@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success - Email Updated</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+    <style>
+        /* Main container */
+        body {
+            background-color: #f9f9f9;
+            font-family: 'Lato', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .success-container {
+            max-width: 400px; /* Reduced max width */
+            margin: 30px auto; /* Reduced margin */
+            padding: 20px; /* Reduced padding */
+            text-align: center;
+            background-color: #ffffff;
+            border-radius: 8px; /* Reduced border radius */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            animation: fadeIn 1s ease forwards;
+        }
+
+        /* Checkmark icon */
+        .checkmark {
+            color: #28a745;
+            font-size: 50px; /* Reduced icon size */
+            animation: popIn 0.5s ease-out forwards;
+        }
+
+        /* Message content */
+        .message-text {
+            font-size: 1.1rem; /* Reduced font size */
+            color: #333;
+            margin-top: 15px; /* Reduced margin */
+            line-height: 1.4; /* Reduced line height */
+            animation: slideInUp 1s ease forwards;
+        }
+
+        /* Home button */
+        .home-button {
+            display: inline-flex;
+            align-items: center;
+            margin-top: 20px; /* Reduced margin */
+            padding: 10px 15px; /* Reduced padding */
+            color: #fff;
+            background-color: #007bff;
+            text-decoration: none;
+            border-radius: 6px; /* Reduced border radius */
+            transition: background-color 0.3s, transform 0.3s;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            animation: slideInUp 1.5s ease forwards;
+        }
+
+        .home-button:hover {
+            background-color: #0056b3;
+            transform: scale(1.03); /* Slight scale on hover */
+        }
+
+        .home-button .home-icon {
+            margin-right: 5px; /* Reduced margin */
+            font-size: 1.0rem; /* Reduced icon size */
+        }
+
+        /* Benefits section */
+        .benefits {
+            margin-top: 25px; /* Reduced margin */
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            animation-delay: 2s; /* Start after the main message */
+        }
+
+        .benefit {
+            font-size: 0.9rem; /* Reduced font size */
+            color: #555;
+            margin: 8px 0; /* Reduced margin */
+            opacity: 0;
+            animation: slideInUp 0.5s ease forwards;
+            animation-delay: calc(2s + var(--i) * 0.5s); /* Staggered animation */
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes slideInUp {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="success-container">
+    <!-- Success checkmark -->
+    <div class="checkmark">✔</div>
+
+    <!-- Message content -->
+    <div class="message-text">
+        <p>Thank You, {{ request.user }}! Your email ({{ request.user.email }}) has been updated successfully.</p>
+        <p>Now, you’ll receive push notifications via email whenever someone schedules a meeting with you.</p>
+    </div>
+
+    <!-- New Information -->
+    <p style="font-size: 0.9rem; color: #555; margin-top: 10px;">Get reminders before meetings to help you prepare!</p>
+
+    <!-- Benefits section -->
+    <div class="benefits">
+        <h3 style="font-family: 'Poppins', sans-serif; font-size: 1.2rem; margin-top: 15px;">Benefits of Updating Your Email:</h3>
+        <div class="benefit" style="--i:0;">📧 Stay informed with timely notifications!</div>
+        <div class="benefit" style="--i:1;">📅 Never miss a meeting invitation!</div>
+        <div class="benefit" style="--i:2;">🔔 Get updates and reminders directly to your inbox!</div>
+        <div class="benefit" style="--i:3;">🤝 Enhance your collaboration experience!</div>
+    </div>
+
+    <!-- Home button with icon -->
+    <a href="{% url 'home' %}" class="home-button">
+        <span class="home-icon">🏠</span> Home
+    </a>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Ensures the container is visible immediately on load
+    const successContainer = document.querySelector('.success-container');
+    successContainer.style.opacity = '1';
+});
+</script>
+
+</body>
+</html>

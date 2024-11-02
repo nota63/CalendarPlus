@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar App</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Font Awesome -->
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+    
+        h1 {
+            margin-top: 30px;
+            font-size: 36px;
+            font-weight: 600;
+            color: #007bff;
+            text-align: center;
+        }
+    
+        .welcome-message {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 20px 0;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 1s ease, transform 1s ease;
+            display: flex;
+            align-items: center;
+            animation: fadeIn 1s forwards;
+        }
+    
+        .welcome-message i {
+            margin-right: 10px;
+            font-size: 30px;
+            color: #007bff;
+        }
+    
+        .auth-links {
+            margin: 10px 0;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 1s ease, transform 1s ease;
+            animation: fadeIn 1s forwards;
+            animation-delay: 1s;
+            text-align: center;
+        }
+    
+        .auth-link {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+            transition: color 0.3s;
+            margin: 0 10px;
+        }
+    
+        .auth-link:hover {
+            color: #0056b3;
+        }
+    
+        .icon-link {
+            font-size: 24px; /* Reduced icon size */
+            color: #007bff;
+            padding: 10px; /* Adjusted padding */
+            margin: 10px;
+            border-radius: 50%;
+            background-color: #f4f4f4;
+            transition: background-color 0.3s, transform 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+        }
+    
+        .icon-link:hover {
+            background-color: #0056b3;
+            color: #fff;
+            transform: scale(1.1); /* Slight scale on hover */
+        }
+    
+        .features {
+            margin-top: 40px;
+            text-align: center;
+            width: 90%;
+            max-width: 800px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+    
+        .feature {
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s;
+        }
+    
+        .feature:hover {
+            transform: translateY(-5px);
+        }
+    
+        .feature i {
+            margin-right: 15px;
+            color: #007bff;
+            font-size: 24px; /* Reduced feature icon size */
+        }
+    
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 28px;
+            }
+    
+            .welcome-message {
+                font-size: 20px;
+            }
+    
+            .feature {
+                flex-direction: column;
+                align-items: flex-start;
+                text-align: left;
+            }
+        }
+    </style>
+    
+</head>
+<body>
+    <h1>Calendar Application</h1>
+
+    {% if user.is_authenticated %}
+        <div class="welcome-message" id="welcomeMessage">
+            <i class="fas fa-user-circle"></i> Welcome, {{ user.username }}!
+        </div>
+        <p class="auth-links">
+            <a href="{% url 'logout' %}" class="auth-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </p>
+        <p class="auth-links">
+            <a href="{% url 'profile_info' %}" class="auth-link"><i class="fas fa-user"></i> Profile</a>
+        </p>
+    {% else %}
+        <p class="auth-links">
+            <a href="{% url 'login' %}" class="auth-link"><i class="fas fa-sign-in-alt"></i> Login</a> 
+            or 
+            <a href="{% url 'register' %}" class="auth-link"><i class="fas fa-user-plus"></i> Register</a>
+        </p>
+    {% endif %}
+
+    <section>
+        <a href="{% url 'render_calendar' %}" class="icon-link" title="View Calendar">
+            <i class="fas fa-calendar-alt"></i>
+        </a>
+        <a href="{% url 'device_info' %}" class="icon-link" title="Device">
+            <i class="fas fa-mobile-alt"></i>
+        </a>
+        <a href="{% url 'user_meetings' %}" class="icon-link" title="Database">
+            <i class="fas fa-database"></i>
+        </a>
+        <a href="{% url 'update_email' %}" class="icon-link" title="Notifications">
+            <i class="fas fa-bell"></i>
+        </a>
+        <a href="{% url 'analytics' %}" class="icon-link" title="Analytics">
+            <i class="fas fa-chart-line"></i> <!-- Change this to the desired icon -->
+        </a>
+
+        <a href="{% url 'stuff' %}" class="icon-link" title="Task">
+            <i class="fas fa-tasks"></i> <!-- Change this to the desired icon -->
+        </a>
+        
+        {% if request.user.is_staff %}
+        <a href="{% url 'meeting-list' %}" class="icon-link" title="Access API">
+            <i class="fas fa-code"></i>
+        </a>
+        {% endif %}
+    </section>
+
+    <div class="features">
+        <h2>Features</h2>
+        <div class="feature">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Schedule Meetings with Ease</span>
+        </div>
+        <div class="feature">
+            <i class="fas fa-users"></i>
+            <span>Invite Participants to Your Meetings</span>
+        </div>
+        <div class="feature">
+            <i class="fas fa-link"></i>
+            <span>Access Meeting Links Anytime</span>
+        </div>
+        <div class="feature">
+            <i class="fas fa-bell"></i>
+            <span>Set Reminders for Your Events</span>
+        </div>
+        <div class="feature">
+            <i class="fas fa-sync"></i>
+            <span>Real-time Updates and Notifications</span>
+        </div>
+        <div class="feature">
+            <i class="fas fa-chart-line"></i>
+            <span>Track Your Meeting History and Statistics</span>
+        </div>
+    </div>
+</body>
+</html>
