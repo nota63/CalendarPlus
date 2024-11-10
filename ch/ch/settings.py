@@ -50,16 +50,19 @@ INSTALLED_APPS = [
     'meet',
     'accounts',
     'rest_framework',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'rest_framework.authtoken',  # Enable DRF token authentication'
     'django.contrib.staticfiles',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -163,7 +166,7 @@ REST_FRAMEWORK={
     'DEFAULT_THROTTLE_RATES':{
         'anon':'1/day',
         'user':'100/min'
-    }
+    },
 }
 
 # EMAIL BACKEND SERVICES
@@ -212,3 +215,10 @@ CACHES = {
 }
 
 
+# CORS CONFIGURATION TO ALLOWED API CALLS FROM MY SECOND WEBSITE
+
+# To allow any domain (for development):
+CORS_ALLOW_ALL_ORIGINS = True
+
+# OR to allow only your specific site:
+CORS_ALLOW_ALL_ORIGINS = True

@@ -234,7 +234,7 @@ class GetMeetingsView(LoginRequiredMixin, View):
                 'meeting_link': meeting.meeting_link,
                 'start': event_start,
                 # new
-                'admin':meeting.admin.username,
+                'admin': meeting.admin.username if meeting.admin else 'No admin assigned',
                 'end': event_end,
                 'user': meeting.user.username,
                 'meeting_type': meeting.meeting_type,
@@ -329,7 +329,8 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAdminUser
 from .pagination import MyCustomPagination
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
-
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 # meeting set
 class MeetingSet(viewsets.ModelViewSet):
@@ -339,6 +340,43 @@ class MeetingSet(viewsets.ModelViewSet):
     authentication_classes=[SessionAuthentication]
     permission_classes=[IsAdminUser]
     throttle_classes=[UserRateThrottle]
+
+    def perform_create(self, serializer):
+        # set request.user as an admin while saving an instance
+        meeting=serializer.save(admin=self.request.user)
+         # Email subject and message
+        context={
+            'user_id':meeting.user_id,
+            'user':meeting.user,
+            'meeting_type':meeting.meeting_type,
+            'meeting_link':meeting.meeting_link,
+            'title':meeting.title,
+            'date':meeting.date,
+            'time':meeting.time,
+            'admin':meeting.admin
+        }
+
+        # push email notification to user 
+        subject=f'You Have New Meeting With {self.request.user}'
+        from_email=settings.DEFAULT_FROM_EMAIL
+        recipient_list=[meeting.user.email]
+        html_message=render_to_string('meet/email_backend.html',context)
+        plain_message='New Meeting Received!'
+
+        try:# send the email
+          send_mail(
+            subject=subject,
+            message=plain_message,
+            from_email=from_email,
+            recipient_list=recipient_list,
+            html_message=html_message
+          )
+        except Exception as e:
+            return JsonResponse({'exeption':str(e)})
+        return JsonResponse({'status': 'success'})
+
+    
+    
 
 
 
