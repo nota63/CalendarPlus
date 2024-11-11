@@ -23,5 +23,7 @@ urlpatterns = [
     path('analytics/',analytics_view, name='analytics'),
     path('stuff/', stuff, name='stuff'),
     path('detail/<int:pk>/', detail_stuff_view, name='detail'),
-    path('delete/<int:pk>/',delete, name='delete')
+    path('delete/<int:pk>/',delete, name='delete'),
+    path('count/',MeetingCountView.as_view(), name='count'),
+    path('intro/', IntroAnalysisView.as_view(), name='intro')
 ]

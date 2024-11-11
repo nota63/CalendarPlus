@@ -318,6 +318,309 @@ def analytics_view(request):
     }
     
     return render(request, 'meet/analytics.html', context)
+
+
+# USER MEETING COUNT
+from django.db.models import Count, Q,F
+from django.views import View
+from django.utils import timezone
+from datetime import timedelta
+from django.db.models.functions import TruncMonth
+from django.core.paginator import Paginator
+
+
+class IntroAnalysisView(View):
+
+    template_name='meet/intro.html'
+    def get(self, request):
+        return render(request,self.template_name)
+    
+
+
+class MeetingCountView(View):
+    template_name = 'meet/count.html'
+
+    def get(self, request):
+        # Get top 4 users with the most meetings
+        top_users = (
+            User.objects.annotate(meeting_count=Count('meeting')).order_by('-meeting_count')[:4]
+        )
+
+        # Prepare top 4 users details
+        top_1_users = []
+        for rank, user in enumerate(top_users, start=1):
+            top_1_users.append({
+                'rank': rank,
+                'username': user.username,
+                'meeting_count': user.meeting_count
+            })
+
+        # Find the user with the most active days (distinct meeting dates)
+        most_active_user = (
+            User.objects.annotate(active_days=Count('meeting__date', distinct=True)).order_by('-active_days').first()
+        )
+
+        # Prepare most active user details
+        top_active_user = []
+        if most_active_user:
+            top_active_user.append({
+                'username': most_active_user.username,
+                'active_days': most_active_user.active_days
+            })
+
+        # Meeting types breakdown for each user
+        users_meeting_type_count = User.objects.annotate(
+            task_meetings=Count('meeting', filter=Q(meeting__meeting_type='Task')),
+            standup_meetings=Count('meeting', filter=Q(meeting__meeting_type='Standup')),
+            personal_meetings=Count('meeting', filter=Q(meeting__meeting_type='Personal')),
+            team_meetings=Count('meeting', filter=Q(meeting__meeting_type='Team'))
+        )
+
+        # Prepare meeting type breakdown list
+        meeting_type_breakdown = []
+        for user in users_meeting_type_count:
+            meeting_type_breakdown.append({
+                'username': user.username,
+                'Task': user.task_meetings,
+                'Standup': user.standup_meetings,
+                'Personal': user.personal_meetings,
+                'Team': user.team_meetings
+            })
+
+        #  users with meetings in the upcoming week 
+        # Get the current time and set the range for the next 7 days
+        current_time = timezone.now()
+        one_week_from_now = current_time + timedelta(days=7)
+
+        # Fetch meetings happening within the next 7 days, using select_related for efficiency
+        upcoming_meetings = Meeting.objects.filter(
+            date__gte=current_time, date__lte=one_week_from_now
+        ).select_related('user')
+
+        # Prepare a list of users with upcoming meetings
+        upcoming_meetings_users = [
+            {
+                'User': meeting.user.username,
+                'Meeting_Title': meeting.title,
+                'Date': meeting.date
+            }
+            for meeting in upcoming_meetings
+        ]
+
+        # users with no meetings (inactive users)
+
+        inactive_users=User.objects.filter(meeting__isnull=True)
+        
+        # prepare a tuple dict 
+        inactive=({
+            'user':user.username
+        }
+        for user in inactive_users
+        )
+
+        # meeting distribution by time
+        # extract the hour from the meeting time and count occurences
+        meeting_time_distribution = (
+          Meeting.objects
+         .values_list('time', flat=True)
+         )
+
+       # Prepare a dictionary for time distribution
+        time_distribution = {}
+        for meeting_time in meeting_time_distribution:
+         hour = meeting_time.hour  # Extracting hour using Python's datetime method
+        time_distribution[hour] = time_distribution.get(hour, 0) + 1
+
+      # Convert the dictionary into a list of dictionaries for easier use in templates
+        time_distribution_list = [
+         {'hour': f"{hour:02d}:00", 'meetings_count': count}
+         for hour, count in sorted(time_distribution.items(), key=lambda x: x[1], reverse=True)
+         ]
+        
+        # get the user with most meetings as an admin
+
+        most_frequent_meeting_admin=(
+            User.objects.annotate(admin_meeting_count=Count('admin_user')).order_by('-admin_meeting_count').first()
+
+
+        )
+        # prepare a dictionary for the admin details
+        frequent_admin_meetings=[
+
+        ]
+        if most_frequent_meeting_admin:
+            frequent_admin_meetings.append({
+                'top_admin':most_frequent_meeting_admin.username,
+                'admin_meetings_count':most_frequent_meeting_admin.admin_meeting_count
+            })
+
+         # Get users with meetings of all types
+        all_meeting_types = ['Task', 'Standup', 'Personal', 'Team']
+        users_with_all_types = (
+          User.objects.annotate(
+            meeting_types=Count('meeting__meeting_type', distinct=True)
+         )
+         .filter(meeting__meeting_type__in=all_meeting_types)
+        .filter(meeting_types=len(all_meeting_types))
+    )
+
+        # Prepare a dictionary for multiple objects
+        all_type_users = [{
+         'user': user.username
+        } for user in users_with_all_types]
+
+        # meeting frequency for each user
+
+        # calculate the frequency of meetings by week
+        today=timezone.now().date()
+        week_start= today - timedelta(days=today.weekday())
+
+        user_meeting_frequency = (
+            User.objects.annotate(meeting_count=Count('meeting',filter=Q(meeting__date__gte=week_start))).order_by('-meeting_count')
+        )
+
+        # prepare a dictionary for multiple objects
+        users_frequency=[{
+            'user':user.username,
+            'meetings_this_week':user.meeting_count
+
+        }for user in user_meeting_frequency]
+
+        # users with most meetings in past month
+
+        last_month=timezone.now().date()- timedelta(days=30)
+
+        active_users_last_month=(
+            User.objects.annotate(meeting_count=Count('meeting',filter=Q(meeting__date__gte=last_month))).order_by('-meeting_count')
+        )
+
+        # prepare it
+        last_month_actives=[{
+            'user':user.username,
+            'meetings_in_last_month':user.meeting_count
+
+        } for user in active_users_last_month]
+
+        # users meeting overlap /""" Identify if there are overlapping meetings for the same user. This could help in scheduling conflicts or understanding how users manage their meetings. ""
+        # query to find meetings with overlapping times
+        overlapping_meetings = Meeting.objects.filter(
+            Q(user=F('user'))& Q(time__lt=F('time'))
+        )
+
+        overlapping=[{
+            'user':meeting.user.username,
+            'overlapping_meeting':meeting.title
+
+        } for meeting in overlapping_meetings]
+
+        # popular meeting links
+        # count the frequency of meeting links
+        popular_meeting_links = (
+            Meeting.objects.values('meeting_link').annotate(link_count=Count('id')).order_by('-link_count')
+        )
+
+        famous_meeting_links=[{
+            'meeting_link':entry['meeting_link'],
+            'usage_count':entry['link_count']
+
+        } for entry in popular_meeting_links]
+
+        # user engagement / number of meetings per month
+
+         # Group meetings by month and year, and count the number of meetings
+        monthly_meetings = (
+          Meeting.objects.annotate(month=TruncMonth('date'))  # Group by month
+         .values('user__username', 'month')  # Group by user and month
+         .annotate(meeting_count=Count('id'))  # Count the number of meetings for each group
+         .order_by('month')  # Order by month
+      )
+
+    # Prepare the list to send to the frontend
+        user_month_meetings = [{
+         'user': entry['user__username'],  # Use user__username to fetch the username
+         'month': entry['month'],
+        'meetings': entry['meeting_count']
+        } for entry in monthly_meetings]
+
+        """
+         User's Meeting Participation in Specific Meeting Types
+         track how much each user participates in specific meeting types 
+         (e.g., Task, Standup, etc.),aggregate by meeting type:
+        """
+
+       # Track the meeting participation by type for each user
+        user_meeting_types = (
+         User.objects.annotate(
+            task_meetings=Count('meeting', filter=Q(meeting__meeting_type='Task')),
+            standup_meetings=Count('meeting', filter=Q(meeting__meeting_type='Standup')),
+            personal_meetings=Count('meeting', filter=Q(meeting__meeting_type='Personal')),
+            team_meetings=Count('meeting', filter=Q(meeting__meeting_type='Team'))
+          )
+        )
+
+    # Paginate the queryset
+        paginator = Paginator(user_meeting_types,2)  # Show 10 users per page
+        page_number = request.GET.get('page')
+        page_objs = paginator.get_page(page_number)
+
+    # Prepare the data to send to the frontend
+        users_meeting_types = [{
+         'user': user.username,
+        'task': user.task_meetings,
+        'standup': user.standup_meetings,
+        'personal': user.personal_meetings,
+        'team': user.team_meetings
+        } for user in page_objs]
+
+        """find users who has meetings that overlap in time (within the same day)"""
+
+       # Query to find conflicting meetings (same date and overlapping times)
+        conflicting_users = (
+          Meeting.objects.values('date', 'time', 'user__username')  # 'user__username' gets the username
+          .annotate(user_count=Count('user', filter=Q(user__meeting__time__gte=F('time'))))
+          .filter(user_count__gt=1)
+          .order_by('date', 'time')
+      )
+    # Paginate the results
+        paginator_conflicts = Paginator(conflicting_users, 2)  # 2 entries per page (you can change it)
+        page_number = request.GET.get('page')
+        page_objs_conflicts = paginator_conflicts.get_page(page_number)
+    # Prepare the data to send to the frontend
+        send_conflicts = [{
+        'date': entry['date'],
+        'time': entry['time'],
+        'conflicting_users_count': entry['user_count'],
+        'username': entry['user__username']  # Accessing the 'username' field
+         } for entry in page_objs_conflicts]
+
+        # Context for rendering the template
+        context = {
+            'top_1_users': top_1_users,
+            'top_active_user': top_active_user,
+            'meeting_type_breakdown': meeting_type_breakdown,
+            'upcoming_meeting_users':upcoming_meetings_users,
+            'inactive':inactive,
+            'time_distribution':time_distribution_list,
+            'frequent_admin_meetings':frequent_admin_meetings,
+            'all_type_users':all_type_users,
+            'users_frequency':users_frequency,
+            'last_month_actives':last_month_actives,
+            'overlapping':overlapping,
+            'meeting_links':famous_meeting_links,
+            'month_meetings':user_month_meetings,
+            'meeting_types':users_meeting_types,
+            'page_obj':page_objs,
+            'send_conflicts':send_conflicts,
+            'page_objs_conflicts':page_objs_conflicts
+        }
+
+        return render(request, self.template_name, context)
+    
+
+
+
+
+
 # API SECTION
 
 # some imports
