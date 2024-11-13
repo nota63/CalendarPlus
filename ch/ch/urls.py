@@ -21,6 +21,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    # path('grappelli/', include('grappelli.urls')),  # Grappelli URL
+  
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('meet/', include('meet.urls')),
