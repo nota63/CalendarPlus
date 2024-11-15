@@ -28,3 +28,17 @@ class Docs(models.Model):
     due_date = models.DateTimeField(null=True, blank=True)  
 
 
+# model for automate birthday wishes
+
+class Birthday(models.Model):
+    user=models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=15)  # Added phone number field
+    birthdate = models.DateField()
+    message = models.TextField()
+    scheduled_time = models.DateTimeField()
+
+    def __str__(self):
+        return f"Birthday Wish for {self.name} on {self.birthdate}"
+    
+

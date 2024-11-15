@@ -176,9 +176,9 @@
         <a href="{% url 'device_info' %}" class="icon-link" title="Device">
             <i class="fas fa-mobile-alt"></i>
         </a>
-        <a href="{% url 'user_meetings' %}" class="icon-link" title="Database">
+        <!-- <a href="{% url 'user_meetings' %}" class="icon-link" title="Database">
             <i class="fas fa-database"></i>
-        </a>
+        </a> -->
         <a href="{% url 'update_email' %}" class="icon-link" title="Notifications">
             <i class="fas fa-bell"></i>
         </a>
@@ -188,6 +188,10 @@
 
         <a href="{% url 'stuff' %}" class="icon-link" title="Task">
             <i class="fas fa-tasks"></i> <!-- Change this to the desired icon -->
+        </a>
+
+        <a href="{% url 'intro_wish' %}" class="icon-link" title="Automate wishes">
+            <i class="fas fa-birthday-cake"></i> <!-- Birthday icon -->
         </a>
         
         {% if request.user.is_staff %}

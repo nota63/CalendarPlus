@@ -25,5 +25,11 @@ urlpatterns = [
     path('detail/<int:pk>/', detail_stuff_view, name='detail'),
     path('delete/<int:pk>/',delete, name='delete'),
     path('count/',MeetingCountView.as_view(), name='count'),
-    path('intro/', IntroAnalysisView.as_view(), name='intro')
+    path('intro/', IntroAnalysisView.as_view(), name='intro'),
+    path('schedule_birthday/',AutomateBirthdayWishes.as_view(), name='schedule_birthday'),
+    path('schedule_birthday/fetch/<int:pk>/', AutomateBirthdayWishes.fetch_birthday_details,   name='fetch_birthday_details'), 
+    path('schedule_birthday/cancel/<int:pk>/',   AutomateBirthdayWishes.cancel_birthday, name='cancel_birthday'),
+    path('intro_wish/', IntroWishView.as_view(),  name='intro_wish')
+
 ]
+

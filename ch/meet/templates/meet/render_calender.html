@@ -20,13 +20,161 @@ body {
     padding: 0;
 }
 
-#calendar {
+/* calendar styles */
+/* #calendar {
     max-width: 900px;
     margin: 40px auto;
     padding: 20px;
     border-radius: 8px;
     background-color: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+ */
+ /* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+body {
+    background: linear-gradient(115deg, #f6f9fc, #e8eff7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #e0f7fa, #80d8ff);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    overflow: hidden;
+}
+
+/* Container Styling */
+#calendar-container {
+    max-width: 400px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.35);
+    border-radius: 20px;
+    padding: 30px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Calendar Title */
+#calendar h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    color: #006064;
+    margin-bottom: 20px;
+}
+
+/* Calendar Date Header */
+#calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+/* Day Labels Styling */
+#calendar table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    color: #006064;
+}
+
+#calendar th {
+    font-weight: 500;
+    color: #00838f;
+    padding: 12px 0;
+}
+
+#calendar td {
+    padding: 20px;
+    text-align: center;
+    font-size: 1rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#calendar td:hover {
+    background: rgba(0, 150, 136, 0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 150, 136, 0.2);
+}
+
+/* Current Date Highlight */
+.current-day {
+    background: rgba(0, 188, 212, 0.8);
+    color: #4ee2e2;
+    font-weight: 900;
+    border: 2px solid #00838f;
+    box-shadow: 0 4px 12px rgba(0, 150, 136, 0.25);
+}
+
+
+.current-date {
+    background: rgba(0, 188, 212, 0.8);
+    color: #4ee2e2;
+    font-weight: 900;
+    border: 2px solid #00838f;
+    box-shadow: 0 4px 12px rgba(0, 150, 136, 0.25);
+}
+
+/* Button Styling */
+.button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(145deg, #76ff03, #64dd17);
+    border: none;
+    color: white;
+    font-weight: 600;
+    border-radius: 50px;
+    padding: 12px 20px;
+    box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.1), -3px -3px 8px rgba(255, 255, 255, 0.5);
+    margin-top: 20px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.button:hover {
+    transform: scale(1.05);
+}
+
+.button:active {
+    transform: scale(0.95);
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #calendar-container {
+        max-width: 90%;
+    }
+
+    #calendar h2 {
+        font-size: 1.8rem;
+    }
+
+    #calendar th, #calendar td {
+        padding: 10px;
+    }
 }
 
 #meetingModal {

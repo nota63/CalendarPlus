@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Meeting,Docs
+from .models import Meeting,Docs, Birthday
 
 
 class MeetingForm(forms.ModelForm):
@@ -37,4 +37,13 @@ class DocsForm(forms.ModelForm):
             'task_title': forms.TextInput(attrs={'style': 'display: none;'}),
             'due_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'style': 'display: none;'}),
           
+        }
+
+class BirthdayForm(forms.ModelForm):
+    class Meta:
+        model = Birthday
+        fields = ['name','phone_number', 'birthdate', 'message', 'scheduled_time']
+        widgets = {
+            'birthdate': forms.DateInput(attrs={'class': 'flatpickr-date'}),
+            'scheduled_time': forms.DateTimeInput(attrs={'class': 'flatpickr-datetime'}),
         }

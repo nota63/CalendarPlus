@@ -3,7 +3,7 @@ import schedule
 import time
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from meet.models import Meeting
+from meet.models import Meeting, Birthday
 from django.core.mail import send_mail
 from django.conf import settings
 from datetime import timedelta

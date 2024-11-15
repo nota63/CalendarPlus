@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from .forms import MeetingForm
 
-# Create your views here.from django.shortcuts import render
+# essentials
 from django.views import View
 from django.http import JsonResponse
 from .models import Meeting
@@ -82,15 +82,12 @@ def update_email(request):
         if form.is_valid():
             try:
                 form.save()
-                # send push notification via email to user about his email has been attached
-                # create main things
                 from_email=settings.DEFAULT_FROM_EMAIL
                 recipients_list=[request.user.email]
                 subject='Email Has Been Updated !'
                 html_message=render_to_string('meet/email_updated.html')
                 plain_message='Your Email Has Been Updated'
 
-                # send the email
                 try:
                   send_mail(
                     subject=subject,
@@ -182,27 +179,23 @@ from django.views import View
 
 class TakeScreenshotView(View):
     def get(self, request):
-        # Define the media directory path for screenshots
+
         gallery_path = os.path.join(settings.MEDIA_ROOT, 'screenshots')
         os.makedirs(gallery_path, exist_ok=True)
 
-        # Generate a unique filename for the screenshot
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         screenshot_filename = f'screenshot_{timestamp}.png'
         screenshot_path = os.path.join(gallery_path, screenshot_filename)
 
-        # Take the screenshot and save it in the media folder
         screenshot = pyautogui.screenshot()
         screenshot.save(screenshot_path)
 
-        # Relative URL path to be used in the template
         relative_path = f'screenshots/{screenshot_filename}'
         full_url = f"{settings.MEDIA_URL}{relative_path}"
 
-        # Render template and pass the screenshot path
         return render(request, 'meet/screenshot_display.html', {'screenshot_url': full_url})
     
-# import q for advanced filter
+# essential imports..
 from django.db.models import Q
 from datetime import timedelta
 
@@ -212,7 +205,6 @@ class GetMeetingsView(LoginRequiredMixin, View):
         end = request.GET.get('end')
         meeting_type = request.GET.get('meeting_type', 'all')
 
-        # Filter meetings based on user and date range
         meetings = Meeting.objects.filter(
             Q(admin=request.user) | Q(user=request.user),
             date__range=[start, end]
@@ -238,7 +230,7 @@ class GetMeetingsView(LoginRequiredMixin, View):
                 'end': event_end,
                 'user': meeting.user.username,
                 'meeting_type': meeting.meeting_type,
-                'allDay': False  # Adjust if needed
+                'allDay': False  
             })
 
         return JsonResponse(events, safe=False)
@@ -545,7 +537,6 @@ class MeetingCountView(View):
         """
          User's Meeting Participation in Specific Meeting Types
          track how much each user participates in specific meeting types 
-         (e.g., Task, Standup, etc.),aggregate by meeting type:
         """
 
        # Track the meeting participation by type for each user
@@ -722,6 +713,85 @@ def delete(request,pk):
     return redirect('stuff')    
 
 
+# Automate birthday wishes 
+
+import pyautogui
+import schedule
+import time
+import webbrowser
+from .forms import BirthdayForm
+from .models import Birthday
+from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+
+
+class IntroWishView(View):
+    template_name='meet/intro_wish.html'
+
+    def get(self, request):
+        return render(request,self.template_name)
+    
 
 
 
+class AutomateBirthdayWishes(View):
+    template_name = 'meet/schedule_birthday.html'
+
+    def get(self, request, pk=None):
+        form = BirthdayForm()
+        birthdays = Birthday.objects.filter(user=request.user)
+        return render(request, self.template_name, {
+            'form': form,
+            'birthdays': birthdays,
+            'pk': pk
+        })
+
+    def post(self, request):
+        form = BirthdayForm(request.POST)
+        if form.is_valid():
+            birthday = form.save(commit=False)
+            birthday.user = request.user
+
+            try:
+                birthday.save()
+                messages.success(request,f'Birthday has been scheduled for {birthday.name}')
+            except Exception as e:
+                return JsonResponse({'exception': str(e)}, status=400)
+        
+        return JsonResponse({'message': 'Birthday has been scheduled successfully'}, status=400)
+    
+    @staticmethod
+    def cancel_birthday(request, pk):
+        birthday = get_object_or_404(Birthday, pk=pk)
+        try:
+            birthday.delete()
+            messages.success(request,"birthday wish has been cancelled")
+            return redirect('schedule_birthday')
+        except Exception as e:
+            return JsonResponse({'exception':str(e)}, status=400)
+
+
+
+    @staticmethod
+    def fetch_birthday_details(request, pk):
+        if request.method == "GET":
+            try:
+                # Try to fetch the birthday details for the given pk
+                birthday = get_object_or_404(Birthday, pk=pk, user=request.user)
+
+                data = {
+                    'name': birthday.name,
+                    'phone_number': birthday.phone_number,
+                    'birthdate': birthday.birthdate.strftime('%Y-%m-%d'),
+                    'message': birthday.message,
+                    'scheduled_time': birthday.scheduled_time.strftime('%Y-%m-%d %H:%M')
+                }
+
+                return JsonResponse(data)
+
+            except Birthday.DoesNotExist:
+                # If the birthday doesn't exist, return a 404 with a JSON error message
+                return JsonResponse({'error': 'Birthday not found'}, status=404)
+
+        # If the request method isn't GET, return an error
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
