@@ -50,14 +50,14 @@ class CreateMeetingView(LoginRequiredMixin, View):
             'admin':admin
         }
 
-        # push email notification to user 
+ 
         subject=f'You Have New Meeting With {request.user}'
         from_email=settings.DEFAULT_FROM_EMAIL
         recipient_list=[user_email]
         html_message=render_to_string('meet/email_backend.html',context)
         plain_message='New Meeting Received!'
 
-        try:# send the email
+        try:
           send_mail(
             subject=subject,
             message=plain_message,
@@ -69,7 +69,7 @@ class CreateMeetingView(LoginRequiredMixin, View):
             return JsonResponse({'exeption':str(e)})
         return JsonResponse({'status': 'success'})
 
-# view to update email address
+
 from .forms import UpdateEmailForm
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
@@ -107,14 +107,9 @@ def update_email(request):
     instance=request.user            
     return render(request,'meet/update_email.html',{"form":form, 'instance':instance})
 
-# success page
 def done(request):
     return render(request,'meet/done.html')
 
-
-
-
-# get profile info
 def get_profile_info(request):
     print("User data:", request.user)
     me=request.user
@@ -126,7 +121,6 @@ import psutil
 import socket
 
 def device_info_view(request):
-   # Get system information using psutil
     system_name = socket.gethostname()
     system_info = {
         'system_name':system_name,
@@ -134,10 +128,8 @@ def device_info_view(request):
         'memory_info': psutil.virtual_memory(),
         'disk_usage': psutil.disk_usage('/'),
         'network_info': psutil.net_io_counters(),
-        'battery': psutil.sensors_battery()  # Get battery info
+        'battery': psutil.sensors_battery()  
     }
-
-    # Check if battery info is available
     if system_info['battery']:
         battery_percent = system_info['battery'].percent
         power_plugged = system_info['battery'].power_plugged
@@ -146,7 +138,6 @@ def device_info_view(request):
     else:
         battery_percent = power_plugged = time_left = None
 
-    # Prepare context to pass to the template
     context = {
         'system_name':system_name,
         'cpu_usage': system_info['cpu_usage'],
@@ -165,7 +156,6 @@ def device_info_view(request):
     return render(request, 'meet/device_info.html', context)
 
 
-# take screenshots
 
 import pyautogui
 import os
@@ -213,11 +203,9 @@ class GetMeetingsView(LoginRequiredMixin, View):
         if meeting_type != 'all':
             meetings = meetings.filter(meeting_type=meeting_type)
 
-        # Prepare events data for JSON response
         events = []
         for meeting in meetings:
             event_start = f"{meeting.date}T{meeting.time}"
-            # Add one-hour duration for each meeting to ensure visibility
             event_end = (meeting.date + timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M')
         
 
@@ -242,7 +230,7 @@ class GetUsersView(LoginRequiredMixin, View):
         user_list = [{'id': user.id, 'username': user.username} for user in users]
         return JsonResponse({'users': user_list})
 
-# all meetings         
+       
 def user_meetings(request):
     meetings=Meeting.objects.filter(user=request.user)
     return render(request,'meet/user_meetings.html',{'meetings':meetings}) 
@@ -256,21 +244,19 @@ from django.utils import timezone
 from .models import Meeting
 import json
 from django.db.models.functions import ExtractHour
+
 def analytics_view(request):
-    user = request.user  # current logged-in user
+    user = request.user  
     today = timezone.now().date()
 
-    # 1. Total Meetings
     total_meetings = Meeting.objects.filter(user=user).count()
 
-    # 2. Meeting Count by Type
     meeting_count_by_type = (
         Meeting.objects.filter(user=user)
         .values('meeting_type')
         .annotate(count=Count('id'))
     )
 
-    # 3. Meetings This Week (count per day)
     week_start = today - timedelta(days=today.weekday())
     meetings_this_week = (
         Meeting.objects.filter(user=user, date__gte=week_start)
@@ -279,7 +265,6 @@ def analytics_view(request):
         .order_by('date')
     )
 
-    # 4. Peak Meeting Hours using `ExtractHour`
     peak_hours = (
         Meeting.objects.filter(user=user)
         .annotate(hour=ExtractHour('time'))
@@ -288,7 +273,6 @@ def analytics_view(request):
         .order_by('hour')
     )
 
-    # 5. Daily Meetings Count
     daily_meetings = (
         Meeting.objects.filter(user=user, date__gte=today - timedelta(days=30))
         .values('date')
@@ -296,7 +280,6 @@ def analytics_view(request):
         .order_by('date')
     )
 
-    # Prepare context with JSON serializable data
     context = {
         'total_meetings': total_meetings,
         'meeting_count_by_type_json': json.dumps(list(meeting_count_by_type)),
@@ -333,7 +316,6 @@ class MeetingCountView(View):
     template_name = 'meet/count.html'
 
     def get(self, request):
-        # Get top 4 users with the most meetings
         top_users = (
             User.objects.annotate(meeting_count=Count('meeting')).order_by('-meeting_count')[:4]
         )
@@ -368,7 +350,6 @@ class MeetingCountView(View):
             team_meetings=Count('meeting', filter=Q(meeting__meeting_type='Team'))
         )
 
-        # Prepare meeting type breakdown list
         meeting_type_breakdown = []
         for user in users_meeting_type_count:
             meeting_type_breakdown.append({
@@ -379,12 +360,9 @@ class MeetingCountView(View):
                 'Team': user.team_meetings
             })
 
-        #  users with meetings in the upcoming week 
-        # Get the current time and set the range for the next 7 days
         current_time = timezone.now()
         one_week_from_now = current_time + timedelta(days=7)
 
-        # Fetch meetings happening within the next 7 days, using select_related for efficiency
         upcoming_meetings = Meeting.objects.filter(
             date__gte=current_time, date__lte=one_week_from_now
         ).select_related('user')
@@ -399,8 +377,6 @@ class MeetingCountView(View):
             for meeting in upcoming_meetings
         ]
 
-        # users with no meetings (inactive users)
-
         inactive_users=User.objects.filter(meeting__isnull=True)
         
         # prepare a tuple dict 
@@ -409,9 +385,6 @@ class MeetingCountView(View):
         }
         for user in inactive_users
         )
-
-        # meeting distribution by time
-        # extract the hour from the meeting time and count occurences
         meeting_time_distribution = (
           Meeting.objects
          .values_list('time', flat=True)
@@ -420,10 +393,8 @@ class MeetingCountView(View):
        # Prepare a dictionary for time distribution
         time_distribution = {}
         for meeting_time in meeting_time_distribution:
-         hour = meeting_time.hour  # Extracting hour using Python's datetime method
+         hour = meeting_time.hour 
         time_distribution[hour] = time_distribution.get(hour, 0) + 1
-
-      # Convert the dictionary into a list of dictionaries for easier use in templates
         time_distribution_list = [
          {'hour': f"{hour:02d}:00", 'meetings_count': count}
          for hour, count in sorted(time_distribution.items(), key=lambda x: x[1], reverse=True)
@@ -436,7 +407,6 @@ class MeetingCountView(View):
 
 
         )
-        # prepare a dictionary for the admin details
         frequent_admin_meetings=[
 
         ]
@@ -446,7 +416,6 @@ class MeetingCountView(View):
                 'admin_meetings_count':most_frequent_meeting_admin.admin_meeting_count
             })
 
-         # Get users with meetings of all types
         all_meeting_types = ['Task', 'Standup', 'Personal', 'Team']
         users_with_all_types = (
           User.objects.annotate(
@@ -456,14 +425,10 @@ class MeetingCountView(View):
         .filter(meeting_types=len(all_meeting_types))
     )
 
-        # Prepare a dictionary for multiple objects
         all_type_users = [{
          'user': user.username
         } for user in users_with_all_types]
 
-        # meeting frequency for each user
-
-        # calculate the frequency of meetings by week
         today=timezone.now().date()
         week_start= today - timedelta(days=today.weekday())
 
@@ -471,14 +436,11 @@ class MeetingCountView(View):
             User.objects.annotate(meeting_count=Count('meeting',filter=Q(meeting__date__gte=week_start))).order_by('-meeting_count')
         )
 
-        # prepare a dictionary for multiple objects
         users_frequency=[{
             'user':user.username,
             'meetings_this_week':user.meeting_count
 
         }for user in user_meeting_frequency]
-
-        # users with most meetings in past month
 
         last_month=timezone.now().date()- timedelta(days=30)
 
@@ -493,8 +455,7 @@ class MeetingCountView(View):
 
         } for user in active_users_last_month]
 
-        # users meeting overlap /""" Identify if there are overlapping meetings for the same user. This could help in scheduling conflicts or understanding how users manage their meetings. ""
-        # query to find meetings with overlapping times
+        
         overlapping_meetings = Meeting.objects.filter(
             Q(user=F('user'))& Q(time__lt=F('time'))
         )
@@ -506,7 +467,6 @@ class MeetingCountView(View):
         } for meeting in overlapping_meetings]
 
         # popular meeting links
-        # count the frequency of meeting links
         popular_meeting_links = (
             Meeting.objects.values('meeting_link').annotate(link_count=Count('id')).order_by('-link_count')
         )
@@ -517,19 +477,15 @@ class MeetingCountView(View):
 
         } for entry in popular_meeting_links]
 
-        # user engagement / number of meetings per month
-
          # Group meetings by month and year, and count the number of meetings
         monthly_meetings = (
-          Meeting.objects.annotate(month=TruncMonth('date'))  # Group by month
-         .values('user__username', 'month')  # Group by user and month
-         .annotate(meeting_count=Count('id'))  # Count the number of meetings for each group
-         .order_by('month')  # Order by month
+          Meeting.objects.annotate(month=TruncMonth('date'))  
+         .values('user__username', 'month')  
+         .annotate(meeting_count=Count('id'))  
+         .order_by('month')  
       )
-
-    # Prepare the list to send to the frontend
         user_month_meetings = [{
-         'user': entry['user__username'],  # Use user__username to fetch the username
+         'user': entry['user__username'],  
          'month': entry['month'],
         'meetings': entry['meeting_count']
         } for entry in monthly_meetings]
@@ -538,8 +494,6 @@ class MeetingCountView(View):
          User's Meeting Participation in Specific Meeting Types
          track how much each user participates in specific meeting types 
         """
-
-       # Track the meeting participation by type for each user
         user_meeting_types = (
          User.objects.annotate(
             task_meetings=Count('meeting', filter=Q(meeting__meeting_type='Task')),
@@ -550,13 +504,11 @@ class MeetingCountView(View):
         )
 
     # Paginate the queryset
-        paginator = Paginator(user_meeting_types,2)  # Show 10 users per page
+        paginator = Paginator(user_meeting_types,2)  
         page_number = request.GET.get('page')
         page_objs = paginator.get_page(page_number)
-
-    # Prepare the data to send to the frontend
         users_meeting_types = [{
-         'user': user.username,
+        'user': user.username,
         'task': user.task_meetings,
         'standup': user.standup_meetings,
         'personal': user.personal_meetings,
@@ -564,27 +516,22 @@ class MeetingCountView(View):
         } for user in page_objs]
 
         """find users who has meetings that overlap in time (within the same day)"""
-
-       # Query to find conflicting meetings (same date and overlapping times)
         conflicting_users = (
           Meeting.objects.values('date', 'time', 'user__username')  # 'user__username' gets the username
           .annotate(user_count=Count('user', filter=Q(user__meeting__time__gte=F('time'))))
           .filter(user_count__gt=1)
           .order_by('date', 'time')
       )
-    # Paginate the results
         paginator_conflicts = Paginator(conflicting_users, 2)  # 2 entries per page (you can change it)
         page_number = request.GET.get('page')
         page_objs_conflicts = paginator_conflicts.get_page(page_number)
-    # Prepare the data to send to the frontend
         send_conflicts = [{
         'date': entry['date'],
         'time': entry['time'],
         'conflicting_users_count': entry['user_count'],
-        'username': entry['user__username']  # Accessing the 'username' field
+        'username': entry['user__username'] 
          } for entry in page_objs_conflicts]
 
-        # Context for rendering the template
         context = {
             'top_1_users': top_1_users,
             'top_active_user': top_active_user,
@@ -636,9 +583,8 @@ class MeetingSet(viewsets.ModelViewSet):
     throttle_classes=[UserRateThrottle]
 
     def perform_create(self, serializer):
-        # set request.user as an admin while saving an instance
         meeting=serializer.save(admin=self.request.user)
-         # Email subject and message
+    
         context={
             'user_id':meeting.user_id,
             'user':meeting.user,
@@ -649,15 +595,13 @@ class MeetingSet(viewsets.ModelViewSet):
             'time':meeting.time,
             'admin':meeting.admin
         }
-
-        # push email notification to user 
         subject=f'You Have New Meeting With {self.request.user}'
         from_email=settings.DEFAULT_FROM_EMAIL
         recipient_list=[meeting.user.email]
         html_message=render_to_string('meet/email_backend.html',context)
         plain_message='New Meeting Received!'
 
-        try:# send the email
+        try:
           send_mail(
             subject=subject,
             message=plain_message,
@@ -776,7 +720,6 @@ class AutomateBirthdayWishes(View):
     def fetch_birthday_details(request, pk):
         if request.method == "GET":
             try:
-                # Try to fetch the birthday details for the given pk
                 birthday = get_object_or_404(Birthday, pk=pk, user=request.user)
 
                 data = {
@@ -790,10 +733,8 @@ class AutomateBirthdayWishes(View):
                 return JsonResponse(data)
 
             except Birthday.DoesNotExist:
-                # If the birthday doesn't exist, return a 404 with a JSON error message
                 return JsonResponse({'error': 'Birthday not found'}, status=404)
 
-        # If the request method isn't GET, return an error
         return JsonResponse({'error': 'Invalid request method'}, status=400)
     
 
@@ -808,7 +749,7 @@ class IntroReminder(View):
     def get(self, request):
         return render(request,self.template_name)
     
-    
+
 
 class CustomReminderView(View):
     template_name='meet/set_reminders.html'

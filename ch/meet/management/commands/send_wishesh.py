@@ -41,7 +41,6 @@ class Command(BaseCommand):
         print(f"Birthday Start Time: {birthday_start_time}, Birthday End Time: {birthday_end_time}")
         print(f"Birthdays Found: {birthdays}")
 
-        # Send WhatsApp messages if any found
         for birthday in birthdays:
             user = birthday.user
             phone_number = birthday.phone_number
@@ -67,7 +66,6 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.ERROR(f'Error sending birthday message to {user.username}: {e}'))
 
     def schedule_jobs(self):
-        # Schedule the send_birthday_wishes method to run every minute
         schedule.every(1).minutes.do(self.send_birthday_wishes)
 
         while True:
@@ -75,7 +73,6 @@ class Command(BaseCommand):
             time.sleep(1)
 
     def handle(self, *args, **kwargs):
-        # Run the scheduler in a separate thread
         thread = threading.Thread(target=self.schedule_jobs)
         thread.start()
         self.stdout.write(self.style.SUCCESS('Scheduler started...'))
