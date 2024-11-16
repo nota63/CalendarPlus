@@ -1,90 +1,81 @@
-import time
 import schedule
-import pytz
-from datetime import timedelta
-from django.utils import timezone
+import time
+import pywhatkit
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 from meet.models import Birthday
-import pywhatkit as kit
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
+from datetime import timedelta
+import threading
+import os
+import django
+import sys
+
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from django.conf import settings
+from pytz import timezone as pytz_timezone  
+
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ch.settings')
+django.setup()
+print("Django setup complete. INSTALLED_APPS:", settings.INSTALLED_APPS)
 
 class Command(BaseCommand):
-    help = 'Send Birthday Wishes'
+    help = 'Send birthday wishes based on the Birthday model'
 
     def send_birthday_wishes(self):
-  
         now = timezone.now()
-        ist_now = now.astimezone(pytz.timezone('Asia/Kolkata'))  
-        print(f"Current UTC Time: {now}")
-        print(f"Current IST Time: {ist_now}")
+        ist_now = now.astimezone(pytz_timezone('Asia/Kolkata'))
+        birthday_start_time = ist_now
+        birthday_end_time = ist_now + timedelta(minutes=2)
 
-
-        birthdays_today = Birthday.objects.filter(
-            birthdate=ist_now.date(),  
+    
+        birthdays = Birthday.objects.filter(
+            scheduled_time__date=now.date(),
+            scheduled_time__time__range=(birthday_start_time.time(), birthday_end_time.time())
         )
 
-        # Debugging output to check the birthdays that are scheduled
-        print(f"Birthdays to send wishes: {birthdays_today}")
+   
+        print(f"Current UTC Time: {now}")
+        print(f"Current IST Time: {ist_now}")
+        print(f"Birthday Start Time: {birthday_start_time}, Birthday End Time: {birthday_end_time}")
+        print(f"Birthdays Found: {birthdays}")
 
-        # Loop through the birthdays and send wishes via WhatsApp
-        for birthday in birthdays_today:
-            # Prepare message
-            message = f"Happy Birthday, {birthday.name}! {birthday.message}"
+        # Send WhatsApp messages if any found
+        for birthday in birthdays:
+            user = birthday.user
+            phone_number = birthday.phone_number
+            message = birthday.message
 
-            # Send message using pywhatkit
-            self.send_whatsapp_message(birthday.phone_number, message, birthday.scheduled_time)
+          
+            formatted_message = f"Happy Birthday {user.username}!\n\n{message}"
 
-    def send_whatsapp_message(self, phone_number, message, scheduled_time):
-        try:
-            scheduled_time_ist = scheduled_time.astimezone(pytz.timezone('Asia/Kolkata'))
-            time_hour = scheduled_time_ist.hour
-            time_minute = scheduled_time_ist.minute
-            current_time = timezone.now().astimezone(pytz.timezone('Asia/Kolkata'))
-            scheduled_time_obj = current_time.replace(hour=time_hour, minute=time_minute, second=0, microsecond=0)
+            try:
+            
+                scheduled_time_ist = birthday.scheduled_time.astimezone(pytz_timezone('Asia/Kolkata'))
+                send_hour = scheduled_time_ist.hour
+                send_minute = scheduled_time_ist.minute
+                pywhatkit.sendwhatmsg(
+                    f"+{phone_number}",  
+                    formatted_message,   
+                    send_hour,           
+                    send_minute         
+                )
 
-            if scheduled_time_obj < current_time:
-                scheduled_time_obj = scheduled_time_obj + timedelta(days=1)
-
-        
-            time_diff = (scheduled_time_obj - current_time).total_seconds()
-            print(f"Time to send message: {time_diff} seconds")
-
- 
-            if time_diff > 0:
-                time.sleep(time_diff) 
-            kit.sendwhatmsg(phone_number, message, scheduled_time_obj.hour, scheduled_time_obj.minute)
-            print(f"Message sent to {phone_number}: {message}")
-
-            # notify the sender 
-
-            html_message=render_to_string('meet/automate_wish.html',{'birthday_user':Birthday.user,
-                                                                     'shceduled_time':Birthday.scheduled_time,
-                                                                     'sent_to':Birthday.name
-                                                                     
-                                                                     })
-
-            send_mail(
-                subject="Birthday wish sent successfully",
-                message=f"Successfully wished to {Birthday.name}",
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[Birthday.user.email],
-                html_message=html_message,
-                fail_silently=False
-
-            )
-
-        except Exception as e:
-            print(f"Error sending message to {phone_number}: {e}")
+                self.stdout.write(self.style.SUCCESS(f'Birthday message sent to {user.username} at {formatted_message}'))
+            except Exception as e:
+                self.stdout.write(self.style.ERROR(f'Error sending birthday message to {user.username}: {e}'))
 
     def schedule_jobs(self):
-        schedule.every(1).minute.do(self.send_birthday_wishes)
+        # Schedule the send_birthday_wishes method to run every minute
+        schedule.every(1).minutes.do(self.send_birthday_wishes)
 
         while True:
             schedule.run_pending()
-            time.sleep(1)  
+            time.sleep(1)
 
     def handle(self, *args, **kwargs):
-        print("Scheduler started...")
-        self.schedule_jobs()
+        # Run the scheduler in a separate thread
+        thread = threading.Thread(target=self.schedule_jobs)
+        thread.start()
+        self.stdout.write(self.style.SUCCESS('Scheduler started...'))

@@ -29,7 +29,10 @@ urlpatterns = [
     path('schedule_birthday/',AutomateBirthdayWishes.as_view(), name='schedule_birthday'),
     path('schedule_birthday/fetch/<int:pk>/', AutomateBirthdayWishes.fetch_birthday_details,   name='fetch_birthday_details'), 
     path('schedule_birthday/cancel/<int:pk>/',   AutomateBirthdayWishes.cancel_birthday, name='cancel_birthday'),
-    path('intro_wish/', IntroWishView.as_view(),  name='intro_wish')
+    path('intro_wish/', IntroWishView.as_view(),  name='intro_wish'),
+    path('set_reminders/', CustomReminderView.as_view(), name='set_reminders'),
+    path('set_reminders/delete/',CustomReminderView.delete_meetings, name='delete_meetings'),
+    path('intro_reminder/', IntroReminder.as_view(), name='intro_reminder')
 
 ]
 

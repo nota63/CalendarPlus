@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.utils import timezone
+from pytz import timezone as pytz_timezone
 # Create your models here.
 # create meeting model
 
@@ -15,6 +16,18 @@ class Meeting(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.user.username} on {self.date}"
+
+# create model for custom meeting reminders
+
+class Reminder(models.Model):
+    meeting=models.ForeignKey(Meeting, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    reminder_datetime=models.DateTimeField()
+
+    def __str__(self):
+        return f"Reminder for {self.user.username} - {self.meeting.title}"
+
+
 
 
 # attach docs 

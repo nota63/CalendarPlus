@@ -1,0 +1,454 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Meeting Reminder</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">    
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">    
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> <!-- Material Icons for the icons -->
+    <!-- Styles -->
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .container {
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 1500px;
+            padding: 20px;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 22px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        select,
+        input[type="datetime-local"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 100%;
+            background-color: #fafafa;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus,
+        input[type="datetime-local"]:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+
+        button {
+            background-color: #4f46e5;
+            color: #fff;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #4338ca;
+        }
+
+        .meetings-container {
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 1500px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            margin-top: 10px;
+            position: relative;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .meetings-container h3 {
+            margin-bottom: 12px;
+            font-size: 16px;
+            color: #333;
+        }
+
+       /* Container for each meeting item */
+.meeting-box {
+    background-color: #fafafa;
+    margin-bottom: 8px;  /* Reduced margin for tighter spacing */
+    padding: 6px;  /* Reduced padding for more compactness */
+    border-radius: 4px;  /* Slightly rounded corners */
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);  /* Light shadow for subtle depth */
+    font-size: 9px;  /* Reduced font size to make it smaller */
+    color: #333;
+    animation: slideIn 0.5s ease-out;
+}
+
+/* Each individual meeting field */
+.meeting-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;  /* Reduced gap for compactness */
+    font-size: 12px;  /* Smaller font size */
+    margin-bottom: 4px;  /* Reduced margin for tighter spacing */
+}
+
+/* Icons inside meeting item */
+.meeting-item span.material-icons {
+    font-size: 14px;  /* Reduced icon size to match smaller font */
+    color: #6366f1;  /* Maintain color for the icons */
+}
+
+/* Strong text for meeting title or details */
+.meeting-item strong {
+    font-weight: 600;
+    font-size: 11px;  /* Smaller font size for better compactness */
+}
+
+/* Add smooth animation for slide-in */
+@keyframes slideIn {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(0); }
+}
+
+        .msg {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .msg strong {
+            font-size: 14px;
+            color: #10b981; /* success color */
+        }
+
+        .info-container {
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 850px;
+            padding: 20px;
+            margin-top: 20px;
+            font-size: 14px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .info-container p {
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .truncate-btn {
+            background-color: #e11d48;
+            color: #fff;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .truncate-btn:hover {
+            background-color: #9b1133;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(0); }
+        }
+
+        .flex-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+
+   /* Apply the fonts globally to the body */
+body {
+    font-family: 'Lato', sans-serif;  /* Default body font */
+    background-color: #f8f8f8;
+    padding: 20px;
+}
+
+/* Styling for h1 heading */
+.h1-class {
+    font-family: 'Roboto Slab', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: hsl(167, 64%, 55%);
+    text-align: center;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px; /* Space between icon and text */
+}
+
+/* Styling for the paragraph */
+.p-class {
+    font-family: 'Lato', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    color: #666;
+    text-align: center;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto 20px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Space between icon and text */
+}
+
+/* Style for icons */
+.material-icons {
+    font-size: 28px;
+    color: #6366f1; /* A shade of blue for a premium feel */
+}
+
+/* General Styling for the Message Section */
+.message {
+    margin: 20px auto;
+    max-width: 600px;
+    padding: 10px;
+}
+
+/* Styling for Each Message Item */
+.message-item {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between icon and message text */
+    background-color: #e6f7e6; /* Light green background */
+    border-left: 5px solid #34c759; /* Green border to highlight */
+    color: #1d7a1d; /* Dark green text color */
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 8px;
+    opacity: 1;
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Style for the Check Icon */
+.message-item .material-icons {
+    color: #34c759; /* Green color for checkmark */
+    font-size: 18px;
+}
+
+/* Fade Out Animation */
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+
+    </style>
+</head>
+<body>
+
+    <h1 class="h1-class">
+        <span class="material-icons">notifications_active</span> 
+        Set Custom Reminders For Your Meetings
+    </h1>
+    <p class="p-class">
+        <!-- <span class="material-icons">alarm</span>  -->
+        Keep yourself productive by setting custom reminders and get reminders before the meeting time
+    </p>
+    
+   <!-- Message Section -->
+<section class="message">
+    {% if messages %}
+      {% for m in messages %}
+         <div class="message-item">
+             <span class="material-icons">check_circle</span>
+             <strong>{{ m }}</strong>
+         </div>
+      {% endfor %}
+    {% endif %}
+</section>
+
+    <!-- Flex container to hold meetings, form, and info container -->
+    <div class="flex-container">
+        <!-- Left Container for Meetings -->
+        <div class="meetings-container">
+            <h3>Your Meetings</h3>
+            {% if meetings %}
+                {% for meeting in meetings %}
+                    <div class="meeting-box">
+                        <div>
+                            <!-- Meeting Title with Icon -->
+                            <div class="meeting-item">
+                                <span class="material-icons">event_note</span>
+                                <strong>{{ meeting.title }}</strong>
+                            </div>
+        
+                            <!-- Meeting Date with Icon -->
+                            <div class="meeting-item">
+                                <span class="material-icons">calendar_today</span>
+                                <span>{{ meeting.date }}</span>
+                            </div>
+        
+                            <!-- Meeting Time with Icon -->
+                            <div class="meeting-item">
+                                <span class="material-icons">access_time</span>
+                                <span>{{ meeting.time }}</span>
+                            </div>
+        
+                            <!-- Meeting Type with Icon -->
+                            <div class="meeting-item">
+                                <span class="material-icons">call</span>
+                                <span>{{ meeting.meeting_type }}</span>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <strong>You have no meetings!</strong>
+            {% endif %}
+        </div>
+
+        <!-- Right Container for Form -->
+        <div class="container">
+            <h2>Set a Custom Reminder</h2>
+
+            {% if messages %}
+            {% for message in messages %}
+            <div class="{{ message.tags }}-message">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                
+                <label for="meeting">Choose a Meeting:</label>
+                <div class="input-container">
+                    <span class="material-icons">event</span>
+                    {{ form.meeting }}
+                </div>
+
+                <label for="reminder_datetime">Reminder Date & Time:</label>
+                <div class="input-container">
+                    <span class="material-icons">alarm</span>
+                    {{ form.reminder_datetime }}
+                </div>
+
+                <div class="btn-container">
+                    <button type="submit">Set Reminder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Info Container -->
+    <div class="info-container">
+        <p><strong>Note:</strong> You can view only the meetings scheduled with you. You can truncate all your meetings by tapping the button below.</p>
+        <!-- <button class="truncate-btn">Truncate Meetings</button> -->
+        <a href="{% url 'delete_meetings'%}">
+            <button class="truncate-btn" type="submit">Truncate Meetings</button>
+        </a>
+    </div>
+
+    <script>
+        // Wait for the DOM to load
+        document.addEventListener("DOMContentLoaded", function () {
+            // Select all message items
+            const messages = document.querySelectorAll('.message-item');
+            
+            messages.forEach((message) => {
+                // Set timeout to remove each message after 4 seconds
+                setTimeout(() => {
+                    message.style.animation = 'fadeOut 0.6s forwards';
+                    // Remove the message from DOM after animation
+                    setTimeout(() => message.remove(), 600);
+                }, 4000);
+            });
+        });
+    </script>
+    
+
+</body>
+</html>

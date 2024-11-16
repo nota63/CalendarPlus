@@ -795,3 +795,58 @@ class AutomateBirthdayWishes(View):
 
         # If the request method isn't GET, return an error
         return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+
+# handle custom user reminders
+from .forms import ReminderForm
+from .models import Reminder
+
+
+class IntroReminder(View):
+    template_name='meet/intro_reminder.html'
+
+    def get(self, request):
+        return render(request,self.template_name)
+    
+    
+
+class CustomReminderView(View):
+    template_name='meet/set_reminders.html'
+
+    def get(self, request):
+        meetings=Meeting.objects.filter(user=request.user)
+        form = ReminderForm(request=request)
+        return render(request,self.template_name, {'form':form, 'meetings':meetings})
+    
+    def post(self, request):
+        form = ReminderForm(request.POST, request=request)
+        if form.is_valid():
+            reminder = form.save(commit=False)
+            reminder.user= request.user
+            try:
+              reminder.save()
+              messages.success(request,'Reminder set successfully')
+              return redirect('set_reminders')
+            except Exception as e:
+                return JsonResponse({'Exception': str(e)}, status=500)
+        else:
+            return render(request, self.template_name,{'form':form})
+        
+    @staticmethod
+    def delete_meetings(request):
+        meetings=Meeting.objects.filter(user=request.user)
+        try:
+            meetings.delete()
+            messages.success(request,'meetings has been truncated!')
+            return redirect('set_reminders')
+        except Exception as e:
+            return JsonResponse({'exception':str(e)}, status=400)
+            
+            
+             
+                      
+
+
+
+
+

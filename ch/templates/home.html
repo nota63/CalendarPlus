@@ -193,6 +193,10 @@
         <a href="{% url 'intro_wish' %}" class="icon-link" title="Automate wishes">
             <i class="fas fa-birthday-cake"></i> <!-- Birthday icon -->
         </a>
+
+        <a href="{% url 'intro_reminder' %}" class="icon-link" title="Custom reminders">
+            <i class="fas fa-hourglass-half"></i> <!-- Birthday icon -->
+        </a>
         
         {% if request.user.is_staff %}
         <a href="{% url 'meeting-list' %}" class="icon-link" title="Access API">

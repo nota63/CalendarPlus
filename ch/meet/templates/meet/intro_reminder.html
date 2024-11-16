@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Reminders Feature</title>
+    <!-- Google Premium Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #f0f4f8, #e2e8f0);
+            color: #1a202c;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            max-width: 700px;
+            width: 100%;
+            margin: 15px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .header {
+            background-color: #3b82f6;
+            color: #ffffff;
+            padding: 25px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .header .material-icons {
+            font-size: 32px;
+        }
+
+        .content {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .content h2 {
+            font-size: 22px;
+            font-weight: 500;
+            color: #2563eb;
+            margin-bottom: 8px;
+        }
+
+        .content p {
+            font-size: 14px;
+            color: #4b5563;
+            margin-bottom: 18px;
+        }
+
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .feature-item {
+            background: #f9fafb;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+            padding: 15px;
+            flex: 1 1 200px;
+            max-width: 220px;
+            text-align: left;
+            transition: transform 0.3s ease;
+            font-size: 13px;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-3px);
+        }
+
+        .feature-item .material-icons {
+            font-size: 24px;
+            color: #10b981;
+        }
+
+        .feature-item h3 {
+            font-size: 16px;
+            margin-top: 8px;
+            color: #1e293b;
+        }
+
+        .cta-section {
+            background-color: #e5e7eb;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .cta-button {
+            background-color: #3b82f6;
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            margin-top: 18px;
+            display: inline-block;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .cta-button:hover {
+            background-color: #2563eb;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <h1>
+                <span class="material-icons">notifications_active</span>
+                Powerful Meeting Reminders
+            </h1>
+        </div>
+
+        <!-- Introduction Section -->
+        <div class="content">
+            <h2>Stay Organized, Stay Ahead</h2>
+            <p>Elevate your productivity with our advanced reminder system, designed to keep you on track and on time for every meeting.</p>
+        </div>
+
+        <!-- Features Section -->
+        <div class="features">
+            <div class="feature-item">
+                <span class="material-icons">schedule</span>
+                <h3>Smart Scheduling</h3>
+                <p>Easily set reminders for any meeting or event, with intuitive scheduling options.</p>
+            </div>
+            <div class="feature-item">
+                <span class="material-icons">notifications</span>
+                <h3>Real-Time Alerts</h3>
+                <p>Get instant notifications that ensure you're always prepared and informed.</p>
+            </div>
+            <div class="feature-item">
+                <span class="material-icons">tune</span>
+                <h3>Customizable Reminders</h3>
+                <p>Tailor your notifications to suit your needs, whether it's a 5-minute heads-up or a day in advance.</p>
+            </div>
+            <div class="feature-item">
+                <span class="material-icons">done</span>
+                <h3>Never Miss a Beat</h3>
+                <p>Seamlessly integrate reminders into your workflow, so you never miss an important meeting.</p>
+            </div>
+        </div>
+
+        <!-- Call-to-Action Section -->
+        <div class="cta-section">
+            <h2>Experience the Power of Smart Reminders</h2>
+            <p>Join thousands of professionals who rely on our system to stay organized and efficient.</p>
+            <a href="{% url 'set_reminders'%}" class="cta-button">Start Your Free Trial</a>
+        </div>
+    </div>
+
+</body>
+</html>
+
