@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendar +</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
@@ -233,12 +235,64 @@
             transform: translateY(0);
         }
     }
+/* Main styling for the h1 */
+h1 {
+    font-size: 1.5rem; /* Small text size */
+    font-weight: 600; /* Bold */
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between logo and text */
+    margin: 0;
+    color: #333;
+}
+
+/* Logo styling with rounded corners */
+.logo {
+    width: 30px; /* Smaller logo size */
+    height: 30px;
+    border-radius: 50%; /* Round logo */
+    object-fit: cover; /* Ensures logo fits correctly */
+    animation: glowingEffect 5s ease-out forwards; /* Animation effect */
+}
+
+/* Premium and modern font style for the Calendar + text */
+.calendar-name {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700; /* Bold text */
+    font-size: 1.2rem; /* Small size */
+    color: #2d92d1; /* Premium blue color */
+    text-transform: uppercase; /* Uppercase letters */
+    letter-spacing: 1px; /* Slightly spaced letters */
+    transition: color 0.3s ease;
+}
+
+/* Hover effect for the text */
+.calendar-name:hover {
+    color: #0056b3;
+}
+
+/* Glowing animation for the logo */
+@keyframes glowingEffect {
+    0% {
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.8), 0 0 10px rgba(0, 123, 255, 0.6);
+    }
+    50% {
+        box-shadow: 0 0 15px rgba(0, 123, 255, 1), 0 0 30px rgba(0, 123, 255, 0.8);
+    }
+    100% {
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0), 0 0 10px rgba(0, 123, 255, 0); /* Fades out */
+    }
+}
     </style>
 </head>
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
-        <h1>Calendar +</h1>
+
+        <h1>
+            <img src="https://static.vecteezy.com/system/resources/previews/000/355/372/original/vector-calendar-icon.jpg" alt="Company Logo" class="logo"> <span class="calendar-name">Calendar +</span>
+        </h1>
+        
         <nav>
             {% if user.is_authenticated %}
                 <a href="{% url 'render_calendar' %}"><i class="fas fa-calendar-alt"></i> Calendar</a>
