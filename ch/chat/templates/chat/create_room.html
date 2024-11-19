@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar + | Create Room</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Montserrat:wght@200;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- GSAP Animation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .form-container {
+            background: #ffffff;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            width: 60vw;
+            height: 75vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 30px;
+            overflow-y: auto;
+        }
+        
+        h2 {
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        label {
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .form-control {
+            font-size: 0.85rem;
+            padding: 8px;
+        }
+        
+        .btn-custom {
+            background-color: #1abc9c;
+            border: none;
+            color: white;
+            font-size: 0.95rem;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-custom:hover {
+            background-color: #16a085;
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .loading-spinner span {
+            display: block;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2980b9;
+        }
+        
+        .footer-text {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="form-container" id="formContainer">
+        <h2>🚀 Create Your Personal Space and Chat in Real-Time!</h2>
+        
+        <form method="post" id="roomForm">
+            {% csrf_token %}
+            {{ form.as_p }}
+            
+            <div class="text-center mt-3">
+                <button type="submit" class="btn btn-custom" onclick="showLoading()">Create Room</button>
+            </div>
+        </form>
+
+        <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner-border text-primary" role="status"></div>
+            <span id="loadingText">Creating Room...</span>
+        </div>
+        
+        <div class="footer-text">
+            &copy; 2024 Calendar+. Your data is secure, and chats are end-to-end encrypted.
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function showLoading() {
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const loadingText = document.getElementById('loadingText');
+
+            loadingSpinner.style.display = 'block';
+
+            setTimeout(() => {
+                loadingText.innerText = 'Inviting Users...';
+            }, 3000);
+        }
+
+        // GSAP Animation for Form Container
+        gsap.from('#formContainer', {
+            duration: 1,
+            y: 50,
+            opacity: 0,
+            ease: 'power4.out'
+        });
+    </script>
+</body>
+</html>
+

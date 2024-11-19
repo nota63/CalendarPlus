@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Push Notification</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            width: 400px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Send Push Notification</h2>
+        <form id="notification-form" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="title">Notification Title</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="body">Notification Body</label>
+                <textarea id="body" name="body" rows="4" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="icon">Notification Icon (URL)</label>
+                <input type="text" id="icon" name="icon" placeholder="Optional" />
+            </div>
+            <div class="form-group">
+                <label for="badge">Notification Badge (URL)</label>
+                <input type="text" id="badge" name="badge" placeholder="Optional" />
+            </div>
+            <button type="submit">Send Notification</button>
+        </form>
+
+        <div class="error" id="error-message"></div>
+        <div id="success-message" style="color: green; font-size: 16px; display: none;">
+            Notification sent successfully!
+        </div>
+    </div>
+
+    <script>
+        // Handle form submission
+        const form = document.getElementById("notification-form");
+        const errorMessage = document.getElementById("error-message");
+        const successMessage = document.getElementById("success-message");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            errorMessage.innerHTML = ""; // Clear previous errors
+            successMessage.style.display = "none"; // Hide success message
+
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch("{% url 'send_notification' %}", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const data = await response.json();
+
+                if (data.status === "Notification sent") {
+                    successMessage.style.display = "block";
+                    form.reset();
+                } else {
+                    errorMessage.innerHTML = "Error: " + (data.error || "Unknown error.");
+                }
+            } catch (error) {
+                errorMessage.innerHTML = "Network Error: " + error.message;
+            }
+        });
+    </script>
+
+</body>
+</html>

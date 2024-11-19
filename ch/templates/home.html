@@ -197,6 +197,10 @@
         <a href="{% url 'intro_reminder' %}" class="icon-link" title="Custom reminders">
             <i class="fas fa-hourglass-half"></i> <!-- Birthday icon -->
         </a>
+
+        <a href="{% url 'selector_room' %}" class="icon-link" title="Live Chat">
+            <i class="fas fa-comments"></i> <!-- Birthday icon -->
+        </a>
         
         {% if request.user.is_staff %}
         <a href="{% url 'meeting-list' %}" class="icon-link" title="Access API">
@@ -240,5 +244,61 @@
             <span>Track Your Meeting History and Statistics</span>
         </div>
     </div>
+    
+    {% load static %}
+
+    <script src="{% static 'service-worker.js' %}"></script>
+
+    <script>
+       // Check if the browser supports service workers and push notifications
+if ('serviceWorker' in navigator && 'PushManager' in window) {
+    // Register the service worker
+    navigator.serviceWorker.register('/static/js/service-worker.js').then(function(registration) {
+        console.log('Service Worker registered with scope:', registration.scope);
+
+        // Request for push notification permission
+        Notification.requestPermission().then(function(permission) {
+            if (permission === 'granted') {
+                console.log('Notification permission granted.');
+
+                // Get the subscription details from the service worker
+                registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: 'BBcf419XhVqXo69B-jnTQxK28h8vnLaRyWJBCb_Y9QJdHlWayVla-TDu1GY6HIkbhzDirKAfhCydXOR2-hcJIG8'  // Replace with your public key
+                }).then(function(subscription) {
+                    console.log('User is subscribed:', subscription);
+
+                    // Send subscription details to your backend (Django)
+                    fetch('/save_subscription/', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            endpoint: subscription.endpoint,
+                            keys: {
+                                p256dh: subscription.getKey('p256dh'),
+                                auth: subscription.getKey('auth')
+                            }
+                        }),
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    }).then(response => response.json())
+                    .then(data => console.log('Subscription saved to backend:', data))
+                    .catch(error => console.error('Error saving subscription:', error));
+                }).catch(function(error) {
+                    console.error('Failed to subscribe the user:', error);
+                });
+            } else {
+                console.error('Notification permission denied.');
+            }
+        });
+    }).catch(function(error) {
+        console.error('Service Worker registration failed:', error);
+    });
+} else {
+    console.error('Push notifications or service workers are not supported in this browser.');
+}
+
+
+    </script>
 </body>
 </html>

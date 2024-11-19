@@ -48,7 +48,11 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'meet',
+    'daphne',
+    'channels',
+    'chat',
     'accounts',
+    'notify',
     'rest_framework',
     'corsheaders',
     # 'grappelli',
@@ -93,7 +97,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ch.wsgi.application'
+ASGI_APPLICATION = 'ch.asgi.application'
 
 
 # Database
@@ -106,6 +110,21 @@ DATABASES = {
     }
 }
 
+
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [('127.0.0.1', 6379)],
+#         },
+#     },
+# }
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -226,3 +245,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 # OR to allow only your specific site:
 CORS_ALLOW_ALL_ORIGINS = True
+
+
+VAPID_PUBLIC_KEY = 'BBcf419XhVqXo69B-jnTQxK28h8vnLaRyWJBCb_Y9QJdHlWayVla-TDu1GY6HIkbhzDirKAfhCydXOR2-hcJIG8'
+VAPID_PRIVATE_KEY = 'hxjvlwfsrCpt8TIbbHDODiXPHfvZaWQuWubaswhnFUM'

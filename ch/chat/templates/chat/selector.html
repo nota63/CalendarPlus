@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar +</title>
+    
+    <!-- Google Fonts (Compact, Premium Fonts) -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 900px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #0052cc;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        p {
+            font-size: 0.85em;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .features {
+            text-align: left;
+            font-size: 0.85em;
+            margin-bottom: 20px;
+            color: #444;
+        }
+
+        .features ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .features li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 8px 0;
+        }
+
+        .features li i {
+            color: #0052cc;
+            font-size: 1.2em;
+        }
+
+        select, .dropdown-button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #333;
+            background-color: #f7f7f7;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        select:focus, .dropdown-button:hover {
+            border-color: #0052cc;
+            background-color: #eaf2ff;
+        }
+
+        .dropdown-button {
+    background-color: #0052cc; /* Blue background color */
+    color: white;
+    cursor: pointer;
+    font-size: 0.85em; /* Smaller font size */
+    padding: 8px 16px; /* Reduced padding for a compact look */
+    border-radius: 12px; /* More rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Slightly deeper shadow for a premium feel */
+    border: none; /* Remove any default border */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.dropdown-button:hover {
+    background-color: #0041a8; /* Darker blue on hover */
+    transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+
+        .footer {
+            font-size: 0.75em;
+            color: #666;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .footer a {
+            color: #0052cc;
+            text-decoration: none;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #0052cc;
+            border-radius: 2px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background-color: #f7f7f7;
+        }
+
+        .container > * {
+            animation: fadeInUp 1s ease-in-out;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Welcome to Calendar +</h1>
+        <p>Your all-in-one scheduling and real-time chat solution! Keep your events organized while enjoying seamless communication with your community.</p>
+
+        <!-- Features Section -->
+        <div class="features">
+            <ul>
+                <li><i class="fas fa-calendar-day"></i> Schedule and manage events effortlessly</li>
+                <li><i class="fas fa-comment-alt"></i> Real-time, instant messaging</li>
+                <li><i class="fas fa-users"></i> Join official rooms or create your own</li>
+                <li><i class="fas fa-shield-alt"></i> Secure, end-to-end encrypted chats</li>
+                <li><i class="fas fa-lock"></i> We won't collect your data. Chat without fear!</li>
+            </ul>
+        </div>
+
+        <p>Choose your room and join your community or create a private space for your events.</p>
+
+        <!-- Room Selection Dropdowns -->
+        <div class="dropdown">
+            <select id="room-selector">
+                <option value="join-community">Join Official Community Room</option>
+                <option value="create-room">Create Your Room</option>
+            </select>
+            <button class="dropdown-button" id="action-button" onclick="handleAction()">Go</button>
+        </div>
+        <a href="{% url 'invitation_list'%}">
+            <button class="dropdown-button" type="submit">Invitations</button>
+        </a>
+
+        <div class="footer">
+            <p>Learn more about us <a href="https://example.com/about" target="_blank">here</a>.</p>
+        </div>
+    </div>
+
+    <script>
+        // GSAP Animation for Page Load
+        gsap.from(".container", { opacity: 0, y: 100, duration: 1, ease: "power3.out" });
+
+        // GSAP Hover Effect for Button
+        const button = document.querySelector('.dropdown-button');
+        button.addEventListener('mouseenter', () => {
+            gsap.to(button, { scale: 1.05, duration: 0.3 });
+        });
+        button.addEventListener('mouseleave', () => {
+            gsap.to(button, { scale: 1, duration: 0.3 });
+        });
+
+        // Handle Room Selection Action
+        function handleAction() {
+            const selectedOption = document.getElementById('room-selector').value;
+            if (selectedOption === 'join-community') {
+                window.location.href = "http://127.0.0.1:8000/chat/join_chat/official/"; // Replace with your community room URL
+            } else if (selectedOption === 'create-room') {
+                window.location.href = "http://127.0.0.1:8000/chat/create_room/"; // Replace with your room creation URL
+            }
+        }
+    </script>
+
+</body>
+</html>

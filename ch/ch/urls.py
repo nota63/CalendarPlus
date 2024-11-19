@@ -26,6 +26,8 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('meet/', include('meet.urls')),
     path('auth/', include('accounts.urls')),
+    path('chat/', include('chat.urls')),
+    path('notify/', include('notify.urls'))
 
 
 ]
