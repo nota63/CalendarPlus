@@ -3,302 +3,316 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendar App</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Font Awesome -->
+    <title>Calendar +</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <style>
         body {
-            font-family: 'Poppins', sans-serif;
             margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
+            font-family: 'Poppins', sans-serif;
+            background: hwb(80 81% 13%);
             color: #333;
             display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            background: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-right: 1px solid #eee;
+            display: flex;
             flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            padding: 10px;
+            animation: fadeIn 0.5s ease;
         }
-    
-        h1 {
-            margin-top: 30px;
-            font-size: 36px;
-            font-weight: 600;
-            color: #007bff;
+
+        .sidebar h1 {
+            font-size: 20px;
+            font-weight: 400;
             text-align: center;
+            margin-bottom: 15px;
+            color: #007bff;
         }
-    
-        .welcome-message {
-            font-size: 24px;
-            font-weight: 600;
-            margin: 20px 0;
-            opacity: 0;
-            transform: translateY(-20px);
-            transition: opacity 1s ease, transform 1s ease;
+
+        .sidebar nav a {
+            text-decoration: none;
+            color: #555;
+            font-size: 14px;
+            padding: 8px 12px;
+            margin: 5px 0;
             display: flex;
             align-items: center;
-            animation: fadeIn 1s forwards;
+            border-radius: 8px;
+            transition: all 0.3s ease;
         }
-    
-        .welcome-message i {
-            margin-right: 10px;
-            font-size: 30px;
-            color: #007bff;
-        }
-    
-        .auth-links {
-            margin: 10px 0;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 1s ease, transform 1s ease;
-            animation: fadeIn 1s forwards;
-            animation-delay: 1s;
-            text-align: center;
-        }
-    
-        .auth-link {
-            text-decoration: none;
-            color: #007bff;
-            font-weight: bold;
-            transition: color 0.3s;
-            margin: 0 10px;
-        }
-    
-        .auth-link:hover {
-            color: #0056b3;
-        }
-    
-        .icon-link {
-            font-size: 24px; /* Reduced icon size */
-            color: #007bff;
-            padding: 10px; /* Adjusted padding */
-            margin: 10px;
-            border-radius: 50%;
-            background-color: #f4f4f4;
-            transition: background-color 0.3s, transform 0.3s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-decoration: none;
-        }
-    
-        .icon-link:hover {
-            background-color: #0056b3;
+
+        .sidebar nav a:hover {
+            background: #007bff;
             color: #fff;
-            transform: scale(1.1); /* Slight scale on hover */
         }
-    
-        .features {
-            margin-top: 40px;
-            text-align: center;
-            width: 90%;
-            max-width: 800px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+
+        .sidebar nav a i {
+            font-size: 14px;
+            margin-right: 8px;
         }
-    
-        .feature {
-            background-color: #fff;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+        /* Main Content */
+        .main {
+            flex-grow: 1;
             display: flex;
-            align-items: center;
-            transition: transform 0.3s;
+            flex-direction: column;
+            overflow-y: auto;
         }
-    
+
+        .main-header {
+            padding: 15px;
+            background: #ffffff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            font-size: 18px;
+            font-weight: 400;
+            margin-bottom: 10px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .feature {
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            font-size: 12px;
+        }
+
         .feature:hover {
             transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
         }
-    
+
         .feature i {
-            margin-right: 15px;
+            font-size: 20px;
             color: #007bff;
-            font-size: 24px; /* Reduced feature icon size */
+            margin-bottom: 5px;
         }
+
+        .feature span {
+            display: block;
+            font-weight: 400;
+            margin-top: 5px;
+        }
+
+        /* .footer {
+            padding: 10px;
+            background: #ffffff;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+        }  */
+
+        /* Footer Styling */
+        .footer {
+    padding: 20px;
+    background: hsl(0, 15%, 94%); /* Dark background for modern feel */
+    text-align: center;
+    color: #fff;
+    font-size: 14px;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2); /* Light shadow for elevation */
+    margin-top: auto; /* Push the footer to the bottom */
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-content span {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.footer-links {
+    display: flex;
+    gap: 20px;
+}
+
+.footer-link {
+    color: #007bff; /* Modern blue color for links */
+    font-size: 16px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.footer-link i {
+    font-size: 18px; /* Icon size */
+    transition: transform 0.2s ease;
+}
+
+.footer-link:hover {
+    color: #fff; /* Hover effect on link */
+    transform: scale(1.1); /* Slight zoom effect for modern look */
+}
+
+.footer-link:hover i {
+    transform: scale(1.2); /* Slight zoom effect for icons */
+}
+
     
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(-20px);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
             }
         }
-    
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 28px;
-            }
-    
-            .welcome-message {
-                font-size: 20px;
-            }
-    
-            .feature {
-                flex-direction: column;
-                align-items: flex-start;
-                text-align: left;
-            }
+
+         /* Welcome Message Container */
+    .welcome-message {
+        font-family: 'Poppins', sans-serif;
+        font-size: 14px;
+        color: #333;
+        background: #f1f5f8;
+        padding: 10px 20px;
+        border-radius: 25px;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        animation: fadeInUp 0.5s ease-out;
+        max-width: 300px;
+        margin: 20px;
+    }
+
+    /* Icon Style */
+    .welcome-message i {
+        font-size: 20px; /* Compact size for the icon */
+        color: #4A90E2; /* Premium icon color */
+        margin-right: 12px;
+        transition: transform 0.3s ease;
+    }
+
+    /* Username Style */
+    .welcome-message span {
+        font-weight: 500;
+        color: #007bff; /* Premium blue for the username */
+    }
+
+    /* Hover Effect on Icon */
+    .welcome-message:hover i {
+        transform: scale(1.2);
+    }
+
+    /* Animation for the Welcome Message */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
         }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
     </style>
-    
 </head>
 <body>
-    <h1>Calendar Application</h1>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h1>Calendar +</h1>
+        <nav>
+            {% if user.is_authenticated %}
+                <a href="{% url 'render_calendar' %}"><i class="fas fa-calendar-alt"></i> Calendar</a>
+                <a href="{% url 'device_info' %}"><i class="fas fa-mobile-alt"></i> Devices</a>
+                <a href="{% url 'update_email' %}"><i class="fas fa-bell"></i> Notifications</a>
+                <a href="{% url 'analytics' %}"><i class="fas fa-chart-line"></i> Analytics</a>
+                <a href="{% url 'stuff' %}"><i class="fas fa-tasks"></i> Tasks</a>
+                <a href="{% url 'intro_wish' %}"><i class="fas fa-birthday-cake"></i> Wishes</a>
+                <a href="{% url 'intro_reminder' %}"><i class="fas fa-hourglass-half"></i> Reminders</a>
+                <a href="{% url 'selector_room' %}"><i class="fas fa-comments"></i> Live Chat</a>
+                <a href="{% url 'profile_info' %}"><i class="fas fa-user"></i> Profile And Permissions</a>
+                {% if request.user.is_staff %}
+                    <a href="{% url 'admin:index' %}"><i class="fas fa-user-shield"></i> Admin</a>
+                    <a href="{% url 'meeting-list' %}"><i class="fas fa-code"></i> Access API</a>
+                    <a href="{% url 'intro' %}"><i class="fas fa-chart-bar"></i> Calenader + ORM</a>
+                {% endif %}
+                <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
+                <a href="{% url 'register' %}"><i class="fas fa-user-plus"></i> Register</a>
+            {% endif %}
+        </nav>
+    </div>
 
-    {% if user.is_authenticated %}
+    <!-- Main Content -->
+    <div class="main">
         <div class="welcome-message" id="welcomeMessage">
             <i class="fas fa-user-circle"></i> Welcome, {{ user.username }}!
         </div>
-        <p class="auth-links">
-            <a href="{% url 'logout' %}" class="auth-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
-        </p>
-        <p class="auth-links">
-            <a href="{% url 'profile_info' %}" class="auth-link"><i class="fas fa-user"></i> Profile</a>
-        </p>
-    {% else %}
-        <p class="auth-links">
-            <a href="{% url 'login' %}" class="auth-link"><i class="fas fa-sign-in-alt"></i> Login</a> 
-            or 
-            <a href="{% url 'register' %}" class="auth-link"><i class="fas fa-user-plus"></i> Register</a>
-        </p>
-    {% endif %}
 
-    <section>
-        <a href="{% url 'render_calendar' %}" class="icon-link" title="View Calendar">
-            <i class="fas fa-calendar-alt"></i>
-        </a>
-        <a href="{% url 'device_info' %}" class="icon-link" title="Device">
-            <i class="fas fa-mobile-alt"></i>
-        </a>
-        <!-- <a href="{% url 'user_meetings' %}" class="icon-link" title="Database">
-            <i class="fas fa-database"></i>
-        </a> -->
-        <a href="{% url 'update_email' %}" class="icon-link" title="Notifications">
-            <i class="fas fa-bell"></i>
-        </a>
-        <a href="{% url 'analytics' %}" class="icon-link" title="Analytics">
-            <i class="fas fa-chart-line"></i> <!-- Change this to the desired icon -->
-        </a>
-
-        <a href="{% url 'stuff' %}" class="icon-link" title="Task">
-            <i class="fas fa-tasks"></i> <!-- Change this to the desired icon -->
-        </a>
-
-        <a href="{% url 'intro_wish' %}" class="icon-link" title="Automate wishes">
-            <i class="fas fa-birthday-cake"></i> <!-- Birthday icon -->
-        </a>
-
-        <a href="{% url 'intro_reminder' %}" class="icon-link" title="Custom reminders">
-            <i class="fas fa-hourglass-half"></i> <!-- Birthday icon -->
-        </a>
-
-        <a href="{% url 'selector_room' %}" class="icon-link" title="Live Chat">
-            <i class="fas fa-comments"></i> <!-- Birthday icon -->
-        </a>
-        
-        {% if request.user.is_staff %}
-        <a href="{% url 'meeting-list' %}" class="icon-link" title="Access API">
-            <i class="fas fa-code"></i>
-        </a>
-   
-        <a href="{% url 'intro' %}" class="icon-link" title="MeetingModel Analytics">
-            <i class="fas fa-chart-bar"></i>
-        </a>
-        <br>
-        <a href="{% url 'admin:index' %}" class="icon-link" title="Access Admin">
-            <i class="fas fa-user-shield"></i> <!-- Admin Icon -->
-        </a>
-        {% endif %}
-    </section>
-
-    <div class="features">
-        <h2>Features</h2>
-        <div class="feature">
-            <i class="fas fa-calendar-alt"></i>
-            <span>Schedule Meetings with Ease</span>
+        <div class="features-grid">
+            <div class="feature">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Schedule Meetings</span>
+            </div>
+            <div class="feature">
+                <i class="fas fa-users"></i>
+                <span>Invite Participants</span>
+            </div>
+            <div class="feature">
+                <i class="fas fa-link"></i>
+                <span>Manage Links</span>
+            </div>
+            <div class="feature">
+                <i class="fas fa-bell"></i>
+                <span>Event Reminders</span>
+            </div>
+            <div class="feature">
+                <i class="fas fa-sync"></i>
+                <span>Real-time Updates</span>
+            </div>
+            <div class="feature">
+                <i class="fas fa-chart-line"></i>
+                <span>Track Statistics</span>
+            </div>
         </div>
-        <div class="feature">
-            <i class="fas fa-users"></i>
-            <span>Invite Participants to Your Meetings</span>
+        <!-- <div class="footer">
+            &copy; 2024 Calendar App. All Rights Reserved.
+        </div> -->
+        <div class="footer">
+            <div class="footer-content">
+                <span>&copy; 2024 Calendar App. All Rights Reserved.</span>
+                <div class="footer-links">
+                    <a href="https://github.com/nota63" target="_blank" class="footer-link">
+                        <i class="fab fa-github"></i> GitHub
+                    </a>
+                    <a href="https://wa.me/9022216598" target="_blank" class="footer-link">
+                        <i class="fab fa-whatsapp"></i> WhatsApp
+                    </a>
+                    <a href="mailto:vishaldudhabarve105@gmail.com" class="footer-link">
+                        <i class="fas fa-envelope"></i> Email
+                    </a>
+                </div>
+            </div>
         </div>
-        <div class="feature">
-            <i class="fas fa-link"></i>
-            <span>Access Meeting Links Anytime</span>
-        </div>
-        <div class="feature">
-            <i class="fas fa-bell"></i>
-            <span>Set Reminders for Your Events</span>
-        </div>
-        <div class="feature">
-            <i class="fas fa-sync"></i>
-            <span>Real-time Updates and Notifications</span>
-        </div>
-        <div class="feature">
-            <i class="fas fa-chart-line"></i>
-            <span>Track Your Meeting History and Statistics</span>
-        </div>
-    </div>
-    
-    {% load static %}
-
-    <script src="{% static 'service-worker.js' %}"></script>
-
-    <script>
-       // Check if the browser supports service workers and push notifications
-if ('serviceWorker' in navigator && 'PushManager' in window) {
-    // Register the service worker
-    navigator.serviceWorker.register('/static/js/service-worker.js').then(function(registration) {
-        console.log('Service Worker registered with scope:', registration.scope);
-
-        // Request for push notification permission
-        Notification.requestPermission().then(function(permission) {
-            if (permission === 'granted') {
-                console.log('Notification permission granted.');
-
-                // Get the subscription details from the service worker
-                registration.pushManager.subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey: 'BBcf419XhVqXo69B-jnTQxK28h8vnLaRyWJBCb_Y9QJdHlWayVla-TDu1GY6HIkbhzDirKAfhCydXOR2-hcJIG8'  // Replace with your public key
-                }).then(function(subscription) {
-                    console.log('User is subscribed:', subscription);
-
-                    // Send subscription details to your backend (Django)
-                    fetch('/save_subscription/', {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            endpoint: subscription.endpoint,
-                            keys: {
-                                p256dh: subscription.getKey('p256dh'),
-                                auth: subscription.getKey('auth')
-                            }
-                        }),
-                        headers: {
-                            'Content-Type': 'application/json',
-                        }
-                    }).then(response => response.json())
-                    .then(data => console.log('Subscription saved to backend:', data))
-                    .catch(error => console.error('Error saving subscription:', error));
-                }).catch(function(error) {
-                    console.error('Failed to subscribe the user:', error);
-                });
-            } else {
-                console.error('Notification permission denied.');
-            }
-        });
-    }).catch(function(error) {
-        console.error('Service Worker registration failed:', error);
-    });
-} else {
-    console.error('Push notifications or service workers are not supported in this browser.');
-}
-
-
-    </script>
 </body>
 </html>
