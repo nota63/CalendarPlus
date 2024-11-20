@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with Gemini AI</title>
+
+    <!-- Premium Google Fonts -->
+     <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Lora:ital,wght@0,400;1,700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Style */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+            font-size: 14px; /* Reduced font size for compact design */
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+            border-radius: 15px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        h2 {
+            font-family: 'Lora', serif;
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 14px; /* Reduced font size */
+            resize: none;
+            outline: none;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            border-color: #007BFF;
+        }
+
+        .mic-animation {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #FF4081;
+            animation: pulse 1.5s infinite ease-in-out;
+            position: absolute;
+            top: 30px;
+            right: 50px;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+        button {
+            padding: 12px 30px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 14px; /* Reduced font size */
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .response-container {
+    width: 100%;
+    margin-top: 40px;
+    background: #f3f6fb;
+    padding: 20px;
+    border-radius: 10px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.response {
+    background-color: #fff;
+    padding: 15px;
+    font-family: 'Lora', serif;
+    font-size: 16px; /* Reduced font size */
+    line-height: 1.6;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.response-icon {
+    width: 30px;
+    height: 30px;
+    margin-right: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.response-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.response strong {
+    font-size: 18px;
+    color: #333;
+    margin-right: 10px;
+}
+
+.response p {
+    margin: 0;
+    font-size: 14px; /* Smaller font size for compact design */
+    color: #555;
+}
+        .wave-container {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            padding-top: 15px;
+        }
+
+        .wave {
+            width: 6px;
+            height: 25px;
+            background-color: #007BFF;
+            animation: wave-animation 1s infinite ease-in-out;
+        }
+
+        .wave:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .wave:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes wave-animation {
+            0%, 100% {
+                height: 25px;
+            }
+            50% {
+                height: 40px;
+            }
+        }
+
+   /* Google Font Import */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Pacifico&display=swap');
+
+/* Base Style for the Heading */
+.ai {
+    font-family: 'Roboto', sans-serif; /* Premium Google Font */
+    font-size: 1.2rem; /* Reduced font size for more compact look */
+    color: #333; /* Dark text color for better readability */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    letter-spacing: 0.5px; /* Slightly reduced letter spacing */
+    padding: 15px 20px;
+    position: relative;
+    background: linear-gradient(135deg, #f9fafb, #e4e8f0); /* Light gradient background */
+    border-radius: 8px; /* Slightly reduced border radius */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 1.5s ease-out; /* Fade-in animation */
+}
+
+/* Animation for the Heading */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Icon Styling */
+.ai .icon {
+    margin-right: 10px; /* Reduced margin */
+    width: 30px; /* Reduced icon size */
+    height: 30px; /* Reduced icon size */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: bounce 1.5s infinite alternate; /* Icon bouncing animation */
+}
+
+.ai .icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Bounce Animation for Icon */
+@keyframes bounce {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(-5px); /* Reduced bounce */
+    }
+}
+
+/* Styling for Text */
+.ai span {
+    font-family: 'Pacifico', cursive; /* A more premium cursive font */
+    font-size: 1.5rem; /* Adjust text size for better balance */
+    color: #007bff; /* Elegant blue color */
+    font-weight: 700;
+}
+
+/* Hover effect for the heading */
+.ai:hover {
+    background: linear-gradient(135deg, #007bff, #00c8ff); /* Hover gradient effect */
+    color: #fff;
+    cursor: pointer;
+}
+/* Sidebar Style */
+.sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #fff;
+            color: #333;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Sidebar Title */
+        .sidebar-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* Links in Sidebar */
+        .sidebar a {
+            padding: 12px 20px;
+            text-decoration: none;
+            font-size: 16px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            transition: 0.3s;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .sidebar a:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Icon inside Sidebar Links */
+        .sidebar i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .sidebar .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 36px;
+            color: #333;
+            cursor: pointer;
+        }
+
+        /* Button to open the sidebar */
+        .open-btn {
+            font-size: 22px;
+            cursor: pointer;
+            background-color: #ffffff;
+            color: #333;
+            border: none;
+            padding: 10px 12px;
+            border-radius: 50%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            transition: 0.3s;
+        }
+
+        .open-btn:hover {
+            background-color: #f1f1f1;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Smaller text for prompts */
+        .sidebar a span {
+            font-size: 12px;
+            font-family: 'Open Sans', sans-serif;
+            color: #555;
+        }
+
+        button {
+    font-size: 18px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+button i {
+    margin-right: 8px; /* Adds space between icon and text */
+}
+    </style>
+    
+    <script>
+        let isListening = false;
+
+        function startSpeechRecognition() {
+            if (isListening) return;
+
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+
+            isListening = true;
+            toggleMicAnimation(true);
+
+            recognition.onstart = () => {
+                document.getElementById('prompt').value = "Listening...";
+            };
+
+            recognition.onspeechend = () => {
+                recognition.stop();
+                toggleMicAnimation(false);
+                isListening = false;
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('prompt').value = transcript;
+            };
+
+            recognition.onerror = (event) => {
+                alert('Speech recognition error: ' + event.error);
+                toggleMicAnimation(false);
+                isListening = false;
+            };
+
+            recognition.start();
+        }
+
+        function toggleMicAnimation(show) {
+            const mic = document.getElementById('mic');
+            mic.style.display = show ? 'inline-block' : 'none';
+        }
+
+        function showSoundWave() {
+            const waveContainer = document.getElementById('sound-wave');
+            waveContainer.style.display = 'flex';
+            setTimeout(() => {
+                waveContainer.style.display = 'none';
+            }, 5000); // Adjust the duration of the wave animation
+        }
+
+         // Open Sidebar Function
+         function openSidebar() {
+            document.getElementById("mySidebar").style.width = "250px";
+        }
+
+        // Close Sidebar Function
+        function closeSidebar() {
+            document.getElementById("mySidebar").style.width = "0";
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2 class="ai">
+            <span class="icon"><img src="https://static.vecteezy.com/system/resources/previews/018/764/128/original/chatgpt-logo-open-ai-icon-with-chatbot-artificial-intelligence-openai-chatbot-icon-chatgpt-openai-icon-artificial-intelligence-smart-ai-virtual-smart-assistant-bot-free-vector.jpg" alt="AI Icon"></span> 
+            Let AI check Your Meetings
+        </h2>
+        
+        <form method="post">
+            {% csrf_token %}
+            <textarea id="prompt" name="prompt" placeholder="Type your prompt or use the mic."></textarea>
+            <div id="mic" class="mic-animation" style="display: none;"></div>
+           <!-- Button to Start Speech Recognition with Icon -->
+<button type="button" onclick="startSpeechRecognition()">
+    <i class="fas fa-microphone"></i>
+</button>
+
+<!-- Button to Submit with Icon -->
+<button type="submit" onclick="showSoundWave()">
+    <i class="fas fa-paper-plane"></i>
+</button>
+        </form>
+        
+        <div class="response-container">
+            <div class="response">
+                <div class="response-icon">
+                    <!-- AI Icon, replace the 'src' with your actual AI icon path -->
+                    <img src="https://th.bing.com/th/id/OIP.cGYpa4GP0s9CMd-L5pLFOwHaHa?rs=1&pid=ImgDetMain" alt="AI Icon">
+                </div>
+                <strong>AI Response:</strong>
+                <p>{{ response }}</p>
+            </div>
+        </div>
+        
+        <div id="sound-wave" class="wave-container" style="display: none;">
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+        </div>
+    </div>
+
+       <!-- Button to Open Sidebar -->
+       <button class="open-btn" onclick="openSidebar()">☰ Open Queries</button>
+
+       <!-- Sidebar -->
+    <div id="mySidebar" class="sidebar">
+        <a href="javascript:void(0)" class="close-btn" onclick="closeSidebar()">×</a>
+        <div class="sidebar-title">Meeting Queries</div>
+        <a href="#">
+            <i class="fas fa-calendar-day"></i> Meetings for Tomorrow <span>"Do I have any meetings scheduled for tomorrow?"</span>
+        </a>
+        <a href="#">
+            <i class="fas fa-calendar-alt"></i> Meetings for Today <span>"What meetings do I have today?"</span>
+        </a>
+        <a href="#">
+            <i class="fas fa-calendar-week"></i> Upcoming Meetings <span>"What are my upcoming meetings this week?"</span>
+        </a>
+        <a href="#">
+            <i class="fas fa-users"></i> Meetings by Type <span>"Do I have any team meetings scheduled?"</span>
+        </a>
+        <a href="#">
+            <i class="fas fa-hourglass-start"></i> First Meeting of the Day <span>"What is my first meeting today?"</span>
+        </a>
+        <a href="#">
+            <i class="fas fa-hourglass-end"></i> Last Meeting of the Day <span>"When is my last meeting today?"</span>
+        </a>
+        <a href="#">
+            <i class="fas fa-tasks"></i> Count of Meetings <span>"How many meetings do I have this week?"</span>
+        </a>
+        <a href="#">
+            <i class="fas fa-calendar-check"></i> Meetings on Specific Date <span>"What meetings do I have on [specific date]?"</span>
+        </a>
+        <a href="#">
+            <i class="fas fa-user-tie"></i> Meetings with Specific Admin <span>"Do I have any meetings with [Admin Name]?"</span>
+        </a>
+        <a href="#">
+            <i class="fas fa-link"></i> Meetings with Links <span>"Which of my meetings have links attached?"</span>
+        </a>
+        <a href="#">
+            <i class="fas fa-unlink"></i> Meetings Without Links <span>"Which meetings don't have any links attached?"</span>
+        </a>
+        <a href="#">
+            <i class="fas fa-info-circle"></i> Meeting Details by Title <span>"What are the details of the meeting titled '[Title]'?"</span>
+        </a>
+        <a href="#">
+            <i class="fas fa-search"></i> Meetings with a Specific Keyword <span>"Do I have any meetings related to 'project update'?"</span>
+        </a>
+        <a href="#">
+            <i class="fas fa-clock"></i> Meetings in a Specific Time Range <span>"What meetings do I have between 10 AM and 2 PM today?"</span>
+        </a>
+        <a href="#">
+            <i class="fas fa-list-alt"></i> All Meetings Summary <span>"Can you summarize all my meetings?"</span>
+        </a>
+    </div>
+   
+</body>
+</html>
+

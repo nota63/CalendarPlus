@@ -49,6 +49,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'meet',
     'daphne',
+    'ai',
     'channels',
     'chat',
     'accounts',
@@ -249,3 +250,6 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 VAPID_PUBLIC_KEY = 'BBcf419XhVqXo69B-jnTQxK28h8vnLaRyWJBCb_Y9QJdHlWayVla-TDu1GY6HIkbhzDirKAfhCydXOR2-hcJIG8'
 VAPID_PRIVATE_KEY = 'hxjvlwfsrCpt8TIbbHDODiXPHfvZaWQuWubaswhnFUM'
+
+
+OPEN_AI_API_KEY='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'

@@ -296,7 +296,10 @@ h1 {
         <nav>
             {% if user.is_authenticated %}
                 <a href="{% url 'render_calendar' %}"><i class="fas fa-calendar-alt"></i> Calendar</a>
-                <a href="{% url 'device_info' %}"><i class="fas fa-mobile-alt"></i> Devices</a>
+                <a href="{% url 'ai_intro' %}">
+                    <i class="fas fa-robot"></i> Ask AI
+                </a>                
+                <a href="{% url 'device_info' %}"><i class="fas fa-mobile-alt"></i> Device</a>
                 <a href="{% url 'update_email' %}"><i class="fas fa-bell"></i> Notifications</a>
                 <a href="{% url 'analytics' %}"><i class="fas fa-chart-line"></i> Analytics</a>
                 <a href="{% url 'stuff' %}"><i class="fas fa-tasks"></i> Tasks</a>
