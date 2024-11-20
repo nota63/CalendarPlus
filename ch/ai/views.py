@@ -8,7 +8,14 @@ import pyttsx3
 from meet.models import Meeting
 from datetime import datetime, timedelta
 import dateutil.parser  
-genai.configure(api_key="AIzaSyDJ7MgCTe2nst6-jjmJdaSgMP1qnIBXMxE")  
+from dotenv import load_dotenv
+import os 
+
+load_dotenv()
+gemini_api_key = os.getenv("gemini_api_key")
+
+
+genai.configure(api_key=gemini_api_key)
 
 class AIIntro(View):
     template='ai/ai_intro.html'
