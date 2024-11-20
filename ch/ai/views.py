@@ -7,34 +7,8 @@ import google.generativeai as genai
 import pyttsx3
 from meet.models import Meeting
 from datetime import datetime, timedelta
-# genai.configure(api_key="AIzaSyDJ7MgCTe2nst6-jjmJdaSgMP1qnIBXMxE")  # Use the key here
-
-# # Create the model
-# generation_config = {
-#     "temperature": 2,
-#     "top_p": 0.95,
-#     "top_k": 40,
-#     "max_output_tokens": 8192,
-#     "response_mime_type": "text/plain",
-# }
-
-# model = genai.GenerativeModel(
-#     model_name="gemini-1.5-pro",
-#     generation_config=generation_config,
-# )
-
-# response = model.generate_content([
-#     "Write a character design in a pirate-themed game set in the Joseon era.",
-#     "input: Main Character (Female)",
-#     "output: **Name:** Haenyeo\n\n**Appearance:**\n...",
-# ])
-
-# print(response.text)
-
-# main
-
-genai.configure(api_key="AIzaSyDJ7MgCTe2nst6-jjmJdaSgMP1qnIBXMxE")  # Use the key here
-
+import dateutil.parser  
+genai.configure(api_key="AIzaSyDJ7MgCTe2nst6-jjmJdaSgMP1qnIBXMxE")  
 
 class AIIntro(View):
     template='ai/ai_intro.html'
@@ -55,7 +29,7 @@ class GeminiView(View):
         user = request.user
         response_text = None
 
-        # Analyze prompt to identify intent
+      
         if "meeting" in prompt.lower():
             if "tomorrow" in prompt.lower():
                 tomorrow = datetime.now().date() + timedelta(days=1)
@@ -99,16 +73,14 @@ class GeminiView(View):
                 response_text = self.format_single_meeting(meeting, f"meeting titled '{title}'")
             
             elif "specific date" in prompt.lower():
-                # Example: "What meetings do I have on 2024-11-25?"
                 try:
                     date_str = prompt.split("on")[-1].strip()
-                    specific_date = parse_date(date_str)
+                    specific_date = self.parse_date(date_str)
                     meetings = Meeting.objects.filter(user=user, date=specific_date)
                     response_text = self.format_meetings_response(meetings, f"on {specific_date}")
                 except:
                     response_text = "I couldn't understand the date format. Please provide a valid date."
 
-        # If not a meeting-related prompt, pass to Gemini AI
         if not response_text:
             generation_config = {
                 "temperature": 2,
@@ -124,7 +96,7 @@ class GeminiView(View):
             response = model.generate_content([prompt])
             response_text = response.text
 
-        # Text-to-speech for the response
+        
         self.speak_response(response_text)
 
         return render(request, self.template, {'response': response_text})

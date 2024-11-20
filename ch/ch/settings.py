@@ -239,15 +239,9 @@ CACHES = {
 }
 
 
-# CORS CONFIGURATION TO ALLOWED API CALLS FROM MY SECOND WEBSITE
 
-# To allow any domain (for development):
 CORS_ALLOW_ALL_ORIGINS = True
-
-# OR to allow only your specific site:
 CORS_ALLOW_ALL_ORIGINS = True
 
 
-VAPID_PUBLIC_KEY = 'BBcf419XhVqXo69B-jnTQxK28h8vnLaRyWJBCb_Y9QJdHlWayVla-TDu1GY6HIkbhzDirKAfhCydXOR2-hcJIG8'
-VAPID_PRIVATE_KEY = 'hxjvlwfsrCpt8TIbbHDODiXPHfvZaWQuWubaswhnFUM'
 
