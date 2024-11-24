@@ -20,47 +20,53 @@
             overflow: hidden;
         }
 
-        /* Sidebar */
-        .sidebar {
-            width: 220px;
-            background: #ffffff;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            border-right: 1px solid #eee;
-            display: flex;
-            flex-direction: column;
-            padding: 10px;
-            animation: fadeIn 0.5s ease;
-        }
+       /* Add the link to import a premium Google font */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap');
 
-        .sidebar h1 {
-            font-size: 20px;
-            font-weight: 400;
-            text-align: center;
-            margin-bottom: 15px;
-            color: #007bff;
-        }
+/* Sidebar */
+.sidebar {
+    width: 220px;
+    background: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-right: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    animation: fadeIn 0.5s ease;
+    overflow-y: auto; /* Enable scrolling in the container */
+    font-family: 'Roboto', sans-serif; /* Use the premium Google font */
+}
 
-        .sidebar nav a {
-            text-decoration: none;
-            color: #555;
-            font-size: 14px;
-            padding: 8px 12px;
-            margin: 5px 0;
-            display: flex;
-            align-items: center;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
+.sidebar h1 {
+    font-size: 18px; /* More compact font size */
+    font-weight: 400;
+    text-align: center;
+    margin-bottom: 15px;
+    color: #007bff;
+}
 
-        .sidebar nav a:hover {
-            background: #007bff;
-            color: #fff;
-        }
+.sidebar nav a {
+    text-decoration: none;
+    color: #555;
+    font-size: 13px; /* More compact font size */
+    padding: 8px 12px;
+    margin: 5px 0;
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
 
-        .sidebar nav a i {
-            font-size: 14px;
-            margin-right: 8px;
-        }
+.sidebar nav a:hover {
+    background: #007bff;
+    color: #fff;
+}
+
+.sidebar nav a i {
+    font-size: 13px; /* More compact font size */
+    margin-right: 8px;
+}
+
 
         /* Main Content */
         .main {
@@ -298,7 +304,10 @@ h1 {
                 <a href="{% url 'render_calendar' %}"><i class="fas fa-calendar-alt"></i> Calendar</a>
                 <a href="{% url 'ai_intro' %}">
                     <i class="fas fa-robot"></i> Ask AI
-                </a>                
+                </a> 
+                {% if request.user.profile.is_profile_admin %}
+                <a href="{% url 'features' %}"><i class="fas fa-lock"></i> Organization</a>
+            {% endif %}           
                 <a href="{% url 'device_info' %}"><i class="fas fa-mobile-alt"></i> Device</a>
                 <a href="{% url 'update_email' %}"><i class="fas fa-bell"></i> Notifications</a>
                 <a href="{% url 'analytics' %}"><i class="fas fa-chart-line"></i> Analytics</a>
@@ -351,10 +360,7 @@ h1 {
                 <i class="fas fa-chart-line"></i>
                 <span>Track Statistics</span>
             </div>
-
-            <a href="{% url 'features'%}">
-                <button type="submit">Feature implementing</button>
-            </a>
+        
         </div>
         <!-- <div class="footer">
             &copy; 2024 Calendar App. All Rights Reserved.
