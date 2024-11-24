@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Add to Organization</h2>
+    <hr>
+    <div class="card shadow-sm p-4">
+        <h4 class="mb-4">{{ organization.organization_name }}</h4>
+        
+        <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            
+            <!-- Display Form Errors -->
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                <strong>There were errors in your submission:</strong>
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            <!-- Organization Form -->
+            <div class="mb-3">
+                {{ form.profile.label_tag }}
+                {{ form.profile }}
+            </div>
+            <div class="mb-3">
+                {{ form.role.label_tag }}
+                {{ form.role }}
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Add</button>
+            <a href="{% url 'organization_detail' organization.pk %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

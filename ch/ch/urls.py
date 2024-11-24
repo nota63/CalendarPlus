@@ -28,7 +28,8 @@ urlpatterns = [
     path('auth/', include('accounts.urls')),
     path('chat/', include('chat.urls')),
     path('notify/', include('notify.urls')),
-    path('ai/', include('ai.urls'))
+    path('ai/', include('ai.urls')),
+    path('new_roles/', include('new_roles.urls'))
 
 
 ]

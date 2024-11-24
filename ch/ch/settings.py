@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'chat',
     'accounts',
     'notify',
+    'new_roles',
     'rest_framework',
     'corsheaders',
     # 'grappelli',
@@ -174,7 +175,7 @@ STATIC_URL = '/static/'
 
 # Ensure static files are collected correctly
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'your_django_app/static'),  # Adjust path as necessary
+    os.path.join(BASE_DIR, 'ch/static'),  # Adjust path as necessary
 ]
 
 
