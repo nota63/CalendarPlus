@@ -6,7 +6,7 @@
     <title>Update Email Address for Notifications</title>
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&display=swap" rel="stylesheet">
 
     <!-- GSAP Animation Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.0/gsap.min.js"></script>
@@ -26,15 +26,14 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            padding: 20px;
             color: #333;
         }
 
         .container {
             background: #ffffff;
-            padding: 30px 20px;
-            width: 100%;
-            max-width: 450px;
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             overflow: hidden;
@@ -46,54 +45,54 @@
         .email-banner {
             background-color: #0078d7;
             color: #fff;
-            padding: 15px;
+            padding: 10px;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 20px;
-            font-size: 16px;
+            font-size: 14px;
             opacity: 0;
         }
 
         .email-icon {
-            margin-right: 12px;
-            font-size: 24px;
+            margin-right: 10px;
+            font-size: 22px;
         }
 
         /* Header Section */
         h2 {
-            font-size: 22px;
+            font-size: 20px;
             color: #0078d7;
             margin-bottom: 10px;
-            font-weight: 600;
+            font-weight: 400;
         }
 
         p.description {
             color: #666;
-            margin-bottom: 20px;
-            font-size: 14px;
+            margin-bottom: 15px;
+            font-size: 13px;
         }
 
         /* Form Styling */
         form {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             margin-bottom: 20px;
         }
 
         label {
-            font-weight: 500;
-            font-size: 14px;
+            font-weight: 400;
+            font-size: 13px;
             color: #444;
         }
 
         input[type="email"] {
             border-radius: 8px;
             border: 1px solid #ccc;
-            padding: 10px;
-            font-size: 15px;
+            padding: 8px;
+            font-size: 14px;
             width: 100%;
             transition: all 0.3s ease;
         }
@@ -109,10 +108,10 @@
             background-color: #0078d7;
             color: white;
             border: none;
-            padding: 12px;
+            padding: 10px;
             border-radius: 8px;
-            font-weight: 600;
-            font-size: 16px;
+            font-weight: 400;
+            font-size: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -126,7 +125,7 @@
         }
 
         .icon {
-            font-size: 18px;
+            font-size: 16px;
         }
 
         /* Benefits Section */
@@ -136,7 +135,7 @@
         }
 
         .benefits h3 {
-            font-size: 18px;
+            font-size: 16px;
             color: #0078d7;
             margin-bottom: 10px;
         }
@@ -145,78 +144,77 @@
             display: flex;
             align-items: flex-start;
             margin-bottom: 8px;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .benefit-icon {
             color: #0078d7;
-            font-size: 18px;
-            margin-right: 10px;
+            font-size: 16px;
+            margin-right: 8px;
         }
 
         /* Footer */
         .footer {
             margin-top: 30px;
-            font-size: 13px;
+            font-size: 12px;
             color: #666;
             text-align: center;
         }
 
         /* Message container */
-section {
-    position: fixed;
-    top: 10%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #d4edda;
-    color: #155724;
-    padding: 15px 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    display: flex;
-    align-items: center;
-    font-family: 'Roboto', sans-serif;
-    font-size: 1rem;
-    opacity: 0;
-    animation: fadeInOut 5s ease forwards;
-    transition: transform 0.5s, opacity 0.5s;
-}
+        section {
+            position: fixed;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            font-family: 'Roboto', sans-serif;
+            font-size: 1rem;
+            opacity: 0;
+            animation: fadeInOut 5s ease forwards;
+            transition: transform 0.5s, opacity 0.5s;
+        }
 
-/* Checkmark icon */
-section::before {
-    content: '✔';
-    margin-right: 8px;
-    color: #28a745;
-    font-size: 1.2rem;
-    animation: bounce 0.5s ease;
-}
+        /* Checkmark icon */
+        section::before {
+            content: '✔';
+            margin-right: 8px;
+            color: #28a745;
+            font-size: 1.2rem;
+            animation: bounce 0.5s ease;
+        }
 
-/* Fade in/out keyframes */
-@keyframes fadeInOut {
-    0% {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    10%, 90% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    100% {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-}
+        /* Fade in/out keyframes */
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            10%, 90% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
 
-/* Checkmark bounce animation */
-@keyframes bounce {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.2);
-    }
-}
-
+        /* Checkmark bounce animation */
+        @keyframes bounce {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
     </style>
 </head>
 <body>
@@ -268,16 +266,6 @@ section::before {
 </div>
 
 <script>
-
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-        const messageBox = document.querySelector('section');
-        if (messageBox) {
-            messageBox.style.opacity = '0';
-            messageBox.style.transform = 'translateY(-20px)';
-        }
-    }, 5000);
-});
     // GSAP animation for email banner
     document.addEventListener("DOMContentLoaded", function() {
         const banner = document.getElementById("emailBanner");
@@ -296,7 +284,19 @@ document.addEventListener('DOMContentLoaded', function() {
             onComplete: () => banner.style.display = 'none'
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            const messageBox = document.querySelector('section');
+            if (messageBox) {
+                messageBox.style.opacity = '0';
+                messageBox.style.transform = 'translateY(-20px)';
+            }
+        }, 5000);
+    });
 </script>
 
 </body>
 </html>
+
+

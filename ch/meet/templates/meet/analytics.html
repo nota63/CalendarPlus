@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analytics Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -53,9 +55,150 @@
                 grid-template-columns: 1fr; /* Stack cards on smaller screens */
             }
         }
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap');
+
+/* Styling for the Analytics Dashboard Section */
+.msg {
+    font-family: 'Montserrat', sans-serif; /* Premium Google Font */
+    background-color: #ffffff; /* White background for clean look */
+    border-radius: 12px; /* Rounded corners for a modern feel */
+    padding: 20px; /* Padding for spacing */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    margin: 20px; /* Margin for spacing */
+    max-width: 800px; /* Maximum width for the section */
+    margin: auto; /* Center the section */
+}
+
+/* Styling for the heading */
+.msg h1 {
+    font-size: 18px; /* Smaller font size */
+    color: #0078d7; /* Primary color for heading */
+    margin-bottom: 10px; /* Space below heading */
+    font-weight: 600; /* Slightly bolder for emphasis */
+    text-align: center; /* Centered heading */
+}
+
+/* Styling for the paragraph */
+.msg p {
+    font-size: 14px; /* Smaller font size */
+    color: #555555; /* Dark grey color for paragraph */
+    line-height: 1.6; /* Line height for readability */
+    text-align: center; /* Centered paragraph */
+}
+
+/* Keyframes for the letter-by-letter animation */
+@keyframes fadeInLetter {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&family=Poppins:wght@300;400&display=swap');
+
+/* Analytics Section */
+.ev {
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+    padding: 12px;
+    background: #ffffff;
+    border: 1px solid #e0e4e8;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    margin: 15px auto;
+    max-width: 400px; /* Smaller width */
+    animation: fadeInSlideUp 1.2s ease-in-out;
+}
+
+/* Title Style */
+.ev h1 {
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.2rem; /* Smaller size */
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ev h1 i {
+    margin-right: 8px;
+    font-size: 1.3rem;
+    color: #007aff; /* Premium blue icon color */
+}
+
+/* Paragraph Style */
+.ev p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.8rem; /* Smaller, compact font size */
+    font-weight: 300;
+    color: #555;
+    margin: 5px 0;
+    line-height: 1.3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ev p i {
+    margin-right: 6px;
+    font-size: 0.9rem; /* Smaller icon size */
+    color: #ff7f50; /* Coral icon color */
+}
+
+/* Keyframes for Text Animation */
+@keyframes fadeInSlideUp {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 600px) {
+    .ev {
+        max-width: 90%;
+        padding: 8px;
+    }
+    .ev h1 {
+        font-size: 1rem;
+    }
+    .ev p {
+        font-size: 0.7rem;
+    }
+    .ev h1 i, .ev p i {
+        font-size: 1rem;
+    }
+}
+
+
     </style>
 </head>
 <body>
+
+    <section class="ev">
+        <h1>
+            <i class="fas fa-chart-line"></i> Analytics Dashboard
+        </h1>
+        <p>
+            <i class="fas fa-info-circle"></i> Dashboard is in development! If you find any bugs, please let us know via our help section!
+        </p>
+    </section>
+    
+
     <div class="container">
         <div class="card">
             <h2>Total Meetings</h2>
@@ -314,6 +457,31 @@
                 }
             }
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+    const msgSection = document.querySelector('.msg');
+    const heading = msgSection.querySelector('h1');
+    const paragraph = msgSection.querySelector('p');
+
+    // Function to apply animation to text content
+    function animateText(element, delay) {
+        const text = element.innerText;
+        element.innerHTML = ''; // Clear the element's content
+        text.split('').forEach((char, i) => {
+            const span = document.createElement('span');
+            span.innerText = char;
+            span.style.display = 'inline-block';
+            span.style.opacity = 0;
+            span.style.animation = `fadeInLetter 0.5s ease ${i * delay}s forwards`;
+            element.appendChild(span);
+        });
+    }
+
+    // Animate heading and paragraph text
+    animateText(heading, 0.05); // 50ms delay between letters
+    animateText(paragraph, 0.03); // 30ms delay between letters
+});
+
     </script>
 </body>
 </html>
