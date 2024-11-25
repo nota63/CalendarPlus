@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members of {{ organization.name }}</title>
+    <!-- Google Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+            overflow: hidden; /* Prevent body from scrolling */
+        }
+
+        .container {
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh; /* Enable scrolling within the container */
+            overflow-y: auto; /* Enable scrolling */
+            animation: fadeIn 1s forwards, slideIn 1s forwards 0.5s;
+            text-align: center;
+        }
+
+        .container::-webkit-scrollbar {
+            width: 8px; /* Thinner scrollbar */
+        }
+
+        .container::-webkit-scrollbar-thumb {
+            background-color: #4f46e5; /* Premium color for scrollbar */
+            border-radius: 4px;
+        }
+
+        h1 {
+            font-size: 20px; /* Reduced font size */
+            margin-bottom: 10px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        p.description {
+            font-size: 12px; /* Reduced font size */
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        h2 {
+            font-size: 18px; /* Reduced font size */
+            margin-bottom: 10px;
+            color: #555;
+            text-align: center;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+        }
+
+        li {
+            background-color: #fafafa;
+            padding: 10px; /* Reduced padding */
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            font-size: 12px; /* Reduced font size */
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            align-items: flex-start;
+        }
+
+        li span.material-icons {
+            font-size: 18px; /* Reduced font size */
+        }
+
+        li strong {
+            font-size: 14px; /* Reduced font size */
+            color: #333;
+        }
+
+        .admin-color {
+            color: #e53935; /* Red */
+        }
+
+        .manager-color {
+            color: #fb8c00; /* Orange */
+        }
+
+        .employee-color {
+            color: #4caf50; /* Green */
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            <span class="material-icons admin-color">group</span>
+            Members of {{ organization.name }}
+        </h1>
+        <p class="description">
+            <span class="material-icons">info</span>
+            All employees of {{ organization.name }} will appear here.
+        </p>
+        <h2>
+            <span class="material-icons admin-color">admin_panel_settings</span>
+            Admins
+        </h2>
+        <ul>
+            {% for profile in admins %}
+                <li>
+                    <span class="material-icons admin-color">admin_panel_settings</span>
+                    <strong class="admin-color">{{ profile.user.username }}</strong> - Admin
+                </li>
+            {% empty %}
+                <li>No Admins</li>
+            {% endfor %}
+        </ul>
+
+        <h2>
+            <span class="material-icons manager-color">manage_accounts</span>
+            Managers
+        </h2>
+        <ul>
+            {% for profile in managers %}
+                <li>
+                    <span class="material-icons manager-color">manage_accounts</span>
+                    <strong class="manager-color">{{ profile.user.username }}</strong> - Manager
+                </li>
+            {% empty %}
+                <li>No Managers</li>
+            {% endfor %}
+        </ul>
+
+        <h2>
+            <span class="material-icons employee-color">person</span>
+            Employees
+        </h2>
+        <ul>
+            {% for profile in employees %}
+                <li>
+                    <span class="material-icons employee-color">person</span>
+                    <strong class="employee-color">{{ profile.user.username }}</strong> - Employee
+                </li>
+            {% empty %}
+                <li>No Employees</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

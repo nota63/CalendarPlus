@@ -301,13 +301,12 @@ h1 {
         
         <nav>
             {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 <a href="{% url 'render_calendar' %}"><i class="fas fa-calendar-alt"></i> Calendar</a>
                 <a href="{% url 'ai_intro' %}">
                     <i class="fas fa-robot"></i> Ask AI
                 </a> 
-                {% if request.user.profile.is_profile_admin %}
-                <a href="{% url 'features' %}"><i class="fas fa-lock"></i> Organization</a>
-            {% endif %}           
+                <!-- <a href="{% url 'features' %}"><i class="fas fa-lock"></i> Organization</a> -->
                 <a href="{% url 'device_info' %}"><i class="fas fa-mobile-alt"></i> Device</a>
                 <a href="{% url 'update_email' %}"><i class="fas fa-bell"></i> Notifications</a>
                 <a href="{% url 'analytics' %}"><i class="fas fa-chart-line"></i> Analytics</a>
@@ -316,15 +315,16 @@ h1 {
                 <a href="{% url 'intro_reminder' %}"><i class="fas fa-hourglass-half"></i> Reminders</a>
                 <a href="{% url 'selector_room' %}"><i class="fas fa-comments"></i> Live Chat</a>
                 <a href="{% url 'profile_info' %}"><i class="fas fa-user"></i> Profile And Permissions</a>
-                {% if request.user.is_staff %}
+                <a href="{% url 'features_auths'%}"><i class="fas fa-lock"></i>Create Organization</a>
+            {% else %}
+               <a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
+               <a href="{% url 'register' %}"><i class="fas fa-user-plus"></i> Register</a>
+            {% endif %}         
+                
+            {% if request.user.is_staff %}
                     <a href="{% url 'admin:index' %}"><i class="fas fa-user-shield"></i> Admin</a>
                     <a href="{% url 'meeting-list' %}"><i class="fas fa-code"></i> Access API</a>
                     <a href="{% url 'intro' %}"><i class="fas fa-chart-bar"></i> Calenader + ORM</a>
-                {% endif %}
-                <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            {% else %}
-                <a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
-                <a href="{% url 'register' %}"><i class="fas fa-user-plus"></i> Register</a>
             {% endif %}
         </nav>
     </div>
@@ -360,7 +360,6 @@ h1 {
                 <i class="fas fa-chart-line"></i>
                 <span>Track Statistics</span>
             </div>
-        
         </div>
         <!-- <div class="footer">
             &copy; 2024 Calendar App. All Rights Reserved.

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Members - {{ organization.name }}</title>
+    <!-- Google Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+            overflow: hidden; /* Prevent body from scrolling */
+        }
+
+        .container {
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh; /* Enable scrolling within the container */
+            overflow-y: auto; /* Enable scrolling */
+            animation: fadeIn 1s forwards, slideIn 1s forwards 0.5s;
+            text-align: center;
+            position: relative;
+        }
+
+        .container::-webkit-scrollbar {
+            width: 8px; /* Thinner scrollbar */
+        }
+
+        .container::-webkit-scrollbar-thumb {
+            background-color: #4f46e5; /* Premium color for scrollbar */
+            border-radius: 4px;
+        }
+
+        h1 {
+            font-size: 20px; /* Reduced font size */
+            margin-bottom: 10px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 18px; /* Reduced font size */
+            margin-bottom: 10px;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            background-color: #fafafa;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .delete-icon {
+            color: #e53935;
+            cursor: pointer;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+
+        .delete-icon:hover {
+            color: #d32f2f;
+        }
+
+        .icon {
+            font-size: 18px;
+            vertical-align: middle;
+        }
+
+        .icon-admin {
+            color: #e53935; /* Red for admins */
+        }
+
+        .icon-manager {
+            color: #fb8c00; /* Orange for managers */
+        }
+
+        .icon-employee {
+            color: #4caf50; /* Green for employees */
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            <span class="material-icons">group</span>
+            Manage Members - {{ organization.name }}
+        </h1>
+
+        <p>You can permanently remove members from here</p>
+
+        <div class="section-title">
+            <h2>
+                <span class="material-icons icon-admin">admin_panel_settings</span>
+                Admins
+            </h2>
+            <ul>
+                {% for admin in admins %}
+                    <li>
+                        <span>{{ admin.user.username }}</span>
+                        {% if user_profile.is_admin and admin.user != user %}
+                            <form method="POST" action="{% url 'members_action' organization.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="profile_id" value="{{ admin.id }}">
+                                <button type="submit" style="background: none; border: none;">
+                                    <span class="material-icons delete-icon">delete</span>
+                                </button>
+                            </form>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="section-title">
+            <h2>
+                <span class="material-icons icon-manager">supervisor_account</span>
+                Managers
+            </h2>
+            <ul>
+                {% for manager in managers %}
+                    <li>
+                        <span>{{ manager.user.username }}</span>
+                        {% if user_profile.is_admin and manager.user != user %}
+                            <form method="POST" action="{% url 'members_action' organization.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="profile_id" value="{{ manager.id }}">
+                                <button type="submit" style="background: none; border: none;">
+                                    <span class="material-icons delete-icon">delete</span>
+                                </button>
+                            </form>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="section-title">
+            <h2>
+                <span class="material-icons icon-employee">person</span>
+                Employees
+            </h2>
+            <ul>
+                {% for employee in employees %}
+                    <li>
+                        <span>{{ employee.user.username }}</span>
+                        {% if user_profile.is_admin or user_profile.is_manager %}
+                            <form method="POST" action="{% url 'members_action' organization.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="profile_id" value="{{ employee.id }}">
+                                <button type="submit" style="background: none; border: none;">
+                                    <span class="material-icons delete-icon">delete</span>
+                                </button>
+                            </form>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
+

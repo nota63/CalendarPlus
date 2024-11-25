@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organization Invitation</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Inline CSS -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fc;
+            margin: 0;
+            padding: 0;
+        }
+
+        .email-container {
+            background-color: #ffffff;
+            max-width: 600px;
+            margin: 30px auto;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .email-header {
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .email-header img {
+            max-width: 100px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .email-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        .email-body {
+            padding: 25px;
+            color: #333;
+        }
+
+        .email-body p {
+            line-height: 1.8;
+            font-size: 1.1rem;
+            margin: 0 0 15px;
+        }
+
+        .email-body strong {
+            color: #007bff;
+        }
+
+        .email-button {
+            display: inline-block;
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-top: 15px;
+        }
+
+        .email-button:hover {
+            background-color: #0056b3;
+        }
+
+        .email-details {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .email-details h3 {
+            margin: 0 0 10px;
+            font-size: 1.4rem;
+            color: #007bff;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .email-details div {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .email-details div span {
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 8px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+
+        .email-details div span i {
+            font-size: 1.2rem;
+        }
+
+        .email-details div p {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .email-footer {
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 15px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .email-footer a {
+            color: #bbe1ff;
+            text-decoration: none;
+        }
+
+        .email-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="email-header">
+            <img src="https://static.vecteezy.com/system/resources/previews/000/355/372/original/vector-calendar-icon.jpg" alt="Company Logo">
+            <h1>You're Invited!</h1>
+        </div>
+
+        <!-- Body -->
+        <div class="email-body">
+            <p>Hello,</p>
+            <p>
+                <strong>{{ inviter_name }}</strong> has invited you to join the organization 
+                <strong>{{ organization_name }}</strong> as a <strong>{{ role }}</strong>.
+            </p>
+            <p>To accept this invitation, click the button below:</p>
+            <a href="{{ accept_invite_url }}" class="email-button">Accept Invitation</a>
+            <p>
+                If you do not wish to join, you can ignore this email. The invitation will expire on 
+                <strong>{{ expiration_date }}</strong>.
+            </p>
+
+            <!-- Details -->
+            <div class="email-details">
+                <h3>Invitation Details</h3>
+                <div>
+                    <span><i class="material-icons">business</i></span>
+                    <p><strong>Organization:</strong> {{ organization_name }}</p>
+                </div>
+                <div>
+                    <span><i class="material-icons">person</i></span>
+                    <p><strong>Role:</strong> {{ role }}</p>
+                </div>
+                <div>
+                    <span><i class="material-icons">account_circle</i></span>
+                    <p><strong>Invited By:</strong> {{ inviter_name }}</p>
+                </div>
+                <div>
+                    <span><i class="material-icons">event</i></span>
+                    <p><strong>Expiration Date:</strong> {{ expiration_date }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="email-footer">
+            &copy; 2024 Calendar+. All rights reserved. <br>
+            <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
+        </div>
+    </div>
+</body>
+</html>
+
+
+

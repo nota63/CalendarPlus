@@ -29,7 +29,9 @@ urlpatterns = [
     path('chat/', include('chat.urls')),
     path('notify/', include('notify.urls')),
     path('ai/', include('ai.urls')),
-    path('new_roles/', include('new_roles.urls'))
+    path('new_roles/', include('new_roles.urls')),
+    path('features_auths/', include('auths.urls'))
+
 
 
 ]

@@ -48,6 +48,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'meet',
+    'auths',
     'daphne',
     'ai',
     'channels',

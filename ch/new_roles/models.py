@@ -12,7 +12,10 @@ class Profile(models.Model):
         ('employee','Employee')
     )
 
-    user= models.OneToOneField(User, on_delete=models.CASCADE)
+# role choices should be a booloen field 
+
+# multi managers are allowed
+    user= models.ForeignKey(User, on_delete=models.CASCADE)
     full_name=models.CharField(max_length=100)
     email= models.EmailField(unique=True)
     contact=models.CharField(max_length=15)
@@ -39,7 +42,6 @@ class Organization(models.Model):
         ('datasnap', 'Datasnap'),
         ('moviesnap', 'Moviesnap'),
     )
-
     organization_name = models.CharField(max_length=100, choices=ORGANIZATION_CHOICES, unique=True)
     # One admin per organization
     admin = models.OneToOneField(
@@ -55,3 +57,8 @@ class Organization(models.Model):
 
     def __str__(self):
         return self.organization_name
+    
+
+# organization name when it is created
+# one text value -- no.of_employees   
+# is created 

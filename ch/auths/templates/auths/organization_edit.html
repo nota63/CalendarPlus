@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Organization</title>
+    <!-- Google Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow: hidden; /* Prevent body from scrolling */
+        }
+
+        .container {
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh; /* Enable scrolling within the container */
+            overflow-y: auto; /* Enable scrolling */
+            animation: fadeIn 1s forwards, slideIn 1s forwards 0.5s;
+            text-align: center;
+            position: relative;
+        }
+
+        .container::-webkit-scrollbar {
+            width: 8px; /* Thinner scrollbar */
+        }
+
+        .container::-webkit-scrollbar-thumb {
+            background-color: #4f46e5; /* Premium color for scrollbar */
+            border-radius: 4px;
+        }
+
+        h1 {
+            font-size: 20px; /* Reduced font size */
+            margin-bottom: 10px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #6366f1;
+            outline: none;
+        }
+
+        button {
+            background-color: #4f46e5;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background-color: #4338ca;
+        }
+
+        .material-icons {
+            font-size: 18px; /* Smaller icon size */
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            <span class="material-icons">edit</span>
+            Edit Your Organization
+        </h1>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">
+                <span class="material-icons">save</span>
+                Save Changes
+            </button>
+        </form>
+    </div>
+</body>
+</html>

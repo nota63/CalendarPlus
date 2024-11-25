@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Email Invitation</title>
+    <!-- Google Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background-color: #f3f4f6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow: hidden; /* Prevent body from scrolling */
+        }
+
+        .info-text {
+            font-size: 14px; /* Reduced font size */
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #666;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            animation: fadeIn 1s forwards;
+        }
+
+        .container {
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh; /* Enable scrolling within the container */
+            overflow-y: auto; /* Enable scrolling */
+            animation: fadeIn 1s forwards, slideIn 1s forwards 0.5s;
+            text-align: center;
+            position: relative;
+        }
+
+        .container::-webkit-scrollbar {
+            width: 8px; /* Thinner scrollbar */
+        }
+
+        .container::-webkit-scrollbar-thumb {
+            background-color: #4f46e5; /* Premium color for scrollbar */
+            border-radius: 4px;
+        }
+
+        h2 {
+            font-size: 20px; /* Reduced font size */
+            margin-bottom: 10px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #6366f1;
+            outline: none;
+        }
+
+        button {
+            background-color: #4f46e5;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background-color: #4338ca;
+        }
+
+        .spinner {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .spinner span {
+            display: inline-block;
+            width: 30px; /* Compact size */
+            height: 30px;
+            border: 4px solid #4f46e5;
+            border-top: 4px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .spinner p {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #333;
+            animation: changeText 1.5s infinite;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes changeText {
+            0%, 50% {
+                content: "Initiating invitation...";
+            }
+            50%, 100% {
+                content: "Just a sec...";
+            }
+        }
+    </style>
+    <script>
+        function showSpinner() {
+            document.querySelector('.spinner').style.display = 'flex';
+        }
+    </script>
+</head>
+<body>
+    <div class="info-text">
+        <span class="material-icons">info</span>
+        Enter an email to invite users on calendar + to join your organization. They can accept or reject the invitation.
+    </div>
+    <div class="container">
+        <h2>
+            <span class="material-icons">mail_outline</span>
+            Send Email Invitation
+        </h2>
+        <form method="post" onsubmit="showSpinner()">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">
+                <span class="material-icons">send</span>
+                Send Invitation
+            </button>
+        </form>
+        <div class="spinner">
+            <span></span>
+            <p></p>
+        </div>
+    </div>
+</body>
+</html>
