@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Profile, Organization, Invitation,EmailInvitation
+from .models import Profile, Organization, Invitation,EmailInvitation, Availability
 
 class AddMemberForm(forms.ModelForm):
     role = forms.ChoiceField(
@@ -87,3 +87,29 @@ class EmailInvitationForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.fields['role'].choices = EmailInvitation.ROLE_CHOICES
    
+
+# profile edit form
+
+class ProfileEditForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        exclude = ['user', 'organization']  # Exclude user and organization fields
+        widgets = {
+            'is_admin': forms.CheckboxInput(),
+            'is_manager': forms.CheckboxInput(),
+            'is_employee': forms.CheckboxInput(),
+        }
+
+# calendar part        
+# meeting form
+
+from django.forms import SelectDateWidget
+from .models import Meets
+
+        
+
+
+# share calendar
+
+class ShareCalendarForm(forms.Form):
+    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter email address'}))

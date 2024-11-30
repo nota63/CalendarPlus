@@ -6,7 +6,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
 from .forms import MeetingForm
-
+from django.db.models import Count, Avg, Max, Min
+from datetime import timedelta
+from django.utils import timezone
+from .models import Meeting
+import json
+from django.db.models.functions import ExtractHour
 # essentials
 from django.views import View
 from django.http import JsonResponse
@@ -19,6 +24,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import send_mail
 from django.conf import settings
 from django.template.loader import render_to_string
+from auths.models import Profile, Availability, Organization
+
+
+
 # render a calender
 
 class RenderCalendarView(LoginRequiredMixin, View):
@@ -68,6 +77,102 @@ class CreateMeetingView(LoginRequiredMixin, View):
         except Exception as e:
             return JsonResponse({'exeption':str(e)})
         return JsonResponse({'status': 'success'})
+
+class FetchAvailabilityView(LoginRequiredMixin, View):
+    def get(self, request):
+        # Get the organization IDs of the logged-in user
+        user_profiles = Profile.objects.filter(user=request.user)
+        organization_ids = user_profiles.values_list('organization_id', flat=True)
+
+        # Fetch availability for users belonging to the same organizations
+        availabilities = Availability.objects.filter(user__profiles__organization_id__in=organization_ids)
+
+        # Get today's date to base the week on
+        today = timezone.localdate()
+
+        # Prepare the availability data for FullCalendar
+        events = []
+        for availability in availabilities:
+            # Find the next matching day in the week
+            days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+            current_day_index = days_of_week.index(today.strftime('%A'))  # Get the current day of the week as index
+            target_day_index = days_of_week.index(availability.day_of_week)  # Day of week from availability
+
+            # Calculate the difference between today and the target day
+            days_diff = target_day_index - current_day_index
+            if days_diff <= 0:
+                days_diff += 7  # Ensure we're looking at the next week if the day already passed
+
+            # Get the target date for the availability
+            target_date = today + timedelta(days=days_diff)
+
+            # Create datetime objects for the start and end times
+            start_datetime = datetime.combine(target_date, availability.start_time)
+            end_datetime = datetime.combine(target_date, availability.end_time)
+
+            # Convert to ISO 8601 format (FullCalendar uses this format)
+            start_iso = start_datetime.isoformat()
+            end_iso = end_datetime.isoformat()
+
+            events.append({
+                'id': availability.id,
+                'title': f"{availability.user.username} - {availability.start_time} to {availability.end_time}",
+                'start': start_iso,  # Use the correctly formatted datetime
+                'end': end_iso,      # Use the correctly formatted datetime
+                'allDay': False,     # Not an all-day event
+                'backgroundColor': "#28a745",  # Customize as needed (Green for availability)
+                'borderColor': "#28a745",      # Customize as needed
+                'isAvailability': True,  # Custom attribute to indicate it's availability
+            })
+        
+        return JsonResponse({'events': events})
+    
+class GetMeetingsView(LoginRequiredMixin, View):
+    def get(self, request):
+        start = request.GET.get('start')
+        end = request.GET.get('end')
+        meeting_type = request.GET.get('meeting_type', 'all')
+
+        meetings = Meeting.objects.filter(
+            Q(admin=request.user) | Q(user=request.user),
+            date__range=[start, end]
+        )
+
+        if meeting_type != 'all':
+            meetings = meetings.filter(meeting_type=meeting_type)
+
+        events = []
+        for meeting in meetings:
+            event_start = f"{meeting.date}T{meeting.time}"
+            event_end = (meeting.date + timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M')
+        
+
+            events.append({
+                'title': meeting.title,
+                'meeting_link': meeting.meeting_link,
+                'start': event_start,
+                # new
+                'admin': meeting.admin.username if meeting.admin else 'No admin assigned',
+                'end': event_end,
+                'user': meeting.user.username,
+                'meeting_type': meeting.meeting_type,
+                'allDay': False  
+            })
+
+        return JsonResponse(events, safe=False)
+    
+# get users of same organization
+class GetUsersView(LoginRequiredMixin, View):
+    def get(self, request):
+        # Get the organizations the logged-in user belongs to
+        user_profiles = Profile.objects.filter(user=request.user)
+        organization_ids = user_profiles.values_list('organization_id', flat=True)
+
+        # Fetch users belonging to the same organizations
+        users = User.objects.filter(profiles__organization_id__in=organization_ids).distinct()
+        user_list = [{'id': user.id, 'username': user.username} for user in users]
+        
+        return JsonResponse({'users': user_list})
 
 
 from .forms import UpdateEmailForm
@@ -119,43 +224,6 @@ def get_profile_info(request):
 # fetch device info
 import psutil
 import socket
-
-def device_info_view(request):
-    system_name = socket.gethostname()
-    system_info = {
-        'system_name':system_name,
-        'cpu_usage': psutil.cpu_percent(interval=1),
-        'memory_info': psutil.virtual_memory(),
-        'disk_usage': psutil.disk_usage('/'),
-        'network_info': psutil.net_io_counters(),
-        'battery': psutil.sensors_battery()  
-    }
-    if system_info['battery']:
-        battery_percent = system_info['battery'].percent
-        power_plugged = system_info['battery'].power_plugged
-        time_left = system_info['battery'].secsleft if system_info[
-                                                           'battery'].secsleft != psutil.POWER_TIME_UNLIMITED else None
-    else:
-        battery_percent = power_plugged = time_left = None
-
-    context = {
-        'system_name':system_name,
-        'cpu_usage': system_info['cpu_usage'],
-        'total_memory': system_info['memory_info'].total / (1024 ** 3),
-        'used_memory': system_info['memory_info'].used / (1024 ** 3),
-        'memory_percent': system_info['memory_info'].percent,
-        'total_disk': system_info['disk_usage'].total / (1024 ** 3),
-        'used_disk': system_info['disk_usage'].used / (1024 ** 3),
-        'disk_percent': system_info['disk_usage'].percent,
-        'bytes_sent': system_info['network_info'].bytes_sent / (1024 ** 2),
-        'bytes_recv': system_info['network_info'].bytes_recv / (1024 ** 2),
-        'battery_percent': battery_percent,
-        'power_plugged': power_plugged,
-        'time_left': time_left,
-    }
-    return render(request, 'meet/device_info.html', context)
-
-
 
 import pyautogui
 import os
@@ -223,13 +291,6 @@ class GetMeetingsView(LoginRequiredMixin, View):
 
         return JsonResponse(events, safe=False)
     
-    
-class GetUsersView(LoginRequiredMixin, View):
-    def get(self, request):
-        users = User.objects.all()
-        user_list = [{'id': user.id, 'username': user.username} for user in users]
-        return JsonResponse({'users': user_list})
-
        
 def user_meetings(request):
     meetings=Meeting.objects.filter(user=request.user)
@@ -238,12 +299,7 @@ def user_meetings(request):
 
 
 # analytics section
-from django.db.models import Count, Avg, Max, Min
-from datetime import timedelta
-from django.utils import timezone
-from .models import Meeting
-import json
-from django.db.models.functions import ExtractHour
+
 
 def analytics_view(request):
     user = request.user  
@@ -293,6 +349,46 @@ def analytics_view(request):
     }
     
     return render(request, 'meet/analytics.html', context)
+
+
+# fetch device info
+import psutil
+import socket
+
+def device_info_view(request):
+    system_name = socket.gethostname()
+    system_info = {
+        'system_name':system_name,
+        'cpu_usage': psutil.cpu_percent(interval=1),
+        'memory_info': psutil.virtual_memory(),
+        'disk_usage': psutil.disk_usage('/'),
+        'network_info': psutil.net_io_counters(),
+        'battery': psutil.sensors_battery()  
+    }
+    if system_info['battery']:
+        battery_percent = system_info['battery'].percent
+        power_plugged = system_info['battery'].power_plugged
+        time_left = system_info['battery'].secsleft if system_info[
+                                                           'battery'].secsleft != psutil.POWER_TIME_UNLIMITED else None
+    else:
+        battery_percent = power_plugged = time_left = None
+
+    context = {
+        'system_name':system_name,
+        'cpu_usage': system_info['cpu_usage'],
+        'total_memory': system_info['memory_info'].total / (1024 ** 3),
+        'used_memory': system_info['memory_info'].used / (1024 ** 3),
+        'memory_percent': system_info['memory_info'].percent,
+        'total_disk': system_info['disk_usage'].total / (1024 ** 3),
+        'used_disk': system_info['disk_usage'].used / (1024 ** 3),
+        'disk_percent': system_info['disk_usage'].percent,
+        'bytes_sent': system_info['network_info'].bytes_sent / (1024 ** 2),
+        'bytes_recv': system_info['network_info'].bytes_recv / (1024 ** 2),
+        'battery_percent': battery_percent,
+        'power_plugged': power_plugged,
+        'time_left': time_left,
+    }
+    return render(request, 'meet/device_info.html', context)
 
 
 # USER MEETING COUNT

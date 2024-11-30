@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Availability Calendar</title>
+    <!-- FullCalendar and Dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
+
+    <!-- new imports -->
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
+
+    <style>
+        /* Custom styling for availability events */
+        .availability-event {
+            color: white;
+            font-weight: bold;
+        }
+        /* Modal styling */
+        #meetingModal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1000;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 50%;
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        #modalContent {
+            display: flex;
+            flex-direction: column;
+        }
+        #closeModal {
+            align-self: flex-end;
+        }
+    </style>
+</head>
+<body>
+    <h2 style="text-align: center;">Availability Calendar</h2>
+    <div class="container">
+        <div id="calendar"></div>
+    </div>
+
+    <!-- Modal for creating the meeting -->
+    <div id="meetingModal">
+        <div id="modalContent">
+            <span id="closeModal" style="color:red;cursor:pointer;">&times;</span>
+            <h2>Create Meeting</h2>
+            
+            <!-- Form for creating a meeting -->
+            <form id="meetingForm">
+                <input type="hidden" id="selectedDate">
+                
+                <label for="title">Meeting Title:</label>
+                <input type="text" id="title" required>
+                
+                <label for="meeting_link">Meeting Link:</label>
+                <input type="url" id="meeting_link" required placeholder="Enter meeting link">
+                
+                <label for="start_time">Start time:</label>
+                <input type="time" id="start_time" required>
+
+                <label for="end_time">End time:</label>
+                <input type="time" id="end_time" required>
+                
+                <label for="user">Select User:</label>
+                <select id="user" required></select>
+                
+                <button type="submit">Create Meeting</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Initialize FullCalendar
+            var calendar = $('#calendar').fullCalendar({
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,agendaWeek,agendaDay'
+                },
+                editable: false, // Events are not editable
+                selectable: true, // Allow selection for scheduling meetings
+                events: '/features_auths/availability-calendar/', // Endpoint for AvailabilityCalendarView
+                select: function(start, end) {
+                    // Show modal when a time slot is clicked
+                    $('#selectedDate').val(start.format('YYYY-MM-DD'));
+                    $('#meetingModal').show();
+                },
+                eventRender: function (event, element) {
+                    // Add custom styles to availability events
+                    if (event.isAvailability) {
+                        element.addClass('availability-event');
+                        element.css({
+                            "background-color": event.backgroundColor,
+                            "border-color": event.borderColor,
+                        });
+                    }
+                },
+                eventLimit: true, // Show "+more" link if too many events
+            });
+
+            // Handle modal close
+            $('#closeModal').on('click', function() {
+                $('#meetingModal').hide();
+            });
+
+            // Fetch users for the user dropdown
+            $.ajax({
+                url: '/features_auths/get-users/',
+                method: 'GET',
+                success: function(data) {
+                    $('#user').empty(); // Clear existing options
+                    data.users.forEach(function(user) {
+                        $('#user').append(new Option(user.username, user.id));
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching users: ", error);
+                }
+            });
+
+            // Handle meeting form submission
+            $('#meetingForm').on('submit', function(e) {
+                e.preventDefault();
+
+                var title = $('#title').val();
+                var start_time = $('#start_time').val();
+                var end_time = $('#end_time').val();
+                var meeting_link = $('#meeting_link').val();
+                var userId = $('#user').val();
+
+                $.post('/features_auths/create-meeting/', {
+                    title: title,
+                    start_time: start_time,
+                    end_time: end_time,
+                    meeting_link: meeting_link,
+                    user_id: userId,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                }, function(response) {
+                    $('#meetingModal').hide();
+                    calendar.fullCalendar('refetchEvents'); // Refresh events
+                }).fail(function(xhr, status, error) {
+                    alert('Error creating meeting: ' + error);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
+

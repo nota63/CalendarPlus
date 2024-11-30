@@ -1,0 +1,201 @@
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ user.username }}'s Calendar</title>
+    <!-- Bootstrap 4 CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+    <!-- FullCalendar CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.css"/>
+    
+    <!-- jQuery 3.5.1 -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    
+    <!-- Popper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+    <!-- Bootstrap 4 JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <!-- FullCalendar JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
+
+    <style>
+        #availabilitySidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100%;
+            background: #f8f9fa;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            border-right: 1px solid #ccc;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        #availabilitySidebar.active {
+            left: 0;
+        }
+        #availabilitySidebar .sidebar-header {
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        #availabilitySidebar .sidebar-content {
+            padding: 15px;
+        }
+        .close-sidebar {
+            text-align: right;
+            cursor: pointer;
+            color: #007bff;
+        }
+        .close-sidebar:hover {
+            color: #0056b3;
+        }
+        .booked {
+            background-color: #dc3545 !important;
+            color: #fff !important;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="mt-4">{{ user.username }}'s Calendar</h2>
+        <div id="calendar"></div>
+    </div>
+
+    <div id="availabilitySidebar">
+        <div class="sidebar-header">
+            <span>Availability Details</span>
+            <span class="close-sidebar">&times;</span>
+        </div>
+        <div class="sidebar-content">
+            <p><strong>Day of Week:</strong> <span id="sidebarDayOfWeek"></span></p>
+            <p><strong>Start Time:</strong> <span id="sidebarStartTime"></span></p>
+            <p><strong>End Time:</strong> <span id="sidebarEndTime"></span></p>
+            <p><strong>Recurring:</strong> <span id="sidebarRecurring"></span></p>
+            <button id="scheduleMeetingButton" class="btn btn-primary">Schedule Meeting</button>
+        </div>
+    </div>
+
+    <div class="modal fade" id="scheduleMeetingModal" tabindex="-1" role="dialog" aria-labelledby="scheduleMeetingModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="scheduleMeetingModalLabel">Schedule Meeting</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="scheduleMeetingForm">
+                    <div class="modal-body">
+                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                        <div class="form-group">
+                            <label for="meetingTitle">Title</label>
+                            <input type="text" class="form-control" id="meetingTitle" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="meetingDescription">Description</label>
+                            <textarea class="form-control" id="meetingDescription" name="description" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="meetingDayOfWeek">Day of Week</label>
+                            <input type="text" class="form-control" id="meetingDayOfWeek" name="day_of_week" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="meetingStartTime">Start Time</label>
+                            <input type="time" class="form-control" id="meetingStartTime" name="start_time" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="meetingEndTime">End Time</label>
+                            <input type="time" class="form-control" id="meetingEndTime" name="end_time" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Schedule</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            var calendar = $('#calendar').fullCalendar({
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,agendaWeek,agendaDay'
+                },
+                events: '/features_auths/fetch-user-availability/{{ user.id }}/',
+                editable: false,
+                eventClick: function(event) {
+                    if (event.className.includes('booked')) return;
+
+                    $('#sidebarDayOfWeek').text(event.dayOfWeek || 'N/A');
+                    $('#sidebarStartTime').text(event.startTime || 'N/A');
+                    $('#sidebarEndTime').text(event.endTime || 'N/A');
+                    $('#sidebarRecurring').text(event.recurring ? 'Yes' : 'No');
+                    $('#availabilitySidebar').addClass('active');
+                }
+            });
+
+            $('.close-sidebar').click(function () {
+                $('#availabilitySidebar').removeClass('active');
+            });
+
+            $('#scheduleMeetingButton').click(function () {
+                $('#meetingDayOfWeek').val($('#sidebarDayOfWeek').text());
+                $('#meetingStartTime').val($('#sidebarStartTime').text());
+                $('#meetingEndTime').val($('#sidebarEndTime').text());
+                $('#scheduleMeetingModal').modal('show');
+            });
+
+            $('#scheduleMeetingForm').submit(function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/features_auths/schedule-meeting/',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            // Mark slot as booked
+                            calendar.fullCalendar('renderEvent', {
+                                id: response.event_id,
+                                title: 'Booked',
+                                start: response.start_time,
+                                end: response.end_time,
+                                backgroundColor: '#dc3545',
+                                textColor: '#fff',
+                                className: 'booked',
+                            });
+
+                            alert('Meeting scheduled successfully!');
+                            $('#scheduleMeetingModal').modal('hide');
+                        } else {
+                            alert('Error: ' + response.error);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+

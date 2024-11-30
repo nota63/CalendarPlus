@@ -20,42 +20,6 @@ body {
     padding: 0;
 }
 
-/* calendar styles */
-/* #calendar {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 20px;
-    border-radius: 8px;
-    background-color: white;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
- */
- /* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-
-body {
-    background: linear-gradient(115deg, #f6f9fc, #e8eff7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    font-family: 'Inter', sans-serif;
-    overflow: hidden;
-}
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
-
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background: linear-gradient(135deg, #e0f7fa, #80d8ff);
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-    overflow: hidden;
-}
-
 /* Container Styling */
 #calendar-container {
     max-width: 400px;
@@ -418,6 +382,7 @@ body {
     color: #377bb5;
 }
 
+
 /* Adding Icons */
 #detailTitle::before { content: "\f007"; font-family: "Font Awesome 5 Free"; font-weight: 900; margin-right: 10px; }
 #detailDate::before { content: "\f073"; font-family: "Font Awesome 5 Free"; font-weight: 900; margin-right: 10px; }
@@ -430,6 +395,9 @@ body {
 
 
 
+
+
+
         /* Existing styles... */
     </style>
 </head>
@@ -438,6 +406,8 @@ body {
     <div class="container">
         <div id="calendar"></div>
     </div>
+
+
 
   <!-- Container holding dropdown and button -->
   <div id="filterContainer">
@@ -509,140 +479,140 @@ body {
         </div>
     </div>
 
+
     <script>
-    //     // Assuming you have the meeting link URL as `meetingLink
-
-        $(document).ready(function() {
-            var calendar = $('#calendar').fullCalendar({
-                header: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'month,agendaWeek,agendaDay'
-                },
-                editable: true,
-                events: '/meet/get-meetings/', // Endpoint to fetch meetings
-                selectable: true,
-                select: function(start, end) {
-                    $('#selectedDate').val(start.format('YYYY-MM-DD'));
-                    $('#meetingForm').show(); // Show create form
-                    $('#meetingDetails').hide(); // Hide details view
-                    $('#modalHeader').text("Create Meeting");
-                    $('#meetingModal').show();
-                    calendar.fullCalendar('unselect');
-                },
-                eventRender: function(event, element) {
-                    // Assign a class based on the meeting type
-                    if (event.meeting_type === 'Team') {
-                        element.addClass('event-team');
-                    } else if (event.meeting_type === 'Personal') {
-                        element.addClass('event-personal');
-                    } else if (event.meeting_type === 'Task') {
-                        element.addClass('event-task');
-                    } else if (event.meeting_type === 'Standup') {
-                        element.addClass('event-standup');
-                    }
-               
-    
-                    element.on('click', function() {
-                        // Display event details
-                        $('#detailTitle').text(event.title);
-                        $('#detailDate').text(event.start.format('YYYY-MM-DD'));
-                        $('#detailTime').text(event.start.format('HH:mm') || "Not assigned");
-                        $('#detailAdmin').text(event.admin || "Not assigned");
-                        $('#detailUser').text(event.user || "Not assigned");
-                        $('#detailMeetingType').text(event.meeting_type || "Not assigned"); // Display meeting type
-                          // Set the 'Join' link only if there's a meeting link available
-    if (event.meeting_link) {
-        $('#joinMeeting').attr('href', event.meeting_link);
-        $('#joinMeeting').show();
-    } else {
-        $('#joinMeeting').hide(); // Hide if there's no meeting link
-    }
-                        $('#meetingForm').hide(); // Hide create form
-                        $('#meetingDetails').show(); // Show details view
-                        $('#modalHeader').text("Meeting Details");
+        //     // Assuming you have the meeting link URL as `meetingLink
+            $(document).ready(function() {
+                var calendar = $('#calendar').fullCalendar({
+                    header: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'month,agendaWeek,agendaDay'
+                    },
+                    editable: true,
+                    events: '/meet/get-meetings/', // Endpoint to fetch meetings
+                    selectable: true,
+                    select: function(start, end) {
+                        $('#selectedDate').val(start.format('YYYY-MM-DD'));
+                        $('#meetingForm').show(); // Show create form
+                        $('#meetingDetails').hide(); // Hide details view
+                        $('#modalHeader').text("Create Meeting");
                         $('#meetingModal').show();
-                    });
-                }
-            });
-
-    
-            // Close modal events
-            $('#closeModal, #closeDetails').on('click', function() {
-                $('#meetingModal').hide();
-            });
-           
-    
-           // Handle meeting form submission
-$('#meetingForm').on('submit', function(e) {
-    e.preventDefault();
-    
-    // Show loading spinner
-    $('#loadingSpinner').show();
-
-    var title = $('#title').val();
-    var date = $('#selectedDate').val();
-    var time = $('#time').val();
-    var meeting_link = $('#meeting_link').val();
-    var userId = $('#user').val();
-    var meetingType = $('#meeting_type').val(); // Get the meeting type
-
-    $.post('/meet/create-meeting/', {
-        title: title,
-        date: date,
-        time: time,
-        meeting_link: meeting_link,
-        user_id: userId,
-        meeting_type: meetingType, // Pass meeting type to backend
-        csrfmiddlewaretoken: '{{ csrf_token }}'
-    }, function(response) {
-        $('#meetingModal').hide();
-        calendar.fullCalendar('refetchEvents'); // Refresh events to include new meeting
-        $('#loadingSpinner').hide(); // Hide spinner after successful creation
-    }).fail(function(xhr, status, error) {
-        alert('Error creating meeting: ' + error);
-        $('#loadingSpinner').hide(); // Hide spinner on error
+                        calendar.fullCalendar('unselect');
+                    },
+                    eventRender: function(event, element) {
+                        // Assign a class based on the meeting type
+                        if (event.meeting_type === 'Team') {
+                            element.addClass('event-team');
+                        } else if (event.meeting_type === 'Personal') {
+                            element.addClass('event-personal');
+                        } else if (event.meeting_type === 'Task') {
+                            element.addClass('event-task');
+                        } else if (event.meeting_type === 'Standup') {
+                            element.addClass('event-standup');
+                        }
+                   
+        
+                        element.on('click', function() {
+                            // Display event details
+                            $('#detailTitle').text(event.title);
+                            $('#detailDate').text(event.start.format('YYYY-MM-DD'));
+                            $('#detailTime').text(event.start.format('HH:mm') || "Not assigned");
+                            $('#detailAdmin').text(event.admin || "Not assigned");
+                            $('#detailUser').text(event.user || "Not assigned");
+                            $('#detailMeetingType').text(event.meeting_type || "Not assigned"); // Display meeting type
+                              // Set the 'Join' link only if there's a meeting link available
+        if (event.meeting_link) {
+            $('#joinMeeting').attr('href', event.meeting_link);
+            $('#joinMeeting').show();
+        } else {
+            $('#joinMeeting').hide(); // Hide if there's no meeting link
+        }
+                            $('#meetingForm').hide(); // Hide create form
+                            $('#meetingDetails').show(); // Show details view
+                            $('#modalHeader').text("Meeting Details");
+                            $('#meetingModal').show();
+                        });
+                    }
+                });
+        
+                // Close modal events
+                $('#closeModal, #closeDetails').on('click', function() {
+                    $('#meetingModal').hide();
+                });
+               
+        
+               // Handle meeting form submission
+    $('#meetingForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        // Show loading spinner
+        $('#loadingSpinner').show();
+        var title = $('#title').val();
+        var date = $('#selectedDate').val();
+        var time = $('#time').val();
+        var meeting_link = $('#meeting_link').val();
+        var userId = $('#user').val();
+        var meetingType = $('#meeting_type').val(); // Get the meeting type
+        $.post('/meet/create-meeting/', {
+            title: title,
+            date: date,
+            time: time,
+            meeting_link: meeting_link,
+            user_id: userId,
+            meeting_type: meetingType, // Pass meeting type to backend
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        }, function(response) {
+            $('#meetingModal').hide();
+            calendar.fullCalendar('refetchEvents'); // Refresh events to include new meeting
+            $('#loadingSpinner').hide(); // Hide spinner after successful creation
+        }).fail(function(xhr, status, error) {
+            alert('Error creating meeting: ' + error);
+            $('#loadingSpinner').hide(); // Hide spinner on error
+        });
     });
-});
-    
-            // Fetch users for the user dropdown
+        
+                // Fetch users for the user dropdown
+                $.ajax({
+                    url: '/meet/get-users/',
+                    method: 'GET',
+                    success: function(data) {
+                        data.users.forEach(function(user) {
+                            $('#user').append(new Option(user.username, user.id));
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error fetching users: ", error);
+                    }
+                });
+        
+                // Event listener for meeting type filter dropdown
+          // Event listener for filter button click
+        $('#filterButton').click(function() {
+            var selectedMeetingType = $('#filterMeetingType').val();
+            // Refetch events with the selected meeting type
             $.ajax({
-                url: '/meet/get-users/',
-                method: 'GET',
+                url: '/meet/get-meetings/',
+                data: {
+                    meeting_type: selectedMeetingType, // Pass selected type
+                    // Add any other data you need, e.g., start and end dates
+                    start: $('#calendar').fullCalendar('getDate').startOf('month').format('YYYY-MM-DD'),
+                    end: $('#calendar').fullCalendar('getDate').endOf('month').format('YYYY-MM-DD'),
+                },
                 success: function(data) {
-                    data.users.forEach(function(user) {
-                        $('#user').append(new Option(user.username, user.id));
-                    });
+                    calendar.fullCalendar('removeEvents'); // Clear existing events
+                    calendar.fullCalendar('addEventSource', data); // Load the filtered events
                 },
                 error: function(xhr, status, error) {
-                    console.error("Error fetching users: ", error);
+                    console.error("Error fetching events: ", error);
                 }
-            });
+            }); // Close the AJAX call
+        }); // Close the button click event listener
+    });
+        </script>
     
-            // Event listener for meeting type filter dropdown
-      // Event listener for filter button click
-    $('#filterButton').click(function() {
-        var selectedMeetingType = $('#filterMeetingType').val();
-
-        // Refetch events with the selected meeting type
-        $.ajax({
-            url: '/meet/get-meetings/',
-            data: {
-                meeting_type: selectedMeetingType, // Pass selected type
-                // Add any other data you need, e.g., start and end dates
-                start: $('#calendar').fullCalendar('getDate').startOf('month').format('YYYY-MM-DD'),
-                end: $('#calendar').fullCalendar('getDate').endOf('month').format('YYYY-MM-DD'),
-            },
-            success: function(data) {
-                calendar.fullCalendar('removeEvents'); // Clear existing events
-                calendar.fullCalendar('addEventSource', data); // Load the filtered events
-            },
-            error: function(xhr, status, error) {
-                console.error("Error fetching events: ", error);
-            }
-        }); // Close the AJAX call
-    }); // Close the button click event listener
-});
-    </script>
+    
+        
+        
 </body>
 </html>

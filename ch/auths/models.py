@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.urls import reverse
 import secrets
+from datetime import datetime, timedelta
 
 
 class Organization(models.Model):
@@ -144,4 +145,50 @@ class EmailInvitation(models.Model):
             self.token = secrets.token_urlsafe(32)  
         super().save(*args, **kwargs)
 
+
+
+
+
+
+# calendar +
+class Availability(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="availabilities")
+    day_of_week = models.CharField(max_length=10, choices=[
+        ("Monday", "Monday"),
+        ("Tuesday", "Tuesday"),
+        ("Wednesday", "Wednesday"),
+        ("Thursday", "Thursday"),
+        ("Friday", "Friday"),
+        ("Saturday", "Saturday"),
+        ("Sunday", "Sunday"),
+    ],null=True, blank=True)
+    start_time = models.TimeField(null=True, blank=True)
+    end_time = models.TimeField(null=True, blank=True)
+    meeting_duration = models.PositiveIntegerField(null=True, blank=True)  # Duration of the meeting in minutes
+    buffer_time = models.PositiveIntegerField(null=True, blank=True)  # Buffer time between meetings in minutes
+    is_recurring = models.BooleanField(default=False,null=True, blank=True)  # Recurring availability (can be used for recurring events)
+    is_booked = models.BooleanField(default=False,null=True, blank=True) 
+
+    def __str__(self):
+        return f"{self.user.username} - {self.day_of_week}: {self.start_time} to {self.end_time}"
+    
+# MEETING MODEL 
+
+
+# model for meeting
+class Meets(models.Model):
+    creator = models.ForeignKey(User, on_delete=models.CASCADE,related_name="created_meetings",blank=True, null=True)  # The person scheduling the meeting (you)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="meetings")
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    day_of_week = models.CharField(max_length=10)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    participants = models.ManyToManyField(User, related_name='meetings_participants',null=True, blank=True),
+    is_booked = models.BooleanField(default=False, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.title} with {self.user.username} (Created by {self.creator}) on {self.day_of_week}"
+
+    
 

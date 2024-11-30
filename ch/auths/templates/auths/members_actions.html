@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Members - {{ organization.name }}</title>
-    <!-- Google Fonts and Icons -->
+    <title>Edit Profiles - {{ organization.name }}</title>
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Inline CSS -->
     <style>
         * {
             box-sizing: border-box;
@@ -49,33 +51,16 @@
             border-radius: 4px;
         }
 
-        h1 {
-            font-size: 20px; /* Reduced font size */
-            margin-bottom: 10px;
+        h1, h2 {
+            font-weight: 600;
             color: #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            margin-bottom: 10px;
         }
 
         p {
-            font-size: 14px;
+            font-size: 14px; /* Smaller font size */
             color: #666;
             margin-bottom: 20px;
-        }
-
-        .section-title {
-            margin-bottom: 20px;
-        }
-
-        h2 {
-            font-size: 18px; /* Reduced font size */
-            margin-bottom: 10px;
-            color: #555;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
         ul {
@@ -95,32 +80,49 @@
             justify-content: space-between;
         }
 
-        .delete-icon {
-            color: #e53935;
+        .action-buttons {
+            display: inline-flex;
+            gap: 10px;
+        }
+
+        .action-buttons button {
             cursor: pointer;
-            font-size: 18px;
-            transition: color 0.3s ease;
+            background: none;
+            border: none;
+            font-size: 14px; /* Smaller font size */
         }
 
-        .delete-icon:hover {
-            color: #d32f2f;
+        .delete-icon {
+            color: #e53935; /* Red for delete */
         }
 
-        .icon {
-            font-size: 18px;
-            vertical-align: middle;
-        }
-
-        .icon-admin {
-            color: #e53935; /* Red for admins */
+        .edit-icon {
+            color: #1e88e5; /* Blue for edit */
         }
 
         .icon-manager {
-            color: #fb8c00; /* Orange for managers */
+            color: #fb8c00; /* Orange for manager */
+            margin-right: 5px;
         }
 
         .icon-employee {
-            color: #4caf50; /* Green for employees */
+            color: #4caf50; /* Green for employee */
+            margin-right: 5px;
+        }
+
+        button[type="submit"] {
+            background-color: #4f46e5;
+            color: #fff;
+            padding: 8px 16px; /* Smaller padding */
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #4338ca;
         }
 
         @keyframes fadeIn {
@@ -146,82 +148,84 @@
 </head>
 <body>
     <div class="container">
-        <h1>
-            <span class="material-icons">group</span>
-            Manage Members - {{ organization.name }}
-        </h1>
+        <h1>Actions on members of  - {{ organization.name }}</h1>
+        <p>You can update the profile of an employee or remove them from the organization</p>
 
-        <p>You can permanently remove members from here</p>
-
+        <!-- Managers Section -->
+        {% if user_profile.is_admin %}
         <div class="section-title">
-            <h2>
-                <span class="material-icons icon-admin">admin_panel_settings</span>
-                Admins
-            </h2>
-            <ul>
-                {% for admin in admins %}
-                    <li>
-                        <span>{{ admin.user.username }}</span>
-                        {% if user_profile.is_admin and admin.user != user %}
-                            <form method="POST" action="{% url 'members_action' organization.id %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="profile_id" value="{{ admin.id }}">
-                                <button type="submit" style="background: none; border: none;">
-                                    <span class="material-icons delete-icon">delete</span>
-                                </button>
-                            </form>
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <div class="section-title">
-            <h2>
-                <span class="material-icons icon-manager">supervisor_account</span>
-                Managers
-            </h2>
+            <h2>Managers</h2>
             <ul>
                 {% for manager in managers %}
-                    <li>
-                        <span>{{ manager.user.username }}</span>
-                        {% if user_profile.is_admin and manager.user != user %}
-                            <form method="POST" action="{% url 'members_action' organization.id %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="profile_id" value="{{ manager.id }}">
-                                <button type="submit" style="background: none; border: none;">
-                                    <span class="material-icons delete-icon">delete</span>
-                                </button>
-                            </form>
-                        {% endif %}
-                    </li>
+                <li>
+                    <span>
+                        <span class="material-icons icon-manager">supervisor_account</span>{{ manager.user.username }}
+                    </span>
+                    <div class="action-buttons">
+                        <!-- Edit Form -->
+                        <form method="POST" action="{% url 'members_action' organization.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="profile_id" value="{{ manager.id }}">
+                            <select name="new_role" style="font-size: 14px; padding: 5px;">
+                                <option value="manager" {% if manager.is_manager %}selected{% endif %}>Manager</option>
+                                <option value="employee">Employee</option>
+                            </select>
+                            <button type="submit" style="background: none; border: none;">
+                                <span class="material-icons edit-icon">update</span>
+                            </button>
+                        </form>
+                        <!-- Delete Form -->
+                        <form method="POST" action="{% url 'delete_profile' organization.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="profile_id" value="{{ manager.id }}">
+                            <button type="submit" style="background: none; border: none;">
+                                <span class="material-icons delete-icon">delete</span>
+                            </button>
+                        </form>
+                    </div>
+                </li>
                 {% endfor %}
             </ul>
         </div>
+        {% endif %}
 
+        <!-- Employees Section -->
         <div class="section-title">
-            <h2>
-                <span class="material-icons icon-employee">person</span>
-                Employees
-            </h2>
+            <h2>Employees</h2>
             <ul>
                 {% for employee in employees %}
-                    <li>
-                        <span>{{ employee.user.username }}</span>
-                        {% if user_profile.is_admin or user_profile.is_manager %}
-                            <form method="POST" action="{% url 'members_action' organization.id %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="profile_id" value="{{ employee.id }}">
-                                <button type="submit" style="background: none; border: none;">
-                                    <span class="material-icons delete-icon">delete</span>
-                                </button>
-                            </form>
-                        {% endif %}
-                    </li>
+                <li>
+                    <span>
+                        <span class="material-icons icon-employee">person</span>{{ employee.user.username }}
+                    </span>
+                    <div class="action-buttons">
+                        <!-- Edit Form -->
+                        <form method="POST" action="{% url 'members_action' organization.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="profile_id" value="{{ employee.id }}">
+                            <select name="new_role" style="font-size: 14px; padding: 5px;">
+                                <option value="employee" {% if employee.is_employee %}selected{% endif %}>Employee</option>
+                                {% if user_profile.is_admin %}
+                                <option value="manager">Manager</option>
+                                {% endif %}
+                            </select>
+                            <button type="submit" style="background: none; border: none;">
+                                <span class="material-icons edit-icon">update</span>
+                            </button>
+                        </form>
+                        <!-- Delete Form -->
+                        <form method="POST" action="{% url 'delete_profile' organization.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="profile_id" value="{{ employee.id }}">
+                            <button type="submit" style="background: none; border: none;">
+                                <span class="material-icons delete-icon">delete</span>
+                            </button>
+                        </form>
+                    </div>
+                </li>
                 {% endfor %}
             </ul>
         </div>
     </div>
 </body>
 </html>
-
