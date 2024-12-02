@@ -261,8 +261,8 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 # Ensure session cookies are being set
-SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
-CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
+SESSION_COOKIE_SECURE = False  
+CSRF_COOKIE_SECURE = False  
 
-# Set the session expiration
-SESSION_COOKIE_AGE = 1209600  # 2 weeks
+
+SESSION_COOKIE_AGE = 1209600  
