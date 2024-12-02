@@ -10,44 +10,38 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
 </head>
-
 <style>
-   /* Position the "Share Calendar" button at the top-left corner with rounded corners */
-#shareCalendarButton {
-    position: absolute;
-    top: 10px; /* Adjust distance from the top */
-    left: 10px; /* Adjust distance from the left */
-    z-index: 10; /* Ensure the button is on top of other content */
-    padding: 8px 15px; /* Compact size, adjust padding as needed */
-    border-radius: 25px; /* Rounded corners */
-    font-size: 14px; /* Smaller text for a compact size */
-    font-weight: bold; /* Make the text stand out */
-    color: #fff; /* White text */
-    background-color: #17a2b8; /* Bootstrap 'info' button color */
-    border: none; /* Remove default border */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Light shadow for a premium look */
-}
-
-#shareCalendarButton:hover {
-    background-color: #138496; /* Darker shade on hover */
-    cursor: pointer;
-}
-
-#shareCalendarButton:focus {
-    outline: none; /* Remove focus outline */
-}
-
-
+    /* Custom styles */
+    #shareCalendarButton {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 10;
+        padding: 8px 15px;
+        border-radius: 25px;
+        font-size: 14px;
+        font-weight: bold;
+        color: #fff;
+        background-color: #17a2b8;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    #shareCalendarButton:hover {
+        background-color: #138496;
+        cursor: pointer;
+    }
+    #shareCalendarButton:focus {
+        outline: none;
+    }
 </style>
-
 <body>
     <div class="container">
         <h2 class="mt-4">{{ user.username }}'s Calendar</h2>
         <div id="calendar"></div>
-
-       <!-- Share Calendar Button -->
-<button type="button" id="shareCalendarButton" class="btn btn-info mt-4" data-toggle="modal" data-target="#shareCalendarModal">Share My Calendar</button>
-
+        
+        <!-- Share Calendar Button -->
+        <button type="button" id="shareCalendarButton" class="btn btn-info mt-4" data-toggle="modal" data-target="#shareCalendarModal">Share My Calendar</button>
+        
         <!-- Modal to share calendar link -->
         <div class="modal fade" id="shareCalendarModal" tabindex="-1" role="dialog" aria-labelledby="shareCalendarModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -87,12 +81,16 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    <!-- <p><strong>Id:</strong> <span id="modalId"></span></p> -->
                     <p><strong>Title:</strong> <span id="modalTitle"></span></p>
                     <p><strong>Description:</strong> <span id="modalDescription"></span></p>
                     <p><strong>Scheduled with:</strong> <span id="modalUser"></span></p>
                     <p><strong>Creator:</strong> <span id="modalCreator"></span></p>
                     <p><strong>Day:</strong> <span id="modalDay"></span></p>
                     <p><strong>Time:</strong> <span id="modalStartTime"></span> to <span id="modalEndTime"></span></p>
+                    <!-- Add button to redirect for setting reminder -->
+                    <a href="#" id="setReminderButton" class="btn btn-warning">Set Reminder</a>
+                    <a href="#" id="inviteMembersButton" class="btn btn-warning">Invite Others</a>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -112,47 +110,66 @@
                 },
                 events: function(start, end, timezone, callback) {
                     $.ajax({
-                        url: "{% url 'fetch_user_meetings' %}",  // Fetch meetings via AJAX
+                        url: "{% url 'fetch_user_meetings' %}",
                         dataType: 'json',
                         success: function(data) {
                             var events = data.map(function(meeting) {
                                 return {
+                                    id:meeting.id,
                                     title: meeting.title,
-                                    start: meeting.start, // FullCalendar requires the date format "YYYY-MM-DDTHH:mm:ss"
-                                    end: meeting.end,     // Same format for the end time
+                                    start: meeting.start,
+                                    end: meeting.end,
                                     description: meeting.description,
-                                    user: meeting.user,  // Username of the person who scheduled the meeting
-                                    creator: meeting.creator, // Username of the creator
+                                    user: meeting.user,
+                                    creator: meeting.creator,
                                     day_of_week: meeting.day_of_week,
-                                    color: meeting.color // Color for the event
+                                    color: meeting.color,
+                                    id: meeting.id  // Include the meeting ID
                                 };
                             });
-                            callback(events);  // Pass events to the calendar
+                            callback(events);
                         },
                         error: function(xhr, status, error) {
                             console.log("Error fetching meetings:", error);
                         }
                     });
                 },
-                editable: false,  // Meetings are not editable
+                editable: false,
                 eventRender: function(event, element) {
-                    // Show the user's name in the event tooltip or title
                     element.attr('title', `Scheduled by: ${event.creator}`);
-                    element.css("background-color", event.color);  // Set event color
+                    element.css("background-color", event.color);
                 },
                 eventClick: function(event) {
                     // Populate the modal with event details
+                    // $('#modalId').text(event.id);
                     $('#modalTitle').text(event.title);
                     $('#modalDescription').text(event.description);
                     $('#modalUser').text(event.user);
                     $('#modalCreator').text(event.creator);
-                    $('#modalDay').text(event.day_of_week);  // Show the day of the week
+                    $('#modalDay').text(event.day_of_week);
                     $('#modalStartTime').text(moment(event.start).format('HH:mm'));
                     $('#modalEndTime').text(moment(event.end).format('HH:mm'));
+                    
+                    // Dynamically set the URL for the reminder button to the correct meeting's reminder page
+            var reminderUrl = '/features_auths/set-reminder/' + event.id + '/';
+            $('#setReminderButton').attr('href', reminderUrl);
+
+
+             // Dynamically set the URL for the invite members button to the correct meeting's invite page
+              var inviteUrl = '/features_auths/invite-users/' + event.id + '/';
+              $('#inviteMembersButton').attr('href', inviteUrl);
+
                     // Show the modal
                     $('#meetingModal').modal('show');
                 }
+
             });
+
+      
+            // new for invite
+
+           
+
 
             // AJAX form for sharing calendar
             $('#shareCalendarForm').submit(function(e) {
@@ -160,9 +177,8 @@
                 var email = $('#recipientEmail').val();
                 var userId = {{ user.id }};
                 var calendarLink = '/features_auths/view-user-calendar/' + userId + '/';
-
                 $.ajax({
-                    url: '{% url "share_calendar" user.id %}',  // URL for the ShareCalendarView
+                    url: '{% url "share_calendar" user.id %}',
                     method: 'POST',
                     data: {
                         email: email,

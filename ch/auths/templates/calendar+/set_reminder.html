@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Reminder for {{ meeting.title }}</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background-color: #f4f7fb;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 2rem auto;
+            max-width: 1000px;
+            animation: fadeIn 1s ease-out;
+        }
+        h2, h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #007bff;
+            margin-bottom: 1rem;
+        }
+        p {
+            font-size: 0.9rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .form-group i {
+            color: #007bff;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="mt-4">Set Reminder for Meeting: {{ meeting.title }}</h2>
+
+        <p><i class="fa fa-envelope"></i> After setting the reminder we will remind you via email on set time</p>
+        <p><i class="fa fa-info-circle"></i> Here are some meeting details for your reference</p>
+        
+        <div>
+            <h3><i class="fa fa-calendar"></i> Meeting Details:</h3>
+            <p><i class="fa fa-tag"></i> <strong>Title:</strong> harshu</p>
+            <p><i class="fa fa-align-left"></i> <strong>Description:</strong> ff</p>
+            <p><i class="fa fa-calendar-day"></i> <strong>Day Of Week:</strong> Wednesday</p>
+            <p><i class="fa fa-clock"></i> <strong>Start Time:</strong> 2:34 p.m.</p>
+            <p><i class="fa fa-clock"></i> <strong>End Time:</strong> 3:17 p.m.</p>
+        </div>
+
+        <h3><i class="fa fa-bell"></i> Set Reminder</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_reminder_time"><i class="fa fa-clock"></i> Reminder Time:</label>
+                {{ reminder_form.reminder_time }}
+            </div>
+            <button type="submit" class="btn btn-primary">Set Reminder</button>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

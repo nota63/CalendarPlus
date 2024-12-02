@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Meets</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+       /* Global styles */
+body {
+    font-family: 'Poppins', sans-serif; /* Apply Google Font */
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+/* Style for the main heading */
+h1.msg {
+    font-size: 26px;
+    font-weight: 600;
+    color: #4CAF50;
+    text-align: center;
+    margin-bottom: 15px;
+    opacity: 0; /* Initially hidden */
+    transform: translateY(20px); /* Start slightly below */
+    animation: fadeInUp 1s ease-out forwards; /* Animation */
+    animation-delay: 0.5s; /* Delay for a smooth start */
+}
+
+/* Animation for fade-in and move-up */
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Style for the section heading */
+h1.text-center {
+    font-size: 28px;
+    font-weight: 600;
+    color: #333;
+    text-align: center;
+    margin-top: 20px;
+    opacity: 0; /* Initially hidden */
+    transform: translateY(20px); /* Start slightly below */
+    animation: fadeInUp 1s ease-out forwards;
+    animation-delay: 1s; /* Delay to sync with previous animation */
+}
+
+/* Slogan Text */
+p.slogan {
+    font-size: 14px;
+    color: #777;
+    text-align: center;
+    margin-top: 10px;
+    font-weight: 300;
+    opacity: 0; /* Initially hidden */
+    transform: translateY(20px); /* Start slightly below */
+    animation: fadeInUp 1s ease-out forwards;
+    animation-delay: 1.5s; /* Delay to sync with previous animations */
+}
+
+/* Icon-based text styling */
+h1.msg::before,
+h1.text-center::before,
+p.slogan::before {
+    display: inline-block;
+    margin-right: 10px;
+    font-size: 16px;
+    vertical-align: middle;
+}
+
+/* Icon for the 'Welcome back' message */
+h1.msg::before {
+    content: '\f007'; /* User Icon from Font Awesome */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900; /* Solid icon style */
+    color: #4CAF50;
+    opacity: 0; /* Initially hidden */
+    animation: iconFadeIn 1s ease-out forwards;
+    animation-delay: 0.5s; /* Sync with text */
+}
+
+/* Animation for icon fade-in */
+@keyframes iconFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Icon for the 'Your Events' heading */
+h1.text-center::before {
+    content: '\f0c6'; /* Calendar Icon from Font Awesome */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    color: #333;
+    opacity: 0; /* Initially hidden */
+    animation: iconFadeIn 1s ease-out forwards;
+    animation-delay: 1s; /* Sync with text */
+}
+
+/* Icon for the slogan text */
+p.slogan::before {
+    content: '\f073'; /* Clock Icon from Font Awesome */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    color: #777;
+    opacity: 0; /* Initially hidden */
+    animation: iconFadeIn 1s ease-out forwards;
+    animation-delay: 1.5s; /* Sync with text */
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="msg">Welcome back, {{request.user}}</h1>
+        <h1 class="text-center">Your Events</h1>
+        <p class="slogan">Keep track of your events and dont miss any meeting</p>
+
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#" data-target="upcoming">Upcoming</a></li>
+            <li><a href="#" data-target="past">Past</a></li>
+            <li><a href="#" data-target="pending">Pending</a></li>
+            <li><a href="#" data-target="filter">Filter by Date</a></li>
+        </ul>
+
+        <!-- Sections -->
+        <div id="upcoming" class="meets-section">
+            <h3>Upcoming Meets</h3>
+            <ul class="list-group">
+                {% for meet in upcoming_meets %}
+                    <li class="list-group-item meet-item" data-id="{{ meet.id }}">
+                        <strong>{{ meet.title }}</strong> with {{ meet.user.username }}
+                        {% if meet.creator %}(Created by {{ meet.creator.username }}){% else %}(No Creator){% endif %}
+                        on {{ meet.day_of_week }} at {{ meet.start_time }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div id="past" class="meets-section" style="display: none;">
+            <h3>Past Meets</h3>
+            <ul class="list-group">
+                {% for meet in past_meets %}
+                    <li class="list-group-item meet-item" data-id="{{ meet.id }}">
+                        <strong>{{ meet.title }}</strong> with {{ meet.user.username }}
+                        {% if meet.creator %}(Created by {{ meet.creator.username }}){% else %}(No Creator){% endif %}
+                        on {{ meet.day_of_week }} at {{ meet.start_time }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div id="pending" class="meets-section" style="display: none;">
+            <h3>Pending Meets</h3>
+            <ul class="list-group">
+                {% for meet in pending_meets %}
+                    <li class="list-group-item meet-item" data-id="{{ meet.id }}">
+                        <strong>{{ meet.title }}</strong> with {{ meet.user.username }}
+                        {% if meet.creator %}(Created by {{ meet.creator.username }}){% else %}(No Creator){% endif %}
+                        on {{ meet.day_of_week }} at {{ meet.start_time }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div id="filter" class="meets-section" style="display: none;">
+            <h3>Filter Meetings by Date</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Select Start Date</h4>
+                    <div id="start-calendar"></div>
+                </div>
+                <div class="col-md-6">
+                    <h4>Select End Date</h4>
+                    <div id="end-calendar"></div>
+                </div>
+            </div>
+            <button id="filter-btn" class="btn btn-primary">Filter</button>
+            <div id="filtered-results" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="meet-details-modal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Meeting Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Loading...</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Tab Navigation with smooth transitions
+            $('.nav-tabs a').click(function (e) {
+                e.preventDefault();
+                const target = $(this).data('target');
+                $('.meets-section').fadeOut(300);  // Fade out previous section
+                $('#' + target).fadeIn(300);  // Fade in the selected section
+                $('.nav-tabs li').removeClass('active');
+                $(this).parent().addClass('active');
+            });
+
+            // Initialize FullCalendar for Start and End Dates
+            $('#start-calendar').fullCalendar({
+                selectable: true,
+                select: function (start, end) {
+                    $('#start-calendar').data('selected-date', start.format('YYYY-MM-DD'));
+                }
+            });
+
+            $('#end-calendar').fullCalendar({
+                selectable: true,
+                select: function (start, end) {
+                    $('#end-calendar').data('selected-date', start.format('YYYY-MM-DD'));
+                }
+            });
+
+            // Filter Meetings by Date
+            $('#filter-btn').click(function () {
+                const startDate = $('#start-calendar').data('selected-date');
+                const endDate = $('#end-calendar').data('selected-date');
+
+                if (!startDate || !endDate) {
+                    alert('Please select both start and end dates.');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/features_auths/filter-meets/',
+                    method: 'GET',
+                    data: { start_date: startDate, end_date: endDate },
+                    success: function (data) {
+                        let html = '<ul class="list-group">';
+                        data.meets.forEach(meet => {
+                            html += ` 
+                                <li class="list-group-item meet-item" data-id="${meet.id}">
+                                    <strong>${meet.title}</strong> with ${meet.user}
+                                    on ${meet.day_of_week} at ${meet.start_time}
+                                </li>`;
+                        });
+                        html += '</ul>';
+                        $('#filtered-results').html(html);
+                    },
+                    error: function () {
+                        alert('Error filtering meetings.');
+                    }
+                });
+            });
+
+            // Modal for Meeting Details
+            $('.meet-item').click(function () {
+                const meetId = $(this).data('id');
+                $('#meet-details-modal .modal-body').html('<p>Loading...</p>');
+                $('#meet-details-modal').modal('show');
+
+                $.ajax({
+                    url: '/features_auths/get-meet-details/',
+                    method: 'GET',
+                    data: { id: meetId },
+                    success: function (data) {
+                        $('#meet-details-modal .modal-body').html(`
+                            <p><i class="fas fa-user"></i> <strong>Creator:</strong> ${data.creator}</p>
+                            <p><i class="fas fa-users"></i> <strong>Created For:</strong> ${data.user}</p>
+                            <p><i class="fas fa-calendar-alt"></i> <strong>Title:</strong> ${data.title}</p>
+                            <p><i class="fas fa-align-left"></i> <strong>Description:</strong> ${data.description}</p>
+                            <p><i class="fas fa-clock"></i> <strong>Start Time:</strong> ${data.start_time}</p>
+                            <p><i class="fas fa-clock"></i> <strong>End Time:</strong> ${data.end_time}</p>
+                            <p><i class="fas fa-calendar-day"></i> <strong>Day Of Week:</strong> ${data.day_of_week}</p>
+                            <p><i class="fas fa-users"></i> <strong>Participants:</strong> ${data.participants}</p>
+                        `);
+                    },
+                    error: function () {
+                        $('#meet-details-modal .modal-body').html('<p>Error loading meeting details.</p>');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

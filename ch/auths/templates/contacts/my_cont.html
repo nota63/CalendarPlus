@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacts</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* General Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7fc;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.8rem;
+            margin: 20px 0;
+            color: #4A90E2;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 20px;
+            align-items: flex-start;
+            justify-content: flex-start;
+        }
+
+        /* Card Design */
+        .contact-card {
+            background: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            width: 180px; /* Smaller size for compact layout */
+            padding: 10px;
+            text-align: center;
+            animation: fadeIn 0.6s ease-in-out;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .contact-card .avatar {
+            background: #4A90E2;
+            color: white;
+            height: 50px;
+            width: 50px;
+            margin: 0 auto;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .contact-card h3 {
+            font-size: 0.9rem;
+            margin: 5px 0;
+            color: #333;
+        }
+
+        .contact-card p {
+            font-size: 0.75rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        /* Button Styles */
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 5px;
+        }
+
+        .buttons button {
+            flex: 1;
+            padding: 6px;
+            border: none;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            text-align: center;
+        }
+
+        .buttons .add-fav,
+        .buttons .view-cal {
+            background-color: #4A90E2;
+            color: white;
+        }
+
+        .buttons .add-fav:hover,
+        .buttons .view-cal:hover {
+            background-color: #3676b5;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scalePulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .favorite-added {
+            animation: scalePulse 0.6s ease-in-out;
+        }
+
+        /* Style for the button when the contact is added to favorites */
+.add-fav.added {
+    background-color: #28a745; /* Green */
+    color: white;
+    cursor: not-allowed;
+}
+
+/* Disable hover effect for added button */
+.add-fav.added:hover {
+    background-color: #28a745; /* Keep it green */
+    transform: none;
+}
+
+/* Animation when the button changes to 'added' */
+.add-fav.added::after {
+    content: "✓"; /* Optional checkmark */
+    margin-left: 8px;
+    font-weight: bold;
+    color: white;
+}
+
+/* Smooth transition for all button states */
+.add-fav, .add-fav.added {
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap');
+
+
+/* Title styling */
+.title {
+    font-size: 24px;
+    font-weight: 400;
+    text-align: center;
+    margin: 20px 0 10px;
+    color: #4a4a4a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* Icon before the title */
+.title::before {
+    content: '\f0c0'; /* Font Awesome user icon */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    font-size: 28px;
+    color: #007bff;
+}
+
+/* Slogan styling */
+.slogan {
+    font-size: 14px;
+    font-weight: 300;
+    text-align: center;
+    margin: 0;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* Icon before the slogan */
+.slogan::before {
+    content: '\f274'; /* Font Awesome calendar icon */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    font-size: 16px;
+    color: #28a745;
+}
+
+/* Small animations on text appearance */
+.title, .slogan {
+    animation: fadeInUp 0.8s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+    </style>
+</head>
+<body>
+    <h1 class="title">Your Contacts</h1>
+    <p class="slogan">scheduling meetings made easier if you add your contacts to your favourites</p>
+
+    <div class="container">
+        {% for contact in contacts %}
+            <div class="contact-card" id="contact-{{ contact.id }}">
+                <div class="avatar">
+                    {{ contact.contact_user.username|first|upper }}
+                </div>
+                <h3>{{ contact.contact_user.username }}</h3>
+                <p>Added on: {{ contact.created_at|date:"F j, Y" }}</p>
+                <div class="buttons">
+                    {% if contact.contact_user.id in favorite_ids %}
+                        <button class="add-fav added" data-contact-id="{{ contact.id }}" disabled>Added to Favorites</button>
+                    {% else %}
+                        <button class="add-fav" data-contact-id="{{ contact.id }}">Add to Favorites</button>
+                    {% endif %}
+                    <button class="view-cal" onclick="window.location.href='{% url 'view_user_calendar' contact.contact_user.id %}'">View Calendar</button>
+                </div>                
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Add to Favorite AJAX -->
+    <script>
+
+document.querySelectorAll('.add-fav').forEach(button => {
+    button.addEventListener('click', function () {
+        const contactId = this.getAttribute('data-contact-id');
+        fetch("{% url 'add_to_favorite' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}",
+            },
+            body: JSON.stringify({ contact_id: contactId }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "added") {
+                this.textContent = "Added to Favorites";
+                this.classList.add('added');
+                this.disabled = true; // Disable the button to prevent multiple clicks
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+});
+
+     
+
+    </script>
+</body>
+</html>
+

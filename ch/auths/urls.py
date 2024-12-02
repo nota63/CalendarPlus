@@ -48,7 +48,50 @@ urlpatterns=[
 
     # share calendar
     path('share-calendar/<int:user_id>/', ShareCalendarView.as_view(), name='share_calendar'),
+
+    # set reminders
+    path('set-reminder/<int:meeting_id>/', views.SetReminderView.as_view(), name='set_reminder'),
+
+    # invite users in meeting
+    path('invite-users/<int:meeting_id>/', MeetingInviteView.as_view(), name='invite-users'),
+
+    # accept or reject invitations
+    path('meeting_invitations/', views.InvitationListView.as_view(), name='meeting-invitations'),
+    path('invitation/<int:invitation_id>/<str:action>/', views.InvitationListView.as_view(), name='invitation-action'),
+    path('empty_meets/', empty_meets, name='empty_meets'),
+
+    # analytics
+
+    path('analytics/',AnalyticsDashboardView.as_view(), name='analytics'),
+
+    path('select_org/',OrganizationSelectView.as_view(), name='select_org'),
+
+    path('organization/<int:org_id>/analytics/',organization_analysis, name='organization_analytics'),
+
+    # my events
+
+    path('my_events/',MeetsView.as_view(),  name='my_events'),
+
+    path('get-meet-details/', get_meet_details, name='get-meet-details'),
+    path('filter-meets/',filter_meets,  name='filter-meets'),
+
+    # create contact list
+
+    path('intro_contacts/',IntroContacts.as_view(), name='intro_contacts'),
+
+    path('select_contact/', ContactBookView.as_view(), name='select_contact'),
+
+    path('contacts/', ContactListView.as_view(), name='contacts'),
+    path('add-to-favorite/',add_to_favorite, name='add_to_favorite'),
+
+    path('favorite-contacts/', views.FavoriteContactsView.as_view(), name='favorite_contacts'),
+    path('remove-favorite/', views.RemoveFavoriteView.as_view(), name='remove_favorite'),  
+
+
+
 ]
+
+
      
 
 

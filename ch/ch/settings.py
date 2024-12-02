@@ -247,3 +247,22 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 
 
+# credentials.json
+
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+GOOGLE_CREDENTIALS_FILE = os.path.join(BASE_DIR,'credentials.json')
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+
+# Use the default database-backed sessions
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+# Ensure session cookies are being set
+SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
+CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
+
+# Set the session expiration
+SESSION_COOKIE_AGE = 1209600  # 2 weeks

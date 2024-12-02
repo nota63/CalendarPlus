@@ -104,8 +104,8 @@ class ProfileEditForm(forms.ModelForm):
 # meeting form
 
 from django.forms import SelectDateWidget
-from .models import Meets
-
+from .models import Meets, Reminder
+from django.utils import timezone
         
 
 
@@ -113,3 +113,10 @@ from .models import Meets
 
 class ShareCalendarForm(forms.Form):
     email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter email address'}))
+
+class ReminderForm(forms.ModelForm):
+    reminder_time = forms.DateTimeField(initial=timezone.now, widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
+
+    class Meta:
+        model = Reminder
+        fields = ['reminder_time']

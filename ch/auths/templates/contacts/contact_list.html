@@ -1,0 +1,235 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Book</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            padding-top: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .section-header {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+        .section-description {
+            font-size: 16px;
+            color: #777;
+            margin-bottom: 20px;
+        }
+        .btn-group button {
+            margin-right: 10px;
+            padding: 12px 20px;
+            font-size: 13px;
+            border-radius: 5px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn-group button:hover {
+            background-color: #0056b3;
+        }
+        .user-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .user-list li {
+            background-color: #f9f9f9;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+        .user-list li i {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+        .user-list li input {
+            transform: scale(1.2);
+        }
+        .user-list li:hover {
+            background-color: #f1f1f1;
+        }
+        .user-list li:nth-child(even) {
+            animation-delay: 0.3s;
+        }
+        .user-list li:nth-child(odd) {
+            animation-delay: 0.6s;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        form button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        form button:hover {
+            background-color: #218838;
+        }
+        h1 {
+            font-size: 30px;
+            font-weight: 700;
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        #all-users-section, #meeting-users-section, #org-users-section, #org-belonging-users-section {
+            display: none;
+        }
+        .msg {
+            margin-bottom: 20px;
+        }
+        .msg strong {
+            color: #ff6347;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <section class="msg">
+        {% if messages %}
+           {% for m in messages %}
+             <strong>{{m}}</strong>
+           {% endfor %}
+        {% endif %}
+    </section>
+    <h1>Introducing Contact Book</h1>
+    <p class="section-description">Select users to add to your contacts. Later, you can easily schedule meetings and view their calendars directly from your contact book.</p>
+    <div class="btn-group">
+        <button id="all-users-btn">All Users</button>
+        <button id="meeting-users-btn">Users You've Had Meetings With</button>
+        <button id="org-users-btn">Users in Your Organization</button>
+        <button id="org-belonging-users-btn">Users Belonging to an Organization</button>
+    </div>
+    <!-- All Users Section -->
+    <div id="all-users-section">
+        <h4 class="section-header">All Users</h4>
+        <form method="post" action="">
+            {% csrf_token %}
+            <ul class="user-list">
+                {% for user in all_users %}
+                    <li>
+                        <i class="fas fa-user"></i>
+                        {{ user.username }} - {{ user_orgs.user.id }}
+                        <input type="checkbox" name="contact_ids" value="{{ user.id }}">
+                    </li>
+                {% endfor %}
+            </ul>
+            <button type="submit">Add to Contacts</button>
+        </form>
+    </div>
+    <!-- Users with Meetings Section -->
+    <div id="meeting-users-section">
+        <h4 class="section-header">Users You've Had Meetings With</h4>
+        <form method="post" action="">
+            {% csrf_token %}
+            <ul class="user-list">
+                {% for user in users_with_meetings %}
+                    <li>
+                        <i class="fas fa-user"></i>
+                        {{ user.username }} - {{ user_orgs.user.id }}
+                        <input type="checkbox" name="contact_ids" value="{{ user.id }}">
+                    </li>
+                {% endfor %}
+            </ul>
+            <button type="submit">Add to Contacts</button>
+        </form>
+    </div>
+    <!-- Users in the Same Organization Section -->
+    <div id="org-users-section">
+        <h4 class="section-header">Users in Your Organization</h4>
+        <form method="post" action="">
+            {% csrf_token %}
+            <ul class="user-list">
+                {% for user in org_users %}
+                    <li>
+                        <i class="fas fa-user"></i>
+                        {{ user.username }} - {{ user_orgs.user.id }}
+                        <input type="checkbox" name="contact_ids" value="{{ user.id }}">
+                    </li>
+                {% endfor %}
+            </ul>
+            <button type="submit">Add to Contacts</button>
+        </form>
+    </div>
+    <!-- Users Belonging to an Organization Section -->
+    <div id="org-belonging-users-section">
+        <h4 class="section-header">Users Belonging to an Organization</h4>
+        <form method="post" action="">
+            {% csrf_token %}
+            <ul class="user-list">
+                {% for user in users_with_organization %}
+                    <li>
+                        <i class="fas fa-user"></i>
+                        {{ user.username }} - {{ user_orgs.user.id }}
+                        <input type="checkbox" name="contact_ids" value="{{ user.id }}">
+                    </li>
+                {% endfor %}
+            </ul>
+            <button type="submit">Add to Contacts</button>
+        </form>
+    </div>
+</div>
+<script>
+    document.getElementById('all-users-btn').onclick = function() {
+        toggleSections('all-users-section');
+    };
+    document.getElementById('meeting-users-btn').onclick = function() {
+        toggleSections('meeting-users-section');
+    };
+    document.getElementById('org-users-btn').onclick = function() {
+        toggleSections('org-users-section');
+    };
+    document.getElementById('org-belonging-users-btn').onclick = function() {
+        toggleSections('org-belonging-users-section');
+    };
+    function toggleSections(sectionId) {
+        let sections = ['all-users-section', 'meeting-users-section', 'org-users-section', 'org-belonging-users-section'];
+        sections.forEach(function(id) {
+            document.getElementById(id).style.display = id === sectionId ? 'block' : 'none';
+        });
+    }
+</script>
+<!-- Bootstrap JS and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+
