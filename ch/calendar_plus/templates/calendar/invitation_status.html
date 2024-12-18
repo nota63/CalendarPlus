@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitation Status</title>
+    <!-- Google Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background-color: #f3f4f6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow: hidden; /* Prevent body from scrolling */
+        }
+
+        .container {
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 80vh; /* Enable scrolling within the container */
+            overflow-y: auto; /* Enable scrolling */
+            animation: fadeIn 1s forwards, slideIn 1s forwards 0.5s;
+            text-align: center;
+            position: relative;
+        }
+
+        .container::-webkit-scrollbar {
+            width: 8px; /* Thinner scrollbar */
+        }
+
+        .container::-webkit-scrollbar-thumb {
+            background-color: #4f46e5; /* Premium color for scrollbar */
+            border-radius: 4px;
+        }
+
+        h1 {
+            font-size: 20px; /* Reduced font size */
+            margin-bottom: 10px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        h2 {
+            font-size: 18px; /* Reduced font size */
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #555;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            font-size: 14px; /* Reduced font size */
+        }
+
+        th {
+            background-color: #4f46e5;
+            color: #fff;
+        }
+
+        td {
+            background-color: #fafafa;
+        }
+
+        .status-pending {
+            color: #e53935; /* Red */
+        }
+
+        .status-accepted {
+            color: #4caf50; /* Green */
+        }
+
+        td[colspan="4"] {
+            text-align: center;
+            color: #666;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            <span class="material-icons">list_alt</span>
+            Invitation Status for {{organization.name}} Organization
+        </h1>
+
+        
+       
+          
+        <h2>Email Invitations</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Invitee Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Expires At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for email_invitation in email_invitations %}
+                <tr>
+                    <td>{{ email_invitation.invitee_email }}</td>
+                    <td>{{ email_invitation.get_role_display }}</td>
+                    <td class="{% if email_invitation.status == 'pending' %}status-pending{% elif email_invitation.status == 'accepted' %}status-accepted{% endif %}">
+                        {{ email_invitation.get_status_display }}
+                    </td>
+                    <td>{{ email_invitation.expires_at }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">No email invitations found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

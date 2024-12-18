@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assign Employees to Manager</title>
+    <!-- Google Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f4f7fc;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px;
+            animation: fadeIn 1s ease-out;
+        }
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 1.5rem;
+        }
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        p {
+            font-size: 0.9rem;
+            margin: 0.5rem 0;
+        }
+        button,
+        .btn {
+            font-size: 0.9rem;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: #fff;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        label {
+            font-size: 0.9rem;
+            margin: 0.5rem 0;
+        }
+        input[type="checkbox"] {
+            margin-right: 0.5rem;
+        }
+        a {
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Assign Employees to Manager</h1>
+
+        <form method="post">
+            {% csrf_token %}
+            <h3>Select Employees to Assign:</h3>
+            {% for employee in employees %}
+                <div>
+                    <label>
+                        <input type="checkbox" name="employee" value="{{ employee.id }}">
+                        {{ employee.user.get_full_name|default:employee.user.username }}
+                    </label>
+                </div>
+            {% empty %}
+                <p>No employees available to assign.</p>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Assign Employees</button>
+        </form>
+
+        <a href="{% url 'assigned_manager_detail' organization.id project.id %}" class="btn btn-secondary">Back to Manager Details</a>
+    </div>
+</body>
+</html>
+

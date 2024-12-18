@@ -24,7 +24,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import send_mail
 from django.conf import settings
 from django.template.loader import render_to_string
-from auths.models import Profile, Availability, Organization
+from accounts.models import Profile, Availability, Organization
 
 
 
@@ -835,49 +835,49 @@ class AutomateBirthdayWishes(View):
     
 
 # handle custom user reminders
-from .forms import ReminderForm
-from .models import Reminder
+# from meet.forms import ReminderForm
+# from .models import Reminder
 
 
-class IntroReminder(View):
-    template_name='meet/intro_reminder.html'
+# class IntroReminder(View):
+#     template_name='meet/intro_reminder.html'
 
-    def get(self, request):
-        return render(request,self.template_name)
+#     def get(self, request):
+#         return render(request,self.template_name)
     
 
 
-class CustomReminderView(View):
-    template_name='meet/set_reminders.html'
+# class CustomReminderView(View):
+#     template_name='meet/set_reminders.html'
 
-    def get(self, request):
-        meetings=Meeting.objects.filter(user=request.user)
-        form = ReminderForm(request=request)
-        return render(request,self.template_name, {'form':form, 'meetings':meetings})
+#     def get(self, request):
+#         meetings=Meeting.objects.filter(user=request.user)
+#         form = ReminderForm(request=request)
+#         return render(request,self.template_name, {'form':form, 'meetings':meetings})
     
-    def post(self, request):
-        form = ReminderForm(request.POST, request=request)
-        if form.is_valid():
-            reminder = form.save(commit=False)
-            reminder.user= request.user
-            try:
-              reminder.save()
-              messages.success(request,'Reminder set successfully')
-              return redirect('set_reminders')
-            except Exception as e:
-                return JsonResponse({'Exception': str(e)}, status=500)
-        else:
-            return render(request, self.template_name,{'form':form})
+#     def post(self, request):
+#         form = ReminderForm(request.POST, request=request)
+#         if form.is_valid():
+#             reminder = form.save(commit=False)
+#             reminder.user= request.user
+#             try:
+#               reminder.save()
+#               messages.success(request,'Reminder set successfully')
+#               return redirect('set_reminders')
+#             except Exception as e:
+#                 return JsonResponse({'Exception': str(e)}, status=500)
+#         else:
+#             return render(request, self.template_name,{'form':form})
         
-    @staticmethod
-    def delete_meetings(request):
-        meetings=Meeting.objects.filter(user=request.user)
-        try:
-            meetings.delete()
-            messages.success(request,'meetings has been truncated!')
-            return redirect('set_reminders')
-        except Exception as e:
-            return JsonResponse({'exception':str(e)}, status=400)
+#     @staticmethod
+#     def delete_meetings(request):
+#         meetings=Meeting.objects.filter(user=request.user)
+#         try:
+#             meetings.delete()
+#             messages.success(request,'meetings has been truncated!')
+#             return redirect('set_reminders')
+#         except Exception as e:
+#             return JsonResponse({'exception':str(e)}, status=400)
             
             
              

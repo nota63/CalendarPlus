@@ -48,7 +48,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'meet',
-    'auths',
+    'calendar_plus',
     'daphne',
     'ai',
     'channels',
@@ -102,7 +102,7 @@ TEMPLATES = [
 
 ASGI_APPLICATION = 'ch.asgi.application'
 
-
+WSGI_APPLICATION = 'ch.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -113,15 +113,6 @@ DATABASES = {
     }
 }
 
-
-# CHANNEL_LAYERS = {
-#     "default": {
-#         "BACKEND": "channels_redis.core.RedisChannelLayer",
-#         "CONFIG": {
-#             "hosts": [('127.0.0.1', 6379)],
-#         },
-#     },
-# }
 
 CHANNEL_LAYERS = {
     'default': {
@@ -266,3 +257,7 @@ CSRF_COOKIE_SECURE = False
 
 
 SESSION_COOKIE_AGE = 1209600  
+import os
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/media/"

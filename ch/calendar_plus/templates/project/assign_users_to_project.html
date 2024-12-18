@@ -1,0 +1,10 @@
+
+  <h2>Assign Manager to Project in {{ organization.name }}</h2>
+  
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Assign Manager</button>
+  </form>
+  
+

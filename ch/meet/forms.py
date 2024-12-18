@@ -48,23 +48,23 @@ class BirthdayForm(forms.ModelForm):
             'scheduled_time': forms.DateTimeInput(attrs={'class': 'flatpickr-datetime'}),
         }
 
-class ReminderForm(forms.ModelForm):
-    class Meta:
-        model = Reminder
+# class ReminderForm(forms.ModelForm):
+#     class Meta:
+#         model = Reminder
         
-        fields= ['meeting','reminder_datetime']
-        widgets={
-            'reminder_datetime':forms.DateTimeInput(attrs={'type':'datetime-local'}),
-        }
+#         fields= ['meeting','reminder_datetime']
+#         widgets={
+#             'reminder_datetime':forms.DateTimeInput(attrs={'type':'datetime-local'}),
+#         }
 
-    def __init__(self, *args, **kwargs):
-        self.request= kwargs.pop('request', None)
-        super(ReminderForm, self).__init__(*args, **kwargs)
+#     def __init__(self, *args, **kwargs):
+#         self.request= kwargs.pop('request', None)
+#         super(ReminderForm, self).__init__(*args, **kwargs)
 
-        if self.request and self.request.user.is_authenticated:
-            user = self.request.user
-            self.fields['meeting'].queryset=Meeting.objects.filter(user=user)
+#         if self.request and self.request.user.is_authenticated:
+#             user = self.request.user
+#             self.fields['meeting'].queryset=Meeting.objects.filter(user=user)
 
-        self.fields['meeting'].label = 'Select a Meeting'
+#         self.fields['meeting'].label = 'Select a Meeting'
          
 

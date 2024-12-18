@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Project</title>
+      <!-- Include jQuery and jQuery UI CSS and JS -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+</head>
+<body>
+    <h1>Create Project for {{ organization.name }}</h1>
+    
+    {% if messages %}
+        <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Create Project</button>
+    </form>
+    
+    <a href="{% url 'org_detail' org_id=organization.id %}">Back to Organization Details</a>
+
+    <script>
+         $(document).ready(function() {
+            // Activate datepicker for the start_date and end_date fields
+            $('#id_start_date').datepicker({
+                dateFormat: 'yy-mm-dd'  // Format for date (e.g. 2024-12-01)
+            });
+
+            $('#id_end_date').datepicker({
+                dateFormat: 'yy-mm-dd'  // Format for date (e.g. 2024-12-01)
+            });
+        });
+    </script>
+</body>
+</html>
+

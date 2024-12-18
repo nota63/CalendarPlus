@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects in {{ organization.name }}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center">Projects in {{ organization.name }}</h2>
+
+        {% if projects %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Project Name</th>
+                        <th>Description</th>
+                        <th>Created By</th>
+                        <th>Created At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for project in projects %}
+                        <tr>
+                            <td>{{ project.name }}</td>
+                            <td>{{ project.description }}</td>
+                            <td>{{ project.created_by.user.username }}</td>  
+                            <td>{{ project.created_at }}</td>
+                            <td>
+                                <a href="{% url 'assign_manager_to_project' organization_id=project.organization.id project_id=project.id %}">Assign Manager</a>
+                            </td>
+                            <td>
+                                <a href="{% url 'assigned_manager_detail' organization_id=project.organization.id project_id=project.id %}">Assigned Manager</a>
+                            </td>
+                            
+                            
+
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No projects found for this organization.</p>
+        {% endif %}
+
+        <a href="{% url 'org_detail' org_id=organization.id %}" class="btn btn-primary">Back to Organization Details</a>
+        <a href="{% url 'create_project' org_id=organization.id %}" class="btn btn-primary">Create Project</a>
+    </div>
+</body>
+</html>

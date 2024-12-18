@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <!-- Google Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f4f7fc;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            padding: 20px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-preview, .edit-profile {
+            width: 48%;
+            margin-bottom: 20px;
+        }
+
+        .profile-preview img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            margin: 0 auto 10px;
+        }
+
+        .profile-preview h3 {
+            margin-top: 10px;
+            font-size: 1.4em;
+            text-align: center;
+        }
+
+        .profile-preview p {
+            color: #555;
+            font-size: 0.9em;
+            margin: 5px 0;
+            text-align: center;
+        }
+
+        .edit-profile h2 {
+            text-align: center;
+            color: #007bff;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .edit-profile label {
+            display: block;
+            font-weight: bold;
+            margin: 10px 0 5px;
+            font-size: 0.9em;
+        }
+
+        .edit-profile input[type="text"], .edit-profile input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .checkbox-container {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .edit-profile button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .edit-profile button:hover {
+            background-color: #0056b3;
+        }
+
+        .messages {
+            margin-top: 20px;
+            background-color: #d4edda;
+            padding: 10px;
+            border-radius: 4px;
+            color: #155724;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .profile-preview, .edit-profile {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Profile Preview Section (Left Side) -->
+        <div class="profile-preview">
+            <img src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}/static/images/default-profile.png{% endif %}" alt="Profile Picture">
+            <h3>{{ profile.full_name|default:"Full Name" }}</h3>
+            <p><strong>Role:</strong> 
+                {% if profile.is_admin %}
+                    Admin
+                {% elif profile.is_manager %}
+                    Manager
+                {% else %}
+                    Employee
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Edit Profile Section (Right Side) -->
+        <div class="edit-profile">
+            <h2><span class="material-icons">edit</span> Edit Profile</h2>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div>
+                    <label for="full_name"><span class="material-icons">person</span> Full Name</label>
+                    <input type="text" id="full_name" name="full_name" value="{{ profile.full_name }}">
+                </div>
+                
+                <div>
+                    <label for="profile_picture"><span class="material-icons">camera_alt</span> Profile Picture</label>
+                    <input type="file" id="profile_picture" name="profile_picture">
+                </div>
+
+                <!-- Hide checkbox dynamically -->
+                {% if not hide_checkbox %}
+                <div class="checkbox-container">
+                    <input type="checkbox" id="is_admin" name="is_admin" {% if profile.is_admin %}checked{% endif %}>
+                    <label for="is_admin">Admin</label>
+                </div>
+                {% endif %}
+                
+                <button type="submit"><span class="material-icons">save</span> Update Profile</button>
+            </form>
+
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

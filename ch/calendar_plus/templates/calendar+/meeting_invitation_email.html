@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Invitation</title>
+    
+    <!-- Premium Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Icon libraries (Font Awesome) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .email-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .email-body {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .meeting-details {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9f7fe;
+            border: 1px solid #007bff;
+            border-radius: 8px;
+        }
+
+        .meeting-details p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .meeting-details i {
+            color: #007bff;
+            margin-right: 10px;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .button-container a {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            display: inline-block;
+        }
+
+        .button-container a:hover {
+            background-color: #0056b3;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #777;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <!-- Company Logo -->
+            <img src="https://static.vecteezy.com/system/resources/previews/000/355/372/original/vector-calendar-icon.jpg" alt="Company Logo" class="logo">
+            <h2>You're Invited to an Important Meeting!</h2>
+        </div>
+        
+        <div class="email-body">
+            <p>Dear {{ user.username }},</p>
+            
+            <p>We hope this message finds you well. We are excited to invite you to participate in an important meeting scheduled by <strong>{{ invited_by.username }}</strong> on behalf of the team. This meeting is designed to discuss key topics that are crucial to the ongoing success of our work, and your presence is highly valued.</p>
+            
+            <p>The meeting details are as follows:</p>
+            
+            <div class="meeting-details">
+                <p><i class="fas fa-calendar-alt"></i><strong>Meeting Title:</strong> {{ meeting.title }}</p>
+                <p><i class="fas fa-user"></i><strong>Scheduled by:</strong> {{ invited_by.username }}</p>
+                <p><i class="fas fa-clock"></i><strong>Meeting Date:</strong> {{ day_of_week }}</p>
+                <p><i class="fas fa-clock"></i><strong>Start Time:</strong> {{ start_time }}</p>
+                <p><i class="fas fa-clock"></i><strong>End Time:</strong> {{ end_time }}</p>
+                <p><i class="fas fa-map-marker-alt"></i><strong>Location:</strong> [Location details, if any]</p>
+                <p><i class="fas fa-comments"></i><strong>Agenda:</strong> [Meeting Agenda or Topics to be Covered]</p>
+            </div>
+
+            <p><strong>Why Your Presence is Crucial:</strong></p>
+            <p>This meeting will be an opportunity for all stakeholders to align their goals, discuss challenges, and come up with effective solutions for our ongoing projects. Your insights, feedback, and expertise will play a pivotal role in shaping the direction of our efforts moving forward.</p>
+            <p>We strongly encourage you to attend and contribute to the conversation. Please mark your calendar and ensure you are available for this important session.</p>
+
+            <p><strong>What to Expect:</strong></p>
+            <ul>
+                <li><strong>Engagement:</strong> A chance to provide feedback on current initiatives and offer suggestions for future actions.</li>
+                <li><strong>Collaboration:</strong> Collaborating with other team members to refine processes and improve results.</li>
+                <li><strong>Next Steps:</strong> Clear action items and goals following the discussion.</li>
+            </ul>
+
+            <p>If you are unable to attend the meeting, please let us know as soon as possible so that we can reschedule if necessary.</p>
+            <p>We look forward to your positive response and to a productive discussion ahead!</p>
+
+            <p>If you have any questions or need further clarification, feel free to reach out to the meeting organizer at <strong>{{ invited_by.email }}</strong>.</p>
+        </div>
+
+        <!-- Button to Check Invitations -->
+        <div class="button-container">
+            <a href="http://127.0.0.1:8000/features_calendar/meeting_invitations/">Check Your Invitations</a>
+        </div>
+
+        <div class="footer">
+            <p>Best regards,</p>
+            <p>The Calendar+ Team</p>
+            <p><i class="fas fa-envelope"></i> Email: support@calendar+.com</p>
+            <p><i class="fas fa-globe"></i> Website: www.calendar+.com</p>
+        </div>
+    </div>
+</body>
+</html>
+

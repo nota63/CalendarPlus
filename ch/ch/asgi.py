@@ -15,19 +15,15 @@ from django.urls import path
 import chat.routing
 
 
-# Set the default Django settings module
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ch.settings')
 
-# Initialize the Django application for ASGI
+
 django_asgi_app = get_asgi_application()
 
-# Define your WebSocket URL patterns (if any)
-websocket_urlpatterns = [
-    # Example WebSocket URL pattern:
-    # path('ws/some_path/', SomeConsumer.as_asgi()),
-]
 
-# Set up the ASGI application with Channels
+
+
 application = ProtocolTypeRouter({
     'http': django_asgi_app,
     'websocket':AuthMiddlewareStack(URLRouter(
