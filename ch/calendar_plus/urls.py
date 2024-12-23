@@ -150,9 +150,19 @@ urlpatterns=[
      path('remove_myself/<int:org_id>/<int:meeting_id>/',RemoveMeetingConfirmationView.as_view(), name='remove_myself'),
 
      # Meeting Reminders
-     path('meeting_reminders/<int:org_id>/<int:meeting_id>/', SaveMeetingReminder.as_view(), name='meeting_reminders')
+     path('meeting_reminders/<int:org_id>/<int:meeting_id>/', SaveMeetingReminder.as_view(), name='meeting_reminders'),
+
+     # invite others in the meeting
+
+     path('invite_others/<int:org_id>/<int:meeting_id>/',InviteMeetingView.as_view(), name='invite_others'),
+
+     path('org_accept_invite/<str:token>/', org_accept_invite, name='org_accept_invite'),
+
+     # search users
+     path('search-users/<int:org_id>/', views.search_users_ajax, name='search_users_ajax'),
 
 ]
+
 
 
 

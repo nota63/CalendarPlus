@@ -3290,14 +3290,15 @@ class MeetingListView(TemplateView):
         org_id = self.kwargs['org_id']
         user = self.request.user
 
-        # Querying meetings where the user is either the user or invitee
         my_scheduled_meetings = MeetingOrganization.objects.filter(
-            Q(organization_id=org_id) & (Q(user=user))
+        Q(organization_id=org_id) &
+        (Q(user=user) | Q(invitee=user) | Q(participants=user))
         )
 
         i_scheduled_meetings = MeetingOrganization.objects.filter(
-            Q(organization_id=org_id) & (Q(invitee=user))
+            Q(organization_id=org_id) & (Q(invitee=user)) | (Q(participants=user)) | Q(invitee=user)
         )
+
 
         # Categorize meetings based on meeting type
         context['my_scheduled_standup'] = my_scheduled_meetings.filter(meeting_type='standup')
@@ -3451,7 +3452,7 @@ class SaveMeetingReminder(View):
      
         )
 
-        # extract form data
+      
 
         reminder_type = request.POST.get('reminder_type', 'email')
 
@@ -3483,3 +3484,125 @@ class SaveMeetingReminder(View):
         messages.success(request, 'reminder saved successfully')
         return JsonResponse({'success':'Reminder has been saved successfully'})
     
+# Invite other users in the meeting
+from accounts.models import MeetingInvitationOrganization
+
+
+class InviteMeetingView(View):
+    template_name = 'my_invitations/invite_to_meeting.html'
+
+    def get(self, request, org_id, meeting_id):
+        organization = get_object_or_404(Organization, id=org_id)
+        meeting = get_object_or_404(MeetingOrganization, id=meeting_id, organization=organization)
+
+        
+        members = Profile.objects.filter(organization=organization).exclude(user=request.user)
+
+        return render(request, self.template_name, {
+            'organization': organization,
+            'meeting': meeting,
+            'members': members
+        })
+
+    def post(self, request, org_id, meeting_id):
+        organization = get_object_or_404(Organization, id=org_id)
+        meeting = get_object_or_404(MeetingOrganization, id=meeting_id, organization=organization)
+
+       
+        selected_member_ids = request.POST.getlist('selected_members')
+
+       
+        if selected_member_ids:
+            for member_id in selected_member_ids:
+                invitee = get_object_or_404(User, id=member_id)
+              
+                profile = get_object_or_404(Profile, user=invitee, organization=organization)
+                invitation = MeetingInvitationOrganization.objects.create(
+                    meeting=meeting,
+                    invitee=invitee,
+                    organization=organization
+                )
+                invitation.send_invite_email()
+            messages.success(request, f"Invitations sent to selected members.")
+
+        
+        invitee_email = request.POST.get('invitee_email')
+        if invitee_email:
+            try:
+                invitee = User.objects.get(email=invitee_email)
+                
+                if Profile.objects.filter(user=invitee, organization=organization).exists():
+                    invitation = MeetingInvitationOrganization.objects.create(
+                        meeting=meeting,
+                        invitee=invitee,
+                        organization=organization
+                    )
+                    invitation.send_invite_email()
+                    messages.success(request, f"Invitation sent to {invitee_email}.")
+                else:
+                    messages.error(request, f"{invitee_email} is not a member of this organization.")
+            except User.DoesNotExist:
+                messages.error(request, f"No user found with the email {invitee_email}.")
+
+        return redirect('meeting_list', org_id=org_id)
+
+
+# search users
+def search_users_ajax(request, org_id):
+  
+    query = request.GET.get('q', '').strip()
+
+ 
+    organization = get_object_or_404(Organization, id=org_id)
+    
+    
+    profiles = Profile.objects.filter(
+        organization=organization,
+        user__username__icontains=query 
+    )
+
+ 
+    results = [
+        {
+            'id': profile.user.id,
+            'username': profile.user.username,
+            'full_name': profile.full_name if profile.full_name else 'No name',
+            'role': 'Admin' if profile.is_admin else 'Manager' if profile.is_manager else 'Employee'
+        }
+        for profile in profiles
+    ]
+
+    return JsonResponse({'results': results})
+
+
+
+# Accept invite 
+
+def org_accept_invite(request, token):
+
+    if not request.user.is_authenticated:
+        messages.error(request, "You need to log in to accept the invitation.")
+        return redirect('login')  
+
+
+    invitation = get_object_or_404(MeetingInvitationOrganization, invite_token=token)
+    meeting = invitation.meeting
+
+
+
+    profile = Profile.objects.filter(user=request.user, organization=meeting.organization).first()
+    if not profile:
+        messages.error(request, "You are not a member of this organization and cannot join the meeting.")
+        return redirect('landing_page')  
+   
+    meeting.participants.add(request.user)
+
+ 
+    invitation.is_accepted = True
+    invitation.save()
+
+  
+    messages.success(request, f"You have successfully joined the meeting '{meeting.meeting_title}'.")
+
+
+    return redirect(reverse('meeting_detail_view', args=[meeting.organization.id, meeting.id]))

@@ -56,6 +56,15 @@
         <p><span>Meeting Link:</span> <a href="{{ meeting.meeting_link }}" target="_blank">{{ meeting.meeting_link }}</a></p>
         <p><span>User:</span> {{ meeting.user}}</p>
         <p><span>Invitee:</span> {{ meeting.invitee}}</p>
+        {% if meeting.participants.all %}
+           <p><span>Participants:</span> 
+           {% for participant in meeting.participants.all %}
+             {{ participant.username }}{% if not forloop.last %}, {% endif %}
+           {% endfor %}
+        </p>
+        {% else %}
+           <p>No participants yet.</p>
+        {% endif %}
         <p><span>Status:</span> {{ meeting.status }}</p>
         <p><span>Created At:</span> {{ meeting.created_at }}</p>
         <p><span>Updated At:</span> {{ meeting.updated_at }}</p>

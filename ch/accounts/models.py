@@ -11,6 +11,9 @@ import uuid
 from django.conf import settings
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from django.utils.crypto import get_random_string
+from django.core.mail import send_mail
+from django.conf import settings
 
 class Organization(models.Model):
     name = models.CharField(max_length=255)
@@ -244,9 +247,8 @@ class HolidaySettings(models.Model):
 
     notify_organization_members = models.BooleanField(default=False, null=True, blank=True)
     reminder_days_before = models.IntegerField(default=0, choices=[(i, i) for i in range(1, 31)], null=True, blank=True)  # Number of days before the holiday to send reminder
-    reminder_message = models.TextField(null=True, blank=True)  # Custom message for the reminder
-    # New field for the carryover
-    carryover = models.BooleanField(default=False, null=True, blank=True)  # New field for Holiday Carryover
+    reminder_message = models.TextField(null=True, blank=True) 
+    carryover = models.BooleanField(default=False, null=True, blank=True) 
     
 
 
@@ -271,16 +273,18 @@ class MeetingOrganization(models.Model):
     end_time = models.TimeField()
 
     # New fields
-    meeting_link = models.URLField(blank=True, null=True)  # Link for the online meeting (Zoom, Google Meet, etc.)
+    meeting_link = models.URLField(blank=True, null=True) 
     meeting_location = models.CharField(max_length=255, choices=[('zoom', 'Zoom'), ('google_meet', 'Google Meet'), ('zoho', 'Zoho'), ('in_person', 'In-person')], default='in_person')
     meeting_type = models.CharField(max_length=255, choices=[('standup', 'Standup'), ('task', 'Task'), ('project_discussion', 'Project Discussion'), ('other', 'Other')], default='other')
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    # Optional fields like status or notification flags
+
     status = models.CharField(max_length=50, choices=[('scheduled', 'Scheduled'), ('completed', 'Completed'), ('canceled', 'Canceled')], default='scheduled')
-    is_notification_sent = models.BooleanField(default=False)  # Flag to mark if notifications are sent
+    is_notification_sent = models.BooleanField(default=False) 
+
+    participants= models.ManyToManyField(User, related_name='participants_meetings', null=True, blank=True)
 
     def __str__(self):
         return f"Meeting: {self.meeting_title} on {self.meeting_date} from {self.start_time} to {self.end_time}"
@@ -295,16 +299,16 @@ class MeetingReminder(models.Model):
         (15, '15 minutes before'),
         (30, '30 minutes before'),
         (45, '45 minutes before'),
-        (0, 'On meeting time')  # Added option for "On meeting time"
+        (0, 'On meeting time')  
     ]
     
     REMINDER_TYPE_CHOICES = [
-        ('email', 'Email'),  # User can only select Email
+        ('email', 'Email'),  
     ]
 
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
-    meeting = models.ForeignKey(MeetingOrganization, on_delete=models.CASCADE)  # Link reminder to a specific meeting
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  # User who sets the reminder
+    meeting = models.ForeignKey(MeetingOrganization, on_delete=models.CASCADE)  
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  
 
     reminder_type = models.CharField(
         max_length=20,
@@ -312,20 +316,20 @@ class MeetingReminder(models.Model):
         default='email'
     )
     
-    # Reminder time options: 15, 30, 45 minutes before or on meeting time
+  
     reminder_time = models.IntegerField(
         choices=REMINDER_TIME_CHOICES,
         default=15
     )
 
-    # Custom time input (minutes or hours) for other reminder options
+    
     custom_minutes = models.IntegerField(null=True, blank=True)
     custom_hours = models.IntegerField(null=True, blank=True)
 
-    # Store the calculated reminder time (datetime)
+  
     reminder_datetime = models.DateTimeField(null=True, blank=True)
 
-    # New field to determine whether to remind all members
+  
     remind_all_members = models.BooleanField(default=False)
     reminder_style = models.CharField(
     max_length=100,
@@ -336,7 +340,7 @@ class MeetingReminder(models.Model):
         ('classic', 'Classic'),
         ('playful', 'Playful'),
     ],
-    default='minimalist',  # Default style
+    default='minimalist',  
     help_text="Choose a theme for your reminder email template."
    , null=True , blank=True)
 
@@ -344,22 +348,78 @@ class MeetingReminder(models.Model):
         return f"Reminder for {self.meeting.meeting_title} ({self.reminder_type})"
     
     def save(self, *args, **kwargs):
-        # Calculate the reminder time based on user input
-        if self.reminder_time == 0:  # On meeting time
-            # Set reminder exactly at the meeting time (no offset)
+        
+        if self.reminder_time == 0: 
             reminder_offset = timedelta(minutes=0)
-        elif self.reminder_time == 15 or self.reminder_time == 30 or self.reminder_time == 45:  # Predefined times
+        elif self.reminder_time == 15 or self.reminder_time == 30 or self.reminder_time == 45: 
             reminder_offset = timedelta(minutes=self.reminder_time)
-        else:  # Custom time handling
+        else:  
             if self.custom_minutes:
                 reminder_offset = timedelta(minutes=self.custom_minutes)
             elif self.custom_hours:
                 reminder_offset = timedelta(hours=self.custom_hours)
             else:
-                reminder_offset = timedelta(minutes=15)  # Default to 15 minutes if no input
+                reminder_offset = timedelta(minutes=15)  
 
-        # Calculate the reminder datetime (meeting datetime - reminder offset)
         meeting_datetime = datetime.combine(self.meeting.meeting_date, self.meeting.start_time)
         self.reminder_datetime = meeting_datetime - reminder_offset
         
         super().save(*args, **kwargs)
+
+
+# Invite other users in the meeting 
+def generate_random_string():
+         return get_random_string(50)
+
+class MeetingInvitationOrganization(models.Model):
+    meeting = models.ForeignKey('MeetingOrganization', related_name='invitations', on_delete=models.CASCADE)
+    invitee = models.ForeignKey(User, related_name='meeting_invitationss', on_delete=models.CASCADE)  # The user invited to the meeting
+    organization = models.ForeignKey(Organization, related_name='meeting_invitations', on_delete=models.CASCADE)
+    status = models.CharField(
+        max_length=20,
+        choices=[('pending', 'Pending'), ('accepted', 'Accepted'), ('declined', 'Declined')],
+        default='pending'
+    )
+    invited_at = models.DateTimeField(auto_now_add=True)
+    accepted_at = models.DateTimeField(null=True, blank=True)
+    declined_at = models.DateTimeField(null=True, blank=True)
+    
+   
+    # A unique token for the invite link with the correct length argument
+    invite_token = models.CharField(max_length=50, unique=True, default=generate_random_string)
+    
+    
+ 
+    is_email_sent = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Invite to {self.invitee.username} for meeting {self.meeting.meeting_title} ({self.status})"
+
+    def accept_invite(self):
+        """Accept the invitation and mark the status as accepted."""
+        self.status = 'accepted'
+        self.accepted_at = timezone.now()
+        self.save()
+    
+    def decline_invite(self):
+        """Decline the invitation and mark the status as declined."""
+        self.status = 'declined'
+        self.declined_at = timezone.now()
+        self.save()
+
+    def send_invite_email(self):
+        """Send an email invite to the invitee."""
+        if not self.is_email_sent:
+            subject = f"You're invited to the meeting: {self.meeting.meeting_title}"
+            message = f"Hello {self.invitee.username},\n\nYou are invited to the meeting '{self.meeting.meeting_title}' on {self.meeting.meeting_date} at {self.meeting.start_time}. To accept the invitation, click the link below:\n\n{self.get_invite_link()}\n\nBest regards,\nYour Organization"
+            from_email = settings.DEFAULT_FROM_EMAIL
+            
+            send_mail(subject, message, from_email, [self.invitee.email])
+            self.is_email_sent = True
+            self.save()
+
+    def get_invite_link(self):
+        """Generate the invite link with the token."""
+        return f"{settings.SITE_URL}/org_accept_invite/{self.invite_token}/"
+    
+    
