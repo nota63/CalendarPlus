@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Availability</title>
+
+    <!-- Load jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Load Moment.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+    <!-- Load FullCalendar.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.min.js"></script>
+
+    <style>
+        /* Custom styles */
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .day-slot { margin-bottom: 20px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .day-slot > div:first-child { font-weight: bold; margin-bottom: 10px; }
+        .time-slots div { margin-bottom: 5px; }
+        .add-time-slot-btn, .delete-btn { margin-left: 10px; padding: 5px 10px; cursor: pointer; }
+        .delete-btn { color: red; }
+        
+        /* Modal styling */
+        #add-time-slot-modal, #edit-availability-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 20px; background-color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1000; }
+        #add-time-slot-modal input, #edit-availability-modal input { margin-bottom: 10px; }
+        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 999; }
+        
+        /* Calendar View */
+        #calendar { display: none; margin-top: 20px; }
+        .toggle-btns { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<h2>Manage Availability for {{ organization.name }}</h2>
+
+<!-- Toggle buttons for list view and calendar view -->
+<div class="toggle-btns">
+    <button id="list-view-btn">List View</button>
+    <button id="calendar-view-btn">Calendar View</button>
+</div>
+
+<!-- List View (Existing) -->
+<div id="availability-container">
+    {% for day, slots in grouped_availabilities.items %}
+        <div class="day-slot" data-day="{{ day }}">
+            <div>
+                {{ day }}
+                <button class="add-time-slot-btn" data-day="{{ forloop.counter0 }}" data-org="{{ organization.id }}">+</button>
+            </div>
+            <div class="time-slots">
+                {% for slot in slots %}
+                    <div>
+                        {{ slot.start_time }} - {{ slot.end_time }}
+                        <button class="delete-btn" data-id="{{ slot.id }}" data-org="{{ organization.id }}">Delete</button>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Calendar View (FullCalendar.js) -->
+<div id="calendar"></div>
+
+<!-- Modal to add time slot -->
+<div id="overlay"></div>
+<div id="add-time-slot-modal">
+    <h3>Add New Time Slot</h3>
+    <form id="add-time-slot-form">
+        <input type="hidden" id="selected-day" name="day_of_week">
+        <input type="hidden" id="selected-org" name="org_id" value="{{ organization.id }}">
+        <label for="start-time">Start Time:</label>
+        <input type="time" id="start-time" name="start_time" required><br><br>
+        <label for="end-time">End Time:</label>
+        <input type="time" id="end-time" name="end_time" required><br><br>
+        <button type="submit">Add Slot</button>
+    </form>
+    <button onclick="closeModal()">Close</button>
+</div>
+
+<!-- Modal to Edit Availability -->
+<div id="edit-availability-modal">
+    <h3>Edit Availability</h3>
+    <form id="edit-availability-form">
+        <input type="hidden" id="availability-id">
+        <input type="hidden" id="organization-id">
+        
+        <label for="edit-start-time">Start Time:</label>
+        <input type="time" id="edit-start-time" required><br><br>
+        
+        <label for="edit-end-time">End Time:</label>
+        <input type="time" id="edit-end-time" required><br><br>
+
+        <button type="submit">Save Changes</button>
+    </form>
+    <button onclick="closeModal()">Close</button>
+</div>
+
+<script>
+    $(document).ready(function () {
+        // Toggle between List View and Calendar View
+        $('#list-view-btn').click(function() {
+            $('#availability-container').show();  // Show list view
+            $('#calendar').hide();  // Hide calendar view
+        });
+
+        $('#calendar-view-btn').click(function() {
+            $('#availability-container').hide();  // Hide list view
+            $('#calendar').show();  // Show calendar view
+            initializeCalendar();  // Initialize calendar on button click
+        });
+
+        function initializeCalendar() {
+            $('#calendar').fullCalendar({
+                events: function (start, end, timezone, callback) {
+                    $.ajax({
+                        url: "{% url 'get_availability_data' organization.id %}",
+                        dataType: 'json',
+                        success: function(data) {
+                            var events = data.events.map(function(event) {
+                                return {
+                                    title: event.title,
+                                    start: event.start,
+                                    end: event.end,
+                                    description: event.description,
+                                    availability_id: event.id,
+                                    organization_id: event.organization_id
+                                };
+                            });
+                            callback(events); // Populate events in FullCalendar
+                        },
+                        error: function() {
+                            alert('Error fetching events.');
+                        }
+                    });
+                },
+                header: { left: 'prev,next today', center: 'title', right: 'month,agendaWeek,agendaDay' },
+                eventRender: function(event, element) { element.attr('title', event.description); }, // Show description on hover
+                eventClick: function(event) { openEditAvailabilityModal(event); } // Open the modal on event click
+            });
+        }
+
+        // Open the modal to edit availability
+          // Open the modal to edit availability
+          function openEditAvailabilityModal(event) {
+            $('#availability-id').val(event.availability_id);
+            $('#organization-id').val(event.organization_id);
+            $('#edit-start-time').val(moment(event.start).format('HH:mm'));
+            $('#edit-end-time').val(moment(event.end).format('HH:mm'));
+            $('#edit-availability-modal').show();
+        }
+
+        // Handle form submission for editing availability
+       // Handle form submission for editing availability
+$("#edit-availability-form").submit(function (e) {
+    e.preventDefault();
+    var availabilityId = $('#availability-id').val();
+    var orgId = $('#organization-id').val();
+    var startTime = $('#edit-start-time').val();
+    var endTime = $('#edit-end-time').val();
+
+    $.ajax({
+        url: `/calendar/edit-availability/${orgId}/${availabilityId}/`,  // Updated URL format
+        method: "POST",
+        data: {
+            start_time: startTime,
+            end_time: endTime,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function(response) {
+            if (response.success) {
+                // Update the event in the calendar
+                $('#calendar').fullCalendar('removeEvents', availabilityId); // Remove old event
+                $('#calendar').fullCalendar('renderEvent', response.event, true); // Add updated event
+                closeModal();
+            } else {
+                alert('Error: ' + response.message);
+            }
+        },
+        error: function() {
+            alert('There was an error editing the time slot.');
+        }
+    });
+});
+
+
+        // Open the modal to add a new time slot when "+" button is clicked
+        $(document).on("click", ".add-time-slot-btn", function () {
+            var dayOfWeek = $(this).data('day');
+            $('#selected-day').val(dayOfWeek);
+            $('#add-time-slot-modal').show();
+            $('#overlay').show();
+        });
+
+        // Close the modal
+        function closeModal() {
+            $('#add-time-slot-modal').hide();
+            $('#edit-availability-modal').hide();
+            $('#overlay').hide();
+        }
+
+        // Handle form submission via AJAX for adding new slot (as before)
+        $("#add-time-slot-form").submit(function (e) {
+            e.preventDefault();
+            var dayOfWeek = $('#selected-day').val();
+            var startTime = $('#start-time').val();
+            var endTime = $('#end-time').val();
+            var orgId = $('#selected-org').val();
+
+            $.ajax({
+                url: "{% url 'add_time_slot' %}",
+                method: "POST",
+                data: {
+                    start_time: startTime,
+                    end_time: endTime,
+                    day_of_week: dayOfWeek,
+                    org_id: orgId,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        var newSlot = `<div>${startTime} - ${endTime} <button class="delete-btn" data-id="${response.slot_id}" data-org="${orgId}">Delete</button></div>`;
+                        $(`.day-slot[data-day="${dayOfWeek}"] .time-slots`).append(newSlot);
+                        closeModal();
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('There was an error adding the time slot.');
+                }
+            });
+        });
+
+        // Handle delete button click (same as before)
+        $(document).on("click", ".delete-btn", function () {
+            var availabilityId = $(this).data('id');
+            var orgId = $(this).data('org');
+            var $this = $(this);
+
+            $.ajax({
+                url: "{% url 'delete_time_slot' %}",
+                method: "POST",
+                data: {
+                    availability_id: availabilityId,
+                    org_id: orgId,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        alert(response.message);
+                        $this.closest('div').remove();
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                },
+                error: function () {
+                    alert('There was an error deleting the time slot.');
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

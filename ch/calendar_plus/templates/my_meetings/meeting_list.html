@@ -1,0 +1,387 @@
+
+
+
+<div class="container">
+    <h1>Meeting List</h1>
+
+    <strong>{{organization.name}}</strong>
+
+    <div class="tabs">
+        <button id="my-scheduled" class="tab-button active">My Scheduled Meetings</button>
+        <button id="i-scheduled" class="tab-button">I Scheduled Meetings</button>
+    </div>
+
+    <!-- My Scheduled Meetings Section -->
+    <div id="my-scheduled-meetings" class="meeting-section active">
+        <h2>My Scheduled Meetings</h2>
+        
+        <div class="meeting-category">
+            <h3><a href="#" class="category-link" data-category="my_scheduled_standup">Standup</a></h3>
+            <div class="meeting-list my_scheduled_standup">
+                {% for meeting in my_scheduled_standup %}
+                    <div class="meeting-item">
+                        <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
+        
+                        <!-- 3 Dots Menu -->
+                        <div class="dots-menu">
+                            <button class="dots-btn">...</button>
+                            <div class="dots-dropdown">
+                                <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
+                                <!-- Remove Me Button -->
+                                <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
+                                <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        
+        <div class="meeting-category">
+            <h3><a href="#" class="category-link" data-category="my_scheduled_task">Task</a></h3>
+            <div class="meeting-list my_scheduled_task">
+                {% for meeting in my_scheduled_task %}
+                    <div class="meeting-item">
+                        <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
+        
+                        <!-- 3 Dots Menu -->
+                        <div class="dots-menu">
+                            <button class="dots-btn">...</button>
+                            <div class="dots-dropdown">
+                                <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
+                               <!-- Remove Me Button -->
+                               <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
+                               <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        
+        <div class="meeting-category">
+            <h3><a href="#" class="category-link" data-category="my_scheduled_project">Project Discussion</a></h3>
+            <div class="meeting-list my_scheduled_project">
+                {% for meeting in my_scheduled_project %}
+                    <div class="meeting-item">
+                        <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
+        
+                        <!-- 3 Dots Menu -->
+                        <div class="dots-menu">
+                            <button class="dots-btn">...</button>
+                            <div class="dots-dropdown">
+                                <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
+                                <!-- Remove Me Button -->
+                                <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
+                                <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        
+        <div class="meeting-category">
+            <h3><a href="#" class="category-link" data-category="my_scheduled_other">Other</a></h3>
+            <div class="meeting-list my_scheduled_other">
+                {% for meeting in my_scheduled_other %}
+                    <div class="meeting-item">
+                        <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
+        
+                        <!-- 3 Dots Menu -->
+                        <div class="dots-menu">
+                            <button class="dots-btn">...</button>
+                            <div class="dots-dropdown">
+                                <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
+                              <!-- Remove Me Button -->
+                              <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
+                              <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- I Scheduled Meetings Section -->
+    <div id="i-scheduled-meetings" class="meeting-section">
+        <h2>I Scheduled Meetings<div class="meeting-category">
+            <h3><a href="#" class="category-link" data-category="i_scheduled_standup">Standup</a></h3>
+            <div class="meeting-list i_scheduled_standup">
+                {% for meeting in i_scheduled_standup %}
+                    <div class="meeting-item">
+                        <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
+        
+                        <!-- 3 Dots Menu -->
+                        <div class="dots-menu">
+                            <button class="dots-btn">...</button>
+                            <div class="dots-dropdown">
+                                <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
+                               <!-- Remove Me Button -->
+                               <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
+                               <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+     
+
+        
+        
+        <div class="meeting-category">
+            <h3><a href="#" class="category-link" data-category="i_scheduled_task">Task</a></h3>
+            <div class="meeting-list i_scheduled_task">
+                {% for meeting in i_scheduled_task %}
+                    <div class="meeting-item">
+                        <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
+        
+                        <!-- 3 Dots Menu -->
+                        <div class="dots-menu">
+                            <button class="dots-btn">...</button>
+                            <div class="dots-dropdown">
+                                <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
+                               <!-- Remove Me Button -->
+                               <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
+                               <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        
+        <div class="meeting-category">
+            <h3><a href="#" class="category-link" data-category="i_scheduled_project">Project Discussion</a></h3>
+            <div class="meeting-list i_scheduled_project">
+                {% for meeting in i_scheduled_project %}
+                    <div class="meeting-item">
+                        <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
+        
+                        <!-- 3 Dots Menu -->
+                        <div class="dots-menu">
+                            <button class="dots-btn">...</button>
+                            <div class="dots-dropdown">
+                                <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
+                               <!-- Remove Me Button -->
+                               <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
+                               <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        
+        <div class="meeting-category">
+            <h3><a href="#" class="category-link" data-category="i_scheduled_other">Other</a></h3>
+            <div class="meeting-list i_scheduled_other">
+                {% for meeting in i_scheduled_other %}
+                    <div class="meeting-item">
+                        <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
+        
+                        <!-- 3 Dots Menu -->
+                        <div class="dots-menu">
+                            <button class="dots-btn">...</button>
+                            <div class="dots-dropdown">
+                                <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
+                                 <!-- Remove Me Link (Popup confirmation) -->
+                                 <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
+                                 <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.container {
+    width: 80%;
+    margin: 20px auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+.tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.tab-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 5px 5px 0 0;
+    margin-right: 10px;
+    transition: all 0.3s ease;
+}
+
+.tab-button:hover {
+    background-color: #007BFF;
+    color: white;
+}
+
+.tab-button.active {
+    background-color: #007BFF;
+    color: white;
+}
+
+.meeting-section {
+    display: none;
+}
+
+.meeting-section.active {
+    display: block;
+}
+
+.meeting-category {
+    margin-bottom: 30px;
+}
+
+.meeting-category h3 {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.meeting-category p {
+    font-size: 16px;
+    color: #555;
+    margin: 5px 0;
+    transition: all 0.3s ease;
+}
+
+.meeting-category p:hover {
+    color: #007BFF;
+    cursor: pointer;
+    text-decoration: underline;
+}
+.dots-menu {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dots-btn {
+        background: transparent;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    .dots-dropdown {
+        display: none;
+        position: absolute;
+        right: 0;
+        background-color: #f9f9f9;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+    }
+
+    .dots-dropdown a {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+    }
+
+    .dots-dropdown a:hover {
+        background-color: #ddd;
+    }
+
+    /* Show the dropdown when the 3 dots button is clicked */
+    .dots-menu:hover .dots-dropdown {
+        display: block;
+    }
+
+
+    /* Initially hide the modal */
+#remove-modal {
+    display: none;
+    position: fixed;
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); /* Black background with transparency */
+    overflow: auto; /* Enable scroll if needed */
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+</style>
+
+<script>
+    // Toggle tab content
+    document.getElementById('my-scheduled').onclick = function() {
+        document.getElementById('my-scheduled-meetings').classList.add('active');
+        document.getElementById('i-scheduled-meetings').classList.remove('active');
+        this.classList.add('active');
+        document.getElementById('i-scheduled').classList.remove('active');
+    };
+    
+    document.getElementById('i-scheduled').onclick = function() {
+        document.getElementById('i-scheduled-meetings').classList.add('active');
+        document.getElementById('my-scheduled-meetings').classList.remove('active');
+        this.classList.add('active');
+        document.getElementById('my-scheduled').classList.remove('active');
+    };
+
+    // Handle category clicks
+    const categoryLinks = document.querySelectorAll('.category-link');
+    categoryLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const category = this.getAttribute('data-category');
+            const meetingLists = document.querySelectorAll('.meeting-list');
+            meetingLists.forEach(list => list.style.display = 'none');
+            const targetList = document.querySelector(`.${category}`);
+            if (targetList) {
+                targetList.style.display = 'block';
+            }
+        });
+    });
+
+    
+
+
+
+</script>

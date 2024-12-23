@@ -1,0 +1,23 @@
+<h2>Availability Slots for {{ user.username }} on {{ selected_date }} (Organization: {{ organization.name }})</h2>
+
+<form method="GET" action="{% url 'schedule_next_step' org_id=organization.id user_id=user.id %}">
+    <ul>
+        {% for slot in available_slots %}
+        <li>
+            {% if slot.booked %}
+                <span class="text-red-500">{{ slot.start_time }} - {{ slot.end_time }} (Booked)</span>
+            {% else %}
+                <input type="radio" name="selected_slot" value="{{ slot.start_time }} - {{ slot.end_time }}" required>
+                {{ slot.start_time }} - {{ slot.end_time }}
+            {% endif %}
+            <input type="hidden" name="selected_date" value="{{ selected_date }}">
+        </li>
+        {% endfor %}
+    </ul>
+
+    {% if available_slots %}
+        <button type="submit">Proceed</button>
+    {% else %}
+        <p>No availability slots for this day.</p>
+    {% endif %}
+</form>

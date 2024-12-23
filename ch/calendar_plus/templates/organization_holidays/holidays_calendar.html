@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ organization.name }} Holidays</title>
+
+    <!-- Load FullCalendar CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.min.css" rel="stylesheet" />
+</head>
+<body>
+
+<h2>Holidays for {{ organization.name }}</h2>
+
+<h4>The holidays you are creating or viewing is only valid for this organization {{organization.name}}! you can customize , manage holidays for each organization you belong to</h4>
+
+<strong>Calendar + supports indian government holidays as of now in development but in future we will be supporting multiple countries holidays!</strong>
+
+<strong>We prevent others to book your event or schedule meetings on your holidays! No one can book or schedule they can just view your holiday!</strong>
+
+<br>
+<br>
+
+<div id="calendar"></div> <!-- FullCalendar container -->
+
+<!-- View Holiday Modal -->
+<div id="viewHolidayModal" style="display: none; border: 1px solid #ccc; padding: 20px;">
+  <div>
+    <h4 id="viewHolidayTitle"></h4>
+    <p id="viewHolidayDescription"></p>
+    <p id="viewHolidayStart"></p>
+    <p id="viewHolidayEnd"></p>
+    <button id="closeViewHolidayModal">Close</button>
+    <button id="deleteHolidayBtn">Delete Holiday</button>
+     <!-- New Message Button -->
+    <button id="messageHolidayBtn">Message</button>
+    
+    <button id="editHolidayBtn">Edit</button>
+    <button id="settingsHolidayBtn">Settings</button>
+  </div>
+</div>
+
+<!-- Add Holiday Modal -->
+<div id="addHolidayModal" style="display: none; border: 1px solid #ccc; padding: 20px;">
+  <div>
+    <h4>Add Holiday</h4>
+    <form id="addHolidayForm">
+      {% csrf_token %}
+      <input type="text" id="addHolidayTitle" name="title" placeholder="Holiday Title" required />
+      <textarea id="addHolidayDescription" name="description" placeholder="Holiday Description"></textarea>
+      <input type="text" id="addHolidayStart" name="start_date" placeholder="Start Date" required />
+      <input type="text" id="addHolidayEnd" name="end_date" placeholder="End Date" required />
+      <button type="submit">Save</button>
+    </form>
+  </div>
+</div>
+
+<!-- Load jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Load Moment.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+<!-- Load FullCalendar.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.min.js"></script>
+<script>
+    $(document).ready(function() {
+        var selectedStartDate = null;
+        var selectedEndDate = null;
+    
+        // Initialize FullCalendar
+        $('#calendar').fullCalendar({
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,agendaWeek,agendaDay'
+            },
+            events: [
+                {% for event in holiday_events %}
+                {
+                    id: '{{ event.id }}',
+                    title: '{{ event.title }}',
+                    start: '{{ event.start }}',
+                    end: '{{ event.end }}',
+                    description: '{{ event.description }}',
+                    organization_id: '{{ event.organization_id }}',
+                },
+                {% endfor %}
+            ],
+            dayClick: function(date, jsEvent, view) {
+                if (!selectedStartDate) {
+                    selectedStartDate = date.format();
+                    $('#addHolidayStart').val(selectedStartDate); // Explicitly set the form's start date field
+                    console.log('Start Date Selected:', selectedStartDate); // Debugging
+                    alert('Start Date selected. Now click on the End Date.');
+                } else if (!selectedEndDate) {
+                    selectedEndDate = date.format();
+                    $('#addHolidayEnd').val(selectedEndDate); // Explicitly set the form's end date field
+                    console.log('End Date Selected:', selectedEndDate); // Debugging
+    
+                    // Ensure the modal is shown only when both dates are selected
+                    if (selectedStartDate && selectedEndDate) {
+                        console.log('Opening Add Holiday Modal');
+                        $('#addHolidayModal').show();
+                    }
+                } else {
+                    // Reset if both dates were already selected
+                    alert('Both dates already selected. Resetting...');
+                    selectedStartDate = null;
+                    selectedEndDate = null;
+                    $('#addHolidayStart').val('');
+                    $('#addHolidayEnd').val('');
+                    console.log('Date Selection Reset');
+                }
+            },
+    
+            // Show the holiday details in the modal when an event is clicked
+            eventClick: function(event) {
+                // Fetch holiday details via AJAX
+                $.ajax({
+                    url: "{% url 'holiday_details' organization.id 0 %}".replace('0', event.id),
+                    method: 'GET',
+                    success: function(data) {
+                        $('#viewHolidayTitle').text(data.title);
+                        $('#viewHolidayDescription').text(data.description);
+                        $('#viewHolidayStart').text('Start: ' + data.start);
+                        $('#viewHolidayEnd').text('End: ' + data.end);
+    
+                        // Show the View Holiday Modal
+                        $('#viewHolidayModal').show();
+    
+                        // Store the event ID and organization ID for use in delete and message
+                        $('#deleteHolidayBtn').data('holiday-id', event.id);
+                        $('#deleteHolidayBtn').data('org-id', data.organization_id);
+                        $('#messageHolidayBtn').data('holiday-id', event.id);  // Store holiday ID
+                        $('#messageHolidayBtn').data('org-id', data.organization_id);
+                        $('#editHolidayBtn').data('holiday-id', event.id);  // Store holiday ID
+                        $('#editHolidayBtn').data('org-id', data.organization_id);   // Store org ID
+                        $('#settingsHolidayBtn').data('holiday-id', event.id);  // Store holiday ID
+                        $('#settingsHolidayBtn').data('org-id', data.organization_id);   // Store org ID
+                    }
+                });
+            }
+        });
+  
+        // Delete holiday button click handler
+        $('#deleteHolidayBtn').click(function() {
+            var holidayId = $(this).data('holiday-id');
+            var orgId = $(this).data('org-id');
+    
+            // Confirm delete action
+            if (confirm('Are you sure you want to delete this holiday?')) {
+                // Correct URL for delete request with org_id and holiday_id
+                var deleteUrl = "{% url 'delete_holiday' 0 0 %}".replace('0', orgId).replace('0', holidayId);
+    
+                $.ajax({
+                    url: deleteUrl,
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': getCSRFToken() }, // CSRF token for security
+                    success: function(response) {
+                        alert(response.message); // Show success message
+                        $('#viewHolidayModal').hide(); // Close the modal
+                        $('#calendar').fullCalendar('removeEvents', holidayId); // Remove the holiday from the calendar
+                    },
+                    error: function(xhr) {
+                        alert('Error deleting holiday. Please try again.');
+                    }
+                });
+            }
+        });
+    
+        // Message button click handler
+        $('#messageHolidayBtn').click(function() {
+            var holidayId = $(this).data('holiday-id');
+            var orgId = $(this).data('org-id');
+    
+            // Forcefully redirect to the message URL with org_id and holiday_id
+            window.location.href = "{% url 'holiday_message' 0 0 %}".replace('0', orgId).replace('0', holidayId);
+        });
+
+        // edit holiday button
+         // Message button click handler
+         $('#editHolidayBtn').click(function() {
+            var holidayId = $(this).data('holiday-id');
+            var orgId = $(this).data('org-id');
+    
+            // Forcefully redirect to the message URL with org_id and holiday_id
+            window.location.href = "{% url 'edit_holiday' 0 0 %}".replace('0', orgId).replace('0', holidayId);
+        });
+
+        // settings holiday button
+        $('#settingsHolidayBtn').click(function() {
+            var holidayId = $(this).data('holiday-id');
+            var orgId = $(this).data('org-id');
+    
+            // Forcefully redirect to the message URL with org_id and holiday_id
+            window.location.href = "{% url 'holiday_settings' 0 0 %}".replace('0', orgId).replace('0', holidayId);
+        });
+    
+
+
+
+
+
+
+
+    
+        // Close the View Holiday Modal
+        $('#closeViewHolidayModal').click(function() {
+            $('#viewHolidayModal').hide();
+        });
+    
+        // Close the Add Holiday Modal
+        $('#closeAddHolidayModal').click(function() {
+            $('#addHolidayModal').hide();
+            selectedStartDate = null;
+            selectedEndDate = null;
+            $('#addHolidayStart').val('');
+            $('#addHolidayEnd').val('');
+        });
+    
+        // Get CSRF token
+        function getCSRFToken() {
+            return document.querySelector('[name=csrfmiddlewaretoken]').value;
+        }
+    
+        // Submit the Add Holiday Form
+        $('#addHolidayForm').submit(function(e) {
+            e.preventDefault();
+    
+            // Collect form data
+            var holidayData = {
+                title: $('#addHolidayTitle').val(),
+                description: $('#addHolidayDescription').val(),
+                start_date: $('#addHolidayStart').val(),  // Use the selected start date
+                end_date: $('#addHolidayEnd').val()  // Use the selected end date
+            };
+    
+            // Ensure start and end dates are present
+            if (!holidayData.start_date || !holidayData.end_date) {
+                alert("Please select valid start and end dates.");
+                return;
+            }
+    
+            // Send data via AJAX
+            $.ajax({
+                url: "{% url 'add_holiday' organization.id %}",
+                method: 'POST',
+                data: holidayData,  // Send the holiday data
+                headers: { 'X-CSRFToken': getCSRFToken() },  // Pass CSRF token
+                success: function(response) {
+                    $('#addHolidayModal').hide();
+                    $('#calendar').fullCalendar('renderEvent', {
+                        id: response.id,
+                        title: response.title,
+                        start: response.start_date,
+                        end: response.end_date,
+                        description: response.description
+                    });
+                    alert('Holiday added successfully!');
+                },
+                error: function(xhr) {
+                    console.log(xhr.responseText);
+                    alert('Error saving holiday. Please try again.');
+                }
+            });
+        });
+    });
+  </script>
+  
+
+</body>
+</html>

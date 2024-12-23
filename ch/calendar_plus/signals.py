@@ -12,55 +12,63 @@ from django.db import transaction
 from django.utils.timezone import datetime
 from datetime import timedelta
 from django.db.utils import IntegrityError
+import logging
+from datetime import datetime, timedelta
+from datetime import time
+from django.db import IntegrityError
 
 
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
-
-DEFAULT_SCHEDULE = [
-    {"day_of_week": "Monday", "start_time": "09:00", "end_time": "17:00"},
-    {"day_of_week": "Tuesday", "start_time": "09:00", "end_time": "17:00"},
-    {"day_of_week": "Wednesday", "start_time": "09:00", "end_time": "17:00"},
-    {"day_of_week": "Thursday", "start_time": "09:00", "end_time": "17:00"},
-    {"day_of_week": "Friday", "start_time": "09:00", "end_time": "17:00"},
-    {"day_of_week": "Saturday", "start_time": "10:00", "end_time": "14:00"},
-    {"day_of_week": "Sunday", "start_time": None, "end_time": None},
+# Define default availability slots
+DEFAULT_AVAILABILITY = [
+    {"day_of_week": 0, "start_time": time(9, 0), "end_time": time(17, 0)},  # Monday
+    {"day_of_week": 1, "start_time": time(9, 0), "end_time": time(17, 0)},  # Tuesday
+    {"day_of_week": 2, "start_time": time(9, 0), "end_time": time(17, 0)},  # Wednesday
+    {"day_of_week": 3, "start_time": time(9, 0), "end_time": time(17, 0)},  # Thursday
+    {"day_of_week": 4, "start_time": time(9, 0), "end_time": time(17, 0)},  # Friday
+    {"day_of_week": 5, "start_time": time(9, 0), "end_time": time(12, 0)},  # saturday
 ]
 
 @receiver(post_save, sender=Profile)
-def create_availability_for_user_in_org(sender, instance, created, **kwargs):
+def create_default_availability(sender, instance, created, **kwargs):
     """
-    Signal to create availability for a user when they are assigned a role in an organization.
+    Signal to create default availability for a user when a Profile instance is created.
     """
-    if created or instance.is_admin or instance.is_manager or instance.is_employee:
+    if created and instance.organization:
         try:
-        
-            if not Availability.objects.filter(user=instance.user, organization=instance.organization).exists():
-                with transaction.atomic():
-                    for schedule in DEFAULT_SCHEDULE:
-                        if schedule["start_time"] and schedule["end_time"]:
-                            start_time = datetime.strptime(schedule["start_time"], "%H:%M").time()
-                            end_time = datetime.strptime(schedule["end_time"], "%H:%M").time()
+            existing_availability = Availability.objects.filter(
+                user=instance.user,
+                organization=instance.organization
+            )
+            if existing_availability.exists():
+                logger.warning(
+                    f"Default availability already exists for user {instance.user} in organization {instance.organization}. Skipping creation."
+                )
+                return
 
-                         
-                            Availability.objects.create(
-                                user=instance.user,
-                                organization=instance.organization,
-                                day_of_week=schedule["day_of_week"],
-                                start_time=start_time,
-                                end_time=end_time,
-                                is_booked=False,
-                            )
+            for slot in DEFAULT_AVAILABILITY:
+                try:
+                    Availability.objects.create(
+                        user=instance.user,
+                        organization=instance.organization,
+                        day_of_week=slot["day_of_week"],
+                        start_time=slot["start_time"],
+                        end_time=slot["end_time"],
+                    )
+                except IntegrityError as e:
+                    logger.error(
+                        f"Failed to create availability for user {instance.user} in organization {instance.organization}: {e}"
+                    )
+
+            logger.info(
+                f"Default availability successfully created for user {instance.user} in organization {instance.organization}."
+            )
         except Exception as e:
-            print(f"Error creating availability for user {instance.user.username} in organization {instance.organization.name}: {e}")
-
-
-# monday -- 09:00 - 17:00  
-
-# monday - 09:00 - 09:30 
-
-
-
-
+            logger.exception(
+                f"An unexpected error occurred while creating availability for user {instance.user} in organization {instance.organization}: {e}"
+            )
 
 
 

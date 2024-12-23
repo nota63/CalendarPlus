@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .details {
+            margin-top: 20px;
+        }
+
+        .details p {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .details p span {
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Meeting Details</h1>
+    <div class="details">
+        <p><span>Meeting Title:</span> {{ meeting.meeting_title }}</p>
+        <p><span>Description:</span> {{ meeting.meeting_description }}</p>
+        <p><span>Type:</span> {{ meeting.meeting_type }}</p>
+        <p><span>Date:</span> {{ meeting.meeting_date }}</p>
+        <p><span>Start Time:</span> {{ meeting.start_time }}</p>
+        <p><span>End Time:</span> {{ meeting.end_time }}</p>
+        <p><span>Location:</span> {{ meeting.meeting_location }}</p>
+        <p><span>Meeting Link:</span> <a href="{{ meeting.meeting_link }}" target="_blank">{{ meeting.meeting_link }}</a></p>
+        <p><span>User:</span> {{ meeting.user}}</p>
+        <p><span>Invitee:</span> {{ meeting.invitee}}</p>
+        <p><span>Status:</span> {{ meeting.status }}</p>
+        <p><span>Created At:</span> {{ meeting.created_at }}</p>
+        <p><span>Updated At:</span> {{ meeting.updated_at }}</p>
+    </div>
+</div>
+</body>
+</html>

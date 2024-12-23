@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Meeting Reminder</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Set Reminder for Meeting: {{ meeting.meeting_title }}</h4>
+            </div>
+            <div class="card-body">
+                <form id="reminderForm" method="post" action="">
+                    {% csrf_token %}
+                    <!-- Reminder Type -->
+                    <div class="mb-3">
+                        <label for="reminder_type" class="form-label">Reminder Type:</label>
+                        <select class="form-select" id="reminder_type" name="reminder_type" disabled>
+                            <option value="email" selected>Email (Default)</option>
+                        </select>
+                        <small class="form-text text-muted">Currently, only email reminders are supported.</small>
+                    </div>
+    
+                    <!-- Reminder Time -->
+                    <div class="mb-3">
+                        <label for="reminder_time" class="form-label">Reminder Time:</label>
+                        <select class="form-select" id="reminder_time" name="reminder_time">
+                            <option value="">Select Reminder Time</option>
+                            <option value="15">15 minutes before</option>
+                            <option value="30">30 minutes before</option>
+                            <option value="45">45 minutes before</option>
+                            <option value="0">On Meeting Time</option>
+                        </select>
+                    </div>
+    
+                    <!-- Custom Time -->
+                    <div class="mb-3">
+                        <label class="form-label">Or provide custom time:</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" name="custom_minutes" placeholder="Minutes">
+                            <input type="number" class="form-control" name="custom_hours" placeholder="Hours">
+                        </div>
+                        <small class="form-text text-muted">Leave blank if using the predefined reminder times above.</small>
+                    </div>
+    
+                    <!-- Remind All Members -->
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="remind_all_members" name="remind_all_members">
+                        <label class="form-check-label" for="remind_all_members">Remind all members (User and Invitee)</label>
+                    </div>
+    
+                    <!-- Reminder Style -->
+                    <div class="mb-3">
+                        <label class="form-label">Select Reminder Style:</label>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <label class="text-center">
+                                <input type="radio" name="reminder_style" value="modern" class="form-check-input">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaCjaF5gkVy47u03woCLOY2blWuJD3Z5bBXg&s" alt="Modern Theme" class="img-thumbnail" style="width: 100px; height: auto;">
+                                <div>Modern</div>
+                            </label>
+                            <label class="text-center">
+                                <input type="radio" name="reminder_style" value="classic" class="form-check-input">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyz3Y1Zri2lI3XmONaBE3Ug4vvp0AQGSZ9Kw&s" alt="Classic Theme" class="img-thumbnail" style="width: 100px; height: auto;">
+                                <div>Classic</div>
+                            </label>
+                            <label class="text-center">
+                                <input type="radio" name="reminder_style" value="minimalist" class="form-check-input">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpcyqqHwhyhrcqkFaQ7bSSDEPv8vPtZhu1kw&s" alt="Minimalist Theme" class="img-thumbnail" style="width: 100px; height: auto;">
+                                <div>Minimalist</div>
+                            </label>
+                            <label class="text-center">
+                                <input type="radio" name="reminder_style" value="dark" class="form-check-input">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLmMC6_5JY2ZGXGE0v-srKub1fVkEVzEIzNg&s" alt="Dark Theme" class="img-thumbnail" style="width: 100px; height: auto;">
+                                <div>Dark</div>
+                            </label>
+                            <label class="text-center">
+                                <input type="radio" name="reminder_style" value="playful" class="form-check-input">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgmVuEaefM9UDajV7hzhfG2AK9w4OVcibVhg&s" alt="Playful Theme" class="img-thumbnail" style="width: 100px; height: auto;">
+                                <div>Playful</div>
+                            </label>
+                        </div>
+                    </div>
+    
+                    <!-- Submit Button -->
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Save Reminder</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Handle form submission
+        document.getElementById('reminderForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.success);
+                    window.location.href = '/calendar/meetings/{{ organization.id }}/';  // Redirect to meeting list
+                } else {
+                    alert(data.error || 'An error occurred while saving the reminder.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

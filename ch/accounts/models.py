@@ -45,6 +45,8 @@ class Profile(models.Model):
             raise ValueError("An organization can have only one admin.")
      super().save(*args, **kwargs)
 
+
+
 # project model 
 class Project(models.Model):
     name = models.CharField(max_length=255)  # Project name
@@ -172,21 +174,8 @@ class EmailInvitation(models.Model):
 
 
 
-class OngoingMeetings(models.Model):
-    user= models.ForeignKey(User, on_delete=models.CASCADE)
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
-    meeting_schedules= models.JSONField(null=True)
-
-
-
-
-
-
 
 # Availability model 
-
-
-# calendar +
 class Availability(models.Model):
     DAYS_OF_WEEK = [
         (0, 'Monday'),
@@ -203,6 +192,174 @@ class Availability(models.Model):
     day_of_week = models.IntegerField(choices=DAYS_OF_WEEK, null=True, blank=True)
     start_time = models.TimeField(null=True, blank=True)
     end_time = models.TimeField(null=True, blank=True)
+    is_booked=models.BooleanField(default=False, null=True, blank=True)
 
     class Meta:
         unique_together = ('user', 'organization', 'day_of_week', 'start_time', 'end_time')
+
+    def __str__(self):
+        return f'{self.day_of_week} - {self.start_time} - {self.end_time}'
+    
+
+# Holidays 
+
+class HolidayOrganization(models.Model):
+    organization = models.ForeignKey(Organization, related_name='holidaysorg', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='holidaysorg', on_delete=models.CASCADE)  
+    name = models.CharField(max_length=255)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+    description = models.TextField(blank=True, null=True)
+    message_for_invitees=models.TextField(null=True, blank=True)
+    # settings fields
+   
+
+    def __str__(self):
+        return f"{self.name} ({self.start_date} - {self.end_date})"
+
+    class Meta:
+        unique_together = ('organization', 'start_date', 'end_date') 
+
+
+# Holiday settings         
+
+# Holiday Type 
+class HolidayType(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    
+    def __str__(self):
+        return self.name
+
+
+# Holiday Settings
+class HolidaySettings(models.Model):
+    holiday = models.OneToOneField(HolidayOrganization, on_delete=models.CASCADE, related_name='settings')
+    organization = models.ForeignKey('Organization', on_delete=models.CASCADE, related_name='holiday_settings')
+    allow_scheduling = models.BooleanField(default=False)
+    holiday_visibility = models.BooleanField(default=True)
+    is_recurring = models.BooleanField(default=False, null=True, blank=True)
+    holiday_type = models.ForeignKey(HolidayType, null=True, blank=True, on_delete=models.SET_NULL)
+    # New field for Holiday Notifications
+    holiday_notifications = models.BooleanField(default=False, null=True, blank=True)
+
+    notify_organization_members = models.BooleanField(default=False, null=True, blank=True)
+    reminder_days_before = models.IntegerField(default=0, choices=[(i, i) for i in range(1, 31)], null=True, blank=True)  # Number of days before the holiday to send reminder
+    reminder_message = models.TextField(null=True, blank=True)  # Custom message for the reminder
+    # New field for the carryover
+    carryover = models.BooleanField(default=False, null=True, blank=True)  # New field for Holiday Carryover
+    
+
+
+
+    def __str__(self):
+        return f"Settings for {self.holiday.name} ({self.organization.name})"
+    
+
+# Organization Meetings
+
+class MeetingOrganization(models.Model):
+    organization = models.ForeignKey(Organization, related_name="meetingss", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="user_meetingss", on_delete=models.CASCADE, null=True, blank=True)  # The user whose calendar is being viewed
+    invitee = models.ForeignKey(User, related_name="created_meetingss", on_delete=models.CASCADE,null=True, blank=True)  # The invitee (the person creating the meeting)
+    
+    meeting_title = models.CharField(max_length=255)
+    meeting_description = models.TextField(blank=True, null=True)
+    
+    # Scheduling fields
+    meeting_date = models.DateField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+
+    # New fields
+    meeting_link = models.URLField(blank=True, null=True)  # Link for the online meeting (Zoom, Google Meet, etc.)
+    meeting_location = models.CharField(max_length=255, choices=[('zoom', 'Zoom'), ('google_meet', 'Google Meet'), ('zoho', 'Zoho'), ('in_person', 'In-person')], default='in_person')
+    meeting_type = models.CharField(max_length=255, choices=[('standup', 'Standup'), ('task', 'Task'), ('project_discussion', 'Project Discussion'), ('other', 'Other')], default='other')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    # Optional fields like status or notification flags
+    status = models.CharField(max_length=50, choices=[('scheduled', 'Scheduled'), ('completed', 'Completed'), ('canceled', 'Canceled')], default='scheduled')
+    is_notification_sent = models.BooleanField(default=False)  # Flag to mark if notifications are sent
+
+    def __str__(self):
+        return f"Meeting: {self.meeting_title} on {self.meeting_date} from {self.start_time} to {self.end_time}"
+
+    class Meta:
+        unique_together = ('organization', 'meeting_date', 'start_time', 'user')  # Ensures no double-booking for the same user
+
+
+# Meeting Reminder
+class MeetingReminder(models.Model):
+    REMINDER_TIME_CHOICES = [
+        (15, '15 minutes before'),
+        (30, '30 minutes before'),
+        (45, '45 minutes before'),
+        (0, 'On meeting time')  # Added option for "On meeting time"
+    ]
+    
+    REMINDER_TYPE_CHOICES = [
+        ('email', 'Email'),  # User can only select Email
+    ]
+
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    meeting = models.ForeignKey(MeetingOrganization, on_delete=models.CASCADE)  # Link reminder to a specific meeting
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # User who sets the reminder
+
+    reminder_type = models.CharField(
+        max_length=20,
+        choices=REMINDER_TYPE_CHOICES,
+        default='email'
+    )
+    
+    # Reminder time options: 15, 30, 45 minutes before or on meeting time
+    reminder_time = models.IntegerField(
+        choices=REMINDER_TIME_CHOICES,
+        default=15
+    )
+
+    # Custom time input (minutes or hours) for other reminder options
+    custom_minutes = models.IntegerField(null=True, blank=True)
+    custom_hours = models.IntegerField(null=True, blank=True)
+
+    # Store the calculated reminder time (datetime)
+    reminder_datetime = models.DateTimeField(null=True, blank=True)
+
+    # New field to determine whether to remind all members
+    remind_all_members = models.BooleanField(default=False)
+    reminder_style = models.CharField(
+    max_length=100,
+    choices=[
+        ('minimalist', 'Minimalist'),
+        ('modern', 'Modern'),
+        ('dark', 'Dark'),
+        ('classic', 'Classic'),
+        ('playful', 'Playful'),
+    ],
+    default='minimalist',  # Default style
+    help_text="Choose a theme for your reminder email template."
+   , null=True , blank=True)
+
+    def __str__(self):
+        return f"Reminder for {self.meeting.meeting_title} ({self.reminder_type})"
+    
+    def save(self, *args, **kwargs):
+        # Calculate the reminder time based on user input
+        if self.reminder_time == 0:  # On meeting time
+            # Set reminder exactly at the meeting time (no offset)
+            reminder_offset = timedelta(minutes=0)
+        elif self.reminder_time == 15 or self.reminder_time == 30 or self.reminder_time == 45:  # Predefined times
+            reminder_offset = timedelta(minutes=self.reminder_time)
+        else:  # Custom time handling
+            if self.custom_minutes:
+                reminder_offset = timedelta(minutes=self.custom_minutes)
+            elif self.custom_hours:
+                reminder_offset = timedelta(hours=self.custom_hours)
+            else:
+                reminder_offset = timedelta(minutes=15)  # Default to 15 minutes if no input
+
+        # Calculate the reminder datetime (meeting datetime - reminder offset)
+        meeting_datetime = datetime.combine(self.meeting.meeting_date, self.meeting.start_time)
+        self.reminder_datetime = meeting_datetime - reminder_offset
+        
+        super().save(*args, **kwargs)

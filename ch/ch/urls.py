@@ -34,13 +34,16 @@ urlpatterns = [
     path('ai/', include('ai.urls')),
     path('new_roles/', include('new_roles.urls')),
     path('calendar/', include('calendar_plus.urls')),
+    path('test/',views.test_base, name='test'),
+
+    # ui components
+    path('styles/', views.styles, name= 'styles'),
+    path('weather/',views.weather, name='weather')
 
   
 
-
-
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-# Serve static and media files during development
+
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

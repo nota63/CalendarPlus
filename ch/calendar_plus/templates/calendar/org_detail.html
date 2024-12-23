@@ -1,175 +1,366 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Organization Detail</title>
+    <!-- Google Fonts and Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #1a1a1a; /* Dark mode background */
-            color: #f5f5f5; /* Light text for contrast */
-            margin: 0;
-            padding: 0;
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 24px;
-            font-weight: 500;
-            margin: 20px 0;
-            color: #00bcd4; /* Accent color */
-        }
-
-        .container {
-            width: 90%;
-            max-width: 800px;
-            margin: 20px auto;
-            background: #2a2a2a; /* Card background */
+        /* Sidebar Styles */
+        .sidebar {
+            background: linear-gradient(135deg, #6EE7B7, #3B82F6);
+            color: white;
+            width: 250px;
+            height: auto; /* Not full height */
+            position: fixed;
+            top: 75px;
+            left: 20px;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            max-height: calc(100vh - 40px); /* Prevent overflow beyond the viewport */
+            overflow-y: auto; /* Allow scrolling if the sidebar content exceeds viewport */
         }
 
-        .organization-details {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .organization-details strong {
-            color: #00bcd4; /* Accent color */
-        }
-
-        .actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: flex-start;
-        }
-
-        .actions a {
+        .sidebar a {
             display: flex;
             align-items: center;
-            gap: 5px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            color: white;
             text-decoration: none;
-            background: #00bcd4; /* Button color */
-            color: #fff;
-            padding: 8px 12px;
-            border-radius: 5px;
-            font-size: 14px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        .sidebar a:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+
+        .sidebar a span {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .sidebar-header {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-header img {
+            width: 40px;
+            margin-right: 10px;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: 300px; /* Add space to the left */
+            padding: 50px;
+            background-color: #F3F4F6;
+            min-height: 100vh;
+            border-radius: 16px;
+        }
+
+/* Card Styles */
+.card {
+    background: white;
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    padding: 24px;
+    margin-bottom: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth shadow transition */
+}
+
+/* Card hover effect */
+.card:hover {
+    transform: translateY(-8px); /* Lift effect */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+}
+
+/* Card header styling */
+.card-header {
+    font-size: 26px;
+    font-weight: 600;
+    color: #4B5563;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #F1F5F9; /* Add subtle line under the header */
+    padding-bottom: 10px;
+}
+
+/* Card body text */
+.card-body p {
+    font-size: 16px;
+    color: #4B5563;
+    line-height: 1.75;
+    margin-bottom: 16px;
+}
+
+/* Strong text inside card body */
+.card-body strong {
+    font-weight: 700;
+    color: #111827; /* Darker color for emphasis */
+}
+
+/* Optional: Add padding inside the card for cleaner spacing */
+.card-body {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+
+        /* Action Links Styling */
+        .action-links a {
+            display: inline-block;
+            margin-right: 15px;
+            padding: 12px 25px;
+            background: #3B82F6;
+            color: white;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .action-links a:hover {
+            background: #2563EB;
+            transform: translateY(-2px);
+        }
+
+        .action-links a:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.5);
+        }
+
+        /* Info Message */
+        .info-message {
+            background-color: #FEE2E2;
+            padding: 16px;
+            border-radius: 8px;
+            color: #B91C1C;
+            font-weight: 500;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-message span {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .info-message strong {
+            font-weight: 700;
+        }
+
+        /* Profile Header */
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #E5E7EB;
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .profile-header h2 {
+            font-size: 30px;
+            font-weight: 600;
+            color: #1F2937;
+        }
+
+        .profile-header img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+
+        .profile-header button {
+            padding: 12px 25px;
+            background: #10B981;
+            color: white;
+            border-radius: 8px;
             font-weight: 500;
             transition: background 0.3s;
         }
 
-        .actions a:hover {
-            background: #02889b; /* Darker accent on hover */
-        }
-
-        .actions a .material-icons {
-            font-size: 18px;
-        }
-
-        .info-message {
-            font-size: 14px;
-            color: #ccc;
-            text-align: center;
-            padding: 10px;
-            background: #333;
-            border-radius: 4px;
+        .profile-header button:hover {
+            background: #059669;
         }
     </style>
 </head>
-<body>
-    <h1>Organization: {{ organization.name }}</h1>
-    <div class="container">
-        <div class="organization-details">
-            <strong>Name:</strong> {{ organization.name }}<br>
-            <strong>Description:</strong> {{ organization.description }}<br>
-            <strong>Created At:</strong> {{ organization.created_at }}<br>
-            {% if organization.current_project%}
-              <strong>Current Project: {{organization.current_project}}</strong>
-            {% endif %}  
-            <strong>Created By:</strong> {{ organization.created_by }}
+<body class="bg-gray-100 font-sans">
+
+   
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <img src="https://via.placeholder.com/40" alt="Logo">
+            <span>Workspace</span>
         </div>
 
-        <div class="actions">
-            {% if is_admin %}
+        {% if is_admin %}
+            <h3 class="font-semibold text-lg text-white mb-6">Admin Controls</h3>
             <a href="{% url 'view_edit_profile' org_id=organization.id %}">
-                View/Edit Profile
+                <span class="material-icons">person</span> View/Edit Profile
             </a>
-                <a href="{% url 'edit_organization' organization.id %}">
-                    <span class="material-icons">edit</span>Edit
-                </a>
-
-                <a href="{% url 'availability-detail' organization.id %}">
-                    <span class="material-icons">edit</span>Manage Availability
-                </a>
-
-              
-
-              
-    
-
-               
-               
-
-
-               
-
-                <a href="{% url 'project_list' organization.id %}">
-                    <span class="material-icons">edit</span>My Projects
-                </a>
-               
-               
-                
-                <a href="{% url 'members_action' organization_id=organization.id %}">
-                    <span class="material-icons">settings</span>Manage Members
-                </a>
-                
-                <a href="{% url 'send_email_invitation' organization_id=organization.id %}">
-                    <span class="material-icons">email</span>Send Email Invite
-                </a>
-                <a href="{% url 'invitation_status' organization.id %}">
-                    <span class="material-icons">person_add</span>Invitations Status
-                </a>
-            {% elif is_manager %}
-
-            <a href="{% url 'view_edit_profile' org_id=organization.id %}">
-                View/Edit Profile
+            <a href="{% url 'edit_organization' organization.id %}">
+                <span class="material-icons">edit</span> Edit Organization
+            </a>
+            <a href="{% url 'organization_availability' organization.id %}">
+                <span class="material-icons">schedule</span> Manage Availability
+            </a>
+            <a href="{% url 'organization_holidays' organization.id %}">
+                <span class="material-icons">event</span> Organization Holidays
+            </a>
+            <a href="{% url 'project_list' organization.id %}">
+                <span class="material-icons">assignment</span> My Projects
+            </a>
+            <a href="{% url 'members_action' organization_id=organization.id %}">
+                <span class="material-icons">group</span> Manage Members
+            </a>
+            <a href="{% url 'send_email_invitation' organization_id=organization.id %}">
+                <span class="material-icons">email</span> Send Email Invite
+            </a>
+            <a href="{% url 'invitation_status' organization.id %}">
+                <span class="material-icons">person_add</span> Invitations Status
             </a>
 
+            <a href="{% url 'organizations_members' organization.id %}">
+                <span class="material-icons">person_add</span> Calendars
+            </a>
+        {% elif is_manager %}
+            <h3 class="font-semibold text-lg text-white mb-6">Manager Controls</h3>
+            <a href="{% url 'view_edit_profile' org_id=organization.id %}">
+                <span class="material-icons">person</span> View/Edit Profile
+            </a>
             <a href="{% url 'project_views_others' organization_id=organization.id %}">
-                My projects 
+                <span class="material-icons">assignment</span> My Projects
             </a>
-               
-               
-             
+            <a href="{% url 'organization_availability' organization.id %}">
+                <span class="material-icons">schedule</span> Manage Availability
+            </a>
 
-                <a href="{% url 'members_action' organization_id=organization.id %}">
-                    <span class="material-icons">settings</span>Manage Members
-                </a>
-                
-                <a href="{% url 'send_email_invitation' organization_id=organization.id %}">
-                    <span class="material-icons">email</span>Send Email Invite
-                </a>
-            {% else %}
+            <a href="{% url 'organization_holidays' organization.id %}">
+                <span class="material-icons">event</span> Organization Holidays
+            </a>
+
+            <a href="{% url 'members_action' organization_id=organization.id %}">
+                <span class="material-icons">group</span> Manage Members
+            </a>
+            <a href="{% url 'send_email_invitation' organization_id=organization.id %}">
+                <span class="material-icons">email</span> Send Email Invite
+            </a>
+            <a href="{% url 'organizations_members' organization.id %}">
+                <span class="material-icons">person_add</span> Calendars
+            </a>
+        {% else %}
+            <h3 class="font-semibold text-lg text-white mb-6">Employee Controls</h3>
             <a href="{% url 'project_views_others' organization_id=organization.id %}">
-                My projects 
+                <span class="material-icons">assignment</span> My Projects
+            </a>
+            <a href="{% url 'view_edit_profile' org_id=organization.id %}">
+                <span class="material-icons">person</span> View/Edit Profile
             </a>
 
-            <a href="{% url 'view_edit_profile' org_id=organization.id %}">
-                View/Edit Profile
+            <a href="{% url 'organization_holidays' organization.id %}">
+                <span class="material-icons">event</span> Organization Holidays
             </a>
-                <div class="info-message">You are an employee in this organization. No administrative actions are available.</div>
+            
+            <a href="{% url 'organization_availability' organization.id %}">
+                <span class="material-icons">schedule</span> Manage Availability
+            </a>
+            <a href="{% url 'organizations_members' organization.id %}">
+                <span class="material-icons">person_add</span> Calendars
+            </a>
+            <div class="info-message">
+                <span class="material-icons">info</span>
+                You are an employee in this organization. No administrative actions are available.
+            </div>
             {% endif %}
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="profile-header">
+            <h2>Welcome Back, {{ request.user }}</h2>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgzlAIaq9_fY1FwvEaetGEades903CrQ0syQ&s" alt="User Avatar">
+            
+        </div>
+   
+
+       <!-- Organization Details -->
+<div class="card">
+    <div class="card-header text-blue-600 text-xl font-semibold">Organization: {{ organization.name }}</div>
+    <div class="card-body space-y-6">
+        <!-- Organization Name -->
+        <div class="flex items-center">
+            <span class="material-icons text-blue-500 mr-3">business</span>
+            <p class="text-lg"><strong>Name:</strong> {{ organization.name }}</p>
+        </div>
+
+        <!-- Organization Description -->
+        <div class="flex items-center">
+            <span class="material-icons text-green-500 mr-3">description</span>
+            <p class="text-lg"><strong>Description:</strong> {{ organization.description }}</p>
+        </div>
+
+        <!-- Organization Creation Date -->
+        <div class="flex items-center">
+            <span class="material-icons text-yellow-500 mr-3">calendar_today</span>
+            <p class="text-lg"><strong>Created At:</strong> {{ organization.created_at }}</p>
+        </div>
+
+        <!-- Current Project (if exists) -->
+        {% if organization.current_project %}
+        <div class="flex items-center">
+            <span class="material-icons text-purple-500 mr-3">work</span>
+            <p class="text-lg"><strong>Current Project:</strong> {{ organization.current_project }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Created By -->
+        <div class="flex items-center">
+            <span class="material-icons text-teal-500 mr-3">person</span>
+            <p class="text-lg"><strong>Created By:</strong> {{ organization.created_by }}</p>
+        </div>
+    </div>
+</div>
+
+        <!-- Action Links -->
+        <div class="action-links">
+            <a href="{% url 'organization_list' %}">Go to your workspaces</a>
+        </div>
+        <br>
+
+        <div class="action-links">
+            <a href="{% url 'meeting_list' organization.id %}">My Meetings</a>
         </div>
     </div>
 
+    <section>
+        <a href="#">
+            <strong>Calendar Pro Trial</strong>
+        </a>
+    </section>
 
 </body>
 </html>
-
+{% endblock %}

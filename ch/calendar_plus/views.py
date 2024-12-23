@@ -64,7 +64,7 @@ from django.http import HttpResponseRedirect
 from .forms import ProjectForm, AssignEmployeeForm, AssignManagerForm
 from accounts.models import ProjectEmployeeAssignment,ProjectManagerAssignment
 from django.shortcuts import render, get_object_or_404, redirect
-from accounts.models import Organization, Project, Profile, ProjectManagerAssignment
+from accounts.models import Organization, Project, Profile, ProjectManagerAssignment, MeetingReminder
 from .forms import AssignManagerForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
@@ -84,6 +84,13 @@ from datetime import timedelta
 from datetime import datetime, timedelta
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from .forms import AvailabilityForm
+import logging
+from django.views.decorators.csrf import csrf_exempt
+from datetime import datetime
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+
 
 # Create your views here.
 class FeaturesImplementation(View):
@@ -296,27 +303,37 @@ class OrgDetailView(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
     
 
-
-
+# Edit Organization
 class OrganizationEditView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Organization
-    fields = ['name', 'description','current_project']
+    fields = ['name', 'description']
     template_name = 'calendar/organization_edit.html'
     context_object_name = 'organization'
 
     def test_func(self):
-      
         organization = self.get_object()
-        user_profile = Profile.objects.filter(user=self.request.user, organization=organization).first()
-        return user_profile and (user_profile.is_admin or user_profile.is_manager)
+        user_profiles_org = Profile.objects.filter(organization=organization, user=self.request.user)
+
+        is_admin = user_profiles_org.filter(is_admin=True).exists()
+        is_manager = user_profiles_org.filter(is_manager=True).exists()
+        is_employee = user_profiles_org.filter(is_employee=True).exists()
+
+        self.is_admin = is_admin  # Save these values for later use
+        self.is_manager = is_manager
+        self.is_employee = is_employee
+
+        return is_admin or is_manager  # Adjust as needed for permission logic
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_admin'] = getattr(self, 'is_admin', False)
+        context['is_manager'] = getattr(self, 'is_manager', False)
+        context['is_employee'] = getattr(self, 'is_employee', False)
+        return context
 
     def form_valid(self, form):
-        
         form.save()
-        return redirect('organization_list')  
-    
-    
-
+        return redirect('org_detail',org_id=self.object.id)
 
 
 
@@ -572,6 +589,12 @@ class ActionMembersView(View):
         user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
 
 
+        user_profiles_org = Profile.objects.filter(organization=organization, user=self.request.user)
+
+        is_admin = user_profiles_org.filter(is_admin=True).exists()
+        is_manager = user_profiles_org.filter(is_manager=True).exists()
+        is_employee = user_profiles_org.filter(is_employee=True).exists()
+
            
         admins_all = Profile.objects.filter(organization=organization, is_admin=True)
         managers_all = Profile.objects.filter(organization=organization, is_manager=True)
@@ -592,7 +615,11 @@ class ActionMembersView(View):
 
             'admins_all':admins_all,
             'managers_all':managers_all,
-            'employee_all':employee_all
+            'employee_all':employee_all,
+
+            'is_manager':is_manager,
+            'is_employee':is_employee,
+            'is_admin':is_admin,
         })
 
 
@@ -641,6 +668,7 @@ class ActionMembersView(View):
 
         return redirect('members_action', organization_id=organization.id)
   
+
 
 # remove employees from organization
 class DeleteProfileView(View):
@@ -1002,47 +1030,6 @@ class CalendarRoomView(View):
 
     def get(self, request):
         return render(request, self.template_name)
-
-
-
-
-# new implementation of availability 
-from .forms import AvailabilityForm
-import logging
-from django.views.decorators.csrf import csrf_exempt
-from datetime import datetime
-
-
-# manage availability for each organizations by diffrent types 
-
-# Display users availability
-
-class AvailabilityDetailView(DetailView):
-    model = Availability
-    template_name ='availability/detail.html'
-    context_object_name = 'availability'
-
-    def get_object(self):
-        user = self.request.user
-        organization_id = self.kwargs.get('organization_id')
-        return get_object_or_404(
-            Availability, user=user , organization_id = organization_id
-        )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -2585,3 +2572,914 @@ class ContactBookView(TemplateView):
             return redirect('select_contact')
         return self.get(request, *args,   **kwargs)
 
+
+
+
+# Manage New Availability by organization 
+from django.utils.dateparse import parse_time
+class OrganizationAvailabilityView(ListView):
+    model = Availability
+    template_name = 'availability/organization_availability.html'
+    context_object_name = 'availabilities'
+
+    def get_queryset(self):
+        org_id = self.kwargs['org_id']
+        organization = get_object_or_404(Organization, id=org_id)
+        return Availability.objects.filter(organization=organization).order_by('day_of_week', 'start_time')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        org_id = self.kwargs['org_id']
+        organization = get_object_or_404(Organization, id=org_id)
+
+        
+        grouped_availabilities = defaultdict(list)
+        for availability in self.object_list:
+            day_name = availability.get_day_of_week_display()
+            grouped_availabilities[day_name].append(availability)
+
+       
+        sorted_grouped_availabilities = dict(sorted(grouped_availabilities.items(), key=lambda x: list(Availability.DAYS_OF_WEEK).index((x[1][0].day_of_week, x[0])) if x[1] else float('inf')))
+
+        context.update({
+            'organization': organization,
+            'grouped_availabilities': sorted_grouped_availabilities,
+        })
+        return context
+    
+# add time slot
+
+@csrf_exempt
+def add_time_slot(request):
+    if request.method == "POST":
+        start_time = request.POST.get('start_time')
+        end_time = request.POST.get('end_time')
+        day_of_week = request.POST.get('day_of_week')
+        org_id = request.POST.get('org_id')
+        
+        availability = Availability.objects.create(
+            user=request.user,
+            start_time=start_time,
+            end_time=end_time,
+            day_of_week=day_of_week,
+            organization_id=org_id
+        )
+        
+        
+        return JsonResponse({
+            'status': 'success',
+            'slot_id': availability.id
+        })
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+
+# Delete time slots    
+@csrf_exempt
+@login_required
+def delete_time_slot(request):
+    if request.method == 'POST':
+        availability_id = int(request.POST.get('availability_id'))
+        org_id = int(request.POST.get('org_id')) 
+
+        try:
+           
+            availability = Availability.objects.get(id=availability_id, user=request.user, organization_id=org_id)
+
+          
+            availability.delete()
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Time slot deleted successfully!'
+            })
+
+        except Availability.DoesNotExist:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Time slot not found or you do not have permission to delete it.'
+            })
+
+    else:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Invalid request method'
+        })
+
+
+# Manage Availability 
+def manage_availability(request, org_id):
+    organization = Organization.objects.get(id=org_id)
+    availabilities = Availability.objects.filter(organization=organization)
+    
+    return render(request, 'manage_availability.html', {
+        'organization': organization,
+        'availabilities': availabilities
+    })   
+
+'-------------------------------------------------------------------------------------------------------------------------------'
+
+import logging
+logger = logging.getLogger(__name__)
+
+def get_availability_data(request, organization_id):
+    try:
+        
+        availabilities = Availability.objects.filter(organization_id=organization_id, user=request.user)
+
+      
+        days_of_week = dict(Availability.DAYS_OF_WEEK)
+
+    
+        today = datetime.now()
+
+      
+        events = []
+        for availability in availabilities:
+            day_name = days_of_week.get(availability.day_of_week, f'Day {availability.day_of_week}')
+            
+          
+            days_ahead = (availability.day_of_week - today.weekday()) % 7
+            event_date = today + timedelta(days=days_ahead)
+
+         
+            start_datetime = datetime.combine(event_date, availability.start_time)
+            end_datetime = datetime.combine(event_date, availability.end_time)
+
+          
+            events.append({
+                'id': availability.id,  
+                'organization_id': organization_id,  
+                'title': f'{day_name} - {availability.start_time} - {availability.end_time}',
+                'start': start_datetime.isoformat(),
+                'end': end_datetime.isoformat(),
+                'description': 'Available for meeting',
+                'backgroundColor': '#28a745',
+                'borderColor': '#28a745',
+            })
+
+        
+        return JsonResponse({'events': events})
+
+    except Exception as e:
+       
+        logger.error(f"Error in get_availability_data: {e}")
+        return JsonResponse({'error': 'An error occurred while fetching availability data.'}, status=500)
+
+
+
+# Edit availability
+@login_required
+@csrf_exempt
+def edit_availability(request, org_id, availability_id):
+    if request.method == 'POST':
+        try:
+            # Retrieve form data from the request
+            start_time = request.POST.get('start_time')
+            end_time = request.POST.get('end_time')
+
+            print(f"Received data - Availability ID: {availability_id}, Start Time: {start_time}, End Time: {end_time}, Organization ID: {org_id}")
+
+         
+            if not start_time or not end_time:
+                return JsonResponse({'error': 'Start time and end time are required'}, status=400)
+
+          
+            availability = get_object_or_404(Availability, id=availability_id, user=request.user, organization_id=org_id)
+
+       
+            availability.start_time = start_time
+            availability.end_time = end_time
+
+            availability.save()
+
+        
+            event = {
+                'id': availability.id, 
+                'title': 'Available',  
+                'start': availability.start_time,
+                'end': availability.end_time,
+            }
+
+          
+            return JsonResponse({'success': 'Availability updated successfully', 'event': event}, status=200)
+
+        except Exception as e:
+            print(f"Error: {str(e)}")
+            return JsonResponse({'error': str(e)}, status=500)
+
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+    
+'-------------------------------------------------------------------------------------------------------------------------'
+'------------------------------------------------------------------------------------------------------------------------------------'
+
+# Holidays for organization
+# Add One day Holidays
+from accounts.models import HolidayOrganization, HolidaySettings, HolidayType, MeetingOrganization
+from accounts.forms import HolidayMessageForm
+from accounts.forms import HolidayForm
+
+class HolidayCalendarView(View):
+    def get(self, request, org_id):
+ 
+        organization = get_object_or_404(Organization, id=org_id)
+
+      
+        holidays = HolidayOrganization.objects.filter(organization=organization)
+
+   
+        holiday_events = []
+        for holiday in holidays:
+            holiday_events.append({
+                'id': holiday.id,
+                'organization_id': holiday.organization.id,
+                'title': holiday.name,
+                'start': holiday.start_date.isoformat(),
+                'end': holiday.end_date.isoformat(),
+                'description': holiday.description,
+            })
+
+        
+        return render(request, 'organization_holidays/holidays_calendar.html', {
+            'organization': organization,
+            'holiday_events': holiday_events,
+        })
+    
+# Holiday Details 
+@csrf_exempt
+def holiday_details(request, org_id, holiday_id):
+    
+    organization = get_object_or_404(Organization, id=org_id)
+    holiday = get_object_or_404(HolidayOrganization, id=holiday_id, organization=organization)
+
+   
+    holiday_data = {
+        'title': holiday.name,
+        'description': holiday.description,
+        'start': holiday.start_date.strftime('%Y-%m-%d'),
+        'end': holiday.end_date.strftime('%Y-%m-%d'),
+        'id': holiday.id,
+        'organization_id':organization.id
+    }
+
+    return JsonResponse(holiday_data)
+
+
+# add holiday
+@csrf_exempt
+def add_holiday(request, org_id):
+    if request.method == 'POST':
+        title = request.POST.get('title') 
+        description = request.POST.get('description') 
+        start_date = request.POST.get('start_date')  
+        end_date = request.POST.get('end_date') 
+        
+        
+        organization = get_object_or_404(Organization, id=org_id)
+
+        holiday = HolidayOrganization.objects.create(
+            name=title,  
+            description=description,
+            start_date=start_date,
+            end_date=end_date,
+            organization=organization,
+            user=request.user  
+        )
+
+   
+        return JsonResponse({
+            'id': holiday.id,
+            'title': holiday.name,
+            'start_date': holiday.start_date,
+            'end_date': holiday.end_date,
+            'description': holiday.description,
+            'organization_id': holiday.organization.id
+        })
+
+
+# Delete Holiday
+
+@csrf_exempt
+def delete_holiday(request, org_id, holiday_id):
+    
+    organization = get_object_or_404(Organization, id=org_id)
+    holiday = get_object_or_404(HolidayOrganization, id=holiday_id, organization=organization)
+
+
+    holiday.delete()
+
+  
+    return JsonResponse({'message': 'Holiday deleted successfully!'})
+
+
+# Attach message for invitees when they schedule or view the holiday
+
+class HolidayMessageView(View):
+    def get(self, request, org_id, holiday_id):
+        try:
+            holiday=HolidayOrganization.objects.get(id=holiday_id, organization_id=org_id, user=request.user)
+        except HolidayOrganization.DoesNotExist:
+            return HttpResponseForbidden("Holiday Not Found!")
+
+      
+        form = HolidayMessageForm()
+        return render(request,'organization_holidays/message_form.html',{
+            'form':form,
+            'holiday':holiday,
+            'org_id':org_id,
+            'holiday_id':holiday_id
+        })
+
+    def post(self, request, org_id, holiday_id):
+        try:
+            holiday = HolidayOrganization.objects.get(id=holiday_id, organization_id=org_id,user=request.user)
+        except HolidayOrganization.DoesNotExist:
+            raise HttpResponseForbidden('Holiday not found')
+
+        form = HolidayMessageForm(request.POST)
+        if form.is_valid():
+            holiday.message_for_invitees = form.cleaned_data['message']
+            holiday.save()
+            return redirect('organization_holidays',org_id=org_id)
+
+        return render(request, 'organization_holidays/message_form.html',{
+            'form':form,
+            'holiday':holiday,   
+             'org_id':org_id,
+             'holiday_id':holiday_id    
+                      })        
+    
+
+# Edit the holiday
+
+class EditHolidayView(View):
+    def get(self, request, org_id, holiday_id):
+    
+        organization = get_object_or_404(Organization, id=org_id)
+        holiday = get_object_or_404(HolidayOrganization, id=holiday_id, organization=organization)
+
+ 
+        form = HolidayForm(instance=holiday)
+
+        return render(request, 'organization_holidays/edit_holiday.html', {
+            'form': form,
+            'holiday': holiday,
+            'organization': organization
+        })
+
+    def post(self, request, org_id, holiday_id):
+     
+        organization = get_object_or_404(Organization, id=org_id)
+        holiday = get_object_or_404(HolidayOrganization, id=holiday_id, organization=organization)
+
+  
+        form = HolidayForm(request.POST, instance=holiday)
+
+        if form.is_valid():
+          
+            form.save()
+
+            
+            return redirect('organization_holidays', org_id=org_id)
+
+        return render(request, 'organization_holidays/edit_holiday.html', {
+            'form': form,
+            'holiday': holiday,
+            'organization': organization
+        })
+
+
+# Holiday settings
+class HolidaySettingsView(View):
+    def get(self, request, org_id, holiday_id):
+        # Retrieve the holiday and its settings
+        holiday = get_object_or_404(HolidayOrganization, id=holiday_id, organization_id=org_id)
+        settings, created = HolidaySettings.objects.get_or_create(holiday=holiday, organization_id=org_id)
+        holiday_types = HolidayType.objects.all() 
+
+        return render(request, 'organization_holidays/holiday_settings.html', {
+            'holiday': holiday,
+            'settings': settings,
+            'holiday_types':holiday_types,
+        })
+
+    def post(self, request, org_id, holiday_id):
+       
+        holiday = get_object_or_404(HolidayOrganization, id=holiday_id, organization_id=org_id)
+        settings, created = HolidaySettings.objects.get_or_create(holiday=holiday, organization_id=org_id)
+       
+
+     
+        if 'toggle_scheduling' in request.POST:
+            settings.allow_scheduling = not settings.allow_scheduling
+            settings.save()
+            return JsonResponse({'allow_scheduling': settings.allow_scheduling})
+
+        
+        elif 'toggle_visibility' in request.POST:
+            settings.holiday_visibility = not settings.holiday_visibility
+            settings.save()
+            return JsonResponse({'holiday_visibility': settings.holiday_visibility})
+        
+        elif 'toggle_recurring' in request.POST:
+          settings.is_recurring = not settings.is_recurring
+          settings.save()
+          return JsonResponse({'is_recurring': settings.is_recurring})
+
+        
+        elif 'holiday_type' in request.POST:
+            holiday_type = get_object_or_404(HolidayType, id=request.POST['holiday_type'])
+            settings.holiday_type = holiday_type
+            settings.save()
+            return JsonResponse({'holiday_type': settings.holiday_type.name})
+        
+        elif 'toggle_notifications' in request.POST:
+            settings.holiday_notifications = not settings.holiday_notifications
+            settings.save()
+            return JsonResponse({'holiday_notifications': settings.holiday_notifications})
+        
+
+       
+        elif 'set_reminder' in request.POST:
+            reminder_days_before = int(request.POST.get('reminder_days_before'))
+            reminder_message = request.POST.get('reminder_message')
+
+            settings.reminder_days_before = reminder_days_before
+            settings.reminder_message = reminder_message
+            settings.save()
+
+            return JsonResponse({
+                'reminder_days_before': settings.reminder_days_before,
+                'reminder_message': settings.reminder_message
+            })
+        
+
+        elif 'toggle_notify' in request.POST:
+            settings.notify_organization_members = not settings.notify_organization_members
+            settings.save()
+            return JsonResponse({'notify_organization_members': settings.notify_organization_members})
+        
+
+      
+        elif 'toggle_carryover' in request.POST:
+            settings.carryover = not settings.carryover
+            settings.save()
+            return JsonResponse({'carryover': settings.carryover})
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+    
+
+'----------------------------------------------------------------------------------------------------------------------------'
+
+
+# Meeting Scheduling 
+
+class OrganizationMembers(TemplateView):
+    template_name ='organization_meetings/organization_members.html'
+
+    def get_context_data(self, **kwargs):
+        org_id = self.kwargs.get('org_id')
+
+        organization = get_object_or_404(Organization, id=org_id)
+
+        profiles = Profile.objects.filter(organization=organization)
+
+        context={
+            'organization':organization,
+            'profiles':profiles
+        }
+        return context
+
+
+# User calendar
+
+def user_calendar(request, user_id, org_id):
+    user = User.objects.get(id=user_id)
+    organization = Organization.objects.get(id=org_id)
+
+ 
+    return render(request, 'organization_meetings/user_calendar.html', {
+        'user': user,
+        'organization': organization
+    })
+
+
+'---------------------------------------------------------------------------------------------------'
+# Users availability and Holidays
+def user_availability_and_holidays(request, user_id, org_id):
+    # Get the selected day from the request
+    selected_date = request.GET.get('date')  
+    user = User.objects.get(id=user_id)
+    organization = Organization.objects.get(id=org_id)
+
+  
+
+    # Parse the selected date to a Python date object
+    selected_date_obj = datetime.strptime(selected_date, "%Y-%m-%d").date()
+
+    print("Selected Date:", selected_date_obj)
+
+    # Fetch availability for the selected day
+    availability = Availability.objects.filter(
+        user=user, 
+        organization=organization, 
+        day_of_week=selected_date_obj.weekday()
+    )
+    
+    # Fetch holidays where the selected date falls within the holiday's start and end date
+    holidays = HolidayOrganization.objects.filter(
+        user=user,
+        organization=organization,
+        start_date__lte=selected_date_obj,
+        end_date__gte=selected_date_obj
+    )
+
+    print(f'Holidays Found On Date {selected_date_obj}, {holidays}')
+
+    # Fetch the holiday settings to check visibility and other settings
+    holiday_settings = HolidaySettings.objects.filter(organization=organization)
+
+    # Format the holiday data
+    holiday_data = []
+    availability_data = []
+    holiday_exists = False  
+    allow_scheduling = False  
+
+    for holiday in holidays:
+       
+        settings = holiday_settings.filter(holiday=holiday).first()
+
+        # Only include holidays if visibility is True
+        if settings and settings.holiday_visibility:
+            holiday_exists = True
+            holiday_info = {
+                'name': holiday.name,
+                'start_date': holiday.start_date,
+                'end_date': holiday.end_date,
+                'description': holiday.description,
+                'message_for_invitees': holiday.message_for_invitees,
+                'holiday_type': settings.holiday_type.name if settings.holiday_type else "No Type",  # Display holiday type
+                'holiday_visibility': settings.holiday_visibility,
+                'allow_scheduling': settings.allow_scheduling,
+            }
+            holiday_data.append(holiday_info)
+
+            # If scheduling is allowed on this holiday, we will also show availability
+            if settings.allow_scheduling:
+                allow_scheduling = True
+
+    
+    if allow_scheduling:
+        # If scheduling is allowed on the holiday, display availability slots along with a message
+        for slot in availability:
+            availability_data.append({
+                'start_time': slot.start_time.strftime('%H:%M'),
+                'end_time': slot.end_time.strftime('%H:%M'),
+                'message': 'Scheduling is allowed on this holiday.',
+            })
+    else:
+     
+        if not holiday_exists:
+            for slot in availability:
+                availability_data.append({
+                    'start_time': slot.start_time.strftime('%H:%M'),
+                    'end_time': slot.end_time.strftime('%H:%M'),
+                })
+
+    
+    return JsonResponse({
+        'availability': availability_data,
+        'holidays': holiday_data,
+    })
+
+'------------------------------------------------------------------------------------------------------'
+
+
+def user_availability_view_org(request, org_id, user_id, date):
+   
+    organization = Organization.objects.get(id=org_id)
+    user = User.objects.get(id=user_id)
+
+  
+    selected_date = datetime.strptime(date, "%Y-%m-%d").date()
+    day_of_week = selected_date.weekday() 
+
+    
+    availability = Availability.objects.filter(
+        organization=organization, 
+        user=user, 
+        day_of_week=day_of_week
+    )
+
+
+    available_slots = []
+    for slot in availability:
+        start_time = datetime.combine(selected_date, slot.start_time)  
+        end_time = datetime.combine(selected_date, slot.end_time)      
+        while start_time < end_time:
+            try:
+                existing_meeting = MeetingOrganization.objects.get(
+                    organization=organization,
+                    meeting_date=selected_date,
+                    start_time=start_time.time(),
+                )
+                booked = True  
+            except MeetingOrganization.DoesNotExist:
+                booked = False  
+
+         
+            available_slots.append({
+                'start_time': start_time.time().strftime('%H:%M'),
+                'end_time': (start_time + timedelta(minutes=30)).time().strftime('%H:%M'),
+                'booked': booked, 
+            })
+            start_time += timedelta(minutes=30)
+
+   
+    return render(request, 'organization_meetings/user_availability.html', {
+        'organization': organization,
+        'user': user,
+        'available_slots': available_slots,
+        'selected_date': selected_date,
+    })
+
+
+
+# Confirm the meeting details
+def schedule_next_step(request, org_id, user_id):
+ 
+    selected_date = request.GET.get('selected_date') 
+    selected_slot = request.GET.get('selected_slot')  
+
+   
+   
+
+    
+    return render(request, 'organization_meetings/confirm_meeting.html', {
+        'org_id': org_id,
+        'user_id': user_id,
+        'selected_date': selected_date,
+        'selected_slot': selected_slot,
+    })
+
+
+
+
+# finally schedule the meeting
+
+def schedule_meeting(request, org_id, user_id):
+
+    selected_date = request.POST.get('selected_date')  
+    selected_slot = request.POST.get('selected_slot') 
+    meeting_title = request.POST.get('meeting_title')
+    meeting_description = request.POST.get('meeting_description')
+    meeting_type = request.POST.get('meeting_type')
+    meeting_location = request.POST.get('meeting_location')
+    meeting_link=request.POST.get('meeting_link')
+
+    # Convert selected_date to the correct format (YYYY-MM-DD)
+    try:
+        # Parse the date from string format like "Dec. 3, 2024" into a date object
+        selected_date = datetime.strptime(selected_date, "%b. %d, %Y").date()
+    except ValueError:
+        messages.error(request, "Invalid date format. Please provide the date in 'Dec. 3, 2024' format.")
+        return redirect('schedule_next_step', org_id=org_id, user_id=user_id)
+
+    
+    try:
+        start_time, end_time = selected_slot.split(' - ')
+        start_time = datetime.strptime(start_time, "%H:%M").time()
+        end_time = datetime.strptime(end_time, "%H:%M").time()
+    except ValueError:
+        messages.error(request, "Invalid time slot format. Please try again.")
+        return redirect('schedule_next_step', org_id=org_id, user_id=user_id)
+
+  
+    try:
+        organization = Organization.objects.get(id=org_id)
+        user = User.objects.get(id=user_id)
+        invitee = request.user  
+    except (Organization.DoesNotExist, User.DoesNotExist):
+        messages.error(request, "Organization or user not found.")
+        return redirect('user_availability_view_org', org_id=org_id, user_id=user_id, date=selected_date)
+
+    meeting = MeetingOrganization.objects.create(
+        organization=organization,
+        user=user,
+        invitee=invitee,
+        meeting_title=meeting_title,
+        meeting_link=meeting_link,
+        meeting_description=meeting_description,
+        meeting_date=selected_date,
+        start_time=start_time,
+        end_time=end_time,
+        meeting_type=meeting_type,
+        meeting_location=meeting_location,
+    )
+
+
+    messages.success(request, "Meeting scheduled successfully!")
+    return redirect('user_calendar',org_id=org_id,user_id=user_id)
+
+
+'--------------------------------------------------------------------------------------------------'
+# Find Meetings
+class MeetingListView(TemplateView):
+    template_name = 'my_meetings/meeting_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        org_id = self.kwargs['org_id']
+        user = self.request.user
+
+        # Querying meetings where the user is either the user or invitee
+        my_scheduled_meetings = MeetingOrganization.objects.filter(
+            Q(organization_id=org_id) & (Q(user=user))
+        )
+
+        i_scheduled_meetings = MeetingOrganization.objects.filter(
+            Q(organization_id=org_id) & (Q(invitee=user))
+        )
+
+        # Categorize meetings based on meeting type
+        context['my_scheduled_standup'] = my_scheduled_meetings.filter(meeting_type='standup')
+        context['org_id'] = org_id
+        context['my_scheduled_task'] = my_scheduled_meetings.filter(meeting_type='task')
+        context['my_scheduled_project'] = my_scheduled_meetings.filter(meeting_type='project_discussion')
+        context['my_scheduled_other'] = my_scheduled_meetings.filter(meeting_type='other')
+
+        context['i_scheduled_standup'] = i_scheduled_meetings.filter(meeting_type='standup')
+        context['i_scheduled_task'] = i_scheduled_meetings.filter(meeting_type='task')
+        context['i_scheduled_project'] = i_scheduled_meetings.filter(meeting_type='project_discussion')
+        context['i_scheduled_other'] = i_scheduled_meetings.filter(meeting_type='other')
+
+        return context
+
+
+# Meeting Detail
+class MeetingDetailView(TemplateView):
+    template_name = 'my_meetings/meeting_detail.html'
+
+    def get_object(self, queryset=None):
+       
+        org_id = self.kwargs.get('org_id')
+        meeting_id = self.kwargs.get('meeting_id')
+        user = self.request.user
+
+       
+        return get_object_or_404(
+            MeetingOrganization,
+            id=meeting_id,
+            organization_id=org_id,
+           
+        )
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['meeting'] = self.get_object()
+        return context
+    
+
+# Remove Myself from meeting
+class RemoveMeetingConfirmationView(View):
+    def get(self, request, org_id, meeting_id):
+      
+        meeting = get_object_or_404(MeetingOrganization, id=meeting_id, organization_id=org_id)
+
+        
+        if meeting.user != request.user and meeting.invitee != request.user:
+            return redirect('meeting_list', org_id=org_id)
+
+        return render(request, 'my_meetings/remove_meeting_confirmation.html', {
+            'meeting': meeting,
+            'org_id': org_id,
+            'meeting_id': meeting_id
+        })
+
+    def post(self, request, org_id, meeting_id):
+      
+        meeting = get_object_or_404(MeetingOrganization, id=meeting_id, organization_id=org_id)
+
+        if meeting.user == request.user:
+           
+            user_left = meeting.user
+            meeting.user = None
+            recipient = meeting.invitee
+            email_subject = f"Notification: {meeting.meeting_title} - User Left the Meeting"
+            email_message = f"The meeting host {user_left.username} has left the meeting."
+
+            self.send_email_notification(recipient, email_subject, email_message, meeting)
+        elif meeting.invitee == request.user:
+          
+            invitee_left = meeting.invitee
+            meeting.invitee = None
+            recipient = meeting.user
+            email_subject = f"Notification: {meeting.meeting_title} - Invitee Left the Meeting"
+            email_message = f"The invitee {invitee_left.username} has left the meeting."
+
+            self.send_email_notification(recipient, email_subject, email_message, meeting)
+        else:
+            return redirect('meeting_list', org_id=org_id)
+
+        meeting.save()
+
+        return JsonResponse({'success': 'You have been removed from the meeting. Refresh the page to see the updates.'})
+
+    def send_email_notification(self, recipient, subject, message, meeting):
+        """
+        Send an email notification to the recipient.
+        """
+        
+        email_body = render_to_string(
+            'my_meetings/email_meeting_notification.html', 
+            {
+                'recipient_name': recipient,
+                'message': message,
+                'meeting_title': meeting.meeting_title,
+                'meeting_date': meeting.meeting_date,
+                'start_time': meeting.start_time,
+                'end_time': meeting.end_time,
+                'meeting_location': meeting.meeting_location,
+                'meeting_link': meeting.meeting_link,
+                'meeting_description': meeting.meeting_description
+            }
+        )
+
+        send_mail(
+            subject,
+            message,  
+            settings.DEFAULT_FROM_EMAIL,
+            [recipient.email],
+            fail_silently=False,
+            html_message=email_body  
+        )
+
+
+
+# Reminder
+class SaveMeetingReminder(View):
+    template_name ='my_reminders/save_meeting_reminders.html'
+    def get(self, request, org_id, meeting_id):
+        user= self.request.user
+
+        organization = get_object_or_404(
+            Organization, 
+            id = org_id,
+       
+        )
+
+        meeting = get_object_or_404(
+            MeetingOrganization, 
+            id=meeting_id,
+       
+        )
+
+        return render(request,self.template_name, {
+            'organization':organization,
+            'meeting':meeting
+        })
+    
+    def post(self, request, org_id, meeting_id):
+        organization = get_object_or_404(
+            Organization, 
+            id = org_id,
+         
+        )
+
+        meeting = get_object_or_404(
+            MeetingOrganization, 
+            id=meeting_id,
+     
+        )
+
+        # extract form data
+
+        reminder_type = request.POST.get('reminder_type', 'email')
+
+        reminder_time = request.POST.get('reminder_time')
+        custom_minutes = request.POST.get('custom_minutes')
+        custom_hours = request.POST.get('custom_hours')
+        remind_all_members = request.POST.get('remind_all_members') =='on'
+        reminder_style = request.POST.get('reminder_style')
+
+
+        # validate inputs
+        if not reminder_time and not (custom_minutes or custom_hours):
+            return JsonResponse({'error':'Please select a reminder time  or provide custom time.'}, status=400)
+        
+
+        
+        reminder = MeetingReminder(
+            organization=organization,
+            meeting= meeting,
+            user=request.user,
+            reminder_style = reminder_style,
+            reminder_type=reminder_type,
+            reminder_time=int(reminder_time) if reminder_time else None,
+            custom_minutes= int(custom_minutes) if custom_minutes else None,
+            custom_hours = int(custom_hours) if custom_hours else None,
+            remind_all_members = remind_all_members
+        )
+        reminder.save()
+        messages.success(request, 'reminder saved successfully')
+        return JsonResponse({'success':'Reminder has been saved successfully'})
+    

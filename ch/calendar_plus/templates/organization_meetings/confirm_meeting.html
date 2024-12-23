@@ -1,0 +1,43 @@
+<form action="{% url 'schedule_meeting' org_id=org_id user_id=user_id %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="selected_date" value="{{ selected_date }}">
+    <input type="hidden" name="selected_slot" value="{{ selected_slot }}">
+
+    <div>
+        <label for="meeting_title">Meeting Title:</label>
+        <input type="text" id="meeting_title" name="meeting_title" required>
+    </div>
+
+    <div>
+        <label for="meeting_description">Description:</label>
+        <textarea id="meeting_description" name="meeting_description"></textarea>
+    </div>
+
+    <div>
+        <label for="meeting_link">Meeting Link:</label>
+        <textarea id="meeting_link" name="meeting_link"></textarea>
+    </div>
+
+    <div>
+        <label for="meeting_type">Meeting Type:</label>
+        <select id="meeting_type" name="meeting_type" required>
+            <option value="standup">Standup</option>
+            <option value="task">Task</option>
+            <option value="project_discussion">Project Discussion</option>
+            <option value="other">Other</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="meeting_location">Meeting Location:</label>
+        <select id="meeting_location" name="meeting_location" required>
+            <option value="zoom">Zoom</option>
+            <option value="google_meet">Google Meet</option>
+            <option value="zoho">Zoho</option>
+            <option value="in_person">In-person</option>
+        </select>
+    </div>
+
+    <button type="submit">Schedule Meeting</button>
+</form>
+

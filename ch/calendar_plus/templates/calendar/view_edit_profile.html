@@ -7,185 +7,168 @@
     <!-- Google Fonts and Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #f4f7fc;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+        /* Animation for profile updates */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
         }
 
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            padding: 20px;
-            max-width: 1200px;
-            width: 100%;
-            margin: 0 auto;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
         }
 
-        .profile-preview, .edit-profile {
-            width: 48%;
-            margin-bottom: 20px;
-        }
-
-        .profile-preview img {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            display: block;
-            margin: 0 auto 10px;
-        }
-
-        .profile-preview h3 {
-            margin-top: 10px;
-            font-size: 1.4em;
-            text-align: center;
-        }
-
-        .profile-preview p {
-            color: #555;
-            font-size: 0.9em;
-            margin: 5px 0;
-            text-align: center;
-        }
-
-        .edit-profile h2 {
-            text-align: center;
-            color: #007bff;
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .edit-profile label {
-            display: block;
-            font-weight: bold;
-            margin: 10px 0 5px;
-            font-size: 0.9em;
-        }
-
-        .edit-profile input[type="text"], .edit-profile input[type="file"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 0.9em;
-        }
-
-        .checkbox-container {
-            margin: 10px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .edit-profile button {
-            padding: 10px 20px;
-            background-color: #007bff;
+        /* Navbar Styling */
+        .navbar {
+            background-color: #1E3A8A; /* Dark blue background */
             color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .navbar a {
+            transition: color 0.3s ease;
+        }
+        .navbar a:hover {
+            color: #93C5FD; /* Lighter blue on hover */
+        }
+
+        /* Adjust Content Container */
+        .content-container {
+            padding: 2rem 1rem;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
+            justify-content: space-between;
+            gap: 2rem;
         }
 
-        .edit-profile button:hover {
-            background-color: #0056b3;
+        .main-content {
+            flex: 1;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .messages {
-            margin-top: 20px;
-            background-color: #d4edda;
-            padding: 10px;
-            border-radius: 4px;
-            color: #155724;
+        .sidebar {
+            width: 250px;
+            background-color: #F9FAFB;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
+            padding: 1rem;
         }
 
+        /* Responsive Layout */
         @media (max-width: 768px) {
-            .container {
+            .content-container {
                 flex-direction: column;
-                align-items: center;
-            }
-
-            .profile-preview, .edit-profile {
-                width: 100%;
             }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <!-- Profile Preview Section (Left Side) -->
-        <div class="profile-preview">
-            <img src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}/static/images/default-profile.png{% endif %}" alt="Profile Picture">
-            <h3>{{ profile.full_name|default:"Full Name" }}</h3>
-            <p><strong>Role:</strong> 
-                {% if profile.is_admin %}
-                    Admin
-                {% elif profile.is_manager %}
-                    Manager
-                {% else %}
-                    Employee
-                {% endif %}
-            </p>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+    <!-- Full Width Navbar -->
+    <div class="navbar w-full fixed top-0 left-0 z-50 p-4 flex justify-between items-center shadow-lg">
+        <div class="flex items-center gap-4">
+            <img src="https://via.placeholder.com/40" alt="Logo" class="rounded-full">
+            <span class="text-lg font-semibold">Workspace</span>
+        </div>
+        <nav class="flex gap-6">
+            <a href="{% url 'project_views_others' organization_id=organization.id %}" class="hover:text-blue-200 transition-colors">My Projects</a>
+            <a href="{% url 'view_edit_profile' org_id=organization.id %}" class="hover:text-blue-200 transition-colors">Edit Profile</a>
+            <a href="{% url 'organization_availability' organization.id %}" class="hover:text-blue-200 transition-colors">Manage Availability</a>
+            <a href="{% url 'organization_holidays' organization.id %}" class="hover:text-blue-200 transition-colors">Holidays</a>
+        </nav>
+    </div>
+
+    <!-- Main Content Container with Top Margin for Navbar -->
+    <div class="content-container mt-16">
+        <!-- Left Sidebar Section (optional, here as an example) -->
+        <div class="sidebar hidden lg:block p-4">
+            <h3 class="font-semibold text-lg mb-4">Shortcuts</h3>
+            <a href="{% url 'project_views_others' organization_id=organization.id %}" class="text-blue-600">My Projects</a><br>
+            <a href="{% url 'view_edit_profile' org_id=organization.id %}" class="text-blue-600">Edit Profile</a><br>
+            <a href="{% url 'organization_availability' organization.id %}" class="text-blue-600">Manage Availability</a><br>
+            <a href="{% url 'organization_holidays' organization.id %}" class="text-blue-600">Holidays</a><br>
         </div>
 
-        <!-- Edit Profile Section (Right Side) -->
-        <div class="edit-profile">
-            <h2><span class="material-icons">edit</span> Edit Profile</h2>
-            <form method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                
-                <div>
-                    <label for="full_name"><span class="material-icons">person</span> Full Name</label>
-                    <input type="text" id="full_name" name="full_name" value="{{ profile.full_name }}">
-                </div>
-                
-                <div>
-                    <label for="profile_picture"><span class="material-icons">camera_alt</span> Profile Picture</label>
-                    <input type="file" id="profile_picture" name="profile_picture">
+        <!-- Right Main Content Section -->
+        <div class="main-content w-full lg:w-2/3">
+            <h1 class="text-3xl font-semibold text-blue-600 mb-4">Update Profile</h1>
+            <h3 class="text-lg text-gray-600 mb-6">Your profile will be updated only for {{organization.name}}</h3>
+
+            <!-- Profile Edit Form -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 fade-in">
+                <!-- Profile Preview Section -->
+                <div class="profile-preview text-center p-6 bg-white rounded-lg shadow-lg">
+                    <img src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}/static/images/default-profile.png{% endif %}" alt="Profile Picture" class="w-32 h-32 mx-auto rounded-full border-4 border-blue-600 object-cover mb-4">
+                    <h3 class="text-2xl font-semibold text-blue-600">{{ profile.full_name|default:"Full Name" }}</h3>
+                    <p class="text-lg mt-2 text-gray-500">
+                        <strong>Role:</strong> 
+                        {% if profile.is_admin %} Admin
+                        {% elif profile.is_manager %} Manager
+                        {% else %} Employee {% endif %}
+                    </p>
                 </div>
 
-                <!-- Hide checkbox dynamically -->
-                {% if not hide_checkbox %}
-                <div class="checkbox-container">
-                    <input type="checkbox" id="is_admin" name="is_admin" {% if profile.is_admin %}checked{% endif %}>
-                    <label for="is_admin">Admin</label>
-                </div>
-                {% endif %}
-                
-                <button type="submit"><span class="material-icons">save</span> Update Profile</button>
-            </form>
+                <!-- Edit Profile Form Section -->
+                <div class="edit-profile bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-3xl font-semibold text-blue-600 flex items-center gap-2 mb-6">
+                        <span class="material-icons">edit</span> Edit Profile
+                    </h2>
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Full Name Input -->
+                        <div class="mb-4">
+                            <label for="full_name" class="block text-sm font-medium text-gray-700">
+                                <span class="material-icons inline-block text-blue-600">person</span> Full Name
+                            </label>
+                            <input type="text" id="full_name" name="full_name" value="{{ profile.full_name }}" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow">
+                        </div>
 
-            {% if messages %}
-                <div class="messages">
-                    {% for message in messages %}
-                        <p>{{ message }}</p>
-                    {% endfor %}
+                        <!-- Profile Picture Input -->
+                        <div class="mb-4">
+                            <label for="profile_picture" class="block text-sm font-medium text-gray-700">
+                                <span class="material-icons inline-block text-blue-600">camera_alt</span> Profile Picture
+                            </label>
+                            <input type="file" id="profile_picture" name="profile_picture" class="mt-1 block w-full text-sm text-gray-700 border border-gray-300 rounded-md file:border-0 file:bg-blue-100 file:text-blue-700 file:px-4 file:py-2 file:rounded-md transition-shadow">
+                        </div>
+
+                        <!-- Admin Checkbox (Hide if applicable) -->
+                        {% if not hide_checkbox %}
+                        <div class="mb-4 flex items-center">
+                            <input type="checkbox" id="is_admin" name="is_admin" {% if profile.is_admin %}checked{% endif %} class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 transition-transform">
+                            <label for="is_admin" class="ml-2 text-sm text-gray-700">Admin</label>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Update Button -->
+                        <button type="submit" class="w-full py-2 px-4 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center gap-2 transition-all">
+                            <span class="material-icons">save</span> Update Profile
+                        </button>
+                    </form>
+
+                    <!-- Success/Info Messages -->
+                    {% if messages %}
+                    <div class="mt-6 text-sm text-green-600">
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                 </div>
-            {% endif %}
+            </div>
+
+            <!-- Global Profile Link -->
+            <section class="mt-8 text-center">
+                <a href="{% url 'profile_info' %}" class="text-blue-600 font-semibold hover:underline">
+                    <strong>See Global Profile</strong>
+                </a>
+            </section>
         </div>
     </div>
+
 </body>
 </html>
+
+{% include 'footer.html' %}

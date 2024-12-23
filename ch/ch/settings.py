@@ -79,7 +79,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'meet.middlewares.AdminOnlyMiddleware'
+    'meet.middlewares.AdminOnlyMiddleware',
+   
 ]
 
 ROOT_URLCONF = 'ch.urls'
@@ -261,3 +262,7 @@ import os
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR ,'static']
+

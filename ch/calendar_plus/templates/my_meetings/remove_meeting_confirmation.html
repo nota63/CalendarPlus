@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remove Yourself from Meeting</title>
+</head>
+<body>
+
+    <h2>Are you sure you want to remove yourself from the meeting?</h2>
+    <p><strong>Meeting Title:</strong> {{ meeting.meeting_title }}</p>
+    <p><strong>Meeting Date:</strong> {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
+    
+    <form method="post" id="remove-meeting-form">
+        {% csrf_token %}
+        <button type="submit">Yes, Remove Me</button>
+    </form>
+
+    <button onclick="window.history.back();">No, Keep Me in the Meeting</button>
+
+    <script>
+       // Handle the button click for confirming removal
+document.getElementById('confirm-remove').addEventListener('click', function() {
+    const orgId = document.getElementById('org_id').value;
+    const meetingId = document.getElementById('meeting_id').value;
+
+    // Send the POST request to remove the user from the meeting
+    fetch(`/calendar/remove_myself/${orgId}/${meetingId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),  // CSRF Token for security
+        },
+        body: JSON.stringify({ action: 'remove' })  // Pass any necessary data
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.success);  // Show success message
+
+            // Optionally redirect after success
+            window.location.href = '/calendar/meetings/' + orgId + '/';  // Redirect to the meeting list page
+        } else {
+            alert('Error: ' + data.error);  // Handle errors
+        }
+    })
+    .catch(error => {
+        alert('An error occurred: ' + error);  // Handle fetch errors
+    });
+});
+
+    </script>
+
+</body>
+</html>

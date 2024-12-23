@@ -1,0 +1,124 @@
+<!-- calendar/edit_holiday.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Holiday</title>
+
+    <!-- Google Fonts and Modern CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Styles similar to previous */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        h2, h1 {
+            color: #444;
+        }
+
+        form {
+            margin-top: 30px;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        input[type="text"], input[type="date"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        a {
+            color: #4CAF50;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        a:hover {
+            color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Edit Holiday: {{ holiday.name }}</h2>
+        <h1>Organization: {{ organization.name }}</h1>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div>
+                <label for="id_name">Holiday Name</label>
+                {{ form.name }}
+            </div>
+
+            <div>
+                <label for="id_description">Holiday Description</label>
+                {{ form.description }}
+            </div>
+
+            <div>
+                <label for="id_start_date">Start Date</label>
+                {{ form.start_date }}
+            </div>
+
+            <div>
+                <label for="id_end_date">End Date</label>
+                {{ form.end_date }}
+            </div>
+
+            <div>
+                <label for="id_message">Message For Invitees</label>
+                {{ form.message_for_invitees }}
+            </div>
+
+
+            <div>
+                <button type="submit">Save Changes</button>
+            </div>
+        </form>
+
+        <a href="{% url 'organization_holidays' org_id=organization.id %}">Back to Holiday Details</a>
+    </div>
+</body>
+</html>

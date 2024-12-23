@@ -105,12 +105,57 @@ urlpatterns=[
     path('delete-holiday/<int:holiday_id>/', views.delete_holiday, name='delete_holiday'),
 
     # New availability
+    path('organization/<int:org_id>/availability/', OrganizationAvailabilityView.as_view(), name='organization_availability'),
+    # add time slot
+    path('add-time-slot/', views.add_time_slot, name='add_time_slot'),
+    # delete time slot
+    path('delete-time-slot/',views.delete_time_slot, name='delete_time_slot'),
+    path('availability/manage/<int:org_id>/', views.manage_availability, name='manage_availability'),
+    # display availability in fullcalendar.js
+    path('get_availability_data/<int:organization_id>/', views.get_availability_data, name='get_availability_data'),
+    # edit availability
+    path('edit-availability/<int:org_id>/<int:availability_id>/', views.edit_availability, name='edit_availability'),
 
-    path('availability/<int:organization_id>/', AvailabilityDetailView.as_view(), name='availability-detail'),
+#     Organization holidays
+     path('organization/<int:org_id>/holidays/', HolidayCalendarView.as_view(), name='organization_holidays'),
+     path('calendar/organization/<int:org_id>/holiday/<int:holiday_id>/', views.holiday_details, name='holiday_details'),
+     path('add_holiday/<int:org_id>/', add_holiday, name='add_holiday'),
+     path('delete_holiday/<int:org_id>/<int:holiday_id>/', views.delete_holiday, name='delete_holiday'),
+     path('calendar/message/<int:org_id>/<int:holiday_id>/', HolidayMessageView.as_view(), name='holiday_message'),
+     path('organization/<int:org_id>/holiday/<int:holiday_id>/edit/', EditHolidayView.as_view(), name='edit_holiday'),
+     # holiday settings
+     path('organization/<int:org_id>/holiday/<int:holiday_id>/settings/', HolidaySettingsView.as_view(), name='holiday_settings'),
 
 
+     # Meeting scheduling withing the organization
+
+     path('organization/<int:org_id>/members/', OrganizationMembers.as_view(), name='organizations_members'),
+
+     # User calendar
+     path('user/<int:user_id>/organization/<int:org_id>/calendar/', user_calendar, name='user_calendar'),
+
+     path('user/<int:user_id>/org/<int:org_id>/availability_and_holidays/', views.user_availability_and_holidays, name='user_availability_and_holidays'),
+
+     # schedule meetings
+
+     path('user-availability-org/<int:org_id>/<int:user_id>/<str:date>/', views.user_availability_view_org, name='user_availability_org'),
+
+     path('schedule-next-step/<int:org_id>/<int:user_id>/', views.schedule_next_step, name='schedule_next_step'),
+
+     path('schedule/meeting/<int:org_id>/<int:user_id>/', views.schedule_meeting, name='schedule_meeting'),
+     # Meeting list
+     path('meetings/<int:org_id>/', MeetingListView.as_view(), name='meeting_list'),
+     # meeting detail
+     path('meeting_detail_view/<int:org_id>/<int:meeting_id>/', MeetingDetailView.as_view(), name='meeting_detail_view'),
+     path('remove_myself/<int:org_id>/<int:meeting_id>/',RemoveMeetingConfirmationView.as_view(), name='remove_myself'),
+
+     # Meeting Reminders
+     path('meeting_reminders/<int:org_id>/<int:meeting_id>/', SaveMeetingReminder.as_view(), name='meeting_reminders')
 
 ]
+
+
+
 
      
 
