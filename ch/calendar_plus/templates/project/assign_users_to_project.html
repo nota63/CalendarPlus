@@ -1,10 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Assign Manager to Project</title>
+    <!-- Include Google Fonts for Premium Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&family=Montserrat:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS for styling -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
 
-  <h2>Assign Manager to Project in {{ organization.name }}</h2>
-  
-  <form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Assign Manager</button>
-  </form>
-  
+    <style>
+        /* Premium Design Styling */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f4f7fc;
+            color: #333;
+            padding-top: 30px;
+        }
 
+        .container {
+            max-width: 800px;
+            margin-top: 50px;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #4e73df; /* Premium blue */
+            margin-bottom: 30px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-control {
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        button[type="submit"] {
+            background-color: #4e73df;
+            border-color: #4e73df;
+            color: #fff;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #2e59d9;
+            border-color: #2e59d9;
+        }
+
+        a {
+            color: #4e73df;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .alert-info {
+            background-color: #e8f4fd;
+            color: #31708f;
+            border-color: #bce8f1;
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Assign Manager to Project in {{ organization.name }}</h2>
+        
+        {% if messages %}
+            <div class="alert alert-info">
+                <ul>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        
+        <!-- Assign Manager Form -->
+        <form method="POST" class="form-horizontal">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_manager" class="col-sm-2 control-label">Manager</label>
+                <div class="col-sm-10">
+                    {{ form.manager }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-primary">Assign Manager</button>
+                </div>
+            </div>
+        </form>
+        
+       
+    </div>
+</body>
+</html>

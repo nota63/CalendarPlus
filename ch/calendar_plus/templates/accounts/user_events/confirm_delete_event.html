@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Event Confirmation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom animation */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* Button hover effects */
+        .btn-hover:hover {
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+        }
+
+        /* Button Focus effects */
+        .btn-focus:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+
+    <div class="max-w-xl mx-auto mt-12 bg-white p-10 rounded-lg shadow-2xl fade-in">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Are you sure you want to delete this event?</h2>
+
+        <!-- Event Details -->
+        <div class="text-center mb-8">
+            <h3 class="text-2xl font-semibold text-gray-700">{{ event.title }}</h3>
+            <p class="text-gray-600 mt-2">Event Type: <span class="font-semibold">{{ event.get_event_type_display }}</span></p>
+            <p class="text-gray-600 mt-2">Location: <span class="font-semibold">{{ event.location }}</span></p>
+            <p class="text-gray-600 mt-2">Duration: <span class="font-semibold">{{ event.duration }} minutes</span></p>
+        </div>
+
+        <div class="flex justify-center space-x-6 mt-8">
+            <!-- Confirm Button -->
+            <form method="POST" action="{% url 'delete-event' org_id=organization.id event_id=event.id %}">
+                {% csrf_token %}
+                <button type="submit"
+                    class="px-8 py-3 bg-red-600 text-white rounded-lg btn-hover hover:bg-red-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                    Yes, Delete
+                </button>
+            </form>
+
+            <!-- Cancel Button -->
+            <a href="{% url 'user-events' organization.id %}"
+                class="px-8 py-3 bg-gray-400 text-white rounded-lg btn-hover hover:bg-gray-500 transition duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                Cancel
+            </a>
+        </div>
+    </div>
+
+</body>
+
+</html>

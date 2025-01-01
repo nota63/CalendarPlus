@@ -38,7 +38,9 @@ urlpatterns = [
 
     # ui components
     path('styles/', views.styles, name= 'styles'),
-    path('weather/',views.weather, name='weather')
+    path('weather/',views.weather, name='weather'),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
+  
 
   
 

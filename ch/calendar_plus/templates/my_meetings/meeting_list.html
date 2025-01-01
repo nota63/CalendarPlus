@@ -1,6 +1,7 @@
 
 
 
+
 <div class="container">
     <h1>Meeting List</h1>
 
@@ -32,6 +33,7 @@
                                 <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
 
                                 <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>
+                                  
                             </div>
                         </div>
                     </div>
@@ -56,6 +58,7 @@
                                <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
                                <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
                                <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>
+                               
                             </div>
                         </div>
                     </div>
@@ -80,6 +83,7 @@
                                 <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
                                 <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
                                 <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>
+                                   
                             </div>
                         </div>
                     </div>
@@ -104,6 +108,7 @@
                               <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
                               <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
                               <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>
+                               
                             </div>
                         </div>
                     </div>
@@ -156,7 +161,7 @@
                                <!-- Remove Me Button -->
                                <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
                                <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
-                               <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>
+                               <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>   
                             </div>
                         </div>
                     </div>
@@ -181,6 +186,7 @@
                                <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
                                <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
                                <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>
+                              
                             </div>
                         </div>
                     </div>
@@ -388,9 +394,4 @@ h1 {
             }
         });
     });
-
-    
-
-
-
 </script>

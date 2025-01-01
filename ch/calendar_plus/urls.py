@@ -161,6 +161,29 @@ urlpatterns=[
      # search users
      path('search-users/<int:org_id>/', views.search_users_ajax, name='search_users_ajax'),
 
+     # create agenda
+     path('create_agenda/<int:org_id>/<int:meeting_id>/', CreateAgendaView.as_view(), name='create_agenda'),
+     path('agenda/success/', TemplateView.as_view(template_name='agenda/agenda_success.html'), name='agenda_success'),
+     path('image_upload/', ImageUploadView.as_view(), name='image_upload'),
+
+
+     # collaborate on real time 
+
+     path('collaborate/<int:org_id>/<int:meeting_id>/', MeetingRoomView.as_view(), name='collaborate'),
+
+
+     path('get_participants/<int:org_id>/<int:meeting_id>/', views.get_participants_in_room, name='get_participants_in_room'),
+
+     path('export-pdf/', views.export_notes_pdf, name='export_pdf'),
+     path('export-via-email/', views.export_notes_email, name='export_via_email'),
+
+     # user meetings calendar
+     path('organization/<int:org_id>/calendar/',user_calendar_view, name='user_meetings_calendar'),
+
+     # display user meetings
+      path('meeting_details/<int:org_id>/<int:meeting_id>/', views.meeting_details, name='meeting_details'),
+
+
 ]
 
 

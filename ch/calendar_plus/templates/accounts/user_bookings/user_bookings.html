@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Bookings</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.2/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .card {
+            perspective: 1000px;
+            width: 100%;
+            height: auto;
+            margin: 20px;
+            cursor: pointer;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s ease-in-out;
+            transform-style: preserve-3d;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card:hover .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 12px;
+        }
+
+        .card-front {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-back {
+            background-color: #f7f7f7;
+            transform: rotateY(180deg);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon {
+            margin-right: 8px;
+            color: #4A90E2;
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .card-title {
+            color: #4A90E2;
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .text-muted {
+            color: #888;
+        }
+
+        .view-details-link {
+            text-decoration: none;
+            color: #4A90E2;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .view-details-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+<div class="container mx-auto mt-10">
+    <h1 class="text-3xl font-bold text-center mb-10">Your Bookings {{organization.name}}</h1>
+    
+    <div class="card-container">
+        {% for booking in bookings %}
+        <a href="{% url 'booking_detail' org_id=booking.event.organization.id booking_id=booking.id %}" class="card">
+            <div class="card-inner">
+                <!-- Front of the card -->
+                <div class="card-front">
+                    <p class="card-title">{{ booking.event.title }}</p>
+                    <p class="text-muted text-sm"><i class="fas fa-calendar-day icon"></i>{{ booking.start_time|date:"l, F j, Y, H:i" }}</p>
+                    <p class="text-muted text-sm"><i class="fas fa-clock icon"></i>{{ booking.event.duration }} mins</p>
+                    <p class="text-muted text-sm"><i class="fas fa-map-marker-alt icon"></i>{{ booking.event.location }}</p>
+                    <p class="text-muted text-sm"><i class="fas fa-user icon"></i>{{ booking.event_host.username }}</p>
+                    <p class="text-muted text-sm"><i class="fas fa-tag icon"></i>{{ booking.status|capfirst }}</p>
+                </div>
+
+                <!-- Back of the card -->
+                <div class="card-back">
+                    <p class="card-title">Event Details</p>
+                    <p class="text-muted text-sm"><i class="fas fa-pencil-alt icon"></i>{{ booking.event.description }}</p>
+                    <p class="text-muted text-sm"><i class="fas fa-users icon"></i>Invitee: {{ booking.invitee.username }}</p>
+                    {% if booking.event.user %}
+                      <p class="text-muted text-sm"><i class="fas fa-users icon"></i>Event Host: {{ booking.event.user.username }}</p>
+                    {% endif %}
+                    <p class="text-muted text-sm"><i class="fas fa-calendar-check icon"></i>Start Time: {{ booking.start_time|date:"l, F j, Y, H:i" }}</p>
+                    <p class="text-muted text-sm"><i class="fas fa-calendar-check icon"></i>End Time: {{ booking.end_time|date:"l, F j, Y, H:i" }}</p>
+                    <p class="text-muted text-sm"><i class="fas fa-clock icon"></i>Buffer Time: {{ booking.event.buffer_time }} mins</p>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+</body>
+</html>
+
+

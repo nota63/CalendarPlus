@@ -10,6 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+
+
+
+
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -43,6 +48,17 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+import os 
+
+# Default file storage setup (local file storage for development)
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+# For media files (where uploaded files will be stored)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+
 
 # Application definition
 
@@ -58,9 +74,12 @@ INSTALLED_APPS = [
     'new_roles',
     'rest_framework',
     'corsheaders',
+     'ckeditor_uploader', 
     # 'grappelli',
     'admin_interface',
     'colorfield',
+     'tinymce',
+      'widget_tweaks',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -267,3 +286,25 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR ,'static']
 
 SITE_URL = ' http://127.0.0.1:8000/calendar'
+
+
+# Ckeditor configurations
+
+
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'language': 'en',
+        'toolbar': [
+            'heading', '|', 'bold', 'italic', 'link', '|', 
+            'bulletedList', 'numberedList', 'blockQuote', '|', 
+            'insertTable', 'tableColumn', 'tableRow', 'mergeTableCells', '|', 
+            'undo', 'redo'
+        ],
+    }
+}
+
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR ,'media'
+
+CKEDITOR_UPLOAD_PATH = "uploads/"

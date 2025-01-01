@@ -4,51 +4,77 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Remove Yourself from Meeting</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-gray-100 font-sans">
 
-    <h2>Are you sure you want to remove yourself from the meeting?</h2>
-    <p><strong>Meeting Title:</strong> {{ meeting.meeting_title }}</p>
-    <p><strong>Meeting Date:</strong> {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
-    
-    <form method="post" id="remove-meeting-form">
-        {% csrf_token %}
-        <button type="submit">Yes, Remove Me</button>
-    </form>
-
-    <button onclick="window.history.back();">No, Keep Me in the Meeting</button>
+    <div class="container mx-auto p-6">
+        <div class="bg-white p-8 rounded-lg shadow-md max-w-lg mx-auto mt-12">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-6">Are you sure you want to remove yourself from the meeting?</h2>
+            
+            <div class="mb-4">
+                <p><span class="font-medium text-gray-700">Meeting Title:</span> <span class="text-gray-900">{{ meeting.meeting_title }}</span></p>
+                <p><span class="font-medium text-gray-700">Meeting Date:</span> <span class="text-gray-900">{{ meeting.meeting_date }} at {{ meeting.start_time }}</span></p>
+            </div>
+            
+            <form method="post" id="remove-meeting-form">
+                {% csrf_token %}
+                <div class="flex justify-center gap-4">
+                    <button type="submit" class="inline-block bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 transition duration-200">Yes, Remove Me</button>
+                    <button type="button" onclick="window.history.back();" class="inline-block bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400 transition duration-200">No, Keep Me in the Meeting</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script>
-       // Handle the button click for confirming removal
-document.getElementById('confirm-remove').addEventListener('click', function() {
-    const orgId = document.getElementById('org_id').value;
-    const meetingId = document.getElementById('meeting_id').value;
+        // Handle the button click for confirming removal
+        document.getElementById('remove-meeting-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
 
-    // Send the POST request to remove the user from the meeting
-    fetch(`/calendar/remove_myself/${orgId}/${meetingId}/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken'),  // CSRF Token for security
-        },
-        body: JSON.stringify({ action: 'remove' })  // Pass any necessary data
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert(data.success);  // Show success message
+            const orgId = document.getElementById('org_id').value;
+            const meetingId = document.getElementById('meeting_id').value;
 
-            // Optionally redirect after success
-            window.location.href = '/calendar/meetings/' + orgId + '/';  // Redirect to the meeting list page
-        } else {
-            alert('Error: ' + data.error);  // Handle errors
+            // Send the POST request to remove the user from the meeting
+            fetch(`/calendar/remove_myself/${orgId}/${meetingId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),  // CSRF Token for security
+                },
+                body: JSON.stringify({ action: 'remove' })  // Pass any necessary data
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.success);  // Show success message
+
+                    // Optionally redirect after success
+                    window.location.href = '/calendar/meetings/' + orgId + '/';  // Redirect to the meeting list page
+                } else {
+                    alert('Error: ' + data.error);  // Handle errors
+                }
+            })
+            .catch(error => {
+                alert('An error occurred: ' + error);  // Handle fetch errors
+            });
+        });
+
+        // Utility to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
         }
-    })
-    .catch(error => {
-        alert('An error occurred: ' + error);  // Handle fetch errors
-    });
-});
-
     </script>
 
 </body>

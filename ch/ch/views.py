@@ -37,3 +37,5 @@ def stylish_cards(request):
 
 def image_slider_2(request):
     return render(request, 'ui/image_slider2.html')
+
+

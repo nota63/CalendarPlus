@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Availability</title>
 
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    
     <!-- Load jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -15,91 +19,104 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.min.js"></script>
 
+
+
     <style>
-        /* Custom styles */
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .day-slot { margin-bottom: 20px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
-        .day-slot > div:first-child { font-weight: bold; margin-bottom: 10px; }
-        .time-slots div { margin-bottom: 5px; }
-        .add-time-slot-btn, .delete-btn { margin-left: 10px; padding: 5px 10px; cursor: pointer; }
-        .delete-btn { color: red; }
-        
-        /* Modal styling */
-        #add-time-slot-modal, #edit-availability-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 20px; background-color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1000; }
-        #add-time-slot-modal input, #edit-availability-modal input { margin-bottom: 10px; }
-        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 999; }
-        
-        /* Calendar View */
-        #calendar { display: none; margin-top: 20px; }
-        .toggle-btns { margin-bottom: 20px; }
+        /* Custom Modal Styling */
+        #add-time-slot-modal, #edit-availability-modal { 
+            display: none; 
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            z-index: 1000; 
+        }
+        #overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0, 0, 0, 0.5); 
+            z-index: 999; 
+        }
     </style>
 </head>
-<body>
+<body class="font-sans bg-gray-100 text-gray-800">
 
-<h2>Manage Availability for {{ organization.name }}</h2>
+    <h2 class="text-2xl font-semibold text-center py-5">Manage Availability for {{ organization.name }}</h2>
 
-<!-- Toggle buttons for list view and calendar view -->
-<div class="toggle-btns">
-    <button id="list-view-btn">List View</button>
-    <button id="calendar-view-btn">Calendar View</button>
-</div>
+    <!-- Toggle buttons for list view and calendar view -->
+    <div class="flex justify-center space-x-4 mb-6">
+        <button id="list-view-btn" class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 focus:outline-none">List View</button>
+        <button id="calendar-view-btn" class="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600 focus:outline-none">Calendar View</button>
+    </div>
 
-<!-- List View (Existing) -->
-<div id="availability-container">
-    {% for day, slots in grouped_availabilities.items %}
-        <div class="day-slot" data-day="{{ day }}">
-            <div>
-                {{ day }}
-                <button class="add-time-slot-btn" data-day="{{ forloop.counter0 }}" data-org="{{ organization.id }}">+</button>
+    <!-- List View (Existing) -->
+    <div id="availability-container" class="space-y-4">
+        {% for day, slots in grouped_availabilities.items %}
+            <div class="bg-white p-4 rounded-lg shadow-md">
+                <div class="flex justify-between items-center">
+                    <span class="font-bold">{{ day }}</span>
+                    <button class="add-time-slot-btn text-green-600 font-semibold" data-day="{{ forloop.counter0 }}" data-org="{{ organization.id }}">+ Add Time Slot</button>
+                </div>
+                <div class="mt-4 space-y-2">
+                    {% for slot in slots %}
+                        <div class="flex justify-between items-center">
+                            <span>{{ slot.start_time }} - {{ slot.end_time }}</span>
+                            <button class="delete-btn text-red-600 font-semibold" data-id="{{ slot.id }}" data-org="{{ organization.id }}">Delete</button>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
-            <div class="time-slots">
-                {% for slot in slots %}
-                    <div>
-                        {{ slot.start_time }} - {{ slot.end_time }}
-                        <button class="delete-btn" data-id="{{ slot.id }}" data-org="{{ organization.id }}">Delete</button>
-                    </div>
-                {% endfor %}
+        {% endfor %}
+    </div>
+
+    <!-- Calendar View (FullCalendar.js) -->
+    <div id="calendar" class="mt-8"></div>
+
+    <!-- Modal to Add Time Slot -->
+    <div id="overlay" class="hidden"></div>
+    <div id="add-time-slot-modal" class="hidden bg-white p-6 rounded-lg shadow-lg">
+        <h3 class="text-xl font-semibold mb-4">Add New Time Slot</h3>
+        <form id="add-time-slot-form">
+            <input type="hidden" id="selected-day" name="day_of_week">
+            <input type="hidden" id="selected-org" name="org_id" value="{{ organization.id }}">
+            <div class="mb-4">
+                <label for="start-time" class="block text-gray-700">Start Time:</label>
+                <input type="time" id="start-time" name="start_time" class="w-full px-4 py-2 border border-gray-300 rounded-md" required><br><br>
             </div>
-        </div>
-    {% endfor %}
-</div>
+            <div class="mb-4">
+                <label for="end-time" class="block text-gray-700">End Time:</label>
+                <input type="time" id="end-time" name="end_time" class="w-full px-4 py-2 border border-gray-300 rounded-md" required><br><br>
+            </div>
+            <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 focus:outline-none">Add Slot</button>
+        </form>
+        <button onclick="closeModal()" class="mt-4 text-gray-500 hover:text-gray-700">Close</button>
+    </div>
 
-<!-- Calendar View (FullCalendar.js) -->
-<div id="calendar"></div>
+    <!-- Modal to Edit Availability -->
+    <div id="edit-availability-modal" class="hidden bg-white p-6 rounded-lg shadow-lg">
+        <h3 class="text-xl font-semibold mb-4">Edit Availability</h3>
+        <form id="edit-availability-form">
+            <input type="hidden" id="availability-id">
+            <input type="hidden" id="organization-id">
+            <div class="mb-4">
+                <label for="edit-start-time" class="block text-gray-700">Start Time:</label>
+                <input type="time" id="edit-start-time" class="w-full px-4 py-2 border border-gray-300 rounded-md" required><br><br>
+            </div>
+            <div class="mb-4">
+                <label for="edit-end-time" class="block text-gray-700">End Time:</label>
+                <input type="time" id="edit-end-time" class="w-full px-4 py-2 border border-gray-300 rounded-md" required><br><br>
+            </div>
+            <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 focus:outline-none">Save Changes</button>
+        </form>
+        <button onclick="closeModal()" class="mt-4 text-gray-500 hover:text-gray-700">Close</button>
+    </div>
 
-<!-- Modal to add time slot -->
-<div id="overlay"></div>
-<div id="add-time-slot-modal">
-    <h3>Add New Time Slot</h3>
-    <form id="add-time-slot-form">
-        <input type="hidden" id="selected-day" name="day_of_week">
-        <input type="hidden" id="selected-org" name="org_id" value="{{ organization.id }}">
-        <label for="start-time">Start Time:</label>
-        <input type="time" id="start-time" name="start_time" required><br><br>
-        <label for="end-time">End Time:</label>
-        <input type="time" id="end-time" name="end_time" required><br><br>
-        <button type="submit">Add Slot</button>
-    </form>
-    <button onclick="closeModal()">Close</button>
-</div>
-
-<!-- Modal to Edit Availability -->
-<div id="edit-availability-modal">
-    <h3>Edit Availability</h3>
-    <form id="edit-availability-form">
-        <input type="hidden" id="availability-id">
-        <input type="hidden" id="organization-id">
-        
-        <label for="edit-start-time">Start Time:</label>
-        <input type="time" id="edit-start-time" required><br><br>
-        
-        <label for="edit-end-time">End Time:</label>
-        <input type="time" id="edit-end-time" required><br><br>
-
-        <button type="submit">Save Changes</button>
-    </form>
-    <button onclick="closeModal()">Close</button>
-</div>
+</body>
+</html>
 
 <script>
     $(document).ready(function () {

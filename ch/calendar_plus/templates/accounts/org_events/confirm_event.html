@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Event</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-sans text-gray-900">
+
+    <div class="container mx-auto p-8 max-w-3xl bg-white shadow-md rounded-lg">
+        <h2 class="text-3xl font-semibold text-indigo-600 mb-6">Confirm Your Event</h2>
+
+        <!-- Event Details -->
+        <p class="text-lg mb-4">You are scheduling an event with <strong class="font-semibold text-indigo-600">{{ user }}</strong>.</p>
+        <p class="text-lg mb-4">Event Title: <strong class="font-semibold">{{ event_details.event_title }}</strong></p>
+        <p class="text-lg mb-4">Event Description: <strong class="font-semibold">{{ event_details.event_description }}</strong></p>
+        <p class="text-lg mb-4">Date: <strong class="font-semibold">{{ event_details.date }}</strong></p>
+        <p class="text-lg mb-6">Selected Slot: <strong class="font-semibold">{{ event_details.selected_slot }}</strong></p>
+
+        <!-- Booking Status -->
+        {% if booking_exists %}
+            <p class="text-red-500 text-lg font-semibold mb-4">Sorry, this time slot has already been booked.</p>
+        {% else %}
+            <p class="text-green-500 text-lg font-semibold mb-4">This slot is available for booking!</p>
+
+            <!-- Form for Scheduling the Event -->
+            <form method="POST" action="{% url 'schedule_event_action' user_id=user.id org_id=organization.id date=event_details.date event_slug=event.slug %}" class="space-y-4">
+                {% csrf_token %}
+                
+                <input type="hidden" name="selected_slot" value="{{ event_details.selected_slot }}">
+                <input type="hidden" name="event_slug" value="{{ event.slug }}">
+                <input type="hidden" name="user_id" value="{{ user.id }}">
+                <input type="hidden" name="org_id" value="{{ organization.id }}">
+
+                <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                    Schedule the Event
+                </button>
+            </form>
+        {% endif %}
+    </div>
+
+</body>
+</html>

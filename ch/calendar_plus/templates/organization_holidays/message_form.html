@@ -5,184 +5,67 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Holiday Message Form</title>
 
-  <!-- Google Fonts -->
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
-
-  <!-- Modern CSS Styling -->
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Roboto', sans-serif;
-      background-color: #f7f7f7;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      color: #333;
-      padding: 20px;
-    }
-
-    .container {
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      padding: 30px;
-      width: 100%;
-      max-width: 800px;
-      animation: fadeIn 0.6s ease-in-out;
-    }
-
-    h2, h3, h1 {
-      color: #444;
-      margin-bottom: 10px;
-    }
-
-    h3 {
-      font-weight: 300;
-    }
-
-    section {
-      margin-bottom: 20px;
-    }
-
-    strong {
-      display: block;
-      margin-top: 10px;
-      color: #555;
-    }
-
-    form {
-      margin-top: 30px;
-    }
-
-    label {
-      font-weight: 600;
-      margin-bottom: 10px;
-      display: block;
-    }
-
-    input[type="text"], textarea {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 20px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 16px;
-      font-family: 'Open Sans', sans-serif;
-      transition: border-color 0.3s ease;
-    }
-
-    input[type="text"]:focus, textarea:focus {
-      border-color: #4CAF50;
-      outline: none;
-    }
-
-    button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #45a049;
-    }
-
-    a {
-      color: #4CAF50;
-      font-weight: 600;
-      text-decoration: none;
-      display: inline-block;
-      margin-top: 20px;
-      transition: color 0.3s ease;
-    }
-
-    a:hover {
-      color: #45a049;
-    }
-
-    /* Animation */
-    @keyframes fadeIn {
-      0% {
-        opacity: 0;
-        transform: translateY(-30px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Message Box Styling */
-    .message-box {
-      padding: 15px;
-      background-color: #f0f0f0;
-      border-left: 5px solid #4CAF50;
-      margin-top: 20px;
-    }
-
-    .message-box strong {
-      color: #333;
-    }
-
-    .message-box p {
-      margin-top: 5px;
-      color: #666;
-    }
-  </style>
 </head>
+<body class="bg-gray-100 font-roboto">
+  <div class="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg space-y-8">
+    <!-- Header Section -->
+    <header>
+      <h2 class="text-2xl font-bold text-gray-800 mb-2">
+        Holiday of Organization: {{ holiday.organization.name }}
+      </h2>
+      <h3 class="text-lg text-gray-600">
+        Organization Description: {{ holiday.organization.description }}
+      </h3>
+    </header>
 
-<body>
-  <div class="container">
-    <h2>Holiday of Organization: {{ holiday.organization.name }}</h2>
-    <h3>Organization Description: {{ holiday.organization.description }}</h3>
-
-    <section>
-      <strong>
-        You are mentioning a message for your holiday {{ holiday.name }}.
-        If others schedule a meeting or book your event, they will be able to see the message and your holiday. 
-        They won't be able to book the event or schedule a meeting during your holiday.
-        Below are the details of the holiday you are mentioning the message for!
-      </strong>
+    <!-- Information Section -->
+    <section class="p-4 bg-blue-50 border-l-4 border-blue-400 rounded-md">
+      <p class="text-sm text-blue-800 font-medium">
+        You are mentioning a message for your holiday <strong>{{ holiday.name }}</strong>. If others schedule a meeting or book your event, they will be able to see the message and your holiday. They won't be able to book the event or schedule a meeting during your holiday. Below are the details of the holiday you are mentioning the message for!
+      </p>
     </section>
 
-    <section>
-      <h1>Holiday: {{ holiday.name }}</h1>
-      <strong>Description: {{ holiday.description }}</strong><br>
-      <strong>Start Date: {{ holiday.start_date }}</strong><br>
-      <strong>End Date: {{ holiday.end_date }}</strong>
-    </section>
-
-    <form method="POST">
-      {% csrf_token %}
-      <div>
-        <label for="id_message">Message</label>
-        {{ form.message }}
+    <!-- Holiday Details -->
+    <section class="space-y-4">
+      <h1 class="text-xl font-semibold text-gray-800">Holiday: {{ holiday.name }}</h1>
+      <div class="text-gray-700">
+        <p><strong>Description:</strong> {{ holiday.description }}</p>
+        <p><strong>Start Date:</strong> {{ holiday.start_date }}</p>
+        <p><strong>End Date:</strong> {{ holiday.end_date }}</p>
       </div>
+    </section>
 
-      <div>
-        <button type="submit">Send Message</button>
+    <!-- Form Section -->
+    <form method="POST" class="space-y-6">
+      {% csrf_token %}
+      <div class="flex flex-col">
+        <label for="id_message" class="text-sm font-semibold text-gray-600 mb-1">Message</label>
+        <div class="mt-1">{{ form.message }}</div>
+      </div>
+      <div class="flex justify-end">
+        <button type="submit" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300">
+          Send Message
+        </button>
       </div>
     </form>
 
-    <!-- Show current message (if any) -->
+    <!-- Display Current Message (if any) -->
     {% if holiday.message_for_invitees %}
-      <div class="message-box">
-        <strong>Message for Invitees:</strong>
-        <p>{{ holiday.message_for_invitees }}</p>
+      <div class="p-4 bg-green-50 border-l-4 border-green-400 rounded-md">
+        <h3 class="text-sm font-semibold text-green-800">Message for Invitees:</h3>
+        <p class="text-gray-700 mt-1">{{ holiday.message_for_invitees }}</p>
       </div>
     {% endif %}
 
-    <a href="{% url 'organization_holidays' org_id=holiday.organization.id %}">Back to Holiday Details</a>
+    <!-- Back Link -->
+    <div class="mt-6">
+      <a href="{% url 'organization_holidays' org_id=holiday.organization.id %}" class="text-blue-600 hover:underline">
+        Back to Holiday Details
+      </a>
+    </div>
   </div>
 </body>
 </html>

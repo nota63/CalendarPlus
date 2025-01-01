@@ -113,3 +113,9 @@ class Command(BaseCommand):
         thread = threading.Thread(target=self.schedule_jobs)
         thread.start()
         self.stdout.write(self.style.SUCCESS('Scheduler started...'))
+    
+
+
+
+
+

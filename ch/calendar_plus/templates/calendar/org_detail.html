@@ -246,6 +246,23 @@
             <a href="{% url 'organizations_members' organization.id %}">
                 <span class="material-icons">person_add</span> Calendars
             </a>
+            <!-- new features  -->
+            <a href="{% url 'user_meetings_calendar' organization.id %}">
+                <span class="material-icons">person_add</span> My Calendar
+            </a>
+
+            <a href="{% url 'event_type_selection' organization.id %}">
+                <span class="material-icons">edit</span>Create Event 
+            </a>
+
+            <a href="{% url 'user-events' organization.id %}">
+                <span class="material-icons">edit</span>My Events
+            </a>
+
+            <a href="{% url 'user_organization_bookings' organization.id %}">
+                <span class="material-icons">edit</span>My Bookings
+            </a>
+
         {% elif is_manager %}
             <h3 class="font-semibold text-lg text-white mb-6">Manager Controls</h3>
             <a href="{% url 'view_edit_profile' org_id=organization.id %}">
@@ -271,6 +288,19 @@
             <a href="{% url 'organizations_members' organization.id %}">
                 <span class="material-icons">person_add</span> Calendars
             </a>
+
+            <a href="{% url 'event_type_selection' organization.id %}">
+                <span class="material-icons">edit</span>Create Event 
+            </a>
+
+            <a href="{% url 'user-events' organization.id %}">
+                <span class="material-icons">edit</span>My Events
+            </a>
+
+            <a href="{% url 'user_organization_bookings' organization.id %}">
+                <span class="material-icons">edit</span>My Bookings
+            </a>
+
         {% else %}
             <h3 class="font-semibold text-lg text-white mb-6">Employee Controls</h3>
             <a href="{% url 'project_views_others' organization_id=organization.id %}">
@@ -290,6 +320,20 @@
             <a href="{% url 'organizations_members' organization.id %}">
                 <span class="material-icons">person_add</span> Calendars
             </a>
+
+            <a href="{% url 'event_type_selection' organization.id %}">
+                <span class="material-icons">edit</span>Create Event 
+            </a>
+
+            <a href="{% url 'user-events' organization.id %}">
+                <span class="material-icons">edit</span>My Events
+            </a>
+
+            <a href="{% url 'user_organization_bookings' organization.id %}">
+                <span class="material-icons">edit</span>My Bookings
+            </a>
+
+            
             <div class="info-message">
                 <span class="material-icons">info</span>
                 You are an employee in this organization. No administrative actions are available.

@@ -1,4 +1,3 @@
-<!-- calendar/edit_holiday.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,119 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Holiday</title>
 
-    <!-- Google Fonts and Modern CSS -->
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        /* Styles similar to previous */
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f7f7f7;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            width: 100%;
-            max-width: 800px;
-        }
-
-        h2, h1 {
-            color: #444;
-        }
-
-        form {
-            margin-top: 30px;
-        }
-
-        label {
-            font-weight: 600;
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        input[type="text"], input[type="date"], textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        a {
-            color: #4CAF50;
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 20px;
-        }
-
-        a:hover {
-            color: #45a049;
-        }
-    </style>
 </head>
+<body class="bg-gray-100 font-roboto">
+    <div class="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">Edit Holiday: {{ holiday.name }}</h2>
+        <h1 class="text-lg font-semibold text-gray-600 mb-6">Organization: {{ organization.name }}</h1>
 
-<body>
-    <div class="container">
-        <h2>Edit Holiday: {{ holiday.name }}</h2>
-        <h1>Organization: {{ organization.name }}</h1>
-
-        <form method="POST">
+        <form method="POST" class="space-y-6">
             {% csrf_token %}
-            <div>
-                <label for="id_name">Holiday Name</label>
-                {{ form.name }}
+
+            <!-- Holiday Name -->
+            <div class="flex flex-col">
+                <label for="id_name" class="text-sm font-semibold text-gray-600 mb-1">Holiday Name</label>
+                <div class="mt-1">{{ form.name }}</div>
             </div>
 
-            <div>
-                <label for="id_description">Holiday Description</label>
-                {{ form.description }}
+            <!-- Holiday Description -->
+            <div class="flex flex-col">
+                <label for="id_description" class="text-sm font-semibold text-gray-600 mb-1">Holiday Description</label>
+                <div class="mt-1">{{ form.description }}</div>
             </div>
 
-            <div>
-                <label for="id_start_date">Start Date</label>
-                {{ form.start_date }}
+            <!-- Start Date -->
+            <div class="flex flex-col">
+                <label for="id_start_date" class="text-sm font-semibold text-gray-600 mb-1">Start Date</label>
+                <div class="mt-1">{{ form.start_date }}</div>
             </div>
 
-            <div>
-                <label for="id_end_date">End Date</label>
-                {{ form.end_date }}
+            <!-- End Date -->
+            <div class="flex flex-col">
+                <label for="id_end_date" class="text-sm font-semibold text-gray-600 mb-1">End Date</label>
+                <div class="mt-1">{{ form.end_date }}</div>
             </div>
 
-            <div>
-                <label for="id_message">Message For Invitees</label>
-                {{ form.message_for_invitees }}
+            <!-- Message for Invitees -->
+            <div class="flex flex-col">
+                <label for="id_message" class="text-sm font-semibold text-gray-600 mb-1">Message For Invitees</label>
+                <div class="mt-1">{{ form.message_for_invitees }}</div>
             </div>
 
-
-            <div>
-                <button type="submit">Save Changes</button>
+            <!-- Save Button -->
+            <div class="flex justify-end">
+                <button type="submit" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300">
+                    Save Changes
+                </button>
             </div>
         </form>
 
-        <a href="{% url 'organization_holidays' org_id=organization.id %}">Back to Holiday Details</a>
+        <!-- Back Link -->
+        <div class="mt-4">
+            <a href="{% url 'organization_holidays' org_id=organization.id %}" class="text-blue-600 hover:underline">
+                Back to Holiday Details
+            </a>
+        </div>
     </div>
 </body>
 </html>
+

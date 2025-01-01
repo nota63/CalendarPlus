@@ -3055,10 +3055,32 @@ def user_calendar(request, user_id, org_id):
     user = User.objects.get(id=user_id)
     organization = Organization.objects.get(id=org_id)
 
- 
+   
+    meetings = MeetingOrganization.objects.filter(
+        organization_id=org_id
+    ).filter(
+        Q(user=user) | 
+        Q(participants=user) | 
+        Q(invitee=user)
+    ).distinct()
+
+
+    events = [
+        {
+            'id': meeting.id,
+            'title': meeting.meeting_title, 
+            'start': f'{meeting.meeting_date}T{meeting.start_time}', 
+            'end': f'{meeting.meeting_date}T{meeting.end_time}',  
+        }
+        for meeting in meetings
+    ]
+
+    print("Events found:", events)
+
     return render(request, 'organization_meetings/user_calendar.html', {
         'user': user,
-        'organization': organization
+        'organization': organization,
+        'events': events, 
     })
 
 
@@ -3299,7 +3321,7 @@ class MeetingListView(TemplateView):
             Q(organization_id=org_id) & (Q(invitee=user)) | (Q(participants=user)) | Q(invitee=user)
         )
 
-
+        
         # Categorize meetings based on meeting type
         context['my_scheduled_standup'] = my_scheduled_meetings.filter(meeting_type='standup')
         context['org_id'] = org_id
@@ -3336,9 +3358,18 @@ class MeetingDetailView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        meeting = self.get_object()
+
+        # Check if the current user is the invitee
+        context['is_invitee'] = meeting.invitee == self.request.user
+
         context['meeting'] = self.get_object()
         return context
     
+
+
+
+
 
 # Remove Myself from meeting
 class RemoveMeetingConfirmationView(View):
@@ -3606,3 +3637,371 @@ def org_accept_invite(request, token):
 
 
     return redirect(reverse('meeting_detail_view', args=[meeting.organization.id, meeting.id]))
+
+
+# Meeting creator can attach and send agenda to meeting participants
+from accounts.models import Agenda
+from accounts.forms import AgendaForm
+from django.contrib.sites.shortcuts import get_current_site
+
+class CreateAgendaView(View):
+    template_name = 'agenda/create_agenda.html'
+
+    def get(self, request, org_id, meeting_id):
+        # Get the meeting object
+        meeting = get_object_or_404(MeetingOrganization, id=meeting_id, organization_id=org_id)
+
+        # Initialize the form
+        form = AgendaForm()
+
+        return render(request, self.template_name, {
+            'form': form,
+            'meeting': meeting
+        })
+
+    def post(self, request, org_id, meeting_id):
+        # Get the meeting object
+        meeting = get_object_or_404(MeetingOrganization, id=meeting_id, organization_id=org_id)
+
+        # Initialize the form with POST data
+        form = AgendaForm(request.POST)
+
+        if form.is_valid():
+            # Save the agenda, but don't commit to the database yet
+            agenda = form.save(commit=False)
+            agenda.organization = meeting.organization
+            agenda.meeting = meeting
+            agenda.save()
+
+            # Send the agenda email
+            self.send_agenda_email(agenda, meeting)
+
+            # Redirect to a success page after saving the agenda
+            return HttpResponseRedirect(reverse('agenda_success'))
+
+        return render(request, self.template_name, {
+            'form': form,
+            'meeting': meeting
+        })
+
+    def send_agenda_email(self, agenda, meeting):
+        # Collect recipients (meeting creator and participants)
+        recipients = [meeting.user.email]
+
+        if meeting.participants.exists():
+            participants_emails = [participant.email for participant in meeting.participants.all()]
+            recipients.extend(participants_emails)
+
+        # Render the email content
+        subject = f'Meeting Agenda: {meeting.meeting_title}'
+        message = render_to_string(
+            'agenda/agenda_email.html',  # Email template
+            {
+                'agenda': agenda,
+                'meeting': meeting,
+                 
+            }
+        )
+
+        # Send the email
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            recipients,
+            html_message=message
+        )
+    
+
+
+
+
+
+
+# Agenda success page
+from django.core.files.storage import FileSystemStorage
+from PIL import Image
+import os
+
+
+class ImageUploadView(View):
+    def post(self, request):
+        # Ensure CSRF validation passes
+        if 'file' not in request.FILES:
+            return JsonResponse({'error': 'No file uploaded.'}, status=400)
+
+        uploaded_file = request.FILES['file']
+
+        # Check if the uploaded file is an image
+        try:
+            # Open the image to validate it
+            image = Image.open(uploaded_file)
+            image.verify()  # Verifies that it's a valid image file
+        except (IOError, SyntaxError):
+            return JsonResponse({'error': 'Uploaded file is not a valid image.'}, status=400)
+
+        # If the file is valid, proceed to save it
+        fs = FileSystemStorage()
+
+        if uploaded_file.size > 5 * 1024 * 1024:  
+            return JsonResponse({'error': 'File size exceeds limit of 5MB.'}, status=400)
+
+        try:
+       
+            filename = fs.save(uploaded_file.name, uploaded_file)
+            file_url = fs.url(filename)
+
+            return JsonResponse({'location': file_url}, status=200)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+        
+
+
+
+
+
+
+
+
+# Collaborate on notes 
+from accounts.models import MeetingNotes, MeetingRoom
+
+class MeetingRoomView(View):
+    def get(self, request, org_id, meeting_id):
+        # Fetch organization and meeting objects
+        org = get_object_or_404(Organization, id=org_id)
+        meeting = get_object_or_404(MeetingOrganization, id=meeting_id)
+
+        # Generate a unique room name based on org_id and meeting_id
+        room_name = f"{org_id}-{meeting_id}"
+
+        # Retrieve or create the meeting room
+        meeting_room, created = MeetingRoom.objects.get_or_create(
+            organization=org,
+            meeting=meeting,
+            room_name=room_name,
+      
+        )
+        # Now, add the participant (request.user) to the room
+        meeting_room.participants.add(request.user)
+
+        # Fetch notes related to this meeting and organization
+        notes = MeetingNotes.objects.filter(meeting=meeting, organization=org)
+
+        # Check if notes exist and fetch emojis
+       
+       
+
+        # Render the meeting room template with the necessary context
+        return render(request, 'meeting_collaboration/meeting_notes.html', {
+            'org_id': org_id,
+            'meeting_id': meeting_id,
+            'meeting': meeting,
+            'meeting_room': meeting_room,
+            'notes': notes,
+        
+        })
+    def post(self, request, org_id, meeting_id):
+        # Handle saving or updating the notes
+        user = request.user
+        content = request.POST.get('content')
+
+        # Fetch organization and meeting objects
+        org = get_object_or_404(Organization, id=org_id)
+        meeting = get_object_or_404(MeetingOrganization, id=meeting_id)
+
+        # Check if notes already exist for this user, meeting, and organization
+        meeting_notes, created = MeetingNotes.objects.get_or_create(
+            organization=org,
+            meeting=meeting,
+            # user=user,
+            defaults={'content': content}
+        )
+
+        if not created:
+            # If notes already exist, update the content
+            meeting_notes.content = content
+            meeting_notes.save()
+
+        return JsonResponse({'message': 'Notes Removed successfully!'})
+
+
+
+
+# Get participants 
+@csrf_exempt
+def get_participants_in_room(request, org_id, meeting_id):
+   
+    try:
+        meeting_room = MeetingRoom.objects.get(organization_id=org_id, meeting_id=meeting_id)
+    except MeetingRoom.DoesNotExist:
+        return JsonResponse({'error': 'Meeting room not found'}, status=404)
+
+
+    participants = meeting_room.participants.all()
+
+   
+    participants_list = [user.username for user in participants]
+    print("participants:", participants_list)
+
+    return JsonResponse({'participants': participants_list})
+
+
+# Export as PDF
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+
+@csrf_exempt
+def export_notes_pdf(request):
+   
+    try:
+        data = json.loads(request.body)
+        user_id = data.get('user_id')
+        org_id = data.get('org_id')
+        meeting_id = data.get('meeting_id')
+        note_id = data.get('note_id')
+        
+        if not all([org_id, meeting_id, note_id]):
+            return JsonResponse({'error': 'Missing required parameters.'}, status=400)
+        
+     
+        organization = get_object_or_404(Organization, id=org_id)
+        meeting = get_object_or_404(MeetingOrganization, id=meeting_id)
+
+        note = get_object_or_404(MeetingNotes, id=note_id, organization=organization, meeting=meeting)
+
+        # Create a PDF response
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="MeetingNotes_{meeting_id}.pdf"'
+
+        p = canvas.Canvas(response, pagesize=letter)
+        width, height = letter
+
+       
+        p.setFont("Helvetica-Bold", 16)
+        p.drawString(30, height - 40, f"Meeting Notes for {meeting.meeting_title}")  
+        p.drawString(30, height - 60, f"Organization: {organization.name}")  
+
+        p.setFont("Helvetica", 12)
+        y_position = height - 100
+        content = note.content  
+        lines = content.split('\n')
+        
+        for line in lines:
+            p.drawString(30, y_position, line)
+            y_position -= 14  
+
+            if y_position < 40:  
+                p.showPage()
+                p.setFont("Helvetica", 12)
+                y_position = height - 40
+
+        p.showPage() 
+        p.save()
+
+        return response
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+# Export notes and send via email
+
+@csrf_exempt
+def export_notes_email(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            user_id = data.get('user_id')
+            org_id = data.get('org_id')
+            meeting_id = data.get('meeting_id')
+            note_id = data.get('note_id')
+
+            if not all([user_id, org_id, meeting_id, note_id]):
+                return JsonResponse({'error': 'Missing required parameters.'}, status=400)
+
+           
+            note = get_object_or_404(MeetingNotes, id=note_id, organization_id=org_id, meeting_id=meeting_id)
+
+            user = get_object_or_404(User, id=user_id)
+
+         
+            subject = f"Meeting Notes for Meeting {meeting_id}"
+            message = f"Here are the meeting notes for Meeting {meeting_id}:\n\n{note.content}"
+
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,  
+                [user.email], 
+                fail_silently=False,
+            )
+
+           
+            return JsonResponse({'success': True}, status=200)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+# -------------------------------------------------------------------------------------------------------------------------------
+
+# Display Meetings In Calendar
+def user_calendar_view(request, org_id):
+    # Fetch meetings for the given organization
+    meetings = MeetingOrganization.objects.filter(
+        organization__id=org_id 
+    ).filter(
+        Q(user=request.user) | 
+        Q(invitee=request.user) |  
+        Q(participants=request.user)  
+    )
+
+    # Prepare event data for FullCalendar
+    events = []
+    for meeting in meetings:
+        events.append({
+            'organization_id':org_id,
+            'id':meeting.id,
+            'title': meeting.meeting_title,  # Only the title
+            'start': f'{meeting.meeting_date}T{meeting.start_time}',  # Date and start time
+            'end': f'{meeting.meeting_date}T{meeting.end_time}',  # Date and end time
+        })
+
+    # Pass events data to the template
+    context = {
+        'org_id': org_id,
+        'events': events,
+        
+    }
+
+    return render(request, 'user_calendar/user_meetings_calendar.html', context)
+
+
+
+# Meeting details
+def meeting_details(request, org_id, meeting_id):
+    
+    meeting = get_object_or_404(MeetingOrganization, organization_id=org_id, id=meeting_id)
+    
+ 
+    meeting_data = {
+     
+        'meeting_title': meeting.meeting_title,
+        'meeting_description': meeting.meeting_description,
+        'meeting_date': meeting.meeting_date,
+        'start_time': meeting.start_time.strftime('%H:%M'),
+        'end_time': meeting.end_time.strftime('%H:%M'),
+        'meeting_location': meeting.meeting_location,
+        'meeting_type': meeting.meeting_type,
+        'meeting_link': meeting.meeting_link,
+        'participants': [participant.username for participant in meeting.participants.all()],
+        'user':meeting.user.username if meeting.user else None,
+        'invitee':meeting.invitee.username if meeting.invitee else None 
+    }
+
+
+    return JsonResponse(meeting_data)
+
+
+# -----------------------------------------------------------------------------

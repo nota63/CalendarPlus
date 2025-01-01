@@ -4,49 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projects in {{ organization.name }}</title>
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
 </head>
 <body>
-    <div class="container">
-        <h2 class="text-center">Projects in {{ organization.name }}</h2>
+<div class="container mt-5">
+    <h2 class="text-center">Projects in {{ organization.name }}</h2>
+    <p>Your projects in <strong>{{ organization.name }}</strong> will appear here. You can manage them directly.</p>
 
-        {% if projects %}
-            <table class="table table-striped">
-                <thead>
+    {% if projects %}
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Project Name</th>
+                    <th>Description</th>
+                    <th>Created By</th>
+                    <th>Created At</th>
+                    <th colspan="2" class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for project in projects %}
                     <tr>
-                        <th>Project Name</th>
-                        <th>Description</th>
-                        <th>Created By</th>
-                        <th>Created At</th>
-                        <th>Actions</th>
+                        <td>{{ project.name }}</td>
+                        <td>{{ project.description }}</td>
+                        <td>{{ project.created_by.user.username }}</td>
+                        <td>{{ project.created_at|date:"d M Y, H:i" }}</td>
+                        <td class="text-center">
+                            <a href="{% url 'assign_manager_to_project' organization_id=project.organization.id project_id=project.id %}" class="btn btn-success btn-sm">
+                                Assign Manager
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'assigned_manager_detail' organization_id=project.organization.id project_id=project.id %}" class="btn btn-info btn-sm">
+                                View Assigned Manager
+                            </a>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    {% for project in projects %}
-                        <tr>
-                            <td>{{ project.name }}</td>
-                            <td>{{ project.description }}</td>
-                            <td>{{ project.created_by.user.username }}</td>  
-                            <td>{{ project.created_at }}</td>
-                            <td>
-                                <a href="{% url 'assign_manager_to_project' organization_id=project.organization.id project_id=project.id %}">Assign Manager</a>
-                            </td>
-                            <td>
-                                <a href="{% url 'assigned_manager_detail' organization_id=project.organization.id project_id=project.id %}">Assigned Manager</a>
-                            </td>
-                            
-                            
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-info mt-4">
+            No projects found for this organization. Start by creating a new project.
+        </div>
+    {% endif %}
 
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>No projects found for this organization.</p>
-        {% endif %}
-
-        <a href="{% url 'org_detail' org_id=organization.id %}" class="btn btn-primary">Back to Organization Details</a>
-        <a href="{% url 'create_project' org_id=organization.id %}" class="btn btn-primary">Create Project</a>
+    <!-- Navigation Buttons -->
+    <div class="mt-4">
+        <a href="{% url 'org_detail' org_id=organization.id %}" class="btn btn-secondary">Back to Organization Details</a>
+        <a href="{% url 'create_project' org_id=organization.id %}" class="btn btn-primary">Create New Project</a>
     </div>
+</div>
 </body>
 </html>

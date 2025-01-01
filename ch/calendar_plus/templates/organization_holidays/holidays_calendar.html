@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,54 +8,79 @@
 
     <!-- Load FullCalendar CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.min.css" rel="stylesheet" />
+
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
 
-<h2>Holidays for {{ organization.name }}</h2>
+<body class="bg-gray-100 font-sans text-gray-900">
 
-<h4>The holidays you are creating or viewing is only valid for this organization {{organization.name}}! you can customize , manage holidays for each organization you belong to</h4>
+    <div class="container mx-auto p-8">
 
-<strong>Calendar + supports indian government holidays as of now in development but in future we will be supporting multiple countries holidays!</strong>
+        <!-- Page Title -->
+        <h2 class="text-4xl font-bold text-center text-gray-800 mb-6">{{ organization.name }} Holidays</h2>
 
-<strong>We prevent others to book your event or schedule meetings on your holidays! No one can book or schedule they can just view your holiday!</strong>
+        <!-- Info Text -->
+        <h4 class="text-lg text-gray-600 text-center mb-8">
+            <span class="font-semibold">The holidays you are creating or viewing are only valid for this organization {{ organization.name }}!</span><br>
+            You can customize and manage holidays for each organization you belong to.
+        </h4>
 
-<br>
-<br>
+        <!-- Holiday Calendar Info -->
+        <div class="text-center mb-8 text-gray-600">
+            <strong class="text-yellow-500">Calendar + supports Indian government holidays as of now in development, but we will be supporting multiple countries' holidays in the future!</strong><br>
+            <strong class="text-yellow-500">We prevent others from booking your event or scheduling meetings on your holidays! No one can book or schedule, they can just view your holiday!</strong>
+        </div>
 
-<div id="calendar"></div> <!-- FullCalendar container -->
+        <!-- FullCalendar Container -->
+        <div id="calendar" class="rounded-2xl shadow-md p-4 bg-white"></div> <!-- FullCalendar container -->
 
-<!-- View Holiday Modal -->
-<div id="viewHolidayModal" style="display: none; border: 1px solid #ccc; padding: 20px;">
-  <div>
-    <h4 id="viewHolidayTitle"></h4>
-    <p id="viewHolidayDescription"></p>
-    <p id="viewHolidayStart"></p>
-    <p id="viewHolidayEnd"></p>
-    <button id="closeViewHolidayModal">Close</button>
-    <button id="deleteHolidayBtn">Delete Holiday</button>
-     <!-- New Message Button -->
-    <button id="messageHolidayBtn">Message</button>
-    
-    <button id="editHolidayBtn">Edit</button>
-    <button id="settingsHolidayBtn">Settings</button>
-  </div>
-</div>
+        <!-- View Holiday Modal -->
+        <div id="viewHolidayModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
+            <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg text-gray-900">
+                <h4 id="viewHolidayTitle" class="text-2xl font-semibold mb-4">Holiday Title</h4>
+                <p id="viewHolidayDescription" class="text-gray-700 mb-4">Holiday Description</p>
+                <p id="viewHolidayStart" class="text-gray-700 mb-4">Start Date</p>
+                <p id="viewHolidayEnd" class="text-gray-700 mb-6">End Date</p>
+                <div class="flex justify-around">
+                    <button id="closeViewHolidayModal" class="bg-gray-200 text-gray-700 px-4 py-1 rounded-full hover:bg-gray-300 transition duration-200 text-sm">Close</button>
+                    <button id="deleteHolidayBtn" class="bg-red-500 text-white px-4 py-1 rounded-full hover:bg-red-600 transition duration-200 text-sm">Delete Holiday</button>
+                    <button id="messageHolidayBtn" class="bg-blue-500 text-white px-4 py-1 rounded-full hover:bg-blue-600 transition duration-200 text-sm">Message</button>
+                    <button id="editHolidayBtn" class="bg-yellow-400 text-white px-4 py-1 rounded-full hover:bg-yellow-500 transition duration-200 text-sm">Edit</button>
+                    <button id="settingsHolidayBtn" class="bg-green-500 text-white px-4 py-1 rounded-full hover:bg-green-600 transition duration-200 text-sm">Settings</button>
+                </div>
+            </div>
+        </div>
 
-<!-- Add Holiday Modal -->
-<div id="addHolidayModal" style="display: none; border: 1px solid #ccc; padding: 20px;">
-  <div>
-    <h4>Add Holiday</h4>
-    <form id="addHolidayForm">
-      {% csrf_token %}
-      <input type="text" id="addHolidayTitle" name="title" placeholder="Holiday Title" required />
-      <textarea id="addHolidayDescription" name="description" placeholder="Holiday Description"></textarea>
-      <input type="text" id="addHolidayStart" name="start_date" placeholder="Start Date" required />
-      <input type="text" id="addHolidayEnd" name="end_date" placeholder="End Date" required />
-      <button type="submit">Save</button>
-    </form>
-  </div>
-</div>
+        <!-- Add Holiday Modal -->
+        <div id="addHolidayModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
+            <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg text-gray-900">
+                <h4 class="text-2xl font-semibold mb-6">Add Holiday</h4>
+                <form id="addHolidayForm">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <input type="text" id="addHolidayTitle" name="title" placeholder="Holiday Title"
+                            class="w-full px-4 py-2 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 bg-gray-100 text-gray-800" required />
+                    </div>
+                    <div class="mb-4">
+                        <textarea id="addHolidayDescription" name="description" placeholder="Holiday Description"
+                            class="w-full px-4 py-2 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 bg-gray-100 text-gray-800"></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <input type="text" id="addHolidayStart" name="start_date" placeholder="Start Date"
+                            class="w-full px-4 py-2 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 bg-gray-100 text-gray-800" required />
+                    </div>
+                    <div class="mb-4">
+                        <input type="text" id="addHolidayEnd" name="end_date" placeholder="End Date"
+                            class="w-full px-4 py-2 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 bg-gray-100 text-gray-800" required />
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition duration-200">Save</button>
+                </form>
+            </div>
+        </div>
 
+    </div>
 <!-- Load jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 

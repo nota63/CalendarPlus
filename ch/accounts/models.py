@@ -15,6 +15,9 @@ from django.utils.crypto import get_random_string
 from django.core.mail import send_mail
 from django.conf import settings
 
+from tinymce.models import HTMLField
+
+
 class Organization(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
@@ -422,4 +425,157 @@ class MeetingInvitationOrganization(models.Model):
         """Generate the invite link with the token."""
         return f"{settings.SITE_URL}/org_accept_invite/{self.invite_token}/"
     
+
+# Meeting Agenda 
+
+class Agenda(models.Model):
+    organization = models.ForeignKey(
+        'Organization',
+        on_delete=models.CASCADE,
+        related_name='agendas'
+    )
+    meeting = models.ForeignKey(
+        'MeetingOrganization',
+        on_delete=models.CASCADE,
+        related_name='agendas'
+    )
+    agenda_content =HTMLField()
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='created_agendas'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Agenda for {self.meeting.meeting_title} by {self.created_by}"
+
+    class Meta:
+        verbose_name = "Meeting Agenda"
+        verbose_name_plural = "Meeting Agendas"
+
+
+# Collaborate on notes
+class MeetingNotes(models.Model):
+    organization = models.ForeignKey('Organization', on_delete=models.CASCADE)
+    meeting = models.ForeignKey('MeetingOrganization', on_delete=models.CASCADE)
+    content = models.TextField(blank=True, null=True)  
+    mentions = models.ManyToManyField(User, null=True,blank=True, related_name='mentioned_in_notes')
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)  
+    class Meta:
+        unique_together = ('organization', 'meeting',)
+
+    def __str__(self):
+        return f"Notes for {self.meeting.meeting_title} by "
     
+
+
+# MeetingRoom 
+class MeetingRoom(models.Model):
+    organization = models.ForeignKey('Organization', on_delete=models.CASCADE)
+    meeting = models.ForeignKey('MeetingOrganization', on_delete=models.CASCADE)
+    room_name = models.CharField(max_length=255, unique=True)  # Each room has a unique name (combination of org_id and meeting_id)
+    participants = models.ManyToManyField(User, related_name='meeting_participants')
+
+    def __str__(self):
+        return f"Room for {self.meeting.meeting_title}"
+    
+
+
+# Event Creation
+
+
+class EventOrganization(models.Model):
+    EVENT_TYPES = [
+        ('one_on_one', 'One-on-One'),
+        ('group', 'Group Meeting'),
+    ]
+    
+    LOCATION_CHOICES = [
+        ('Google Meet', 'Google Meet'),
+        ('Zoom', 'Zoom'),
+        ('Phone Call', 'Phone Call'),
+        ('In Person Meeting', 'In Person Meeting'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="eventss", null=True, blank=True)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="events", null=True, blank=True)
+    event_type = models.CharField(max_length=20, choices=EVENT_TYPES, default='one_on_one', null=True, blank=True)
+    title = models.CharField(max_length=255, null=True, blank=True)
+    description = models.TextField(blank=True, null=True)
+    duration = models.PositiveIntegerField(null=True, blank=True)
+    buffer_time = models.PositiveIntegerField(default=0, null=True, blank=True)
+    is_recurring = models.BooleanField(default=False, null=True, blank=True)
+    location = models.CharField(
+        max_length=100, choices=LOCATION_CHOICES, default='Google Meet', null=True, blank=True
+    )
+    slug = models.SlugField(unique=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+
+    
+
+    def save(self, *args, **kwargs):
+      if not self.slug:
+        # Ensure the title is used to create a slug if it's not empty; otherwise, use just the UUID
+        base_slug = self.title if self.title else f"event-{uuid.uuid4().hex[:8]}"
+        self.slug = slugify(f"{base_slug}-{uuid.uuid4().hex[:8]}")  # Generate unique slug
+      super().save(*args, **kwargs)
+   
+
+    def __str__(self):
+        return f"{self.title} ({self.user.username})"
+
+
+
+
+
+
+class BookingOrganization(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('confirmed', 'Confirmed'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    organization= models.ForeignKey('Organization', on_delete=models.CASCADE, related_name='booking_organization')
+
+    event = models.ForeignKey('EventOrganization', on_delete=models.CASCADE, related_name='bookings')
+    invitee = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookingss')
+    event_host=models.ForeignKey(User,on_delete=models.CASCADE, related_name='event_hosts', blank=True,null=True)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Booking for {self.event.title} by {self.invitee.username} at {self.start_time}"
+
+    def is_accepted(self):
+        return self.status == 'confirmed'
+
+    def cancel(self):
+        self.status = 'cancelled'
+        self.save()
+
+    def confirm(self):
+        self.status = 'confirmed'
+        self.save()
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
