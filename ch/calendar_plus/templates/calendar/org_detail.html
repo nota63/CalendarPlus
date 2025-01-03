@@ -263,6 +263,12 @@
                 <span class="material-icons">edit</span>My Bookings
             </a>
 
+           
+
+            <a href="{% url 'contacts_list' organization.id %}">
+                <span class="material-icons">edit</span>My Contacts
+            </a>
+
         {% elif is_manager %}
             <h3 class="font-semibold text-lg text-white mb-6">Manager Controls</h3>
             <a href="{% url 'view_edit_profile' org_id=organization.id %}">
@@ -301,6 +307,12 @@
                 <span class="material-icons">edit</span>My Bookings
             </a>
 
+          
+
+            <a href="{% url 'contacts_list' organization.id %}">
+                <span class="material-icons">edit</span>My Contacts
+            </a>
+
         {% else %}
             <h3 class="font-semibold text-lg text-white mb-6">Employee Controls</h3>
             <a href="{% url 'project_views_others' organization_id=organization.id %}">
@@ -332,6 +344,13 @@
             <a href="{% url 'user_organization_bookings' organization.id %}">
                 <span class="material-icons">edit</span>My Bookings
             </a>
+
+           
+
+            <a href="{% url 'contacts_list' organization.id %}">
+                <span class="material-icons">edit</span>My Contacts
+            </a>
+
 
             
             <div class="info-message">

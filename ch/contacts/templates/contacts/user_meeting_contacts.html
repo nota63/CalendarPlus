@@ -1,0 +1,141 @@
+
+
+
+
+
+
+<!-- contacts/user_meeting_contacts.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Contacts</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.2/dist/tailwind.min.js"></script>
+    
+
+</head>
+
+<body class="bg-gray-100 text-gray-900">
+<form method="post">
+    {% csrf_token %}
+</form>
+
+    <div class="container mx-auto p-8">
+        <h1 class="text-3xl font-bold mb-6">Contacts {{organization.name}}</h1>
+
+        <p>users with you had or will have future meetings are fetched here eyou can add them into your contact list to make scheduling easiar!</p>
+
+        <!-- Organization Info -->
+        <div class="mb-6">
+            <h2 class="text-2xl font-semibold">Organization: {{ organization.name }}</h2>
+            <p class="text-sm text-gray-600">These are users with whom you have scheduled meetings.</p>
+        </div>
+
+        <!-- User Details List -->
+        <div class="space-y-6">
+            {% for user_info in user_details %}
+                <div class="bg-white p-5 rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
+                    <div class="flex justify-between items-center mb-4">
+                        <!-- User Name and Role -->
+                        <div>
+                            <h3 class="text-xl font-semibold">{{ user_info.user.username }}</h3>
+                            <p class="text-sm text-gray-500">{{ user_info.role }}</p>
+                        </div>
+
+                        <!-- Organization Name -->
+                        <span class="text-sm text-gray-600">{{ user_info.organization_name }}</span>
+                    </div>
+
+                    <!-- Last Meeting Info -->
+                    <div class="mb-4">
+                        <strong class="text-lg">Last Meeting:</strong>
+                        {% if user_info.last_meeting.date %}
+                            <div class="mt-2 text-sm text-gray-700">
+                                <p><strong>Date:</strong> {{ user_info.last_meeting.date }}</p>
+                                <p><strong>Time:</strong> {{ user_info.last_meeting.time }}</p>
+                                <p><strong>Title:</strong> {{ user_info.last_meeting.title }}</p>
+                            </div>
+                        {% else %}
+                            <p class="mt-2 text-gray-600">No past meetings</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Next Meeting Info -->
+                    <div>
+                        <strong class="text-lg">Next Meeting:</strong>
+                        {% if user_info.next_meeting.date %}
+                            <div class="mt-2 text-sm text-gray-700">
+                                <p><strong>Date:</strong> {{ user_info.next_meeting.date }}</p>
+                                <p><strong>Time:</strong> {{ user_info.next_meeting.time }}</p>
+                                <p><strong>Title:</strong> {{ user_info.next_meeting.title }}</p>
+                            </div>
+                        {% else %}
+                            <p class="mt-2 text-gray-600">No upcoming meetings</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Add to Contacts Button -->
+                    <div class="mt-4">
+                        <button 
+                            class="add-contact-btn bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            data-org-id="{{ organization.id }}" 
+                            data-user-id="{{ user_info.user.id }}">
+                            Add to Contacts
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.add-contact-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const orgId = btn.getAttribute('data-org-id');
+                const userId = btn.getAttribute('data-user-id');
+
+                fetch(`/contacts/add_to_contacts/${orgId}/${userId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({
+                        'org_id': orgId,
+                        'user_id': userId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);  // Success message
+                    } else if (data.error) {
+                        alert(data.error);  // Error message
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while adding the contact.');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body class="font-sans bg-gray-100">
+
+    <div class="container mx-auto px-4 py-6">
+        <!-- Button to Send Email -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-700">Emails For {{user}}</h1>
+            <br>
+          
+            <a href="{% url 'send_email' org_id=organization.id user_id=user.id %}" class="inline-block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Send Email</a>
+        </div>
+
+        <p class="text-2xl font-sans text-gray-600">Here’s your sentbox, {{request.user}}! You can effortlessly manage all the emails you've sent to {{user}} from {{organization.name}}.</p>
+        <br>
+
+
+        <!-- Check if there are emails -->
+        {% if emails %}
+            <div class="overflow-x-auto bg-white shadow-md rounded-md">
+                <table class="min-w-full table-auto">
+                    <thead class="bg-gray-200 text-left">
+                        <tr>
+                            <th class="py-2 px-4 text-sm font-medium text-gray-600">Sender</th>
+                            <th class="py-2 px-4 text-sm font-medium text-gray-600">Participant</th>
+                            <th class="py-2 px-4 text-sm font-medium text-gray-600">Message</th>
+                            <th class="py-2 px-4 text-sm font-medium text-gray-600">Sent At</th>
+                            <th class="py-2 px-4 text-sm font-medium text-gray-600">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for email in emails %}
+                            <tr class="border-b">
+                                <td class="py-2 px-4 text-gray-700">{{ email.sender.username }}</td>
+                                <td class="py-2 px-4 text-gray-700">{{ email.participant.username }}</td>
+                                <td class="py-2 px-4 text-gray-700">{{ email.message|slice:":100" }}{% if email.message|length > 100 %}...{% endif %}</td>
+                                <td class="py-2 px-4 text-gray-700">{{ email.sent_at|date:"F j, Y, H:i" }}</td>
+                                <td class="py-2 px-4 text-gray-700">
+                                    <!-- 3-Dots Menu -->
+                                    <button class="text-gray-600 hover:text-gray-800" onclick="showDetails({{ organization.id }}, {{ user.id }}, {{ email.id }})">
+                                        &#x22EE; <!-- Ellipsis (3-dots) -->
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="mt-4 text-gray-600">No emails found for this user in this organization.</p>
+        {% endif %}
+    </div>
+
+   <!-- Modal to Show Email Details -->
+<div id="email-details-modal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
+    <div class="bg-white p-6 rounded-md w-1/2">
+        <h3 class="text-xl font-semibold mb-4" id="email-subject">Email Subject</h3>
+        <p><strong>Sender:</strong> <span id="email-sender"></span></p>
+        <p><strong>Participant:</strong> <span id="email-participant"></span></p>
+        <p><strong>Message:</strong></p>
+        <p id="email-message"></p>
+        <p><strong>Status:</strong> <span id="email-status"></span></p>
+        <p><strong>Sent At:</strong> <span id="email-sent-at"></span></p>
+        <button id="close-modal" class="mt-4 bg-red-500 text-white px-4 py-2 rounded-md">Close</button>
+        <a id="download-pdf" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md">Download PDF</a>
+        <a id="delete-btn" class="mt-4 bg-red-500 text-white px-4 py-2 rounded-md">Wipe Email</a>
+        <a id="email-analysis" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md">Analyse</a>
+        <a id="resend-email" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md">Modify And Resend</a>
+        <a id="schedule-email" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md">Schedule Email</a>
+    </div>
+</div>
+
+<script>
+    function showDetails(orgId, userId, emailId) {
+        $.ajax({
+            url: `/contacts/contacts/email-detail/${orgId}/${userId}/${emailId}/`,
+            method: 'GET',
+            success: function(response) {
+                if (response.success) {
+                    // Populate modal with email details
+                    $('#email-subject').text(response.email.subject || 'No Subject');
+                    $('#email-sender').text(response.email.sender || 'Unknown');
+                    $('#email-participant').text(response.email.participant || 'Unknown');
+                    $('#email-message').text(response.email.message || 'No Message');
+                    $('#email-status').text(response.email.status || 'N/A');
+                    $('#email-sent-at').text(response.email.sent_at || 'Unknown');
+
+                    // Update "Download PDF" link dynamically
+                    const downloadUrl = `/contacts/emails/download/${orgId}/${userId}/${emailId}/`;
+                    $('#download-pdf').attr('href', downloadUrl);
+
+                    // Update "Delete button " link dynamically
+                    const deleteButton = `/contacts/contacts/delete-email/${orgId}/${userId}/${emailId}/`;
+                    $('#delete-btn').attr('href', deleteButton);
+
+                     // Update "Email analysis " link dynamically
+                    const emailAnalysis = `/contacts/email-analysis/${orgId}/${userId}/${emailId}/`;
+                    $('#email-analysis').attr('href', emailAnalysis);
+
+                    // modify and resend email
+                    const resendEmail = `/contacts/edit-resend-email/${orgId}/${userId}/${emailId}/`;
+                    $('#resend-email').attr('href', resendEmail);
+
+                    // schedule email
+                    const scheduleEmail = `/contacts/schedule-email/${orgId}/${userId}/`;
+                    $('#schedule-email').attr('href', scheduleEmail);
+
+
+
+
+                    // Show modal
+                    $('#email-details-modal').removeClass('hidden');
+                } else {
+                    alert('Failed to load email details.');
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Failed to load email details. Please try again.');
+                console.error('AJAX Error:', error);
+            }
+        });
+    }
+
+    // Close modal
+    $('#close-modal').on('click', function() {
+        $('#email-details-modal').addClass('hidden');
+    });
+</script>

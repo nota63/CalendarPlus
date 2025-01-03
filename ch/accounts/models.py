@@ -14,16 +14,19 @@ from django.core.exceptions import ValidationError
 from django.utils.crypto import get_random_string
 from django.core.mail import send_mail
 from django.conf import settings
-
 from tinymce.models import HTMLField
 
 
+# Models 
+# organization model 
 class Organization(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_organizations')
+ 
+   
 
     def __str__(self):
         return self.name

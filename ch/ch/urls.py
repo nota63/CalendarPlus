@@ -35,7 +35,7 @@ urlpatterns = [
     path('new_roles/', include('new_roles.urls')),
     path('calendar/', include('calendar_plus.urls')),
     path('test/',views.test_base, name='test'),
-
+    path('contacts/',include('contacts.urls')),
     # ui components
     path('styles/', views.styles, name= 'styles'),
     path('weather/',views.weather, name='weather'),
