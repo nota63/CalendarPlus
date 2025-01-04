@@ -181,7 +181,7 @@ urlpatterns=[
      path('organization/<int:org_id>/calendar/',user_calendar_view, name='user_meetings_calendar'),
 
      # display user meetings
-      path('meeting_details/<int:org_id>/<int:meeting_id>/', views.meeting_details, name='meeting_details'),
+     path('meeting_details/<int:org_id>/<int:meeting_id>/', views.meeting_details, name='meeting_details'),
 
 
 ]

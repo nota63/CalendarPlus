@@ -1,94 +1,95 @@
-
-
-
-
-
-
-<!-- contacts/user_meeting_contacts.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meeting Contacts</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.2/dist/tailwind.min.js"></script>
-    
-
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Optional: Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
 </head>
 
-<body class="bg-gray-100 text-gray-900">
+<body class="bg-light text-dark">
+
+<!-- CSRF Token Form -->
 <form method="post">
     {% csrf_token %}
 </form>
 
-    <div class="container mx-auto p-8">
-        <h1 class="text-3xl font-bold mb-6">Contacts {{organization.name}}</h1>
+<!-- Main Content Container -->
+<div class="container my-5">
+    <h1 class="text-center text-primary fw-bold mb-5">Contacts for {{ organization.name }}</h1>
+    <p class="text-center text-muted mb-5">Users you've had or will have future meetings with are listed here. Add them to your contact list to simplify scheduling!</p>
 
-        <p>users with you had or will have future meetings are fetched here eyou can add them into your contact list to make scheduling easiar!</p>
+    <!-- Organization Info Section -->
+    <div class="mb-4">
+        <h2 class="h4 text-uppercase text-primary mb-3">Organization: {{ organization.name }}</h2>
+        <p class="text-muted">These are users with whom you have scheduled meetings.</p>
+    </div>
 
-        <!-- Organization Info -->
-        <div class="mb-6">
-            <h2 class="text-2xl font-semibold">Organization: {{ organization.name }}</h2>
-            <p class="text-sm text-gray-600">These are users with whom you have scheduled meetings.</p>
-        </div>
-
-        <!-- User Details List -->
-        <div class="space-y-6">
-            {% for user_info in user_details %}
-                <div class="bg-white p-5 rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
-                    <div class="flex justify-between items-center mb-4">
-                        <!-- User Name and Role -->
-                        <div>
-                            <h3 class="text-xl font-semibold">{{ user_info.user.username }}</h3>
-                            <p class="text-sm text-gray-500">{{ user_info.role }}</p>
+    <!-- User Contacts List -->
+    <div class="row">
+        {% for user_info in user_details %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card shadow-sm border-0 rounded-3">
+                    <div class="card-body">
+                        <!-- User Info Section -->
+                        <div class="d-flex justify-content-between mb-3">
+                            <div>
+                                <h5 class="fw-bold">{{ user_info.user.username }}</h5>
+                                <p class="text-muted small">{{ user_info.role }}</p>
+                            </div>
+                            <span class="badge bg-secondary">{{ user_info.organization_name }}</span>
                         </div>
 
-                        <!-- Organization Name -->
-                        <span class="text-sm text-gray-600">{{ user_info.organization_name }}</span>
-                    </div>
+                        <!-- Last Meeting Info Section -->
+                        <div class="mb-3">
+                            <strong class="h6">Last Meeting:</strong>
+                            {% if user_info.last_meeting.date %}
+                                <div class="mt-2 text-muted">
+                                    <p><strong>Date:</strong> {{ user_info.last_meeting.date }}</p>
+                                    <p><strong>Time:</strong> {{ user_info.last_meeting.time }}</p>
+                                    <p><strong>Title:</strong> {{ user_info.last_meeting.title }}</p>
+                                </div>
+                            {% else %}
+                                <p class="mt-2 text-muted">No past meetings</p>
+                            {% endif %}
+                        </div>
 
-                    <!-- Last Meeting Info -->
-                    <div class="mb-4">
-                        <strong class="text-lg">Last Meeting:</strong>
-                        {% if user_info.last_meeting.date %}
-                            <div class="mt-2 text-sm text-gray-700">
-                                <p><strong>Date:</strong> {{ user_info.last_meeting.date }}</p>
-                                <p><strong>Time:</strong> {{ user_info.last_meeting.time }}</p>
-                                <p><strong>Title:</strong> {{ user_info.last_meeting.title }}</p>
-                            </div>
-                        {% else %}
-                            <p class="mt-2 text-gray-600">No past meetings</p>
-                        {% endif %}
-                    </div>
+                        <!-- Next Meeting Info Section -->
+                        <div>
+                            <strong class="h6">Next Meeting:</strong>
+                            {% if user_info.next_meeting.date %}
+                                <div class="mt-2 text-muted">
+                                    <p><strong>Date:</strong> {{ user_info.next_meeting.date }}</p>
+                                    <p><strong>Time:</strong> {{ user_info.next_meeting.time }}</p>
+                                    <p><strong>Title:</strong> {{ user_info.next_meeting.title }}</p>
+                                </div>
+                            {% else %}
+                                <p class="mt-2 text-muted">No upcoming meetings</p>
+                            {% endif %}
+                        </div>
 
-                    <!-- Next Meeting Info -->
-                    <div>
-                        <strong class="text-lg">Next Meeting:</strong>
-                        {% if user_info.next_meeting.date %}
-                            <div class="mt-2 text-sm text-gray-700">
-                                <p><strong>Date:</strong> {{ user_info.next_meeting.date }}</p>
-                                <p><strong>Time:</strong> {{ user_info.next_meeting.time }}</p>
-                                <p><strong>Title:</strong> {{ user_info.next_meeting.title }}</p>
-                            </div>
-                        {% else %}
-                            <p class="mt-2 text-gray-600">No upcoming meetings</p>
-                        {% endif %}
-                    </div>
-
-                    <!-- Add to Contacts Button -->
-                    <div class="mt-4">
-                        <button 
-                            class="add-contact-btn bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            data-org-id="{{ organization.id }}" 
-                            data-user-id="{{ user_info.user.id }}">
-                            Add to Contacts
-                        </button>
+                        <!-- Add to Contacts Button -->
+                        <div class="mt-4 text-center">
+                            <button 
+                                class="add-contact-btn btn btn-primary btn-sm"
+                                data-org-id="{{ organization.id }}" 
+                                data-user-id="{{ user_info.user.id }}">
+                                <i class="fas fa-user-plus"></i> Add to Contacts
+                            </button>
+                        </div>
                     </div>
                 </div>
-            {% endfor %}
-        </div>
+            </div>
+        {% endfor %}
     </div>
+</div>
+
+<!-- Bootstrap 5 JS and Popper.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
 
     <script>
         document.querySelectorAll('.add-contact-btn').forEach(btn => {

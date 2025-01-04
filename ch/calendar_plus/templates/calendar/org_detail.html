@@ -251,22 +251,20 @@
                 <span class="material-icons">person_add</span> My Calendar
             </a>
 
-            <a href="{% url 'event_type_selection' organization.id %}">
-                <span class="material-icons">edit</span>Create Event 
-            </a>
-
             <a href="{% url 'user-events' organization.id %}">
-                <span class="material-icons">edit</span>My Events
+                <span class="material-icons">edit</span>Events & Bookings
             </a>
 
-            <a href="{% url 'user_organization_bookings' organization.id %}">
-                <span class="material-icons">edit</span>My Bookings
+            <a href="{% url 'security' organization.id %}">
+                <span class="material-icons">person_add</span>Security
             </a>
 
-           
+            <a href="{% url 'managed_workflows' organization.id %}">
+                <span class="material-icons">person_add</span>Managed Workflows
+            </a>
 
             <a href="{% url 'contacts_list' organization.id %}">
-                <span class="material-icons">edit</span>My Contacts
+                <span class="material-icons">edit</span>Contacts
             </a>
 
         {% elif is_manager %}
@@ -295,18 +293,12 @@
                 <span class="material-icons">person_add</span> Calendars
             </a>
 
-            <a href="{% url 'event_type_selection' organization.id %}">
-                <span class="material-icons">edit</span>Create Event 
-            </a>
-
+            
             <a href="{% url 'user-events' organization.id %}">
-                <span class="material-icons">edit</span>My Events
+                <span class="material-icons">edit</span>Events & Bookings
             </a>
 
-            <a href="{% url 'user_organization_bookings' organization.id %}">
-                <span class="material-icons">edit</span>My Bookings
-            </a>
-
+           
           
 
             <a href="{% url 'contacts_list' organization.id %}">
@@ -333,18 +325,13 @@
                 <span class="material-icons">person_add</span> Calendars
             </a>
 
-            <a href="{% url 'event_type_selection' organization.id %}">
-                <span class="material-icons">edit</span>Create Event 
-            </a>
+           
 
             <a href="{% url 'user-events' organization.id %}">
-                <span class="material-icons">edit</span>My Events
+                <span class="material-icons">edit</span> Events & Bookings
             </a>
 
-            <a href="{% url 'user_organization_bookings' organization.id %}">
-                <span class="material-icons">edit</span>My Bookings
-            </a>
-
+            
            
 
             <a href="{% url 'contacts_list' organization.id %}">

@@ -8,6 +8,27 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<div class="container py-8">
+    <!-- Enhanced Modern Text-based Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <!-- Create Event Link -->
+        <a href="{% url 'event_type_selection' org_id=org_id %}" class="relative block p-6 bg-gradient-to-r from-blue-500 to-teal-500 text-white text-lg rounded-2xl shadow-xl hover:scale-105 transition-all duration-300 ease-in-out transform hover:shadow-2xl">
+            <span class="font-semibold text-2xl">Create New Event</span>
+            <p class="text-sm mt-2">Set up an event and share the link with others.</p>
+            <!-- Hover glow effect -->
+            <span class="absolute inset-0 bg-blue-200 opacity-25 rounded-2xl"></span>
+        </a>
+
+        <!-- My Bookings Link -->
+        <a href="{% url 'user_organization_bookings' org_id=org_id %}" class="relative block p-6 bg-gradient-to-r from-green-400 to-green-600 text-white text-lg rounded-2xl shadow-xl hover:scale-105 transition-all duration-300 ease-in-out transform hover:shadow-2xl">
+            <span class="font-semibold text-2xl">My Bookings</span>
+            <p class="text-sm mt-2">View and manage your bookings.</p>
+            <!-- Hover glow effect -->
+            <span class="absolute inset-0 bg-green-200 opacity-25 rounded-2xl"></span>
+        </a>
+    </div>
+</div>
+
 
 <body class="bg-gray-100">
     <div class="container mx-auto py-8">

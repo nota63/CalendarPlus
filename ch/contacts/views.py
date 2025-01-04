@@ -614,8 +614,49 @@ class EmailScheduleSuccessView(View):
 
         return render(request, 'schedule/success.html',context)
     
+# Retrive scheduled emails
+
+class ScheduledEmailListView(ListView):
+    model = ScheduledEmail
+    template_name = 'schedule/scheduled_email_list.html'
+    context_object_name = 'scheduled_emails'
+    paginate_by = 10  
+
+    def get_queryset(self):
+        org_id = self.kwargs['org_id']
+        user_id = self.kwargs['user_id']
+        return ScheduledEmail.objects.filter(organization_id=org_id, participant_id=user_id).order_by('-schedule_time')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['organization'] = self.kwargs['org_id']
+        context['participant'] = self.kwargs['user_id']
+        return context
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+# Contacts section -
+#    REMAIND CONTATCS OPERATION STARTS FROM HERE 
 
 
+"""This view handle deletion of contacts"""
+
+class DeleteContactView(View):
+    def post(self, request, org_id, contact_id):
+        try:
+            # Fetch the contact object with the given parameters
+            contact = get_object_or_404(
+                ContactsOrganization, 
+                organization_id=org_id, 
+                user=request.user,  
+                contact_id=contact_id
+            )
+            
+            # Delete the contact
+            contact.delete()
+            return JsonResponse({'success':'True'}, status=200)
+        except ContactsOrganization.DoesNotExist:
+            return JsonResponse({"error": "Contact not found or you do not have permission to delete it."}, status=404)
 
 
 

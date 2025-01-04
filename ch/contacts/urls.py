@@ -40,7 +40,14 @@ urlpatterns = [
         'email/success/<int:org_id>/<int:participant_id>/<str:organization_name>/<str:participant_name>/<str:message>/<str:schedule_time>/<str:template_style>/',
         EmailScheduleSuccessView.as_view(),
         name='email_schedule_success',
-    ),
+       ),
+
+       # retrive scheduled emails
+       path('scheduled-emails/<int:org_id>/<int:user_id>/', ScheduledEmailListView.as_view(), name='scheduled_email_list'),
+
+       # Contact section started......
+       # delete contact
+       path('delete-contact/<int:org_id>/<int:contact_id>/', DeleteContactView.as_view(), name='delete_contact')
 
 
 

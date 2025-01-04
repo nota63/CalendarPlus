@@ -16,6 +16,7 @@
             <br>
           
             <a href="{% url 'send_email' org_id=organization.id user_id=user.id %}" class="inline-block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Send Email</a>
+           
         </div>
 
         <p class="text-2xl font-sans text-gray-600">Here’s your sentbox, {{request.user}}! You can effortlessly manage all the emails you've sent to {{user}} from {{organization.name}}.</p>
@@ -57,6 +58,8 @@
             <p class="mt-4 text-gray-600">No emails found for this user in this organization.</p>
         {% endif %}
     </div>
+    <br>
+   
 
    <!-- Modal to Show Email Details -->
 <div id="email-details-modal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
@@ -74,6 +77,9 @@
         <a id="email-analysis" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md">Analyse</a>
         <a id="resend-email" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md">Modify And Resend</a>
         <a id="schedule-email" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md">Schedule Email</a>
+        <br>
+        <br>
+        <a id="scheduled-emails" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md">Followed-Up</a>
     </div>
 </div>
 
@@ -111,6 +117,10 @@
                     // schedule email
                     const scheduleEmail = `/contacts/schedule-email/${orgId}/${userId}/`;
                     $('#schedule-email').attr('href', scheduleEmail);
+
+                    const followedUp = `/contacts/scheduled-emails/${orgId}/${userId}/`;
+                    $('#scheduled-emails').attr('href', followedUp);
+
 
 
 
