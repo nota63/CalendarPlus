@@ -23,7 +23,6 @@ from calendar_plus.views import *
 
 
 urlpatterns = [
-    # path('grappelli/', include('grappelli.urls')),  
     path('admin/', admin.site.urls),
     # path('',LandingPageView.as_view(), name='landing_page'),
     path('',views.home, name='home'),
@@ -37,6 +36,7 @@ urlpatterns = [
     path('test/',views.test_base, name='test'),
     path('contacts/',include('contacts.urls')),
     path('security/', include('security.urls')),
+    path('groups/', include('groups.urls')),
     # ui components
     path('styles/', views.styles, name= 'styles'),
     path('weather/',views.weather, name='weather'),

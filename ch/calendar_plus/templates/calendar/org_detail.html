@@ -267,6 +267,16 @@
                 <span class="material-icons">edit</span>Contacts
             </a>
 
+            <a href="{% url 'group_create' organization.id %}">
+                <span class="material-icons">person_add</span>Groups
+            </a>
+
+            <a href="{% url 'display_groups' organization.id %}">
+                <span class="material-icons">person_add</span>Organization Groups
+            </a>
+
+
+
         {% elif is_manager %}
             <h3 class="font-semibold text-lg text-white mb-6">Manager Controls</h3>
             <a href="{% url 'view_edit_profile' org_id=organization.id %}">
@@ -305,6 +315,10 @@
                 <span class="material-icons">edit</span>My Contacts
             </a>
 
+            <a href="{% url 'user_groups' organization.id %}">
+                <span class="material-icons">person_add</span>Groups
+            </a>
+
         {% else %}
             <h3 class="font-semibold text-lg text-white mb-6">Employee Controls</h3>
             <a href="{% url 'project_views_others' organization_id=organization.id %}">
@@ -336,6 +350,10 @@
 
             <a href="{% url 'contacts_list' organization.id %}">
                 <span class="material-icons">edit</span>My Contacts
+            </a>
+
+            <a href="{% url 'user_groups' organization.id %}">
+                <span class="material-icons">person_add</span>Groups
             </a>
 
 

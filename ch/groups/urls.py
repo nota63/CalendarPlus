@@ -1,0 +1,61 @@
+
+from django.urls import path
+from .views import *
+
+urlpatterns = [
+
+    path('groups/create/<int:org_id>/', GroupCreationWizard.as_view(), name='group_create'),
+
+    # display groups to the admin
+    path('groups/<int:org_id>/display/', GroupListView.as_view(), name='display_groups'),
+
+
+    # send invite
+
+    path('groups/<int:org_id>/<int:group_id>/invite/', invite_members_to_group, name='invite_members_to_group'),
+
+
+
+    # accept or reject the invitation
+     # URL pattern for accepting or rejecting an invitation
+    path('invite/<int:org_id>/<int:group_id>/<int:invitation_id>/accept/', 
+        accept_or_reject_invitation, 
+         name='accept_reject_invitation'),
+
+
+    # Members side view for group actions 
+    path('groups/user/<int:org_id>/',user_groups, name='user_groups'),
+
+    # Manage group users
+     path('groups/manage-users/<int:org_id>/<int:group_id>/',manage_group_users, name='manage_group_users'),
+
+    #  remove the user from the group
+
+    path('organizations/<int:org_id>/groups/<int:group_id>/remove_user/<int:user_id>/', remove_user_from_group, name='remove_user_from_group'),
+
+    # team leader can create event within the group
+    path('create_group_event/<int:org_id>/<int:group_id>/',create_group_event, name='create_group_event'),
+
+    # display created events
+    path('org/<int:org_id>/group/<int:group_id>/events/', display_group_events, name='display_group_events'),
+
+    # Book the event
+
+    path('organization/<int:org_id>/group/<int:group_id>/event/<int:event_id>/book/', 
+      book_group_event, 
+         name='book_group_event'),
+
+    # mark as absent 
+    path('organization/<int:org_id>/group/<int:group_id>/event/<int:event_id>/absent/', 
+      mark_absent, 
+         name='mark_absent'),
+
+
+# pending
+    path('organization/<int:org_id>/group/<int:group_id>/event/<int:event_id>/reminder/', 
+      set_event_reminder, 
+         name='set_event_reminder'),
+
+  
+]
+

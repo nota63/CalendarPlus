@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Group Event</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        /* Modern design tweaks */
+        .event-card {
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #f8f9fa;
+        }
+
+        .location-icons img {
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            margin: 10px;
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .location-icons img:hover {
+            transform: scale(1.1);
+        }
+
+        .location-icons img.selected {
+            border: 3px solid #007bff;
+            padding: 5px;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.5);
+        }
+
+        .btn-custom {
+            background-color: #007bff;
+            color: white;
+            border-radius: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+
+        .floating-label input,
+        .floating-label textarea {
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .floating-label label {
+            position: absolute;
+            top: -12px;
+            left: 16px;
+            font-size: 0.9rem;
+            color: #007bff;
+            background-color: #fff;
+            padding: 0 6px;
+        }
+
+        .event-header {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .input-group .form-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .event-form-container {
+            max-width: 1000px; /* Increased width for better look */
+            margin: 0 auto;
+        }
+
+        .section-header {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #007bff;
+        }
+
+        .modal-content {
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4 event-form-container">
+        <div class="event-card">
+            <h2 class="event-header">Create Event for Group: {{ group.name }}</h2>
+            <p>Organization: {{ organization.name }}</p>
+
+            <!-- Event Creation Form -->
+            <form id="eventForm" method="POST" class="mt-4">
+                {% csrf_token %}
+                
+                <!-- Event Title -->
+                <div class="input-group">
+                    <label for="title" class="form-label">Event Title</label>
+                    <input type="text" class="form-control" id="title" name="title" placeholder="Enter the event title" required>
+                </div>
+
+                <!-- Event Date and Time -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <label for="date" class="form-label">Event Date</label>
+                            <input type="date" class="form-control" id="date" name="date" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <label for="start_time" class="form-label">Start Time</label>
+                            <input type="time" class="form-control" id="start_time" name="start_time" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <label for="end_time" class="form-label">End Time</label>
+                            <input type="time" class="form-control" id="end_time" name="end_time" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Description with Floating Label -->
+                <div class="floating-label">
+                    <textarea class="form-control" id="description" name="description" placeholder="Provide a description for the event"></textarea>
+                    <label for="description">Event Description</label>
+                </div>
+                <br>
+
+                <!-- Meeting Link with Floating Label -->
+                <div class="floating-label">
+                    <input type="url" class="form-control" id="meeting_link" name="meeting_link" placeholder="Enter meeting link (Optional)">
+                    <label for="meeting_link">Meeting Link</label>
+                </div>
+
+                <!-- Location Selection with Icons -->
+                <div class="section-header">Select Event Location</div>
+                <div class="location-icons">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJ8heXta8npoK1xCPaRmMWjSKQI4NATzNb9A&s" alt="Zoom" class="location-icon" id="zoom-icon">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbLY_Gzjx9AUefb9O74KPoGndPe4TIQGxcxQ&s" alt="Google Meet" class="location-icon" id="google-meet-icon">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThIH3m0GXzMQSOK4UX1LOiD6LLya-_i3PzCg&s" alt="Organization" class="location-icon" id="organization-icon">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSscqLov_-ynW_pZB59MILR-xDm4cw902Hc8Q&s" alt="Salesforce" class="location-icon" id="salesforce-icon">
+                    <img src="https://download.logo.wine/logo/Microsoft_Teams/Microsoft_Teams-Logo.wine.png" alt="Micorsoft Teams" class="location-icon" id="micorsoft_teams-icon">
+                    <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVtZ6YBJSqORqYNwMw803kx2RCTim5ybFjSw&s" alt="Slack" class="location-icon" id="slack">
+                </div>
+
+                <!-- Hidden Input to Capture the Location -->
+                <input type="hidden" name="location" id="location">
+
+                <!-- Available Slots -->
+                <div class="input-group mt-4">
+                    <label for="slots" class="form-label">Available Slots</label>
+                    <input type="number" class="form-control" id="slots" name="slots" min="1" value="0" required>
+                </div>
+
+                <!-- Submit Button with Modal Trigger -->
+                <button type="button" class="btn btn-custom mt-4" data-bs-toggle="modal" data-bs-target="#confirmationModal">
+                    Create Event
+                </button>
+
+                <!-- Confirmation Modal Inside Form -->
+                <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="confirmationModalLabel">Confirm Event Creation</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to create this event? Please double-check all the details before proceeding.
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <!-- Submit Button -->
+                                <button type="submit" class="btn btn-custom">Yes, Create Event</button> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+       
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+
+    <script>
+        // Add event listener for location icon selection
+        const locationIcons = document.querySelectorAll('.location-icon');
+        locationIcons.forEach(icon => {
+            icon.addEventListener('click', function() {
+                locationIcons.forEach(i => i.classList.remove('selected'));  // Remove selected class from all
+                this.classList.add('selected');  // Add selected class to the clicked icon
+
+                // Set the location input value based on selected icon
+                document.getElementById('location').value = this.alt;
+            });
+        });
+    </script>
+</body>
+</html>

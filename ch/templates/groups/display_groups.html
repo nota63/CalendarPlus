@@ -1,0 +1,52 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Groups - {{ organization.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Groups in {{ organization.name }}</h4>
+        </div>
+        <div class="card-body">
+            {% if groups %}
+                <div class="row">
+                    {% for group in groups %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h5 class="card-title">{{ group.name }}</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">{{ group.description|default:"No description available." }}</p>
+                                    <p><strong>Team Leader:</strong> {{ group.team_leader.username|default:"No team leader assigned" }}</p>
+                                    <p><strong>Created by:</strong> {{ group.created_by.username }}</p>
+                                    <p><small class="text-muted">Created on: {{ group.created_at }}</small></p>
+                                </div>
+                                <div class="card-footer text-end">
+                                    <a href="{% url 'invite_members_to_group' org_id=group.organization.id group_id=group.id %}" class="btn btn-primary">Invite Teammates</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No groups available for this organization.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+
+</body>
+</html>

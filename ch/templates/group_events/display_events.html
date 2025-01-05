@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ group.name }} - Events</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        .card {
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+        .booked-btn {
+            background-color: #6c757d !important;
+            color: white;
+            cursor: not-allowed;
+        }
+        .alert-success {
+            display: none;
+        }
+        /* Spinner style */
+        .spinner-wrapper {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .spinner-wrapper .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+   
+    <div class="container my-5">
+        <h2 class="text-center mb-4">{{ group.name }} - Events</h2>
+        <p class="text-muted text-center">{{ organization.name }}</p>
+
+        <div class="alert alert-success" id="successMessage">
+            Event booked successfully!
+        </div>
+
+        <!-- Spinner for booking event -->
+        <div class="spinner-wrapper" id="spinnerWrapper">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p>Sending booking request to system...</p>
+        </div>
+
+
+
+        <!-- Modal for Marking Absence -->
+<div class="modal fade" id="absenceModal" tabindex="-1" aria-labelledby="absenceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="absenceModalLabel">Mark Yourself as Absent</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="absenceForm">
+                    <div class="mb-3">
+                        <label for="reason" class="form-label">Reason for Absence</label>
+                        <select id="reason" class="form-control">
+                            <option value="Personal">Personal</option>
+                            <option value="Availability Issues">Availability Issues</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="customMessage" class="form-label">Custom Message (Optional)</label>
+                        <textarea id="customMessage" class="form-control" rows="3" placeholder="Provide a custom message if needed"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" id="submitAbsence">Mark as Absent</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reminder Modal -->
+<!-- Reminder Modal -->
+<div class="modal fade" id="reminderModal" tabindex="-1" aria-labelledby="reminderModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="reminderModalLabel">Set Event Reminder</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="reminderForm">
+            <!-- Reminder options: 1 day before, 1 hour before, or custom -->
+            <div class="mb-3">
+              <label class="form-label">Reminder Option</label>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="reminder_option" id="reminderOption1Day" value="1_day_before" required>
+                <label class="form-check-label" for="reminderOption1Day">
+                  1 Day Before
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="reminder_option" id="reminderOption1Hour" value="1_hour_before" required>
+                <label class="form-check-label" for="reminderOption1Hour">
+                  1 Hour Before
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="reminder_option" id="reminderOptionCustom" value="custom" required>
+                <label class="form-check-label" for="reminderOptionCustom">
+                  Custom
+                </label>
+              </div>
+            </div>
+  
+            <!-- Custom reminder datetime field (hidden initially) -->
+            <div class="mb-3 d-none" id="customTimeContainer">
+              <label for="customTime" class="form-label">Custom Reminder Time</label>
+              <input type="datetime-local" id="customTime" class="form-control">
+            </div>
+  
+            <!-- Optional reason field -->
+            <div class="mb-3">
+              <label for="reason" class="form-label">Reason (Optional)</label>
+              <textarea id="reason" class="form-control" rows="3"></textarea>
+            </div>
+  
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary">Set Reminder</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+        <div class="row">
+            {% if events %}
+                {% for event in events %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">{{ event.title }}</h5>
+                                <p class="card-text">
+                                    <strong>Date:</strong> {{ event.date }}<br>
+                                    <strong>Time:</strong> {{ event.start_time }} - {{ event.end_time }}<br>
+                                    <strong>Location:</strong> {{ event.location }}<br>
+                                    {% if event.meeting_link %}
+                                        <strong>Meeting Link:</strong> 
+                                        <a href="{{ event.meeting_link }}" target="_blank">Join Meeting</a><br>
+                                    {% endif %}
+                                    <strong>Created At:</strong> {{ event.created_at|date:"M d, Y h:i A" }}
+                                </p>
+                                
+                                {% if event.is_booked_by_user %}
+                                    <button class="btn btn-secondary booked-btn" disabled>Event Booked</button>
+                                {% else %}
+                                    <button 
+                                        class="btn btn-success book-event" 
+                                        data-event-id="{{ event.id }}" 
+                                        data-org-id="{{ organization.id }}" 
+                                        data-group-id="{{ group.id }}">
+                                        Book Now
+                                    </button>
+
+                                    <button 
+                                        class="btn btn-danger mark-absent" 
+                                        data-event-id="{{ event.id }}" 
+                                        data-org-id="{{ organization.id }}" 
+                                        data-group-id="{{ group.id }}" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#absenceModal">
+                                         Mark as Absent
+                                       </button>
+
+                                       <button 
+                                         class="btn btn-success remind-me" 
+                                         data-org-id="{{ organization.id }}" 
+                                         data-group-id="{{ group.id }}"
+                                         data-event-id="{{ event.id }}"
+                                         data-bs-toggle="modal" 
+                                         data-bs-target="#reminderModal">
+                                         Remind Me
+                                       </button>
+                                {% endif %}
+
+                            </div>
+                            <div class="card-footer bg-white">
+                                <small class="text-muted">
+                                    Created by: {{ event.created_by.username }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        No events created yet for this group.
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).on('click', '.book-event', function() {
+            const eventId = $(this).data('event-id');
+            const orgId = $(this).data('org-id');
+            const groupId = $(this).data('group-id');
+
+            // Show spinner while the AJAX request is processing
+            $('#spinnerWrapper').fadeIn();
+
+            $.ajax({
+                url: `/groups/organization/${orgId}/group/${groupId}/event/${eventId}/book/`,
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    // Show success message
+                    $('#successMessage').fadeIn();
+                    // Disable the button and change text
+                    $(this).removeClass('btn-success').addClass('btn-secondary booked-btn').text('Event Booked');
+                    setTimeout(function() {
+                        $('#successMessage').fadeOut();
+                    }, 3000); // Hide success message after 3 seconds
+                    // Hide the spinner
+                    $('#spinnerWrapper').fadeOut();
+                },
+                error: function(xhr) {
+                    alert(xhr.responseJSON.error || 'An error occurred while booking the event.');
+                    // Hide the spinner
+                    $('#spinnerWrapper').fadeOut();
+                }
+            });
+        });
+
+        // handle absent 
+
+        $(document).on('click', '#submitAbsence', function() {
+        const eventId = $('.mark-absent').data('event-id');
+        const orgId = $('.mark-absent').data('org-id');
+        const groupId = $('.mark-absent').data('group-id');
+        const reason = $('#reason').val();
+        const customMessage = $('#customMessage').val();
+
+        $.ajax({
+            url: `/groups/organization/${orgId}/group/${groupId}/event/${eventId}/absent/`,
+            method: 'POST',
+            data: {
+                'reason': reason,
+                'custom_message': customMessage,
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+            },
+            success: function(response) {
+                alert(response.message);  // Show success message
+                $('#absenceModal').modal('hide'); // Hide the modal
+            },
+            error: function(xhr) {
+                alert(xhr.responseJSON.error || 'An error occurred while marking you absent.');
+            }
+        });
+    });
+
+
+    // Handle the Reminder
+    $(document).ready(function () {
+  var orgId, groupId, eventId;
+
+  // When the "Remind Me" button is clicked, store the IDs for AJAX request
+  $('.remind-me').on('click', function () {
+    orgId = $(this).data('org-id');
+    groupId = $(this).data('group-id');
+    eventId = $(this).data('event-id');
+    console.log("Event ID: " + eventId);  // Debugging
+  });
+
+  // When the reminder option is selected, show/hide the custom time input
+  $('input[name="reminder_option"]').on('change', function () {
+    var reminderOption = $(this).val();
+    if (reminderOption === 'custom') {
+      $('#customTimeContainer').removeClass('d-none');
+    } else {
+      $('#customTimeContainer').addClass('d-none');
+    }
+  });
+
+  // Handle the form submission to set the reminder
+  $('#reminderForm').on('submit', function (e) {
+    e.preventDefault();
+
+    // Get the selected reminder option
+    var reminderOption = $('input[name="reminder_option"]:checked').val();
+    var customTime = reminderOption === 'custom' ? $('#customTime').val() : null;
+    var reason = $('#reason').val();
+
+    // Validate custom time if "Custom" option is selected
+    if (reminderOption === 'custom' && !customTime) {
+      alert('Please select a custom reminder time.');
+      return;
+    }
+
+    // Prepare data for AJAX request
+    var data = {
+      reminder_option: reminderOption,
+      custom_time: customTime,
+      reason: reason,
+      csrfmiddlewaretoken: '{{ csrf_token }}'  // Attach CSRF token directly in data
+    };
+
+    // Log the data being sent to verify
+    console.log('Sending data:', data);
+
+    // Make the AJAX request to set the reminder
+    $.ajax({
+      url: `/groups/organization/${orgId}/group/${groupId}/event/${eventId}/reminder/`,  // Ensure event ID is here
+      method: 'POST',
+      data: data,
+      success: function (response) {
+        console.log('Response:', response);  // Debugging: Log the success response
+        alert(response.message);  // Show success message
+        $('#reminderModal').modal('hide');  // Close the modal
+      },
+      error: function (xhr) {
+        console.log('Error:', xhr);  // Debugging: Log the error response
+        alert(xhr.responseJSON.error || 'An error occurred while setting the reminder.');
+      }
+    });
+  });
+});
+
+
+    </script>
+</body>
+</html>
