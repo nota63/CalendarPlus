@@ -1048,38 +1048,3 @@ class GroupEventView(LoginRequiredMixin, View):
     
 
 # Filter the events based on location 
-
-@login_required
-@csrf_exempt
-def filter_events_by_location(request, org_id, group_id):
-    if request.method == "GET":
-        location = request.GET.get('location')
-        user = request.user
-
-      
-        group_member = GroupMember.objects.filter(group_id=group_id, user=user).exists()
-        if not group_member:
-            return JsonResponse({"error": "You are not a member of this group."}, status=403)
-
-       
-        events_query = GroupEvent.objects.filter(organization_id=org_id, group_id=group_id)
-        if location:
-            events_query = events_query.filter(location=location)
-
-       
-        events = [
-            {
-                "id": event.id,
-                "title": event.title,
-                "description": event.description,
-                "date": event.date.strftime('%Y-%m-%d'),
-                "start_time": event.start_time.strftime('%H:%M:%S'),
-                "end_time": event.end_time.strftime('%H:%M:%S'),
-                "location": event.location,
-                "slots": event.slots,
-            }
-            for event in events_query
-        ]
-        return JsonResponse({"events": events}, status=200)
-
-    return JsonResponse({"error": "Invalid request method."}, status=400) 

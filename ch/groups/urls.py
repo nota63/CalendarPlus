@@ -87,9 +87,7 @@ urlpatterns = [
     # Group event calendar
     path('group-event-calendar/<int:org_id>/<int:group_id>/',GroupEventView.as_view(), name='group_event_calendar'),
 
-    path('filter-events/<int:org_id>/<int:group_id>/', filter_events_by_location, name='filter_events_by_location'),
-
-
+  
 
   
 ]

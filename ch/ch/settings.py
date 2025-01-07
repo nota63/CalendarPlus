@@ -81,6 +81,7 @@ INSTALLED_APPS = [
      'contacts',
      'security',
      'groups',
+     'group_tasks',
     'widget_tweaks',
     'solo_communication',
     'django.contrib.admin',
