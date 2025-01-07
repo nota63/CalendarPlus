@@ -1,3 +1,11 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+
+<br>
+<br>
+<br>
+<br>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -10,60 +18,133 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-        .group-card {
-            margin-bottom: 20px;
-        }
-        .group-card-title {
-            font-size: 1.25rem;
-            font-weight: bold;
-        }
+
     </style>
 </head>
 <body>
     <div class="container mt-4">
-        <h2>Groups in {{ organization.name }}</h2>
+        <h3 class="text-center text-primary fw-bold mb-4" style="font-size: 1.75rem;">
+            Explore Your Teams and Collaborations within <strong>{{ organization.name }}</strong>
+        </h3>
+        <div class="my-4 text-center">
+            <h5 class="text-muted" style="font-family: 'Roboto', sans-serif; font-size: 1.1rem;">
+                Upgrade to the Teams plan to access this feature and other advanced scheduling tools.
+            </h5>
+            <a href="#">
+                <button type="submit" class="btn btn-primary btn-sm mt-2">
+                    Explore The Teams Plan
+                </button>
+            </a>
+        </div>
+        
 
-        <!-- Check if user belongs to any groups -->
-        {% if user_groups %}
-            <div class="row">
-                {% for group in user_groups %}
-                    <div class="col-md-4 mb-4">
-                        <div class="card group-card">
-                            <div class="card-body">
-                                <h5 class="group-card-title">{{ group.name }}</h5>
-                                <p class="card-text">{{ group.description|default:"No description available." }}</p>
-                                
-                                <!-- Display Team Leader -->
-                                <p><strong>Team Leader:</strong> 
-                                    {% if group.team_leader %}
-                                        {{ group.team_leader.username }}
-                                    {% else %}
-                                        N/A
+        <section class="text-center my-5">
+            <img src="https://assets.calendly.com/assets/frontend/media/groups_icon-952bb436e7c3f1352ab9.svg" class="mb-3" alt="Group Icon">
+            <br>
+            <strong class="fs-4 text-primary">Streamline Your Team's Workflow and Communication with Calendar Plus</strong>
+        
+            <p class="fs-5 text-muted mt-3 mb-4">
+                At <strong>{{ organization.name }}</strong>, we understand how crucial it is to keep your team organized and efficient. That's why all the groups you're associated with within the organization are displayed here, making it easy for you to stay connected and in control. Whether you're leading a project or collaborating with others, Calendar Plus allows you to view group schedules, track important events, and take actions directly from the platform.
+            </p>
+            <p class="fs-5 text-muted mb-4">
+                With Calendar Plus, not only can you easily manage your own schedule, but you can also coordinate with team members, ensure everyone is on the same page, and plan for future meetings. The platform provides a comprehensive overview of all upcoming activities, making it easier than ever to keep track of your responsibilities and those of your colleagues. Take advantage of the streamlined interface to make scheduling more efficient and collaboration more seamless.
+            </p>
+            <p class="fs-5 text-muted mb-4">
+                From setting up meetings to adjusting timelines, Calendar Plus offers a variety of actions to enhance your group’s productivity. This powerful tool is designed with your team’s needs in mind, empowering you to make informed decisions and manage tasks with ease. No matter where you are, you'll have the power to manage your group’s activities at your fingertips.
+            </p>
+            <a href="#" class="btn btn-link text-decoration-none text-primary">
+                Learn More
+            </a>
+        </section>
+        
+        <section class="my-5">
+            <!-- Section Title -->
+            <h2 class="text-center mb-2 fw-bold"
+                style="font-family: 'Poppins', sans-serif; font-size: 1.5rem; color: #6a1b9a; text-transform: capitalize; letter-spacing: 1px; background-image: linear-gradient(to right, #ff7e5f, #feb47b); -webkit-background-clip: text; color: transparent;">
+                Groups You Are Part of in {{ organization.name }}
+            </h2>
+            <p class="text-center text-muted" style="font-family: 'Roboto', sans-serif; font-size: 0.875rem;">
+                If you are a team leader, more actions will be available to you.
+            </p>
+        </section>
+        
+
+            <!-- Check if user belongs to any groups -->
+            {% if user_groups %}
+                <div class="row">
+                    {% for group in user_groups %}
+                        <div class="col-md-4 mb-4">
+                            <!-- Card Design with Bootstrap 5 -->
+                            <div class="card shadow-lg border-light rounded-3">
+                                <div class="card-body">
+                                    <!-- Group Name -->
+                                    <h5 class="card-title text-center text-primary fw-bold mb-3" style="text-transform: uppercase;">
+                                        {{ group.name }}
+                                    </h5> 
+                                    <!-- Group Description -->
+                                    <p class="card-text text-muted">{{ group.description|default:"No description available." }}</p>
+                                    
+                                    <!-- Team Leader Info -->
+                                    <p><strong class="text-dark">Team Leader:</strong> 
+                                        {% if group.team_leader %}
+                                            <span class="text-success">{{ group.team_leader.username }}</span>
+                                        {% else %}
+                                            <span class="text-secondary">N/A</span>
+                                        {% endif %}
+                                    </p>
+        
+                                    <!-- Created By Info -->
+                                    <p><strong class="text-dark">Created By:</strong> {{ group.created_by.username }}</p>
+
+                                    <div>
+                                        {% if group.team_leader == request.user %}
+                                          <P>You are a team leader in this group</P>
+                                        {% else %}
+                                           <p>You are a member of this group</p>
+                                        {%endif%}     
+                                    </div>
+        
+                                    <!-- Three Dot Menu (For Team Leader) -->
+                                    {% if group.team_leader == request.user %}
+                                        <div class="dropdown my-3">
+                                            <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="bi bi-three-dots"></i> Options
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <li><a class="dropdown-item" href="{% url 'manage_group_users' org_id=group.organization.id group_id=group.id %}">Manage Members</a></li>
+                                                <li><a class="dropdown-item" href="{% url 'group_details' org_id=group.organization.id group_id=group.id %}">Group Info</a></li>
+                                            </ul>
+                                        </div>
                                     {% endif %}
-                                </p>
 
-                                <p><strong>Created By:</strong> {{ group.created_by.username }}</p>
-
-                                <!-- Check if the user is the team leader of this group -->
-                                {% if group.team_leader == request.user %}
-                                    <a href="{% url 'manage_group_users' org_id=group.organization.id group_id=group.id %}" class="btn btn-warning">Manage Members</a>
-                                {% endif %}
-
-                                <a href="{% url 'display_groups' org_id=group.organization.id %}" class="btn btn-primary">View Group</a>
-                                <br>
-                                <a href="{% url 'display_group_events' org_id=group.organization.id  group_id=group.id%}" class="btn btn-primary">Group Events</a>
+                                    
+        
+                                    <!-- Three Dot Menu for Group Actions -->
+                                    <div class="dropdown">
+                                        <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-three-dots"></i> Group Actions
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <li><a class="dropdown-item" href="{% url 'display_groups' org_id=group.organization.id %}">View Group</a></li>
+                                            <li><a class="dropdown-item" href="{% url 'display_group_events' org_id=group.organization.id group_id=group.id %}">Group Events</a></li>
+                                            <li><a class="dropdown-item" href="{% url 'group_event_calendar' org_id=group.organization.id group_id=group.id %}">Group Calendar</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <p>No groups found for you in this organization.</p>
-        {% endif %}
-    </div>
-
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-center">No groups found for you in this organization.</p>
+            {% endif %}
+        </section>
+        
     <!-- Bootstrap JS and dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
 </body>
 </html>
+
+
+{% endblock %}

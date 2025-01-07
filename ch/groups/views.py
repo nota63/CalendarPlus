@@ -25,6 +25,18 @@ from django.http import JsonResponse
 from datetime import datetime 
 from django.db import models
 from django.db import IntegrityError
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
+from django.utils import timezone
+from datetime import timedelta
+from django.utils.timezone import now, make_aware
+from django.utils.html import format_html
+from .models import AbsentEvent
+from django.utils import timezone
+
 
 # Create your views here.
 FORMS = [
@@ -45,11 +57,11 @@ class GroupCreationWizard(SessionWizardView):
     storage_name = "formtools.wizard.storage.session.SessionStorage"
 
     def dispatch(self, request, *args, **kwargs):
-        # Fetch org_id from URL and validate
+      
         self.org_id = kwargs.get('org_id')
         self.organization = get_object_or_404(Organization, id=self.org_id)
 
-        # Ensure the current user is an admin of the organization
+    
         profile = Profile.objects.filter(user=request.user, organization=self.organization, is_admin=True).first()
         if not profile:
             raise PermissionDenied("You are not authorized to create groups for this organization.")
@@ -60,13 +72,13 @@ class GroupCreationWizard(SessionWizardView):
         return [TEMPLATES[self.steps.current]]
 
     def done(self, form_list, **kwargs):
-        # Extract form data
+       
         data = {form_name: form.cleaned_data for form_name, form in zip(self.get_form_list().keys(), form_list)}
         name = data['name']['name']
         description = data['description']['description']
         email = data['team_leader']['email']
 
-        # Validate team leader email
+   
         team_leader_profile = Profile.objects.filter(
             user__email=email, organization=self.organization
         ).first()
@@ -75,7 +87,7 @@ class GroupCreationWizard(SessionWizardView):
             form.add_error('email', "The email does not belong to any member of this organization.")
             return self.render_revalidation_failure({'team_leader': form})
 
-        # Create the group
+        
         group = Group.objects.create(
             organization=self.organization,
             name=name,
@@ -98,21 +110,18 @@ class GroupListView(ListView):
     def get_queryset(self):
         org_id = self.kwargs.get('org_id')
         
-        # Get the organization based on the org_id
+   
         organization = get_object_or_404(Organization, id=org_id)
         
-        # Check if the request.user is an admin of the organization
         if not self.request.user.profiles.filter(organization=organization, is_admin=True).exists():
             raise Http404("You are not an admin of this organization.")
 
-        # Filter groups by the organization and the user who created them
         return Group.objects.filter(organization=organization, created_by=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         org_id = self.kwargs.get('org_id')
         
-        # Get the organization to pass it to the template
         organization = get_object_or_404(Organization, id=org_id)
         context['organization'] = organization
         
@@ -126,13 +135,12 @@ class GroupListView(ListView):
 @login_required
 def invite_members_to_group(request, org_id, group_id):
     try:
-        # Fetch organization and group objects
+        
         organization = Organization.objects.get(id=org_id)
         group = Group.objects.get(id=group_id, organization=organization)
 
-        # Check if the request.user is either:
-        # 1. An admin of the organization
-        # 2. A team leader of the group
+    
+    
         profile = Profile.objects.get(user=request.user, organization=organization)
         is_admin = profile.is_admin
         is_team_leader = group.team_leader == request.user
@@ -145,20 +153,20 @@ def invite_members_to_group(request, org_id, group_id):
 
     if request.method == 'POST':
         emails = request.POST.get('emails')
-        email_list = emails.split(',')  # Assuming emails are comma-separated
+        email_list = emails.split(',')  
         
-        # Check if emails belong to the admin's organization
+   
         for email in email_list:
             email = email.strip()
             try:
-                # Check if user with this email exists in the same organization
+                
                 user = User.objects.get(email=email)
                 if not Profile.objects.filter(user=user, organization=organization).exists():
                     raise ValidationError(f"Email {email} does not belong to an organization member.")
             except User.DoesNotExist:
                 raise ValidationError(f"No user found with email: {email}")
 
-            # Send invitation only if the email is valid and not already sent
+      
             if not GroupInvitation.objects.filter(recipient_email=email, group=group).exists():
                 invitation = GroupInvitation.objects.create(
                     group=group,
@@ -166,7 +174,7 @@ def invite_members_to_group(request, org_id, group_id):
                     recipient_email=email
                 )
 
-                # Send invitation email with a unique URL to accept or reject the invitation
+               
                 invite_link = request.build_absolute_uri(
                     f'/groups/invite/{org_id}/{group_id}/{invitation.id}/accept/'
                 )
@@ -192,12 +200,12 @@ def accept_or_reject_invitation(request, org_id, group_id, invitation_id):
     invitation = get_object_or_404(GroupInvitation, id=invitation_id, group_id=group_id)
     organization = get_object_or_404(Organization, id=org_id)
 
-    # Check if the invitation is for the correct organization
+   
     if invitation.group.organization.id != org_id:
         messages.error(request, "Invalid invitation link.")
         return redirect('home')
 
-    # Check if the user belongs to the organization of the inviter (admin's organization)
+
     if not Profile.objects.filter(user=request.user, organization=invitation.group.organization).exists():
         messages.error(request, "You are not a part of this organization.")
         return redirect('home')
@@ -227,7 +235,7 @@ def accept_or_reject_invitation(request, org_id, group_id, invitation_id):
                 messages.warning(request, "You are already a member of this group.")
 
         elif action == 'reject':
-            # Reject the invitation
+         
             invitation.invitation_status = 'rejected'
             invitation.save()
             messages.success(request, "You have rejected the invitation.")
@@ -242,29 +250,29 @@ def accept_or_reject_invitation(request, org_id, group_id, invitation_id):
 # ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-# Mebers side features for groups and actions
+# Members side features for groups and actions
 
 # display the groups
 @login_required
 def user_groups(request, org_id):
-    # Fetch the organization object
+    
     organization = get_object_or_404(Organization, id=org_id)
     
-    # Check if the logged-in user is part of the organization
+
     if not organization.profiles.filter(user=request.user).exists():
-        # If the user isn't part of the organization, redirect them or show a message
-        return redirect('home')  # Or a custom page with an error message
     
-    # Fetch the groups where the user is a member
+        return redirect('home')  
+    
+   
     user_groups = Group.objects.filter(organization=organization, members__user=request.user)
     
-    # Check if the user is the team leader of any group
+    
     team_leader_groups = user_groups.filter(team_leader=request.user)
 
     return render(request, 'user_groups/user_groups.html', {
         'organization': organization,
         'user_groups': user_groups,
-        'team_leader_groups': team_leader_groups,  # Groups where the user is the team leader
+        'team_leader_groups': team_leader_groups,  
     })
 
 
@@ -273,15 +281,15 @@ def user_groups(request, org_id):
 
 @login_required
 def manage_group_users(request, org_id, group_id):
-    # Fetch the organization and group objects
+   
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id, organization=organization)
 
-    # Check if the logged-in user is the team leader
+   
     if group.team_leader != request.user:
-        return redirect('user_groups', org_id=org_id)  # Redirect if not team leader
+        return redirect('user_groups', org_id=org_id)  
 
-    # Fetch the members of the group
+
     members = GroupMember.objects.filter(group=group)
 
     return render(request, 'user_groups/manage_group_users.html', {
@@ -300,25 +308,23 @@ def manage_group_users(request, org_id, group_id):
 from django.http import HttpResponseForbidden
 @login_required
 def remove_user_from_group(request, org_id, group_id, user_id):
-    # Fetch the organization, group, and user to be removed
+   
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id, organization=organization)
     user_to_remove = get_object_or_404(User, id=user_id)
 
-    # Check if the request.user is the team leader of the group
     if group.team_leader != request.user:
         return HttpResponseForbidden("You are not authorized to remove members from this group.")
 
-    # Check if the user to be removed is part of the group
+    
     try:
         group_member = GroupMember.objects.get(group=group, user=user_to_remove)
     except GroupMember.DoesNotExist:
-        return redirect('user_groups', org_id=org_id)  # User is not part of the group
+        return redirect('user_groups', org_id=org_id)  
 
-    # Remove the user from the group by deleting the membership
     group_member.delete()
 
-    # Redirect back to the group page with a success message
+ 
     return redirect('manage_group_users', org_id=org_id , group_id=group.id)
 
 
@@ -326,15 +332,13 @@ def remove_user_from_group(request, org_id, group_id, user_id):
 # Team leader Event Creation
 @login_required
 def create_group_event(request, org_id, group_id):
-    # Fetch organization and group
+   
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id, organization=organization)
 
-    # Check if the user is the team leader
     if group.team_leader != request.user:
         return HttpResponseForbidden("You do not have permission to create events for this group.")
     
-    # Handle event creation
     if request.method == 'POST':
         title = request.POST.get('title')
         description = request.POST.get('description')
@@ -345,12 +349,12 @@ def create_group_event(request, org_id, group_id):
         location = request.POST.get('location')
         slots = request.POST.get('slots')
 
-        # Validate required fields
+        
         if not title or not date or not start_time or not end_time or not location:
             messages.error(request, "Please fill in all required fields.")
             return redirect('create_group_event', org_id=org_id, group_id=group_id)
 
-        # Create Group Event
+        
         group_event = GroupEvent.objects.create(
             group=group,
             organization=organization,
@@ -366,10 +370,10 @@ def create_group_event(request, org_id, group_id):
             created_at=now(),
         )
 
-        # Fetch all group members using GroupMember model
+      
         group_members = GroupMember.objects.filter(group=group)
         
-        # Prepare email content
+ 
         subject = f"New Event Created: {title} in {group.name}"
         message = f"""
         Hello,
@@ -390,7 +394,7 @@ def create_group_event(request, org_id, group_id):
         {organization.name} Team
         """
 
-        # Send email to each group member
+    
         for group_member in group_members:
             send_mail(
                 subject=subject,
@@ -414,18 +418,18 @@ def create_group_event(request, org_id, group_id):
 # Display the created events to all the Group Members 
 @login_required
 def display_group_events(request, org_id, group_id):
-    # Fetch organization and group
+ 
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id, organization=organization)
 
-    # Check if the user belongs to the organization and group
     if not GroupMember.objects.filter(group=group, organization=organization, user=request.user).exists():
         return HttpResponseForbidden("You do not have permission to view events for this group.")
 
-    # Fetch all events for this group, ordered by most recent
     events = GroupEvent.objects.filter(group=group).order_by('-created_at')
 
-    # Check if the user has already booked the event using query filtering
+    is_team_leader = group.team_leader == request.user
+
+ 
     for event in events:
         event.is_booked_by_user = GroupEventBooking.objects.filter(group_event=event, user=request.user).exists()
 
@@ -433,6 +437,7 @@ def display_group_events(request, org_id, group_id):
         'organization': organization,
         'group': group,
         'events': events,
+        'is_team_leader':is_team_leader,
     })
 
 
@@ -440,46 +445,49 @@ def display_group_events(request, org_id, group_id):
 
 
 # Make Ajax call to book the event
-from django.utils.timezone import now, make_aware
-from django.utils.html import format_html
-from .models import AbsentEvent
-from django.utils import timezone
 
 @login_required
 @transaction.atomic
 def book_group_event(request, org_id, group_id, event_id):
-    # Fetch organization, group, and event
+   
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id, organization=organization)
     event = get_object_or_404(GroupEvent, id=event_id, group=group, organization=organization)
 
-    # Check if the user is part of the group and organization
+    
     if not GroupMember.objects.filter(group=group, organization=organization, user=request.user).exists():
         return HttpResponseForbidden("You are not authorized to book this event.")
 
-    # Get current time (timezone-aware)
+
     current_time = now()
 
-    # Combine the event date and start time to form a datetime object
+  
     event_datetime = datetime.combine(event.date, event.start_time)
     
-    # Make event_datetime timezone-aware
+    
     event_datetime = make_aware(event_datetime, timezone=current_time.tzinfo)
 
-    # Check if the event date and time are valid (future event)
+
     if event_datetime <= current_time:
         return JsonResponse({"error": "This event is no longer available for booking."}, status=400)
 
-    # Check for existing booking for this user
+  
     if GroupEventBooking.objects.filter(group_event=event, user=request.user).exists():
         return JsonResponse({"error": "You have already booked this event."}, status=400)
 
-    # Check if the event has available slots
+ 
     total_bookings = GroupEventBooking.objects.filter(group_event=event).count()
     if total_bookings >= event.slots:
         return JsonResponse({"error": "No slots are available for this event."}, status=400)
+    
+   
+    if event.slots <= 0:
+        return JsonResponse({"error": "No slots are available for this event."}, status=400)
 
-    # Create the booking
+  
+    event.slots -= 1
+    event.save()
+
     booking = GroupEventBooking.objects.create(
         group_event=event,
         organization=organization,
@@ -487,16 +495,17 @@ def book_group_event(request, org_id, group_id, event_id):
         user=request.user,
         booking_date=current_time.date(),
         booking_time=current_time.time(),
-        status='pending',
+        status='confirmed',
     )
 
-    # Prepare email content
+
+    
     user_email = request.user.email
     event_creator_email = event.created_by.email
 
     subject = f"Event Booking Confirmation: {event.title}"
 
-    # Email body for the user who booked the event
+
     user_email_body = format_html("""
         <h3>Dear {user_name},</h3>
         <p>You have successfully booked the event <strong>{event_title}</strong> for {event_date} at {event_time}.</p>
@@ -518,7 +527,7 @@ def book_group_event(request, org_id, group_id, event_id):
         organization_name=organization.name
     ))
 
-    # Email body for the event creator
+ 
     creator_email_body = format_html("""
         <h3>Dear {creator_name},</h3>
         <p>The user <strong>{user_name}</strong> has booked the event <strong>{event_title}</strong> for {event_date} at {event_time}.</p>
@@ -540,7 +549,7 @@ def book_group_event(request, org_id, group_id, event_id):
         organization_name=organization.name
     ))
 
-    # Send email to the user who booked the event
+
     send_mail(
         subject,
         '',
@@ -550,7 +559,7 @@ def book_group_event(request, org_id, group_id, event_id):
         html_message=user_email_body
     )
 
-    # Send email to the event creator
+
     send_mail(
         subject,
         '',
@@ -560,7 +569,7 @@ def book_group_event(request, org_id, group_id, event_id):
         html_message=creator_email_body
     )
 
-    # Respond with success
+   
     return JsonResponse({
         "message": "Event successfully booked and emails sent!",
         "booking_id": booking.id,
@@ -576,7 +585,7 @@ def mark_absent(request, org_id, group_id, event_id):
     group = get_object_or_404(Group, id=group_id, organization=organization)
     event = get_object_or_404(GroupEvent, id=event_id, group=group, organization=organization)
 
-    # Check if the user is a member of the group and the organization
+  
     if not GroupMember.objects.filter(group=group, organization=organization, user=request.user).exists():
         return JsonResponse({"error": "You are not a member of this group or organization."}, status=400)
 
@@ -584,17 +593,16 @@ def mark_absent(request, org_id, group_id, event_id):
     if AbsentEvent.objects.filter(event=event, user=request.user).exists():
         return JsonResponse({"error": "As per organization rules you can only be absent to one event not more than one!."}, status=400)
     
-    # Handle POST request to mark absence
     if request.method == 'POST':
-        # Ensure the user has selected a reason
+        
         reason = request.POST.get('reason')
         custom_message = request.POST.get('custom_message')
 
-        # Validate the reason
+     
         if not reason:
             return JsonResponse({"error": "Invalid reason selected."}, status=400)
 
-        # Create a new absence record
+     
         absent_event = AbsentEvent.objects.create(
             organization=organization,
             event=event,
@@ -605,7 +613,7 @@ def mark_absent(request, org_id, group_id, event_id):
             date=timezone.now(),
         )
 
-        # Return success response
+      
         return JsonResponse({
             "message": f"You have marked yourself as absent for the event: {event.title}.",
             "absent_event_id": absent_event.id
@@ -618,32 +626,31 @@ def mark_absent(request, org_id, group_id, event_id):
 # Handle Reminders
 @login_required
 def set_event_reminder(request, org_id, group_id, event_id):
-    # Fetch the organization, group, and event
+    
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id, organization=organization)
     event = get_object_or_404(GroupEvent, id=event_id, group=group, organization=organization)
 
-    # Check if the user is a member of the group and organization
+    
     if not GroupMember.objects.filter(group=group, organization=organization, user=request.user).exists():
         return JsonResponse({"error": "You are not a member of this group or organization."}, status=400)
 
-    # Prevent setting multiple reminders for the same event by the same user
+
     existing_reminder = GroupEventReminder.objects.filter(event=event, group=group, organization=organization, user=request.user).first()
     if existing_reminder:
         return JsonResponse({"error": "You have already set a reminder for this event."}, status=400)
 
-    # Handle POST request to create a new reminder
     if request.method == 'POST':
-        # Get reminder options from POST data
+      
         reminder_option = request.POST.get('reminder_option')
-        custom_time = request.POST.get('custom_time')  # this will be in datetime format
+        custom_time = request.POST.get('custom_time')  
         reason = request.POST.get('reason')
 
-        # Validate the reminder option
+        
         if reminder_option not in ['1_day_before', '1_hour_before', 'custom']:
             return JsonResponse({"error": "Invalid reminder option."}, status=400)
 
-        # Handle custom reminder time
+
         if reminder_option == 'custom' and not custom_time:
             return JsonResponse({"error": "Custom time is required for custom reminder."}, status=400)
 
@@ -653,7 +660,7 @@ def set_event_reminder(request, org_id, group_id, event_id):
             except ValueError:
                 return JsonResponse({"error": "Invalid custom time format. Please use 'YYYY-MM-DD HH:MM:SS'."}, status=400)
 
-        # Create the reminder
+    
         try:
             reminder = GroupEventReminder.objects.create(
                 organization=organization,
@@ -667,7 +674,7 @@ def set_event_reminder(request, org_id, group_id, event_id):
                 is_sent=False
             )
 
-            # Return success response
+            
             return JsonResponse({
                 "message": f"Reminder set successfully for event: {event.title}.",
                 "reminder_id": reminder.id
@@ -677,3 +684,402 @@ def set_event_reminder(request, org_id, group_id, event_id):
             return JsonResponse({"error": "Failed to create reminder. Please try again."}, status=500)
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
+
+
+# Display all users who booked the event!
+
+@login_required
+def fetch_event_bookings(request, org_id, group_id, event_id):
+    """
+    Fetch and return all users who booked a specific group event.
+    """
+    
+    organization = get_object_or_404(Organization, id=org_id)
+    group = get_object_or_404(Group, id=group_id, organization=organization)
+    event = get_object_or_404(GroupEvent, id=event_id, group=group, organization=organization)
+
+
+    if not GroupMember.objects.filter(group=group, organization=organization, user=request.user).exists():
+        return JsonResponse({"error": "You are not authorized to view bookings for this event."}, status=403)
+
+    # Fetch all bookings for the event
+    bookings = GroupEventBooking.objects.filter(group_event=event).select_related('user')
+
+    print('Bookings Found!:',bookings)
+
+    
+    booking_data = [
+        {
+            "user_id": booking.user.id,
+            "user_name": booking.user.get_full_name() or booking.user.username,
+            "email": booking.user.email,
+            "booking_date": booking.booking_date.strftime('%Y-%m-%d'),
+            "booking_time": booking.booking_time.strftime('%H:%M:%S'),
+            "status": booking.status,
+        }
+        for booking in bookings
+    ]
+
+    return JsonResponse({"bookings": booking_data}, status=200)
+
+
+# Event Analytics
+from django.db.models import Count
+
+@login_required
+def event_analytics(request, org_id, group_id, event_id):
+    
+    event = get_object_or_404(GroupEvent, id=event_id, organization_id=org_id, group_id=group_id)
+
+    # Total bookings
+    total_bookings = GroupEventBooking.objects.filter(group_event=event).count()
+
+    # Bookings by status
+    confirmed_bookings = GroupEventBooking.objects.filter(group_event=event, status='confirmed').count()
+    pending_bookings = GroupEventBooking.objects.filter(group_event=event, status='pending').count()
+    cancelled_bookings = GroupEventBooking.objects.filter(group_event=event, status='cancelled').count()
+
+    # Absentee reasons
+    absentee_reasons_query = AbsentEvent.objects.filter(event=event).values('reason').annotate(count=models.Count('reason'))
+    absentee_reasons = [{'reason': item['reason'], 'count': item['count']} for item in absentee_reasons_query]
+
+    # Reminders stats
+    total_reminders = GroupEventReminder.objects.filter(event=event).count()
+    reminder_sent = GroupEventReminder.objects.filter(event=event, is_sent=True).count()
+    reminder_pending = GroupEventReminder.objects.filter(event=event, is_sent=False).count()
+
+    # Reminder types breakdown
+    reminder_types_query = GroupEventReminder.objects.filter(event=event).values('reminder_options').annotate(count=models.Count('reminder_options'))
+    reminder_types = [{'reminder_options': item['reminder_options'], 'count': item['count']} for item in reminder_types_query]
+
+    # Construct the response
+    data = {
+        'event_title': event.title,
+        'event_description': event.description,
+        'event_date': event.date,
+        'event_start_time': event.start_time,
+        'event_end_time': event.end_time,
+        'total_bookings': total_bookings,
+        'confirmed_bookings': confirmed_bookings,
+        'pending_bookings': pending_bookings,
+        'cancelled_bookings': cancelled_bookings,
+        'absentee_reasons': absentee_reasons,
+        'total_reminders': total_reminders,
+        'reminder_sent': reminder_sent,
+        'reminder_pending': reminder_pending,
+        'reminder_types': reminder_types,
+    }
+
+    return JsonResponse(data)
+
+
+# User specific analysis
+
+@login_required
+def user_group_event_analytics(request, org_id, group_id, event_id):
+   
+    event = get_object_or_404(GroupEvent, id=event_id, organization_id=org_id)
+
+
+    bookings = GroupEventBooking.objects.filter(
+        user=request.user, group_event__id=event_id, group_event__organization_id=org_id
+    )
+
+ 
+    absences = AbsentEvent.objects.filter(
+        user=request.user, event__id=event_id, event__organization_id=org_id
+    )
+
+ 
+    reminders = GroupEventReminder.objects.filter(
+        user=request.user, event__id=event_id, event__organization_id=org_id
+    )
+
+ 
+    total_bookings = bookings.count()
+    confirmed_bookings = bookings.filter(status='confirmed').count()
+    pending_bookings = bookings.filter(status='pending').count()
+    cancelled_bookings = bookings.filter(status='cancelled').count()
+
+
+    total_absences = absences.count()
+    absentee_reasons = absences.values('reason').annotate(count=models.Count('reason'))
+
+    # Calculate reminders data
+    total_reminders = reminders.count()
+    reminder_sent = reminders.filter(is_sent=True).count()
+    reminder_pending = reminders.filter(is_sent=False).count()
+
+    # Construct response data
+    data = {
+        'event_title': event.title,
+        'event_description': event.description,
+        'event_date': event.date,
+        'event_start_time': event.start_time,
+        'event_end_time': event.end_time,
+        'total_bookings': total_bookings,
+        'confirmed_bookings': confirmed_bookings,
+        'pending_bookings': pending_bookings,
+        'cancelled_bookings': cancelled_bookings,
+        'total_absences': total_absences,
+        'absentee_reasons': list(absentee_reasons),
+        'total_reminders': total_reminders,
+        'reminder_sent': reminder_sent,
+        'reminder_pending': reminder_pending,
+    }
+
+    return JsonResponse(data)
+
+
+
+# Delete the event!
+@csrf_exempt
+def delete_group_event(request, org_id, group_id, event_id):
+    if request.method == 'POST':
+       
+        organization = get_object_or_404(Organization, id=org_id)
+        group = get_object_or_404(Group, id=group_id, organization=organization)
+        event = get_object_or_404(GroupEvent, id=event_id, group=group, organization=organization)
+
+  
+        if request.user != group.team_leader:
+            return JsonResponse({'error': 'You do not have permission to delete this event.'}, status=403)
+
+     
+        team_leader = group.team_leader
+
+        
+        password = request.POST.get('password')
+
+        if not team_leader.check_password(password):
+            return JsonResponse({'error': 'Incorrect password.'}, status=400)
+
+ 
+        event.delete()
+        return JsonResponse({'success': 'Event deleted successfully.'})
+
+    return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+
+
+# Handle Recurring Events
+@method_decorator([login_required, csrf_exempt], name='dispatch')
+class SaveRecurrenceInfoView(View):
+    def post(self, request, org_id, group_id, event_id):
+        try:
+           
+            organization = get_object_or_404(Organization, id=org_id)
+
+           
+            group = get_object_or_404(Group, id=group_id, organization=organization)
+
+          
+            event = get_object_or_404(GroupEvent, id=event_id, group=group, organization=organization)
+
+          
+            if group.team_leader != request.user:
+                return JsonResponse({'success': False, 'message': 'You are not authorized to perform this action.'}, status=403)
+
+        
+            if event.recurrence_type != 'none':
+                return JsonResponse({'success': False, 'message': 'Recurrence has already been set for this event.'}, status=400)
+
+         
+            recurrence_type = request.POST.get('recurrence_type', 'none')
+            recurrence_end_date = request.POST.get('recurrence_end_date')
+            recurrence_days = request.POST.get('recurrence_days', '')
+
+            if recurrence_type != 'none' and not recurrence_end_date:
+                return JsonResponse({'success': False, 'message': 'Recurrence end date is required for recurring events.'}, status=400)
+
+          
+            event.recurrence_type = recurrence_type
+            event.recurrence_end_date = recurrence_end_date
+            event.recurrence_days = recurrence_days
+            event.save()
+
+            return JsonResponse({'success': True, 'message': 'Recurrence information saved successfully.'})
+        except Organization.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Organization not found.'}, status=404)
+        except Group.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Group not found.'}, status=404)
+        except GroupEvent.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Event not found.'}, status=404)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+
+# Implement Search bar
+def search_events(request, org_id, group_id):
+    search_title = request.GET.get('search_title', '')
+    filter_date = request.GET.get('filter_date', '')
+    filter_location = request.GET.get('filter_location', '')
+
+    events = GroupEvent.objects.filter(
+        organization_id=org_id,
+        group_id=group_id
+    )
+
+  
+    if search_title:
+        events = events.filter(title__icontains=search_title)
+
+  
+    if filter_date:
+        events = events.filter(date=filter_date)
+
+
+    if filter_location:
+        events = events.filter(location=filter_location)
+
+    
+    event_data = []
+    for event in events:
+        event_data.append({
+            'id': event.id,
+            'title': event.title,
+            'date': event.date,
+            'start_time': event.start_time,
+            'end_time': event.end_time,
+            'location': event.location,
+            'slots': event.slots,
+            'meeting_link': event.meeting_link if event.meeting_link else '',
+            'created_at': event.created_at.strftime('%b %d, %Y %I:%M %p'),
+            'organization_id': event.organization.id,
+            'group_id': event.group.id,
+            'created_by': event.created_by.username,
+        })
+
+    return JsonResponse({'events': event_data})
+
+# ---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+# Group related actions for team leader and members
+
+
+class GroupDetailsView(LoginRequiredMixin, View):
+    template_name = 'group_actions/group_details.html'
+
+    def get(self, request, org_id, group_id):
+     
+        organization = get_object_or_404(Organization, id=org_id)
+        group = get_object_or_404(Group, id=group_id, organization=organization)
+
+        if request.user != group.created_by and request.user != group.team_leader:
+            return render(request, '403.html', {"message": "Access Denied"})
+
+        members = GroupMember.objects.filter(group=group)
+        events = GroupEvent.objects.filter(group=group)
+        bookings = GroupEventBooking.objects.filter(group_event__group=group)
+        absentees = AbsentEvent.objects.filter(group=group)
+        reminders = GroupEventReminder.objects.filter(group=group)
+
+    
+        total_members = members.count()
+        total_bookings = bookings.count()
+        total_absentees = absentees.count()
+        reminder_sent_count = reminders.filter(is_sent=True).count()
+        reminder_pending_count = reminders.filter(is_sent=False).count()
+
+        events_with_bookings = GroupEvent.objects.filter(group=group).annotate(num_bookings=Count('bookings'))
+        total_bookings = GroupEventBooking.objects.filter(group_event__group=group).count()
+
+    
+        event_labels = [event.title for event in events_with_bookings]
+        event_bookings = [event.num_bookings for event in events_with_bookings]
+        events_with_users = GroupEvent.objects.annotate(num_users=Count('bookings__user'))
+        last_month = timezone.now() - timedelta(days=30)
+        user_participation = GroupEventBooking.objects.filter(
+         booking_date__gte=last_month
+       ).values('user').annotate(events_attended=Count('user')).order_by('-events_attended')
+        context = {
+            'organization': organization,
+            'group': group,
+            'members': members,
+            'events': events,
+            'bookings': bookings,
+            'absentees': absentees,
+            'reminders': reminders,
+            'total_members': total_members,
+            'total_bookings': total_bookings,
+            'total_absentees': total_absentees,
+            'reminder_sent_count': reminder_sent_count,
+            'reminder_pending_count': reminder_pending_count,
+            'events_with_bookings': events_with_bookings,
+            'total_bookings': total_bookings,
+             'event_labels': event_labels,
+             'event_bookings':event_bookings,
+             'events_with_users':events_with_users,
+             'last_month':last_month,
+             'user_participation':user_participation,
+        }
+        return render(request, self.template_name, context)
+
+
+# Group Calendar
+class GroupEventView(LoginRequiredMixin, View):
+    def get(self, request, org_id, group_id):
+    
+        group = get_object_or_404(Group, id=group_id, organization_id=org_id)
+        organization = get_object_or_404(Organization, id=org_id)
+        if not GroupMember.objects.filter(group=group, user=request.user).exists():
+            return JsonResponse({'error': 'You are not a member of this group.'}, status=403)
+
+       
+        events = GroupEvent.objects.filter(group=group, organization=organization)
+
+    
+        event_data = []
+        for event in events:
+            event_data.append({
+                'title': event.title,
+                'start': f'{event.date}T{event.start_time.isoformat()}',
+                'end': f'{event.date}T{event.end_time.isoformat()}',
+                'description': event.description,
+                'location': event.location,
+                'meeting_link': event.meeting_link,
+            })
+
+        return render(request, 'group_actions/group_event_calendar.html', {
+            'group': group,
+            'events': event_data
+        })
+    
+
+# Filter the events based on location 
+
+@login_required
+@csrf_exempt
+def filter_events_by_location(request, org_id, group_id):
+    if request.method == "GET":
+        location = request.GET.get('location')
+        user = request.user
+
+      
+        group_member = GroupMember.objects.filter(group_id=group_id, user=user).exists()
+        if not group_member:
+            return JsonResponse({"error": "You are not a member of this group."}, status=403)
+
+       
+        events_query = GroupEvent.objects.filter(organization_id=org_id, group_id=group_id)
+        if location:
+            events_query = events_query.filter(location=location)
+
+       
+        events = [
+            {
+                "id": event.id,
+                "title": event.title,
+                "description": event.description,
+                "date": event.date.strftime('%Y-%m-%d'),
+                "start_time": event.start_time.strftime('%H:%M:%S'),
+                "end_time": event.end_time.strftime('%H:%M:%S'),
+                "location": event.location,
+                "slots": event.slots,
+            }
+            for event in events_query
+        ]
+        return JsonResponse({"events": events}, status=200)
+
+    return JsonResponse({"error": "Invalid request method."}, status=400) 

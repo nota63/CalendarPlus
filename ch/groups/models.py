@@ -139,6 +139,25 @@ class GroupEvent(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    recurrence_type = models.CharField(
+        max_length=20,
+        choices=(
+            ('none', 'None'),  
+            ('daily', 'Daily'),
+            ('weekly', 'Weekly'),
+            ('bi-weekly', 'Bi-Weekly'),
+            ('monthly', 'Monthly'),
+            ('yearly', 'Yearly'),
+        ),
+        default='none', null=True, blank=True
+    )
+    recurrence_end_date = models.DateField(null=True, blank=True)  
+    recurrence_days = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text="Comma-separated days for weekly recurrence, e.g., 'Monday, Wednesday'."
+    )
+
 
 # Group Event Booking
 class GroupEventBooking(models.Model):

@@ -6,7 +6,7 @@ urlpatterns = [
 
     path('groups/create/<int:org_id>/', GroupCreationWizard.as_view(), name='group_create'),
 
-    # display groups to the admin
+   
     path('groups/<int:org_id>/display/', GroupListView.as_view(), name='display_groups'),
 
 
@@ -16,8 +16,7 @@ urlpatterns = [
 
 
 
-    # accept or reject the invitation
-     # URL pattern for accepting or rejecting an invitation
+  
     path('invite/<int:org_id>/<int:group_id>/<int:invitation_id>/accept/', 
         accept_or_reject_invitation, 
          name='accept_reject_invitation'),
@@ -51,10 +50,46 @@ urlpatterns = [
          name='mark_absent'),
 
 
-# pending
     path('organization/<int:org_id>/group/<int:group_id>/event/<int:event_id>/reminder/', 
       set_event_reminder, 
          name='set_event_reminder'),
+
+
+  #  Display the users who booked the event!
+    path(
+        'organization/<int:org_id>/group/<int:group_id>/event/<int:event_id>/bookings/',
+        fetch_event_bookings,
+        name='fetch_event_bookings',
+    ),
+
+ 
+    path('event-analytics/<int:org_id>/<int:group_id>/<int:event_id>/', event_analytics, name='event_analytics'),
+   
+
+ 
+    path('user-group-event-analytics/<int:org_id>/<int:group_id>/<int:event_id>/',user_group_event_analytics, name='user_group_event_analytics'),
+
+    path('delete_event/<int:org_id>/<int:group_id>/<int:event_id>/', delete_group_event, name='delete_group_event'),
+
+   
+    path(
+        'save-recurrence/<int:org_id>/<int:group_id>/<int:event_id>/',
+        SaveRecurrenceInfoView.as_view(),
+        name='save_recurrence_info'
+    ),
+
+ 
+    path('search-events/<int:org_id>/<int:group_id>/', search_events, name='search_events'),
+
+ 
+    path('group/<int:org_id>/<int:group_id>/', GroupDetailsView.as_view(), name='group_details'),
+
+    # Group event calendar
+    path('group-event-calendar/<int:org_id>/<int:group_id>/',GroupEventView.as_view(), name='group_event_calendar'),
+
+    path('filter-events/<int:org_id>/<int:group_id>/', filter_events_by_location, name='filter_events_by_location'),
+
+
 
   
 ]
