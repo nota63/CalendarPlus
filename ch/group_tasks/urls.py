@@ -10,5 +10,7 @@ urlpatterns = [
     path('task_detail/<int:org_id>/<int:group_id>/<int:task_id>/',my_day_task_detail, name='task_detail'),
     path('task/<int:org_id>/<int:group_id>/<int:task_id>/add_comment/',add_comment, name='add_comment'),
     path('task/<int:org_id>/<int:group_id>/<int:task_id>/add_note/', add_task_note, name='add_task_note'),
+    path('task/<int:org_id>/<int:group_id>/<int:task_id>/manage_timer/',manage_task_timer, name='manage_task_timer'),
+    path('tasks/<int:org_id>/<int:group_id>/<int:task_id>/update_progress/',update_task_progress, name='update_task_progress'),
 ]
 

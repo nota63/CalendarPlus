@@ -18,6 +18,9 @@ from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.core.exceptions import PermissionDenied
+from .models import TaskTimer
+from datetime import timedelta
+from django.utils.timezone import now
 # Create your views here.
 
 # Task creation
@@ -199,12 +202,21 @@ def my_day_task_detail(request, org_id, group_id, task_id):
     if not AddDay.objects.filter(task=task, user=request.user).exists():
         raise Http404("This task is not added to My Day for you please add it first!")
     
+    # Fetch the time 
+    # Fetch the task timer directly for the current user and task
+   # Inside your view
+    task_timer = TaskTimer.objects.filter(task=task, user=request.user).first()
+    time_spent = task_timer.accumulated_time if task_timer else timedelta()
+    formatted_time = str(time_spent)
+
+    print('Time Fetched formatted:', formatted_time)
     return render(request, 'task/my_day_task_detail.html', {
         'organization': organization,
         'group': group,
         'group_id':group_id,
         'org_id':org_id,
         'task': task,
+        'formatted_time':formatted_time,
     })
 
 
@@ -253,6 +265,7 @@ def add_comment(request, org_id, group_id, task_id):
         'created_at': comment.created_at.strftime('%Y-%m-%d %H:%M:%S')
     }, status=200)
 
+
 # Handle add note 
 @login_required
 def add_task_note(request, org_id, group_id, task_id):
@@ -289,3 +302,57 @@ def add_task_note(request, org_id, group_id, task_id):
  
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
+
+# Manage task timer
+def manage_task_timer(request, org_id, group_id, task_id):
+    organization = get_object_or_404(Organization, id=org_id)
+    group = get_object_or_404(Group, id=group_id, organization=organization)
+    task = get_object_or_404(Task, id=task_id, group=group)
+
+ 
+    timer, created = TaskTimer.objects.get_or_create(
+        user=request.user,
+        organization=organization,
+        group=group,
+        task=task,
+        defaults={'start_time': timezone.now(), 'is_running': False, 'accumulated_time': timezone.timedelta()},
+    )
+
+    if request.method == "POST":
+        if 'start' in request.POST:
+            # Start the timer
+            if not timer.is_running:
+                timer.start_time = timezone.now()
+                timer.is_running = True
+                timer.save()
+                return JsonResponse({'status': 'started', 'message': 'Timer started successfully.'})
+
+        elif 'stop' in request.POST:
+         
+            if timer.is_running:
+                timer.accumulated_time += timezone.now() - timer.start_time
+                timer.is_running = False
+                timer.save()
+                return JsonResponse({'status': 'stopped', 'message': 'Timer stopped and time saved successfully.'})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid action.'})
+
+
+
+# Update the task progress 
+def update_task_progress(request, org_id, group_id, task_id):
+    if request.method == "POST":
+        organization = get_object_or_404(Organization, id=org_id)
+        group = get_object_or_404(Group, id=group_id, organization=organization)
+        task = get_object_or_404(Task, id=task_id, group=group)
+
+        new_progress = int(request.POST.get('progress', 0))
+
+        if 0 <= new_progress <= 100:
+            task.progress = new_progress
+            task.save()
+            return JsonResponse({'status': 'success', 'progress': task.progress})
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Progress must be between 0 and 100.'}, status=400)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
