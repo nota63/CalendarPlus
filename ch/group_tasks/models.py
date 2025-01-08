@@ -202,7 +202,7 @@ class AddDay(models.Model):
 
 
 # Store task comments , notes , and tags
-# Model to store comments on tasks
+
 class TaskComment(models.Model):
     task = models.ForeignKey('Task', on_delete=models.CASCADE, related_name='comments')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -220,16 +220,41 @@ class TaskComment(models.Model):
 
 # Model to store tags for tasks
 class TaskTag(models.Model):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='tags')
-    name = models.CharField(max_length=50, unique=True)
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE,null=True, blank=True)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True )  
+    PREDEFINED_TAGS = [
+        ('Important', 'Important'),
+        ('Urgent', 'Urgent'),
+        ('Low Priority', 'Low Priority'),
+        ('Completed', 'Completed'),
+    ]
+
+    task = models.ForeignKey(
+        Task, 
+        on_delete=models.CASCADE,
+        related_name='tags'
+    )
+    name = models.CharField(
+        max_length=50,
+        choices=PREDEFINED_TAGS,  
+    )
+    organization = models.ForeignKey(
+        Organization, 
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+    group = models.ForeignKey(
+        Group,  
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         return self.name
 
     class Meta:
         ordering = ['name']
+        unique_together = ('task', 'name') 
 
 
 # Model to store notes on tasks

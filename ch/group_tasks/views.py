@@ -488,7 +488,7 @@ def toggle_task_status(request, org_id, group_id,task_id):
                 'organization':task.organization,
                 'group':task.group,
                 'activity_logs':activity_logs,
-                'completed_by':task.assigned_to,
+                'completed_by':task.assigned_to.username,
                 'completed_date':timezone.now(),
             }
 
