@@ -7,38 +7,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ task.title }} - Task Details</title>
 
+   
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
 
     <!-- Dark Theme -->
     <style>
-        body {
-            background-color: #121212;
-            color: #ffffff;
-        }
-        .task-container {
-            margin: 20px auto;
-            background-color: #1e1e1e;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            padding: 20px;
-            max-width: 800px;
-        }
-        .task-icon {
-            font-size: 2rem;
-            color: #f39c12;
-        }
-        .btn-back {
-            color: #ffffff;
-            background-color: #007bff;
-            border: none;
-            transition: background-color 0.3s;
-        }
-        .btn-back:hover {
-            background-color: #0056b3;
-        }
+   /* Overall body styling */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #000; /* Pure black background */
+    color: #fff; /* Light text color */
+    margin: 0;
+    padding: 0;
+}
+
+/* Task container styling */
+.task-container {
+    width: 90%; /* Increased width */
+    max-width: 1400px; /* Maximum width */
+    margin: 50px auto; /* Centering the container */
+    padding: 30px;
+    background-color: #000; /* Pure black background */
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2); /* Glowing effect */
+    border-radius: 20px; /* Rounded corners */
+    font-weight: bold; /* Bold text */
+    font-size: 20px; /* Adjusted font size */
+    border: 2px solid #333; /* Dark border */
+    transition: all 0.3s ease; /* Smooth transition */
+    position: relative;
+    overflow: hidden;
+}
+
+/* Glowing border effect */
+.task-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, #000, #000, #000, #000); /* Same color for pure black */
+    background-size: 400% 400%;
+    z-index: -1;
+    animation: glowing-border 5s linear infinite; /* Glowing animation */
+    border-radius: 20px;
+}
+
+/* Glowing effect animation */
+@keyframes glowing-border {
+    0% {
+        background-position: 400% 0;
+    }
+    50% {
+        background-position: 0 100%;
+    }
+    100% {
+        background-position: 400% 0;
+    }
+}
+
+/* Add hover effect with shine */
+.task-container:hover {
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.4); /* Shine effect */
+    transform: translateY(-10px); /* Heavy lift on hover */
+}
+
+/* Styling the text inside the container */
+.task-container p {
+    font-size: 18px; /* Adjust paragraph text */
+    color: #fff; /* Light text color for contrast */
+}
+/* Container with dark theme and stylish look */
+.task-container {
+    opacity: 0;
+    transform: translateY(-100vh) scale(0.8); /* Starts from above the page */
+    animation: slideInFromTop 1s ease-out forwards; /* Animation to slide in smoothly */
+    border-radius: 30px; /* Rounded corners */
+    padding: 20px;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.3), 0 0 50px rgba(255, 255, 255, 0.5); /* Glowing effect */
+    background-color: #000; /* Dark theme background */
+    color: white; /* White text for contrast */
+    transition: transform 0.5s ease-in-out, box-shadow 0.5s ease-in-out; /* Smooth transition on hover */
+}
+
+/* Animation for smooth sliding from the top */
+@keyframes slideInFromTop {
+    0% {
+        opacity: 0;
+        transform: translateY(-100vh) scale(0.8); /* Starts from above the screen */
+        box-shadow: 0 0 25px rgba(255, 255, 255, 0.3); /* Glowing starts softly */
+    }
+    60% {
+        opacity: 0.6;
+        transform: translateY(30px) scale(1.05); /* Moving towards its final position */
+        box-shadow: 0 0 30px rgba(255, 255, 255, 0.4); /* Increased glow */
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1); /* Fully in place, no scaling */
+        box-shadow: 0 0 50px rgba(255, 255, 255, 0.7); /* Max glow effect */
+    }
+}
+
+/* Hover effect to enhance the feel when the user interacts */
+.task-container:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 60px rgba(255, 255, 255, 0.8), 0 0 120px rgba(255, 255, 255, 1);
+}
 
 
        /* Import Google Fonts */
@@ -203,7 +281,93 @@ or: pointer;
     color: white;
 }
 
+/* Stopwatch Container */
+#stopwatch-container {
+    background-color: #121212;  /* Black background */
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    max-width: 200px;
+    max-height: 170px;
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    border: 2px solid transparent;  /* Transparent border to start */
+    position: relative;
+    transition: border-color 0.5s ease, box-shadow 0.5s ease;
+}
 
+/* Glowing Border Effect */
+#stopwatch-container:hover {
+    border-color: #00bfff;  /* Light blue border */
+    box-shadow: 0 4px 15px rgba(0, 191, 255, 0.7);  /* Glow effect */
+}
+
+/* Time Display */
+#time-display {
+    font-size: 20px;  /* Medium time display */
+    font-weight: bold;
+    color: #00bfff;  /* Light blue color */
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+/* Button Styling */
+#start-stop-btn, #save-time-btn {
+    padding: 8px 18px;
+    font-size: 14px;
+    border-radius: 5px;
+    margin: 5px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.3s ease;
+    border: none;
+    outline: none;
+}
+
+#start-stop-btn {
+    background-color: #007bff;  /* Blue button */
+    color: white;
+}
+
+#start-stop-btn:hover {
+    background-color: #0056b3;  /* Darker blue on hover */
+    transform: scale(1.05);
+}
+
+#save-time-btn {
+    background-color: #28a745; /* Green button */
+    color: white;
+    display: none; /* Initially hidden */
+}
+
+#save-time-btn:hover {
+    background-color: #218838; /* Darker green on hover */
+    transform: scale(1.05);
+}
+
+/* Smooth Time Change Transition */
+@keyframes timeChange {
+    0% {
+        transform: scale(1);
+        color: #00bfff;
+    }
+    50% {
+        transform: scale(1.1);
+        color: #ff9800;  /* Orange momentary effect */
+    }
+    100% {
+        transform: scale(1);
+        color: #00bfff;
+    }
+}
+
+#time-display.animate-time {
+    animation: timeChange 0.5s ease-in-out;  /* Smooth transition */
+}
+
+/* Optional - For Stopwatch's Start/Stop Button Toggle */
+#stopwatch-container .btn {
+    transition: all 0.3s ease;
+}
 
 
     </style>
@@ -354,33 +518,44 @@ or: pointer;
     {% endif %}
 </p>
 
-            <!-- Track the time -->
 
-           <!-- Displaying Time Spent -->
-         <!-- Displaying Time Spent -->
-<p><strong>Time Spent:</strong>
-    {% if formatted_time %}
-        <span id="timeSpent">{{ formatted_time }}</span>
+
+<!-- Displaying Time Tracking -->
+ <!-- Displaying Time Tracking -->
+<p><strong>Time Tracking:</strong>
+    {% if task.time_tracking.all %}
+        {% for time_entry in task.time_tracking.all %}
+            <span class="badge bg-info" 
+                  id="time-entry-{{ time_entry.id }}" 
+                  data-task-id="{{ task.id }}"
+                  data-org-id="{{ org_id }}"
+                  data-group-id="{{ group_id }}">
+                {{ time_entry.user.username }}: {{ time_entry.time_spent }} hours
+            </span>
+        {% endfor %}
     {% else %}
-        <span id="timeSpent">00:00:00</span>
+        <span class="badge bg-secondary">No time tracked</span>
     {% endif %}
 </p>
 
-<!-- Timer Control Button (Icon) -->
-<button id="startStopButton" class="btn btn-primary" onclick="toggleTimer()">
-    <i id="timerIcon" class="bi bi-play-circle"></i> <!-- Play Icon for start -->
-    Track Time
-</button>
+<!-- Stopwatch Display -->
+<!-- Stopwatch Display -->
+<div id="stopwatch-container">
+    <p><strong>Stopwatch:</strong></p>
+    <p id="time-display">00:00:00</p>
+    <button id="start-stop-btn" 
+            class="btn btn-sm btn-primary"
+            data-task-id="{{ task.id }}" 
+            data-org-id="{{ org_id }}" 
+            data-group-id="{{ group_id }}">
+        Start
+    </button>
+    <button id="save-time-btn" class="btn btn-sm btn-success" style="display: none;">Save Time</button>
+</div>
 
-        
-        
 
 
-           
-
-
-            
-
+            <!-- Track the time -->
             <!-- Displaying notes -->
         <p><strong>Notes:</strong>
            {% if task.notes.all %}
@@ -860,6 +1035,137 @@ document.addEventListener('click', function (event) {
             alert('An error occurred.');
         });
     }
+});
+
+// Handle time tracking
+// Stopwatch Variables
+let stopwatchInterval;
+let isRunning = false;
+let startTime = 0;
+let elapsedTime = 0;
+
+// DOM elements for stopwatch
+const startStopBtn = document.getElementById('start-stop-btn');
+const resetBtn = document.getElementById('reset-btn');  // Ensure this button exists or add it if needed
+const timeDisplay = document.getElementById('time-display');
+
+// Capture dynamic task ID, org ID, and group ID from button attributes
+const taskId = startStopBtn.getAttribute('data-task-id');
+const orgId = startStopBtn.getAttribute('data-org-id');
+const groupId = startStopBtn.getAttribute('data-group-id');
+
+// Function to format time (HH:MM:SS)
+function formatTime(time) {
+    const hours = Math.floor(time / 3600);
+    const minutes = Math.floor((time % 3600) / 60);
+    const seconds = time % 60;
+
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+// Function to start/stop the stopwatch
+function toggleStopwatch() {
+    if (isRunning) {
+        // Stop the stopwatch
+        clearInterval(stopwatchInterval);
+        startStopBtn.textContent = 'Start';
+        saveTime();  // Save the time once stopped
+    } else {
+        // Start the stopwatch
+        startTime = Date.now() - elapsedTime;
+        stopwatchInterval = setInterval(updateTimeDisplay, 1000);
+        startStopBtn.textContent = 'Stop';
+    }
+    isRunning = !isRunning;
+}
+
+// Function to update time display
+function updateTimeDisplay() {
+    elapsedTime = Date.now() - startTime;
+    timeDisplay.textContent = formatTime(elapsedTime / 1000);  // Convert to seconds
+}
+
+// Function to reset the stopwatch
+function resetStopwatch() {
+    clearInterval(stopwatchInterval);
+    isRunning = false;
+    startStopBtn.textContent = 'Start';
+    timeDisplay.textContent = '00:00:00';
+    elapsedTime = 0;
+}
+
+// Function to save time to the database and append it dynamically
+// Function to save time to the database
+function saveTime() {
+    const timeSpent = (elapsedTime / 1000 / 3600).toFixed(2); // Convert to hours
+
+    // Send AJAX request to save time
+    fetch(`/tasks/tasks/${orgId}/${groupId}/${taskId}/save_time/`, {  // Correct URL structure
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken(),  // Ensure CSRF token is included
+        },
+        body: JSON.stringify({
+            time_spent: timeSpent,  // Send time spent in hours
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Time saved successfully!');
+
+            // Dynamically create a new badge for the new time entry
+            const newBadge = document.createElement('span');
+            newBadge.classList.add('badge', 'bg-info');
+            newBadge.setAttribute('id', `time-entry-${data.time_entry_id}`); // Set unique ID for the time entry badge
+            newBadge.setAttribute('data-task-id', taskId);
+            newBadge.setAttribute('data-org-id', orgId);
+            newBadge.setAttribute('data-group-id', groupId);
+            newBadge.textContent = `${data.username}: ${data.time_spent} hours`;
+
+            // Append the new badge to the time tracking section
+            const timeTrackingContainer = document.querySelector('p');
+            if (timeTrackingContainer) {
+                const noTimeElement = timeTrackingContainer.querySelector('.badge.bg-secondary');
+                if (noTimeElement) {
+                    noTimeElement.remove(); // Remove "No time tracked" message
+                }
+                timeTrackingContainer.appendChild(newBadge);  // Append the new time entry
+            }
+
+            // Optionally reset stopwatch after saving time
+            resetStopwatch();
+        } else {
+            alert('Failed to save time.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while saving the time.');
+    });
+}
+
+// Event listeners for buttons
+startStopBtn.addEventListener('click', toggleStopwatch);
+resetBtn.addEventListener('click', resetStopwatch);
+
+
+
+
+
+// GSAP ANIMATIONS
+document.addEventListener('DOMContentLoaded', function() {
+    // Anime.js animation for task container
+    anime({
+        targets: '.task-container',
+        opacity: [0, 1],          // Fade in
+        scale: [0.5, 1],          // Scale from 50% to 100%
+        rotate: [360, 0],         // Rotate 360 degrees
+        easing: 'easeOutBounce',  // Bounce effect for smoothness
+        duration: 2000,           // 2-second duration
+        delay: 500,               // 0.5s delay before the animation starts
+    });
 });
 
     </script>

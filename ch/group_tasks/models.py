@@ -307,7 +307,8 @@ class ActivityLog(models.Model):
         ('TASK_COMPLETED', 'Marked task as completed'),
         ('TASK_PENDING','Marked task as pending'),
         ('TAG_ADDED','Added a tag in task'),
-        ('TAG_REMOVED','Removed the tag from task')
+        ('TAG_REMOVED','Removed the tag from task'),
+        ('TIME_SPENT','Spent time on task')
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="activity_logss")
@@ -325,3 +326,25 @@ class ActivityLog(models.Model):
 
     def __str__(self):
         return f"{self.user.username} {self.get_action_display()} at {self.timestamp}"
+
+
+# New Model to track time
+
+class TaskTimeTracking(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="time_tracking")
+    organization=models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='time_tracked')
+    group=models.ForeignKey(Group, on_delete=models.CASCADE, related_name='time_tracks')
+    user = models.ForeignKey(User, on_delete=models.CASCADE) 
+    time_spent = models.DecimalField(max_digits=5, decimal_places=2) 
+    start_time = models.DateTimeField(default=timezone.now)
+    end_time = models.DateTimeField(null=True, blank=True)  
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"Time tracking for {self.task.title} by {self.user.username}"
+
+    def get_duration(self):
+        if self.end_time:
+            duration = self.end_time - self.start_time
+            return duration.total_seconds() / 3600 
+        return 0
