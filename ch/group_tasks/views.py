@@ -21,6 +21,9 @@ from django.core.exceptions import PermissionDenied
 from .models import TaskTimer
 from datetime import timedelta
 from django.utils.timezone import now
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+
 # Create your views here.
 
 # Task creation
@@ -443,3 +446,82 @@ def fetch_activity_logs(request, org_id, group_id, task_id):
 
     
     return JsonResponse({'status': 'success', 'activity_logs': logs_data})
+
+
+# Handle task as completed
+
+@csrf_exempt
+def toggle_task_status(request, org_id, group_id,task_id):
+
+    if request.method == 'POST':
+        task = get_object_or_404(Task, id=task_id, group_id=group_id, organization_id=org_id)
+
+        if not GroupMember.objects.filter(group=task.group, user=request.user).exists():
+            return JsonResponse({'status': 'error', 'message': 'Permission denied.'}, status=403)
+        
+
+        if task.status != 'completed':
+            task.status = 'completed'
+            task.save()
+
+            ActivityLog.objects.create(
+                user=request.user,
+                organization=task.organization,
+                group=task.group,
+                task=task,
+                action = "TASK_COMPLETED",
+                details=f" {request.user} Marked the task as completed:'{task.title}'"
+            )
+
+      
+
+            activity_logs = ActivityLog.objects.filter(
+                user=task.assigned_to,
+                task=task,
+                organization=task.organization,
+                group=task.group
+            ).order_by('-timestamp')
+
+            subject = f'Task Completed: {task.title}'
+            context = {
+                'task':task,
+                'organization':task.organization,
+                'group':task.group,
+                'activity_logs':activity_logs,
+                'completed_by':task.assigned_to,
+                'completed_date':timezone.now(),
+            }
+
+            html_message = render_to_string('task/task_completed_email.html', context)
+
+            plain_message= strip_tags(html_message)
+
+          
+            send_mail(
+                subject,
+                plain_message,
+                settings.DEFAULT_FROM_EMAIL,
+                [task.created_by.email],
+                html_message=html_message,
+            )
+
+            return JsonResponse({'status': 'success', 'new_status': 'completed'})
+        
+        else:
+            task.status = 'pending'
+            task.save()
+            ActivityLog.objects.create(
+                user=request.user,
+                organization=task.organization,
+                group=task.group,
+                task=task,
+                action = "TASK_PENDING",
+                details=f" {request.user} Marked task as pending:'{task.title}'"
+            )
+
+            return JsonResponse({'status': 'success', 'new_status': 'pending'})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request.'}, status=400)
+
+
+

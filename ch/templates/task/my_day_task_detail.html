@@ -130,8 +130,28 @@
 
 #closeSidebarButton:hover {
     background-color: #e2e6ea;
-    cursor: pointer;
+    curs.form-check-input {
+    width: 50px;
+    height: 25px;
+    background-color: #ccc;
+    border: none;
+    transition: background-color 0.3s ease;
 }
+
+.form-check-input:checked {
+    background-color: #28a745; /* Green when checked */
+}
+
+.form-check-label {
+    margin-left: 10px;
+    font-size: 14px;
+    color: #333;
+}
+or: pointer;
+}
+
+
+
 
 
     </style>
@@ -192,6 +212,29 @@
 <button id="activityLogsButton" class="btn btn-dark">
     <i class="bi bi-list-check"></i> Activity Logs
 </button>
+
+<!-- mark as completed  -->
+<div class="form-check form-switch">
+    <input 
+        class="form-check-input" 
+        type="checkbox" 
+        role="switch" 
+        id="toggleTaskStatus" 
+        data-task-id="{{ task.id }}" 
+        data-org-id="{{ org_id }}" 
+        data-group-id="{{ group_id }}" 
+        {% if task.status == 'completed' %} checked {% endif %}>
+    <label class="form-check-label" for="toggleTaskStatus">
+        {% if task.status == 'completed' %}
+            Mark as Pending
+        {% else %}
+            Mark as Completed
+        {% endif %}
+    </label>
+</div>
+
+
+
 
             <hr>
             <h4>Additional Features</h4>
@@ -555,6 +598,60 @@ $(document).ready(function () {
         });
     }
 });
+
+
+// Handle task toggle as completed
+
+document.getElementById('toggleTaskStatus').addEventListener('change', function () {
+    const taskId = this.getAttribute('data-task-id');
+    const orgId = this.getAttribute('data-org-id');
+    const groupId = this.getAttribute('data-group-id');
+    const isChecked = this.checked;
+
+    // Determine the action based on the toggle state
+    const action = isChecked ? 'completed' : 'pending';
+
+    // Send an AJAX request
+    fetch(`/tasks/tasks/${orgId}/${groupId}/${taskId}/toggle_status/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken(), // Ensure you include your CSRF token
+        },
+        body: JSON.stringify({ status: action }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Update the label text
+                document.querySelector('label[for="toggleTaskStatus"]').textContent = 
+                    isChecked ? 'Mark as Pending' : 'Mark as Completed';
+            } else {
+                alert('Failed to update task status.');
+                this.checked = !isChecked; // Revert the toggle state
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred.');
+            this.checked = !isChecked; // Revert the toggle state
+        });
+});
+
+// Function to get the CSRF token
+function getCSRFToken() {
+    const name = 'csrftoken';
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.startsWith(name + '=')) {
+            return cookie.substring(name.length + 1);
+        }
+    }
+    return '';
+}
+
+
 
     </script>
 

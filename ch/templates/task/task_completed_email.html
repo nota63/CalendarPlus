@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+        .container {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .header {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+        .details {
+            margin-top: 20px;
+        }
+        .activity-log {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Task Completed</h2>
+        </div>
+        <p>Dear {{ task.created_by.first_name }},</p>
+        <p>The task "<strong>{{ task.title }}</strong>" assigned to <strong>{{ completed_by.first_name }}</strong> has been marked as completed.</p>
+        <div class="details">
+            <h4>Task Details:</h4>
+            <p><strong>Title:</strong> {{ task.title }}</p>
+            <p><strong>Organization:</strong> {{ organization.name }}</p>
+            <p><strong>Group:</strong> {{ group.name }}</p>
+            <p><strong>Completion Date:</strong> {{ completion_date }}</p>
+        </div>
+        <div class="activity-log">
+            <h4>Activity Logs of {{ completed_by.first_name }}:</h4>
+            {% for log in activity_logs %}
+                <p>{{ log.timestamp|date:"Y-m-d H:i:s" }} - {{ log.details }}</p>
+            {% empty %}
+                <p>No activity logs available.</p>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

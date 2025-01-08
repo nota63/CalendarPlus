@@ -280,6 +280,7 @@ class ActivityLog(models.Model):
         ('PROGRESS_UPDATE', 'Updated progress'),
         ('TASK_CREATED', 'Created a task'),
         ('TASK_COMPLETED', 'Marked task as completed'),
+        ('TASK_PENDING','Marked task as pending'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="activity_logss")
