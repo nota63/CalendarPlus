@@ -202,9 +202,6 @@ def my_day_task_detail(request, org_id, group_id, task_id):
     if not AddDay.objects.filter(task=task, user=request.user).exists():
         raise Http404("This task is not added to My Day for you please add it first!")
     
-    # Fetch the time 
-    # Fetch the task timer directly for the current user and task
-   # Inside your view
     task_timer = TaskTimer.objects.filter(task=task, user=request.user).first()
     time_spent = task_timer.accumulated_time if task_timer else timedelta()
     formatted_time = str(time_spent)
@@ -264,7 +261,7 @@ def add_comment(request, org_id, group_id, task_id):
         group=group,
         task=task,
         action='COMMENT',
-        details=f"Added a comment: '{comment.comment}'"
+        details=f"{request.user} Added a comment: '{comment.comment}'"
     )
     except Exception as e:
     
@@ -311,7 +308,7 @@ def add_task_note(request, org_id, group_id, task_id):
               group=group,
               task=task,
               action='NOTE',
-              details=f"Added a note: '{note.note}'"
+              details=f"{request.user} Added a note: '{note.note}'"
            )
        
             return JsonResponse({
@@ -357,7 +354,7 @@ def manage_task_timer(request, org_id, group_id, task_id):
                   group=group,
                   task=task,
                   action='START_TIMER',
-                  details=f"Started a timer: '{timer.start_time}'"
+                  details=f"{request.user} Started a timer: '{timer.start_time}'"
                 )
        
                 return JsonResponse({'status': 'started', 'message': 'Timer started successfully.'})
@@ -374,7 +371,7 @@ def manage_task_timer(request, org_id, group_id, task_id):
                   group=group,
                   task=task,
                   action='STOP_TIMER',
-                  details=f"Stopeed the timer: '{timer.accumulated_time}'"
+                  details=f" {request.user} Stopeed the timer: '{timer.accumulated_time}'"
                 )
        
                 return JsonResponse({'status': 'stopped', 'message': 'Timer stopped and time saved successfully.'})
@@ -402,7 +399,7 @@ def update_task_progress(request, org_id, group_id, task_id):
                   group=group,
                   task=task,
                   action='PROGRESS_UPDATE',
-                  details=f"Updated the progreess: '{task.progress}'"
+                  details=f" {request.user} Updated the progreess: '{task.progress}'"
                 )
             except Exception as e:
                 return JsonResponse({'error':str(e)}, status=400)  
