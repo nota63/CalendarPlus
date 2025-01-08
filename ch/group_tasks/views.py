@@ -23,7 +23,8 @@ from datetime import timedelta
 from django.utils.timezone import now
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-
+from decimal import Decimal
+from .models import TaskTimeTracking
 # Create your views here.
 
 # Task creation
@@ -587,41 +588,40 @@ def update_tags(request, org_id, group_id, task_id):
 
 
 # Handle time tracking
-from decimal import Decimal
-from .models import TaskTimeTracking
 
-@login_required  # Ensure that the user is logged in
+
+@login_required 
 def save_time(request, org_id, group_id, task_id):
     try:
-        # Ensure the request method is POST
+        
         if request.method != 'POST':
             return JsonResponse({'error': 'Invalid request method'}, status=400)
 
-        # Parse the JSON body of the request
+    
         data = json.loads(request.body)
 
-        # Get the time spent from the parsed data
-        time_spent = data.get('time_spent')  # Time should be in hours
+     
+        time_spent = data.get('time_spent')  
 
         if not time_spent:
             return JsonResponse({'error': 'Time spent is required'}, status=400)
 
         try:
-            # Convert time_spent to Decimal (for precise decimal calculations)
+     
             time_spent = Decimal(time_spent)
         except ValueError:
             return JsonResponse({'error': 'Invalid time format'}, status=400)
 
-        # Fetch the related objects
+    
         organization = get_object_or_404(Organization, id=org_id)
         group = get_object_or_404(Group, id=group_id, organization=organization)
         task = get_object_or_404(Task, id=task_id, group=group)
 
-        # Ensure the user is part of the group
+  
         if not group.members.filter(user=request.user).exists():
             return JsonResponse({'error': 'User is not a member of this group'}, status=400)
 
-        # Create or update the time tracking entry
+
         time_tracking_entry, created = TaskTimeTracking.objects.get_or_create(
             task=task,
             user=request.user,
@@ -640,7 +640,7 @@ def save_time(request, org_id, group_id, task_id):
         print("Time Spent:",time_spent)
 
         if not created:
-            # If the entry already exists, update the time_spent
+        
             time_tracking_entry.time_spent += time_spent
             time_tracking_entry.save()
 
