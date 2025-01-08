@@ -4,6 +4,7 @@ from accounts.models import Profile , Organization
 from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import timedelta
+from django.utils.timezone import now
 # Create your models here.
 
 
@@ -267,3 +268,32 @@ class TaskTimer(models.Model):
             self.accumulated_time += (timezone.now() - self.start_time)
             self.is_running = False
             self.save() 
+
+
+# Show activity log
+class ActivityLog(models.Model):
+    ACTION_CHOICES = [
+        ('COMMENT', 'Commented on the task'),
+        ('NOTE', 'Added a note'),
+        ('START_TIMER', 'Started the timer'),
+        ('STOP_TIMER', 'Stopped the timer'),
+        ('PROGRESS_UPDATE', 'Updated progress'),
+        ('TASK_CREATED', 'Created a task'),
+        ('TASK_COMPLETED', 'Marked task as completed'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="activity_logss")
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="activity_logss")
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="activity_logss", null=True, blank=True)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="activity_logss", null=True, blank=True)
+    action = models.CharField(max_length=50, choices=ACTION_CHOICES)
+    details = models.TextField(null=True, blank=True, help_text="Optional details about the action.")
+    timestamp = models.DateTimeField(default=now)
+
+    class Meta:
+        ordering = ['-timestamp']
+        verbose_name = "Activity Log"
+        verbose_name_plural = "Activity Logs"
+
+    def __str__(self):
+        return f"{self.user.username} {self.get_action_display()} at {self.timestamp}"

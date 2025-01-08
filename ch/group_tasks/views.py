@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect , get_list_or_404
-from .models import Task, TaskNote, TaskComment , TaskTag
+from .models import Task, TaskNote, TaskComment , TaskTag, ActivityLog
 from accounts.models import Organization, Profile
 from groups.models import Group
 from django.views import View
@@ -247,15 +247,29 @@ def add_comment(request, org_id, group_id, task_id):
         return JsonResponse({'error': 'Comment cannot be empty.'}, status=400)
 
 
-    comment = TaskComment(
-        task=task,
+    try:
+      comment = TaskComment.objects.create(
+         task=task,
+         user=request.user,
+         organization=organization,
+         group=group,
+         comment=comment_text,
+         created_at=timezone.now()
+     )
+
+    # Log the activity
+      ActivityLog.objects.create(
         user=request.user,
         organization=organization,
         group=group,
-        comment=comment_text,
-        created_at=timezone.now()
+        task=task,
+        action='COMMENT',
+        details=f"Added a comment: '{comment.comment}'"
     )
-    comment.save()
+    except Exception as e:
+    
+       print(f"Error saving comment or activity log: {e}")
+
 
  
     return JsonResponse({
@@ -289,6 +303,16 @@ def add_task_note(request, org_id, group_id, task_id):
                 organization=organization,
                 group=group,
             )
+
+            # Log the activity
+            ActivityLog.objects.create(
+              user=request.user,
+              organization=organization,
+              group=group,
+              task=task,
+              action='NOTE',
+              details=f"Added a note: '{note.note}'"
+           )
        
             return JsonResponse({
                 'note_id': note.id,
@@ -318,6 +342,7 @@ def manage_task_timer(request, org_id, group_id, task_id):
         defaults={'start_time': timezone.now(), 'is_running': False, 'accumulated_time': timezone.timedelta()},
     )
 
+
     if request.method == "POST":
         if 'start' in request.POST:
             # Start the timer
@@ -325,6 +350,16 @@ def manage_task_timer(request, org_id, group_id, task_id):
                 timer.start_time = timezone.now()
                 timer.is_running = True
                 timer.save()
+                # Log the activity
+                ActivityLog.objects.create(
+                  user=request.user,
+                  organization=organization,
+                  group=group,
+                  task=task,
+                  action='START_TIMER',
+                  details=f"Started a timer: '{timer.start_time}'"
+                )
+       
                 return JsonResponse({'status': 'started', 'message': 'Timer started successfully.'})
 
         elif 'stop' in request.POST:
@@ -333,6 +368,15 @@ def manage_task_timer(request, org_id, group_id, task_id):
                 timer.accumulated_time += timezone.now() - timer.start_time
                 timer.is_running = False
                 timer.save()
+                ActivityLog.objects.create(
+                  user=request.user,
+                  organization=organization,
+                  group=group,
+                  task=task,
+                  action='STOP_TIMER',
+                  details=f"Stopeed the timer: '{timer.accumulated_time}'"
+                )
+       
                 return JsonResponse({'status': 'stopped', 'message': 'Timer stopped and time saved successfully.'})
 
     return JsonResponse({'status': 'error', 'message': 'Invalid action.'})
@@ -349,10 +393,56 @@ def update_task_progress(request, org_id, group_id, task_id):
         new_progress = int(request.POST.get('progress', 0))
 
         if 0 <= new_progress <= 100:
-            task.progress = new_progress
-            task.save()
+            try:
+              task.progress = new_progress
+              task.save()
+              ActivityLog.objects.create(
+                  user=request.user,
+                  organization=organization,
+                  group=group,
+                  task=task,
+                  action='PROGRESS_UPDATE',
+                  details=f"Updated the progreess: '{task.progress}'"
+                )
+            except Exception as e:
+                return JsonResponse({'error':str(e)}, status=400)  
+       
             return JsonResponse({'status': 'success', 'progress': task.progress})
         else:
             return JsonResponse({'status': 'error', 'message': 'Progress must be between 0 and 100.'}, status=400)
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
+
+
+
+# Fetch activity logs
+
+def fetch_activity_logs(request, org_id, group_id, task_id):
+    organization = get_object_or_404(Organization, id=org_id)
+    group = get_object_or_404(Group, id=group_id, organization=organization)
+    task = get_object_or_404(Task, id=task_id, group=group, organization=organization)
+
+  
+    group_member = GroupMember.objects.filter(group=group, user=request.user).exists()
+    if not group_member:
+        return JsonResponse({'status': 'error', 'message': 'You are not a member of this group.'})
+
+
+    activity_logs = ActivityLog.objects.filter(
+        user=request.user,
+        organization=organization,
+        group=group,
+        task=task
+    ).order_by('-timestamp')  
+
+  
+    logs_data = []
+    for log in activity_logs:
+        logs_data.append({
+            'action': log.action,
+            'details': log.details,
+            'created_at': log.timestamp.strftime('%Y-%m-%d %H:%M:%S'), 
+        })
+
+    
+    return JsonResponse({'status': 'success', 'activity_logs': logs_data})

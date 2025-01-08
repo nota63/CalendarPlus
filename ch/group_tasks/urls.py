@@ -12,5 +12,6 @@ urlpatterns = [
     path('task/<int:org_id>/<int:group_id>/<int:task_id>/add_note/', add_task_note, name='add_task_note'),
     path('task/<int:org_id>/<int:group_id>/<int:task_id>/manage_timer/',manage_task_timer, name='manage_task_timer'),
     path('tasks/<int:org_id>/<int:group_id>/<int:task_id>/update_progress/',update_task_progress, name='update_task_progress'),
+    path('tasks/<int:org_id>/<int:group_id>/<int:task_id>/activity_logs/', fetch_activity_logs, name='fetch_activity_logs'),
 ]
 
