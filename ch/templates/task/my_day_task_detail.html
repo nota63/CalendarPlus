@@ -46,6 +46,7 @@
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
 /* Dark sidebar styling */
+/* Dark sidebar styling */
 .activity-logs-sidebar {
     position: fixed;
     top: 0;
@@ -58,6 +59,7 @@
     transition: right 0.3s ease;
     z-index: 999;
     box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+    overflow-y: auto; /* Enable vertical scrolling */
 }
 
 /* Sidebar content */
@@ -151,6 +153,56 @@ or: pointer;
 }
 
 
+/* Style for the tag container and tags */
+.badge.bg-warning {
+    font-size: 0.85rem;  /* Reduces font size */
+    padding: 0.4rem 0.6rem;  /* Adjusts padding to make the tag smaller */
+    border-radius: 12px;  /* Adds rounded corners */
+    margin-right: 5px;  /* Adds spacing between tags */
+    margin-bottom: 5px;  /* Adds spacing below tags */
+}
+
+/* Style for the remove button inside the tag */
+.badge.bg-warning button.remove-tag {
+    font-size: 0.75rem;  /* Reduces the size of the remove button */
+    padding: 0.2rem 0.4rem;  /* Adjusts padding of the button */
+    margin-left: 8px;  /* Adds space between the tag text and the button */
+    border-radius: 50%;  /* Makes the remove button circular */
+    background-color: #dc3545;  /* Red background for the remove button */
+    color: white;  /* White text color */
+    border: none;  /* Removes button border */
+    transition: background-color 0.3s ease;  /* Smooth transition for hover effect */
+}
+
+.badge.bg-warning button.remove-tag:hover {
+    background-color: #c82333;  /* Darker red on hover */
+    cursor: pointer;  /* Changes cursor to pointer on hover */
+}
+/* Style for the add tag button */
+#add-tag-btn {
+    font-size: 0.9rem;  /* Reduces font size for a smaller button */
+    padding: 0.3rem 0.5rem;  /* Adjusts padding to make the button smaller */
+    border-radius: 25px;  /* Makes the button more rounded */
+    background-color: #28a745;  /* Green color for the add button */
+    color: white;  /* White text color */
+    border: none;  /* No border */
+    transition: background-color 0.3s ease;  /* Smooth transition for hover effect */
+}
+
+#add-tag-btn:hover {
+    background-color: #218838;  /* Darker green on hover */
+    cursor: pointer;  /* Pointer cursor on hover */
+}
+
+/* Style for the 'No tags' message */
+.badge.bg-secondary {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 12px;
+    background-color: #6c757d;  /* Gray background for 'No tags' */
+    color: white;
+}
+
 
 
 
@@ -178,6 +230,35 @@ or: pointer;
         </div>
     </div>
 </div>
+
+
+
+
+<div class="modal fade" id="addTagModal" tabindex="-1" aria-labelledby="addTagModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addTagModalLabel">Add Tag</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Dropdown for predefined tags -->
+        <select class="form-select" id="tag-select">
+          <option value="">Select a tag</option>
+          <option value="Important">Important</option>
+          <option value="Urgent">Urgent</option>
+          <option value="Low Priority">Low Priority</option>
+          <option value="Completed">Completed</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="save-tag-btn">Save Tag</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 
 
@@ -240,17 +321,38 @@ or: pointer;
             <h4>Additional Features</h4>
 
             <!-- Displaying tags -->
-            <p><strong>Tags:</strong>
-                {% if task.tags.all %}
-                    {% for tag in task.tags.all %}
-                        <span class="badge bg-warning">{{ tag.name }}</span>
-                    {% endfor %}
-                {% else %}
-                    <span class="badge bg-secondary">No tags</span>
-                {% endif %}
-            </p>
-
-
+            <!-- Displaying tags -->
+<p><strong>Tags:</strong>
+    {% if task.tags.all %}
+        {% for tag in task.tags.all %}
+            <span class="badge bg-warning" 
+                  id="tag-{{ tag.id }}" 
+                  data-task-id="{{ task.id }}"
+                  data-org-id="{{ org_id }}"
+                  data-group-id="{{ group_id }}">
+                {{ tag.name }}
+                <button class="btn btn-sm btn-danger remove-tag" 
+                        data-tag="{{ tag.name }}" 
+                        data-tag-id="{{ tag.id }}"
+                        data-task-id="{{ task.id }}"
+                        data-org-id="{{ org_id }}"
+                        data-group-id="{{ group_id }}">-</button>
+            </span>
+        {% endfor %}
+        <button class="btn btn-sm btn-success" 
+                id="add-tag-btn"
+                data-task-id="{{ task.id }}"
+                data-org-id="{{ org_id }}"
+                data-group-id="{{ group_id }}">+</button>
+    {% else %}
+        <span class="badge bg-secondary">No tags</span>
+        <button class="btn btn-sm btn-success" 
+                id="add-tag-btn"
+                data-task-id="{{ task.id }}"
+                data-org-id="{{ org_id }}"
+                data-group-id="{{ group_id }}">+</button>
+    {% endif %}
+</p>
 
             <!-- Track the time -->
 
@@ -651,7 +753,114 @@ function getCSRFToken() {
     return '';
 }
 
+/* Handle add remove tag  */
+// Handle Add Tag Button click
+document.getElementById('add-tag-btn').addEventListener('click', function () {
+    const taskId = this.getAttribute('data-task-id');  // Fetch task ID
+    const orgId = this.getAttribute('data-org-id');  // Fetch org ID
+    const groupId = this.getAttribute('data-group-id');  // Fetch group ID
+    
+    // Open the modal to choose tags
+    $('#addTagModal').modal('show');
+    
+    // Handle tag selection
+    document.getElementById('save-tag-btn').addEventListener('click', function () {
+        const selectedTag = document.getElementById('tag-select').value;  // Get selected tag
+        if (!selectedTag) {
+            alert('Please select a tag.');
+            return;
+        }
 
+        // Send an AJAX request to add the tag
+        fetch(`/tasks/tasks/${orgId}/${groupId}/${taskId}/update_tags/`, {  // Corrected the URL structure
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(), // Ensure you include your CSRF token
+            },
+            body: JSON.stringify({ action: 'add', tag_name: selectedTag }),  // Send action and tag_name
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.tag_name) {  // Check if tag_name exists in the response
+                // Create the new tag element
+                const tagBadge = document.createElement('span');
+                tagBadge.classList.add('badge', 'bg-warning');
+                tagBadge.setAttribute('id', 'tag-' + data.tag_name);  // Set id for the tag
+                tagBadge.textContent = data.tag_name;
+
+                // Create the remove button
+                const removeButton = document.createElement('button');
+                removeButton.classList.add('btn', 'btn-sm', 'btn-danger', 'remove-tag');
+                removeButton.setAttribute('data-tag', data.tag_name);  // Use tag_name
+                removeButton.setAttribute('data-tag-id', data.tag_name);  // Use tag_name for the tag id
+                removeButton.setAttribute('data-task-id', taskId);  // Set task id
+                removeButton.setAttribute('data-org-id', orgId);  // Set org id
+                removeButton.setAttribute('data-group-id', groupId);  // Set group id
+                removeButton.textContent = '-';
+                
+                // Append the remove button to the tag
+                tagBadge.appendChild(removeButton);
+
+                // Append the new tag to the tag container dynamically
+                const tagContainer = document.querySelector('p');
+                if (tagContainer) {
+                    // If there's an existing "No tags" message, remove it
+                    const noTagsElement = tagContainer.querySelector('.badge.bg-secondary');
+                    if (noTagsElement) {
+                        noTagsElement.remove(); // Remove "No tags" message
+                    }
+
+                    // Append the new tag badge to the container
+                    tagContainer.appendChild(tagBadge);
+                }
+
+                $('#addTagModal').modal('hide'); // Close the modal
+            } else {
+                alert('Failed to add tag.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred.');
+        });
+    });
+});
+// Remove tag event listener (Improved delegation)
+document.addEventListener('click', function (event) {
+    if (event.target && event.target.classList.contains('remove-tag')) {
+        // Make sure the event is triggered by the button with class 'remove-tag'
+        
+        const tagElement = event.target.closest('.badge');  // Find the parent badge element
+        const taskId = tagElement.getAttribute('data-task-id');  // Fetch task ID from the badge parent
+        const orgId = tagElement.getAttribute('data-org-id');  // Fetch org ID from the badge parent
+        const groupId = tagElement.getAttribute('data-group-id');  // Fetch group ID from the badge parent
+        const tagName = event.target.getAttribute('data-tag');  // Fetch tag name
+        
+        // Send an AJAX request to remove the tag
+        fetch(`/tasks/tasks/${orgId}/${groupId}/${taskId}/update_tags/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(),
+            },
+            body: JSON.stringify({ action: 'remove', tag_name: tagName }),  // Send action and tag_name
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.tag_name) {  // Check if tag_name exists in the response
+                // Remove the tag from the displayed list
+                tagElement.remove();  // Remove the tag element from the DOM
+            } else {
+                alert('Failed to remove tag.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred.');
+        });
+    }
+});
 
     </script>
 

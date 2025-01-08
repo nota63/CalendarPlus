@@ -524,4 +524,63 @@ def toggle_task_status(request, org_id, group_id,task_id):
     return JsonResponse({'status': 'error', 'message': 'Invalid request.'}, status=400)
 
 
+# Handle task tags 
+import json
 
+
+@csrf_exempt
+def update_tags(request, org_id, group_id, task_id):
+    if request.method == 'POST':
+        try:
+           
+            data = json.loads(request.body)
+            action = data.get('action')
+            tag_name = data.get('tag_name')
+
+            organization = get_object_or_404(Organization, id=org_id)
+            group = get_object_or_404(Group, id=group_id, organization=organization)
+            
+            task = get_object_or_404(Task, id=task_id,group=group,organization=organization)
+            if not GroupMember.objects.filter(group=group, user=request.user, organization=organization).exists():
+               return JsonResponse({'status': 'error', 'message': 'Permission denied.'}, status=403)
+        
+            if action == 'add' and tag_name in dict(TaskTag.PREDEFINED_TAGS):
+                # Check if tag already exists for this task
+                existing_tag = TaskTag.objects.filter(task=task, name=tag_name).first()
+                if not existing_tag:
+                    TaskTag.objects.create(task=task, name=tag_name, organization=organization, group=group)
+                    ActivityLog.objects.create(
+                        user=request.user,
+                        organization=organization,
+                        group=group,
+                        task=task,
+                        action = "TAG_ADDED",
+                        details=f" {request.user} Added a tag in task:'{tag_name}'"
+                    )
+                    return JsonResponse({'tag_name': tag_name}, status=200)
+                else:
+                    return JsonResponse({'error': 'Tag already added'}, status=400)
+            
+            elif action == 'remove' and tag_name in dict(TaskTag.PREDEFINED_TAGS):
+                # Remove tag from task
+                tag = TaskTag.objects.filter(task=task, name=tag_name).first()
+                if tag:
+                    tag.delete()
+                    ActivityLog.objects.create(
+                        user=request.user,
+                        organization=organization,
+                        group=group,
+                        task=task,
+                        action = "TAG_REMOVED",
+                        details=f" {request.user} Removed The tag from task:'{tag_name}'"
+                    )
+                    return JsonResponse({'tag_name': tag_name}, status=200)
+                else:
+                    return JsonResponse({'error': 'Tag not found'}, status=400)
+
+            return JsonResponse({'error': 'Invalid action or tag'}, status=400)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)

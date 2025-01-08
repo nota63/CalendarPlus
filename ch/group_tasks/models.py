@@ -306,6 +306,8 @@ class ActivityLog(models.Model):
         ('TASK_CREATED', 'Created a task'),
         ('TASK_COMPLETED', 'Marked task as completed'),
         ('TASK_PENDING','Marked task as pending'),
+        ('TAG_ADDED','Added a tag in task'),
+        ('TAG_REMOVED','Removed the tag from task')
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="activity_logss")
