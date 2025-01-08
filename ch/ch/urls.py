@@ -37,6 +37,7 @@ urlpatterns = [
     path('contacts/',include('contacts.urls')),
     path('security/', include('security.urls')),
     path('groups/', include('groups.urls')),
+    path('tasks/',include('group_tasks.urls')),
     # ui components
     path('styles/', views.styles, name= 'styles'),
     path('weather/',views.weather, name='weather'),

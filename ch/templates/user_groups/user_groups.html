@@ -113,6 +113,7 @@
                                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                 <li><a class="dropdown-item" href="{% url 'manage_group_users' org_id=group.organization.id group_id=group.id %}">Manage Members</a></li>
                                                 <li><a class="dropdown-item" href="{% url 'group_details' org_id=group.organization.id group_id=group.id %}">Group Info</a></li>
+                                                <li><a class="dropdown-item" href="{% url 'create_task' org_id=group.organization.id group_id=group.id %}">Task & Assign</a></li>
                                             </ul>
                                         </div>
                                     {% endif %}
@@ -128,6 +129,7 @@
                                             <li><a class="dropdown-item" href="{% url 'display_groups' org_id=group.organization.id %}">View Group</a></li>
                                             <li><a class="dropdown-item" href="{% url 'display_group_events' org_id=group.organization.id group_id=group.id %}">Group Events</a></li>
                                             <li><a class="dropdown-item" href="{% url 'group_event_calendar' org_id=group.organization.id group_id=group.id %}">Group Calendar</a></li>
+                                            <li><a class="dropdown-item" href="{% url 'task_calendar' org_id=group.organization.id group_id=group.id %}">Tasks & Calendar</a></li>
                                         </ul>
                                     </div>
                                 </div>

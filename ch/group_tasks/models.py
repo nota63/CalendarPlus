@@ -2,7 +2,8 @@ from django.db import models
 from groups.models import Group, GroupMember, GroupEvent, GroupInvitation, GroupEventBooking
 from accounts.models import Profile , Organization
 from django.contrib.auth.models import User
-
+from django.utils import timezone
+from datetime import timedelta
 # Create your models here.
 
 
@@ -169,5 +170,100 @@ class Task(models.Model):
 
 
 
+# Add day to track the task
+class AddDay(models.Model):
+    
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    timer_start_time = models.DateTimeField(null=True, blank=True)
+    timer_end_time = models.DateTimeField(null=True, blank=True)
+    timer_running = models.BooleanField(default=False)
+    comment = models.TextField(null=True, blank=True)
+    notes = models.TextField(null=True, blank=True)
+    
+   
+    TAG_CHOICES = [
+        ('urgent', 'Urgent'),
+        ('important', 'Important'),
+        ('low', 'Low'),
+    ]
+    tags = models.CharField(max_length=10, choices=TAG_CHOICES, null=True, blank=True)
+
+    # Date added to "My Day" list
+    added_on = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Task {self.task.title} - My Day ({self.user.username})"
 
 
+
+# Store task comments , notes , and tags
+# Model to store comments on tasks
+class TaskComment(models.Model):
+    task = models.ForeignKey('Task', on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True, blank=True ) 
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True  ) 
+    comment = models.TextField()
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Comment by {self.user.username} on {self.task.title}"
+
+    class Meta:
+        ordering = ['created_at']
+
+
+# Model to store tags for tasks
+class TaskTag(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='tags')
+    name = models.CharField(max_length=50, unique=True)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE,null=True, blank=True)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True )  
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']
+
+
+# Model to store notes on tasks
+class TaskNote(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='notes')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True, blank=True)  
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True) 
+    note = models.TextField()
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"Note by {self.user.username} on {self.task.title}"
+
+    class Meta:
+        ordering = ['created_at']
+
+
+# Task timer 
+
+class TaskTimer(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)  
+    start_time = models.DateTimeField(auto_now_add=True)  
+    accumulated_time = models.DurationField(default=timedelta)  
+    is_running = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Timer for {self.task.title} by {self.user.username}"
+
+    def stop_timer(self):
+        """Stop the timer and update the accumulated time"""
+        if self.is_running:
+            self.accumulated_time += (timezone.now() - self.start_time)
+            self.is_running = False
+            self.save() 

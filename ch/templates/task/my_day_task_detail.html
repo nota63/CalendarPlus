@@ -1,0 +1,232 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ task.title }} - Task Details</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Dark Theme -->
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+        }
+        .task-container {
+            margin: 20px auto;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            max-width: 800px;
+        }
+        .task-icon {
+            font-size: 2rem;
+            color: #f39c12;
+        }
+        .btn-back {
+            color: #ffffff;
+            background-color: #007bff;
+            border: none;
+            transition: background-color 0.3s;
+        }
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Modal to add notes  -->
+
+<!-- Modal to add note -->
+<div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addNoteModalLabel">Add Note</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <textarea id="noteText" class="form-control" rows="4" placeholder="Enter your note"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveNoteButton">Save Note</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+    <div class="container">
+        <div class="task-container">
+            <h1 class="mb-4"><i class="bi bi-list-task task-icon"></i> {{ task.title }}</h1>
+            <p><strong>Description:</strong> {{ task.description }}</p>
+            <p><strong>Priority:</strong> <span class="badge bg-danger">{{ task.priority }}</span></p>
+            <p><strong>Deadline:</strong> {{ task.deadline }}</p>
+            <p><strong>Progress:</strong></p>
+            <div class="progress mb-3">
+                <div class="progress-bar bg-success" role="progressbar" style="width: {{ task.progress }}%" aria-valuenow="{{ task.progress }}" aria-valuemin="0" aria-valuemax="100">{{ task.progress }}%</div>
+            </div>
+            <hr>
+            <h4>Additional Features</h4>
+
+            <!-- Displaying tags -->
+            <p><strong>Tags:</strong>
+                {% if task.tags.all %}
+                    {% for tag in task.tags.all %}
+                        <span class="badge bg-warning">{{ tag.name }}</span>
+                    {% endfor %}
+                {% else %}
+                    <span class="badge bg-secondary">No tags</span>
+                {% endif %}
+            </p>
+
+            <!-- Displaying notes -->
+<p><strong>Notes:</strong>
+    {% if task.notes.all %}
+        <ul id="taskNotesList">
+            {% for note in task.notes.all %}
+                <li><strong>{{ note.user.username }}:</strong> {{ note.note }} ({{ note.created_at|date:"F j, Y, g:i a" }})</li>
+            {% endfor %}
+        </ul>
+        <!-- Button to open the modal -->
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">
+            Add Note
+        </button>
+    {% else %}
+        <span>No notes yet.</span>
+    {% endif %}
+</p>
+
+
+
+            <!-- Displaying comments -->
+            <p><strong>Comments:</strong>
+                {% if task.comments.all %}
+                    <ul id="comments-list">
+                        {% for comment in task.comments.all %}
+                            <li><strong>{{ comment.user.username }}:</strong> {{ comment.comment }} ({{ comment.created_at|date:"F j, Y, g:i a" }})</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <span>No comments yet.</span>
+                {% endif %}
+            </p>
+
+            <!-- Comment Input -->
+            <div class="form-group">
+                <textarea id="comment-text" class="form-control" rows="3" placeholder="Add your comment..."></textarea>
+            </div>
+            <button id="submit-comment" class="btn btn-primary mt-2" 
+                    data-org-id="{{ org_id }}" data-group-id="{{ group_id }}" data-task-id="{{ task.id }}">
+                Add Comment
+            </button>
+
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+       $(document).ready(function() {
+    $('#submit-comment').click(function() {
+        var commentText = $('#comment-text').val().trim();
+        if (commentText == "") {
+            alert("Please write a comment before submitting.");
+            return;
+        }
+
+        var orgId = $(this).data('org-id');
+        var groupId = $(this).data('group-id');
+        var taskId = $(this).data('task-id');
+
+        // Construct the URL using JavaScript
+        var url = '/tasks/task/' + orgId + '/' + groupId + '/' + taskId + '/add_comment/';
+
+        // Send the comment via AJAX
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: {
+                'comment': commentText,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                // Append new comment to the list
+                $('#comments-list').append('<li><strong>' + response.username + ':</strong> ' + response.comment + ' (' + response.created_at + ')</li>');
+
+                // Clear the comment text area
+                $('#comment-text').val('');
+            },
+            error: function(xhr, errmsg, err) {
+                alert("Error submitting comment. Please try again.");
+            }
+        });
+    });
+});
+
+
+// Handle add note featue
+// JavaScript to handle the AJAX request for adding a note
+document.getElementById("saveNoteButton").addEventListener("click", function() {
+    // Fetch the task ID, org ID, and group ID from template context
+    var taskId = '{{ task.id }}';
+    var orgId = '{{ org_id }}';
+    var groupId = '{{ group_id }}';
+
+    // Get the note content
+    var noteContent = document.getElementById("noteText").value;
+
+    if (noteContent.trim() === "") {
+        alert("Please enter a note!");
+        return;
+    }
+
+    // Construct the URL dynamically using JavaScript syntax
+    var url = "/tasks/task/" + orgId + "/" + groupId + "/" + taskId + "/add_note/";
+
+    // Send the note via AJAX
+    $.ajax({
+        type: 'POST',
+        url: url,
+        data: {
+            'note': noteContent,
+            'csrfmiddlewaretoken': '{{ csrf_token }}' // CSRF token for security
+        },
+        success: function(response) {
+            // Close the modal
+            $('#addNoteModal').modal('hide');
+
+            // Append the new note to the list of notes (or update UI as needed)
+            var newNote = "<li><strong>You:</strong> " + response.note + " (" + response.created_at + ")</li>";
+            document.querySelector("#taskNotesList").insertAdjacentHTML('beforeend', newNote);
+
+            // Clear the textarea
+            document.getElementById("noteText").value = "";
+        },
+        error: function(xhr, status, error) {
+            alert("Error while adding note: " + error);
+        }
+    });
+});
+
+    </script>
+
+</body>
+</html>
+
