@@ -506,6 +506,23 @@ or: pointer;
     align-items: center;
 }
 
+.dropdown-toggle {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #6c757d; /* Subtle gray for premium look */
+}
+
+.dropdown-menu {
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-item:hover {
+    background-color: #28a745; /* Match "success" button color */
+    color: white;
+}
 
 
     </style>
@@ -593,16 +610,40 @@ or: pointer;
             {% if problems %}
                 {% for problem in problems %}
                     <li>
-                        <strong>{{ problem.reported_by.username }}:</strong> 
-                        {{ problem.description }} 
+                        <strong>{{ problem.reported_by.username }}:</strong>
+                        {{ problem.description }}
                         ({{ problem.created_at|date:"F j, Y, g:i a" }}) 
                         <strong>Is Resolved: {{ problem.is_resolved }}</strong>
+                        
+                        <!-- Three-dot menu -->
+                        <div class="dropdown" style="display: inline-block; position: relative;">
+                            <button class="btn btn-secondary dropdown-toggle" 
+                                    type="button" 
+                                    id="dropdownMenuButton{{ problem.id }}" 
+                                    data-bs-toggle="dropdown" 
+                                    aria-expanded="false"
+                                    style="background: none; border: none; font-size: 20px; cursor: pointer;">
+                                &#x22EE; <!-- Vertical ellipsis -->
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ problem.id }}">
+                                <li>
+                                    <button class="dropdown-item resolve-problem-btn" 
+                                            data-org-id="{{ organization.id }}" 
+                                            data-group-id="{{ group.id }}" 
+                                            data-task-id="{{ task.id }}" 
+                                            data-problem-id="{{ problem.id }}">
+                                        Mark as Resolved
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
                     </li>
                 {% endfor %}
             {% else %}
                 <span>No problems yet.</span>
             {% endif %}
         </ul>
+        
     </div>
 </div>
 
@@ -1446,6 +1487,91 @@ function getCSRFToken() {
     }
     return csrfToken;
 }
+
+
+// Handle problem resolve
+document.addEventListener('DOMContentLoaded', function () {
+    // Attach event listeners to all resolve-problem buttons
+    document.querySelectorAll('.resolve-problem-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            const orgId = this.getAttribute('data-org-id');
+            const groupId = this.getAttribute('data-group-id');
+            const taskId = this.getAttribute('data-task-id');
+            const problemId = this.getAttribute('data-problem-id');
+
+            console.log(`Resolving problem with orgId=${orgId}, groupId=${groupId}, taskId=${taskId}, problemId=${problemId}`);
+
+            // Reference to the current list item
+            const problemListItem = this.closest('li');
+            if (!problemListItem) {
+                console.error("Problem list item not found!");
+                return;
+            }
+
+            fetch(`/tasks/tasks/${orgId}/${groupId}/${taskId}/resolve_problem/${problemId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(), // Ensure CSRF token is sent
+                },
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Server response:", data);
+                    if (data.success) {
+                        alert('Problem marked as resolved!');
+
+                        // Update the Is Resolved field in the UI
+                        const isResolvedField = problemListItem.querySelector('strong:nth-of-type(2)');
+                        if (isResolvedField) {
+                            isResolvedField.textContent = 'Is Resolved: True';
+                        } else {
+                            console.warn("Is Resolved field not found!");
+                        }
+
+                        // Remove the resolve button
+                        const resolveButton = problemListItem.querySelector('.resolve-problem-btn');
+                        if (resolveButton) {
+                            resolveButton.remove();
+                        } else {
+                            console.warn("Resolve button not found!");
+                        }
+                    } else {
+                        alert('Failed to mark the problem as resolved.');
+                        console.error("Error response from server:", data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error occurred:', error);
+                    alert('An error occurred while resolving the problem.');
+                });
+        });
+    });
+});
+
+// Function to get CSRF token from cookies
+function getCSRFToken() {
+    let csrfToken = null;
+    const cookieValue = document.cookie.split(';').find(cookie => cookie.trim().startsWith('csrftoken='));
+    if (cookieValue) {
+        csrfToken = cookieValue.split('=')[1];
+    }
+    return csrfToken;
+}
+
+
+
+
+
+
+
+
+
 
 // stopwatrch functions
 startStopBtn.addEventListener('click', toggleStopwatch);

@@ -708,3 +708,46 @@ def create_problem(request, org_id, group_id, task_id):
                'is_resolved': problem.is_resolved,
              }, status=200)
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+# resolve the problem
+
+@login_required
+def resolve_problem(request, org_id, group_id, task_id, problem_id):
+    if request.method == 'POST':
+        organization = get_object_or_404(Organization, id=org_id)
+        group = get_object_or_404(Group, id=group_id, organization=organization)
+        task = get_object_or_404(Task, id=task_id, group=group,organization=organization)
+        problem = get_object_or_404(Problem, id=problem_id, task=task, group=group, organization=organization)
+
+        
+        print(f"User: {request.user.username}, Task Creator: {task.created_by.username}")
+        print(f"User Role in Group: {group.members.filter(user=request.user).first().role if group.members.filter(user=request.user).exists() else 'No Role'}")
+
+       
+       
+        if not group.members.filter(user=request.user).exists():
+            return JsonResponse({'error': 'You do not have permission to resolve this problem.'}, status=403)
+
+       
+        problem.is_resolved = True
+        ActivityLog.objects.create(
+            user=request.user,
+            organization=organization,
+            group=group,
+            task=task,
+            action='RESOLVED_PROBLEM',
+            details=f" {request.user} Resolved a problem :'{problem.description}\n reported to {problem.task_created_by}'"
+
+        )
+        problem.save()
+
+    
+        return JsonResponse({
+            'success': 'Problem marked as resolved.',
+            'problem_id': problem.id,
+            'is_resolved': problem.is_resolved,
+            'resolved_at': problem.updated_at.isoformat(),
+        }, status=200)
+
+   
+    return JsonResponse({'error': 'Invalid request method.'}, status=405)
