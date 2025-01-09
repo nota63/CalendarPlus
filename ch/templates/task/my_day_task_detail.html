@@ -454,17 +454,64 @@ or: pointer;
 
 
 
+/* styles for spinner */
+/* Spinner and loading text container */
+#loading-spinner {
+    display: none;
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3; /* Light background */
+    border-top: 4px solid #007bff; /* Blue color for the spinner */
+    border-radius: 50%;
+    animation: spin 2s linear infinite;
+}
+
+#loading-text {
+    display: none;
+    font-size: 16px;
+    font-weight: 500;
+    color: #007bff; /* Match the blue of the spinner */
+    margin-left: 10px;
+    vertical-align: middle;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Animation for spinner */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Additional premium feel for the form button and text */
+#raise-problem-btn {
+    position: relative;
+    padding-right: 50px; /* Space for the spinner */
+    transition: all 0.3s ease-in-out;
+}
+
+#raise-problem-btn:disabled {
+    background-color: #d6d6d6;
+    cursor: not-allowed;
+}
+
+/* Optionally, add a hover effect on the button */
+#raise-problem-btn:hover {
+    background-color: #e03e3e;
+    color: #fff;
+}
+
+/* You can also center the spinner and text vertically */
+.spinner-container {
+    display: flex;
+    align-items: center;
+}
+
 
 
     </style>
 </head>
 <body>
     
-
-
-
-
-
 
 <!-- Modal to add notes  -->
 
@@ -524,6 +571,24 @@ or: pointer;
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
+
+        <h5>Raise a Problem</h5>
+        <form id="raise-problem-form">
+            <div class="form-group">
+                <label for="problem-description">Problem Description</label>
+                <textarea id="problem-description" class="form-control" rows="4" placeholder="Describe the problem..."></textarea>
+            </div>
+            <button type="button" id="raise-problem-btn" data-org-id="{{ organization.id }}" data-group-id="{{ group.id }}" data-task-id="{{ task.id }}" class="btn btn-danger mt-3">Report Problem</button>
+
+
+             <!-- Spinner for loading indication -->
+           <!-- Spinner for loading indication -->
+            <div id="loading-spinner" class="spinner-border text-primary" role="status" style="display: none;">
+                 <span class="visually-hidden">Loading...</span>
+             </div>
+              <div id="loading-text" style="display: none;">Reporting the problem to manager...</div>
+        </form>
+
         <ul id="problems-list">
             {% if problems %}
                 {% for problem in problems %}
@@ -570,6 +635,13 @@ or: pointer;
 
 
 
+<!-- Displaying Problems -->
+ <!-- View Problems Button -->
+ <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#problemsSidebar" aria-controls="problemsSidebar">
+    View Problems
+</button>
+
+
 
 <!-- Activity log  -->
 
@@ -597,13 +669,6 @@ or: pointer;
         {% endif %}
     </label>
 </div>
-
-<!-- Displaying Problems -->
- <!-- View Problems Button -->
-<button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#problemsSidebar" aria-controls="problemsSidebar">
-    View Problems
-</button>
-
 
 
 
@@ -1292,12 +1357,99 @@ function saveTime() {
 }
 
 // Event listeners for buttons
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const raiseProblemButton = document.getElementById('raise-problem-btn');
+    const loadingSpinner = document.getElementById('loading-spinner'); // Spinner element
+    const loadingText = document.getElementById('loading-text'); // Loading text element
+
+    if (raiseProblemButton) {
+        raiseProblemButton.addEventListener('click', function () {
+            const orgId = this.getAttribute('data-org-id');
+            const groupId = this.getAttribute('data-group-id');
+            const taskId = this.getAttribute('data-task-id');
+            const problemDescription = document.getElementById('problem-description').value;
+
+            if (!problemDescription) {
+                alert('Please provide a description for the problem.');
+                return;
+            }
+
+            // Show the spinner and text
+            loadingSpinner.style.display = 'inline-block';
+            loadingText.style.display = 'inline-block';
+
+            // Send an AJAX request to report the problem
+            fetch(`/tasks/tasks/${orgId}/${groupId}/${taskId}/create_problem/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(), // Ensure CSRF token is added here
+                },
+                body: JSON.stringify({
+                    description: problemDescription,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Problem reported successfully!');
+
+                    // Create a new list item for the reported problem
+                    const newProblemItem = document.createElement('li');
+                    newProblemItem.innerHTML = `
+                        <strong>${data.reported_by}</strong>: 
+                        ${data.description} 
+                        (${new Date(data.created_at).toLocaleString()}) 
+                        <strong>Is Resolved: ${data.is_resolved}</strong>
+                    `;
+
+                    // Append the new problem to the list
+                    const problemsList = document.getElementById('problems-list');
+                    if (problemsList) {
+                        problemsList.appendChild(newProblemItem);
+
+                        // Trigger the animation
+                        setTimeout(function () {
+                            newProblemItem.classList.add('show');
+                        }, 10); // Adding a small delay to trigger the transition
+                    }
+
+                    // Optionally, clear the problem description textarea
+                    document.getElementById('problem-description').value = '';
+                } else {
+                    alert('Failed to report the problem.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while reporting the problem.');
+            })
+            .finally(() => {
+                // Hide the spinner and text once the request is complete
+                loadingSpinner.style.display = 'none';
+                loadingText.style.display = 'none';
+            });
+        });
+    } else {
+        console.error('Raise Problem button not found');
+    }
+});
+
+// Function to get CSRF token from the cookies
+function getCSRFToken() {
+    let csrfToken = null;
+    const cookieValue = document.cookie.split(';').find(cookie => cookie.trim().startsWith('csrftoken='));
+    if (cookieValue) {
+        csrfToken = cookieValue.split('=')[1];
+    }
+    return csrfToken;
+}
+
+// stopwatrch functions
 startStopBtn.addEventListener('click', toggleStopwatch);
 resetBtn.addEventListener('click', resetStopwatch);
-
-
-
-// Fetch problems if any
 
     </script>
 

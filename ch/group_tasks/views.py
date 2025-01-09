@@ -657,3 +657,54 @@ def save_time(request, org_id, group_id, task_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+
+# Raise a problem
+@login_required
+def create_problem(request, org_id, group_id, task_id):
+    if request.method == 'POST':
+        try:
+         
+            data = json.loads(request.body)
+            description = data.get('description') 
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON format.'}, status=400)
+
+        organization = get_object_or_404(Organization, id=org_id)
+        group = get_object_or_404(Group, id=group_id, organization=organization)
+        task = get_object_or_404(Task, id=task_id, group=group)
+
+      
+        if not group.members.filter(user=request.user).exists():
+            return JsonResponse({'error': 'You must be a member of this group to report a problem.'}, status=403)
+
+        if not description:
+            return JsonResponse({'error': 'Problem description is required.'}, status=400)
+
+        problem = Problem.objects.create(
+            organization=organization,
+            group=group,
+            task=task,
+            reported_by=request.user,
+            task_created_by=task.created_by,
+            description=description,
+        )
+
+        ActivityLog.objects.create(
+            user=request.user,
+            organization=organization,
+            group=group,
+            task=task,
+            action='RAISED_PROBLEM',
+            details=f" {request.user} Raised a problem :'{problem.description}\n reported to {problem.task_created_by}'"
+
+        )
+
+        return JsonResponse({
+               'success': 'Problem reported successfully!',
+               'problem_id': problem.id,
+              'reported_by': problem.reported_by.username,
+              'description': problem.description,
+              'created_at': problem.created_at.isoformat(),
+               'is_resolved': problem.is_resolved,
+             }, status=200)
+    return JsonResponse({'error': 'Invalid request method.'}, status=405)
