@@ -368,11 +368,103 @@ or: pointer;
 #stopwatch-container .btn {
     transition: all 0.3s ease;
 }
+#problemsSidebar .offcanvas-body {
+    background-color: #f8f9fa; /* Light gray background */
+    color: #343a40; /* Dark gray text */
+    padding: 1.5rem;
+}
+
+#problemsSidebar {
+    border-left: 1px solid #ddd;
+}
+
+#problems-content ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#problems-content li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #ddd;
+}
+
+
+/* problem sidebar styles */
+/* Importing Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
+
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Sidebar Style */
+#problemsSidebar {
+    background-color: #2C2C2C; /* Darker background for the sidebar */
+    color: white;  /* White text for visibility */
+    font-family: 'Roboto', sans-serif;  /* Google Font */
+    padding: 15px;
+    font-size: 0.9rem;  /* Slightly smaller font size */
+    max-width: 400px;  /* Optional: Set a max-width for the sidebar */
+    border-left: 3px solid #ffcc00; /* Golden left border for the sidebar */
+}
+
+#problemsSidebarLabel {
+    color: white;  /* Sidebar header text color */
+    font-weight: 500;  /* Bold for the title */
+    font-size: 1.2rem; /* Larger font size for the header */
+    margin-bottom: 15px; /* Add spacing between the header and the content */
+}
+
+#problems-list {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 20px;
+}
+
+#problems-list li {
+    background-color: #3E3E3E;  /* Slightly lighter dark background for each problem */
+    margin: 5px 0;
+    padding: 12px;
+    border-radius: 5px;
+    font-size: 0.9rem;  /* Default font size for the list items */
+    color: white;  /* White text for list items */
+    border-bottom: 1px solid #444444; /* Subtle border for each list item */
+}
+
+/* Add a hover effect for each list item */
+#problems-list li:hover {
+    background-color: #4a4a4a;
+    cursor: pointer;
+}
+
+/* For strong text inside list items */
+#problems-list li strong {
+    color: #ffcc00; /* Golden color for names and important text */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #problemsSidebar {
+        font-size: 0.85rem;  /* Slightly smaller font size on mobile */
+    }
+}
+
+
+
 
 
     </style>
 </head>
 <body>
+    
+
+
+
+
+
 
 <!-- Modal to add notes  -->
 
@@ -424,9 +516,34 @@ or: pointer;
 </div>
 
 
+<!-- Sidebar for displaying the problems  -->
+<!-- Sidebar for Problems -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="problemsSidebar" aria-labelledby="problemsSidebarLabel">
+    <div class="offcanvas-header">
+        <h5 id="problemsSidebarLabel">Problems</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <ul id="problems-list">
+            {% if problems %}
+                {% for problem in problems %}
+                    <li>
+                        <strong>{{ problem.reported_by.username }}:</strong> 
+                        {{ problem.description }} 
+                        ({{ problem.created_at|date:"F j, Y, g:i a" }}) 
+                        <strong>Is Resolved: {{ problem.is_resolved }}</strong>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <span>No problems yet.</span>
+            {% endif %}
+        </ul>
+    </div>
+</div>
 
 
 
+<!-- --------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
 
 
@@ -450,6 +567,9 @@ or: pointer;
     <button id="increaseProgress" class="btn btn-primary btn-sm">+</button>
 </div>
 <br>
+
+
+
 
 <!-- Activity log  -->
 
@@ -478,9 +598,35 @@ or: pointer;
     </label>
 </div>
 
+<!-- Displaying Problems -->
+ <!-- View Problems Button -->
+<button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#problemsSidebar" aria-controls="problemsSidebar">
+    View Problems
+</button>
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Additional features  -->
             <hr>
             <h4>Additional Features</h4>
 
@@ -554,8 +700,7 @@ or: pointer;
 </div>
 
 
-
-            <!-- Track the time -->
+            
             <!-- Displaying notes -->
         <p><strong>Notes:</strong>
            {% if task.notes.all %}
@@ -1152,21 +1297,7 @@ resetBtn.addEventListener('click', resetStopwatch);
 
 
 
-
-
-// GSAP ANIMATIONS
-document.addEventListener('DOMContentLoaded', function() {
-    // Anime.js animation for task container
-    anime({
-        targets: '.task-container',
-        opacity: [0, 1],          // Fade in
-        scale: [0.5, 1],          // Scale from 50% to 100%
-        rotate: [360, 0],         // Rotate 360 degrees
-        easing: 'easeOutBounce',  // Bounce effect for smoothness
-        duration: 2000,           // 2-second duration
-        delay: 500,               // 0.5s delay before the animation starts
-    });
-});
+// Fetch problems if any
 
     </script>
 

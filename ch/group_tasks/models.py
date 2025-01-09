@@ -348,3 +348,26 @@ class TaskTimeTracking(models.Model):
             duration = self.end_time - self.start_time
             return duration.total_seconds() / 3600 
         return 0
+
+
+# Problem Model
+
+class Problem(models.Model):
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="problems")
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="problems")
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="problems")
+    reported_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reported_problems")
+    task_created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="problems_created")
+    description = models.TextField()
+    is_resolved = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('task', 'reported_by', 'description')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Problem in Task: {self.task.title} by {self.reported_by.username}"
+
+

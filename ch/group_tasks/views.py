@@ -24,7 +24,7 @@ from django.utils.timezone import now
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from decimal import Decimal
-from .models import TaskTimeTracking
+from .models import TaskTimeTracking, Problem
 # Create your views here.
 
 # Task creation
@@ -202,6 +202,7 @@ def my_day_task_detail(request, org_id, group_id, task_id):
     group=get_object_or_404(Group, id=group_id, organization=organization)
 
     task = get_object_or_404(Task, id=task_id, group=group)
+    problems = Problem.objects.filter(task=task,organization=organization,group=group)
 
     if not AddDay.objects.filter(task=task, user=request.user).exists():
         raise Http404("This task is not added to My Day for you please add it first!")
@@ -218,6 +219,7 @@ def my_day_task_detail(request, org_id, group_id, task_id):
         'org_id':org_id,
         'task': task,
         'formatted_time':formatted_time,
+        'problems':problems,
     })
 
 
@@ -654,3 +656,4 @@ def save_time(request, org_id, group_id, task_id):
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+

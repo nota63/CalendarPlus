@@ -16,5 +16,7 @@ urlpatterns = [
     path('tasks/<int:org_id>/<int:group_id>/<int:task_id>/toggle_status/', toggle_task_status, name='toggle_task_status'),
     path('tasks/<int:org_id>/<int:group_id>/<int:task_id>/update_tags/',update_tags, name='update_tags'),
     path('tasks/<int:org_id>/<int:group_id>/<int:task_id>/save_time/',save_time, name='save_time'),
+  
 ]
+
 
