@@ -310,7 +310,9 @@ class ActivityLog(models.Model):
         ('TAG_REMOVED','Removed the tag from task'),
         ('TIME_SPENT','Spent time on task'),
         ('RAISED_PROBLEM','Raised a problem'),
-        ('RESOLVED_PROBLEM','Resolved a problem')
+        ('RESOLVED_PROBLEM','Resolved a problem'),
+        ('NOTE_ELIMINATED', 'Eliminated a note'),
+        ('NOTE_AMENDED', 'Amended a note'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="activity_logss")

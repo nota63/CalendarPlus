@@ -751,3 +751,101 @@ def resolve_problem(request, org_id, group_id, task_id, problem_id):
 
    
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+
+
+# Handle Note Deletion
+
+
+@csrf_exempt
+def delete_task_note(request, org_id, group_id, task_id, note_id):
+    try:
+        
+        organization = get_object_or_404(Organization, id=org_id)
+
+        
+        group = get_object_or_404(Group, id=group_id, organization=organization)
+
+       
+        task = get_object_or_404(Task, id=task_id, group=group,organization=organization)
+
+        note = get_object_or_404(TaskNote, id=note_id, task=task, organization=organization, group=group)
+
+   
+        if request.user != note.user and not request.user.is_superuser:
+            return JsonResponse({'error': 'You are not allowed to delete this note.'}, status=403)
+        
+        if not group.members.filter(user=request.user).exists():
+            return JsonResponse({'error': 'You do not have permission to resolve this problem.'}, status=403)
+
+        note.delete()
+
+        ActivityLog.objects.create(
+            user=request.user,
+            organization=organization,
+            group=group,
+            task=task,
+            action='NOTE_ELIMINATED',
+            details=f" {request.user} Eliminated a note :'{note.note}\n reported to {task.created_by}'"
+
+        )
+
+        return JsonResponse({'message': 'Note deleted successfully!'}, status=200)
+    
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+
+# Edit the note 
+@csrf_exempt
+def edit_task_note(request, org_id, group_id, task_id, note_id):
+   
+    organization = get_object_or_404(Organization, id=org_id)
+
+
+    group = get_object_or_404(Group, id=group_id, organization=organization)
+
+ 
+    task = get_object_or_404(Task, id=task_id, group=group,organization=organization)
+
+    note = get_object_or_404(TaskNote, id=note_id, task=task, organization=organization, group=group)
+
+    if not group.members.filter(user=request.user).exists():
+            return JsonResponse({'error': 'You do not have permission to resolve this problem.'}, status=403)
+
+
+    if request.method == 'POST':
+       
+        try:
+            data = json.loads(request.body)
+            new_note_content = data.get('note')
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data provided.'}, status=400)
+
+        if not new_note_content:
+            return JsonResponse({'error': 'No note content provided.'}, status=400)
+
+        
+        if request.user != note.user and not request.user.is_superuser:
+            return JsonResponse({'error': 'You are not allowed to edit this note.'}, status=403)
+
+        note.note = new_note_content
+        note.save()
+        ActivityLog.objects.create(
+            user=request.user,
+            organization=organization,
+            group=group,
+            task=task,
+            action='NOTE_AMENDED',
+            details=f" {request.user} Amended a note :'{note.note}\n reported to {task.created_by}'"
+
+        )
+
+
+        return JsonResponse({
+            'message': 'Note updated successfully!',
+            'note_content': new_note_content,  
+            'note_id': note.id,  
+        }, status=200)
+    
+    return JsonResponse({'error': 'Invalid request method.'}, status=405)

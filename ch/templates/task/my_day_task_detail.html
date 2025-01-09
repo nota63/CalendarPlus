@@ -13,6 +13,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
 
+  
+
     <!-- Dark Theme -->
     <style>
    /* Overall body styling */
@@ -778,6 +780,32 @@ or: pointer;
 </div>
 
 
+<!-- edit note modal -->
+ <!-- Edit Note Modal -->
+<div class="modal fade" id="editNoteModal" tabindex="-1" aria-labelledby="editNoteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editNoteModalLabel">Edit Note</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editNoteForm">
+            <div class="mb-3">
+              <label for="noteContent" class="form-label">Note Content</label>
+              <textarea class="form-control" id="noteContent" rows="3"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="saveNoteBtn">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
 
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
@@ -943,25 +971,50 @@ or: pointer;
 
             
             <!-- Displaying notes -->
-        <p><strong>Notes:</strong>
-           {% if task.notes.all %}
-             <ul id="taskNotesList">
-                {% for note in task.notes.all %}
-                <li><strong>{{ note.user.username }}:</strong> {{ note.note }} ({{ note.created_at|date:"F j, Y, g:i a" }})</li>
-              {% endfor %}
-           </ul>
-        <!-- Button to open the modal -->
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">
-            Add Note
-        </button>
-    {% else %}
-        <span>No notes yet.</span>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">
-            Add Note
-        </button>
-    {% endif %}
-</p>
-
+            <p><strong>Notes:</strong>
+                {% if task.notes.all %}
+                <ul id="taskNotesList">
+                    {% for note in task.notes.all %}
+                    <li id="note-{{ note.id }}">
+                        <strong>{{ note.user.username }}:</strong> 
+                        <span class="note-content">{{ note.note }}</span> 
+                        ({{ note.created_at|date:"F j, Y, g:i a" }})
+                        
+                        <!-- 3-dot menu -->
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                &#x22EE; <!-- Ellipsis (three dots) -->
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li><button class="dropdown-item delete-note" 
+                                        data-note-id="{{ note.id }}" 
+                                        data-task-id="{{ task.id }}" 
+                                        data-group-id="{{ task.group.id }}" 
+                                        data-org-id="{{ task.group.organization.id }}">
+                                    Delete
+                                </button></li>
+                                <li><button class="dropdown-item edit-note" 
+                                    data-note-id="{{ note.id }}" 
+                                    data-task-id="{{ task.id }}" 
+                                    data-group-id="{{ task.group.id }}" 
+                                    data-org-id="{{ task.group.organization.id }}" 
+                                    data-note-content="{{ note.note }}">
+                                Edit
+                            </button></li>
+                            </ul>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <span>No notes yet.</span>
+                {% endif %}
+                <!-- Button to open the modal -->
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">
+                    Add Note
+                </button>
+            </p>
+            
 
 
             <!-- Displaying comments -->
@@ -1743,9 +1796,137 @@ function getCSRFToken() {
 }
 
 
+// Handle note deletion
+document.addEventListener('DOMContentLoaded', function () {
+    // Add event listener for delete buttons
+    document.querySelectorAll('.delete-note').forEach(button => {
+        button.addEventListener('click', function () {
+            const noteId = this.getAttribute('data-note-id');
+            const taskId = this.getAttribute('data-task-id');
+            const groupId = this.getAttribute('data-group-id');
+            const orgId = this.getAttribute('data-org-id');
+
+            // Send AJAX request to delete the note
+            fetch(`/tasks/tasks/${orgId}/${groupId}/${taskId}/${noteId}/delete_note/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'), // Ensure CSRF token is included
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    // Remove the note element from the DOM
+                    const noteElement = document.getElementById(`note-${noteId}`);
+                    if (noteElement) {
+                        noteElement.remove();
+                    }
+                   
+                    showNotification("Note has been expunged and is no longer available.")
+                } else if (data.error) {
+                    alert(data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+});
+
+// Function to get the CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
 
 
 
+// Edit the note
+document.addEventListener('DOMContentLoaded', function () {
+    // Function to get CSRF token from the cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Handle Edit button click
+    document.querySelectorAll('.edit-note').forEach(button => {
+        button.addEventListener('click', function () {
+            const noteId = this.getAttribute('data-note-id');
+            const taskId = this.getAttribute('data-task-id');
+            const groupId = this.getAttribute('data-group-id');
+            const orgId = this.getAttribute('data-org-id');
+            const currentNoteContent = this.getAttribute('data-note-content');
+            
+            // Populate the modal with the current note content
+            document.getElementById('noteContent').value = currentNoteContent;
+
+            // Show the modal
+            const editModal = new bootstrap.Modal(document.getElementById('editNoteModal'));
+            editModal.show();
+
+            // Set a save handler for the modal save button
+            document.getElementById('saveNoteBtn').addEventListener('click', function () {
+                const updatedNoteContent = document.getElementById('noteContent').value;
+
+                fetch(`/tasks/tasks/${orgId}/${groupId}/${taskId}/${noteId}/edit_note/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        'note': updatedNoteContent
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        // Find the note item by ID and update the content
+                        const noteItem = document.getElementById(`note-${noteId}`);
+                        if (noteItem) {
+                            const noteContentElement = noteItem.querySelector('.note-content');
+                            if (noteContentElement) {
+                                noteContentElement.textContent = updatedNoteContent;
+                            }
+                        }
+
+                        
+                        showNotification('Your note has been revised and the updates are now logged')
+
+                        // Close the modal
+                        var modal = bootstrap.Modal.getInstance(document.getElementById('editNoteModal'));
+                        modal.hide();
+                    } else {
+                        alert(data.error);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    });
+});
 
 
 
@@ -1753,6 +1934,7 @@ function getCSRFToken() {
 // stopwatrch functions
 startStopBtn.addEventListener('click', toggleStopwatch);
 resetBtn.addEventListener('click', resetStopwatch);
+
 
     </script>
 

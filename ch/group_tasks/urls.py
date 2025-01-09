@@ -18,6 +18,12 @@ urlpatterns = [
     path('tasks/<int:org_id>/<int:group_id>/<int:task_id>/save_time/',save_time, name='save_time'),
     path('tasks/<int:org_id>/<int:group_id>/<int:task_id>/create_problem/',create_problem, name='create_problem'),
     path('tasks/<int:org_id>/<int:group_id>/<int:task_id>/resolve_problem/<int:problem_id>/',resolve_problem, name='resolve_problem'),
+    path('tasks/<int:org_id>/<int:group_id>/<int:task_id>/<int:note_id>/delete_note/',delete_task_note, name='delete_note'),
+    path('tasks/<int:org_id>/<int:group_id>/<int:task_id>/<int:note_id>/edit_note/',edit_task_note, name='edit_note'),
+  
+  
+  
+  
   
   
 ]
