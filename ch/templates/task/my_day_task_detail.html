@@ -524,10 +524,134 @@ or: pointer;
     color: white;
 }
 
+/* Spinner container */
+.loading-spinner {
+    display: none;
+    text-align: center;
+    font-size: 14px;
+    color: #007bff; /* Blue color for the spinner text */
+}
+
+/* Spinner animation */
+.loading-spinner .spinner-border {
+    width: 2rem;
+    height: 2rem;
+    border-width: 0.25em;
+    animation: spin 1s linear infinite;
+}
+
+/* Spinner spin animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Styling the 'Reporting to manager...' text */
+.loading-spinner span {
+    margin-left: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #007bff;
+}
+
+/* jsonresponse notification */
+/* Notification container */
+.notification {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: -70px; /* Initially off-screen */
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    background-color: #1e90ff; /* Light blue background */
+    color: #fff;
+    font-size: 16px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+    opacity: 0;
+    transition: all 0.6s ease-out; /* Ultra smooth transition */
+    text-align: center;
+    letter-spacing: 1px; /* Add some spacing for a more premium look */
+    text-transform: capitalize;
+}
+
+/* To show the notification with smooth animation */
+.notification.show {
+    display: block;
+    top: 20px; /* Slide into view */
+    opacity: 1; /* Fade in */
+    transform: translateX(-50%) translateY(20px); /* Smooth upward motion */
+}
+
+/* Shiny text effect */
+.notification .text {
+    position: relative;
+    animation: shine 1.5s ease-in-out infinite;
+}
+
+/* Shiny text animation */
+@keyframes shine {
+    0% {
+        background-position: -200% center;
+    }
+    100% {
+        background-position: 200% center;
+    }
+}
+
+.notification .text {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0) 75%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+/* Close button for the notification */
+.notification .close-btn {
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    position: absolute;
+    top: 8px;
+    right: 15px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+/* Hover effect for the close button */
+.notification .close-btn:hover {
+    transform: rotate(90deg); /* Subtle rotation on hover */
+}
+
+/* Styling for the success message */
+.notification.success {
+    background-color: #1e90ff; /* Light blue background */
+    border-left: 5px solid #0f7bcc; /* Darker blue border for a professional touch */
+}
+
+/* Optional: Styling for info messages */
+.notification.info {
+    background-color: #17a2b8; /* Info background (Blue) */
+    border-left: 5px solid #117a8b; /* Darker blue border */
+}
+
+/* Optional: Styling for warning messages */
+.notification.warning {
+    background-color: #ffc107; /* Yellow background for warning */
+    border-left: 5px solid #e0a800; /* Dark yellow border */
+}
+
 
     </style>
 </head>
 <body>
+    
+   
     
 
 <!-- Modal to add notes  -->
@@ -635,6 +759,12 @@ or: pointer;
                                         Mark as Resolved
                                     </button>
                                 </li>
+                                <li id="loading-spinner-{{ problem.id }}" class="loading-spinner" style="display: none;">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                    <span>Reporting to manager...</span>
+                                </li>
                             </ul>
                         </div>
                     </li>
@@ -651,6 +781,11 @@ or: pointer;
 
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
+
+<div id="notification" class="notification">
+    <span id="notification-text"></span>
+    <button class="close-btn" onclick="closeNotification()">
+</div>
 
 
     <div class="container">
@@ -675,8 +810,6 @@ or: pointer;
 <br>
 
 
-
-<!-- Displaying Problems -->
  <!-- View Problems Button -->
  <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#problemsSidebar" aria-controls="problemsSidebar">
     View Problems
@@ -737,7 +870,7 @@ or: pointer;
             <h4>Additional Features</h4>
 
             <!-- Displaying tags -->
-            <!-- Displaying tags -->
+       <!-- Displaying tags -->
 <p><strong>Tags:</strong>
     {% if task.tags.all %}
         {% for tag in task.tags.all %}
@@ -769,6 +902,8 @@ or: pointer;
                 data-group-id="{{ group_id }}">+</button>
     {% endif %}
 </p>
+
+
 
 
 
@@ -908,6 +1043,7 @@ or: pointer;
             success: function(response) {
                 // Append new comment to the list
                 $('#comments-list').append('<li><strong>' + response.username + ':</strong> ' + response.comment + ' (' + response.created_at + ')</li>');
+                showNotification('Comment has been added to your task')
 
                 // Clear the comment text area
                 $('#comment-text').val('');
@@ -921,7 +1057,6 @@ or: pointer;
 
 
 // Handle add note featue
-// JavaScript to handle the AJAX request for adding a note
 document.getElementById("saveNoteButton").addEventListener("click", function() {
     // Fetch the task ID, org ID, and group ID from template context
     var taskId = '{{ task.id }}';
@@ -954,6 +1089,7 @@ document.getElementById("saveNoteButton").addEventListener("click", function() {
             // Append the new note to the list of notes (or update UI as needed)
             var newNote = "<li><strong>You:</strong> " + response.note + " (" + response.created_at + ")</li>";
             document.querySelector("#taskNotesList").insertAdjacentHTML('beforeend', newNote);
+            showNotification("Note is integrated")
 
             // Clear the textarea
             document.getElementById("noteText").value = "";
@@ -1065,6 +1201,7 @@ function updateProgress(delta) {
                 progressBar.style.width = response.progress + '%';
                 progressBar.setAttribute('aria-valuenow', response.progress);
                 progressBar.textContent = response.progress + '%';
+                showNotification("Progress has been synced")
             } else {
                 alert(response.message || 'An error occurred.');
             }
@@ -1091,6 +1228,7 @@ $(document).ready(function () {
             success: function (response) {
                 if (response.status === 'success') {
                     loadActivityLogs(response.activity_logs);
+                    showNotification("Activity Logs up and running")
                     // Show the sidebar
                     $('#activityLogsSidebar').css('right', '0');
                 } else {
@@ -1107,6 +1245,7 @@ $(document).ready(function () {
     $('#closeSidebarButton').click(function () {
         $('#activityLogsSidebar').css('right', '-400px');
     });
+    showNotification('Task is fired up and ready')
 
     // Function to load activity logs into the sidebar
     function loadActivityLogs(logs) {
@@ -1144,7 +1283,7 @@ document.getElementById('toggleTaskStatus').addEventListener('change', function 
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': getCSRFToken(), // Ensure you include your CSRF token
+            'X-CSRFToken': getCSRFToken(), 
         },
         body: JSON.stringify({ status: action }),
     })
@@ -1154,6 +1293,7 @@ document.getElementById('toggleTaskStatus').addEventListener('change', function 
                 // Update the label text
                 document.querySelector('label[for="toggleTaskStatus"]').textContent = 
                     isChecked ? 'Mark as Pending' : 'Mark as Completed';
+                    showNotification("Victory achieved")
             } else {
                 alert('Failed to update task status.');
                 this.checked = !isChecked; // Revert the toggle state
@@ -1180,78 +1320,90 @@ function getCSRFToken() {
 }
 
 /* Handle add remove tag  */
+/* Handle Add/Remove Tag */
 // Handle Add Tag Button click
 document.getElementById('add-tag-btn').addEventListener('click', function () {
-    const taskId = this.getAttribute('data-task-id');  // Fetch task ID
+    const taskId = this.getAttribute('data-task-id'); // Fetch task ID
     const orgId = this.getAttribute('data-org-id');  // Fetch org ID
-    const groupId = this.getAttribute('data-group-id');  // Fetch group ID
-    
+    const groupId = this.getAttribute('data-group-id'); // Fetch group ID
+
     // Open the modal to choose tags
     $('#addTagModal').modal('show');
-    
-    // Handle tag selection
-    document.getElementById('save-tag-btn').addEventListener('click', function () {
-        const selectedTag = document.getElementById('tag-select').value;  // Get selected tag
+
+    // Ensure we only bind the event handler once
+    const saveTagButton = document.getElementById('save-tag-btn');
+    saveTagButton.onclick = function () {
+        const selectedTag = document.getElementById('tag-select').value; // Get selected tag
         if (!selectedTag) {
             alert('Please select a tag.');
             return;
         }
 
         // Send an AJAX request to add the tag
-        fetch(`/tasks/tasks/${orgId}/${groupId}/${taskId}/update_tags/`, {  // Corrected the URL structure
+        fetch(`/tasks/tasks/${orgId}/${groupId}/${taskId}/update_tags/`, { // Corrected the URL structure
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCSRFToken(), // Ensure you include your CSRF token
             },
-            body: JSON.stringify({ action: 'add', tag_name: selectedTag }),  // Send action and tag_name
+            body: JSON.stringify({ action: 'add', tag_name: selectedTag }), // Send action and tag_name
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.tag_name) {  // Check if tag_name exists in the response
-                // Create the new tag element
-                const tagBadge = document.createElement('span');
-                tagBadge.classList.add('badge', 'bg-warning');
-                tagBadge.setAttribute('id', 'tag-' + data.tag_name);  // Set id for the tag
-                tagBadge.textContent = data.tag_name;
+            .then(response => response.json())
+            .then(data => {
+                if (data.tag_name) { // Check if tag_name exists in the response
+                    // Create the new tag element
+                    const tagBadge = document.createElement('span');
+                    tagBadge.classList.add('badge', 'bg-warning');
+                    tagBadge.setAttribute('id', `tag-${data.tag_name}`); // Set id for the tag
+                    tagBadge.setAttribute('data-task-id', taskId);
+                    tagBadge.setAttribute('data-org-id', orgId);
+                    tagBadge.setAttribute('data-group-id', groupId);
+                    tagBadge.innerHTML = `
+                        ${data.tag_name}
+                        <button class="btn btn-sm btn-danger remove-tag" 
+                                data-tag="${data.tag_name}" 
+                                data-tag-id="${data.tag_name}" 
+                                data-task-id="${taskId}" 
+                                data-org-id="${orgId}" 
+                                data-group-id="${groupId}">-</button>
+                    `;
 
-                // Create the remove button
-                const removeButton = document.createElement('button');
-                removeButton.classList.add('btn', 'btn-sm', 'btn-danger', 'remove-tag');
-                removeButton.setAttribute('data-tag', data.tag_name);  // Use tag_name
-                removeButton.setAttribute('data-tag-id', data.tag_name);  // Use tag_name for the tag id
-                removeButton.setAttribute('data-task-id', taskId);  // Set task id
-                removeButton.setAttribute('data-org-id', orgId);  // Set org id
-                removeButton.setAttribute('data-group-id', groupId);  // Set group id
-                removeButton.textContent = '-';
-                
-                // Append the remove button to the tag
-                tagBadge.appendChild(removeButton);
+                    // Append the new tag to the tag container dynamically
+                    const tagContainer = document.querySelector('p');
+                    if (tagContainer) {
+                        // If there's an existing "No tags" message, remove it
+                        const noTagsElement = tagContainer.querySelector('.badge.bg-secondary');
+                        if (noTagsElement) {
+                            noTagsElement.remove(); // Remove "No tags" message
+                        }
 
-                // Append the new tag to the tag container dynamically
-                const tagContainer = document.querySelector('p');
-                if (tagContainer) {
-                    // If there's an existing "No tags" message, remove it
-                    const noTagsElement = tagContainer.querySelector('.badge.bg-secondary');
-                    if (noTagsElement) {
-                        noTagsElement.remove(); // Remove "No tags" message
+                        // Insert the new tag badge before the "+" button
+                        const addTagButton = tagContainer.querySelector('#add-tag-btn');
+                        if (addTagButton) {
+                            tagContainer.insertBefore(tagBadge, addTagButton);
+                        } else {
+                            // If no "+" button, append it to the end
+                            tagContainer.appendChild(tagBadge);
+                        }
                     }
 
-                    // Append the new tag badge to the container
-                    tagContainer.appendChild(tagBadge);
-                }
+                    // Show success notification
+                    showNotification('Your task has been tagged!');
 
-                $('#addTagModal').modal('hide'); // Close the modal
-            } else {
-                alert('Failed to add tag.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred.');
-        });
-    });
+                    // Close the modal
+                    $('#addTagModal').modal('hide');
+                } else {
+                    alert('Failed to add tag.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred.');
+            });
+    };
 });
+
+
 // Remove tag event listener (Improved delegation)
 document.addEventListener('click', function (event) {
     if (event.target && event.target.classList.contains('remove-tag')) {
@@ -1276,7 +1428,8 @@ document.addEventListener('click', function (event) {
         .then(data => {
             if (data.tag_name) {  // Check if tag_name exists in the response
                 // Remove the tag from the displayed list
-                tagElement.remove();  // Remove the tag element from the DOM
+                tagElement.remove();
+                showNotification('Tag removed successfully','success');  // Remove the tag element from the DOM
             } else {
                 alert('Failed to remove tag.');
             }
@@ -1328,6 +1481,7 @@ function toggleStopwatch() {
         startStopBtn.textContent = 'Stop';
     }
     isRunning = !isRunning;
+    showNotification('Stopwatch in action, logging your activity time. It will keep going until you stop it')
 }
 
 // Function to update time display
@@ -1364,8 +1518,10 @@ function saveTime() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Time saved successfully!');
-
+            
+            showNotification("Time logged with precision")
+            
+            
             // Dynamically create a new badge for the new time entry
             const newBadge = document.createElement('span');
             newBadge.classList.add('badge', 'bg-info');
@@ -1435,7 +1591,9 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Problem reported successfully!');
+                   
+                    showNotification('Issue escalated and flagged to your manager')
+                      
 
                     // Create a new list item for the reported problem
                     const newProblemItem = document.createElement('li');
@@ -1450,7 +1608,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const problemsList = document.getElementById('problems-list');
                     if (problemsList) {
                         problemsList.appendChild(newProblemItem);
-
+                     
                         // Trigger the animation
                         setTimeout(function () {
                             newProblemItem.classList.add('show');
@@ -1489,9 +1647,9 @@ function getCSRFToken() {
 }
 
 
+
 // Handle problem resolve
 document.addEventListener('DOMContentLoaded', function () {
-    // Attach event listeners to all resolve-problem buttons
     document.querySelectorAll('.resolve-problem-btn').forEach(button => {
         button.addEventListener('click', function () {
             const orgId = this.getAttribute('data-org-id');
@@ -1512,47 +1670,67 @@ document.addEventListener('DOMContentLoaded', function () {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': getCSRFToken(), // Ensure CSRF token is sent
+                    'X-CSRFToken': getCSRFToken(),
                 },
             })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log("Server response:", data);
-                    if (data.success) {
-                        alert('Problem marked as resolved!');
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Server response:", data);
+                if (data.success) {
+                    // Display notification
+                    showNotification(data.success);
 
-                        // Update the Is Resolved field in the UI
-                        const isResolvedField = problemListItem.querySelector('strong:nth-of-type(2)');
-                        if (isResolvedField) {
-                            isResolvedField.textContent = 'Is Resolved: True';
-                        } else {
-                            console.warn("Is Resolved field not found!");
-                        }
-
-                        // Remove the resolve button
-                        const resolveButton = problemListItem.querySelector('.resolve-problem-btn');
-                        if (resolveButton) {
-                            resolveButton.remove();
-                        } else {
-                            console.warn("Resolve button not found!");
-                        }
+                    // Update the Is Resolved field in the UI
+                    const isResolvedField = problemListItem.querySelector('strong:nth-of-type(2)');
+                    if (isResolvedField) {
+                        isResolvedField.textContent = 'Is Resolved: True';
                     } else {
-                        alert('Failed to mark the problem as resolved.');
-                        console.error("Error response from server:", data);
+                        console.warn("Is Resolved field not found!");
                     }
-                })
-                .catch(error => {
-                    console.error('Error occurred:', error);
-                    alert('An error occurred while resolving the problem.');
-                });
+
+                    // Remove the resolve button
+                    const resolveButton = problemListItem.querySelector('.resolve-problem-btn');
+                    if (resolveButton) {
+                        resolveButton.remove();
+                    } else {
+                        console.warn("Resolve button not found!");
+                    }
+                } else {
+                    alert('Failed to mark the problem as resolved.');
+                    console.error("Error response from server:", data);
+                }
+            })
+            .catch(error => {
+                console.error('Error occurred:', error);
+                alert('An error occurred while resolving the problem.');
+            });
         });
     });
 });
+
+// Function to show notification
+function showNotification(message) {
+    const notification = document.getElementById('notification');
+    const notificationText = document.getElementById('notification-text');
+    notificationText.textContent = message;
+    notification.classList.add('show');
+
+    // Auto hide notification after 3 seconds
+    setTimeout(() => {
+        closeNotification();
+    }, 5000);
+}
+
+// Function to close the notification
+function closeNotification() {
+    const notification = document.getElementById('notification');
+    notification.classList.remove('show');
+}
 
 // Function to get CSRF token from cookies
 function getCSRFToken() {
@@ -1563,7 +1741,6 @@ function getCSRFToken() {
     }
     return csrfToken;
 }
-
 
 
 
