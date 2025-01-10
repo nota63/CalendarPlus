@@ -21,6 +21,8 @@ urlpatterns = [
     path('tasks/<int:org_id>/<int:group_id>/<int:task_id>/<int:note_id>/delete_note/',delete_task_note, name='delete_note'),
     path('tasks/<int:org_id>/<int:group_id>/<int:task_id>/<int:note_id>/edit_note/',edit_task_note, name='edit_note'),
     path('tasks/<int:org_id>/<int:group_id>/<int:task_id>/<int:comment_id>/edit_comment/',edit_task_comment, name='edit_comment'),
+    path('tasks/<int:org_id>/<int:group_id>/<int:task_id>/<int:comment_id>/delete_comment/',delete_task_comment, name='delete_comment'),
+  
   
   
   

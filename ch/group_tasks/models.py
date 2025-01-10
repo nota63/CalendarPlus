@@ -314,6 +314,7 @@ class ActivityLog(models.Model):
         ('NOTE_ELIMINATED', 'Eliminated a note'),
         ('NOTE_AMENDED', 'Amended a note'),
         ('COMMENT_MODIFIED','The comment was modified by.'),
+        ('COMMENT_DELETED', 'The comment deletion was performed by'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="activity_logss")

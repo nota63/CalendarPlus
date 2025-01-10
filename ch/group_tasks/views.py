@@ -898,3 +898,41 @@ def edit_task_comment(request, org_id, group_id, task_id, comment_id):
         }, status=200)
 
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+
+# Delete comment 
+
+@csrf_exempt
+def delete_task_comment(request, org_id, group_id, task_id, comment_id):
+    organization = get_object_or_404(Organization, id=org_id)
+
+    group = get_object_or_404(Group, id=group_id, organization=organization)
+
+
+    task = get_object_or_404(Task, id=task_id, group=group,organization=organization)
+
+
+    comment = get_object_or_404(TaskComment, id=comment_id, task=task, organization=organization, group=group)
+
+
+    if request.user != comment.user and not request.user.is_superuser:
+        return JsonResponse({'error': 'You are not allowed to delete this comment.'}, status=403)
+    
+    if not group.members.filter(user=request.user).exists():
+            return JsonResponse({'error': 'You do not have permission to resolve this problem.'}, status=403)
+        
+
+  
+    comment.delete()
+
+    ActivityLog.objects.create(
+            user=request.user,
+            organization=organization,
+            group=group,
+            task=task,
+            action='COMMENT_DELETED',
+            details=f" The comment deletion for - {comment.comment} was performed by {request.user}"
+
+        )
+
+    return JsonResponse({'message': 'Comment deleted successfully!'}, status=200)
