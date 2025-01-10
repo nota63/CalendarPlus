@@ -849,3 +849,52 @@ def edit_task_note(request, org_id, group_id, task_id, note_id):
         }, status=200)
     
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+
+
+# Edit delete comment 
+
+@csrf_exempt
+def edit_task_comment(request, org_id, group_id, task_id, comment_id):
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body)
+            new_comment_content = body.get('comment')
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data.'}, status=400)
+        
+        
+        if not new_comment_content:
+            return JsonResponse({'error': 'No comment content provided.'}, status=400)
+
+        organization = get_object_or_404(Organization, id=org_id)
+        group = get_object_or_404(Group, id=group_id, organization=organization)
+        task = get_object_or_404(Task, id=task_id, group=group,organization=organization)
+        comment = get_object_or_404(TaskComment, id=comment_id, task=task, organization=organization, group=group)
+
+    
+        if request.user != comment.user and not request.user.is_superuser:
+            return JsonResponse({'error': 'You are not allowed to edit this comment.'}, status=403)
+        
+        if not group.members.filter(user=request.user).exists():
+            return JsonResponse({'error': 'You do not have permission to resolve this problem.'}, status=403)
+        
+        comment.comment = new_comment_content
+        comment.save()
+        ActivityLog.objects.create(
+            user=request.user,
+            organization=organization,
+            group=group,
+            task=task,
+            action='COMMENT_MODIFIED',
+            details=f" The comment {comment.comment} was modified by {request.user}"
+
+        )
+
+
+        return JsonResponse({
+            'message': 'Comment updated successfully!',
+            'new_comment': comment.comment
+        }, status=200)
+
+    return JsonResponse({'error': 'Invalid request method.'}, status=405)

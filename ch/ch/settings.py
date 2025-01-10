@@ -312,3 +312,12 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR ,'media'
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
+
+
+# settings.py
+STATIC_URL = '/static/'
+
+# If you have a custom directory for static files
+STATICFILES_DIRS = [
+    BASE_DIR ,"static",
+]
