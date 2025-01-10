@@ -646,6 +646,69 @@ or: pointer;
     border-left: 5px solid #e0a800; /* Dark yellow border */
 }
 
+/* Greeting */
+ /* Base styling for the greeting */
+ #greeting {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 20px 40px;
+            font-size: 2rem;
+            font-weight: 700;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: transparent;
+            background-clip: text; /* Clips the background to the text */
+            -webkit-background-clip: text; /* For Safari support */
+            width: 100%;
+            text-align: center;
+            z-index: 1000; /* Ensure it stays on top */
+            border-radius: 8px;
+            opacity: 0; /* Initially hidden for animation */
+            animation: slideIn 1s ease-out forwards, fadeIn 1s ease-out forwards;
+            font-family: 'Poppins', sans-serif, 'Arial'; /* Modern font */
+        }
+
+        /* Gradient effect for the text */
+        #greeting {
+            background-image: linear-gradient(to right, #00c6ff, #ff6ec7); /* Light blue to pink gradient */
+            font-size: 2.5rem; /* Increase font size for more impact */
+        }
+
+        /* Slide in animation */
+        @keyframes slideIn {
+            0% {
+                top: -50px;
+                opacity: 0;
+            }
+            100% {
+                top: 0;
+                opacity: 1;
+            }
+        }
+
+        /* Fade-in animation */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        body {
+            margin-top: 80px; /* Add space for the greeting */
+            font-family: 'Arial', sans-serif; /* Modern font */
+            background-color: hsl(240, 3%, 6%); /* Subtle background color for contrast */
+        }
+
+        /* Add a modern font and responsive design */
+        @media (max-width: 600px) {
+            #greeting {
+                font-size: 1.8rem; /* Make the text smaller on small screens */
+            }
+        }
 </style>
 
 
@@ -837,6 +900,11 @@ or: pointer;
 </div>
 
 
+
+
+     <!-- Greeting Display -->
+<div id="greeting"></div>
+
     <div class="container">
         <div class="task-container">
             <h1 class="mb-4"><i class="bi bi-list-task task-icon"></i> {{ task.title }}</h1>
@@ -857,6 +925,8 @@ or: pointer;
     <button id="increaseProgress" class="btn btn-primary btn-sm">+</button>
 </div>
 <br>
+
+
 
 
  <!-- View Problems Button -->
@@ -2149,6 +2219,31 @@ function getCookie(name) {
     return cookieValue;
 }
 
+// Greeting
+document.addEventListener('DOMContentLoaded', function() {
+            // Function to get current hour
+            function getGreeting() {
+                const currentHour = new Date().getHours();  // Get current hour (0-23)
+                let greetingMessage = '';
+
+                // Determine the appropriate greeting based on the time of day
+                if (currentHour >= 5 && currentHour < 12) {
+                    greetingMessage = 'Good Morning, {{request.user}}!';
+                } else if (currentHour >= 12 && currentHour < 17) {
+                    greetingMessage = 'Good Afternoon, {{request.user}}!';
+                } else if (currentHour >= 17 && currentHour < 21) {
+                    greetingMessage = 'Good Evening, {{request.user}}!';
+                } else {
+                    greetingMessage = 'Good Night, {{request.user}}!';
+                }
+
+                // Display the greeting
+                document.getElementById('greeting').textContent = greetingMessage;
+            }
+
+            // Call the function when the page loads
+            getGreeting();
+        });
 
 
 
