@@ -139,7 +139,7 @@ def task_calendar(request, org_id, group_id):
     tasks = tasks.order_by('-created_at')
 
 
-    paginator = Paginator(tasks, 2)
+    paginator = Paginator(tasks, 3)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
