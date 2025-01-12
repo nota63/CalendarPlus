@@ -165,13 +165,6 @@ def task_calendar(request, org_id, group_id):
 
 
 
-
-
-
-
-
-
-
 # Add the task to my day 
 
 @login_required

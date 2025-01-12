@@ -36,7 +36,7 @@ from django.utils.timezone import now, make_aware
 from django.utils.html import format_html
 from .models import AbsentEvent
 from django.utils import timezone
-
+from django.utils.timezone import localtime
 
 # Create your views here.
 FORMS = [
@@ -1047,4 +1047,36 @@ class GroupEventView(LoginRequiredMixin, View):
         })
     
 
-# Filter the events based on location 
+# More features 
+
+# Fetch user details 
+
+def group_member_details(request, org_id, group_id, user_id):
+    organization = get_object_or_404(Organization, id=org_id)
+    group = get_object_or_404(Group, id=group_id, organization=organization)
+
+
+    if group.team_leader != request.user:
+        raise PermissionDenied("You are not authorized to view this member.")
+
+    
+    group_member = get_object_or_404(GroupMember, group=group, user__id=user_id)
+
+    
+    if not group_member.user:
+        return JsonResponse({'error': 'The user is not associated with this group!'}, status=400)
+
+    user = group_member.user
+
+   
+    joined_at = localtime(group_member.joined_at).strftime("%d %b %Y, %H:%M")
+
+    
+    member_details = {
+        'username': user.username,
+        'email': user.email,
+        'role': group_member.role,
+        'joined_at': joined_at, 
+    }
+
+    return JsonResponse(member_details)

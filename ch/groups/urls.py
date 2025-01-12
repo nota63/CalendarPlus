@@ -86,6 +86,7 @@ urlpatterns = [
 
     # Group event calendar
     path('group-event-calendar/<int:org_id>/<int:group_id>/',GroupEventView.as_view(), name='group_event_calendar'),
+    path('groups/<int:org_id>/<int:group_id>/<int:user_id>/group_member_details/',group_member_details, name='group_member_details')
 
   
 
