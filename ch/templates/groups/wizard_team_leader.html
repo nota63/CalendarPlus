@@ -1,6 +1,37 @@
 {% extends "groups/wizard_form.html" %}
 
 {% block content %}
+
+
+
+<style>
+    .group-name-section {
+       text-align: center;
+       margin: 10px 0;
+   }
+
+   .group-name-section p {
+       font-size: 1.5rem;
+       font-weight: bold;
+       letter-spacing: 0px;
+       text-transform: uppercase;
+       background-image: linear-gradient(to right, #FF63A5, #00D1D1);
+       background-clip: text;
+       color: transparent;
+       padding: 10px 0;
+   }
+</style>
+
+
+
+
+
+<section class="group-name-section">
+   <p>Enter the email of the person you’d like to make the group leader, and we’ll find them in your workspace to assign the role</p>
+</section>
+
+
+
 <form method="post">
     {% csrf_token %}
     {{ wizard.management_form }} <!-- Include the management form -->

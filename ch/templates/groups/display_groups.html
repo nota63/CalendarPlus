@@ -1,3 +1,7 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+<br><br><br><br>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -5,6 +9,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Groups - {{ organization.name }}</title>
+    <!-- Include Bootstrap Icons CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
       
     <!-- Bootstrap 5 CSS -->
@@ -168,7 +174,43 @@
 .modal-footer .btn-secondary:hover {
   background-color: #5a6268;
 }
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', Arial, sans-serif;
+    background-color: #f0f4f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
 
+  section {
+    text-align: center;
+    padding: 20px;
+    max-width: 600px;
+    color: #333; /* Text color */
+  }
+
+  section strong {
+    font-size: 24px;
+    font-weight: 700;
+    color: #4a4a4a; /* Darker color for emphasis */
+    line-height: 1.4;
+    margin-bottom: 15px;
+    display: block;
+  }
+
+  section strong .organization-name {
+    color: #28a745; /* Green color */
+  }
+
+  section p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #666; /* Lighter color for secondary text */
+    margin-top: 10px;
+  }
     </style>
 
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
@@ -223,10 +265,26 @@
 
 
 
+<section>
+    <p>
+      <strong>
+        Effortlessly monitor all your workspace groups in <span class="organization-name">{{organization.name}}</span> from one centralized dashboard
+      </strong>
+    </p>
+    <p>
+      Track your team's daily activities, stay updated on group progress, and achieve goals faster with streamlined monitoring.
+    </p>
+  </section>
 
-
-
-
+  <section class="btn">
+    <a href="{% url 'group_create' organization.id %}">
+        <button type="submit" class="btn btn-primary rounded-pill d-flex align-items-center px-4 py-2">
+            <!-- Add an icon before the text -->
+            <i class="bi bi-plus-circle me-2"></i> <!-- Bootstrap icon for a plus sign -->
+            Create New One
+        </button>
+    </a>
+</section>
 
 <div class="container mt-5">
     <div class="card shadow">
@@ -462,3 +520,4 @@ function getCookie(name) {
 </body>
 </html>
 
+{% endblock %}

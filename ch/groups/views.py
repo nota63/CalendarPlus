@@ -1274,6 +1274,9 @@ class GroupActivityLogView(View):
         return JsonResponse({'success': True, 'activities': activity_data})
 
 
+# MORE FEATURES ARE PENDING........
+
+
 
 
 
