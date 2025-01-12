@@ -7,11 +7,8 @@ urlpatterns = [
     path('groups/create/<int:org_id>/', GroupCreationWizard.as_view(), name='group_create'),
 
    
-    path('groups/<int:org_id>/display/', GroupListView.as_view(), name='display_groups'),
-
-
+    path('groups/<int:org_id>/', GroupListView.as_view(), name='display_groups'),
     # send invite
-
     path('groups/<int:org_id>/<int:group_id>/invite/', invite_members_to_group, name='invite_members_to_group'),
 
 
@@ -90,6 +87,9 @@ urlpatterns = [
     # Admin side features 
     path('groups/<int:org_id>/<int:group_id>/fetch_group_members/',fetch_group_members, name='fetch_group_members'),
     path('groups/<int:org_id>/<int:group_id>/delete_group/',delete_group, name='delete_group'),
+    path('groups/<int:org_id>/<int:group_id>/activities/',GroupActivityLogView.as_view(), name='activities'),
+    
+
     
 
     

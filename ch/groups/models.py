@@ -257,11 +257,21 @@ class GroupActivity(models.Model):
         ('GROUP_UPDATED', 'Updated group'),
         ('GROUP_DELETED', 'Deleted group'),
         ('INVITE_MEMBER', 'Invited member'),
+        ("INVITATION_ACCEPT",'Invitation accepted'),
+        ('INVITATION_REJECT','Invitation rejected'),
+        ('MEMBER_DISCARD','Member removed'),
+        ("CREATE_EVENT",'Event created'),
+        ("BOOK_EVENT",'Event booked'),
+        ("MARK_ABSENT",'Marked as absent'),
+        ("SET_EVENT_REMINDER",'Reminder set'),
+        ("DELETE_EVENT",'Event deleted'),
+        ('RECURRING_EVENT','Set event as recurring')
         
     ]
 
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    event=models.ForeignKey(GroupEvent, on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     action_type = models.CharField(max_length=50, choices=ACTION_CHOICES)
     details = models.TextField(blank=True, null=True) 

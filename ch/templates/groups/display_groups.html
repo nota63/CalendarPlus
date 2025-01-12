@@ -5,13 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Groups - {{ organization.name }}</title>
+
+      
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
  
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+   
 </head>
 <body>
 
@@ -73,6 +75,100 @@
     z-index: 9999;
 }
 
+
+
+/* Modal container */
+.modal-content {
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+/* Modal header */
+.modal-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 15px 20px;
+}
+
+.modal-title {
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: #343a40;
+}
+
+/* Close button */
+.modal-header .btn-close {
+  filter: brightness(80%);
+}
+
+.modal-header .btn-close:hover {
+  filter: brightness(100%);
+}
+
+/* Modal body */
+.modal-body {
+  padding: 20px;
+  background-color: #ffffff;
+  max-height: 400px; /* Scrollable content */
+  overflow-y: auto;
+}
+
+/* List group in modal */
+.modal-body .list-group {
+  margin-top: 10px;
+}
+
+.modal-body .list-group-item {
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  background-color: #fdfdfe;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.modal-body .list-group-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Highlighted user name */
+.modal-body .list-group-item strong {
+  color: #0d6efd; /* Bootstrap primary color */
+  font-weight: 600;
+}
+
+/* Small text */
+.modal-body .list-group-item small {
+  display: block;
+  color: #6c757d;
+  margin-top: 5px;
+  font-size: 0.9rem;
+}
+
+/* Modal footer */
+.modal-footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  padding: 10px 20px;
+}
+
+/* Buttons */
+.modal-footer .btn {
+  padding: 8px 20px;
+  font-size: 0.95rem;
+  border-radius: 5px;
+}
+
+.modal-footer .btn-secondary {
+  background-color: #6c757d;
+  border: none;
+}
+
+.modal-footer .btn-secondary:hover {
+  background-color: #5a6268;
+}
+
     </style>
 
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
@@ -104,7 +200,24 @@
     </div>
 </div>
 
-
+<!-- Modal for Activity Logs -->
+<div class="modal fade" id="activityLogsModal" tabindex="-1" aria-labelledby="activityLogsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="activityLogsModalLabel">Activity Logs</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="activityLogsModalBody">
+          <!-- Activity logs will be dynamically loaded here -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
 
 <!-- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
@@ -136,31 +249,37 @@
                                     <p><small class="text-muted">Created on: {{ group.created_at }}</small></p>
                                 </div>
                                  <!-- Dropdown for 3-dot menu -->
-                                 <div class="dropdown">
-                                      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                      &#x22EE; <!-- This is the Unicode character for 3 dots -->
-                                 </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                   <li>
-                                      <a class="dropdown-item" href="{% url 'invite_members_to_group' org_id=group.organization.id group_id=group.id %}">
-                                         Invite Teammates
-                                       </a>
-                                     </li>
-                                  <li>
-                                     <a class="dropdown-item" href="javascript:void(0);" onclick="fetchGroupMembers({{ group.organization.id }}, {{ group.id }})">
-                                          Fetch Members
-                                      </a>
-                                   </li>
+                              <!-- Dropdown for 3-dot menu -->
+                              <div class="dropdown">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                &#x22EE; <!-- This is the Unicode character for 3 dots -->
+                           </button>
+                          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                             <li>
+                                <a class="dropdown-item" href="{% url 'invite_members_to_group' org_id=group.organization.id group_id=group.id %}">
+                                   Invite Teammates
+                                 </a>
+                               </li>
+                            <li>
+                               <a class="dropdown-item" href="javascript:void(0);" onclick="fetchGroupMembers({{ group.organization.id }}, {{ group.id }})">
+                                    Fetch Members
+                                </a>
+                             </li>
 
-                                   <li>
-                                    <a class="dropdown-item text-danger" href="javascript:void(0);" onclick="deleteGroup({{ group.organization.id }}, {{ group.id }})">
-                                        Delete Group
-                                    </a>
-                                  </li>
-                    
-                                   </div>
-                               </ul>
+                             <li>
+                                 <a class="dropdown-item text-danger" href="javascript:void(0);" onclick="deleteGroup({{ group.organization.id }}, {{ group.id }})">
+                                  Delete Group
+                                </a>
+                             </li>
 
+                             <li>
+                                <a class="dropdown-item" href="javascript:void(0);" onclick="fetchGroupActivityLogs({{ group.organization.id }}, {{ group.id }})">
+                                  View Activity Logs
+                                </a>
+                             </li>
+              
+                             </div>
+                         </ul>
                                <!-- Spinner (Initially hidden) -->
                                <div id="loading-spinner" style="display:none;">
                                 <div class="spinner-border text-primary" role="status">
@@ -289,6 +408,55 @@ function getCookie(name) {
     return cookieValue;
 }
 
+
+// Function to fetch activity logs
+
+// Function to fetch the activity logs via AJAX
+ // Function to fetch group activity logs
+ function fetchGroupActivityLogs(orgId, groupId) {
+    const url = `/groups/groups/${orgId}/${groupId}/activities`; // Adjust the URL pattern as needed
+
+    // Show a loading spinner while fetching data
+    const modalBody = document.getElementById("activityLogsModalBody");
+    modalBody.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div></div>';
+
+    // Make an AJAX call to fetch the logs
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const activities = data.activities;
+
+          // Prepare the logs to display
+          if (activities.length === 0) {
+            modalBody.innerHTML = "<p>No activity logs available for this group.</p>";
+          } else {
+            let logsHTML = '<ul class="list-group">';
+            activities.forEach(activity => {
+              logsHTML += `
+                <li class="list-group-item">
+                  <strong>${activity.user}</strong>: ${activity.action_type}<br>
+                  <small>${activity.details}</small><br>
+                  <small class="text-muted">${activity.timestamp}</small>
+                </li>
+              `;
+            });
+            logsHTML += "</ul>";
+            modalBody.innerHTML = logsHTML;
+          }
+        } else {
+          modalBody.innerHTML = "<p>Failed to fetch activity logs. Please try again later.</p>";
+        }
+      })
+      .catch(error => {
+        console.error("Error fetching activity logs:", error);
+        modalBody.innerHTML = "<p>There was an error fetching the activity logs.</p>";
+      });
+
+    // Show the modal
+    const activityLogsModal = new bootstrap.Modal(document.getElementById("activityLogsModal"));
+    activityLogsModal.show();
+  }
 </script>
 
 </body>

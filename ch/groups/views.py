@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect , get_object_or_404
 from django.urls import reverse
-from .models import Group, GroupMember, GroupInvitation, GroupEvent, GroupEventBooking, GroupEventReminder
+from .models import Group, GroupMember, GroupInvitation, GroupEvent, GroupEventBooking, GroupEventReminder, GroupActivity
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User
 from formtools.wizard.views import SessionWizardView
@@ -96,7 +96,16 @@ class GroupCreationWizard(SessionWizardView):
             created_by=self.request.user
         )
 
-        return redirect('display_groups/',org_id=self.org_id)
+        GroupActivity.objects.create(
+                organization=group.organization,
+                group=group,
+                user=self.request.user,
+                action_type='GROUP_CREATED',
+                details=f"Group '{group.name}' created by {group.created_by}.",
+            )
+
+
+        return redirect('display_groups/',org_id=self.organization.id)
     
 
 
@@ -174,7 +183,14 @@ def invite_members_to_group(request, org_id, group_id):
                     recipient_email=email
                 )
 
-               
+                GroupActivity.objects.create(
+                   organization=group.organization,
+                   group=group,
+                   user=invitation.sender,
+                   action_type='INVITED_MEMBER',
+                   details=f"{invitation.sender} invited {invitation.recipient_email} in group {group.name}",
+               )
+                 
                 invite_link = request.build_absolute_uri(
                     f'/groups/invite/{org_id}/{group_id}/{invitation.id}/accept/'
                 )
@@ -226,6 +242,14 @@ def accept_or_reject_invitation(request, org_id, group_id, invitation_id):
                     organization=organization,
                     role=invitation.role
                 )
+
+                GroupActivity.objects.create(
+                   organization=organization,
+                   group=invitation.group,
+                   user=request.user,
+                   action_type='INVITATION_ACCEPT',
+                   details=f"{request.user} accepted the invitation for {invitation.role} in group {invitation.group}",
+                )
                 invitation.invitation_status = 'accepted'
                 invitation.invited_user = request.user
                 invitation.organization=organization
@@ -238,6 +262,13 @@ def accept_or_reject_invitation(request, org_id, group_id, invitation_id):
          
             invitation.invitation_status = 'rejected'
             invitation.save()
+            GroupActivity.objects.create(
+                   organization=organization,
+                   group=invitation.group,
+                   user=request.user,
+                   action_type='INVITATION_REJECT',
+                   details=f"{request.user} rejected the invitation for {invitation.role} in group {invitation.group}",
+                )
             messages.success(request, "You have rejected the invitation.")
 
 # redirection is pending!!
@@ -323,6 +354,13 @@ def remove_user_from_group(request, org_id, group_id, user_id):
         return redirect('user_groups', org_id=org_id)  
 
     group_member.delete()
+    GroupActivity.objects.create(
+                   organization=organization,
+                   group=group,
+                   user=request.user,
+                   action_type='MEMBER_DISCARD',
+                   details=f"{request.user} removed {group_member.user} from group {group} in group.",
+                )
 
  
     return redirect('manage_group_users', org_id=org_id , group_id=group.id)
@@ -369,6 +407,14 @@ def create_group_event(request, org_id, group_id):
             slots=slots,
             created_at=now(),
         )
+
+        GroupActivity.objects.create(
+                   organization=organization,
+                   group=group,
+                   user=request.user,
+                   action_type='CREATE_EVENT',
+                   details=f"{request.user} created event {group_event.title}.",
+                )
 
       
         group_members = GroupMember.objects.filter(group=group)
@@ -498,6 +544,14 @@ def book_group_event(request, org_id, group_id, event_id):
         status='confirmed',
     )
 
+    GroupActivity.objects.create(
+                   organization=organization,
+                   group=group,
+                   user=request.user,
+                   action_type='BOOK_EVENT',
+                   details=f"{request.user} booked the event {event.title} Event created by {event.created_by}.",
+                )
+
 
     
     user_email = request.user.email
@@ -580,7 +634,6 @@ def book_group_event(request, org_id, group_id, event_id):
 # Absent Event
 @login_required
 def mark_absent(request, org_id, group_id, event_id):
-    # Fetch the organization, group, and event
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id, organization=organization)
     event = get_object_or_404(GroupEvent, id=event_id, group=group, organization=organization)
@@ -589,7 +642,6 @@ def mark_absent(request, org_id, group_id, event_id):
     if not GroupMember.objects.filter(group=group, organization=organization, user=request.user).exists():
         return JsonResponse({"error": "You are not a member of this group or organization."}, status=400)
 
-     # Prevent marking absent for the same event multiple times
     if AbsentEvent.objects.filter(event=event, user=request.user).exists():
         return JsonResponse({"error": "As per organization rules you can only be absent to one event not more than one!."}, status=400)
     
@@ -612,6 +664,16 @@ def mark_absent(request, org_id, group_id, event_id):
             custom_message=custom_message,
             date=timezone.now(),
         )
+
+        GroupActivity.objects.create(
+                   organization=organization,
+                   group=group,
+                   event=event,
+                   user=request.user,
+                   action_type='MARK_ABSENT',
+                   details=f"{request.user} marked absent to himself for event {event.title} in group {group.name}",
+
+                )
 
       
         return JsonResponse({
@@ -673,6 +735,17 @@ def set_event_reminder(request, org_id, group_id, event_id):
                 reason=reason or 'Upcoming',
                 is_sent=False
             )
+
+            GroupActivity.objects.create(
+                   organization=organization,
+                   group=group,
+                   event=event,
+                   user=request.user,
+                   action_type='SET_EVENT_REMINDER',
+                   details=f"{request.user} set reminder for event {event.title} in group {group.name}",
+                   
+                )
+            
 
             
             return JsonResponse({
@@ -810,7 +883,7 @@ def user_group_event_analytics(request, org_id, group_id, event_id):
     reminder_sent = reminders.filter(is_sent=True).count()
     reminder_pending = reminders.filter(is_sent=False).count()
 
-    # Construct response data
+
     data = {
         'event_title': event.title,
         'event_description': event.description,
@@ -856,6 +929,16 @@ def delete_group_event(request, org_id, group_id, event_id):
 
  
         event.delete()
+
+        GroupActivity.objects.create(
+                   organization=organization,
+                   group=group,
+                   event=event,
+                   user=request.user,
+                   action_type='DELETE_EVENT',
+                   details=f"{request.user} deleted the event {event.title} from group {group.name}",
+                   
+                )
         return JsonResponse({'success': 'Event deleted successfully.'})
 
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
@@ -897,6 +980,17 @@ class SaveRecurrenceInfoView(View):
             event.recurrence_end_date = recurrence_end_date
             event.recurrence_days = recurrence_days
             event.save()
+
+            GroupActivity.objects.create(
+                   organization=organization,
+                   group=group,
+                   event=event,
+                   user=request.user,
+                   action_type='RECURRING_EVENT',
+                   details=f"{request.user} set the event as recurring to event {event.title} in group {group.name}",
+                   
+                )
+            
 
             return JsonResponse({'success': True, 'message': 'Recurrence information saved successfully.'})
         except Organization.DoesNotExist:
@@ -1125,24 +1219,59 @@ def fetch_group_members(request, org_id, group_id):
 
 
 # Delete the group
-
-@csrf_exempt 
+@csrf_exempt
 def delete_group(request, org_id, group_id):
     if request.method == 'POST':
-     
         group = get_object_or_404(Group, id=group_id, organization_id=org_id)
 
-        
+      
         if group.created_by == request.user:
+          
+            GroupActivity.objects.create(
+                organization=group.organization,
+                group=group,
+                user=request.user,
+                action_type='GROUP_DELETED',
+                details=f"Group '{group.name}' deleted by {request.user.username}.",
+            )
+
+         
             group.delete()
             return JsonResponse({'success': True, 'message': 'Group deleted successfully.'})
+
         else:
             return JsonResponse({'success': False, 'message': 'You are not authorized to delete this group.'})
+
     else:
         return JsonResponse({'success': False, 'message': 'Invalid request method.'})
 
 
+# Fetch group activities
 
+class GroupActivityLogView(View):
+    def get(self, request, org_id, group_id):
+      
+        organization = get_object_or_404(Organization, id=org_id)
+        group = get_object_or_404(Group, id=group_id, organization=organization)
+
+        
+   
+        activities = GroupActivity.objects.filter(group=group).order_by('-timestamp')
+        if not group.created_by == request.user:
+            return HttpResponseForbidden("You do not have permissions to access this feature! please contact your workspace admin!")
+          
+        activity_data = [
+            {
+                'user': activity.user.username,
+                'action_type': activity.get_action_type_display(),
+                'details': activity.details,
+                'timestamp': activity.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+            }
+            for activity in activities
+        ]
+
+    
+        return JsonResponse({'success': True, 'activities': activity_data})
 
 
 

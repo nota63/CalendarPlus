@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Group, GroupMember, GroupInvitation, GroupEvent, GroupEventBooking, AbsentEvent, GroupEventReminder
+from .models import Group, GroupMember, GroupInvitation, GroupEvent, GroupEventBooking, AbsentEvent, GroupEventReminder, GroupActivity
 # Register your models here.
 
 
@@ -23,3 +23,5 @@ admin.site.register(GroupEventBooking)
 admin.site.register(GroupEvent)
 admin.site.register(AbsentEvent)
 admin.site.register(GroupEventReminder)
+admin.site.register(GroupActivity)
+
