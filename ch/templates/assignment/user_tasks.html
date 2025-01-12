@@ -33,6 +33,10 @@
                                 <p>{{ add_day.task.description }}</p>
                                 <small>Added on: {{ add_day.added_on|date:"M d, Y H:i" }}</small>
                                 <p><strong>Tag:</strong> {{ add_day.get_tags_display }}</p>
+                                <a href="{% url 'task_details' org_id=organization.id group_id=group.id task_id=add_day.task.id user_id=user.id %}">
+                                    <button type="submit">Details</button>
+                                </a>
+                                
                             </div>
                         {% endfor %}
                     </div>
@@ -57,6 +61,10 @@
                                 <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>
                                 <p><strong>Completed on:</strong> {{ task.updated_at|date:"M d, Y H:i" }}</p>
                                 <p><strong>Status:</strong> Completed</p>
+                                <a href="{% url 'task_details' org_id=organization.id group_id=group.id task_id=task.id user_id=user.id %}">
+                                    <button type="submit">Details</button>
+                                </a>
+                                
                             </div>
                         {% endfor %}
                     </div>
@@ -80,6 +88,10 @@
                                 <p>{{ task.description }}</p>
                                 <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>
                                 <p><strong>Deadline:</strong> {{ task.deadline|date:"M d, Y H:i" }}</p>
+                                <a href="{% url 'task_details' org_id=organization.id group_id=group.id task_id=task.id user_id=user.id %}">
+                                    <button type="submit">Details</button>
+                                </a>
+                                
                             </div>
                         {% endfor %}
                     </div>

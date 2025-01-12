@@ -1011,23 +1011,68 @@ def user_tasks_view(request, org_id, group_id, user_id):
     user = get_object_or_404(User, id=user_id)
 
     
-    tasks = Task.objects.filter(group=group, created_by=request.user, assigned_to=user)
+    if group.team_leader != request.user:
+        return HttpResponseForbidden("You are not authorized to perform this action! please contact to your workspace admin")
+        
 
-   
+    # Fetch all tasks assigned by the team leader to this user in the group
+    tasks = Task.objects.filter(group=group, created_by=request.user, assigned_to=user, organization=organization)
+    
     tasks_in_add_day = AddDay.objects.filter(user=user, task__in=tasks)
 
    
-    tasks_added = tasks_in_add_day.filter(task__status='completed')
-    tasks_without_add_day = tasks.exclude(id__in=tasks_in_add_day.values_list('task', flat=True)) 
+    tasks_added = tasks_in_add_day.filter(task__status='completed')  
+    tasks_without_add_day = tasks.exclude(id__in=tasks_in_add_day.values_list('task', flat=True))  
+    tasks_completed = tasks.filter(status='completed') 
 
-
+   
     tasks_added = tasks_added.order_by('-task__updated_at')
     tasks_without_add_day = tasks_without_add_day.order_by('-deadline')
     tasks_completed = tasks_completed.order_by('-updated_at')
 
     return render(request, 'assignment/user_tasks.html', {
         'user': user,
-        'tasks_added': tasks_added,  
+        'organization':organization,
+        'group':group,
+        'tasks_added': tasks_added, 
         'tasks_without_add_day': tasks_without_add_day,  
         'tasks_completed': tasks_completed,  
     })
+
+
+
+
+# Detailed tasks details 
+
+class TaskDetailView(View):
+    def get(self, request, org_id, group_id, task_id, user_id):
+       
+        task = get_object_or_404(Task, id=task_id, organization_id=org_id, group_id=group_id)
+        
+ 
+        user = get_object_or_404(User, id=user_id)
+        if task.created_by != user and not task.group.members.filter(user=user).exists():
+            raise Http404("You don't have permission to view this task.")
+        
+    
+        comments = TaskComment.objects.filter(task=task).order_by('-created_at')
+        notes = TaskNote.objects.filter(task=task).order_by('-created_at')
+        time_tracking = TaskTimeTracking.objects.filter(task=task, user=user)
+        activity_logs = ActivityLog.objects.filter(task=task).order_by('-timestamp')
+        problems = Problem.objects.filter(task=task)
+        tags = TaskTag.objects.filter(task=task)
+
+        context = {
+            'task': task,
+            'comments': comments,
+            'notes': notes,
+            'time_tracking': time_tracking,
+            'activity_logs': activity_logs,
+            'problems': problems,
+            'tags': tags,
+            'user': user,
+        }
+
+        return render(request, 'assignment/task_detail.html', context)
+
+
