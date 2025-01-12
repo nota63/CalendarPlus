@@ -63,6 +63,16 @@
     margin-right: 0.5rem;
 }
 
+
+
+#loading-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+}
+
     </style>
 
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
@@ -126,23 +136,38 @@
                                     <p><small class="text-muted">Created on: {{ group.created_at }}</small></p>
                                 </div>
                                  <!-- Dropdown for 3-dot menu -->
-    <div class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-            &#x22EE; <!-- This is the Unicode character for 3 dots -->
-        </button>
-        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <li>
-                <a class="dropdown-item" href="{% url 'invite_members_to_group' org_id=group.organization.id group_id=group.id %}">
-                    Invite Teammates
-                </a>
-            </li>
-            <li>
-                <a class="dropdown-item" href="javascript:void(0);" onclick="fetchGroupMembers({{ group.organization.id }}, {{ group.id }})">
-                    Fetch Members
-                </a>
-            </li>
-        </ul>
-    </div>
+                                 <div class="dropdown">
+                                      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                      &#x22EE; <!-- This is the Unicode character for 3 dots -->
+                                 </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                   <li>
+                                      <a class="dropdown-item" href="{% url 'invite_members_to_group' org_id=group.organization.id group_id=group.id %}">
+                                         Invite Teammates
+                                       </a>
+                                     </li>
+                                  <li>
+                                     <a class="dropdown-item" href="javascript:void(0);" onclick="fetchGroupMembers({{ group.organization.id }}, {{ group.id }})">
+                                          Fetch Members
+                                      </a>
+                                   </li>
+
+                                   <li>
+                                    <a class="dropdown-item text-danger" href="javascript:void(0);" onclick="deleteGroup({{ group.organization.id }}, {{ group.id }})">
+                                        Delete Group
+                                    </a>
+                                  </li>
+                    
+                                   </div>
+                               </ul>
+
+                               <!-- Spinner (Initially hidden) -->
+                               <div id="loading-spinner" style="display:none;">
+                                <div class="spinner-border text-primary" role="status">
+                               <span class="visually-hidden">Loading...</span>
+                            </div>
+
+                            </div>
                             </div>
                         </div>
                     {% endfor %}
@@ -205,6 +230,63 @@
         console.error('Error:', error);
         alert('Failed to fetch data.');
     });
+}
+
+// Function to delete the group
+// Function to delete the group
+function deleteGroup(orgId, groupId) {
+    // Show the loading spinner
+    document.getElementById('loading-spinner').style.display = 'block';
+
+    // Confirm the action before proceeding
+    if (confirm("Are you sure you want to delete this group? This action cannot be undone.")) {
+        // Make an AJAX request to delete the group
+        fetch(`/groups/groups/${orgId}/${groupId}/delete_group/`, {
+            method: 'POST', // Using POST for deletion
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken') // Get CSRF token for POST request (if CSRF is enabled)
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Hide the spinner once the request is complete
+            document.getElementById('loading-spinner').style.display = 'none';
+            
+            if (data.success) {
+                alert(data.message);  // Success message
+                // Optionally, remove the group's HTML element from the DOM
+                document.getElementById(`group-card-${groupId}`).remove();
+            } else {
+                alert(data.message);  // Failure message
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the group.');
+            // Hide the spinner in case of error
+            document.getElementById('loading-spinner').style.display = 'none';
+        });
+    } else {
+        // Hide the spinner if the user cancels the action
+        document.getElementById('loading-spinner').style.display = 'none';
+    }
+}
+
+// Utility function to get the CSRF token (if needed for POST)
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }
 
 </script>

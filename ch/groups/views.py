@@ -1124,6 +1124,22 @@ def fetch_group_members(request, org_id, group_id):
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
+# Delete the group
+
+@csrf_exempt 
+def delete_group(request, org_id, group_id):
+    if request.method == 'POST':
+     
+        group = get_object_or_404(Group, id=group_id, organization_id=org_id)
+
+        
+        if group.created_by == request.user:
+            group.delete()
+            return JsonResponse({'success': True, 'message': 'Group deleted successfully.'})
+        else:
+            return JsonResponse({'success': False, 'message': 'You are not authorized to delete this group.'})
+    else:
+        return JsonResponse({'success': False, 'message': 'Invalid request method.'})
 
 
 
