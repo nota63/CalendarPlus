@@ -1,7 +1,7 @@
 from django.db import models
 from accounts.models import Organization, Profile
 from django.contrib.auth.models import User
-
+from django.utils import timezone
 
 # Create your models here.
 
@@ -241,4 +241,35 @@ class GroupEventReminder(models.Model):
     
     class Meta:
         unique_together = ('organization', 'group', 'event', 'user', 'reminder_options', 'custom_time')
+
+
+
+# Model to track the group activity
+
+class GroupActivity(models.Model):
+    ACTION_CHOICES = [
+        ('ADD_MEMBER', 'Added member'),
+        ('REMOVE_MEMBER', 'Removed member'),
+        ('CREATE_TASK', 'Created task'),
+        ('UPDATE_TASK', 'Updated task'),
+        ('DELETE_TASK', 'Deleted task'),
+        ('GROUP_CREATED', 'Created group'),
+        ('GROUP_UPDATED', 'Updated group'),
+        ('GROUP_DELETED', 'Deleted group'),
+        ('INVITE_MEMBER', 'Invited member'),
+        
+    ]
+
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    action_type = models.CharField(max_length=50, choices=ACTION_CHOICES)
+    details = models.TextField(blank=True, null=True) 
+    timestamp = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.get_action_type_display()} on {self.timestamp}"
+
+    class Meta:
+        ordering = ['-timestamp']
 
