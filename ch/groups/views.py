@@ -1080,3 +1080,56 @@ def group_member_details(request, org_id, group_id, user_id):
     }
 
     return JsonResponse(member_details)
+
+# -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Admin side features 
+
+# Fetch all group Members 
+
+@csrf_exempt
+def fetch_group_members(request, org_id, group_id):
+    if request.method == 'GET':
+        # Fetch the group and check if it's created by the current user
+        group = get_object_or_404(Group, id=group_id, organization_id=org_id)
+
+        if group.created_by != request.user:
+            return JsonResponse({'error': 'You are not authorized to view this group'}, status=403)
+
+        # Fetch the team leader and group members
+        team_leader = group.team_leader
+        group_members = GroupMember.objects.filter(group=group)
+
+        members_data = []
+        for member in group_members:
+            members_data.append({
+                'user_id': member.user.id,
+                'username': member.user.username,
+                'role': member.role,
+                'joined_at': member.joined_at,
+            })
+
+        # Include the team leader in the response data
+        response_data = {
+            'team_leader': {
+                'user_id': team_leader.id,
+                'username': team_leader.username,
+                'role': 'team_leader',
+            },
+            'members': members_data
+        }
+
+        return JsonResponse(response_data)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+
+
+
+
+
+
+
+
+
