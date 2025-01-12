@@ -936,3 +936,98 @@ def delete_task_comment(request, org_id, group_id, task_id, comment_id):
         )
 
     return JsonResponse({'message': 'Comment deleted successfully!'}, status=200)
+
+
+# -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+# Team leader side features
+
+# Fetch all members to whom he assigned the tasks
+from django.views.generic import ListView
+from django.http import HttpResponseForbidden
+from django.db import models
+from django.core.paginator import Paginator
+
+
+class AssignedUsersListView(ListView):
+    template_name = 'assignment/assigned_users_list.html'
+    context_object_name = 'assigned_users'
+
+    def get_queryset(self):
+        org_id = self.kwargs['org_id']
+        group_id= self.kwargs['group_id']
+        team_leader = self.request.user
+
+        organization = get_object_or_404(Organization, id=org_id)
+
+        group = get_object_or_404(Group, id=group_id, organization=organization)
+
+        if group.team_leader != team_leader:
+            return HttpResponseForbidden("You are not authorized to perform this action! please contact to your workspace admin")
+        
+        return (
+            Task.objects.filter(group=group, created_by=team_leader)
+            .exclude(assigned_to=team_leader)
+            .values(
+                'assigned_to__id',
+                'assigned_to__username',
+                'assigned_to__email',
+                'assigned_to__profiles__profile_picture',
+            )
+            .annotate(
+                task_count=models.Count('id'),
+                pending_count=models.Count('id', filter=models.Q(status='pending')),
+                completed_count=models.Count('id', filter=models.Q(status='completed')),
+                in_progress_count=models.Count('id', filter=models.Q(status='in_progress')),
+                nearest_deadline=models.Min('deadline'),
+            )
+        )
+    
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+      
+        org_id = self.kwargs['org_id']
+        group_id = self.kwargs['group_id']
+        user_id =self.request.user.id
+
+        context['org_id'] = org_id
+        context['group_id'] = group_id
+        context['user_id'] = user_id
+
+        return context
+
+
+
+# Fetch all tasks team leader assignhed to the user]
+def user_tasks_view(request, org_id, group_id, user_id):
+    organization = get_object_or_404(Organization, id=org_id)
+    group = get_object_or_404(Group, id=group_id, organization=organization)
+
+    if group.team_leader != request.user:
+        return HttpResponseForbidden("You are not authorized to view this information.")
+
+    user = get_object_or_404(User, id=user_id)
+
+    
+    tasks = Task.objects.filter(group=group, created_by=request.user, assigned_to=user)
+
+   
+    tasks_in_add_day = AddDay.objects.filter(user=user, task__in=tasks)
+
+   
+    tasks_added = tasks_in_add_day.filter(task__status='completed')
+    tasks_without_add_day = tasks.exclude(id__in=tasks_in_add_day.values_list('task', flat=True)) 
+
+
+    tasks_added = tasks_added.order_by('-task__updated_at')
+    tasks_without_add_day = tasks_without_add_day.order_by('-deadline')
+    tasks_completed = tasks_completed.order_by('-updated_at')
+
+    return render(request, 'assignment/user_tasks.html', {
+        'user': user,
+        'tasks_added': tasks_added,  
+        'tasks_without_add_day': tasks_without_add_day,  
+        'tasks_completed': tasks_completed,  
+    })

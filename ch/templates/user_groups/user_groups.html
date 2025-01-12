@@ -114,6 +114,7 @@
                                                 <li><a class="dropdown-item" href="{% url 'manage_group_users' org_id=group.organization.id group_id=group.id %}">Manage Members</a></li>
                                                 <li><a class="dropdown-item" href="{% url 'group_details' org_id=group.organization.id group_id=group.id %}">Group Info</a></li>
                                                 <li><a class="dropdown-item" href="{% url 'create_task' org_id=group.organization.id group_id=group.id %}">Task & Assign</a></li>
+                                                <li><a class="dropdown-item" href="{% url 'assigned_users_list' org_id=group.organization.id group_id=group.id %}">Check Reports & Tasks</a></li>
                                             </ul>
                                         </div>
                                     {% endif %}

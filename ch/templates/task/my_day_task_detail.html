@@ -194,7 +194,7 @@ body {
 /* Bu
 /* Material Icon for activity log button */
 #activityLogsButton i {
-    font-size: 22px;  /* Smaller size for the icon */
+    font-size: 16px;  /* Smaller size for the icon */
 }
 
 /* When sidebar is open, bring it to the right */
@@ -648,79 +648,214 @@ or: pointer;
 
 /* Greeting */
  /* Base styling for the greeting */
- #greeting {
-            position: fixed;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 20px 40px;
-            font-size: 2rem;
-            font-weight: 700;
-            background-color: rgba(0, 0, 0, 0.8);
-            color: transparent;
-            background-clip: text; /* Clips the background to the text */
-            -webkit-background-clip: text; /* For Safari support */
-            width: 100%;
-            text-align: center;
-            z-index: 1000; /* Ensure it stays on top */
-            border-radius: 8px;
-            opacity: 0; /* Initially hidden for animation */
-            animation: slideIn 1s ease-out forwards, fadeIn 1s ease-out forwards;
-            font-family: 'Poppins', sans-serif, 'Arial'; /* Modern font */
-        }
+#greeting {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translateX(0);
+    padding: 20px 40px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: transparent;
+    background-clip: text; /* Clips the background to the text */
+    -webkit-background-clip: text; /* For Safari support */
+    width: auto;
+    z-index: 1000; /* Ensure it stays on top */
+    border-radius: 8px;
+    opacity: 0; /* Initially hidden for animation */
+    animation: slideIn 1s ease-out forwards, fadeIn 1s ease-out forwards;
+    font-family: 'Poppins', sans-serif, 'Arial'; /* Modern font */
+}
 
-        /* Gradient effect for the text */
-        #greeting {
-            background-image: linear-gradient(to right, #00c6ff, #ff6ec7); /* Light blue to pink gradient */
-            font-size: 2.5rem; /* Increase font size for more impact */
-        }
+/* Gradient effect for the text */
+#greeting {
+    background-image: linear-gradient(to right, #00c6ff, #ff6ec7); /* Light blue to pink gradient */
+    font-size: 2.5rem; /* Increase font size for more impact */
+}
 
-        /* Slide in animation */
-        @keyframes slideIn {
-            0% {
-                top: -50px;
-                opacity: 0;
-            }
-            100% {
-                top: 0;
-                opacity: 1;
-            }
-        }
+/* Slide in animation */
+@keyframes slideIn {
+    0% {
+        top: -50px;
+        opacity: 0;
+    }
+    100% {
+        top: 0;
+        opacity: 1;
+    }
+}
 
-        /* Fade-in animation */
-        @keyframes fadeIn {
-            0% {
-                opacity: 0;
-            }
-            100% {
-                opacity: 1;
-            }
-        }
+/* Fade-in animation */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
 
-        body {
-            margin-top: 80px; /* Add space for the greeting */
-            font-family: 'Arial', sans-serif; /* Modern font */
-            background-color: hsl(240, 3%, 6%); /* Subtle background color for contrast */
-        }
+body {
+    margin: 0; /* Remove margin for better layout */
+    font-family: 'Arial', sans-serif; /* Modern font */
+    background-color: hsl(240, 3%, 6%); /* Subtle background color for contrast */
+}
 
-        /* Add a modern font and responsive design */
-        @media (max-width: 600px) {
-            #greeting {
-                font-size: 1.8rem; /* Make the text smaller on small screens */
-            }
-        }
+/* Add a modern font and responsive design */
+@media (max-width: 600px) {
+    #greeting {
+        font-size: 1.5rem; /* Make the text smaller on small screens */
+    }
+}
+
+#current-date {
+    position: fixed;
+    top: 10px;
+    right: 10px;  /* Position at top-right */
+    font-size: 1.4rem;  /* Adjusted size for better readability */
+    font-weight: 700;  /* Bold font */
+    background-color: rgba(0, 0, 0, 0.7);  /* Slightly darker background */
+    color: hsl(175, 87%, 50%);  /* White text color */
+    padding: 10px 15px;  /* Padding around the text */
+    border-radius: 8px;  /* Rounded corners */
+    z-index: 1000;
+    font-family: 'Poppins', sans-serif;  /* Modern font */
+    letter-spacing: 0.5px;  /* Small letter spacing for better clarity */
+    text-align: center;  /* Center the text */
+}
+
+/* Optional: Animation for the date when the page loads */
+@keyframes fadeInDate {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#current-date {
+    animation: fadeInDate 0.8s ease-out forwards;  /* Fade-in and slide-up animation */
+}
+
+
+
+
+
+
+/* Progress Bar Container */
+.progress {
+    height: 20px;
+    border-radius: 15px;
+    background-color: #f1f1f1;
+    margin-bottom: 20px;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Progress Bar Inner */
+.progress-bar {
+    height: 100%;
+    text-align: center;
+    line-height: 20px;
+    font-weight: bold;
+    color: #fff;
+    border-radius: 15px;
+    transition: width 0.5s ease-in-out, background-color 0.5s ease;
+}
+
+/* Progress Bar Colors Based on Progress */
+.progress-bar.bg-success {
+    background: linear-gradient(90deg, #00b4d8, #0077b6); /* Blue gradient for good progress */
+}
+
+.progress-bar.bg-warning {
+    background: linear-gradient(90deg, #f39c12, #f1c40f); /* Yellow gradient for warning */
+}
+
+.progress-bar.bg-danger {
+    background: linear-gradient(90deg, #e74c3c, #c0392b); /* Red gradient for poor progress */
+}
+
+/* Tooltip on Hover (for Progress Bar) */
+.progress-bar:hover {
+    cursor: pointer;
+    opacity: 0.9;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+#comments-list {
+    list-style: none;
+    padding: 0;
+}
+
+#comments-list li {
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.875rem; /* Smaller font size */
+    margin-bottom: 1rem;
+}
+
+#comments-list strong {
+    font-weight: 700;
+}
+
+.comment-text {
+    display: block;
+    font-size: 1rem; /* Slightly increased font size */
+    color: #fff; /* White color for highlight */
+}
+
+.dropdown-toggle::after {
+    display: none; /* Remove default arrow */
+}
+
+.dropdown-menu {
+    font-size: 0.75rem; /* Smaller font size */
+}
+
+.dropdown-item {
+    font-size: 0.75rem; /* Smaller font size */
+    padding: 0.25rem 1rem;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.btn-sm {
+    font-size: 0.75rem; /* Smaller font size */
+    padding: 0.25rem 0.5rem;
+}
+
+#comments-list span {
+    display: block;
+    font-size: 0.75rem; /* Smaller font size */
+    color: #777;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+#taskNotesList {
+    font-family: 'Roboto', sans-serif;
+}
+
 </style>
-
-
-
-
-
-
-
-
 <body>
     
    
+<!-- greeting -->
+<div id="greeting"></div>
+
+
+<div id="current-date"></div>
+<br>
+<br>
+
     
 
 <!-- Modal to add notes  -->
@@ -902,9 +1037,7 @@ or: pointer;
 
 
 
-     <!-- Greeting Display -->
-<div id="greeting"></div>
-
+     
     <div class="container">
         <div class="task-container">
             <h1 class="mb-4"><i class="bi bi-list-task task-icon"></i> {{ task.title }}</h1>
@@ -925,7 +1058,6 @@ or: pointer;
     <button id="increaseProgress" class="btn btn-primary btn-sm">+</button>
 </div>
 <br>
-
 
 
 
@@ -962,27 +1094,6 @@ or: pointer;
         {% endif %}
     </label>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <!-- Additional features  -->
             <hr>
@@ -1021,7 +1132,6 @@ or: pointer;
                 data-group-id="{{ group_id }}">+</button>
     {% endif %}
 </p>
-
 
 
 
@@ -2245,7 +2355,25 @@ document.addEventListener('DOMContentLoaded', function() {
             getGreeting();
         });
 
+// Current date 
 
+document.addEventListener("DOMContentLoaded", function () {
+        // Get current date
+        const now = new Date();
+
+        // Format the date
+        const dayOfWeek = now.toLocaleString('en-us', { weekday: 'short' }); // "Fri"
+        const day = now.getDate(); // "10"
+        const month = now.toLocaleString('en-us', { month: 'long' }); // "January"
+        const year = now.getFullYear(); // "2025"
+
+        // Create the formatted date string
+        const formattedDate = `${dayOfWeek} ${day} ${month}`;
+
+        // Display the date
+        const currentDateElement = document.getElementById("current-date");
+        currentDateElement.innerHTML = formattedDate;
+    });
 
 
 

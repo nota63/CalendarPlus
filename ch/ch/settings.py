@@ -321,3 +321,11 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR ,"static",
 ]
+
+# Access of gemini api key
+
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from the .env file
+load_dotenv()

@@ -22,6 +22,10 @@ urlpatterns = [
     path('tasks/<int:org_id>/<int:group_id>/<int:task_id>/<int:note_id>/edit_note/',edit_task_note, name='edit_note'),
     path('tasks/<int:org_id>/<int:group_id>/<int:task_id>/<int:comment_id>/edit_comment/',edit_task_comment, name='edit_comment'),
     path('tasks/<int:org_id>/<int:group_id>/<int:task_id>/<int:comment_id>/delete_comment/',delete_task_comment, name='delete_comment'),
+    # Team leader features 
+    path('tasks/assigned-users/<int:org_id>/<int:group_id>/', AssignedUsersListView.as_view(), name='assigned_users_list'),
+    path('tasks/users-task/<int:org_id>/<int:group_id>/<int:user_id>/', user_tasks_view, name='users_tasks'),
+  
   
   
   

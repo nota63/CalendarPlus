@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assigned Tasks for {{ user.username }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4 text-center">Assigned Tasks for {{ user.username }}</h1>
+
+        <!-- Filter Buttons -->
+        <div class="mb-4 text-center">
+            <a href="?category=add_day" class="btn btn-primary">Add Day Tasks</a>
+            <a href="?category=completed" class="btn btn-success">Completed Tasks</a>
+            <a href="?category=not_added" class="btn btn-secondary">Not in Add Day Tasks</a>
+        </div>
+
+        <div class="row mb-5">
+            <!-- Add Day Tasks -->
+            <div class="col" id="add_day_section" style="display: {% if request.GET.category == 'add_day' or not request.GET.category %}block{% else %}none{% endif %}">
+                <h3>Tasks Added to My Day</h3>
+                {% if tasks_added %}
+                    <div class="list-group">
+                        {% for add_day in tasks_added %}
+                            <div class="list-group-item">
+                                <h5>{{ add_day.task.title }}
+                                    {% if forloop.first %}
+                                        <span class="badge bg-warning">Most Recent</span>
+                                    {% endif %}
+                                </h5>
+                                <p>{{ add_day.task.description }}</p>
+                                <small>Added on: {{ add_day.added_on|date:"M d, Y H:i" }}</small>
+                                <p><strong>Tag:</strong> {{ add_day.get_tags_display }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No tasks added to My Day yet.</p>
+                {% endif %}
+            </div>
+
+            <!-- Completed Tasks -->
+            <div class="col" id="completed_section" style="display: {% if request.GET.category == 'completed' %}block{% else %}none{% endif %}">
+                <h3>Completed Tasks</h3>
+                {% if tasks_completed %}
+                    <div class="list-group">
+                        {% for task in tasks_completed %}
+                            <div class="list-group-item">
+                                <h5>{{ task.title }}
+                                    {% if forloop.first %}
+                                        <span class="badge bg-warning">Most Recent</span>
+                                    {% endif %}
+                                </h5>
+                                <p>{{ task.description }}</p>
+                                <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>
+                                <p><strong>Completed on:</strong> {{ task.updated_at|date:"M d, Y H:i" }}</p>
+                                <p><strong>Status:</strong> Completed</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No completed tasks yet.</p>
+                {% endif %}
+            </div>
+
+            <!-- Not Added to My Day Tasks -->
+            <div class="col" id="not_added_section" style="display: {% if request.GET.category == 'not_added' %}block{% else %}none{% endif %}">
+                <h3>Tasks Not Added to My Day</h3>
+                {% if tasks_without_add_day %}
+                    <div class="list-group">
+                        {% for task in tasks_without_add_day %}
+                            <div class="list-group-item">
+                                <h5>{{ task.title }}
+                                    {% if forloop.first %}
+                                        <span class="badge bg-warning">Most Recent</span>
+                                    {% endif %}
+                                </h5>
+                                <p>{{ task.description }}</p>
+                                <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>
+                                <p><strong>Deadline:</strong> {{ task.deadline|date:"M d, Y H:i" }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No tasks assigned that have not been added to My Day.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
