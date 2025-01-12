@@ -119,27 +119,30 @@ def create_task(request, org_id, group_id):
 # Display the tasks in calendar
 from .models import AddDay
 
-
-
 @login_required
 def task_calendar(request, org_id, group_id):
-    
     group = get_object_or_404(Group, id=group_id, organization_id=org_id)
     organization = get_object_or_404(Organization, id=org_id)
 
-   
     if not GroupMember.objects.filter(group=group, user=request.user).exists():
         raise Http404("You are not a member of this group.")
 
+    
+    priority_filter = request.GET.get('priority', None)
 
-    tasks = Task.objects.filter(group=group, assigned_to=request.user).order_by('-created_at')
 
-    # Pagination
-    paginator = Paginator(tasks, 2) 
+    tasks = Task.objects.filter(group=group, assigned_to=request.user)
+
+    if priority_filter:
+        tasks = tasks.filter(priority=priority_filter)
+
+    tasks = tasks.order_by('-created_at')
+
+
+    paginator = Paginator(tasks, 2)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-   
     task_data = []
     for task in page_obj:
         task_in_my_day = AddDay.objects.filter(task=task, user=request.user).exists()
@@ -157,8 +160,13 @@ def task_calendar(request, org_id, group_id):
         'tasks': task_data,
         'group': group,
         'organization': organization,
-        'page_obj': page_obj,  
+        'page_obj': page_obj,
     })
+
+
+
+
+
 
 
 
@@ -1081,7 +1089,6 @@ class TaskDetailView(View):
 
 
 # Team leader can comment on the task
-
 @login_required
 @csrf_exempt
 def add_task_comment(request, org_id, group_id, task_id):
@@ -1137,3 +1144,6 @@ def add_task_comment(request, org_id, group_id, task_id):
 
  
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+
+
