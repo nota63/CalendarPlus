@@ -1,241 +1,851 @@
-<html>
+{% load static %}
+
+
+<!DOCTYPE html>
+<html class="no-js" lang="en">
   <head>
-    <style>
-      * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+    <meta charset="utf-8" />
 
-body {
-  height: 100vh;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-}
+    <!--====== Title ======-->
+    <title>Basic - SaaS Landing Page</title>
 
-main {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-}
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-.item {
-  width: 200px;
-  height: 300px;
-  list-style-type: none;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 1;
-  background-position: center;
-  background-size: cover;
-  border-radius: 20px;
-  box-shadow: 0 20px 30px rgba(255,255,255,0.3) inset;
-  transition: transform 0.1s, left 0.75s, top 0.75s, width 0.75s, height 0.75s;
+    <!--====== Favicon Icon ======-->
+    <link
+      rel="shortcut icon"
+      href="{% static 'assets_2/images_2/favicon.png' %}"
+      type="image/png"
+    />
 
-  &:nth-child(1), &:nth-child(2) {
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    transform: none;
-    border-radius: 0;
-    box-shadow: none;
-    opacity: 1;
-  }
+    <!--====== CSS Files LinkUp ======-->
+   <!--====== CSS Files LinkUp ======-->
+<link rel="stylesheet" href="{% static 'assets_2/css_2/animate.css' %}">
+<link rel="stylesheet" href="{% static 'assets_2/css_2/animate.css' %}"/>
 
-  &:nth-child(3) { left: 50%; }
-  &:nth-child(4) { left: calc(50% + 220px); }
-  &:nth-child(5) { left: calc(50% + 440px); }
-  &:nth-child(6) { left: calc(50% + 660px); opacity: 0; }
-}
+<link rel="stylesheet" href="{% static 'assets_2/css_2/glightbox.min.css' %}" />
+<link rel="stylesheet" href="{% static 'assets_2/css_2/glightbox.min.css' %}">
+<link rel="stylesheet" href="{% static 'assets_2/css_2/lineIcons.css' %}" />
+<link rel="stylesheet" href="{% static 'assets_2/css_2/bootstrap.min.css' %}" />
+<link rel="stylesheet" href="{% static 'assets_2/css_2/style.css' %}" />
 
-.content {
-  width: min(30vw,400px);
-  position: absolute;
-  top: 50%;
-  left: 3rem;
-  transform: translateY(-50%);
-  font: 400 0.85rem helvetica,sans-serif;
-  color: white;
-  text-shadow: 0 3px 8px rgba(0,0,0,0.5);
-  opacity: 0;
-  display: none;
-
-  & .title {
-    font-family: 'arial-black';
-    text-transform: uppercase;
-  }
-
-  & .description {
-    line-height: 1.7;
-    margin: 1rem 0 1.5rem;
-    font-size: 0.8rem;
-  }
-
-  & button {
-    width: fit-content;
-    background-color: rgba(0,0,0,0.1);
-    color: white;
-    border: 2px solid white;
-    border-radius: 0.25rem;
-    padding: 0.75rem;
-    cursor: pointer;
-  }
-}
-
-.item:nth-of-type(2) .content {
-  display: block;
-  animation: show 0.75s ease-in-out 0.3s forwards;
-}
-
-@keyframes show {
-  0% {
-    filter: blur(5px);
-    transform: translateY(calc(-50% + 75px));
-  }
-  100% {
-    opacity: 1;
-    filter: blur(0);
-  }
-}
-
-.nav {
-  position: absolute;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 5;
-  user-select: none;
-
-  & .btn {
-    background-color: rgba(255,255,255,0.5);
-    color: rgba(0,0,0,0.7);
-    border: 2px solid rgba(0,0,0,0.6);
-    margin: 0 0.25rem;
-    padding: 0.75rem;
-    border-radius: 50%;
-    cursor: pointer;
-
-    &:hover {
-      background-color: rgba(255,255,255,0.3);
-    }
-  }
-}
-
-@media (width > 650px) and (width < 900px) {
-  .content {
-    & .title        { font-size: 1rem; }
-    & .description  { font-size: 0.7rem; }
-    & button        { font-size: 0.7rem; }
-  }
-  .item {
-    width: 160px;
-    height: 270px;
-
-    &:nth-child(3) { left: 50%; }
-    &:nth-child(4) { left: calc(50% + 170px); }
-    &:nth-child(5) { left: calc(50% + 340px); }
-    &:nth-child(6) { left: calc(50% + 510px); opacity: 0; }
-  }
-}
-
-@media (width < 650px) {
-  .content {
-    & .title        { font-size: 0.9rem; }
-    & .description  { font-size: 0.65rem; }
-    & button        { font-size: 0.7rem; }
-  }
-  .item {
-    width: 130px;
-    height: 220px;
-
-    &:nth-child(3) { left: 50%; }
-    &:nth-child(4) { left: calc(50% + 140px); }
-    &:nth-child(5) { left: calc(50% + 280px); }
-    &:nth-child(6) { left: calc(50% + 420px); opacity: 0; }
-  }
-}
-    </style>
   </head>
+
   <body>
-    <main>
-      <ul class='slider'>
-        <li class='item' style="background-image: url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT2qD3Nx7KRcvdpEfRVhrX8nn51_Q1TfdwK6w&s)">
-          <div class='content'>
-            <h2 class='title'>"Lossless Youths"</h2>
-            <p class='description'> Lorem ipsum, dolor sit amet consectetur
-            adipisicing elit. Tempore fuga voluptatum, iure corporis inventore
-            praesentium nisi. Id laboriosam ipsam enim.  </p>
-            <button>Read More</button>
+    <!--[if IE]>
+      <p class="browserupgrade">
+        You are using an <strong>outdated</strong> browser. Please
+        <a href="https://browsehappy.com/">upgrade your browser</a> to improve
+        your experience and security.
+      </p>
+    <![endif]-->
+
+    <!--====== PRELOADER PART START ======-->
+    <!-- <div class="preloader">
+      <div class="loader">
+        <div class="spinner">
+          <div class="spinner-container">
+            <div class="spinner-rotator">
+              <div class="spinner-left">
+                <div class="spinner-circle"></div>
+              </div>
+              <div class="spinner-right">
+                <div class="spinner-circle"></div>
+              </div>
+            </div>
           </div>
-        </li>
-        <li class='item' style="background-image: url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0QJce7Y5aqHz8Se2WjlBnqClnluoKHZ9jCg&s)">
-          <div class='content'>
-            <h2 class='title'>"Estrange Bond"</h2>
-            <p class='description'> Lorem ipsum, dolor sit amet consectetur
-            adipisicing elit. Tempore fuga voluptatum, iure corporis inventore
-            praesentium nisi. Id laboriosam ipsam enim.  </p>
-            <button>Read More</button>
+        </div>
+      </div>
+    </div> -->
+    <!--====== PRELOADER PART ENDS ======-->
+
+    <!--====== HEADER PART START ======-->
+    <header class="header-area">
+      <div class="navbar-area">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <nav class="navbar navbar-expand-lg">
+                <a class="navbar-brand" href="index.html">
+                  
+                  <img src="{% static 'assets_2/images_2/logo/logo.svg' %}" alt="Logo" />
+                </a>
+                <button
+                  class="navbar-toggler"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#navbarSupportedContent"
+                  aria-controls="navbarSupportedContent"
+                  aria-expanded="false"
+                  aria-label="Toggle navigation"
+                >
+                  <span class="toggler-icon"> </span>
+                  <span class="toggler-icon"> </span>
+                  <span class="toggler-icon"> </span>
+                </button>
+
+                <div
+                  class="collapse navbar-collapse sub-menu-bar"
+                  id="navbarSupportedContent"
+                >
+                  <ul id="nav" class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                      <a class="page-scroll active" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="page-scroll" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="page-scroll" href="#about">About</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="page-scroll" href="#facts">Why</a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="javascript:void(0)">Team</a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="javascript:void(0)">Blog</a>
+                    </li>
+                  </ul>
+                </div>
+                <!-- navbar collapse -->
+
+                <div class="navbar-btn d-none d-sm-inline-block">
+                  <a
+                    class="main-btn"
+                    data-scroll-nav="0"
+                    href="https://uideck.com/templates/basic/"
+                    rel="nofollow"
+                  >
+                    Download Now
+                  </a>
+                </div>
+              </nav>
+              <!-- navbar -->
+            </div>
           </div>
-        </li>
-        <li class='item' style="background-image: url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3bH4QF9TsjjlqXbDhcQ2htXe2dBLGuPg1Dg&s)">
-          <div class='content'>
-            <h2 class='title'>"The Gate Keeper"</h2>
-            <p class='description'> Lorem ipsum, dolor sit amet consectetur
-            adipisicing elit. Tempore fuga voluptatum, iure corporis inventore
-            praesentium nisi. Id laboriosam ipsam enim.  </p>
-            <button>Read More</button>
-          </div>
-        </li>
-        <li class='item' style="background-image: url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsIz4qZKTOplGKCIt860B8HP3mTBMZGACNFg&s)">
-          <div class='content'>
-            <h2 class='title'>"Last Trace Of Us"</h2>
-            <p class='description'>
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore fuga voluptatum, iure corporis inventore praesentium nisi. Id laboriosam ipsam enim.
-            </p>
-            <button>Read More</button>
-          </div>
-        </li>
-        <li class='item' style="background-image: url(https://img.freepik.com/free-photo/painting-mountain-lake-with-mountain-background_188544-9126.jpg)">
-          <div class='content'>
-            <h2 class='title'>"Urban Decay"</h2>
-            <p class='description'>
-              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Tempore fuga voluptatum, iure corporis inventore praesentium nisi. Id laboriosam ipsam enim.
-            </p>
-            <button>Read More</button>
-          </div>
-        </li>
-        <li class='item' style="background-image: url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHZZg947N2lOmW7Ur_Gtn-z-3TxVomHQPuXA&s)">
-          <div class='content'>
-            <h2 class='title'>"The Migration"</h2>
-            <p class='description'> Lorem ipsum, dolor sit amet consectetur
-            adipisicing elit. Tempore fuga voluptatum, iure corporis inventore
-            praesentium nisi. Id laboriosam ipsam enim.  </p>
-            <button>Read More</button>
-          </div>
-        </li>
-      </ul>
-      <nav class='nav'>
-        <ion-icon class='btn prev' name="arrow-back-outline"></ion-icon>
-        <ion-icon class='btn next' name="arrow-forward-outline"></ion-icon>
-      </nav>
-    </main>
+          <!-- row -->
+        </div>
+        <!-- container -->
+      </div>
+      <!-- navbar area -->
+
+      <div
+      id="home"
+      class="header-hero bg_cover"
+      style="background-image: url('{% static 'assets_2/images_2/header/banner-bg.svg' %}')"
+    >
     
-    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-    <script>
-      const slider = document.querySelector('.slider');
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-lg-8">
+              <div class="header-hero-content text-center">
+                <h3
+                  class="header-sub-title wow fadeInUp"
+                  data-wow-duration="1.3s"
+                  data-wow-delay="0.2s"
+                >
+                  Basic - SaaS Landing Page
+                </h3>
+                <h2
+                  class="header-title wow fadeInUp"
+                  data-wow-duration="1.3s"
+                  data-wow-delay="0.5s"
+                >
+                  Kickstart Your SaaS or App Site
+                </h2>
+                <p
+                  class="text wow fadeInUp"
+                  data-wow-duration="1.3s"
+                  data-wow-delay="0.8s"
+                >
+                  Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
+                  diam nonumy eirmod tempor
+                </p>
+                <a
+                  href="javascript:void(0)"
+                  class="main-btn wow fadeInUp"
+                  data-wow-duration="1.3s"
+                  data-wow-delay="1.1s"
+                >
+                  Get Started
+                </a>
+              </div>
+              <!-- header hero content -->
+            </div>
+          </div>
+          <!-- row -->
+          <div class="row">
+            <div class="col-lg-12">
+              <div
+                class="header-hero-image text-center wow fadeIn"
+                data-wow-duration="1.3s"
+                data-wow-delay="1.4s"
+              >
+              <img src="{% static 'assets_2/images_2/header/header-hero.png' %}" alt="hero" />
 
-      function activate(e) {
-        const items = document.querySelectorAll('.item');
-        e.target.matches('.next') && slider.append(items[0])
-        e.target.matches('.prev') && slider.prepend(items[items.length-1]);
-      }
+              </div>
+              <!-- header hero image -->
+            </div>
+          </div>
+          <!-- row -->
+        </div>
+        <!-- container -->
+        <div id="particles-1" class="particles"></div>
+      </div>
+      <!-- header hero -->
+    </header>
+    <!--====== HEADER PART ENDS ======-->
 
-      document.addEventListener('click',activate,false);
-    </script>
+    <!--====== BRAND PART START ======-->
+    <div class="brand-area pt-90">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+            <div
+              class="
+                brand-logo
+                d-flex
+                align-items-center
+                justify-content-center justify-content-md-between
+              "
+            >
+              <div
+                class="single-logo mt-30 wow fadeIn"
+                data-wow-duration="1s"
+                data-wow-delay="0.2s"
+              >
+              <img src="{% static 'assets_2/images_2/brands/uideck.svg' %}" alt="brand" />
+
+              </div>
+              <!-- single logo -->
+              <div
+                class="single-logo mt-30 wow fadeIn"
+                data-wow-duration="1.5s"
+                data-wow-delay="0.2s"
+              >
+              <img src="{% static 'assets_2/images_2/brands/ayroui.svg' %}" alt="brand" />
+
+              </div>
+              <!-- single logo -->
+              <div
+                class="single-logo mt-30 wow fadeIn"
+                data-wow-duration="1.5s"
+                data-wow-delay="0.3s"
+              >
+              <img src="{% static 'assets_2/images_2/brands/graygrids.svg' %}" alt="brand" />
+
+              </div>
+              <!-- single logo -->
+              <div
+                class="single-logo mt-30 wow fadeIn"
+                data-wow-duration="1.5s"
+                data-wow-delay="0.4s"
+              >
+              <img src="{% static 'assets_2/images_2/brands/lineicons.svg' %}" alt="brand" />
+
+              </div>
+              <!-- single logo -->
+              <div
+                class="single-logo mt-30 wow fadeIn"
+                data-wow-duration="1.5s"
+                data-wow-delay="0.5s"
+              >
+          
+                  <img src="{% static 'assets_2/images_2/brands/ecommerce-html.svg' %}" alt="brand" />
+
+                  alt="brand"
+                />
+              </div>
+              <!-- single logo -->
+            </div>
+            <!-- brand logo -->
+          </div>
+        </div>
+        <!-- row -->
+      </div>
+      <!-- container -->
+    </div>
+    <!--====== BRAND PART ENDS ======-->
+
+    <!--====== SERVICES PART START ======-->
+    <section id="features" class="services-area pt-120">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-lg-10">
+            <div class="section-title text-center pb-40">
+              <div class="line m-auto"></div>
+              <h3 class="title">
+                Clean and simple design,
+                <span> Comes with everything you need to get started!</span>
+              </h3>
+            </div>
+            <!-- section title -->
+          </div>
+        </div>
+        <!-- row -->
+        <div class="row justify-content-center">
+          <div class="col-lg-4 col-md-7 col-sm-8">
+            <div
+              class="single-services text-center mt-30 wow fadeIn"
+              data-wow-duration="1s"
+              data-wow-delay="0.2s"
+            >
+            <div class="services-icon">
+              <img class="shape" src="{% static 'assets_2/images_2/services/services-shape.svg' %}" alt="shape" />
+          </div>
+          
+          <img
+          class="shape-1"
+          src="{% static 'assets_2/images_2/services/services-shape-1.svg' %}"
+          alt="shape"
+        />
+        
+                <i class="lni lni-baloon"> </i>
+              </div>
+              <div class="services-content mt-30">
+                <h4 class="services-title">
+                  <a href="javascript:void(0)">Clean</a>
+                </h4>
+                <p class="text">
+                  Lorem ipsum dolor sit amet,consetetur sadipscing elitr,
+                  seddiam nonu eirmod tempor invidunt labore.
+                </p>
+                <a class="more" href="javascript:void(0)"
+                  >Learn More <i class="lni lni-chevron-right"> </i>
+                </a>
+              </div>
+            </div>
+            <!-- single services -->
+          </div>
+          <div class="col-lg-4 col-md-7 col-sm-8">
+            <div
+              class="single-services text-center mt-30 wow fadeIn"
+              data-wow-duration="1s"
+              data-wow-delay="0.5s"
+            >
+              <div class="services-icon">
+                <img
+  class="shape"
+  src="{% static 'assets_2/images_2/services/services-shape.svg' %}"
+  alt="shape"
+/>
+
+<img
+class="shape-1"
+src="{% static 'assets_2/images_2/services/services-shape-2.svg' %}"
+alt="shape"
+/>
+
+                <i class="lni lni-cog"> </i>
+              </div>
+              <div class="services-content mt-30">
+                <h4 class="services-title">
+                  <a href="javascript:void(0)">Robust</a>
+                </h4>
+                <p class="text">
+                  Lorem ipsum dolor sit amet,consetetur sadipscing elitr,
+                  seddiam nonu eirmod tempor invidunt labore.
+                </p>
+                <a class="more" href="javascript:void(0)"
+                  >Learn More <i class="lni lni-chevron-right"> </i>
+                </a>
+              </div>
+            </div>
+            <!-- single services -->
+          </div>
+          <div class="col-lg-4 col-md-7 col-sm-8">
+            <div
+              class="single-services text-center mt-30 wow fadeIn"
+              data-wow-duration="1s"
+              data-wow-delay="0.8s"
+            >
+              <div class="services-icon">
+                <img
+  class="shape"
+  src="{% static 'assets_2/images_2/services/services-shape.svg' %}"
+  alt="shape"
+/>
+
+<img
+class="shape-1"
+src="{% static 'assets_2/images_2/services/services-shape-3.svg' %}"
+alt="shape"
+/>
+
+                <i class="lni lni-bolt-alt"> </i>
+              </div>
+              <div class="services-content mt-30">
+                <h4 class="services-title">
+                  <a href="javascript:void(0)">Powerful</a>
+                </h4>
+                <p class="text">
+                  Lorem ipsum dolor sit amet,consetetur sadipscing elitr,
+                  seddiam nonu eirmod tempor invidunt labore.
+                </p>
+                <a class="more" href="javascript:void(0)"
+                  >Learn More <i class="lni lni-chevron-right"> </i>
+                </a>
+              </div>
+            </div>
+            <!-- single services -->
+          </div>
+        </div>
+        <!-- row -->
+      </div>
+      <!-- container -->
+    </section>
+    <!--====== SERVICES PART ENDS ======-->
+
+    <section id="about">
+      <!--====== ABOUT PART START ======-->
+      <div class="about-area pt-70">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-6">
+              <div
+                class="about-content mt-50 wow fadeInLeftBig"
+                data-wow-duration="1s"
+                data-wow-delay="0.5s"
+              >
+                <div class="section-title">
+                  <div class="line"></div>
+                  <h3 class="title">
+                    Quick & Easy <span>to Use Bootstrap Template</span>
+                  </h3>
+                </div>
+                <!-- section title -->
+                <p class="text">
+                  Lorem ipsum dolor sit amet, consetetur sadipscing elitr, seiam
+                  nonumy eirmod tempor invidunt ut labore et dolore magna
+                  aliquyam erat, sed diam voluptua. At vero eos et accusam et
+                  justo duo dolores et ea rebum. Stet clita kasd gubergren, no
+                  sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem
+                  ipsum dolor sit amet, consetetur sadipscing.
+                </p>
+                <a href="javascript:void(0)" class="main-btn">Try it Free</a>
+              </div>
+              <!-- about content -->
+            </div>
+            <div class="col-lg-6">
+              <div
+                class="about-image text-center mt-50 wow fadeInRightBig"
+                data-wow-duration="1s"
+                data-wow-delay="0.5s"
+              >
+              <img src="{% static 'assets_2/images_2/about/about1.svg' %}" alt="about" />
+
+              </div>
+              <!-- about image -->
+            </div>
+          </div>
+          <!-- row -->
+        </div>
+        <!-- container -->
+        <div class="about-shape-1">
+          <img src="{% static 'assets_2/images_2/about/about-shape-1.svg' %}" alt="shape" />
+
+        </div>
+      </div>
+      <!--====== ABOUT PART ENDS ======-->
+
+      <!--====== ABOUT PART START ======-->
+      <div class="about-area pt-70">
+        <div class="about-shape-2">
+          <img src="{% static 'assets_2/images_2/about/about-shape-2.svg' %}" alt="shape" />
+
+        </div>
+        <div class="container">
+          <div class="row align-items-center">
+            <div class="col-lg-6 order-lg-last">
+              <div
+                class="about-content ms-lg-auto mt-50 wow fadeInLeftBig"
+                data-wow-duration="1s"
+                data-wow-delay="0.5s"
+              >
+                <div class="section-title">
+                  <div class="line"></div>
+                  <h3 class="title">
+                    Modern design <span> with Essential Features</span>
+                  </h3>
+                </div>
+                <!-- section title -->
+                <p class="text">
+                  Lorem ipsum dolor sit amet, consetetur sadipscing elitr, seiam
+                  nonumy eirmod tempor invidunt ut labore et dolore magna
+                  aliquyam erat, sed diam voluptua. At vero eos et accusam et
+                  justo duo dolores et ea rebum. Stet clita kasd gubergren, no
+                  sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem
+                  ipsum dolor sit amet, consetetur sadipscing.
+                </p>
+                <a href="javascript:void(0)" class="main-btn">Try it Free</a>
+              </div>
+              <!-- about content -->
+            </div>
+            <div class="col-lg-6 order-lg-first">
+              <div
+                class="about-image text-center mt-50 wow fadeInRightBig"
+                data-wow-duration="1s"
+                data-wow-delay="0.5s"
+              >
+              <img src="{% static 'assets_2/images_2/about/about2.svg' %}" alt="about" />
+
+              </div>
+              <!-- about image -->
+            </div>
+          </div>
+          <!-- row -->
+        </div>
+        <!-- container -->
+      </div>
+      <!--====== ABOUT PART ENDS ======-->
+
+      <!--====== ABOUT PART START ======-->
+      <div class="about-area pt-70">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-6">
+              <div
+                class="about-content mt-50 wow fadeInLeftBig"
+                data-wow-duration="1s"
+                data-wow-delay="0.5s"
+              >
+                <div class="section-title">
+                  <div class="line"></div>
+                  <h3 class="title">
+                    <span>Crafted for</span> SaaS, App and Software Landing Page
+                  </h3>
+                </div>
+                <!-- section title -->
+                <p class="text">
+                  Lorem ipsum dolor sit amet, consetetur sadipscing elitr, seiam
+                  nonumy eirmod tempor invidunt ut labore et dolore magna
+                  aliquyam erat, sed diam voluptua. At vero eos et accusam et
+                  justo duo dolores et ea rebum. Stet clita kasd gubergren, no
+                  sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem
+                  ipsum dolor sit amet, consetetur sadipscing.
+                </p>
+                <a href="javascript:void(0)" class="main-btn">Try it Free</a>
+              </div>
+              <!-- about content -->
+            </div>
+            <div class="col-lg-6">
+              <div
+                class="about-image text-center mt-50 wow fadeInRightBig"
+                data-wow-duration="1s"
+                data-wow-delay="0.5s"
+              >
+              <img src="{% static 'assets_2/images_2/about/about3.svg' %}" alt="about" />
+
+              </div>
+              <!-- about image -->
+            </div>
+          </div>
+          <!-- row -->
+        </div>
+        <!-- container -->
+        <div class="about-shape-1">
+          <img src="{% static 'assets_2/images_2/about/about-shape-1.svg' %}" alt="shape" />
+
+        </div>
+      </div>
+      <!--====== ABOUT PART ENDS ======-->
+    </section>
+
+    <!--====== VIDEO COUNTER PART START ======-->
+    <section id="facts" class="video-counter pt-70">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-6 order-lg-last">
+            <div
+              class="counter-wrapper mt-50 wow fadeIn"
+              data-wow-duration="1s"
+              data-wow-delay="0.8s"
+            >
+              <div class="counter-content">
+                <div class="section-title">
+                  <div class="line"></div>
+                  <h3 class="title">Cool facts <span> about this app</span></h3>
+                </div>
+                <!-- section title -->
+                <p class="text">
+                  Lorem ipsum dolor sit amet, consetetur sadipscing elitr, seiam
+                  nonumy eirmod tempor invidunt ut labore et dolore magna
+                  aliquyam erat, sed diam voluptua.
+                </p>
+              </div>
+              <!-- counter content -->
+              <div class="row no-gutters">
+                <div class="col-4">
+                  <div
+                    class="
+                      single-counter
+                      counter-color-1
+                      d-flex
+                      align-items-center
+                      justify-content-center
+                    "
+                  >
+                    <div class="counter-items text-center">
+                      <span
+                        class="count countup text-uppercase"
+                        cup-end="125"
+                      ></span>
+
+                      <p class="text">Downloads</p>
+                    </div>
+                  </div>
+                  <!-- single counter -->
+                </div>
+                <div class="col-4">
+                  <div
+                    class="
+                      single-counter
+                      counter-color-2
+                      d-flex
+                      align-items-center
+                      justify-content-center
+                    "
+                  >
+                    <div class="counter-items text-center">
+                      <span
+                        class="count countup text-uppercase"
+                        cup-end="87"
+                      ></span>
+                      <p class="text">Active Users</p>
+                    </div>
+                  </div>
+                  <!-- single counter -->
+                </div>
+                <div class="col-4">
+                  <div
+                    class="
+                      single-counter
+                      counter-color-3
+                      d-flex
+                      align-items-center
+                      justify-content-center
+                    "
+                  >
+                    <div class="counter-items text-center">
+                      <span
+                        class="count countup text-uppercase"
+                        cup-end="59"
+                      ></span>
+                      <p class="text">User Rating</p>
+                    </div>
+                  </div>
+                  <!-- single counter -->
+                </div>
+              </div>
+              <!-- row -->
+            </div>
+            <!-- counter wrapper -->
+          </div>
+          <div class="col-lg-6">
+            <div
+              class="video-content mt-50 wow fadeIn"
+              data-wow-duration="1s"
+              data-wow-delay="0.5s"
+            >
+            <img class="dots" src="{% static 'assets_2/images_2/video/dots.svg' %}" alt="dots" />
+
+              <div class="video-wrapper">
+                <div class="video-image">
+                  <img src="{% static 'assets_2/images_2/video/video.png' %}" alt="video" />
+
+                </div>
+                <div class="video-icon">
+                  <a
+                    href="https://www.youtube.com/watch?v=r44RKWyfcFw"
+                    class="video-popup glightbox"
+                  >
+                    <i class="lni lni-play"> </i>
+                  </a>
+                </div>
+              </div>
+              <!-- video wrapper -->
+            </div>
+            <!-- video content -->
+          </div>
+        </div>
+        <!-- row -->
+      </div>
+      <!-- container -->
+    </section>
+    <!--====== VIDEO COUNTER PART ENDS ======-->
+
+    <!--====== FOOTER PART START ======-->
+    <footer id="footer" class="footer-area pt-120">
+      <div class="container">
+        <div
+          class="subscribe-area wow fadeIn"
+          data-wow-duration="1s"
+          data-wow-delay="0.5s"
+        >
+          <div class="row">
+            <div class="col-lg-6">
+              <div class="subscribe-content mt-45">
+                <h2 class="subscribe-title">
+                  Subscribe Our Newsletter <span>get reguler updates</span>
+                </h2>
+              </div>
+            </div>
+            <div class="col-lg-6">
+              <div class="subscribe-form mt-50">
+                <form action="#">
+                  <input type="text" placeholder="Enter eamil" />
+                  <button class="main-btn">Subscribe</button>
+                </form>
+              </div>
+            </div>
+          </div>
+          <!-- row -->
+        </div>
+        <!-- subscribe area -->
+        <div class="footer-widget pb-100">
+          <div class="row">
+            <div class="col-lg-4 col-md-6 col-sm-8">
+              <div
+                class="footer-about mt-50 wow fadeIn"
+                data-wow-duration="1s"
+                data-wow-delay="0.2s"
+              >
+                <a class="logo" href="javascript:void(0)">
+                  <img src="{% static 'assets_2/images_2/logo/logo.svg' %}" alt="logo" />
+
+                </a>
+                <p class="text">
+                  Lorem ipsum dolor sit amet consetetur sadipscing elitr,
+                  sederfs diam nonumy eirmod tempor invidunt ut labore et dolore
+                  magna aliquyam.
+                </p>
+                <ul class="social">
+                  <li>
+                    <a href="javascript:void(0)">
+                      <i class="lni lni-facebook-filled"> </i>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0)">
+                      <i class="lni lni-twitter-filled"> </i>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0)">
+                      <i class="lni lni-instagram-filled"> </i>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0)">
+                      <i class="lni lni-linkedin-original"> </i>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <!-- footer about -->
+            </div>
+            <div class="col-lg-5 col-md-7 col-sm-12">
+              <div class="footer-link d-flex mt-50 justify-content-sm-between">
+                <div
+                  class="link-wrapper wow fadeIn"
+                  data-wow-duration="1s"
+                  data-wow-delay="0.4s"
+                >
+                  <div class="footer-title">
+                    <h4 class="title">Quick Link</h4>
+                  </div>
+                  <ul class="link">
+                    <li><a href="javascript:void(0)">Road Map</a></li>
+                    <li><a href="javascript:void(0)">Privacy Policy</a></li>
+                    <li><a href="javascript:void(0)">Refund Policy</a></li>
+                    <li><a href="javascript:void(0)">Terms of Service</a></li>
+                    <li><a href="javascript:void(0)">Pricing</a></li>
+                  </ul>
+                </div>
+                <!-- footer wrapper -->
+                <div
+                  class="link-wrapper wow fadeIn"
+                  data-wow-duration="1s"
+                  data-wow-delay="0.6s"
+                >
+                  <div class="footer-title">
+                    <h4 class="title">Resources</h4>
+                  </div>
+                  <ul class="link">
+                    <li><a href="javascript:void(0)">Home</a></li>
+                    <li><a href="javascript:void(0)">Page</a></li>
+                    <li><a href="javascript:void(0)">Portfolio</a></li>
+                    <li><a href="javascript:void(0)">Blog</a></li>
+                    <li><a href="javascript:void(0)">Contact</a></li>
+                  </ul>
+                </div>
+                <!-- footer wrapper -->
+              </div>
+              <!-- footer link -->
+            </div>
+            <div class="col-lg-3 col-md-5 col-sm-12">
+              <div
+                class="footer-contact mt-50 wow fadeIn"
+                data-wow-duration="1s"
+                data-wow-delay="0.8s"
+              >
+                <div class="footer-title">
+                  <h4 class="title">Contact Us</h4>
+                </div>
+                <ul class="contact">
+                  <li>+809272561823</li>
+                  <li>info@gmail.com</li>
+                  <li>www.yourweb.com</li>
+                  <li>
+                    123 Stree New York City , United <br />
+                    States Of America 750.
+                  </li>
+                </ul>
+              </div>
+              <!-- footer contact -->
+            </div>
+          </div>
+          <!-- row -->
+        </div>
+        <!-- footer widget -->
+        <div class="footer-copyright">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="copyright d-sm-flex justify-content-between">
+                <div class="copyright-content">
+                  <p class="text">
+                    Designed and Developed by
+                    <a href="https://uideck.com" rel="nofollow">UIdeck</a>
+                  </p>
+                </div>
+                <!-- copyright content -->
+              </div>
+              <!-- copyright -->
+            </div>
+          </div>
+          <!-- row -->
+        </div>
+        <!-- footer copyright -->
+      </div>
+      <!-- container -->
+      <div id="particles-2"></div>
+    </footer>
+    <!--====== FOOTER PART ENDS ======-->
+
+    <!--====== BACK TOP TOP PART START ======-->
+    <a href="#" class="back-to-top"> <i class="lni lni-chevron-up"> </i> </a>
+    <!--====== BACK TOP TOP PART ENDS ======-->
+
+   <!--====== Javascript Files ======-->
+<script src="{% static 'assets_2/js_2/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'assets_2/js_2/wow.min.js' %}"></script>
+<script src="{% static 'assets_2/js_2/glightbox.min.js' %}"></script>
+<script src="{% static 'assets_2/js_2/count-up.min.js' %}"></script>
+<script src="{% static 'assets_2/js_2/particles.min.js' %}"></script>
+<script src="{% static 'assets_2/js_2/main.js' %}"></script>
+
   </body>
 </html>

@@ -1,9 +1,17 @@
+{% include 'header.html' %}
+<br>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendar View</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+
 
     <!-- Include jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -18,9 +26,42 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    <h1>Your Meetings in {{ organization.name }}</h1>
 
-    <div id="calendar"></div>
+    <style>
+         /* Custom CSS to style the image */
+    /* Custom CSS to style the image */
+    .small-img {
+        max-width: 100px; /* Adjust image size */
+        height: auto;
+        border-radius: 10px; /* Rounded corners */
+    }
+    </style>
+
+
+    <section class="text-center py-5" style="background-color: #f7f7f7; border-radius: 15px;">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcDyE4sWPgG_z3D8yJrm96EbbnX1xGTO7b8g&s" alt="Meeting Image" class="small-img mb-4">
+        <strong>
+            <p class="lead" style="font-size: 1.0rem; font-weight: 700; background-image: linear-gradient(to right, #ff6b81, #6c94ff); -webkit-background-clip: text; color: transparent;">
+                Stay on top of your meetings with a streamlined calendar and boost your productivity to achieve your goals effortlessly
+            </p>
+        </strong>
+    </section>
+    
+    
+    
+    <div class="container mt-5">
+        <h1 class="mb-4" style="text-transform: uppercase; font-weight: bold; font-size: 2rem; background-image: linear-gradient(to right, #f8a5d3, #a2c2e3); -webkit-background-clip: text; color: transparent;">
+            Your Meetings 
+        </h1>
+        
+        <div id="calendar" class="container py-5 shadow-lg rounded-3 bg-light border border-0 border-secondary">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+             
+            </div>
+            <!-- FullCalendar will be inserted here -->
+        </div>
+        
+    </div>
 
     <!-- Modal for displaying meeting details -->
     <div class="modal fade" id="meetingModal" tabindex="-1" aria-labelledby="meetingModalLabel" aria-hidden="true">
