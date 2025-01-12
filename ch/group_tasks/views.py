@@ -123,11 +123,11 @@ from .models import AddDay
 
 @login_required
 def task_calendar(request, org_id, group_id):
-    # Fetch the group and organization based on IDs
+    
     group = get_object_or_404(Group, id=group_id, organization_id=org_id)
     organization = get_object_or_404(Organization, id=org_id)
 
-    # Ensure that the user is assigned to this group
+   
     if not GroupMember.objects.filter(group=group, user=request.user).exists():
         raise Http404("You are not a member of this group.")
 
@@ -432,7 +432,6 @@ def fetch_activity_logs(request, org_id, group_id, task_id):
 
 
     activity_logs = ActivityLog.objects.filter(
-        user=request.user,
         organization=organization,
         group=group,
         task=task
@@ -1046,8 +1045,11 @@ def user_tasks_view(request, org_id, group_id, user_id):
 
 class TaskDetailView(View):
     def get(self, request, org_id, group_id, task_id, user_id):
+
+        organization = get_object_or_404(Organization, id=org_id)
+        group=get_object_or_404(Group, id=group_id, organization=organization)
        
-        task = get_object_or_404(Task, id=task_id, organization_id=org_id, group_id=group_id)
+        task = get_object_or_404(Task, id=task_id, organization=organization, group=group)
         
  
         user = get_object_or_404(User, id=user_id)
@@ -1063,6 +1065,8 @@ class TaskDetailView(View):
         tags = TaskTag.objects.filter(task=task)
 
         context = {
+            'organization':organization,
+            'group':group,
             'task': task,
             'comments': comments,
             'notes': notes,
@@ -1076,3 +1080,60 @@ class TaskDetailView(View):
         return render(request, 'assignment/task_detail.html', context)
 
 
+# Team leader can comment on the task
+
+@login_required
+@csrf_exempt
+def add_task_comment(request, org_id, group_id, task_id):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+
+            
+            organization = get_object_or_404(Organization, id=org_id)
+            group = get_object_or_404(Group, id=group_id, organization=organization)
+            task = get_object_or_404(Task, id=task_id, group=group)
+
+        
+            if group.team_leader != request.user:
+                return JsonResponse({'error': 'You are not authorized to comment on this task.'}, status=403)
+
+            comment_text = data.get('comment')
+            if not comment_text:
+                return JsonResponse({'error': 'Comment text is required.'}, status=400)
+
+         
+            comment = TaskComment.objects.create(
+                task=task,
+                user=request.user,
+                organization=organization,
+                group=group,
+                comment=comment_text
+            )
+
+            ActivityLog.objects.create(
+              user=request.user,
+              organization=organization,
+              group=group,
+              task=task,
+              action='COMMENT',
+              details=f" {request.user} - Team Leader Commented {comment_text}"
+
+         )
+
+          
+            return JsonResponse({
+                'message': 'Comment added successfully!',
+                'comment': {
+                    'id': comment.id,
+                    'user': comment.user.username,
+                    'text': comment.comment,
+                    'created_at': comment.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                }
+            })
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data.'}, status=400)
+
+ 
+    return JsonResponse({'error': 'Invalid request method.'}, status=405)

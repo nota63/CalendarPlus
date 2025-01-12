@@ -26,6 +26,7 @@ urlpatterns = [
     path('tasks/assigned-users/<int:org_id>/<int:group_id>/', AssignedUsersListView.as_view(), name='assigned_users_list'),
     path('tasks/users-task/<int:org_id>/<int:group_id>/<int:user_id>/', user_tasks_view, name='users_tasks'),
     path('tasks/task-detail/<int:org_id>/<int:group_id>/<int:task_id>/<int:user_id>/',TaskDetailView.as_view(), name='task_details'),
+    path('tasks/<int:org_id>/<int:group_id>/<int:task_id>/add_comment/',add_task_comment, name='add_comment'),
   
   
   

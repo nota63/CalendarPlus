@@ -4,7 +4,7 @@ from django.dispatch import receiver
 from django.core.mail import send_mail, EmailMessage
 from django.template.loader import render_to_string
 from django.conf import settings
-from .models import Problem
+from .models import Problem, TaskComment
 
 @receiver(post_save, sender=Problem)
 def send_problem_report_email(sender, instance, created, **kwargs):
@@ -74,3 +74,42 @@ def send_resolution_email(sender, instance, created, **kwargs):
 
        
             email.send(fail_silently=False)
+
+
+# Signal to send comment email 
+
+@receiver(post_save, sender=TaskComment)
+def send_task_comment_email(sender, instance, created, **kwargs):
+    if created:  
+        task = instance.task
+        group = instance.group
+        organization = instance.organization
+        comment_user = instance.user
+        comment_text = instance.comment
+
+       
+        subject = f"New Comment on Task: {task.title}"
+        recipient_email = task.assigned_to.email
+
+        if recipient_email:
+           
+            html_message = render_to_string('assignment/task_comment_notification.html', {
+                'comment_user': comment_user.username,
+                'task': task,
+                'organization': organization,
+                'group': group,
+                'comment_text': comment_text,
+                'site_url': f"https://example.com/tasks/{task.id}/", 
+            })
+
+           
+            send_mail(
+                subject,
+                '',
+                settings.DEFAULT_FROM_EMAIL,
+                [recipient_email],
+                fail_silently=False,
+                html_message=html_message  
+            )
+
+
