@@ -185,6 +185,11 @@
         text-align: center;
         vertical-align: middle;
     }
+
+
+    /* Spinner */
+
+    
     </style>
 </head>
 <body>
@@ -272,11 +277,17 @@
 
 
 
-    {% if messages %}
-      {% for m in messages %}
-        <strong>{{m}}</strong>
-      {% endfor %}
-    {% endif %}    
+{% if messages %}
+<div class="container mt-4">
+  {% for m in messages %}
+    <div class="alert alert-{{ m.tags }} alert-dismissible fade show" role="alert">
+      <strong>{{ m }}</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
 
     <div class="container mt-5">
         <h2>Create a New Channel</h2>
@@ -328,12 +339,16 @@
                 <input type="text" name="channel_name" id="channelName" class="form-control" placeholder="Enter channel name" required>
             </div>
 
+            <p class="text-muted small">
+                Channels are where conversations happen around a topic. Use a name that is easy to find and understand.
+            </p>
+            
             <!-- Visibility -->
             <div class="mb-3">
                 <label class="form-label">Visibility</label>
                 <div>
                     <input type="radio" name="visibility" value="PUBLIC" id="visibilityPublic" required>
-                    <label for="visibilityPublic">Public - Anyone in Organization</label>
+                    <label for="visibilityPublic">Public - Anyone in {{organization.name}}</label>
                 </div>
                 <div>
                     <input type="radio" name="visibility" value="PRIVATE" id="visibilityPrivate" required>
@@ -358,7 +373,7 @@
             <!-- Submit Button -->
             <button type="submit" class="btn btn-primary" id="createChannelBtn" disabled>Create Channel</button>
         </form>
-    </div>
+</div>
 
     <!-- Blank Channel Guide Modal -->
     <div id="blankChannelModal">
@@ -465,6 +480,9 @@
                                 ? `${data.most_popular.channel_type} (${data.most_popular.count} channels)`
                                 : 'N/A'
                         }</h6>
+
+                        <p>Statistics data is based on your workspace {{organization.name}}'s channel creations</p>
+                          
                     `;
 
                     statsContent.innerHTML = statsHtml;
@@ -474,7 +492,6 @@
                 statsContent.innerHTML = `<p class="text-danger">${error.message}</p>`;
             });
     });
-       
     </script>
 </body>
 </html>
