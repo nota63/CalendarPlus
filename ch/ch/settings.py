@@ -41,9 +41,9 @@ MEDIA_ROOT = BASE_DIR / 'media'
 SECRET_KEY = 'django-insecure-2_5v35*4-ylcnkadmjcbghfoa3^fhq8%kun$ywajnp7jd3_s2j'
 
 
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.vercel.app','.now.sh','127.0.0.1']
 
 import os 
 
@@ -126,14 +126,16 @@ WSGI_APPLICATION = 'ch.wsgi.application'
 
 # Database
 
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',  
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
-        'NAME': 'calendar_plus',  
+        'HOST': 'monorail.proxy.rlwy.net',
+        'PORT': '51887',
+        'NAME': 'railway',  
         'USER': 'postgres',  
-        'PASSWORD': 'skl12qw@#', 
+        'PASSWORD': 'dkfAhWBtZWfiPZLctTzZfdAvRNmHLceG', 
     }
 }
 
@@ -182,7 +184,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -195,9 +197,10 @@ STATIC_URL = '/static/'
 
 # Ensure static files are collected correctly
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'ch/static'),  # Adjust path as necessary
+    os.path.join(BASE_DIR, 'ch/static'),  
 ]
 
+STATIC_ROOT =os.path.join(BASE_DIR,'staticfiles_build','static')
 
 # rest framework configuration
 
@@ -246,19 +249,6 @@ CELERY_ACCEPT_CONTENT = ['json']
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
-
-
-
-# CACHES = {
-#     "default": {
-#         "BACKEND": "django_redis.cache.RedisCache",
-#         "LOCATION": "redis://127.0.0.1:6379/1",  
-#         "OPTIONS": {
-#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-#         }
-#     }
-# }
-
 
 
 CORS_ALLOW_ALL_ORIGINS = True
