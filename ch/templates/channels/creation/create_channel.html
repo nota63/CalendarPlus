@@ -154,6 +154,37 @@
         background-color: #138496;
         border-color: #117a8b;
     }
+
+
+
+    #channelStatsModal .modal-content {
+        background: #f9f9f9;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    #channelStatsModal .modal-header {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    #channelStatsModal .modal-body h5,
+    #channelStatsModal .modal-body h6 {
+        margin: 10px 0;
+        font-weight: bold;
+        color: #343a40;
+    }
+
+    #channelStatsModal .table th {
+        background-color: #007bff;
+        color: white;
+    }
+
+    #channelStatsModal .table td,
+    #channelStatsModal .table th {
+        text-align: center;
+        vertical-align: middle;
+    }
     </style>
 </head>
 <body>
@@ -205,6 +236,28 @@
     </div>
 </div>
 
+
+<!-- Statistics Modal -->
+ <!-- Statistics Modal -->
+<div class="modal fade" id="channelStatsModal" tabindex="-1" aria-labelledby="channelStatsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="channelStatsLabel">Channel Creation Statistics</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="statsContent">
+                    <p>Loading statistics...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- ---------------------------------------------------------------------------------------------------------- -->
 
 <!-- Guide Button -->
@@ -212,7 +265,10 @@
     Open Channel Creation Guide
 </button>
 
-
+<!-- Button to Open Statistics Modal -->
+<button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#channelStatsModal" id="viewStatsBtn">
+    View Channel Statistics
+</button>
 
 
 
@@ -359,6 +415,65 @@
         });
 
 
+        // Channels statistics
+        document.getElementById('viewStatsBtn').addEventListener('click', function () {
+        const statsContent = document.getElementById('statsContent');
+        statsContent.innerHTML = '<p>Loading statistics...</p>';
+
+        fetch("{% url 'channel_statistics' org_id=organization.id %}")
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to fetch statistics.');
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    statsContent.innerHTML = `<p class="text-danger">${data.error}</p>`;
+                } else {
+                    let statsHtml = `
+                        <h5>Total Channels Created: ${data.total_channels}</h5>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Channel Type</th>
+                                    <th>Count</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    Object.values(data.percentages).forEach(item => {
+                        statsHtml += `
+                            <tr>
+                                <td>${item.channel_type}</td>
+                                <td>${item.count}</td>
+                                <td>${item.percentage}%</td>
+                            </tr>
+                        `;
+                    });
+
+                    statsHtml += `
+                            </tbody>
+                        </table>
+                        <h6>Last Created Channel: ${
+                            data.last_created
+                                ? `${data.last_created.name} (${data.last_created.type})`
+                                : 'No channels created yet.'
+                        }</h6>
+                        <h6>Most Popular Channel Type: ${
+                            data.most_popular
+                                ? `${data.most_popular.channel_type} (${data.most_popular.count} channels)`
+                                : 'N/A'
+                        }</h6>
+                    `;
+
+                    statsContent.innerHTML = statsHtml;
+                }
+            })
+            .catch(error => {
+                statsContent.innerHTML = `<p class="text-danger">${error.message}</p>`;
+            });
+    });
        
     </script>
 </body>
