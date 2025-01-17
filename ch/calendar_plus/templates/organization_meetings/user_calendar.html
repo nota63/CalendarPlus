@@ -1,3 +1,5 @@
+{% include 'header.html' %}
+<br>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -5,6 +7,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ user.username }}'s Calendar</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+
 
     <!-- FullCalendar CSS -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@3.10.2/dist/fullcalendar.min.css" rel="stylesheet">
@@ -14,11 +21,33 @@
 </head>
 <body>
 
-<div class="container mt-5">
-    <h1>{{ user.username }}'s Calendar - {{ organization.name }}</h1>
 
-    <!-- FullCalendar Container -->
-    <div id="calendar"></div>
+    <section class="py-5 bg-light">
+        <div class="container text-center">
+            <p class="mb-3 fs-5 text-muted">
+                Select a specific date to check {{user.username}}'s availability. Once confirmed, proceed with the scheduling process by clicking on the 'Schedule' button for a seamless experience.
+            </p>
+            <p class="text-danger fw-bold">
+                Note: Calendar Plus automatically prevents scheduling on public holidays to avoid conflicts.
+            </p>
+        </div>
+    </section>
+    
+
+<div class="container mt-5">
+    <div class="container mt-5">
+        <h1 class="mb-4" style="text-transform: uppercase; font-weight: bold; font-size: 2rem; background-image: linear-gradient(to right, #f8a5d3, #a2c2e3); -webkit-background-clip: text; color: transparent;">
+            {{ user.username }}'s' Calendar and Availability
+        </h1>
+        
+        <div id="calendar" class="container py-5 shadow-lg rounded-3 bg-light border border-0 border-secondary">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+             
+            </div>
+            <!-- FullCalendar will be inserted here -->
+        </div>
+        
+    </div>
 </div>
 
 <!-- Modal for displaying availability and holidays -->

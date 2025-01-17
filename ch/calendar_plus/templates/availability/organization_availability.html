@@ -1,3 +1,5 @@
+{% include 'header.html' %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +9,11 @@
 
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+
 
     
     <!-- Load jQuery -->
@@ -22,30 +29,127 @@
 
 
     <style>
-        /* Custom Modal Styling */
-        #add-time-slot-modal, #edit-availability-modal { 
-            display: none; 
-            position: fixed; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            z-index: 1000; 
-        }
-        #overlay { 
-            display: none; 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background-color: rgba(0, 0, 0, 0.5); 
-            z-index: 999; 
-        }
+       /* Custom Modal Styling */
+#add-time-slot-modal, #edit-availability-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    max-width: 600px;
+    width: 100%;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    overflow: hidden;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease;
+}
+
+#add-time-slot-modal.open, #edit-availability-modal.open {
+    display: block;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+#overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 999;
+    transition: background-color 0.3s ease;
+}
+
+#overlay.active {
+    display: block;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Modal Header */
+#add-time-slot-modal .modal-header, #edit-availability-modal .modal-header {
+    padding: 15px;
+    border-bottom: 1px solid #e0e0e0;
+    background-color: #f5f5f5;
+    border-radius: 10px 10px 0 0;
+}
+
+#add-time-slot-modal .modal-header h5, #edit-availability-modal .modal-header h5 {
+    font-size: 18px;
+    color: #333;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* Modal Body */
+#add-time-slot-modal .modal-body, #edit-availability-modal .modal-body {
+    padding: 20px;
+    font-size: 16px;
+    color: #555;
+    line-height: 1.6;
+}
+
+/* Modal Footer */
+#add-time-slot-modal .modal-footer, #edit-availability-modal .modal-footer {
+    padding: 15px;
+    border-top: 1px solid #e0e0e0;
+    background-color: #f9f9f9;
+    text-align: right;
+}
+
+#add-time-slot-modal .modal-footer button, #edit-availability-modal .modal-footer button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#add-time-slot-modal .modal-footer button:hover, #edit-availability-modal .modal-footer button:hover {
+    background-color: #0056b3;
+}
+
+/* Responsive Design for Modal */
+@media (max-width: 768px) {
+    #add-time-slot-modal, #edit-availability-modal {
+        max-width: 90%;
+        padding: 20px;
+    }
+
+    #add-time-slot-modal .modal-header h5, #edit-availability-modal .modal-header h5 {
+        font-size: 16px;
+    }
+
+    #add-time-slot-modal .modal-body, #edit-availability-modal .modal-body {
+        font-size: 14px;
+    }
+
+    #add-time-slot-modal .modal-footer button, #edit-availability-modal .modal-footer button {
+        font-size: 14px;
+        padding: 8px 15px;
+    }
+}
+
     </style>
 </head>
 <body class="font-sans bg-gray-100 text-gray-800">
 
-    <h2 class="text-2xl font-semibold text-center py-5">Manage Availability for {{ organization.name }}</h2>
+    <h2 class="text-center py-5 text-uppercase" style="font-size: 2rem; font-weight: 600;">
+        Manage Availability for <span class="text-success">{{ organization.name }}</span>
+    </h2>
+
+    <p class="text-center text-muted" style="font-size: 1.125rem; line-height: 1.6;">
+        Your availability will be limited to this workspace. You can modify the availability, and Calendar Plus will prevent users from scheduling outside of your availability.
+    </p>
+    
+    
 
     <!-- Toggle buttons for list view and calendar view -->
     <div class="flex justify-center space-x-4 mb-6">
@@ -74,8 +178,18 @@
     </div>
 
     <!-- Calendar View (FullCalendar.js) -->
-    <div id="calendar" class="mt-8"></div>
-
+    <div class="container mt-5">
+        <h1 class="mb-4" style="text-transform: uppercase; font-weight: bold; font-size: 2rem; background-image: linear-gradient(to right, #f8a5d3, #a2c2e3); -webkit-background-clip: text; color: transparent;">
+        </h1>
+        
+        <div id="calendar" class="container py-5 shadow-lg rounded-3 bg-light border border-0 border-secondary">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+             
+            </div>
+            <!-- FullCalendar will be inserted here -->
+        </div>
+        
+    </div>
     <!-- Modal to Add Time Slot -->
     <div id="overlay" class="hidden"></div>
     <div id="add-time-slot-modal" class="hidden bg-white p-6 rounded-lg shadow-lg">

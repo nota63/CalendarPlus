@@ -1,3 +1,8 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+<br><br><br>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,75 +13,78 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<div class="container py-8">
-    <!-- Enhanced Modern Text-based Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <!-- Create Event Link -->
-        <a href="{% url 'event_type_selection' org_id=org_id %}" class="relative block p-6 bg-gradient-to-r from-blue-500 to-teal-500 text-white text-lg rounded-2xl shadow-xl hover:scale-105 transition-all duration-300 ease-in-out transform hover:shadow-2xl">
-            <span class="font-semibold text-2xl">Create New Event</span>
-            <p class="text-sm mt-2">Set up an event and share the link with others.</p>
-            <!-- Hover glow effect -->
-            <span class="absolute inset-0 bg-blue-200 opacity-25 rounded-2xl"></span>
-        </a>
-
-        <!-- My Bookings Link -->
-        <a href="{% url 'user_organization_bookings' org_id=org_id %}" class="relative block p-6 bg-gradient-to-r from-green-400 to-green-600 text-white text-lg rounded-2xl shadow-xl hover:scale-105 transition-all duration-300 ease-in-out transform hover:shadow-2xl">
-            <span class="font-semibold text-2xl">My Bookings</span>
-            <p class="text-sm mt-2">View and manage your bookings.</p>
-            <!-- Hover glow effect -->
-            <span class="absolute inset-0 bg-green-200 opacity-25 rounded-2xl"></span>
-        </a>
-    </div>
-</div>
-
 
 <body class="bg-gray-100">
-    <div class="container mx-auto py-8">
-        <h1 class="text-3xl font-bold mb-6">My Events in {{ organization_name }}</h1>
 
-        <!-- Location filter buttons -->
-        <div class="mb-6">
+    <section class="intro py-8 px-6 text-center bg-blue-100 mb-6 rounded-xl">
+        <p class="text-lg font-semibold text-gray-700">
+            Manage all your events seamlessly and create new ones with ease. 
+            Let's organize your workspace events like a pro!
+        </p>
+    </section>
+
+    <div class="container py-8">
+        <h2 class="text-3xl font-semibold text-center text-gray-800 mb-6">My Events in {{ organization_name }}</h2>
+
+        <!-- Event Management Links -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <!-- Create Event Link -->
+            <a href="{% url 'event_type_selection' org_id=org_id %}" class="relative block p-6 bg-gradient-to-r from-blue-500 to-teal-500 text-white text-lg rounded-2xl shadow-xl hover:scale-105 transition-all duration-300 ease-in-out transform hover:shadow-2xl">
+                <span class="font-semibold text-2xl">Create New Event</span>
+                <p class="text-sm mt-2">Set up an event and share the link with others.</p>
+                <span class="absolute inset-0 bg-blue-200 opacity-25 rounded-2xl"></span>
+            </a>
+
+            <!-- My Bookings Link -->
+            <a href="{% url 'user_organization_bookings' org_id=org_id %}" class="relative block p-6 bg-gradient-to-r from-green-400 to-green-600 text-white text-lg rounded-2xl shadow-xl hover:scale-105 transition-all duration-300 ease-in-out transform hover:shadow-2xl">
+                <span class="font-semibold text-2xl">My Bookings</span>
+                <p class="text-sm mt-2">View and manage your bookings.</p>
+                <span class="absolute inset-0 bg-green-200 opacity-25 rounded-2xl"></span>
+            </a>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="my-6 flex justify-center space-x-4">
             <button class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition duration-300" data-filter="all">All Locations</button>
             <button class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-700 transition duration-300" data-filter="Google Meet">Google Meet</button>
             <button class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-700 transition duration-300" data-filter="Zoom">Zoom</button>
             <button class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-700 transition duration-300" data-filter="Phone Call">Phone Call</button>
-            <button class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-700 transition duration-300" data-filter="In Person Meeting">In Person Meeting</button>
+            <button class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-700 transition duration-300" data-filter="In Person Meeting">In Person</button>
         </div>
 
-        <!-- Event grid -->
+        <!-- Event Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="event-list">
             {% for item in page_obj %}
-            <div class="event-card bg-white shadow-md rounded-lg overflow-hidden" data-location="{{ item.event.location }}">
-                <div class="p-4 relative">
-                    <h2 class="text-xl font-semibold">{{ item.event.title }}</h2>
-                    <p class="text-gray-600 mb-2">Duration: {{ item.event.duration }} minutes</p>
-                    <p class="text-gray-600 mb-2">Location: {{ item.event.location }}</p>
-                    <p class="text-gray-600 mb-2">Event Type: {{ item.event.get_event_type_display }}</p>
-                    <p class="text-gray-600 mb-2">Created on: {{ item.event.created_at|date:"M d, Y" }}</p>
-                    <div class="mt-4">
-                        <span class="px-3 py-1 bg-blue-500 text-white text-sm font-medium rounded-full">
-                            Bookings: +{{ item.booking_count }}
-                        </span>
-                    </div>
+            <div class="event-card bg-white shadow-md rounded-lg overflow-hidden p-4 relative hover:shadow-xl transition-all duration-300 transform hover:scale-105" data-location="{{ item.event.location }}">
+                <h2 class="text-xl font-semibold text-gray-800">{{ item.event.title }}</h2>
+                <p class="text-gray-600 mb-2">Duration: {{ item.event.duration }} minutes</p>
+                <p class="text-gray-600 mb-2">Location: {{ item.event.location }}</p>
+                <p class="text-gray-600 mb-2">Event Type: {{ item.event.get_event_type_display }}</p>
+                <p class="text-gray-600 mb-2">Created on: {{ item.event.created_at|date:"M d, Y" }}</p>
 
-                    <!-- 3-dots menu -->
-                    <div class="absolute top-4 right-4">
-                        <button class="menu-btn p-2 rounded-full hover:bg-gray-200 focus:outline-none">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M6 10a2 2 0 114 0 2 2 0 01-4 0zm4 0a2 2 0 114 0 2 2 0 01-4 0zm6 0a2 2 0 114 0 2 2 0 01-4 0z" />
-                            </svg>
-                        </button>
-                        <div class="menu hidden absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg">
-                            <a href="{% url 'view_bookings' org_id=org_id event_id=item.event.id %}" 
-                               class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                                View Bookings
-                            </a>
+                <div class="mt-4">
+                    <span class="px-3 py-1 bg-blue-500 text-white text-sm font-medium rounded-full">
+                        Bookings: +{{ item.booking_count }}
+                    </span>
+                </div>
 
-                            <a href="{% url 'delete-event' org_id=org_id event_id=item.event.id %}" 
-                               class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                                Wipe Event
-                            </a>
-                        </div>
+                <!-- 3-dots menu -->
+                <div class="absolute top-4 right-4">
+                    <button class="menu-btn p-2 rounded-full hover:bg-gray-200 focus:outline-none">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M6 10a2 2 0 114 0 2 2 0 01-4 0zm4 0a2 2 0 114 0 2 2 0 01-4 0zm6 0a2 2 0 114 0 2 2 0 01-4 0z" />
+                        </svg>
+                    </button>
+                    <div class="menu hidden absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg">
+                        <a href="{% url 'view_bookings' org_id=org_id event_id=item.event.id %}" 
+                           class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                            View Bookings
+                        </a>
+
+                        <a href="{% url 'delete-event' org_id=org_id event_id=item.event.id %}" 
+                           class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                            Wipe Event
+                        </a>
                     </div>
                 </div>
             </div>
@@ -145,3 +153,5 @@
 </body>
 
 </html>
+
+{% endblock %}

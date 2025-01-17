@@ -4,260 +4,306 @@
 <html>
 <head>
     <title>Manage Members</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.1/gsap.min.js"></script>
+
+    <!-- Link to Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap 5 JavaScript (Optional, for interactive components) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-icons/3.0.1/iconfont/material-icons.css">
     <style>
-         * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Montserrat', sans-serif;
-        }
-        body {
-            background-color: #f3f4f6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-            margin: 0;
-            overflow: hidden; /* Prevent body from scrolling */
-        }
-        .container {
-            background-color: #ffffff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
-            padding: 20px;
-            max-width: 800px;
-            width: 100%;
-            max-height: 90vh; /* Enable scrolling within the container */
-            overflow-y: auto; /* Enable scrolling */
-            animation: fadeIn 1s forwards, slideIn 1s forwards 0.5s;
-            text-align: center;
-            position: relative;
-        }
-        .container::-webkit-scrollbar {
-            width: 8px; /* Thinner scrollbar */
-        }
-        .container::-webkit-scrollbar-thumb {
-            background-color: #4f46e5; /* Premium color for scrollbar */
-            border-radius: 4px;
-        }
-        h1, h2 {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        p {
-            font-size: 14px; /* Smaller font size */
-            color: #666;
-            margin-bottom: 20px;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
-        li {
-            background-color: #fafafa;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .action-buttons {
-            display: inline-flex;
-            gap: 10px;
-        }
-        .action-buttons button {
-            cursor: pointer;
-            background: none;
-            border: none;
-            font-size: 14px; /* Smaller font size */
-        }
-        .delete-icon {
-            color: #e53935; /* Red for delete */
-        }
-        .edit-icon {
-            color: #1e88e5; /* Blue for edit */
-        }
-        .icon-manager {
-            color: #fb8c00; /* Orange for manager */
-            margin-right: 5px;
-        }
-        .icon-employee {
-            color: #4caf50; /* Green for employee */
-            margin-right: 5px;
-        }
-        button[type="submit"] {
-            background-color: #4f46e5;
-            color: #fff;
-            padding: 8px 16px; /* Smaller padding */
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        button[type="submit"]:hover {
-            background-color: #4338ca;
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-        @keyframes slideIn {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
+       /* General styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f6f9;
+    color: #333;
+}
 
+.container, .small-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+    transition: box-shadow 0.3s ease;
+}
 
+.container:hover, .small-container:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
 
+/* Headings */
+h1, h2 {
+    font-size: 28px;
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 20px;
+    transition: color 0.3s ease;
+}
 
-         /* Styling for the small container */
-    .small-container {
-        max-width: 800px;
-        margin: 20px auto;
-        padding: 20px;
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+h1 {
+    display: flex;
+    align-items: center;
+}
+
+.material-icons {
+    margin-right: 12px;
+    font-size: 28px;
+}
+
+/* Description Text */
+.description-text {
+    font-size: 16px;
+    color: #7f8c8d;
+    line-height: 1.6;
+}
+
+/* Lists */
+.admins-list, .managers-list, .employees-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* List Items */
+.admin-item, .manager-item, .employee-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-bottom: 1px solid #ecf0f1;
+    background-color: #f9fafb;
+    transition: background-color 0.3s ease;
+}
+
+.admin-item:hover, .manager-item:hover, .employee-item:hover {
+    background-color: #ecf0f1;
+}
+
+/* Text Styling for Item */
+.admin-item strong, .manager-item strong, .employee-item strong {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.action-buttons form {
+    display: inline-block;
+}
+
+button {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    font-size: 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: inline-block;
+}
+
+button:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: translateY(2px);
+}
+
+/* Icon Styling */
+.delete-icon {
+    color: #e74c3c;
+    font-size: 20px;
+    transition: color 0.3s ease;
+}
+
+.delete-icon:hover {
+    color: #c0392b;
+}
+
+.edit-icon {
+    color: #27ae60;
+    font-size: 20px;
+    transition: color 0.3s ease;
+}
+
+.edit-icon:hover {
+    color: #2ecc71;
+}
+
+/* Section Titles */
+.section-title h2 {
+    font-size: 24px;
+    color: #2c3e50;
+    margin-bottom: 16px;
+}
+
+.section-title {
+    margin-bottom: 24px;
+}
+
+/* Icons for different roles */
+.material-icons.admin-icon,
+.material-icons.manager-icon,
+.material-icons.employee-icon {
+    font-size: 32px;
+    transition: transform 0.3s ease;
+}
+
+.admin-icon {
+    color: #f39c12;
+}
+
+.manager-icon {
+    color: #2980b9;
+}
+
+.employee-icon {
+    color: #27ae60;
+}
+
+.icon-manager, .icon-employee {
+    font-size: 30px;
+    margin-right: 10px;
+}
+
+/* Empty Message */
+.empty-message {
+    font-size: 16px;
+    color: #bdc3c7;
+    font-style: italic;
+}
+
+/* Dropdowns & Forms */
+select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9fafb;
+    font-size: 16px;
+    color: #333;
+    transition: border-color 0.3s ease;
+}
+
+select:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+/* Buttons for more premium look */
+button {
+    background-color: #3498db;
+    border-radius: 50px;
+    padding: 12px 28px;
+    font-size: 16px;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container, .small-container {
+        padding: 15px;
     }
 
-    /* Heading 1 styling */
-    h1 {
-        font-size: 2rem;
-        color: #007bff;
-        margin-bottom: 10px;
+    h1, h2 {
+        font-size: 24px;
     }
 
-    /* Description paragraph styling */
-    .description-text {
-        font-size: 1rem;
-        color: #6c757d;
-        margin-bottom: 20px;
-        line-height: 1.5;
+    .action-buttons {
+        flex-direction: column;
     }
 
-    /* Heading 2 styling */
-    h2 {
-        font-size: 1.5rem;
-        color: #333;
-        margin-top: 20px;
-        margin-bottom: 10px;
-    }
-
-    /* Styling for icon classes */
     .material-icons {
-        vertical-align: middle;
-        font-size: 1.2rem;
-        margin-right: 10px;
+        font-size: 24px;
+    }
+}
+
+
+ /* Apply Poppins font */
+ .premium-text {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        font-size: 1.125rem; /* Slightly reduced font size */
+        color: #333;
     }
 
-    /* Styling for Admin section */
-    .admins-list, .managers-list, .employees-list {
-        list-style-type: none;
-        padding-left: 0;
+    /* Optional: Enhance the overall container's look */
+    .text-uppercase {
+        text-transform: uppercase;
     }
 
-    .admin-item, .manager-item, .employee-item {
-        font-size: 1rem;
-        padding: 8px;
+    .font-weight-bold {
+        font-weight: 700;
+    }
+
+    .p-4 {
+        padding: 20px;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .bg-light {
         background-color: #f8f9fa;
-        margin-bottom: 10px;
-        border-radius: 5px;
-        display: flex;
-        align-items: center;
     }
 
-    /* Admins section */
-    .admin-item {
-        background-color: #e2f1ff;
+    .border {
+        border: 1px solid #ddd;
     }
 
-    .admin-name {
-        font-weight: bold;
-        color: #007bff;
+    .rounded {
+        border-radius: 8px;
     }
 
-    .admin-icon {
-        color: #007bff;
+    .shadow-sm {
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
-    /* Managers section */
-    .manager-item {
-        background-color: #e1f7d5;
-    }
-
-    .manager-name {
-        font-weight: bold;
-        color: #28a745;
-    }
-
-    .manager-icon {
-        color: #28a745;
-    }
-
-    /* Employees section */
-    .employee-item {
-        background-color: #fff3cd;
-    }
-
-    .employee-name {
-        font-weight: bold;
-        color: #ffc107;
-    }
-
-    .employee-icon {
-        color: #ffc107;
-    }
-
-    /* Empty state for lists */
-    .admins-list li, .managers-list li, .employees-list li {
-        color: #6c757d;
-        font-style: italic;
-    }
-
-    /* Media Query for smaller screens */
-    @media (max-width: 600px) {
-        .small-container {
-            padding: 15px;
-            max-width: 100%;
-        }
-
-        h1 {
-            font-size: 1.8rem;
-        }
-
-        h2 {
-            font-size: 1.3rem;
-        }
-
-        .material-icons {
-            font-size: 1rem;
-        }
-
-        .admin-item, .manager-item, .employee-item {
-            font-size: 0.9rem;
-            padding: 6px;
-        }
+    strong {
+        font-weight: 600;
     }
 
     </style>
 </head>
 <body>
+
+    <div class="text-uppercase font-weight-bold p-4 text-center bg-light border rounded shadow-sm">
+        <p class="premium-text">
+            <strong>
+                Take full control of your workspace members. Effortlessly update roles, manage permissions, and remove individuals to maintain an efficient and collaborative workspace.
+            </strong>
+        </p>
+    </div>
+    
     <div class="small-container">
         <h1>
             <span class="material-icons admin-icon">group</span>
@@ -267,6 +313,7 @@
             <span class="material-icons">info</span>
             All employees of {{ organization.name }} will appear here.
         </p>
+        
         <h2>
             <span class="material-icons admin-icon">admin_panel_settings</span>
             Admins
@@ -278,7 +325,7 @@
                     <strong class="admin-name">{{ profile.user.username }}</strong> - Admin
                 </li>
             {% empty %}
-                <li>No Admins</li>
+                <li class="empty-message">No Admins</li>
             {% endfor %}
         </ul>
     
@@ -293,7 +340,7 @@
                     <strong class="manager-name">{{ profile.user.username }}</strong> - Manager
                 </li>
             {% empty %}
-                <li>No Managers</li>
+                <li class="empty-message">No Managers</li>
             {% endfor %}
         </ul>
     
@@ -308,29 +355,15 @@
                     <strong class="employee-name">{{ profile.user.username }}</strong> - Employee
                 </li>
             {% empty %}
-                <li>No Employees</li>
+                <li class="empty-message">No Employees</li>
             {% endfor %}
         </ul>
     </div>
     
-
-
-
-
-
-
-
-
-
-
-
-
-
     <div class="container">
         <h1>Actions on Members of - {{ organization.name }}</h1>
         <p>You can update the profile of an employee or remove them from the organization.</p>
 
-        <!-- Managers Section -->
         {% if user_profile.is_admin %}
         <div class="section-title">
             <h2>Managers</h2>
@@ -341,25 +374,23 @@
                         <span class="material-icons icon-manager">supervisor_account</span>{{ manager.user.username }}
                     </span>
                     <div class="action-buttons">
-                        <!-- Edit Role Form -->
-                        <form method="POST" action="{% url 'members_action' organization.id %}" style="display:inline;">
+                        <form method="POST" action="{% url 'members_action' organization.id %}">
                             {% csrf_token %}
                             <input type="hidden" name="profile_id" value="{{ manager.id }}">
                             <input type="hidden" name="action" value="update">
-                            <select name="new_role" style="font-size: 14px; padding: 5px;">
+                            <select name="new_role">
                                 <option value="manager" {% if manager.is_manager %}selected{% endif %}>Manager</option>
                                 <option value="employee">Employee</option>
                             </select>
-                            <button type="submit" style="background: none; border: none;">
+                            <button type="submit">
                                 <span class="material-icons edit-icon">update</span>
                             </button>
                         </form>
-                        <!-- Remove User Form -->
-                        <form method="POST" action="{% url 'members_action' organization.id %}" style="display:inline;">
+                        <form method="POST" action="{% url 'members_action' organization.id %}">
                             {% csrf_token %}
                             <input type="hidden" name="profile_id" value="{{ manager.id }}">
                             <input type="hidden" name="action" value="remove">
-                            <button type="submit" style="background: none; border: none;">
+                            <button type="submit">
                                 <span class="material-icons delete-icon">delete</span>
                             </button>
                         </form>
@@ -370,7 +401,6 @@
         </div>
         {% endif %}
 
-        <!-- Employees Section -->
         <div class="section-title">
             <h2>Employees</h2>
             <ul>
@@ -380,27 +410,25 @@
                         <span class="material-icons icon-employee">person</span>{{ employee.user.username }}
                     </span>
                     <div class="action-buttons">
-                        <!-- Edit Role Form -->
-                        <form method="POST" action="{% url 'members_action' organization.id %}" style="display:inline;">
+                        <form method="POST" action="{% url 'members_action' organization.id %}">
                             {% csrf_token %}
                             <input type="hidden" name="profile_id" value="{{ employee.id }}">
                             <input type="hidden" name="action" value="update">
-                            <select name="new_role" style="font-size: 14px; padding: 5px;">
+                            <select name="new_role">
                                 <option value="employee" {% if employee.is_employee %}selected{% endif %}>Employee</option>
                                 {% if user_profile.is_admin %}
                                 <option value="manager">Manager</option>
                                 {% endif %}
                             </select>
-                            <button type="submit" style="background: none; border: none;">
+                            <button type="submit">
                                 <span class="material-icons edit-icon">update</span>
                             </button>
                         </form>
-                        <!-- Remove User Form -->
-                        <form method="POST" action="{% url 'members_action' organization.id %}" style="display:inline;">
+                        <form method="POST" action="{% url 'members_action' organization.id %}">
                             {% csrf_token %}
                             <input type="hidden" name="profile_id" value="{{ employee.id }}">
                             <input type="hidden" name="action" value="remove">
-                            <button type="submit" style="background: none; border: none;">
+                            <button type="submit">
                                 <span class="material-icons delete-icon">delete</span>
                             </button>
                         </form>
@@ -410,6 +438,64 @@
             </ul>
         </div>
     </div>
+
+    <script>
+        // Wait until the DOM is fully loaded before applying animations
+        document.addEventListener("DOMContentLoaded", function () {
+            // Animate the text container
+            gsap.from(".text-uppercase", {
+                opacity: 0,
+                y: -30,
+                duration: 1,
+                ease: "power4.out",
+            });
+    
+            // Animate the headings with a stagger effect
+            gsap.from(".section-title h2", {
+                opacity: 0,
+                y: 50,
+                duration: 1.2,
+                stagger: 0.2,
+                ease: "power4.out",
+            });
+    
+            // Animate each list item with a stagger effect
+            gsap.from(".admin-item, .manager-item, .employee-item", {
+                opacity: 0,
+                x: -50,
+                duration: 0.8,
+                stagger: 0.2,
+                ease: "power4.out",
+            });
+    
+            // Animate buttons to slide in from the bottom
+            gsap.from(".action-buttons button", {
+                opacity: 0,
+                y: 30,
+                duration: 0.8,
+                stagger: 0.3,
+                ease: "power4.out",
+            });
+    
+            // Animate the icons with rotation and fade-in effect
+            gsap.from(".material-icons", {
+                opacity: 0,
+                rotation: 45,
+                duration: 1,
+                stagger: 0.2,
+                ease: "power4.out",
+            });
+    
+            // Animate the "No Members" message
+            gsap.from(".empty-message", {
+                opacity: 0,
+                y: 30,
+                duration: 0.8,
+                ease: "power4.out",
+            });
+        });
+    </script>
+
 </body>
 </html>
 

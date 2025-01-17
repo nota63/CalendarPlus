@@ -4,8 +4,9 @@ from django.conf import settings
 
 # homepage
 def home(request):
-    return render(request,'home.html')
+    return render(request,'index.html')
 
+# HOME.HTML HAS SOME FEATURES----
 
 # test the base ui
 

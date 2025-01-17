@@ -1,3 +1,8 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+<br><br><br><br><br>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -130,7 +135,7 @@
     <div class="container py-4">
         <!-- Page Header -->
         <div class="mb-4">
-            <h1>Contacts in {{ organization.name }}</h1>
+            <h1>Your Contacts </h1>
             <p>You can view and manage the contacts you've added in this organization.</p>
         </div>
 
@@ -162,48 +167,47 @@
 </div>
 
 
-            {% if contacts %}
-                <ul class="list-group">
-                    {% for contact in contacts %}
+{% if contacts %}
+<ul class="list-group">
+    {% for contact in contacts %}
 
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <!-- Retrieving the username directly from the User model -->
-                                <strong>{{ contact.contact.username }}</strong>
-                                <small class="text-muted ms-2">ID: {{ contact.contact.id }}</small>
-                            </div>
-                            <!-- 3-Dots Menu -->
-                            <div class="dropdown">
-                                <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton{{ contact.contact.id }}" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-three-dots"></i>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ contact.contact.id }}">
-                                    <li><a class="dropdown-item user-details-btn" href="#" data-user-id="{{ contact.contact.id }}">View Details</a></li>
-                
-                                    <li><a class="dropdown-item " href="{% url 'fetch_emails' org_id=contact.organization.id user_id=contact.contact.id%}" data-user-id="{{ contact.contact.id }}">Emails</a></li>
-                                    <li><a class="dropdown-item " href="{% url 'user_calendar' org_id=contact.organization.id user_id=contact.contact.id%}" data-user-id="{{ contact.contact.id }}">Schedule & View</a></li>
-                                    <li>
-                                        <a class="dropdown-item remove-contact" 
-                                           href="#" 
-                                           data-org-id="{{ contact.organization.id }}" 
-                                           data-contact-id="{{ contact.contact.id }}">
-                                            Remove Contact
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                       
-                    {% endfor %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <!-- Retrieving the username directly from the User model -->
+                <strong>{{ contact.contact.username }}</strong>
+                <small class="text-muted ms-2">ID: {{ contact.contact.id }}</small>
+            </div>
+            <!-- 3-Dots Menu -->
+            <div class="dropdown">
+                <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton{{ contact.contact.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-three-dots"></i>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ contact.contact.id }}">
+                    <li><a class="dropdown-item user-details-btn" href="#" data-user-id="{{ contact.contact.id }}">View Details</a></li>
+
+                    <li><a class="dropdown-item " href="{% url 'fetch_emails' org_id=contact.organization.id user_id=contact.contact.id%}" data-user-id="{{ contact.contact.id }}">Emails</a></li>
+                    <li><a class="dropdown-item " href="{% url 'user_calendar' org_id=contact.organization.id user_id=contact.contact.id%}" data-user-id="{{ contact.contact.id }}">Schedule & View</a></li>
+                    <li>
+                        <a class="dropdown-item remove-contact" 
+                           href="#" 
+                           data-org-id="{{ contact.organization.id }}" 
+                           data-contact-id="{{ contact.contact.id }}">
+                            Remove Contact
+                        </a>
+                    </li>
                 </ul>
+            </div>
+        </li>
+       
+    {% endfor %}
+</ul>
 
-                
 
-            {% else %}
-                <p class="text-muted">You have not added any contacts in this organization yet.</p>
-            {% endif %}
-        </div>
 
+{% else %}
+<p class="text-muted">You have not added any contacts in this organization yet.</p>
+{% endif %}
+</div>
         <br>
         <br>
         <a href="{% url 'user_meeting_contacts' org_id=organization_id %}" class="text-blue-500 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
@@ -390,3 +394,5 @@
     </script>
 </body>
 </html>
+
+{% endblock %}

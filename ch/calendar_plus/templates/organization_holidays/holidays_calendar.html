@@ -1,3 +1,5 @@
+{% include 'header.html' %}
+<br><br>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,6 +7,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ organization.name }} Holidays</title>
+
+     <!-- Bootstrap 5 CSS -->
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+
 
     <!-- Load FullCalendar CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.min.css" rel="stylesheet" />
@@ -18,8 +25,10 @@
     <div class="container mx-auto p-8">
 
         <!-- Page Title -->
-        <h2 class="text-4xl font-bold text-center text-gray-800 mb-6">{{ organization.name }} Holidays</h2>
-
+        <h2 class="text-center text-uppercase text-success font-weight-bold mb-4" style="font-size: 2.5rem;">
+            {{ organization.name }} Holidays
+        </h2>
+        
         <!-- Info Text -->
         <h4 class="text-lg text-gray-600 text-center mb-8">
             <span class="font-semibold">The holidays you are creating or viewing are only valid for this organization {{ organization.name }}!</span><br>
@@ -28,12 +37,22 @@
 
         <!-- Holiday Calendar Info -->
         <div class="text-center mb-8 text-gray-600">
-            <strong class="text-yellow-500">Calendar + supports Indian government holidays as of now in development, but we will be supporting multiple countries' holidays in the future!</strong><br>
+            <strong class="text-yellow-500">Calendar Plus supports Indian government holidays as of now in development, but we will be supporting multiple countries' holidays in the future!</strong><br>
             <strong class="text-yellow-500">We prevent others from booking your event or scheduling meetings on your holidays! No one can book or schedule, they can just view your holiday!</strong>
         </div>
 
-        <!-- FullCalendar Container -->
-        <div id="calendar" class="rounded-2xl shadow-md p-4 bg-white"></div> <!-- FullCalendar container -->
+        <div class="container mt-5">
+            <h1 class="mb-4" style="text-transform: uppercase; font-weight: bold; font-size: 2rem; background-image: linear-gradient(to right, #f8a5d3, #a2c2e3); -webkit-background-clip: text; color: transparent;">
+            </h1>
+            
+            <div id="calendar" class="container py-5 shadow-lg rounded-3 bg-light border border-0 border-secondary">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                 
+                </div>
+                <!-- FullCalendar will be inserted here -->
+            </div>
+            
+        </div> <!-- FullCalendar container -->
 
         <!-- View Holiday Modal -->
         <div id="viewHolidayModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">

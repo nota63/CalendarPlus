@@ -17,43 +17,39 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-# BASE_DIR is usually already defined as:
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# URL to use when referring to static files in templates (e.g., /static/myfile.css)
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+
 STATIC_URL = '/static/'
 
-# Directory where `collectstatic` will place all static files for deployment
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Additional locations the staticfiles app will search for static files
+
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',  # This is where you place your project's static files
+    BASE_DIR / 'static',  
 ]
 
-# Media files settings (optional, for user-uploaded files)
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+
 SECRET_KEY = 'django-insecure-2_5v35*4-ylcnkadmjcbghfoa3^fhq8%kun$ywajnp7jd3_s2j'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
 import os 
 
-# Default file storage setup (local file storage for development)
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
-# For media files (where uploaded files will be stored)
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -74,9 +70,6 @@ INSTALLED_APPS = [
     'new_roles',
     'rest_framework',
     'corsheaders',
-    'ckeditor_uploader', 
-    'admin_interface',
-    'colorfield',
      'tinymce',
      'contacts',
      'security',
@@ -84,6 +77,9 @@ INSTALLED_APPS = [
      'group_tasks',
     'widget_tweaks',
     'solo_communication',
+    'ckeditor_uploader',
+    'organization_channels',
+     'formtools',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -127,8 +123,7 @@ TEMPLATES = [
 ASGI_APPLICATION = 'ch.asgi.application'
 
 WSGI_APPLICATION = 'ch.wsgi.application'
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+
 
 DATABASES = {
     'default': {
@@ -144,8 +139,7 @@ CHANNEL_LAYERS = {
     },
 }
 
-# Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -221,11 +215,11 @@ EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'vishaldudhabarve105@gmail.com'
 
 
-# settings.py
+
 
 # set redis as the message broker 
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'  # Redis as the broker
-# CELERY_RESULT_BACKEND = 'django-db'
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'  
+
 CELERY_TIMEZONE = "Asia/Kolkata"
 CELERY_RESULT_EXTENDED = True
 
@@ -295,23 +289,11 @@ SITE_URL = ' http://127.0.0.1:8000/calendar'
 # Ckeditor configurations
 
 
-CKEDITOR_5_CONFIGS = {
-    'default': {
-        'language': 'en',
-        'toolbar': [
-            'heading', '|', 'bold', 'italic', 'link', '|', 
-            'bulletedList', 'numberedList', 'blockQuote', '|', 
-            'insertTable', 'tableColumn', 'tableRow', 'mergeTableCells', '|', 
-            'undo', 'redo'
-        ],
-    }
-}
 
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR ,'media'
 
-CKEDITOR_UPLOAD_PATH = "uploads/"
 
 
 # settings.py
@@ -322,11 +304,4 @@ STATICFILES_DIRS = [
     BASE_DIR ,"static",
 ]
 
-# Access of gemini api key
-
-import os
-from dotenv import load_dotenv
-
-# Load environment variables from the .env file
-load_dotenv()
 

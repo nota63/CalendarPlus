@@ -1,43 +1,110 @@
-<form action="{% url 'schedule_meeting' org_id=org_id user_id=user_id %}" method="post">
-    {% csrf_token %}
-    <input type="hidden" name="selected_date" value="{{ selected_date }}">
-    <input type="hidden" name="selected_slot" value="{{ selected_slot }}">
+{% extends 'custom.html' %}
 
-    <div>
-        <label for="meeting_title">Meeting Title:</label>
-        <input type="text" id="meeting_title" name="meeting_title" required>
+{% block content %}
+<br><br>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Meeting</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        .form-section {
+            max-width: 600px;
+            margin: auto;
+        }
+        .spinner-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Spinner while waiting -->
+<div id="spinnerContainer" class="spinner-container">
+    <div class="text-center">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3 fs-5">Checking the slot in users' availability...</p>
     </div>
+</div>
 
-    <div>
-        <label for="meeting_description">Description:</label>
-        <textarea id="meeting_description" name="meeting_description"></textarea>
-    </div>
+<!-- Form Section (hidden initially) -->
+<div id="formContainer" style="display: none;">
+    <section class="py-5 bg-light">
+        <div class="container text-center">
+            <p class="fs-5 fw-bold text-primary">
+                Slot successfully selected! The user is available for this time. Please provide the necessary meeting details to complete the scheduling process.
+            </p>
+        </div>
+    </section>
 
-    <div>
-        <label for="meeting_link">Meeting Link:</label>
-        <textarea id="meeting_link" name="meeting_link"></textarea>
-    </div>
+    <form action="{% url 'schedule_meeting' org_id=org_id user_id=user_id %}" method="post" class="container mt-4 p-4 shadow-lg bg-white rounded form-section">
+        {% csrf_token %}
+        <input type="hidden" name="selected_date" value="{{ selected_date }}">
+        <input type="hidden" name="selected_slot" value="{{ selected_slot }}">
 
-    <div>
-        <label for="meeting_type">Meeting Type:</label>
-        <select id="meeting_type" name="meeting_type" required>
-            <option value="standup">Standup</option>
-            <option value="task">Task</option>
-            <option value="project_discussion">Project Discussion</option>
-            <option value="other">Other</option>
-        </select>
-    </div>
+        <div class="mb-3">
+            <label for="meeting_title" class="form-label fw-bold">Meeting Title:</label>
+            <input type="text" id="meeting_title" name="meeting_title" class="form-control" placeholder="Enter a descriptive title" required>
+        </div>
 
-    <div>
-        <label for="meeting_location">Meeting Location:</label>
-        <select id="meeting_location" name="meeting_location" required>
-            <option value="zoom">Zoom</option>
-            <option value="google_meet">Google Meet</option>
-            <option value="zoho">Zoho</option>
-            <option value="in_person">In-person</option>
-        </select>
-    </div>
+        <div class="mb-3">
+            <label for="meeting_description" class="form-label fw-bold">Description:</label>
+            <textarea id="meeting_description" name="meeting_description" class="form-control" rows="3" placeholder="Provide a brief description of the meeting"></textarea>
+        </div>
 
-    <button type="submit">Schedule Meeting</button>
-</form>
+        <div class="mb-3">
+            <label for="meeting_link" class="form-label fw-bold">Meeting Link:</label>
+            <textarea id="meeting_link" name="meeting_link" class="form-control" rows="2" placeholder="Paste the meeting link if applicable"></textarea>
+        </div>
 
+        <div class="mb-3">
+            <label for="meeting_type" class="form-label fw-bold">Meeting Type:</label>
+            <select id="meeting_type" name="meeting_type" class="form-select" required>
+                <option value="" disabled selected>Select the meeting type</option>
+                <option value="standup">Standup</option>
+                <option value="task">Task</option>
+                <option value="project_discussion">Project Discussion</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="meeting_location" class="form-label fw-bold">Meeting Location:</label>
+            <select id="meeting_location" name="meeting_location" class="form-select" required>
+                <option value="" disabled selected>Select the meeting location</option>
+                <option value="zoom">Zoom</option>
+                <option value="google_meet">Google Meet</option>
+                <option value="zoho">Zoho</option>
+                <option value="in_person">In-person</option>
+            </select>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary btn-lg px-5">Schedule Meeting</button>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Wait for 3 seconds before hiding the spinner and showing the form
+    setTimeout(function() {
+        document.getElementById('spinnerContainer').style.display = 'none';  // Hide spinner
+        document.getElementById('formContainer').style.display = 'block';    // Show form
+    }, 1000);
+</script>
+</body>
+</html>
+
+{% endblock %}
