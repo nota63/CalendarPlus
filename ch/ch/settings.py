@@ -30,7 +30,7 @@ ALLOWED_HOSTS = ['.vercel.app', '.now.sh', '127.0.0.1']
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles_build'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'ch/static'),
+    BASE_DIR / 'static',  # Update this to match the correct folder
 ]
 
 MEDIA_URL = '/media/'

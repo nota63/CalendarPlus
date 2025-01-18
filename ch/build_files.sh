@@ -1,10 +1,9 @@
 #!/bin/bash
+# build_files.sh
+#!/bin/bash
+echo "Collecting static files..."
+python3 manage.py collectstatic --noinput
 
-# Install dependencies
-pip install -r requirements.txt
-
-# Collect static files for Django
-python manage.py collectstatic --noinput
-
-# You can add other build steps here if necessary, like migrations
-# python manage.py migrate
+echo "Cleaning up migrations (optional)..."
+find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
+find . -path "*/migrations/*.pyc" -delete
