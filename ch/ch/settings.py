@@ -10,85 +10,73 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-
-
-
-
-
+import os
 from pathlib import Path
+import logging
 
-
+# Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+# Secret Key
+SECRET_KEY = 'django-insecure-2_5v35*4-ylcnkadmjcbghfoa3^fhq8%kun$ywajnp7jd3_s2j'
 
+# Debug mode
+DEBUG = False
 
+# Allowed Hosts
+ALLOWED_HOSTS = ['.vercel.app', '.now.sh', '127.0.0.1']
+
+# Static and Media files
 STATIC_URL = '/static/'
-
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-
+STATIC_ROOT = BASE_DIR / 'staticfiles_build'
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',  
+    os.path.join(BASE_DIR, 'ch/static'),
 ]
-
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-
-
-SECRET_KEY = 'django-insecure-2_5v35*4-ylcnkadmjcbghfoa3^fhq8%kun$ywajnp7jd3_s2j'
-
-
-DEBUG = False
-
-ALLOWED_HOSTS = ['.vercel.app','.now.sh','127.0.0.1']
-
-import os 
-
+# Default file storage
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-
-
-
-# Application definition
-
+# Installed apps
 INSTALLED_APPS = [
+    # Custom apps
     'meet',
     'calendar_plus',
-    'daphne',
     'ai',
-    'channels',
     'chat',
     'accounts',
     'notify',
     'new_roles',
+    'contacts',
+    'security',
+    'groups',
+    'group_tasks',
+    'solo_communication',
+    'organization_channels',
+
+    # Third-party apps
+    'daphne',
+    'channels',
     'rest_framework',
     'corsheaders',
-     'tinymce',
-     'contacts',
-     'security',
-     'groups',
-     'group_tasks',
+    'tinymce',
     'widget_tweaks',
-    'solo_communication',
     'ckeditor_uploader',
-    'organization_channels',
-     'formtools',
+    'formtools',
+
+    # Django default apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'rest_framework.authtoken',  
+    'rest_framework.authtoken',
     'django.contrib.staticfiles',
 ]
 
+# Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -99,15 +87,16 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'meet.middlewares.AdminOnlyMiddleware',
-   
 ]
 
+# URL Configuration
 ROOT_URLCONF = 'ch.urls'
 
+# Templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR,'templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -120,190 +109,95 @@ TEMPLATES = [
     },
 ]
 
+# WSGI and ASGI
+WSGI_APPLICATION = 'ch.wsgi.application'
 ASGI_APPLICATION = 'ch.asgi.application'
 
-WSGI_APPLICATION = 'ch.wsgi.application'
-
-# Database
-
-
-
+# Database configuration
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',  
+        'ENGINE': 'django.db.backends.postgresql',
         'HOST': 'monorail.proxy.rlwy.net',
         'PORT': '51887',
-        'NAME': 'railway',  
-        'USER': 'postgres',  
-        'PASSWORD': 'dkfAhWBtZWfiPZLctTzZfdAvRNmHLceG', 
+        'NAME': 'railway',
+        'USER': 'postgres',
+        'PASSWORD': 'dkfAhWBtZWfiPZLctTzZfdAvRNmHLceG',
     }
 }
 
-
-
-
-
-
-
+# Channel layers
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',
     },
 }
 
-
-
+# Password validators
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
-
 
 # Internationalization
-# https://docs.djangoproject.com/en/5.1/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
-
-
-
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-import os
-
-STATIC_URL = '/static/'
-
-# Ensure static files are collected correctly
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'ch/static'),  
-]
-
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles_build'
-
-
-# rest framework configuration
-
-REST_FRAMEWORK={
-    'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE':2,
-    'DEFAULT_THROTTLE_CLASSES':[
+# REST Framework
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 2,
+    'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle',
     ],
-    'DEFAULT_THROTTLE_RATES':{
-        'anon':'1/day',
-        'user':'100/min'
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '1/day',
+        'user': '100/min',
     },
 }
 
-# EMAIL BACKEND SERVICES
-
+# Email backend
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587 
+EMAIL_PORT = 587
 EMAIL_HOST_USER = 'vishaldudhabarve105@gmail.com'
-EMAIL_HOST_PASSWORD = 'esmv cymg qdns jqqz' 
+EMAIL_HOST_PASSWORD = 'esmv cymg qdns jqqz'
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'vishaldudhabarve105@gmail.com'
 
-
-
-
-# set redis as the message broker 
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'  
-
+# Celery configurations
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
 CELERY_TIMEZONE = "Asia/Kolkata"
 CELERY_RESULT_EXTENDED = True
-
-# Celery Beat settings for periodic tasks
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
-
-
-# json as the task serializer
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
 
-
-import logging
-
+# Logging configuration
 logging.basicConfig(level=logging.DEBUG)
 
-
+# CORS
 CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_ALL_ORIGINS = True
 
+# Google Credentials
+GOOGLE_CREDENTIALS_FILE = os.path.join(BASE_DIR, 'credentials.json')
 
-
-# credentials.json
-
-import os
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-GOOGLE_CREDENTIALS_FILE = os.path.join(BASE_DIR,'credentials.json')
-
+# Session configuration
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_AGE = 1209600
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
 
+# CKEditor configurations (if required)
+CKEDITOR_UPLOAD_PATH = "uploads/"
 
-# Use the default database-backed sessions
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-
-# Ensure session cookies are being set
-SESSION_COOKIE_SECURE = False  
-CSRF_COOKIE_SECURE = False  
-
-
-SESSION_COOKIE_AGE = 1209600  
-import os
-
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_URL = "/media/"
-
-# STATIC_URL = '/static/'
-# STATICFILES_DIRS = [BASE_DIR ,'static']
-
-SITE_URL = ' http://127.0.0.1:8000/calendar'
-
-
-# Ckeditor configurations
-
-
-
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR ,'media'
-
-
-
-# settings.py
-# STATIC_URL = '/static/'
-
-
-# STATICFILES_DIRS = [
-#     BASE_DIR ,"static",
-# ]
-
-
+# Site URL
+SITE_URL = 'http://127.0.0.1:8000/calendar'
