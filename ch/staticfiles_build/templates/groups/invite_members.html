@@ -1,0 +1,164 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+<br><br><br>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invite Members to Group</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .section-header {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .section-header img {
+            max-width: 100%;
+            height: auto;
+        }
+        .btn-custom {
+            background-color: #28a745;
+            color: white;
+            font-weight: bold;
+        }
+        .btn-custom:hover {
+            background-color: #218838;
+        }
+        .back-button {
+            background-color: #6c757d;
+            color: white;
+        }
+        .spinner-border {
+            display: none; /* Initially hidden */
+        }
+
+        .invite-section {
+    display: flex;
+    gap: 2rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f9f9f9, #e8f5ff);
+    border-radius: 12px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+
+    .image-container {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .modern-image {
+            max-width: 60%;
+            height: auto;
+            border-radius: 20px;
+            border: 5px solid rgba(0, 102, 204, 0.2);
+            box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+            &:hover {
+                transform: scale(1.05);
+                box-shadow: 0 12px 25px rgba(0, 102, 204, 0.5);
+            }
+        }
+    }
+
+    .text-container {
+        flex: 2;
+        color: #333;
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .description {
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+            color: #555;
+        }
+
+        .note {
+            font-size: 1rem;
+            color: #ff6600;
+        }
+    }
+}
+
+    </style>
+</head>
+<body>
+
+    <section class="invite-section d-flex align-items-center">
+        <div class="image-container">
+            <img 
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqasgkz_zQ04AnMzXdh-iLIXvhR6J6NS6pYA&s" 
+                alt="Invite Members" 
+                class="modern-image">
+        </div>
+        <div class="text-container">
+            <h2>Invite Members to Your Group</h2>
+            <p class="description">
+                Bring your team together in <strong>{{group.name}}</strong> from your workspace, <strong>{{organization.name}}</strong>, and collaborate effortlessly.
+            </p>
+            <p class="note"><strong>Note:</strong> Only users from your workspace are allowed!</p>
+        </div>
+    </section>
+    
+    
+
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header text-center">
+                <h4>Invite Members to {{group.name}}</h4>
+            </div>
+            <div class="card-body">
+                <h5>Invite users to join the group: {{group.name}}</h5>
+                <p>{{group.description}}</p>
+
+                <form method="post" id="inviteForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="emails" class="form-label">Enter Emails (comma-separated)</label>
+                        <textarea class="form-control" id="emails" name="emails" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-custom">
+                        Send Invitations
+                        <span id="spinner" class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>
+                    </button>
+                </form>
+
+                {% if messages %}
+                    <div class="mt-3">
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="text-center mt-3">
+            <a href="{% url 'display_groups' org_id=group.organization.id %}" class="btn back-button">Back to Group</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const form = document.getElementById('inviteForm');
+        const spinner = document.getElementById('spinner');
+        const submitButton = form.querySelector('button[type="submit"]');
+
+        form.addEventListener('submit', function(event) {
+            // Show spinner and disable button
+            spinner.style.display = 'inline-block';
+            submitButton.disabled = true;
+        });
+    </script>
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: #283593;
+            padding: 20px;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        .header .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #ffffff;
+            padding: 10px;
+            margin-top: -40px;
+            margin-bottom: 10px;
+            display: inline-block;
+            border: 3px solid #f5a623;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .highlight {
+            color: #f5a623;
+        }
+
+        .meeting-details {
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        .details-item {
+            margin-bottom: 15px;
+        }
+
+        .details-item strong {
+            display: inline-block;
+            width: 150px;
+            color: #555;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #f1f1f1;
+            font-size: 12px;
+            color: #777;
+        }
+
+        .join-button {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .details-item {
+        font-size: 14px;
+        font-family: 'Roboto', sans-serif;
+        color: #333;
+    }
+    .icon {
+        vertical-align: middle;
+        margin-right: 5px;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header with Logo -->
+        <div class="header">
+            <img src="https://static.vecteezy.com/system/resources/previews/000/355/372/original/vector-calendar-icon.jpg" alt="Company Logo" class="logo">
+            <h1>Meeting Reminder for Admin</h1>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <h2 class="highlight">Upcoming Meeting Alert Admin</h2>
+            <p>Dear {{ admin }},</p>
+            <p>This is a reminder for the upcoming meeting you had scheduled with {{user}}. Here are the details:</p>
+
+            <div class="meeting-details">
+                <div class="details-item">
+                    <strong>Title:</strong> {{ title }}
+                </div>
+                <div class="details-item">
+                    <strong>Date:</strong> {{ date }}
+                </div>
+                <div class="details-item">
+                    <strong>Time:</strong> {{ time }} IST
+                </div>
+                <div class="details-item">
+                    <strong>Join Link:</strong> <a href="{{ link }}" class="button">Join Meeting</a>
+                </div>
+                <div class="details-item">
+                    <strong>Meeting Type:</strong> {{ type }}
+                </div>
+                <div class="details-item">
+                    <strong>User:</strong> {{ user }}
+                </div>
+                <div class="details-item">
+                    <strong>Attendees:</strong>
+                    <span>
+                        <i class="fas fa-user-shield"></i> Admin: {{ admin }}
+                    </span>
+                    <span style="margin-left: 10px;">
+                        <i class="fas fa-user"></i> User: {{ user }}
+                    </span>
+                </div>
+    
+                <div class="details-item">
+                    <strong>Preparation:</strong> Please ensure relevant documents are accessible for the meeting
+                </div>
+            </div>
+
+            <p>If you need any technical support before the meeting, feel free to <a href="#">contact our IT team</a>.</p>
+            <p>Thank you for ensuring a smooth meeting experience!</p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            &copy; 2024 Calendar. All rights reserved.
+        </div>
+    </div>
+</body>
+
+</html>

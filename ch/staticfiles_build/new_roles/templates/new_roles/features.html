@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snapp Organization</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #4ecdc4;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+        }
+        header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: .15em solid orange;
+            letter-spacing: .15em;
+            animation: typing 3.5s steps(30, end), blink-caret .75s step-end infinite;
+        }
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: orange; }
+        }
+        header p {
+            font-size: 16px;
+            animation: fadeIn 5s;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        main {
+            padding: 20px;
+            text-align: center;
+        }
+        main h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            color: #4ecdc4;
+        }
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+        .features a {
+            text-decoration: none;
+        }
+        .features button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .features button:hover {
+            background-color: #0056b3;
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+        .icon-title {
+            margin-right: 5px;
+            color: #007bff; /* Blue color for title icons */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><i class="fas fa-building icon-title"></i>Welcome to Snapp Organization</h1>
+        <p>You reached here because you are a part of Snapp family.</p>
+    </header>
+    <main>
+        <h2><i class="fas fa-info-circle icon-title"></i>About Us</h2>
+        <p>Additional functionalities.</p>
+    </main>
+
+    <section class="features">
+        <a href="{% url 'add_user'%}">
+            <button type="button"><i class="fas fa-user-plus"></i> Add Users</button>
+        </a>
+
+        <a href="{% url 'profile_list'%}">
+            <button type="button"><i class="fas fa-user-check"></i> Added Users</button>
+        </a>
+
+        <a href="{% url 'organization_list'%}">
+            <button type="button"><i class="fas fa-sitemap"></i> My Organization</button>
+        </a>
+
+        <a href="{% url 'user_profile'%}">
+            <button type="button"><i class="fas fa-user"></i> My Profile</button>
+        </a>
+    </section>
+
+    <footer>
+        &copy; 2024 Snapp Environment
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // GSAP Animations
+        gsap.from("header", {duration: 1, y: -50, opacity: 0, ease: "bounce"});
+        gsap.from("main", {duration: 1, opacity: 0, delay: 0.5, ease: "power2.out"});
+        gsap.from(".features", {duration: 1, opacity: 0, delay: 1, ease: "power2.out"});
+    </script>
+</body>
+</html>

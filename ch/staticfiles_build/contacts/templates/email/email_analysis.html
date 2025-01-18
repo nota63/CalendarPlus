@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+
+
+
+<body class="bg-gray-100 p-6">
+    <div class="max-w-3xl mx-auto">
+        <h1 class="text-3xl font-semibold mb-8 text-center text-green-600">Email Insights for {{organization.name}}</h1>
+        <h3 class="text-2xl font-medium mb-4 text-center text-red">Dashboard Under Construction — Data Accuracy Pending</h3>
+        <p class="text-center text-gray-700 mb-4">Current data reflects all emails, not specific ones. Enhancements will be implemented as development progresses.</p>
+        
+
+        <!-- Chart 1: Response Time Analysis -->
+        <div class="mb-8">
+            <canvas id="response-time-chart"></canvas>
+        </div>
+
+        <!-- Chart 2: Email Status Distribution -->
+        <div class="mb-8">
+            <canvas id="status-chart"></canvas>
+        </div>
+
+        <!-- Chart 3: Participant Email Activity -->
+        <div class="mb-8">
+            <canvas id="participant-activity-chart"></canvas>
+        </div>
+
+        <!-- Chart 4: Total Emails Sent and Received per Day -->
+        <div class="mb-8">
+            <canvas id="emails-per-day-chart"></canvas>
+        </div>
+
+        <!-- Chart 5: Top Senders -->
+        <div class="mb-8">
+            <canvas id="top-senders-chart"></canvas>
+        </div>
+
+        <!-- Chart 6: Top Receivers -->
+        <div class="mb-8">
+            <canvas id="top-receivers-chart"></canvas>
+        </div>
+
+    </div>
+
+    <script>
+        // Parse the JSON data passed from Django to JavaScript
+        const chartData = JSON.parse('{{ chart_data|escapejs }}');
+        
+        // Extract individual data from the parsed chart data
+        const responseTimes = chartData.response_times;
+        const labels = chartData.labels;
+        const statusCounts = chartData.status_counts;
+        const sentCount = chartData.sent_count;
+        const receivedCount = chartData.received_count;
+        const emailCountsPerDay = chartData.email_counts_per_day;
+        const topSenders = chartData.top_senders;
+        const topReceivers = chartData.top_receivers;
+        
+        // Chart 1: Response Time Analysis
+        var responseTimeChart = new Chart(document.getElementById('response-time-chart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Response Time (in minutes)',
+                    data: responseTimes,
+                    borderColor: '#4CAF50',
+                    backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                    fill: true,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: { display: true, text: 'Response Time Analysis' }
+                }
+            }
+        });
+
+        // Chart 2: Email Status Distribution
+        var statusChart = new Chart(document.getElementById('status-chart').getContext('2d'), {
+            type: 'pie',
+            data: {
+                labels: ['Delivered', 'Pending', 'Shipped', 'Canceled'],
+                datasets: [{
+                    label: 'Email Status Distribution',
+                    data: [
+                        statusCounts.Delivered,
+                        statusCounts.Pending,
+                        statusCounts.Shipped,
+                        statusCounts.Canceled
+                    ],
+                    backgroundColor: ['#4CAF50', '#FFEB3B', '#2196F3', '#F44336']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: { display: true, text: 'Email Status Distribution' }
+                }
+            }
+        });
+
+        // Chart 3: Participant Email Activity (Sent vs Received)
+        var participantActivityChart = new Chart(document.getElementById('participant-activity-chart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Sent Emails', 'Received Emails'],
+                datasets: [{
+                    label: 'Email Activity',
+                    data: [sentCount, receivedCount],
+                    backgroundColor: ['#4CAF50', '#FFEB3B']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: { display: true, text: 'Participant Email Activity (Sent vs Received)' }
+                }
+            }
+        });
+
+        // Chart 4: Total Emails Sent and Received per Day
+        var emailsPerDayChart = new Chart(document.getElementById('emails-per-day-chart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: emailCountsPerDay.map(item => item.date_sent),
+                datasets: [{
+                    label: 'Emails Sent/Received per Day',
+                    data: emailCountsPerDay.map(item => item.count),
+                    borderColor: '#2196F3',
+                    backgroundColor: 'rgba(33, 150, 243, 0.2)',
+                    fill: true,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: { display: true, text: 'Total Emails Sent and Received per Day' }
+                }
+            }
+        });
+
+        // Chart 5: Top Senders
+        var topSendersChart = new Chart(document.getElementById('top-senders-chart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: topSenders.map(sender => sender.sender),
+                datasets: [{
+                    label: 'Top Senders',
+                    data: topSenders.map(sender => sender.sent_count),
+                    backgroundColor: '#FFEB3B'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: { display: true, text: 'Top Senders' }
+                }
+            }
+        });
+
+        // Chart 6: Top Receivers
+        var topReceiversChart = new Chart(document.getElementById('top-receivers-chart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: topReceivers.map(receiver => receiver.participant),
+                datasets: [{
+                    label: 'Top Receivers',
+                    data: topReceivers.map(receiver => receiver.received_count),
+                    backgroundColor: '#F44336'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: { display: true, text: 'Top Receivers' }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+
+

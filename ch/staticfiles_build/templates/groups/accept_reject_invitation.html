@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitation Response</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header text-center">
+            <h4 class="card-title">Invitation to Join Group</h4>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">You have been invited to join the group: {{ invitation.group.name }}</h5>
+            <p class="card-text">
+                Sent by: {{ invitation.sender.username }}<br>
+                Invitation Status: <strong>{{ invitation.invitation_status|title }}</strong>
+            </p>
+            <div class="mb-3">
+                <p>{{ invitation.group.description }}</p>
+            </div>
+
+            {% if invitation.invitation_status == "pending" %}
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex justify-content-around">
+                    <button type="submit" name="action" value="accept" class="btn btn-success">Accept Invitation</button>
+                    <button type="submit" name="action" value="reject" class="btn btn-danger">Reject Invitation</button>
+                </div>
+            </form>
+            {% else %}
+            <div class="alert alert-info text-center">
+                This invitation has already been responded to.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="text-center mt-3">
+        <a href="{% url 'home' %}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

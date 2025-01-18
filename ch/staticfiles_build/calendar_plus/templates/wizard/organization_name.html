@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Your Organization</title>
+    <!-- Google Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+</head>
+<body class="bg-gray-50 font-montserrat flex flex-col min-h-screen">
+
+    <!-- Header -->
+    {% include 'header.html' %}
+    <br>
+    <br>
+    <br>
+    <br>
+
+    <!-- Main Layout -->
+    <div class="flex flex-1">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-blue-500 text-white flex flex-col p-4">
+            <div class="mb-6">
+                <h2 class="text-2xl font-semibold">Sidebar</h2>
+                <p class="text-sm text-blue-200">Your navigation goes here</p>
+            </div>
+            <ul class="space-y-4">
+                <li><a href="{% url 'organization_list' %}" class="flex items-center gap-2 text-blue-100 hover:text-white"><span class="material-icons">dashboard</span> Workspaces</a></li>
+                <li><a href="#" class="flex items-center gap-2 text-blue-100 hover:text-white"><span class="material-icons">group</span> Team</a></li>
+                <li><a href="#" class="flex items-center gap-2 text-blue-100 hover:text-white"><span class="material-icons">settings</span> Settings</a></li>
+            </ul>
+            <div class="mt-auto">
+                <a href="#" class="flex items-center gap-2 text-blue-100 hover:text-white"><span class="material-icons">logout</span> Logout</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-10">
+            <div class="animate__animated animate__fadeInUp">
+                <section class="steps flex items-center gap-2 mb-4">
+                    <i class="step-icon text-xl text-blue-500"></i>
+                    <strong class="text-gray-700 text-lg">Step 1 of 4</strong>
+                </section>
+
+                <h2 class="flex items-center gap-3 text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-pink-600 text-transparent bg-clip-text mb-6">
+                    <i class="heading-icon text-3xl"></i>
+                    What’s the name of your company or team?
+                </h2>
+                
+                <div class="container w-full max-w-lg bg-white shadow-md rounded-lg p-6">
+                    <h3 class="text-gray-600 text-base mb-4">This will be the name of your Slack workspace.</h3>
+                    <form method="post" class="space-y-4">
+                        {% csrf_token %}
+                        {{ wizard.management_form }}
+                        {{ wizard.form.as_p }}
+                        <button type="submit" class="w-full flex items-center justify-center bg-blue-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600">
+                            <span class="material-icons mr-2">navigate_next</span> Next
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    {% include 'footer.html' %}
+
+</body>
+</html>

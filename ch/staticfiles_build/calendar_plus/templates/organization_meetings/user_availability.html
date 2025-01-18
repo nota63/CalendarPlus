@@ -1,0 +1,81 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+<br><br><br>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Availability Slots</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+    <section class="py-4 bg-light">
+        <div class="container text-center">
+            <p class="fs-5 text-muted">
+                Select a slot to schedule your meeting effortlessly. If the chosen slot is already booked, 
+                Calendar Plus will automatically block the scheduling to prevent any conflicts and ensure smooth coordination.
+            </p>
+        </div>
+    </section>
+    
+
+<div class="container py-5">
+    <h2 class="text-center mb-4">
+        Availability Slots for <strong>{{ user.username }}</strong> on 
+        <span class="text-primary">{{ selected_date }}</span> 
+       
+    </h2>
+
+    <form method="GET" action="{% url 'schedule_next_step' org_id=organization.id user_id=user.id %}">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                {% if available_slots %}
+                    <ul class="list-group list-group-flush">
+                        {% for slot in available_slots %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {% if slot.booked %}
+                                <span class="text-danger">
+                                    {{ slot.start_time }} - {{ slot.end_time }} (Booked)
+                                </span>
+                            {% else %}
+                                <div class="form-check">
+                                    <input type="radio" class="form-check-input" name="selected_slot" value="{{ slot.start_time }} - {{ slot.end_time }}" id="slot{{ forloop.counter }}" required>
+                                    <label class="form-check-label" for="slot{{ forloop.counter }}">
+                                        {{ slot.start_time }} - {{ slot.end_time }}
+                                    </label>
+                                </div>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-center text-danger fw-bold mt-3">No availability slots for this day.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if available_slots %}
+            <div class="text-center mt-4">
+                <input type="hidden" name="selected_date" value="{{ selected_date }}">
+                <button type="submit" class="btn btn-primary btn-lg px-5">
+                    Proceed
+                </button>
+            </div>
+        {% endif %}
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+{% endblock %}

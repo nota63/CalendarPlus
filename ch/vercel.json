@@ -6,7 +6,7 @@
       "use": "@vercel/python",
       "config": { 
         "maxLambdaSize": "15mb", 
-        "runtime": "python3.11"  
+        "runtime": "python3.11" 
       }
     },
     {
@@ -19,7 +19,7 @@
   ],
   "routes": [
     {
-      "src": "ch/static/(.*)",
+      "src": "static/(.*)",
       "dest": "ch/static/$1"
     },
     {

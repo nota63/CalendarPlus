@@ -1,0 +1,602 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+<br>
+<br>
+<br>
+<br>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Details Dashboard</title>
+
+      <!-- Add Font Awesome CDN -->
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<style>
+/* General container styles */
+.container {
+    margin-top: 30px;
+}
+
+/* Chart card styles */
+.chart-card {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    height: 300px;  /* Reduced height */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+/* Add hover effect to chart cards */
+.chart-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Title styles */
+.chart-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #333;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Adjust chart canvas size */
+canvas {
+    max-width: 100% !important;
+    max-height: 200px !important;
+    margin-top: 10px;
+    height: auto;
+    border-radius: 8px; /* Soft rounded borders for the canvas */
+    transition: transform 0.3s ease-in-out; /* Animation for canvas */
+}
+
+/* Add hover effect to canvas */
+.chart-card:hover canvas {
+    transform: scale(1.05); /* Slight zoom on hover */
+}
+
+/* Grid layout for three charts per row */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.col-4 {
+    flex: 1 1 calc(33.333% - 20px); /* 3 charts per row with gap */
+    max-width: 33.333%;
+}
+
+/* Responsive layout adjustments for smaller screens */
+@media screen and (max-width: 768px) {
+    .col-4 {
+        flex: 1 1 100%; /* Stack charts vertically on small screens */
+        max-width: 100%;
+    }
+}
+
+
+
+
+
+
+/* General container styles */
+.container {
+    margin-top: 30px;
+    padding: 0 15px; /* Added some padding for responsive design */
+}
+
+/* Group Overview Card */
+.bg-white {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+}
+
+/* Heading Style for Group Overview */
+.bg-white h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #333333;
+    margin-bottom: 16px;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Text Style for Group Overview Information */
+.bg-white p {
+    font-size: 1.1rem;
+    color: #555555;
+    margin-bottom: 10px;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Make Group Name bold, uppercased, and colored */
+.bg-white .font-bold {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 1.2rem;  /* Slightly larger */
+    color: #4C8DFF; /* Blue color for highlighting */
+    margin-bottom: 10px;
+}
+
+/* Style for Subheading (organization name) */
+.bg-white .text-gray-600 {
+    color: #6C757D; /* Light gray color */
+}
+
+/* Add smooth transitions on hover for better UX */
+.bg-white p:hover {
+    color: #333333;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+/* Icon Styling */
+.fas {
+    font-size: 1.2rem;
+}
+
+/* Text and Icon Spacing */
+.bg-white p {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+    color: #555555;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Icon Color Customization */
+.bg-white i {
+    margin-right: 10px; /* Spacing between icon and text */
+}
+
+/* Specific Colors for Icons */
+.bg-white .fa-users {
+    color: #4C8DFF; /* Blue for Organization & Group */
+}
+
+.bg-white .fa-users-cog {
+    color: #4C8DFF; /* Blue for Group Name */
+}
+
+.bg-white .fa-calendar-check {
+    color: #F4B400; /* Yellow for Total Bookings */
+}
+
+.bg-white .fa-user-slash {
+    color: #E63946; /* Red for Total Absentees */
+}
+
+.bg-white .fa-paper-plane {
+    color: #4CAF50; /* Green for Sent Reminders */
+}
+
+.bg-white .fa-clock {
+    color: #FF9800; /* Orange for Pending Reminders */
+}
+
+/* Hover Effects for Icons */
+.bg-white p:hover {
+    color: #333333;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.bg-white i:hover {
+    transform: scale(1.1); /* Slight zoom effect on icon hover */
+    transition: transform 0.3s ease;
+}
+
+/* Ensure the section is centered on the page */
+/* Group Details Title Styling */
+.group-details-title {
+    background-color: #3b82f6;  /* Blue color */
+    color: white;
+    padding: 1rem;  /* Padding for spacing */
+}
+
+/* Optional: You can adjust the font size or spacing if needed */
+.group-details-title h1 {
+    font-size: 1.75rem;  /* Adjust font size */
+    font-weight: 700;  /* Make the font bold */
+}
+
+
+</style>
+
+
+
+
+<body class="font-sans bg-gray-100 text-gray-800">
+
+  
+
+    <section class="container mt-5 dashboard-section">
+        <div class="row align-items-center justify-content-center">
+            <!-- Content - Left Side -->
+            <div class="col-lg-6">
+                <h3 class="display-5 font-weight-bold mb-4">Dashboard</h3>
+                <h1 class="mb-4">Monitor your group in one place</h1>
+                <p class="lead mb-4">
+                    <ul>
+                        <li>Identify if a user is absent for an event</li>
+                        <li>Track your team's weekly meeting activity</li>
+                        <li>Use quick links to view team and analytics details</li>
+                    </ul>
+                </p>
+    
+                <a href="#" class="btn btn-primary mb-3">Learn More</a>
+    
+                <a href="{% url 'invite_members_to_group' org_id=organization.id group_id=group.id %}">
+                    <button class="btn btn-success" type="submit">Invite a team-mate</button>
+                </a>
+            </div>
+    
+            <!-- Image - Right Side -->
+            <div class="col-lg-6 text-center">
+                <img src="https://assets.calendly.com/assets/frontend/media/admin_dashboard_side-dd237f1cd10014891a81.svg" class="img-fluid rounded" alt="Dashboard Image">
+            </div>
+        </div>
+    </section>
+    
+    
+
+
+
+
+    <!-- Main Content -->
+    <main class="py-8">
+        <div class="container mx-auto">
+            <!-- Group Overview -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <h2 class="text-3xl font-semibold mb-4">Group Overview</h2>
+                <p class="text-lg"><i class="fas fa-users text-blue-600 mr-2"></i> Organization: <span class="text-gray-600">{{ organization.name }}</span></p>
+                <p class="text-lg font-bold text-xl text-blue-600 uppercase mb-2"><i class="fas fa-users-cog text-blue-600 mr-2"></i>{{ group.name }}</p>
+                <p class="text-lg"><i class="fas fa-users text-green-500 mr-2"></i> Total Members: {{ total_members }}</p>
+                <p class="text-lg"><i class="fas fa-calendar-check text-yellow-500 mr-2"></i> Total Bookings: {{ total_bookings }}</p>
+                <p class="text-lg"><i class="fas fa-user-slash text-red-500 mr-2"></i> Total Absentees: {{ total_absentees }}</p>
+                <p class="text-lg"><i class="fas fa-paper-plane text-green-500 mr-2"></i> Sent Reminders: {{ reminder_sent_count }}</p>
+                <p class="text-lg"><i class="fas fa-clock text-orange-500 mr-2"></i> Pending Reminders: {{ reminder_pending_count }}</p>
+            </div>
+       
+        
+            <div class="container">
+                <!-- Chart Section -->
+                <div class="row">
+                    <!-- Total Members - Pie Chart -->
+                    <div class="col-4">
+                        <div class="chart-card">
+                            <h3>Total Members</h3>
+                            <canvas id="totalMembersChart"></canvas>
+                        </div>
+                    </div>
+            
+                    <!-- Total Events - Pie Chart -->
+                    <div class="col-4">
+                        <div class="chart-card">
+                            <h3>Total Events</h3>
+                            <canvas id="totalEventsChart"></canvas>
+                        </div>
+                    </div>
+            
+                    <!-- Bookings - Bar Chart -->
+                    <div class="col-4">
+                        <div class="chart-card">
+                            <h3>Bookings</h3>
+                            <canvas id="bookingsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Second row of charts -->
+                <div class="row mt-4">
+                    <!-- Total Absentees - Pie Chart -->
+                    <div class="col-4">
+                        <div class="chart-card">
+                            <h3>Total Absentees</h3>
+                            <canvas id="absenteesChart"></canvas>
+                        </div>
+                    </div>
+            
+                    <!-- Reminder Sent vs Pending - Pie Chart -->
+                    <div class="col-4">
+                        <div class="chart-card">
+                            <h3>Reminder Status</h3>
+                            <canvas id="reminderStatusChart"></canvas>
+                        </div>
+                    </div>
+            
+                    <!-- Organization Info - Pie Chart -->
+                    <div class="col-4">
+                        <div class="chart-card">
+                            <h3>Organization Info</h3>
+                            <canvas id="organizationChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Third row of charts -->
+                <div class="row mt-4">
+                    <!-- Events with Bookings - Pie Chart -->
+                    <div class="col-4">
+                        <div class="chart-card">
+                            <h3>Events with Bookings</h3>
+                            <canvas id="eventsBookingsChart"></canvas>
+                        </div>
+                    </div>
+            
+                    <!-- Total Bookings - Pie Chart -->
+                    <div class="col-4">
+                        <div class="chart-card">
+                            <h3>Total Bookings</h3>
+                            <canvas id="totalBookingsChart"></canvas>
+                        </div>
+                    </div>
+            
+                    <!-- Events with Users - Pie Chart -->
+                    <div class="col-4">
+                        <div class="chart-card">
+                            <h3>Events with Users</h3>
+                            <canvas id="eventsUsersChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- User Participation Over Time (Line Chart) -->
+                <div class="row mt-4">
+                    <div class="col-4">
+                        <div class="chart-card">
+                            <h3>User Participation Over Time</h3>
+                            <canvas id="userParticipationChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
+        <!-- New chart -->
+       
+        
+    </main>
+
+    
+    <!-- Chart.js Script -->
+    <script>
+        // Total Members Pie Chart
+        var ctx1 = document.getElementById('totalMembersChart').getContext('2d');
+        var totalMembersChart = new Chart(ctx1, {
+            type: 'pie',
+            data: {
+                labels: ['Members'],
+                datasets: [{
+                    data: [{{ total_members }}], // Display the total members
+                    backgroundColor: ['#4CAF50'],
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+        // Total Events Bar Chart (Modern Style)
+/// Total Events Bar Chart
+var ctx2 = document.getElementById('totalEventsChart').getContext('2d');
+        var totalEventsChart = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['Events'],
+                datasets: [{
+                    label: 'Total Events',
+                    data: [{{ events.count }}], // Count of events
+                    backgroundColor: '#3F51B5',
+                    borderColor: '#3F51B5',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+
+        // Bookings Bar Chart
+        var ctx3 = document.getElementById('bookingsChart').getContext('2d');
+        var bookingsChart = new Chart(ctx3, {
+            type: 'bar',
+            data: {
+                labels: ['Bookings'],
+                datasets: [{
+                    label: 'Total Bookings',
+                    data: [{{ total_bookings }}], // Total bookings count
+                    backgroundColor: '#FF5722',
+                    borderColor: '#FF5722',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Absentees Bar Chart
+        var ctx4 = document.getElementById('absenteesChart').getContext('2d');
+        var absenteesChart = new Chart(ctx4, {
+            type: 'bar',
+            data: {
+                labels: ['Absentees'],
+                datasets: [{
+                    label: 'Total Absentees',
+                    data: [{{ total_absentees }}], // Total absentees count
+                    backgroundColor: '#FFC107',
+                    borderColor: '#FFC107',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Reminder Status Pie Chart (Sent vs Pending)
+        var ctx5 = document.getElementById('reminderStatusChart').getContext('2d');
+        var reminderStatusChart = new Chart(ctx5, {
+            type: 'pie',
+            data: {
+                labels: ['Sent Reminders', 'Pending Reminders'],
+                datasets: [{
+                    label: 'Reminder Status',
+                    data: [{{ reminder_sent_count }}, {{ reminder_pending_count }}], // Sent and Pending reminders
+                    backgroundColor: ['#4CAF50', '#FFC107']
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+        // Organization Info Pie Chart (Number of Groups, etc.)
+        var ctx6 = document.getElementById('organizationChart').getContext('2d');
+        var organizationChart = new Chart(ctx6, {
+            type: 'pie',
+            data: {
+                labels: ['Groups', 'Members'],
+                datasets: [{
+                    label: 'Organization Info',
+                    data: [{{ organization.groups.count }}, {{ total_members }}], // Example data, customize as needed
+                    backgroundColor: ['#3F51B5', '#FF5722']
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+        // new charts
+        
+      // Events with Bookings - Bar Chart
+var ctx1 = document.getElementById('eventsBookingsChart').getContext('2d');
+var eventsBookingsChart = new Chart(ctx1, {
+    type: 'bar',
+    data: {
+        labels: {{ event_labels|safe }}, // Event titles
+        datasets: [{
+            label: 'Bookings per Event',
+            data: {{ event_bookings|safe }}, // Number of bookings per event
+            backgroundColor: '#3F51B5',
+            borderColor: '#3F51B5',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// Total Bookings - Pie Chart
+var ctx2 = document.getElementById('totalBookingsChart').getContext('2d');
+var totalBookingsChart = new Chart(ctx2, {
+    type: 'pie',
+    data: {
+        labels: ['Total Bookings'],
+        datasets: [{
+            data: [{{ total_bookings }}], // Total bookings count
+            backgroundColor: ['#FF5722']
+        }]
+    },
+    options: {
+        responsive: true
+    }
+});
+
+
+
+// Users per Event - Bar Chart
+// Users per Event Bar Chart
+var ctx1 = document.getElementById('eventsUsersChart').getContext('2d');
+var eventsUsersChart = new Chart(ctx1, {
+    type: 'bar',
+    data: {
+        labels: [{% for event in events_with_users %}'{{ event.title }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Users per Event',
+            data: [{% for event in events_with_users %}{{ event.num_users }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+            backgroundColor: '#FF5722',
+            borderColor: '#FF5722',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// User Participation Over Time Line Chart
+var ctx2 = document.getElementById('userParticipationChart').getContext('2d');
+var userParticipationChart = new Chart(ctx2, {
+    type: 'line',
+    data: {
+        labels: [{% for user in user_participation %}'{{ user.user.username }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Events Attended',
+            data: [{% for user in user_participation %}{{ user.events_attended }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+            borderColor: '#3F51B5',
+            borderWidth: 2,
+            fill: false
+        }]
+    },
+    options: {
+        responsive: true
+    }
+});
+
+
+
+
+    </script>
+
+</body>
+</html>
+
+
+{% endblock %}
+

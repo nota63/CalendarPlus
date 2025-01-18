@@ -1,0 +1,156 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+<br><br><br>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assigned Users</title>
+    
+    <!-- Google Fonts (Premium Style) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        section img {
+            max-width: 70%; /* Reduced image size */
+            margin-bottom: 30px;
+        }
+
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .card-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+        .card-text {
+            font-size: 1rem;
+            color: #495057;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+        .text-primary {
+            color: #007bff !important;
+        }
+
+        .container {
+            margin-top: 40px;
+        }
+
+        .card-img-top {
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            margin-bottom: 15px;
+        }
+
+        .badge {
+            font-size: 0.85rem;
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+        }
+
+        .section-header h1 {
+            font-family: 'Roboto', sans-serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: #343a40;
+        }
+    </style>
+</head>
+<body>
+
+    <section class="container text-center my-5">
+        <img src="https://cdni.iconscout.com/illustration/premium/thumb/business-team-monitoring-data-analytics-illustration-download-in-svg-png-gif-file-formats--logo-analysis-collection-activities-pack-people-illustrations-5673580.png?f=webp" class="img-fluid mb-4" alt="Business team monitoring">
+        
+        <p>
+            <strong>
+                Monitor all tasks assigned to your group members in your workspace {{organization.name}}, track their progress, review activity logs, and address any issues to ensure smooth task completion and timely results.
+            </strong>
+        </p>
+        
+        <p>
+            Administrative actions are available!
+            <a href="#" class="text-primary"><strong>Learn More</strong></a>
+        </p>
+    </section>
+
+    <div class="container mt-4">
+        <div class="section-header text-center">
+            <h1>Users Assigned Tasks</h1>
+        </div>
+
+        {% if assigned_users %}
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% for user in assigned_users %}
+                    <div class="col">
+                        <div class="card h-100">
+                            {% if user.assigned_to__profile__profile_picture %}
+                                <img src="{{ user.assigned_to__profile__profile_picture }}" 
+                                     class="card-img-top" 
+                                     alt="{{ user.assigned_to__username }}'s profile picture">
+                            {% else %}
+                                <img src="https://via.placeholder.com/150" class="card-img-top" alt="Default Profile">
+                            {% endif %}
+                            
+                            <div class="card-body">
+                                <h5 class="card-title">{{ user.assigned_to__username }}</h5>
+                                <p class="card-text">
+                                    <strong><i class="fas fa-envelope"></i> Email:</strong> {{ user.assigned_to__email }}<br>
+                                    <strong><i class="fas fa-tasks"></i> Total Tasks:</strong> {{ user.task_count }}<br>
+                                    <strong><i class="fas fa-hourglass-half"></i> Pending:</strong> {{ user.pending_count }}<br>
+                                    <strong><i class="fas fa-cogs"></i> In Progress:</strong> {{ user.in_progress_count }}<br>
+                                    <strong><i class="fas fa-check-circle"></i> Completed:</strong> {{ user.completed_count }}<br>
+                                    <strong><i class="fas fa-calendar-day"></i> Nearest Deadline:</strong> 
+                                    {% if user.nearest_deadline %}
+                                        {{ user.nearest_deadline|date:"M d, Y H:i" }}
+                                    {% else %}
+                                        None
+                                    {% endif %}
+                                </p>
+                                <a href="{% url 'users_tasks' org_id=org_id group_id=group_id user_id=user.assigned_to__id %}" class="btn btn-primary w-100">View Tasks</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted text-center">No users have been assigned tasks yet.</p>
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap 5 JS (Optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+{% endblock %}

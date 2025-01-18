@@ -1,0 +1,2391 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ task.title }} - Task Details</title>
+    <link rel="stylesheet" href="{% static 'assets/css/my_tasks.css' %}">
+   
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+</head>
+
+<style>
+/* Overall body styling */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #000; /* Pure black background */
+    color: hsl(0, 100%, 1%); /* Light text color */
+    margin: 0;
+    padding: 0;
+}
+
+/* Task container styling */
+.task-container {
+    width: 90%; /* Increased width */
+    max-width: 1400px; /* Maximum width */
+    margin: 50px auto; /* Centering the container */
+    padding: 30px;
+    background-color: #000; /* Pure black background */
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2); /* Glowing effect */
+    border-radius: 20px; /* Rounded corners */
+    font-weight: bold; /* Bold text */
+    font-size: 20px; /* Adjusted font size */
+    border: 2px solid #333; /* Dark border */
+    transition: all 0.3s ease; /* Smooth transition */
+    position: relative;
+    overflow: hidden;
+}
+
+/* Glowing border effect */
+.task-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, #000, #000, #000, #000); /* Same color for pure black */
+    background-size: 400% 400%;
+    z-index: -1;
+    animation: glowing-border 5s linear infinite; /* Glowing animation */
+    border-radius: 20px;
+}
+
+/* Glowing effect animation */
+@keyframes glowing-border {
+    0% {
+        background-position: 400% 0;
+    }
+    50% {
+        background-position: 0 100%;
+    }
+    100% {
+        background-position: 400% 0;
+    }
+}
+
+/* Add hover effect with shine */
+.task-container:hover {
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.4); /* Shine effect */
+    transform: translateY(-10px); /* Heavy lift on hover */
+}
+
+/* Styling the text inside the container */
+.task-container p {
+    font-size: 18px; /* Adjust paragraph text */
+    color: #fff; /* Light text color for contrast */
+}
+/* Container with dark theme and stylish look */
+.task-container {
+    opacity: 0;
+    transform: translateY(-100vh) scale(0.8); /* Starts from above the page */
+    animation: slideInFromTop 1s ease-out forwards; /* Animation to slide in smoothly */
+    border-radius: 30px; /* Rounded corners */
+    padding: 20px;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.3), 0 0 50px rgba(255, 255, 255, 0.5); /* Glowing effect */
+    background-color: #000; /* Dark theme background */
+    color: white; /* White text for contrast */
+    transition: transform 0.5s ease-in-out, box-shadow 0.5s ease-in-out; /* Smooth transition on hover */
+}
+
+/* Animation for smooth sliding from the top */
+@keyframes slideInFromTop {
+    0% {
+        opacity: 0;
+        transform: translateY(-100vh) scale(0.8); /* Starts from above the screen */
+        box-shadow: 0 0 25px rgba(255, 255, 255, 0.3); /* Glowing starts softly */
+    }
+    60% {
+        opacity: 0.6;
+        transform: translateY(30px) scale(1.05); /* Moving towards its final position */
+        box-shadow: 0 0 30px rgba(255, 255, 255, 0.4); /* Increased glow */
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1); /* Fully in place, no scaling */
+        box-shadow: 0 0 50px rgba(255, 255, 255, 0.7); /* Max glow effect */
+    }
+}
+
+/* Hover effect to enhance the feel when the user interacts */
+.task-container:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 60px rgba(255, 255, 255, 0.8), 0 0 120px rgba(255, 255, 255, 1);
+}
+
+
+       /* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+/* Dark sidebar styling */
+/* Dark sidebar styling */
+.activity-logs-sidebar {
+    position: fixed;
+    top: 0;
+    right: -400px;  /* Hidden initially */
+    width: 400px;
+    height: 100%;
+    background-color: #333;
+    color: white;
+    font-family: 'Roboto', sans-serif;  /* Use Roboto font */
+    transition: right 0.3s ease;
+    z-index: 999;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+    overflow-y: auto; /* Enable vertical scrolling */
+}
+
+/* Sidebar content */
+.sidebar-content {
+    padding: 15px;
+    overflow-y: auto;
+}
+
+/* Activity logs container */
+.activity-logs-container {
+    max-height: calc(100% - 100px);
+    overflow-y: auto;
+    margin-top: 10px;
+}
+
+/* Individual activity log item */
+.activity-log {
+    margin-bottom: 12px;
+    padding: 12px;
+    background-color: #444;
+    border-radius: 5px;
+    font-size: 14px;  /* Smaller font size */
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Title of activity log */
+.activity-log h5 {
+    margin: 0;
+    font-weight: 500;
+    font-size: 16px;  /* Reduced title font size */
+    color: #FFD700;  /* Gold color for the title */
+}
+
+/* Description of activity log */
+.activity-log p {
+    margin: 5px 0;
+    color: #ddd;  /* Lighter color for description */
+    font-weight: 400;
+    font-size: 13px;  /* Reduced font size for description */
+}
+
+/* Button to close the sidebar */
+#closeSidebarButton {
+    background-color: #f8f9fa;
+    border: none;
+    color: #333;
+    font-size: 16px;  /* Slightly reduced button font size */
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-weight: 600;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Bu
+/* Material Icon for activity log button */
+#activityLogsButton i {
+    font-size: 16px;  /* Smaller size for the icon */
+}
+
+/* When sidebar is open, bring it to the right */
+.activity-logs-sidebar.open {
+    right: 0;
+}
+
+/* Apply hover effects for buttons */
+#activityLogsButton:hover {
+    background-color: #0056b3;
+    cursor: pointer;
+}
+
+#closeSidebarButton:hover {
+    background-color: #e2e6ea;
+    curs.form-check-input {
+    width: 50px;
+    height: 25px;
+    background-color: #ccc;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+
+.form-check-input:checked {
+    background-color: #28a745; /* Green when checked */
+}
+
+.form-check-label {
+    margin-left: 10px;
+    font-size: 14px;
+    color: #333;
+}
+or: pointer;
+}
+
+
+/* Style for the tag container and tags */
+.badge.bg-warning {
+    font-size: 0.85rem;  /* Reduces font size */
+    padding: 0.4rem 0.6rem;  /* Adjusts padding to make the tag smaller */
+    border-radius: 12px;  /* Adds rounded corners */
+    margin-right: 5px;  /* Adds spacing between tags */
+    margin-bottom: 5px;  /* Adds spacing below tags */
+}
+
+/* Style for the remove button inside the tag */
+.badge.bg-warning button.remove-tag {
+    font-size: 0.75rem;  /* Reduces the size of the remove button */
+    padding: 0.2rem 0.4rem;  /* Adjusts padding of the button */
+    margin-left: 8px;  /* Adds space between the tag text and the button */
+    border-radius: 50%;  /* Makes the remove button circular */
+    background-color: #dc3545;  /* Red background for the remove button */
+    color: white;  /* White text color */
+    border: none;  /* Removes button border */
+    transition: background-color 0.3s ease;  /* Smooth transition for hover effect */
+}
+
+.badge.bg-warning button.remove-tag:hover {
+    background-color: #c82333;  /* Darker red on hover */
+    cursor: pointer;  /* Changes cursor to pointer on hover */
+}
+/* Style for the add tag button */
+#add-tag-btn {
+    font-size: 0.9rem;  /* Reduces font size for a smaller button */
+    padding: 0.3rem 0.5rem;  /* Adjusts padding to make the button smaller */
+    border-radius: 25px;  /* Makes the button more rounded */
+    background-color: #28a745;  /* Green color for the add button */
+    color: white;  /* White text color */
+    border: none;  /* No border */
+    transition: background-color 0.3s ease;  /* Smooth transition for hover effect */
+}
+
+#add-tag-btn:hover {
+    background-color: #218838;  /* Darker green on hover */
+    cursor: pointer;  /* Pointer cursor on hover */
+}
+
+/* Style for the 'No tags' message */
+.badge.bg-secondary {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 12px;
+    background-color: #6c757d;  /* Gray background for 'No tags' */
+    color: white;
+}
+
+/* Stopwatch Container */
+#stopwatch-container {
+    background-color: #121212;  /* Black background */
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    max-width: 200px;
+    max-height: 170px;
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    border: 2px solid transparent;  /* Transparent border to start */
+    position: relative;
+    transition: border-color 0.5s ease, box-shadow 0.5s ease;
+}
+
+/* Glowing Border Effect */
+#stopwatch-container:hover {
+    border-color: #00bfff;  /* Light blue border */
+    box-shadow: 0 4px 15px rgba(0, 191, 255, 0.7);  /* Glow effect */
+}
+
+/* Time Display */
+#time-display {
+    font-size: 20px;  /* Medium time display */
+    font-weight: bold;
+    color: #00bfff;  /* Light blue color */
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+/* Button Styling */
+#start-stop-btn, #save-time-btn {
+    padding: 8px 18px;
+    font-size: 14px;
+    border-radius: 5px;
+    margin: 5px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.3s ease;
+    border: none;
+    outline: none;
+}
+
+#start-stop-btn {
+    background-color: #007bff;  /* Blue button */
+    color: white;
+}
+
+#start-stop-btn:hover {
+    background-color: #0056b3;  /* Darker blue on hover */
+    transform: scale(1.05);
+}
+
+#save-time-btn {
+    background-color: #28a745; /* Green button */
+    color: white;
+    display: none; /* Initially hidden */
+}
+
+#save-time-btn:hover {
+    background-color: #218838; /* Darker green on hover */
+    transform: scale(1.05);
+}
+
+/* Smooth Time Change Transition */
+@keyframes timeChange {
+    0% {
+        transform: scale(1);
+        color: #00bfff;
+    }
+    50% {
+        transform: scale(1.1);
+        color: #ff9800;  /* Orange momentary effect */
+    }
+    100% {
+        transform: scale(1);
+        color: #00bfff;
+    }
+}
+
+#time-display.animate-time {
+    animation: timeChange 0.5s ease-in-out;  /* Smooth transition */
+}
+
+/* Optional - For Stopwatch's Start/Stop Button Toggle */
+#stopwatch-container .btn {
+    transition: all 0.3s ease;
+}
+#problemsSidebar .offcanvas-body {
+    background-color: #f8f9fa; /* Light gray background */
+    color: #343a40; /* Dark gray text */
+    padding: 1.5rem;
+}
+
+#problemsSidebar {
+    border-left: 1px solid #ddd;
+}
+
+#problems-content ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#problems-content li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #ddd;
+}
+
+
+/* problem sidebar styles */
+/* Importing Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
+
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Sidebar Style */
+#problemsSidebar {
+    background-color: #2C2C2C; /* Darker background for the sidebar */
+    color: white;  /* White text for visibility */
+    font-family: 'Roboto', sans-serif;  /* Google Font */
+    padding: 15px;
+    font-size: 0.9rem;  /* Slightly smaller font size */
+    max-width: 400px;  /* Optional: Set a max-width for the sidebar */
+    border-left: 3px solid #ffcc00; /* Golden left border for the sidebar */
+}
+
+#problemsSidebarLabel {
+    color: white;  /* Sidebar header text color */
+    font-weight: 500;  /* Bold for the title */
+    font-size: 1.2rem; /* Larger font size for the header */
+    margin-bottom: 15px; /* Add spacing between the header and the content */
+}
+
+#problems-list {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 20px;
+}
+
+#problems-list li {
+    background-color: #3E3E3E;  /* Slightly lighter dark background for each problem */
+    margin: 5px 0;
+    padding: 12px;
+    border-radius: 5px;
+    font-size: 0.9rem;  /* Default font size for the list items */
+    color: white;  /* White text for list items */
+    border-bottom: 1px solid #444444; /* Subtle border for each list item */
+}
+
+/* Add a hover effect for each list item */
+#problems-list li:hover {
+    background-color: #4a4a4a;
+    cursor: pointer;
+}
+
+/* For strong text inside list items */
+#problems-list li strong {
+    color: #ffcc00; /* Golden color for names and important text */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #problemsSidebar {
+        font-size: 0.85rem;  /* Slightly smaller font size on mobile */
+    }
+}
+
+
+
+/* styles for spinner */
+/* Spinner and loading text container */
+#loading-spinner {
+    display: none;
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3; /* Light background */
+    border-top: 4px solid #007bff; /* Blue color for the spinner */
+    border-radius: 50%;
+    animation: spin 2s linear infinite;
+}
+
+#loading-text {
+    display: none;
+    font-size: 16px;
+    font-weight: 500;
+    color: #007bff; /* Match the blue of the spinner */
+    margin-left: 10px;
+    vertical-align: middle;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Animation for spinner */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Additional premium feel for the form button and text */
+#raise-problem-btn {
+    position: relative;
+    padding-right: 50px; /* Space for the spinner */
+    transition: all 0.3s ease-in-out;
+}
+
+#raise-problem-btn:disabled {
+    background-color: #d6d6d6;
+    cursor: not-allowed;
+}
+
+/* Optionally, add a hover effect on the button */
+#raise-problem-btn:hover {
+    background-color: #e03e3e;
+    color: #fff;
+}
+
+/* You can also center the spinner and text vertically */
+.spinner-container {
+    display: flex;
+    align-items: center;
+}
+
+.dropdown-toggle {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #6c757d; /* Subtle gray for premium look */
+}
+
+.dropdown-menu {
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-item:hover {
+    background-color: #28a745; /* Match "success" button color */
+    color: white;
+}
+
+/* Spinner container */
+.loading-spinner {
+    display: none;
+    text-align: center;
+    font-size: 14px;
+    color: #007bff; /* Blue color for the spinner text */
+}
+
+/* Spinner animation */
+.loading-spinner .spinner-border {
+    width: 2rem;
+    height: 2rem;
+    border-width: 0.25em;
+    animation: spin 1s linear infinite;
+}
+
+/* Spinner spin animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Styling the 'Reporting to manager...' text */
+.loading-spinner span {
+    margin-left: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #007bff;
+}
+
+/* jsonresponse notification */
+/* Notification container */
+.notification {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: -70px; /* Initially off-screen */
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    background-color: #1e90ff; /* Light blue background */
+    color: #fff;
+    font-size: 16px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+    opacity: 0;
+    transition: all 0.6s ease-out; /* Ultra smooth transition */
+    text-align: center;
+    letter-spacing: 1px; /* Add some spacing for a more premium look */
+    text-transform: capitalize;
+}
+
+/* To show the notification with smooth animation */
+.notification.show {
+    display: block;
+    top: 20px; /* Slide into view */
+    opacity: 1; /* Fade in */
+    transform: translateX(-50%) translateY(20px); /* Smooth upward motion */
+}
+
+/* Shiny text effect */
+.notification .text {
+    position: relative;
+    animation: shine 1.5s ease-in-out infinite;
+}
+
+/* Shiny text animation */
+@keyframes shine {
+    0% {
+        background-position: -200% center;
+    }
+    100% {
+        background-position: 200% center;
+    }
+}
+
+.notification .text {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0) 75%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+/* Close button for the notification */
+.notification .close-btn {
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    position: absolute;
+    top: 8px;
+    right: 15px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+/* Hover effect for the close button */
+.notification .close-btn:hover {
+    transform: rotate(90deg); /* Subtle rotation on hover */
+}
+
+/* Styling for the success message */
+.notification.success {
+    background-color: #1e90ff; /* Light blue background */
+    border-left: 5px solid #0f7bcc; /* Darker blue border for a professional touch */
+}
+
+/* Optional: Styling for info messages */
+.notification.info {
+    background-color: #17a2b8; /* Info background (Blue) */
+    border-left: 5px solid #117a8b; /* Darker blue border */
+}
+
+/* Optional: Styling for warning messages */
+.notification.warning {
+    background-color: #ffc107; /* Yellow background for warning */
+    border-left: 5px solid #e0a800; /* Dark yellow border */
+}
+
+/* Greeting */
+ /* Base styling for the greeting */
+#greeting {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translateX(0);
+    padding: 20px 40px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: transparent;
+    background-clip: text; /* Clips the background to the text */
+    -webkit-background-clip: text; /* For Safari support */
+    width: auto;
+    z-index: 1000; /* Ensure it stays on top */
+    border-radius: 8px;
+    opacity: 0; /* Initially hidden for animation */
+    animation: slideIn 1s ease-out forwards, fadeIn 1s ease-out forwards;
+    font-family: 'Poppins', sans-serif, 'Arial'; /* Modern font */
+}
+
+/* Gradient effect for the text */
+#greeting {
+    background-image: linear-gradient(to right, #00c6ff, #ff6ec7); /* Light blue to pink gradient */
+    font-size: 2.5rem; /* Increase font size for more impact */
+}
+
+/* Slide in animation */
+@keyframes slideIn {
+    0% {
+        top: -50px;
+        opacity: 0;
+    }
+    100% {
+        top: 0;
+        opacity: 1;
+    }
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+body {
+    margin: 0; /* Remove margin for better layout */
+    font-family: 'Arial', sans-serif; /* Modern font */
+    background-color: hsl(240, 3%, 6%); /* Subtle background color for contrast */
+}
+
+/* Add a modern font and responsive design */
+@media (max-width: 600px) {
+    #greeting {
+        font-size: 1.5rem; /* Make the text smaller on small screens */
+    }
+}
+
+#current-date {
+    position: fixed;
+    top: 10px;
+    right: 10px;  /* Position at top-right */
+    font-size: 1.4rem;  /* Adjusted size for better readability */
+    font-weight: 700;  /* Bold font */
+    background-color: rgba(0, 0, 0, 0.7);  /* Slightly darker background */
+    color: hsl(175, 87%, 50%);  /* White text color */
+    padding: 10px 15px;  /* Padding around the text */
+    border-radius: 8px;  /* Rounded corners */
+    z-index: 1000;
+    font-family: 'Poppins', sans-serif;  /* Modern font */
+    letter-spacing: 0.5px;  /* Small letter spacing for better clarity */
+    text-align: center;  /* Center the text */
+}
+
+/* Optional: Animation for the date when the page loads */
+@keyframes fadeInDate {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#current-date {
+    animation: fadeInDate 0.8s ease-out forwards;  /* Fade-in and slide-up animation */
+}
+
+
+
+
+
+
+/* Progress Bar Container */
+.progress {
+    height: 20px;
+    border-radius: 15px;
+    background-color: #f1f1f1;
+    margin-bottom: 20px;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Progress Bar Inner */
+.progress-bar {
+    height: 100%;
+    text-align: center;
+    line-height: 20px;
+    font-weight: bold;
+    color: #fff;
+    border-radius: 15px;
+    transition: width 0.5s ease-in-out, background-color 0.5s ease;
+}
+
+/* Progress Bar Colors Based on Progress */
+.progress-bar.bg-success {
+    background: linear-gradient(90deg, #00b4d8, #0077b6); /* Blue gradient for good progress */
+}
+
+.progress-bar.bg-warning {
+    background: linear-gradient(90deg, #f39c12, #f1c40f); /* Yellow gradient for warning */
+}
+
+.progress-bar.bg-danger {
+    background: linear-gradient(90deg, #e74c3c, #c0392b); /* Red gradient for poor progress */
+}
+
+/* Tooltip on Hover (for Progress Bar) */
+.progress-bar:hover {
+    cursor: pointer;
+    opacity: 0.9;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+#comments-list {
+    list-style: none;
+    padding: 0;
+}
+
+#comments-list li {
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.875rem; /* Smaller font size */
+    margin-bottom: 1rem;
+}
+
+#comments-list strong {
+    font-weight: 700;
+}
+
+.comment-text {
+    display: block;
+    font-size: 1rem; /* Slightly increased font size */
+    color: #fff; /* White color for highlight */
+}
+
+.dropdown-toggle::after {
+    display: none; /* Remove default arrow */
+}
+
+.dropdown-menu {
+    font-size: 0.75rem; /* Smaller font size */
+}
+
+.dropdown-item {
+    font-size: 0.75rem; /* Smaller font size */
+    padding: 0.25rem 1rem;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.btn-sm {
+    font-size: 0.75rem; /* Smaller font size */
+    padding: 0.25rem 0.5rem;
+}
+
+#comments-list span {
+    display: block;
+    font-size: 0.75rem; /* Smaller font size */
+    color: #777;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+#taskNotesList {
+    font-family: 'Roboto', sans-serif;
+}
+
+</style>
+<body>
+    
+   
+<!-- greeting -->
+<div id="greeting"></div>
+
+
+<div id="current-date"></div>
+<br>
+<br>
+
+    
+
+<!-- Modal to add notes  -->
+
+<!-- Modal to add note -->
+<div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addNoteModalLabel">Add Note</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <textarea id="noteText" class="form-control" rows="4" placeholder="Enter your note"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveNoteButton">Save Note</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="modal fade" id="addTagModal" tabindex="-1" aria-labelledby="addTagModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addTagModalLabel">Add Tag</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Dropdown for predefined tags -->
+        <select class="form-select" id="tag-select">
+          <option value="">Select a tag</option>
+          <option value="Important">Important</option>
+          <option value="Urgent">Urgent</option>
+          <option value="Low Priority">Low Priority</option>
+          <option value="Completed">Completed</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="save-tag-btn">Save Tag</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Sidebar for displaying the problems  -->
+<!-- Sidebar for Problems -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="problemsSidebar" aria-labelledby="problemsSidebarLabel">
+    <div class="offcanvas-header">
+        <h5 id="problemsSidebarLabel">Problems</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+
+        <h5>Raise a Problem</h5>
+        <form id="raise-problem-form">
+            <div class="form-group">
+                <label for="problem-description">Problem Description</label>
+                <textarea id="problem-description" class="form-control" rows="4" placeholder="Describe the problem..."></textarea>
+            </div>
+            <button type="button" id="raise-problem-btn" data-org-id="{{ organization.id }}" data-group-id="{{ group.id }}" data-task-id="{{ task.id }}" class="btn btn-danger mt-3">Report Problem</button>
+
+
+             <!-- Spinner for loading indication -->
+           <!-- Spinner for loading indication -->
+            <div id="loading-spinner" class="spinner-border text-primary" role="status" style="display: none;">
+                 <span class="visually-hidden">Loading...</span>
+             </div>
+              <div id="loading-text" style="display: none;">Reporting the problem to manager...</div>
+        </form>
+
+        <ul id="problems-list">
+            {% if problems %}
+                {% for problem in problems %}
+                    <li>
+                        <strong>{{ problem.reported_by.username }}:</strong>
+                        {{ problem.description }}
+                        ({{ problem.created_at|date:"F j, Y, g:i a" }}) 
+                        <strong>Is Resolved: {{ problem.is_resolved }}</strong>
+                        
+                        <!-- Three-dot menu -->
+                        <div class="dropdown" style="display: inline-block; position: relative;">
+                            <button class="btn btn-secondary dropdown-toggle" 
+                                    type="button" 
+                                    id="dropdownMenuButton{{ problem.id }}" 
+                                    data-bs-toggle="dropdown" 
+                                    aria-expanded="false"
+                                    style="background: none; border: none; font-size: 20px; cursor: pointer;">
+                                &#x22EE; <!-- Vertical ellipsis -->
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ problem.id }}">
+                                <li>
+                                    <button class="dropdown-item resolve-problem-btn" 
+                                            data-org-id="{{ organization.id }}" 
+                                            data-group-id="{{ group.id }}" 
+                                            data-task-id="{{ task.id }}" 
+                                            data-problem-id="{{ problem.id }}">
+                                        Mark as Resolved
+                                    </button>
+                                </li>
+                                <li id="loading-spinner-{{ problem.id }}" class="loading-spinner" style="display: none;">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                    <span>Reporting to manager...</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <span>No problems yet.</span>
+            {% endif %}
+        </ul>
+        
+    </div>
+</div>
+
+
+<!-- edit note modal -->
+ <!-- Edit Note Modal -->
+<div class="modal fade" id="editNoteModal" tabindex="-1" aria-labelledby="editNoteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editNoteModalLabel">Edit Note</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editNoteForm">
+            <div class="mb-3">
+              <label for="noteContent" class="form-label">Note Content</label>
+              <textarea class="form-control" id="noteContent" rows="3"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="saveNoteBtn">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+<!-- Modal for editing comments -->
+<div class="modal fade" id="editCommentModal" tabindex="-1" aria-labelledby="editCommentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCommentModalLabel">Edit Comment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <textarea id="commentContent" class="form-control" rows="4"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveCommentBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- --------------------------------------------------------------------------------------------------------------------------------------------------- -->
+
+
+<div id="notification" class="notification">
+    <span id="notification-text"></span>
+    <button class="close-btn" onclick="closeNotification()">
+</div>
+
+
+
+
+     
+    <div class="container">
+        <div class="task-container">
+            <h1 class="mb-4"><i class="bi bi-list-task task-icon"></i> {{ task.title }}</h1>
+            <p><strong>Description:</strong> {{ task.description }}</p>
+            <p><strong>Priority:</strong> <span class="badge bg-danger">{{ task.priority }}</span></p>
+            <p><strong>Deadline:</strong> {{ task.deadline }}</p>
+            <p><strong>Progress:</strong></p>
+<div class="progress mb-3">
+    <div id="progressBar" class="progress-bar bg-success" role="progressbar" 
+         style="width: {{ task.progress }}%" 
+         aria-valuenow="{{ task.progress }}" 
+         aria-valuemin="0" 
+         aria-valuemax="100">{{ task.progress }}%</div>
+</div>
+
+<div class="progress-controls">
+    <button id="decreaseProgress" class="btn btn-secondary btn-sm">-</button>
+    <button id="increaseProgress" class="btn btn-primary btn-sm">+</button>
+</div>
+<br>
+
+
+
+ <!-- View Problems Button -->
+ <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#problemsSidebar" aria-controls="problemsSidebar">
+    View Problems
+</button>
+
+
+
+<!-- Activity log  -->
+
+<!-- Activity Logs Icon -->
+<button id="activityLogsButton" class="btn btn-dark">
+    <i class="bi bi-list-check"></i> Activity Logs
+</button>
+
+<!-- mark as completed  -->
+<div class="form-check form-switch">
+    <input 
+        class="form-check-input" 
+        type="checkbox" 
+        role="switch" 
+        id="toggleTaskStatus" 
+        data-task-id="{{ task.id }}" 
+        data-org-id="{{ org_id }}" 
+        data-group-id="{{ group_id }}" 
+        {% if task.status == 'completed' %} checked {% endif %}>
+    <label class="form-check-label" for="toggleTaskStatus">
+        {% if task.status == 'completed' %}
+            Mark as Pending
+        {% else %}
+            Mark as Completed
+        {% endif %}
+    </label>
+</div>
+
+<!-- Additional features  -->
+            <hr>
+            <h4>Additional Features</h4>
+
+            <!-- Displaying tags -->
+       <!-- Displaying tags -->
+<p><strong>Tags:</strong>
+    {% if task.tags.all %}
+        {% for tag in task.tags.all %}
+            <span class="badge bg-warning" 
+                  id="tag-{{ tag.id }}" 
+                  data-task-id="{{ task.id }}"
+                  data-org-id="{{ org_id }}"
+                  data-group-id="{{ group_id }}">
+                {{ tag.name }}
+                <button class="btn btn-sm btn-danger remove-tag" 
+                        data-tag="{{ tag.name }}" 
+                        data-tag-id="{{ tag.id }}"
+                        data-task-id="{{ task.id }}"
+                        data-org-id="{{ org_id }}"
+                        data-group-id="{{ group_id }}">-</button>
+            </span>
+        {% endfor %}
+        <button class="btn btn-sm btn-success" 
+                id="add-tag-btn"
+                data-task-id="{{ task.id }}"
+                data-org-id="{{ org_id }}"
+                data-group-id="{{ group_id }}">+</button>
+    {% else %}
+        <span class="badge bg-secondary">No tags</span>
+        <button class="btn btn-sm btn-success" 
+                id="add-tag-btn"
+                data-task-id="{{ task.id }}"
+                data-org-id="{{ org_id }}"
+                data-group-id="{{ group_id }}">+</button>
+    {% endif %}
+</p>
+
+
+
+
+<!-- Displaying Time Tracking -->
+ <!-- Displaying Time Tracking -->
+<p><strong>Time Tracking:</strong>
+    {% if task.time_tracking.all %}
+        {% for time_entry in task.time_tracking.all %}
+            <span class="badge bg-info" 
+                  id="time-entry-{{ time_entry.id }}" 
+                  data-task-id="{{ task.id }}"
+                  data-org-id="{{ org_id }}"
+                  data-group-id="{{ group_id }}">
+                {{ time_entry.user.username }}: {{ time_entry.time_spent }} hours
+            </span>
+        {% endfor %}
+    {% else %}
+        <span class="badge bg-secondary">No time tracked</span>
+    {% endif %}
+</p>
+
+<!-- Stopwatch Display -->
+<!-- Stopwatch Display -->
+<div id="stopwatch-container">
+    <p><strong>Stopwatch:</strong></p>
+    <p id="time-display">00:00:00</p>
+    <button id="start-stop-btn" 
+            class="btn btn-sm btn-primary"
+            data-task-id="{{ task.id }}" 
+            data-org-id="{{ org_id }}" 
+            data-group-id="{{ group_id }}">
+        Start
+    </button>
+    <button id="save-time-btn" class="btn btn-sm btn-success" style="display: none;">Save Time</button>
+</div>
+
+
+            
+            <!-- Displaying notes -->
+            <p><strong>Notes:</strong>
+                {% if task.notes.all %}
+                <ul id="taskNotesList">
+                    {% for note in task.notes.all %}
+                    <li id="note-{{ note.id }}">
+                        <strong>{{ note.user.username }}:</strong> 
+                        <span class="note-content">{{ note.note }}</span> 
+                        ({{ note.created_at|date:"F j, Y, g:i a" }})
+                        
+                        <!-- 3-dot menu -->
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                &#x22EE; <!-- Ellipsis (three dots) -->
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li><button class="dropdown-item delete-note" 
+                                        data-note-id="{{ note.id }}" 
+                                        data-task-id="{{ task.id }}" 
+                                        data-group-id="{{ task.group.id }}" 
+                                        data-org-id="{{ task.group.organization.id }}">
+                                    Delete
+                                </button></li>
+                                <li><button class="dropdown-item edit-note" 
+                                    data-note-id="{{ note.id }}" 
+                                    data-task-id="{{ task.id }}" 
+                                    data-group-id="{{ task.group.id }}" 
+                                    data-org-id="{{ task.group.organization.id }}" 
+                                    data-note-content="{{ note.note }}">
+                                Edit
+                            </button></li>
+                            </ul>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <span>No notes yet.</span>
+                {% endif %}
+                <!-- Button to open the modal -->
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">
+                    Add Note
+                </button>
+            </p>
+            
+
+
+            <!-- Displaying comments -->
+
+
+            <p><strong>Comments:</strong>
+    {% if task.comments.all %}
+        <ul id="comments-list">
+            {% for comment in task.comments.all %}
+                <li id="comment-{{ comment.id }}">
+                    <strong>{{ comment.user.username }}:</strong> 
+                    <span class="comment-text">{{ comment.comment }}</span> 
+                    ({{ comment.created_at|date:"F j, Y, g:i a" }})
+
+                    <!-- Three-dot menu -->
+                    <div class="dropdown d-inline-block">
+                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" 
+                                id="dropdownMenuButton{{ comment.id }}" 
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            ...
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ comment.id }}">
+                            <li>
+                                <button class="dropdown-item edit-comment" 
+                                        data-comment-id="{{ comment.id }}" 
+                                        data-org-id="{{ org_id }}" 
+                                        data-group-id="{{ group_id }}" 
+                                        data-task-id="{{ task.id }}" 
+                                        data-comment-content="{{ comment.comment }}">
+                                    Edit
+                                </button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item delete-comment" 
+                                        data-comment-id="{{ comment.id }}" 
+                                        data-org-id="{{ org_id }}" 
+                                        data-group-id="{{ group_id }}" 
+                                        data-task-id="{{ task.id }}">
+                                    Delete
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <span>No comments yet.</span>
+    {% endif %}
+</p>
+
+            <!-- Comment Input -->
+            <div class="form-group">
+                <textarea id="comment-text" class="form-control" rows="3" placeholder="Add your comment..."></textarea>
+            </div>
+            <button id="submit-comment" class="btn btn-primary mt-2" 
+                    data-org-id="{{ org_id }}" data-group-id="{{ group_id }}" data-task-id="{{ task.id }}">
+                Add Comment
+            </button>
+
+        </div>
+    </div>
+
+
+
+    <!-- Modal for activity logs  -->
+
+    <!-- Sidebar for Activity Logs -->
+<div id="activityLogsSidebar" class="activity-logs-sidebar">
+    <div class="sidebar-content">
+        <button id="closeSidebarButton" class="btn btn-light">Close</button>
+        <h3>Activity Logs</h3>
+        <div id="activityLogsContainer" class="activity-logs-container">
+            <!-- Activity logs will be loaded here -->
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Script -->
+<script>
+       $(document).ready(function() {
+    $('#submit-comment').click(function() {
+        var commentText = $('#comment-text').val().trim();
+        if (commentText == "") {
+            alert("Please write a comment before submitting.");
+            return;
+        }
+
+        var orgId = $(this).data('org-id');
+        var groupId = $(this).data('group-id');
+        var taskId = $(this).data('task-id');
+
+        // Construct the URL using JavaScript
+        var url = '/tasks/task/' + orgId + '/' + groupId + '/' + taskId + '/add_comment/';
+
+        // Send the comment via AJAX
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: {
+                'comment': commentText,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                // Append new comment to the list
+                $('#comments-list').append('<li><strong>' + response.username + ':</strong> ' + response.comment + ' (' + response.created_at + ')</li>');
+                showNotification('Comment has been added to your task')
+
+                // Clear the comment text area
+                $('#comment-text').val('');
+            },
+            error: function(xhr, errmsg, err) {
+                alert("Error submitting comment. Please try again.");
+            }
+        });
+    });
+});
+
+
+// Handle add note featue
+document.getElementById("saveNoteButton").addEventListener("click", function() {
+    // Fetch the task ID, org ID, and group ID from template context
+    var taskId = '{{ task.id }}';
+    var orgId = '{{ org_id }}';
+    var groupId = '{{ group_id }}';
+
+    // Get the note content
+    var noteContent = document.getElementById("noteText").value;
+
+    if (noteContent.trim() === "") {
+        alert("Please enter a note!");
+        return;
+    }
+
+    // Construct the URL dynamically using JavaScript syntax
+    var url = "/tasks/task/" + orgId + "/" + groupId + "/" + taskId + "/add_note/";
+
+    // Send the note via AJAX
+    $.ajax({
+        type: 'POST',
+        url: url,
+        data: {
+            'note': noteContent,
+            'csrfmiddlewaretoken': '{{ csrf_token }}' // CSRF token for security
+        },
+        success: function(response) {
+            // Close the modal
+            $('#addNoteModal').modal('hide');
+
+            // Append the new note to the list of notes (or update UI as needed)
+            var newNote = "<li><strong>You:</strong> " + response.note + " (" + response.created_at + ")</li>";
+            document.querySelector("#taskNotesList").insertAdjacentHTML('beforeend', newNote);
+            showNotification("Note is integrated")
+
+            // Clear the textarea
+            document.getElementById("noteText").value = "";
+        },
+        error: function(xhr, status, error) {
+            alert("Error while adding note: " + error);
+        }
+    });
+});
+
+// Handle the timer
+function toggleTimer() {
+    var taskId = '{{ task.id }}';
+    var orgId = '{{ org_id }}';
+    var groupId = '{{ group_id }}';
+    var button = document.getElementById("startStopButton");
+    var icon = document.getElementById("timerIcon");
+    
+    // Check if timer is running by reading button text
+    var isRunning = button.innerText.toLowerCase() === "stop timer";
+
+    // Set action to either start or stop based on current button state
+    var action = isRunning ? "stop" : "start";
+
+    // Make AJAX request to start/stop timer
+    $.ajax({
+        type: 'POST',
+        url: '/tasks/task/' + orgId + '/' + groupId + '/' + taskId + '/manage_timer/',
+        data: {
+            'action': action,  // send the action (start/stop)
+            'csrfmiddlewaretoken': '{{ csrf_token }}'  // CSRF token for security
+        },
+        success: function(response) {
+            if (response.status === 'started') {
+                button.innerText = "Stop Timer";  // Change button text to "Stop Timer"
+                icon.classList.remove("bi-play-circle");  // Remove play icon
+                icon.classList.add("bi-pause-circle");   // Add pause icon
+                startTimerDisplay();  // Start updating the time display
+            } else if (response.status === 'stopped') {
+                button.innerText = "Start Timer";  // Change button text back to "Start Timer"
+                icon.classList.remove("bi-pause-circle");  // Remove pause icon
+                icon.classList.add("bi-play-circle");      // Add play icon
+                stopTimerDisplay();  // Stop updating the time display
+            }
+        },
+        error: function(xhr, status, error) {
+            alert("Error: " + error);
+        }
+    });
+}
+
+function startTimerDisplay() {
+    // Implement the timer countdown functionality in real-time
+    var timeSpent = document.getElementById("timeSpent");
+    var startTime = Date.now();  // Capture the start time when the timer starts
+    
+    // Update time every second
+    var timerInterval = setInterval(function() {
+        var elapsedTime = Date.now() - startTime;
+        var seconds = Math.floor((elapsedTime / 1000) % 60);
+        var minutes = Math.floor((elapsedTime / 60000) % 60);
+        var hours = Math.floor((elapsedTime / 3600000) % 24);
+        
+        // Format time as HH:mm:ss
+        timeSpent.innerText = formatTime(hours, minutes, seconds);
+    }, 1000);
+    
+    // Store interval ID to clear it when stopping the timer
+    window.timerInterval = timerInterval;
+}
+
+function stopTimerDisplay() {
+    // Clear the interval and stop updating the time display
+    clearInterval(window.timerInterval);
+}
+
+function formatTime(hours, minutes, seconds) {
+    // Format time to be displayed as HH:mm:ss
+    return (hours < 10 ? "0" + hours : hours) + ":" + 
+           (minutes < 10 ? "0" + minutes : minutes) + ":" + 
+           (seconds < 10 ? "0" + seconds : seconds);
+}
+
+
+// handle the progress
+
+document.getElementById('increaseProgress').addEventListener('click', function () {
+    updateProgress(10); // Increase by 10
+});
+
+document.getElementById('decreaseProgress').addEventListener('click', function () {
+    updateProgress(-10); // Decrease by 10
+});
+
+function updateProgress(delta) {
+    const progressBar = document.getElementById('progressBar');
+    const currentProgress = parseInt(progressBar.getAttribute('aria-valuenow'));
+    const newProgress = Math.min(100, Math.max(0, currentProgress + delta)); // Ensure between 0 and 100
+
+    $.ajax({
+        type: 'POST',
+        url: '/tasks/tasks/{{ org_id }}/{{ group_id }}/{{ task.id }}/update_progress/',
+        data: {
+            'progress': newProgress,
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        },
+        success: function (response) {
+            if (response.status === 'success') {
+                progressBar.style.width = response.progress + '%';
+                progressBar.setAttribute('aria-valuenow', response.progress);
+                progressBar.textContent = response.progress + '%';
+                showNotification("Progress has been synced")
+            } else {
+                alert(response.message || 'An error occurred.');
+            }
+        },
+        error: function (xhr, status, error) {
+            alert('Error: ' + error);
+        }
+    });
+}
+
+// Handle activity logs
+
+$(document).ready(function () {
+    // Handle the click event to open the sidebar
+    $('#activityLogsButton').click(function () {
+        // Fetch activity logs via AJAX when the sidebar is opened
+        var orgId = '{{ org_id }}';
+        var groupId = '{{ group_id }}';
+        var taskId = '{{ task.id }}';
+
+        $.ajax({
+            type: 'GET',
+            url: '/tasks/tasks/' + orgId + '/' + groupId + '/' + taskId + '/activity_logs/',
+            success: function (response) {
+                if (response.status === 'success') {
+                    loadActivityLogs(response.activity_logs);
+                    showNotification("Activity Logs up and running")
+                    // Show the sidebar
+                    $('#activityLogsSidebar').css('right', '0');
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert('Error fetching activity logs: ' + error);
+            }
+        });
+    });
+
+    // Handle the close button click to hide the sidebar
+    $('#closeSidebarButton').click(function () {
+        $('#activityLogsSidebar').css('right', '-400px');
+    });
+    showNotification('Task is fired up and ready')
+
+    // Function to load activity logs into the sidebar
+    function loadActivityLogs(logs) {
+        var container = $('#activityLogsContainer');
+        container.empty();  // Clear any existing logs
+
+        // Loop through and display each log
+        logs.forEach(function (log) {
+            var logElement = `
+                <div class="activity-log">
+                    <h5>${log.action}</h5>
+                    <p>${log.details}</p>
+                    <small>${log.created_at}</small>
+                </div>
+            `;
+            container.append(logElement);
+        });
+    }
+});
+
+
+// Handle task toggle as completed
+
+document.getElementById('toggleTaskStatus').addEventListener('change', function () {
+    const taskId = this.getAttribute('data-task-id');
+    const orgId = this.getAttribute('data-org-id');
+    const groupId = this.getAttribute('data-group-id');
+    const isChecked = this.checked;
+
+    // Determine the action based on the toggle state
+    const action = isChecked ? 'completed' : 'pending';
+
+    // Send an AJAX request
+    fetch(`/tasks/tasks/${orgId}/${groupId}/${taskId}/toggle_status/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken(), 
+        },
+        body: JSON.stringify({ status: action }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Update the label text
+                document.querySelector('label[for="toggleTaskStatus"]').textContent = 
+                    isChecked ? 'Mark as Pending' : 'Mark as Completed';
+                    showNotification("Victory achieved")
+            } else {
+                alert('Failed to update task status.');
+                this.checked = !isChecked; // Revert the toggle state
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred.');
+            this.checked = !isChecked; // Revert the toggle state
+        });
+});
+
+// Function to get the CSRF token
+function getCSRFToken() {
+    const name = 'csrftoken';
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.startsWith(name + '=')) {
+            return cookie.substring(name.length + 1);
+        }
+    }
+    return '';
+}
+
+/* Handle add remove tag  */
+/* Handle Add/Remove Tag */
+// Handle Add Tag Button click
+document.getElementById('add-tag-btn').addEventListener('click', function () {
+    const taskId = this.getAttribute('data-task-id'); // Fetch task ID
+    const orgId = this.getAttribute('data-org-id');  // Fetch org ID
+    const groupId = this.getAttribute('data-group-id'); // Fetch group ID
+
+    // Open the modal to choose tags
+    $('#addTagModal').modal('show');
+
+    // Ensure we only bind the event handler once
+    const saveTagButton = document.getElementById('save-tag-btn');
+    saveTagButton.onclick = function () {
+        const selectedTag = document.getElementById('tag-select').value; // Get selected tag
+        if (!selectedTag) {
+            alert('Please select a tag.');
+            return;
+        }
+
+        // Send an AJAX request to add the tag
+        fetch(`/tasks/tasks/${orgId}/${groupId}/${taskId}/update_tags/`, { // Corrected the URL structure
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(), // Ensure you include your CSRF token
+            },
+            body: JSON.stringify({ action: 'add', tag_name: selectedTag }), // Send action and tag_name
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.tag_name) { // Check if tag_name exists in the response
+                    // Create the new tag element
+                    const tagBadge = document.createElement('span');
+                    tagBadge.classList.add('badge', 'bg-warning');
+                    tagBadge.setAttribute('id', `tag-${data.tag_name}`); // Set id for the tag
+                    tagBadge.setAttribute('data-task-id', taskId);
+                    tagBadge.setAttribute('data-org-id', orgId);
+                    tagBadge.setAttribute('data-group-id', groupId);
+                    tagBadge.innerHTML = `
+                        ${data.tag_name}
+                        <button class="btn btn-sm btn-danger remove-tag" 
+                                data-tag="${data.tag_name}" 
+                                data-tag-id="${data.tag_name}" 
+                                data-task-id="${taskId}" 
+                                data-org-id="${orgId}" 
+                                data-group-id="${groupId}">-</button>
+                    `;
+
+                    // Append the new tag to the tag container dynamically
+                    const tagContainer = document.querySelector('p');
+                    if (tagContainer) {
+                        // If there's an existing "No tags" message, remove it
+                        const noTagsElement = tagContainer.querySelector('.badge.bg-secondary');
+                        if (noTagsElement) {
+                            noTagsElement.remove(); // Remove "No tags" message
+                        }
+
+                        // Insert the new tag badge before the "+" button
+                        const addTagButton = tagContainer.querySelector('#add-tag-btn');
+                        if (addTagButton) {
+                            tagContainer.insertBefore(tagBadge, addTagButton);
+                        } else {
+                            // If no "+" button, append it to the end
+                            tagContainer.appendChild(tagBadge);
+                        }
+                    }
+
+                    // Show success notification
+                    showNotification('Your task has been tagged!');
+
+                    // Close the modal
+                    $('#addTagModal').modal('hide');
+                } else {
+                    alert('Failed to add tag.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred.');
+            });
+    };
+});
+
+
+// Remove tag event listener (Improved delegation)
+document.addEventListener('click', function (event) {
+    if (event.target && event.target.classList.contains('remove-tag')) {
+        // Make sure the event is triggered by the button with class 'remove-tag'
+        
+        const tagElement = event.target.closest('.badge');  // Find the parent badge element
+        const taskId = tagElement.getAttribute('data-task-id');  // Fetch task ID from the badge parent
+        const orgId = tagElement.getAttribute('data-org-id');  // Fetch org ID from the badge parent
+        const groupId = tagElement.getAttribute('data-group-id');  // Fetch group ID from the badge parent
+        const tagName = event.target.getAttribute('data-tag');  // Fetch tag name
+        
+        // Send an AJAX request to remove the tag
+        fetch(`/tasks/tasks/${orgId}/${groupId}/${taskId}/update_tags/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(),
+            },
+            body: JSON.stringify({ action: 'remove', tag_name: tagName }),  // Send action and tag_name
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.tag_name) {  // Check if tag_name exists in the response
+                // Remove the tag from the displayed list
+                tagElement.remove();
+                showNotification('Tag removed successfully','success');  // Remove the tag element from the DOM
+            } else {
+                alert('Failed to remove tag.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred.');
+        });
+    }
+});
+
+// Handle time tracking
+// Stopwatch Variables
+let stopwatchInterval;
+let isRunning = false;
+let startTime = 0;
+let elapsedTime = 0;
+
+// DOM elements for stopwatch
+const startStopBtn = document.getElementById('start-stop-btn');
+const resetBtn = document.getElementById('reset-btn');  // Ensure this button exists or add it if needed
+const timeDisplay = document.getElementById('time-display');
+
+// Capture dynamic task ID, org ID, and group ID from button attributes
+const taskId = startStopBtn.getAttribute('data-task-id');
+const orgId = startStopBtn.getAttribute('data-org-id');
+const groupId = startStopBtn.getAttribute('data-group-id');
+
+// Function to format time (HH:MM:SS)
+function formatTime(time) {
+    const hours = Math.floor(time / 3600);
+    const minutes = Math.floor((time % 3600) / 60);
+    const seconds = time % 60;
+
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+// Function to start/stop the stopwatch
+function toggleStopwatch() {
+    if (isRunning) {
+        // Stop the stopwatch
+        clearInterval(stopwatchInterval);
+        startStopBtn.textContent = 'Start';
+        saveTime();  // Save the time once stopped
+    } else {
+        // Start the stopwatch
+        startTime = Date.now() - elapsedTime;
+        stopwatchInterval = setInterval(updateTimeDisplay, 1000);
+        startStopBtn.textContent = 'Stop';
+    }
+    isRunning = !isRunning;
+    showNotification('Stopwatch in action, logging your activity time. It will keep going until you stop it')
+}
+
+// Function to update time display
+function updateTimeDisplay() {
+    elapsedTime = Date.now() - startTime;
+    timeDisplay.textContent = formatTime(elapsedTime / 1000);  // Convert to seconds
+}
+
+// Function to reset the stopwatch
+function resetStopwatch() {
+    clearInterval(stopwatchInterval);
+    isRunning = false;
+    startStopBtn.textContent = 'Start';
+    timeDisplay.textContent = '00:00:00';
+    elapsedTime = 0;
+}
+
+// Function to save time to the database and append it dynamically
+// Function to save time to the database
+function saveTime() {
+    const timeSpent = (elapsedTime / 1000 / 3600).toFixed(2); // Convert to hours
+
+    // Send AJAX request to save time
+    fetch(`/tasks/tasks/${orgId}/${groupId}/${taskId}/save_time/`, {  // Correct URL structure
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken(),  // Ensure CSRF token is included
+        },
+        body: JSON.stringify({
+            time_spent: timeSpent,  // Send time spent in hours
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            
+            showNotification("Time logged with precision")
+            
+            
+            // Dynamically create a new badge for the new time entry
+            const newBadge = document.createElement('span');
+            newBadge.classList.add('badge', 'bg-info');
+            newBadge.setAttribute('id', `time-entry-${data.time_entry_id}`); // Set unique ID for the time entry badge
+            newBadge.setAttribute('data-task-id', taskId);
+            newBadge.setAttribute('data-org-id', orgId);
+            newBadge.setAttribute('data-group-id', groupId);
+            newBadge.textContent = `${data.username}: ${data.time_spent} hours`;
+
+            // Append the new badge to the time tracking section
+            const timeTrackingContainer = document.querySelector('p');
+            if (timeTrackingContainer) {
+                const noTimeElement = timeTrackingContainer.querySelector('.badge.bg-secondary');
+                if (noTimeElement) {
+                    noTimeElement.remove(); // Remove "No time tracked" message
+                }
+                timeTrackingContainer.appendChild(newBadge);  // Append the new time entry
+            }
+
+            // Optionally reset stopwatch after saving time
+            resetStopwatch();
+        } else {
+            alert('Failed to save time.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while saving the time.');
+    });
+}
+
+// Event listeners for buttons
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const raiseProblemButton = document.getElementById('raise-problem-btn');
+    const loadingSpinner = document.getElementById('loading-spinner'); // Spinner element
+    const loadingText = document.getElementById('loading-text'); // Loading text element
+
+    if (raiseProblemButton) {
+        raiseProblemButton.addEventListener('click', function () {
+            const orgId = this.getAttribute('data-org-id');
+            const groupId = this.getAttribute('data-group-id');
+            const taskId = this.getAttribute('data-task-id');
+            const problemDescription = document.getElementById('problem-description').value;
+
+            if (!problemDescription) {
+                alert('Please provide a description for the problem.');
+                return;
+            }
+
+            // Show the spinner and text
+            loadingSpinner.style.display = 'inline-block';
+            loadingText.style.display = 'inline-block';
+
+            // Send an AJAX request to report the problem
+            fetch(`/tasks/tasks/${orgId}/${groupId}/${taskId}/create_problem/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(), // Ensure CSRF token is added here
+                },
+                body: JSON.stringify({
+                    description: problemDescription,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                   
+                    showNotification('Issue escalated and flagged to your manager')
+                      
+
+                    // Create a new list item for the reported problem
+                    const newProblemItem = document.createElement('li');
+                    newProblemItem.innerHTML = `
+                        <strong>${data.reported_by}</strong>: 
+                        ${data.description} 
+                        (${new Date(data.created_at).toLocaleString()}) 
+                        <strong>Is Resolved: ${data.is_resolved}</strong>
+                    `;
+
+                    // Append the new problem to the list
+                    const problemsList = document.getElementById('problems-list');
+                    if (problemsList) {
+                        problemsList.appendChild(newProblemItem);
+                     
+                        // Trigger the animation
+                        setTimeout(function () {
+                            newProblemItem.classList.add('show');
+                        }, 10); // Adding a small delay to trigger the transition
+                    }
+
+                    // Optionally, clear the problem description textarea
+                    document.getElementById('problem-description').value = '';
+                } else {
+                    alert('Failed to report the problem.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while reporting the problem.');
+            })
+            .finally(() => {
+                // Hide the spinner and text once the request is complete
+                loadingSpinner.style.display = 'none';
+                loadingText.style.display = 'none';
+            });
+        });
+    } else {
+        console.error('Raise Problem button not found');
+    }
+});
+
+// Function to get CSRF token from the cookies
+function getCSRFToken() {
+    let csrfToken = null;
+    const cookieValue = document.cookie.split(';').find(cookie => cookie.trim().startsWith('csrftoken='));
+    if (cookieValue) {
+        csrfToken = cookieValue.split('=')[1];
+    }
+    return csrfToken;
+}
+
+
+
+// Handle problem resolve
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.resolve-problem-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            const orgId = this.getAttribute('data-org-id');
+            const groupId = this.getAttribute('data-group-id');
+            const taskId = this.getAttribute('data-task-id');
+            const problemId = this.getAttribute('data-problem-id');
+
+            console.log(`Resolving problem with orgId=${orgId}, groupId=${groupId}, taskId=${taskId}, problemId=${problemId}`);
+
+            // Reference to the current list item
+            const problemListItem = this.closest('li');
+            if (!problemListItem) {
+                console.error("Problem list item not found!");
+                return;
+            }
+
+            fetch(`/tasks/tasks/${orgId}/${groupId}/${taskId}/resolve_problem/${problemId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(),
+                },
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Server response:", data);
+                if (data.success) {
+                    // Display notification
+                    showNotification(data.success);
+
+                    // Update the Is Resolved field in the UI
+                    const isResolvedField = problemListItem.querySelector('strong:nth-of-type(2)');
+                    if (isResolvedField) {
+                        isResolvedField.textContent = 'Is Resolved: True';
+                    } else {
+                        console.warn("Is Resolved field not found!");
+                    }
+
+                    // Remove the resolve button
+                    const resolveButton = problemListItem.querySelector('.resolve-problem-btn');
+                    if (resolveButton) {
+                        resolveButton.remove();
+                    } else {
+                        console.warn("Resolve button not found!");
+                    }
+                } else {
+                    alert('Failed to mark the problem as resolved.');
+                    console.error("Error response from server:", data);
+                }
+            })
+            .catch(error => {
+                console.error('Error occurred:', error);
+                alert('An error occurred while resolving the problem.');
+            });
+        });
+    });
+});
+
+// Function to show notification
+function showNotification(message) {
+    const notification = document.getElementById('notification');
+    const notificationText = document.getElementById('notification-text');
+    notificationText.textContent = message;
+    notification.classList.add('show');
+
+    // Auto hide notification after 3 seconds
+    setTimeout(() => {
+        closeNotification();
+    }, 5000);
+}
+
+// Function to close the notification
+function closeNotification() {
+    const notification = document.getElementById('notification');
+    notification.classList.remove('show');
+}
+
+// Function to get CSRF token from cookies
+function getCSRFToken() {
+    let csrfToken = null;
+    const cookieValue = document.cookie.split(';').find(cookie => cookie.trim().startsWith('csrftoken='));
+    if (cookieValue) {
+        csrfToken = cookieValue.split('=')[1];
+    }
+    return csrfToken;
+}
+
+
+// Handle note deletion
+document.addEventListener('DOMContentLoaded', function () {
+    // Add event listener for delete buttons
+    document.querySelectorAll('.delete-note').forEach(button => {
+        button.addEventListener('click', function () {
+            const noteId = this.getAttribute('data-note-id');
+            const taskId = this.getAttribute('data-task-id');
+            const groupId = this.getAttribute('data-group-id');
+            const orgId = this.getAttribute('data-org-id');
+
+            // Send AJAX request to delete the note
+            fetch(`/tasks/tasks/${orgId}/${groupId}/${taskId}/${noteId}/delete_note/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'), // Ensure CSRF token is included
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    // Remove the note element from the DOM
+                    const noteElement = document.getElementById(`note-${noteId}`);
+                    if (noteElement) {
+                        noteElement.remove();
+                    }
+                   
+                    showNotification("Note has been expunged and is no longer available.")
+                } else if (data.error) {
+                    alert(data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+});
+
+// Function to get the CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+
+
+// Edit the note
+document.addEventListener('DOMContentLoaded', function () {
+    // Function to get CSRF token from the cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Handle Edit button click
+    document.querySelectorAll('.edit-note').forEach(button => {
+        button.addEventListener('click', function () {
+            const noteId = this.getAttribute('data-note-id');
+            const taskId = this.getAttribute('data-task-id');
+            const groupId = this.getAttribute('data-group-id');
+            const orgId = this.getAttribute('data-org-id');
+            const currentNoteContent = this.getAttribute('data-note-content');
+            
+            // Populate the modal with the current note content
+            document.getElementById('noteContent').value = currentNoteContent;
+
+            // Show the modal
+            const editModal = new bootstrap.Modal(document.getElementById('editNoteModal'));
+            editModal.show();
+
+            // Set a save handler for the modal save button
+            document.getElementById('saveNoteBtn').addEventListener('click', function () {
+                const updatedNoteContent = document.getElementById('noteContent').value;
+
+                fetch(`/tasks/tasks/${orgId}/${groupId}/${taskId}/${noteId}/edit_note/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        'note': updatedNoteContent
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        // Find the note item by ID and update the content
+                        const noteItem = document.getElementById(`note-${noteId}`);
+                        if (noteItem) {
+                            const noteContentElement = noteItem.querySelector('.note-content');
+                            if (noteContentElement) {
+                                noteContentElement.textContent = updatedNoteContent;
+                            }
+                        }
+
+                        
+                        showNotification('Your note has been revised and the updates are now logged')
+
+                        // Close the modal
+                        var modal = bootstrap.Modal.getInstance(document.getElementById('editNoteModal'));
+                        modal.hide();
+                    } else {
+                        alert(data.error);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    });
+});
+
+// Edit comment
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Function to get CSRF token from the cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Handle Edit Comment button click
+    document.querySelectorAll('.edit-comment').forEach(button => {
+        button.addEventListener('click', function () {
+            const commentId = this.getAttribute('data-comment-id');
+            const orgId = this.getAttribute('data-org-id');
+            const groupId = this.getAttribute('data-group-id');
+            const taskId = this.getAttribute('data-task-id');
+            const currentCommentContent = this.getAttribute('data-comment-content');
+            
+            // Populate the modal with the current comment content
+            document.getElementById('commentContent').value = currentCommentContent;
+
+            // Show the modal
+            const editModal = new bootstrap.Modal(document.getElementById('editCommentModal'));
+            editModal.show();
+
+            // Set up the save button handler
+            document.getElementById('saveCommentBtn').addEventListener('click', function saveHandler() {
+                const updatedCommentContent = document.getElementById('commentContent').value;
+
+                fetch(`/tasks/tasks/${orgId}/${groupId}/${taskId}/${commentId}/edit_comment/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        'comment': updatedCommentContent
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        // Update the comment text in the list
+                        const commentItem = document.querySelector(`#comment-${commentId} .comment-text`);
+                        commentItem.textContent = updatedCommentContent;
+                        showNotification("The update to the comment was successful.")
+
+                        // Close the modal
+                        editModal.hide();
+                    } else {
+                        alert(data.error);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+
+                // Remove the save handler after execution to avoid duplicates
+                this.removeEventListener('click', saveHandler);
+            });
+        });
+    });
+});
+
+
+// Delete comment
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Handle Delete Comment click
+    document.querySelectorAll('.delete-comment').forEach(button => {
+        button.addEventListener('click', function () {
+            const commentId = this.getAttribute('data-comment-id');
+            const taskId = this.getAttribute('data-task-id');
+            const groupId = this.getAttribute('data-group-id');
+            const orgId = this.getAttribute('data-org-id');
+
+            // Show confirmation dialog
+            if (confirm("Are you sure you want to delete this comment?")) {
+                fetch(`/tasks/tasks/${orgId}/${groupId}/${taskId}/${commentId}/delete_comment/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        // Remove the deleted comment from the list
+                        const commentItem = document.getElementById(`comment-${commentId}`);
+                        commentItem.remove();
+
+                     
+                        showNotification('The comment deletion was successful.')
+                    } else {
+                        alert(data.error);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+    });
+});
+
+// CSRF Token Helper Function
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Greeting
+document.addEventListener('DOMContentLoaded', function() {
+            // Function to get current hour
+            function getGreeting() {
+                const currentHour = new Date().getHours();  // Get current hour (0-23)
+                let greetingMessage = '';
+
+                // Determine the appropriate greeting based on the time of day
+                if (currentHour >= 5 && currentHour < 12) {
+                    greetingMessage = 'Good Morning, {{request.user}}!';
+                } else if (currentHour >= 12 && currentHour < 17) {
+                    greetingMessage = 'Good Afternoon, {{request.user}}!';
+                } else if (currentHour >= 17 && currentHour < 21) {
+                    greetingMessage = 'Good Evening, {{request.user}}!';
+                } else {
+                    greetingMessage = 'Good Night, {{request.user}}!';
+                }
+
+                // Display the greeting
+                document.getElementById('greeting').textContent = greetingMessage;
+            }
+
+            // Call the function when the page loads
+            getGreeting();
+        });
+
+// Current date 
+
+document.addEventListener("DOMContentLoaded", function () {
+        // Get current date
+        const now = new Date();
+
+        // Format the date
+        const dayOfWeek = now.toLocaleString('en-us', { weekday: 'short' }); // "Fri"
+        const day = now.getDate(); // "10"
+        const month = now.toLocaleString('en-us', { month: 'long' }); // "January"
+        const year = now.getFullYear(); // "2025"
+
+        // Create the formatted date string
+        const formattedDate = `${dayOfWeek} ${day} ${month}`;
+
+        // Display the date
+        const currentDateElement = document.getElementById("current-date");
+        currentDateElement.innerHTML = formattedDate;
+    });
+
+
+
+// stopwatrch functions
+startStopBtn.addEventListener('click', toggleStopwatch);
+resetBtn.addEventListener('click', resetStopwatch);
+
+    </script>
+
+    
+
+
+</body>
+</html>
+

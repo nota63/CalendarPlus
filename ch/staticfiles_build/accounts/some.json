@@ -1,0 +1,54 @@
+{
+  "organization": "Amazon",
+  "Availability": {
+    "mon": {
+      "break": {
+        "breakfast": ["start_time", "end_time"],
+        "lunch": ["start_time", "end_time"],
+        "evening": ["start_time", "end_time"]
+      },
+      "main_time": ["start_time", "end_time"]
+    },
+    "tue": {
+      "break": {
+        "breakfast": ["start_time", "end_time"],
+        "lunch": ["start_time", "end_time"],
+        "evening": ["start_time", "end_time"]
+      },
+      "main_time": ["start_time", "end_time"]
+    }
+  }, 
+  "user_holidays":{"total days":"28",
+                   "date_applied":["start_date","end_date"],
+                   "date_applied":["start_date","end_date"],
+                   "date_applied":["start_date","end_date"]
+                
+                },
+   "company holidays":{"sick leave":[""],
+                        "previlege leave":[""],
+                        "normal leave":[""],
+                        "optional leave":[""] 
+}
+                      
+}
+
+
+
+{"2024":{"decemeber":{}}}
+
+
+after user creates profile --- {"2024":{"decemeber":{}}}
+
+
+
+
+
+
+
+default times json
+
+group meeting --- 
+
+store meeting key values in user profiles also in json format 
+
+

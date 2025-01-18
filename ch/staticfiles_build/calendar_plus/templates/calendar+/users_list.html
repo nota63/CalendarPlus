@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organization and Users</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background-color: #f4f7fb;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        /* Main Container */
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding-top: 30px;
+            height: 100vh;
+        }
+        /* Organization Section */
+        .organization-container {
+            text-align: center;
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: organizationAnimation 2s ease-out forwards;
+            width: 100%;
+            max-width: 200px; /* Smaller organization size */
+            margin-bottom: 20px;
+        }
+        .organization-container .icon {
+            font-size: 35px; /* Smaller organization icon */
+            color: #17a2b8;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .organization-container .name {
+            font-size: 16px; /* Reduced size for name */
+            font-weight: bold;
+            color: #343a40;
+            margin-top: 5px;
+            opacity: 0;
+            animation: fadeIn 2s ease-out forwards;
+            cursor: pointer;
+        }
+        /* Fade-in and Scaling for Organization */
+        @keyframes organizationAnimation {
+            0% { opacity: 0; transform: scale(0); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        /* Grid Layout for Users */
+        .user-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* More compact size */
+            gap: 10px; /* Smaller gap */
+            width: 80%;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+        }
+        .user-card {
+            text-align: center;
+            opacity: 0;
+            transform: scale(0.7);
+            animation: userCardAnimation 1.5s ease-out forwards;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            padding: 10px;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            width: 100%;
+        }
+        .user-card:hover {
+            transform: scale(1.1); /* Enlarge on hover */
+        }
+        /* Animation for User Cards */
+        @keyframes userCardAnimation {
+            0% { opacity: 0; transform: scale(0.7) translateY(30px); }
+            50% { opacity: 0.8; transform: scale(1.15) translateY(-10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .user-card .icon {
+            font-size: 20px; /* Smaller icon size */
+            color: #6c757d;
+            transition: color 0.3s ease;
+        }
+        .role-badge {
+            display: inline-block;
+            margin-top: 5px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        .role-admin {
+            background-color: #ffc107;
+            color: #fff;
+        }
+        .role-manager {
+            background-color: #28a745;
+            color: #fff;
+        }
+        .role-employee {
+            background-color: #6c757d;
+            color: #fff;
+        }
+        .view-calendar-btn {
+            margin-top: 5px;
+            padding: 4px 6px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .view-calendar-btn:hover {
+            background-color: #0056b3;
+        }
+        /* User Card Delay Animations */
+        .user-card:nth-child(1) { animation-delay: 2.2s; }
+        .user-card:nth-child(2) { animation-delay: 2.5s; }
+        .user-card:nth-child(3) { animation-delay: 2.8s; }
+        .user-card:nth-child(4) { animation-delay: 3.1s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% for organization, members in organization_members.items %}
+            <div class="organization-container">
+                <div class="icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="name">{{ organization.name }}</div>
+            </div>
+            <div class="user-grid">
+                {% for member in members %}
+                    <div class="user-card">
+                        <div class="icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="role">
+                            {{ member.user.username }} <br>
+                            <span class="role">
+                                {% if member.is_admin %}
+                                    <span class="role-badge role-admin">Admin</span>
+                                {% elif member.is_manager %}
+                                    <span class="role-badge role-manager">Manager</span>
+                                {% else %}
+                                    <span class="role-badge role-employee">Employee</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <a href="{% url 'view_user_calendar' member.user.id %}" class="view-calendar-btn">View Calendar</a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+    <script>
+        window.onload = function() {
+            setTimeout(function() {
+                document.querySelector('.user-grid').style.opacity = 1;
+            }, 2000); // Show users after 2 seconds
+        };
+    </script>
+</body>
+</html>
+
+

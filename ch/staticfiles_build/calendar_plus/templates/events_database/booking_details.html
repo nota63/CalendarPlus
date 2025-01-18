@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Booking Details</h2>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <p><strong>Event:</strong> {{ booking.event.title }}</p>
+            <p><strong>Event Host:</strong> {{ booking.event.user }}</p>
+            <p><strong>Invitee:</strong> {{ booking.invitee.username }}</p>
+            <p><strong>Start Time:</strong> {{ booking.start_time|date:"M d, Y H:i A" }}</p>
+            <p><strong>End Time:</strong> {{ booking.end_time|date:"M d, Y H:i A" }}</p>
+            <p><strong>Status:</strong> 
+                <span class="badge 
+                    {% if booking.status == 'confirmed' %} bg-success
+                    {% elif booking.status == 'pending' %} bg-warning
+                    {% else %} bg-danger {% endif %}">
+                    {{ booking.get_status_display }}
+                </span>
+            </p>
+            <p><strong>Created At:</strong> {{ booking.created_at|date:"M d, Y H:i A" }}</p>
+            <p><strong>Updated At:</strong> {{ booking.updated_at|date:"M d, Y H:i A" }}</p>
+        </div>
+    </div>
+</div>
+<br>
+<br>
+
+{% endblock %}

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Meeting Count Summary</title>
+    <!-- Google Fonts for premium feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap');
+    
+        /* Smooth Fade-in Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(to right, #e0eafc, #cfdef3);
+            color: #2c3e50;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            animation: fadeIn 1s ease-out;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 1200px;
+            padding: 25px;
+            margin: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            opacity: 0;
+            animation: fadeIn 1s ease-in-out forwards;
+        }
+        h2 {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #16a085;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: fadeIn 1.2s ease-in-out;
+        }
+        h2 i {
+            margin-right: 8px;
+        }
+        .section {
+            background: linear-gradient(145deg, #ffffff, #f1f1f1);
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            opacity: 0;
+            animation: fadeIn 1.5s ease forwards;
+        }
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+        .user-card {
+            background-color: #f7f9fc;
+            border: 1px solid #dfe6e9;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        .user-card:hover {
+            background-color: #ecf0f1;
+            transform: translateY(-3px);
+        }
+        .user-card strong {
+            font-weight: 500;
+            color: #2d3436;
+        }
+        .user-card i {
+            color: #2980b9;
+            margin-right: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            opacity: 0;
+            animation: fadeIn 1.8s ease-in-out forwards;
+        }
+        th, td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: 0.7rem;
+            text-align: left;
+            transition: background-color 0.2s ease;
+        }
+        th {
+            background-color: #dfe6e9;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        tr:hover td {
+            background-color: #f0f4f7;
+        }
+        .icon {
+            font-size: 0.85rem;
+            color: #16a085;
+            margin-right: 6px;
+        }
+        .no-data {
+            text-align: center;
+            color: #95a5a6;
+            font-size: 0.65rem;
+            margin-top: 25px;
+            opacity: 0;
+            animation: fadeIn 2s ease forwards;
+        }
+        /* Pagination Styling */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .pagination a {
+            color: #3498db;
+            padding: 6px 12px;
+            margin: 0 5px;
+            text-decoration: none;
+            border-radius: 4px;
+            background-color: #ecf0f1;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .pagination a:hover {
+            background-color: #3498db;
+            color: #ffffff;
+        }
+        .pagination .active {
+            background-color: #16a085;
+            color: #ffffff;
+            pointer-events: none;
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="container">
+        <!-- Top 4 Users Section -->
+        <div class="section">
+            <h2><i class="fas fa-crown"></i>Top 4 Users with Most Meetings</h2>
+            {% if top_1_users %}
+                {% for user in top_1_users %}
+                    <div class="user-card">
+                        <div><i class="fas fa-user"></i> Rank {{ user.rank }}: <strong>{{ user.username }}</strong></div>
+                        <div><i class="fas fa-calendar-alt"></i> Meetings: {{ user.meeting_count }}</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="no-data">No users found.</p>
+            {% endif %}
+        </div>
+
+        <!-- Most Active User Section -->
+        <div class="section">
+            <h2><i class="fas fa-chart-line"></i>Most Active User</h2>
+            {% if top_active_user %}
+                {% for user in top_active_user %}
+                    <div class="user-card">
+                        <div><i class="fas fa-user"></i> {{ user.username }}</div>
+                        <div><i class="fas fa-clock"></i> Active Days: {{ user.active_days }}</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="no-data">No active users found.</p>
+            {% endif %}
+        </div>
+
+        <!-- Meeting Type Breakdown Section -->
+        <div class="section">
+            <h2><i class="fas fa-list-ul"></i>Meeting Type Breakdown</h2>
+            {% if meeting_type_breakdown %}
+                {% for user in meeting_type_breakdown %}
+                    <div class="user-card">
+                        <div><i class="fas fa-user"></i> {{ user.username }}</div>
+                        <div>
+                            <i class="fas fa-tasks"></i> Task: {{ user.Task }},
+                            <i class="fas fa-people-arrows"></i> Standup: {{ user.Standup }},
+                            <i class="fas fa-user-friends"></i> Team: {{ user.Team }},
+                            <i class="fas fa-user-secret"></i> Personal: {{ user.Personal }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="no-data">No meeting breakdown found.</p>
+            {% endif %}
+        </div>
+
+        <!-- Upcoming Meetings Section -->
+        <div class="section">
+            <h2><i class="fas fa-calendar-check"></i>Upcoming Meetings in the Next Week</h2>
+            {% if upcoming_meetings_users %}
+                {% for meeting in upcoming_meetings_users %}
+                    <div class="user-card">
+                        <div><i class="fas fa-user"></i> {{ meeting.User }}</div>
+                        <div><i class="fas fa-calendar"></i> {{ meeting.Meeting_Title }} on {{ meeting.Date|date:"Y-m-d H:i" }}</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="no-data">No upcoming meetings found.</p>
+            {% endif %}
+        </div>
+
+        <!-- Inactive Users Section -->
+        <div class="section">
+            <h2><i class="fas fa-user-slash"></i>Inactive Users</h2>
+            {% if inactive %}
+                {% for user in inactive %}
+                    <div class="user-card">
+                        <i class="fas fa-user-times"></i> {{ user.user }}
+                    </div>
+                {% endfor %}    
+            {% else %}
+                    <p class="no-data">No inactive users found.</p>
+            {% endif %}
+            </div>
+
+        <!-- Meeting Time Distribution Section -->
+        <div class="section">
+            <h2><i class="fas fa-clock"></i>Meeting Time Distribution</h2>
+            {% if time_distribution_list %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Hour</th>
+                            <th>Meetings Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in time_distribution_list %}
+                            <tr>
+                                <td>{{ entry.hour }}</td>
+                                <td>{{ entry.meetings_count }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="no-data">No meeting time distribution data available.</p>
+            {% endif %}
+        </div>
+
+        <!-- Frequent Admin Meetings Section -->
+        <div class="section">
+            <h2><i class="fas fa-users-cog"></i>Most Frequent Meeting Admin</h2>
+            {% if frequent_admin_meetings %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Admin</th>
+                            <th>Meetings Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for admin in frequent_admin_meetings %}
+                            <tr>
+                                <td>{{ admin.top_admin }}</td>
+                                <td>{{ admin.admin_meetings_count }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="no-data">No admin meeting data available.</p>
+            {% endif %}
+        </div>
+
+        <!-- Users with Meetings of All Types Section -->
+<div class="section">
+    <h2><i class="fas fa-users"></i>Users with Meetings of All Types</h2>
+    {% if all_type_users %}
+        <ul>
+            {% for user in all_type_users %}
+                <li><i class="fas fa-check-circle"></i> {{ user.user }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="no-data">No users found with all types of meetings.</p>
+    {% endif %}
+</div>
+
+
+<!-- Meeting Frequency for Each User Section -->
+<div class="section">
+    <h2><i class="fas fa-calendar-check"></i>Meeting Frequency This Week</h2>
+    {% if users_frequency %}
+        <ul>
+            {% for user in users_frequency %}
+                <li>
+                    <i class="fas fa-clock"></i> {{ user.user }} - 
+                    <strong>{{ user.meetings_this_week }}</strong> meetings this week
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="no-data">No meetings for any users this week.</p>
+    {% endif %}
+</div>
+
+<!-- Users with Most Meetings in Past Month Section -->
+<div class="section">
+    <h2><i class="fas fa-calendar-alt"></i>Users with Most Meetings in the Last Month</h2>
+    {% if last_month_actives %}
+        <ul>
+            {% for user in last_month_actives %}
+                <li>
+                    <i class="fas fa-user-clock"></i> {{ user.user }} - 
+                    <strong>{{ user.meetings_in_last_month }}</strong> meetings in the past month
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="no-data">No meetings found for any users in the last month.</p>
+    {% endif %}
+</div>
+
+ <!-- Overlapping Meetings Section -->
+ <div class="section">
+    <h2><i class="fas fa-exclamation-circle"></i>Users with Overlapping Meetings</h2>
+    {% if overlapping %}
+        <ul>
+            {% for meeting in overlapping %}
+                <li>
+                    <i class="fas fa-user-clock"></i> {{ meeting.user }} - 
+                    <strong>{{ meeting.overlapping_meeting }}</strong> has overlapping meetings
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="no-data">No overlapping meetings found.</p>
+    {% endif %}
+</div>
+
+<!-- Popular Meeting Links Section -->
+<div class="section">
+    <h2><i class="fas fa-link"></i>Popular Meeting Links</h2>
+    {% if meeting_links %}
+        <ul>
+            {% for link in meeting_links %}
+                <li>
+                    <i class="fas fa-link"></i> {{ link.meeting_link }} - 
+                    <strong>{{ link.usage_count }} Uses</strong>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="no-data">No popular meeting links found.</p>
+    {% endif %}
+</div>
+
+<!-- Monthly Meetings per User Section -->
+<div class="section">
+    <h2><i class="fas fa-calendar-alt"></i>Meetings Per User (Monthly Engagement)</h2>
+    {% if month_meetings %}
+        <ul>
+            {% for entry in month_meetings %}
+                <li>
+                    <i class="fas fa-user"></i> {{ entry.user }} - 
+                    <strong>{{ entry.meetings }} Meetings in {{ entry.month|date:"F Y" }}</strong>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="no-data">No meetings recorded for this month.</p>
+    {% endif %}
+</div>
+
+      <!-- User's Meeting Participation by Type Section -->
+      <div class="section">
+        <h2><i class="fas fa-users"></i>User Meeting Participation</h2>
+        {% if meeting_types %}
+            <ul>
+                {% for entry in meeting_types %}
+                    <li>
+                        <i class="fas fa-user"></i> {{ entry.user }} - 
+                        <strong>Task:</strong> {{ entry.task }} |
+                        <strong>Standup:</strong> {{ entry.standup }} |
+                        <strong>Personal:</strong> {{ entry.personal }} |
+                        <strong>Team:</strong> {{ entry.team }}
+                    </li>
+                {% endfor %}
+            </ul>
+            <!-- Pagination Controls -->
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; First</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                {% endif %}
+                <span class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">Next</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                {% endif %}
+            </div>
+        {% else %}
+            <p class="no-data">No meetings found for users.</p>
+        {% endif %}
+    </div>
+
+    <div class="container">
+        <!-- Conflicting Users Section -->
+       <!-- Conflicting Users Section -->
+<div class="section">
+    <h2><i class="fas fa-users"></i> Conflicting Users</h2>
+    {% if send_conflicts %}
+        <ul>
+            {% for entry in send_conflicts %}
+                <li>
+                    <strong>Date:</strong> {{ entry.date }} |
+                    <strong>Time:</strong> {{ entry.time }} |
+                    <strong>Conflicting Users:</strong> {{ entry.conflicting_users_count }} |
+                    <strong>Username:</strong> {{ entry.username }}
+                </li>
+            {% endfor %}
+        </ul>
+
+        <!-- Pagination Controls -->
+        <div class="pagination">
+            <span class="page-links">
+                {% if page_objs_conflicts.has_previous %}
+                    <a href="?page=1">&laquo; First</a>
+                    <a href="?page={{ page_objs_conflicts.previous_page_number }}">Previous</a>
+                {% endif %}
+                
+                <span class="current-page">
+                    Page {{ page_objs_conflicts.number }} of {{ page_objs_conflicts.paginator.num_pages }}
+                </span>
+                
+                {% if page_objs_conflicts.has_next %}
+                    <a href="?page={{ page_objs_conflicts.next_page_number }}">Next</a>
+                    <a href="?page={{ page_objs_conflicts.paginator.num_pages }}">Last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    {% else %}
+        <p class="no-data">No conflicting meetings found.</p>
+    {% endif %}
+</div>
+    </div>
+</body>
+</html>

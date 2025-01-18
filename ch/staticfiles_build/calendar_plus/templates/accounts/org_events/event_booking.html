@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ event.title }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css">
+
+    <style>
+        /* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+/* Heading Styles */
+h1 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 1rem;
+    text-align: center;
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+/* Event Details Section */
+.event-details {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+}
+
+.event-details p {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 0.8rem;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+    opacity: 0;
+    animation: modalContentFadeIn 0.5s ease-in-out forwards;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #333;
+    transition: color 0.3s ease;
+}
+
+.close:hover {
+    color: #e74c3c;
+}
+
+.slot-item {
+    background-color: #f1f1f1;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.slot-item:hover {
+    background-color: #e2e2e2;
+    cursor: pointer;
+}
+
+#bookEventButton {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+}
+
+#bookEventButton:hover {
+    background-color: #2980b9;
+}
+
+/* Calendar Container */
+.calendar-container {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+#calendar {
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes modalContentFadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Additional Responsive Styles */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .event-details {
+        padding: 15px;
+    }
+
+    #calendar {
+        margin-top: 20px;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+}
+
+
+/* Updated Heading Styles */
+.intro {
+    font-size: 1.8rem; /* Smaller font size */
+    background: linear-gradient(to right, #ff66b2, #66ccff); /* Pink to light blue gradient */
+    -webkit-background-clip: text; /* Clip the background to the text */
+    color: transparent; /* Make the text itself transparent to show the gradient */
+    font-weight: bold;
+    text-align: center;
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+
+    </style>
+    
+</head>
+<body>
+    <h1 class="intro">Book Event: {{ event.title }}</h1>
+
+    <section class="event-details">
+        <p>Description : {{event.description}}</p>
+        <p>Duration : {{event.duration}}</p>
+        <p>Event Type : {{event.event_type}}</p>
+        <p>Buffer Time : {{event.buffer_time}}</p>
+        <p>Is this recurring event? : {{event.is_recurring}}</p>
+        <p>Location : {{event.location}}</p>
+        <p>Created At : {{event.created_at}}</p>
+    </section>
+
+
+
+    <div class="calendar-container">
+        <h3>Please Pick a date to see the  {{event.user}}'s  Availability and book the event</h3>
+        <div id="calendar"></div>
+    </div>
+
+    <!-- Modal for Available Slots -->
+    <div id="availableSlotsModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>{{event.user}} is available on these slots!</h3>
+            <div id="slotsList"></div>
+            <button id="bookEventButton" style="display:none;">Book Event</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          var calendarEl = document.getElementById('calendar');
+          var calendar = new FullCalendar.Calendar(calendarEl, {
+              initialView: 'dayGridMonth',
+              events: [], // Initially empty, we'll fetch available slots dynamically when a date is clicked
+              dateClick: function(info) {
+                  var selectedDate = info.dateStr; // Format: 'YYYY-MM-DD'
+                  fetchAvailableSlots(selectedDate);
+              }
+          });
+          calendar.render();
+        });
+      
+        function fetchAvailableSlots(selectedDate) {
+          // Fetch user, organization, and event slug dynamically from the template
+          var userId = "{{ event.user.id }}";
+          var orgId = "{{ event.organization.id }}";
+          var eventSlug = "{{ event.slug }}";  // Event slug passed from backend
+          var url = `/auth/fetch-availability-user/${userId}/${orgId}/${selectedDate}`;
+      
+          // Perform AJAX request
+          $.ajax({
+              url: url,
+              method: "GET",
+              success: function(response) {
+                  displayAvailableSlots(response, selectedDate, userId, orgId, eventSlug); // Pass eventSlug to display function
+              },
+              error: function(xhr, status, error) {
+                  console.error("Failed to fetch slots:", error);
+                  alert("No slots available for the selected date or an error occurred.");
+              }
+          });
+        }
+      
+        function displayAvailableSlots(response, selectedDate, userId, orgId, eventSlug) {
+          var modal = document.getElementById('availableSlotsModal');
+          var slotsList = document.getElementById('slotsList');
+          var bookButton = document.getElementById('bookEventButton');
+      
+          slotsList.innerHTML = ""; // Clear any previous slots
+      
+          // Show modal
+          modal.style.display = "block";
+      
+          // Check if 'main_time' exists and is an array
+          if (response.main_time && Array.isArray(response.main_time) && response.main_time.length > 0) {
+              // Loop through the available slots and create the HTML elements for them
+              response.main_time.forEach(function(slot) {
+                  var slotElement = document.createElement('div');
+                  slotElement.textContent = slot; // Assuming the slot is a string like "09:00 - 09:30"
+                  slotElement.className = 'slot-item';
+      
+                  // Add the slot to the list
+                  slotsList.appendChild(slotElement);
+              });
+      
+              // Display the "Book Event" button
+              bookButton.style.display = "block";
+              bookButton.onclick = function() {
+                  // Redirect with eventSlug
+                  window.location.href = `/auth/schedule_event/${userId}/${orgId}/${selectedDate}/${eventSlug}/`;
+              };
+      
+          } else {
+              // If no slots are available, display a message
+              var noSlots = document.createElement('p');
+              noSlots.textContent = "No available slots for this date.";
+              slotsList.appendChild(noSlots);
+          }
+        }
+      
+        // Get the modal
+        var modal = document.getElementById('availableSlotsModal');
+      
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+      
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+      
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+      </script>
+      
+</body>
+</html>
+
+

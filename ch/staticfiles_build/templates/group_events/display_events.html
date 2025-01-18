@@ -1,0 +1,1287 @@
+
+{% extends 'custom.html'%}
+
+
+
+{% block content %}
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ group.name }} - Events</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
+
+    <style>
+      
+
+
+
+
+        .card {
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+        .booked-btn {
+            background-color: #6c757d !important;
+            color: white;
+            cursor: not-allowed;
+        }
+        .alert-success {
+            display: none;
+        }
+        /* Spinner style */
+        .spinner-wrapper {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .spinner-wrapper .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+
+/* 
+
+/* Modal Styles */
+.modal-content {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+
+
+
+
+
+    </style>
+</head>
+<body>
+
+    <div class="my-5">
+        <!-- Title with Premium Bold Styling -->
+        <h2 class="text-center mb-4 fw-bold text-uppercase" style="background-image: linear-gradient(to right, #00c6ff, #ff66cc); -webkit-background-clip: text; color: transparent;">
+            {{ group.name }} - Events
+        </h2>
+        
+        <!-- Subtitle with Icon and Premium Text Styling -->
+        <p class="text-muted text-center fs-6 mb-4" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+            <i class="bi bi-building me-2 text-primary"></i>
+            Organized In <strong class="text-dark">{{ organization.name }}</strong>
+        </p>
+        
+        <!-- Event Information Section with Soft Premium Styling -->
+        <div class="container my-5 px-4 py-3 bg-light rounded shadow-sm">
+            <div class="text-center">
+                <p class="fs-5 text-muted mb-3" style="font-family: 'Roboto', sans-serif;">
+                    <i class="bi bi-person-circle me-2 text-primary"></i>
+                    All events organized by your group leader, <strong>{{ group.team_leader.username }}</strong>, will be displayed here.
+                </p>
+                <p class="fs-6 text-muted mb-3" style="font-family: 'Roboto', sans-serif;">
+                    <i class="bi bi-check-circle me-2 text-success"></i>
+                    Participation in all events is mandatory to ensure active collaboration and success.
+                </p>
+                <p class="fs-6 text-secondary mb-0" style="font-family: 'Roboto', sans-serif;">
+                    <i class="bi bi-calendar-plus me-2 text-warning"></i>
+                    Book your spot now and notify your group leader of your attendance!
+                </p>
+            </div>
+        </div>
+        
+      <!-- Leader Status Section with Stylish Text -->
+<div class="container my-4 px-4 py-3 bg-light rounded shadow-sm">
+    <div class="text-center">
+        {% if is_team_leader %}
+            <p class="fs-5 text-success mb-3" style="font-family: 'Roboto', sans-serif;">
+                <i class="bi bi-person-check me-2"></i>
+                You are the team leader of this group. Administrative actions are available for you.
+            </p>
+        {% else %}
+            <p class="fs-5 text-danger mb-3" style="font-family: 'Roboto', sans-serif;">
+                <i class="bi bi-person-x me-2"></i>
+                You are not the team leader.
+            </p>
+        {% endif %}
+    </div>
+</div>
+
+    
+
+        <div class="alert alert-success" id="successMessage">
+            Event booked successfully!
+        </div>
+
+        <!-- Spinner for booking event -->
+        <div class="spinner-wrapper" id="spinnerWrapper">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p>Sending booking request to system...</p>
+        </div>
+
+
+
+        <!-- Modal for Marking Absence -->
+<div class="modal fade" id="absenceModal" tabindex="-1" aria-labelledby="absenceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="absenceModalLabel">Mark Yourself as Absent</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="absenceForm">
+                    <div class="mb-3">
+                        <label for="reason" class="form-label">Reason for Absence</label>
+                        <select id="reason" class="form-control">
+                            <option value="Personal">Personal</option>
+                            <option value="Availability Issues">Availability Issues</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="customMessage" class="form-label">Custom Message (Optional)</label>
+                        <textarea id="customMessage" class="form-control" rows="3" placeholder="Provide a custom message if needed"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" id="submitAbsence">Mark as Absent</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reminder Modal -->
+<!-- Reminder Modal -->
+<div class="modal fade" id="reminderModal" tabindex="-1" aria-labelledby="reminderModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="reminderModalLabel">Set Event Reminder</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="reminderForm">
+            <!-- Reminder options: 1 day before, 1 hour before, or custom -->
+            <div class="mb-3">
+              <label class="form-label">Reminder Option</label>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="reminder_option" id="reminderOption1Day" value="1_day_before" required>
+                <label class="form-check-label" for="reminderOption1Day">
+                  1 Day Before
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="reminder_option" id="reminderOption1Hour" value="1_hour_before" required>
+                <label class="form-check-label" for="reminderOption1Hour">
+                  1 Hour Before
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="reminder_option" id="reminderOptionCustom" value="custom" required>
+                <label class="form-check-label" for="reminderOptionCustom">
+                  Custom
+                </label>
+              </div>
+            </div>
+  
+            <!-- Custom reminder datetime field (hidden initially) -->
+            <div class="mb-3 d-none" id="customTimeContainer">
+              <label for="customTime" class="form-label">Custom Reminder Time</label>
+              <input type="datetime-local" id="customTime" class="form-control">
+            </div>
+  
+            <!-- Optional reason field -->
+            <div class="mb-3">
+              <label for="reason" class="form-label">Reason (Optional)</label>
+              <textarea id="reason" class="form-control" rows="3"></textarea>
+            </div>
+  
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary">Set Reminder</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Display Bookings -->
+
+  <!-- Modal to Display Bookings -->
+
+  <!-- Modal for Event Bookings -->
+  <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookingModalLabel">Event Bookings</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="bookingListContainer">
+                
+                    <p>Loading bookings...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Analytics dashboard -->
+<!-- Modal Structure -->
+<div class="modal fade" id="analyticsModal" tabindex="-1" aria-labelledby="analyticsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="analyticsModalLabel">Event Analytics</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Event Details -->
+          <h6 id="event-title">Event Title: Loading...</h6>
+          <p id="event-description">Description: Loading...</p>
+          <p><strong>Date:</strong> <span id="event-date">Loading...</span></p>
+          <p><strong>Time:</strong> <span id="event-time">Loading...</span></p>
+  
+          <!-- Analytics Overview -->
+          <div class="row">
+            <div class="col-md-6">
+              <p><strong>Total Bookings:</strong> <span id="total-bookings">0</span></p>
+              <p><strong>Confirmed Bookings:</strong> <span id="confirmed-bookings">0</span></p>
+              <p><strong>Pending Bookings:</strong> <span id="pending-bookings">0</span></p>
+              <p><strong>Cancelled Bookings:</strong> <span id="cancelled-bookings">0</span></p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Total Reminders:</strong> <span id="total-reminders">0</span></p>
+              <p><strong>Reminders Sent:</strong> <span id="reminder-sent">0</span></p>
+              <p><strong>Reminders Pending:</strong> <span id="reminder-pending">0</span></p>
+            </div>
+          </div>
+  
+          <!-- Charts -->
+          <div class="mt-4">
+            <h6>Booking Status Distribution</h6>
+            <canvas id="bookings-chart" width="400" height="200"></canvas>
+          </div>
+          <div class="mt-4">
+            <h6>Absentee Reasons Distribution</h6>
+            <canvas id="absentee-chart" width="400" height="200"></canvas>
+          </div>
+          <div class="mt-4">
+            <h6>Reminder Types</h6>
+            <canvas id="reminder-types-chart" width="400" height="200"></canvas>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- User-Specific Analytics Modal -->
+<div class="modal fade" id="userAnalyticsModal" tabindex="-1" aria-labelledby="userAnalyticsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content rounded-3 shadow-lg">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="userAnalyticsModalLabel">My Event Analytics</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h4 class="text-center mb-4">Your Personalized Analytics</h4>
+
+                <!-- User Event Details -->
+                <div id="userEventDetails" class="mb-4">
+                    <!-- Dynamic content will be loaded here -->
+                </div>
+
+                <!-- User Booking Status Chart -->
+                <div class="chart-container mb-4">
+                    <canvas id="userBookingStatusChart" width="400" height="400"></canvas>
+                </div>
+
+                <!-- User Absentee Reasons Chart -->
+                <div class="chart-container mb-4">
+                    <canvas id="userAbsenteeReasonsChart" width="400" height="400"></canvas>
+                </div>
+
+                <!-- User Reminder Status Chart -->
+                <div class="chart-container mb-4">
+                    <canvas id="userReminderStatusChart" width="400" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+  
+<!-- Delete event modal  -->
+<div class="modal fade" id="deleteEventModal" tabindex="-1" aria-labelledby="deleteEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteEventModalLabel">Delete Event</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this event? Please enter your password to proceed.</p>
+                <form id="deleteEventForm">
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-danger">Delete Event</button>
+                </form>
+                <div id="deleteMessage" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add recurrence info modal  -->
+<div class="modal fade" id="recurrenceModal" tabindex="-1" aria-labelledby="recurrenceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="recurrenceModalLabel">Add Recurrence Information</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="recurrenceForm">
+            <div class="mb-3">
+              <label for="recurrence_type" class="form-label">Recurrence Type</label>
+              <select class="form-select" id="recurrence_type" name="recurrence_type" required>
+                <option value="none">None</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="bi-weekly">Bi-Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="recurrence_days" class="form-label">Days of the Week (for Weekly/Bi-Weekly Recurrence)</label>
+              <input type="text" class="form-control" id="recurrence_days" name="recurrence_days" placeholder="e.g., Monday, Wednesday">
+            </div>
+            <div class="mb-3">
+              <label for="recurrence_end_date" class="form-label">End Date</label>
+              <input type="date" class="form-control" id="recurrence_end_date" name="recurrence_end_date">
+            </div>
+            <button type="submit" class="btn btn-primary">Save Recurrence</button>
+          </form>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- Search and Filter Bar (Visible Always) -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="form-group me-2">
+        <input type="text" id="search-title" class="form-control shadow-sm border-0 rounded-3" placeholder="Search by title" aria-label="Search by title">
+    </div>
+    
+    <div class="form-group me-2">
+        <input type="date" id="filter-date" class="form-control shadow-sm border-0 rounded-3" aria-label="Filter by date">
+    </div>
+    
+    <div class="form-group me-2">
+        <select id="filter-location" class="form-select shadow-sm border-0 rounded-3" aria-label="Filter by location">
+            <option value="">All Locations</option>
+            <option value="Zoom">Zoom</option>
+            <option value="Google Meet">Google Meet</option>
+            <option value="Organization">Organization</option>
+            <option value="Salesforce">Salesforce</option>
+            <option value="Microsoft Teams">Microsoft Teams</option>
+            <option value="Skype">Skype</option>
+            <option value="Webex">Webex</option>
+            <option value="Slack">Slack</option>
+        </select>
+    </div>
+
+    <button class="btn btn-primary px-4 py-2 rounded-3 shadow-lg" id="apply-filters">Apply Filters</button>
+</div>
+
+
+
+
+<div class="row">
+    {% if events %}
+        {% for event in events %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">{{ event.title }}</h5>
+                        <p class="card-text">
+                            <strong>Date:</strong> {{ event.date }}<br>
+                            <strong>Time:</strong> {{ event.start_time }} - {{ event.end_time }}<br>
+                            <strong>Location:</strong> {{ event.location }}<br>
+                            <strong>Slots:</strong> {{ event.slots }} Remaining!<br>
+                            {% if event.meeting_link %}
+                                <strong>Launch:</strong> 
+                                <a href="{{ event.meeting_link }}" target="_blank">Join Meeting</a><br>
+                            {% endif %}
+                            <strong>Created At:</strong> {{ event.created_at|date:"M d, Y h:i A" }}
+                        </p>
+
+                        <!-- 3-Dot Menu for Event Actions -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="eventActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-three-dots-vertical"></i> Event Actions
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="eventActionsDropdown">
+                                {% if event.is_booked_by_user %}
+                                    <li>
+                                        <button class="dropdown-item btn btn-secondary" disabled>Event Booked</button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item btn btn-info view-bookings" 
+                                                data-event-id="{{ event.id }}" 
+                                                data-org-id="{{ organization.id }}" 
+                                                data-group-id="{{ group.id }}" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#bookingModal">
+                                            Check Bookings
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item btn btn-primary view-user-analytics"
+                                                data-event-id="{{ event.id }}"
+                                                data-org-id="{{ organization.id }}"
+                                                data-group-id="{{ group.id }}"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#userAnalyticsModal">
+                                            <i class="bi bi-person-lines-fill me-2"></i> Dashboard
+                                        </button>
+                                    </li>
+
+                                    {% if is_team_leader %}
+                                        <li>
+                                            <button class="dropdown-item btn btn-info view-analytics"
+                                                    data-event-id="{{ event.id }}"
+                                                    data-org-id="{{ organization.id }}"
+                                                    data-group-id="{{ group.id }}"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#analyticsModal">
+                                                View Event Analytics
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item btn btn-danger delete-event"
+                                                    data-event-id="{{ event.id }}"
+                                                    data-org-id="{{ organization.id }}"
+                                                    data-group-id="{{ group.id }}"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteEventModal">
+                                                Delete & Cancel
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item btn btn-primary add-recurrence" 
+                                                    data-event-id="{{ event.id }}" 
+                                                    data-org-id="{{ organization.id }}" 
+                                                    data-group-id="{{ group.id }}" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#recurrenceModal">
+                                                Add Recurrence Info
+                                            </button>
+                                        </li>
+                                    {% endif %}
+                                {% else %}
+                                    <li>
+                                        <button class="dropdown-item btn btn-success book-event" 
+                                                data-event-id="{{ event.id }}" 
+                                                data-org-id="{{ organization.id }}" 
+                                                data-group-id="{{ group.id }}">
+                                            Book Now
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item btn btn-danger mark-absent" 
+                                                data-event-id="{{ event.id }}" 
+                                                data-org-id="{{ organization.id }}" 
+                                                data-group-id="{{ group.id }}" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#absenceModal">
+                                            Mark as Absent
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item btn btn-success remind-me" 
+                                                data-org-id="{{ organization.id }}" 
+                                                data-group-id="{{ group.id }}"
+                                                data-event-id="{{ event.id }}"
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#reminderModal">
+                                            Remind Me
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item btn btn-info view-bookings" 
+                                                data-event-id="{{ event.id }}" 
+                                                data-org-id="{{ organization.id }}" 
+                                                data-group-id="{{ group.id }}" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#bookingModal">
+                                            Check Bookings
+                                        </button>
+                                    </li>
+
+                                    {% if is_team_leader %}
+                                        <li>
+                                            <button class="dropdown-item btn btn-info view-analytics"
+                                                    data-event-id="{{ event.id }}"
+                                                    data-org-id="{{ organization.id }}"
+                                                    data-group-id="{{ group.id }}"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#analyticsModal">
+                                                View Event Analytics
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item btn btn-danger delete-event"
+                                                    data-event-id="{{ event.id }}"
+                                                    data-org-id="{{ organization.id }}"
+                                                    data-group-id="{{ group.id }}"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteEventModal">
+                                                Delete & Cancel
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item btn btn-primary add-recurrence" 
+                                                    data-event-id="{{ event.id }}" 
+                                                    data-org-id="{{ organization.id }}" 
+                                                    data-group-id="{{ group.id }}" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#recurrenceModal">
+                                                Add Recurrence Info
+                                            </button>
+                                        </li>
+                                    {% endif %}
+                                    <li>
+                                        <button class="dropdown-item btn btn-info view-user-analytics"
+                                                data-event-id="{{ event.id }}"
+                                                data-org-id="{{ organization.id }}"
+                                                data-group-id="{{ group.id }}"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#userAnalyticsModal">
+                                            <i class="bi bi-person-lines-fill me-2"></i> Dashboard
+                                        </button>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+
+                    </div>
+                    <div class="card-footer bg-white">
+                        <small class="text-muted">
+                            Created by: {{ event.created_by.username }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).on('click', '.book-event', function() {
+            const eventId = $(this).data('event-id');
+            const orgId = $(this).data('org-id');
+            const groupId = $(this).data('group-id');
+
+            // Show spinner while the AJAX request is processing
+            $('#spinnerWrapper').fadeIn();
+
+            $.ajax({
+                url: `/groups/organization/${orgId}/group/${groupId}/event/${eventId}/book/`,
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    // Show success message
+                    $('#successMessage').fadeIn();
+                    // Disable the button and change text
+                    $(this).removeClass('btn-success').addClass('btn-secondary booked-btn').text('Event Booked');
+                    setTimeout(function() {
+                        $('#successMessage').fadeOut();
+                    }, 3000); // Hide success message after 3 seconds
+                    // Hide the spinner
+                    $('#spinnerWrapper').fadeOut();
+                },
+                error: function(xhr) {
+                    alert(xhr.responseJSON.error || 'An error occurred while booking the event.');
+                    // Hide the spinner
+                    $('#spinnerWrapper').fadeOut();
+                }
+            });
+        });
+
+        // handle absent 
+
+        $(document).on('click', '#submitAbsence', function() {
+        const eventId = $('.mark-absent').data('event-id');
+        const orgId = $('.mark-absent').data('org-id');
+        const groupId = $('.mark-absent').data('group-id');
+        const reason = $('#reason').val();
+        const customMessage = $('#customMessage').val();
+
+        $.ajax({
+            url: `/groups/organization/${orgId}/group/${groupId}/event/${eventId}/absent/`,
+            method: 'POST',
+            data: {
+                'reason': reason,
+                'custom_message': customMessage,
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+            },
+            success: function(response) {
+                alert(response.message);  // Show success message
+                $('#absenceModal').modal('hide'); // Hide the modal
+            },
+            error: function(xhr) {
+                alert(xhr.responseJSON.error || 'An error occurred while marking you absent.');
+            }
+        });
+    });
+
+
+    // Handle the Reminder
+    $(document).ready(function () {
+  var orgId, groupId, eventId;
+
+  // When the "Remind Me" button is clicked, store the IDs for AJAX request
+  $('.remind-me').on('click', function () {
+    orgId = $(this).data('org-id');
+    groupId = $(this).data('group-id');
+    eventId = $(this).data('event-id');
+    console.log("Event ID: " + eventId);  // Debugging
+  });
+
+  // When the reminder option is selected, show/hide the custom time input
+  $('input[name="reminder_option"]').on('change', function () {
+    var reminderOption = $(this).val();
+    if (reminderOption === 'custom') {
+      $('#customTimeContainer').removeClass('d-none');
+    } else {
+      $('#customTimeContainer').addClass('d-none');
+    }
+  });
+
+  // Handle the form submission to set the reminder
+  $('#reminderForm').on('submit', function (e) {
+    e.preventDefault();
+
+    // Get the selected reminder option
+    var reminderOption = $('input[name="reminder_option"]:checked').val();
+    var customTime = reminderOption === 'custom' ? $('#customTime').val() : null;
+    var reason = $('#reason').val();
+
+    // Validate custom time if "Custom" option is selected
+    if (reminderOption === 'custom' && !customTime) {
+      alert('Please select a custom reminder time.');
+      return;
+    }
+
+    // Prepare data for AJAX request
+    var data = {
+      reminder_option: reminderOption,
+      custom_time: customTime,
+      reason: reason,
+      csrfmiddlewaretoken: '{{ csrf_token }}'  // Attach CSRF token directly in data
+    };
+
+    // Log the data being sent to verify
+    console.log('Sending data:', data);
+
+    // Make the AJAX request to set the reminder
+    $.ajax({
+      url: `/groups/organization/${orgId}/group/${groupId}/event/${eventId}/reminder/`,  // Ensure event ID is here
+      method: 'POST',
+      data: data,
+      success: function (response) {
+        console.log('Response:', response);  // Debugging: Log the success response
+        alert(response.message);  // Show success message
+        $('#reminderModal').modal('hide');  // Close the modal
+      },
+      error: function (xhr) {
+        console.log('Error:', xhr);  // Debugging: Log the error response
+        alert(xhr.responseJSON.error || 'An error occurred while setting the reminder.');
+      }
+    });
+  });
+});
+
+
+// Display bookings
+$(document).ready(function () {
+    $('.view-bookings').on('click', function () {
+        const eventId = $(this).data('event-id');
+        const orgId = $(this).data('org-id');
+        const groupId = $(this).data('group-id');
+
+        // Show loading message
+        const bookingListContainer = $('#bookingListContainer');
+        bookingListContainer.html('<p>Loading bookings...</p>');
+
+        // AJAX request to fetch bookings
+        $.ajax({
+            url: `/groups/organization/${orgId}/group/${groupId}/event/${eventId}/bookings/`,
+            type: 'GET',
+            success: function (response) {
+                if (response.bookings && response.bookings.length > 0) {
+                    let bookingListHtml = `
+                     <p>Get a quick look at who’s attending from your group</p>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Booking Date</th>
+                                    <th>Booking Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    response.bookings.forEach(booking => {
+                        bookingListHtml += `
+                            <tr>
+                                <td>${booking.user_id}</td>
+                                <td>${booking.user_name}</td>
+                                <td>${booking.email}</td>
+                                <td>${booking.booking_date}</td>
+                                <td>${booking.booking_time}</td>
+                                <td>${booking.status}</td>
+                            </tr>
+                        `;
+                    });
+
+                    bookingListHtml += `
+                            </tbody>
+                        </table>
+                    `;
+                    bookingListContainer.html(bookingListHtml);
+                } else {
+                    bookingListContainer.html('<p>No bookings found for this event.</p>');
+                }
+            },
+            error: function (xhr) {
+                bookingListContainer.html('<p class="text-danger">Error fetching bookings. Please try again later.</p>');
+                console.error(xhr.responseJSON.error || 'Unknown error occurred.');
+            }
+        });
+    });
+});
+
+
+// Analytics dashboard
+$(document).ready(function () {
+    let bookingsChart, absenteeChart, reminderTypesChart; // Chart instances
+
+    $('.view-analytics').click(function () {
+        const orgId = $(this).data('org-id');
+        const groupId = $(this).data('group-id');
+        const eventId = $(this).data('event-id');
+
+        // Reset modal content and show loading spinner
+        $('#event-title').text('Event Title: Loading...');
+        $('#event-description').text('Description: Loading...');
+        $('#event-date').text('Loading...');
+        $('#event-time').text('Loading...');
+        $('#total-bookings').text('0');
+        $('#confirmed-bookings').text('0');
+        $('#pending-bookings').text('0');
+        $('#cancelled-bookings').text('0');
+        $('#total-reminders').text('0');
+        $('#reminder-sent').text('0');
+        $('#reminder-pending').text('0');
+
+        // Clear any existing charts
+        destroyChart(bookingsChart);
+        destroyChart(absenteeChart);
+        destroyChart(reminderTypesChart);
+
+        // Fetch analytics data
+        $.ajax({
+            url: `/groups/event-analytics/${orgId}/${groupId}/${eventId}/`,
+            method: 'GET',
+            success: function (data) {
+                // Populate modal content
+                $('#event-title').text(`Event Title: ${data.event_title}`);
+                $('#event-description').text(`Description: ${data.event_description}`);
+                $('#event-date').text(data.event_date);
+                $('#event-time').text(`${data.event_start_time} - ${data.event_end_time}`);
+                $('#total-bookings').text(data.total_bookings);
+                $('#confirmed-bookings').text(data.confirmed_bookings);
+                $('#pending-bookings').text(data.pending_bookings);
+                $('#cancelled-bookings').text(data.cancelled_bookings);
+                $('#total-reminders').text(data.total_reminders);
+                $('#reminder-sent').text(data.reminder_sent);
+                $('#reminder-pending').text(data.reminder_pending);
+
+                // Initialize charts
+                const bookingsCtx = document.getElementById('bookings-chart').getContext('2d');
+                bookingsChart = createPieChart(bookingsCtx, 'Booking Status Distribution', ['Confirmed', 'Pending', 'Cancelled'], [
+                    data.confirmed_bookings,
+                    data.pending_bookings,
+                    data.cancelled_bookings
+                ]);
+
+                const absenteeCtx = document.getElementById('absentee-chart').getContext('2d');
+                absenteeChart = createBarChart(absenteeCtx, 'Absentee Reasons', Object.keys(data.absentee_reasons), Object.values(data.absentee_reasons));
+
+                const reminderTypesCtx = document.getElementById('reminder-types-chart').getContext('2d');
+                reminderTypesChart = createPieChart(reminderTypesCtx, 'Reminder Types Distribution', Object.keys(data.reminder_types), Object.values(data.reminder_types));
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching analytics:', error);
+
+                // Display error message
+                $('#analyticsModal .modal-body').html('<p>Error loading analytics data. Please try again later.</p>');
+            }
+        });
+    });
+
+    // Utility: Destroy existing charts
+    function destroyChart(chart) {
+        if (chart) {
+            chart.destroy();
+        }
+    }
+
+    // Utility: Create a pie chart
+    function createPieChart(ctx, title, labels, data) {
+        return new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: ['#4caf50', '#ff9800', '#f44336', '#2196f3', '#9c27b0'],
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: title,
+                    }
+                }
+            }
+        });
+    }
+
+    // Utility: Create a bar chart
+    function createBarChart(ctx, title, labels, data) {
+        return new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: ['#4caf50', '#ff9800', '#f44336', '#2196f3', '#9c27b0'],
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    title: {
+                        display: true,
+                        text: title,
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    // Clear charts when modal is hidden
+    $('#analyticsModal').on('hidden.bs.modal', function () {
+        destroyChart(bookingsChart);
+        destroyChart(absenteeChart);
+        destroyChart(reminderTypesChart);
+    });
+});
+
+// user-specific-analysis modal
+
+$(document).ready(function () {
+    // Handle the user-specific analytics button click event
+    $('.view-user-analytics').on('click', function () {
+        // Get data attributes from the button
+        var eventId = $(this).data('event-id');
+        var orgId = $(this).data('org-id');
+        var groupId = $(this).data('group-id');
+
+        // Send the AJAX request
+        $.ajax({
+            url: '/groups/user-group-event-analytics/' + orgId + '/' + groupId + '/' + eventId + '/',
+            type: 'GET',
+            success: function(response) {
+                // Update the modal content with the user-specific analytics data
+                $('#userEventDetails').html(`
+                    <p><strong>Event Title:</strong> ${response.event_title}</p>
+                    <p><strong>Event Description:</strong> ${response.event_description}</p>
+                    <p><strong>Event Date:</strong> ${response.event_date}</p>
+                    <p><strong>Event Time:</strong> ${response.event_start_time} - ${response.event_end_time}</p>
+                    <p><strong>Total Bookings:</strong> ${response.total_bookings}</p>
+                    <p><strong>Confirmed Bookings:</strong> ${response.confirmed_bookings}</p>
+                    <p><strong>Pending Bookings:</strong> ${response.pending_bookings}</p>
+                    <p><strong>Cancelled Bookings:</strong> ${response.cancelled_bookings}</p>
+                    <p><strong>Total Absences:</strong> ${response.total_absences}</p>
+                    <p><strong>Absentee Reasons:</strong> ${response.absentee_reasons.map(reason => reason)}</p>
+                    <p><strong>Reminders Sent:</strong> ${response.reminders_sent}</p>
+                    <p><strong>Reminders Pending:</strong> ${response.reminders_pending}</p>
+                `);
+
+                // Initialize the charts for user-specific data
+                var ctxBookingStatus = document.getElementById('userBookingStatusChart').getContext('2d');
+                var userBookingStatusChart = new Chart(ctxBookingStatus, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Confirmed', 'Pending', 'Cancelled'],
+                        datasets: [{
+                            label: 'Booking Status Distribution',
+                            data: [response.confirmed_bookings, response.pending_bookings, response.cancelled_bookings],
+                            backgroundColor: ['#4caf50', '#ff9800', '#f44336'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(tooltipItem) {
+                                        return tooltipItem.raw + ' bookings';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                var ctxAbsenteeReasons = document.getElementById('userAbsenteeReasonsChart').getContext('2d');
+                var userAbsenteeReasonsChart = new Chart(ctxAbsenteeReasons, {
+                    type: 'doughnut',
+                    data: {
+                        labels: response.absentee_reasons_labels,
+                        datasets: [{
+                            label: 'Absentee Reasons',
+                            data: response.absentee_reasons_values,
+                            backgroundColor: ['#007bff', '#ffc107', '#6c757d'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true
+                    }
+                });
+
+                var ctxReminderStatus = document.getElementById('userReminderStatusChart').getContext('2d');
+                var userReminderStatusChart = new Chart(ctxReminderStatus, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Sent', 'Pending'],
+                        datasets: [{
+                            label: 'Reminder Status',
+                            data: [response.reminders_sent, response.reminders_pending],
+                            backgroundColor: '#28a745',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            }
+                        }
+                    }
+                });
+            },
+            error: function() {
+                alert('An error occurred while fetching user-specific analytics.');
+            }
+        });
+    });
+});
+
+// Delete the event
+$(document).ready(function() {
+        // Listen for the modal opening to populate hidden data attributes
+        $('#deleteEventModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var eventId = button.data('event-id');
+            var orgId = button.data('org-id');
+            var groupId = button.data('group-id');
+            
+            // Store these values in the modal for later use
+            $('#deleteEventForm').data('event-id', eventId);
+            $('#deleteEventForm').data('org-id', orgId);
+            $('#deleteEventForm').data('group-id', groupId);
+        });
+
+        // Handle the form submission with AJAX
+        $('#deleteEventForm').on('submit', function (e) {
+            e.preventDefault();
+            
+            var password = $('#password').val();
+            var eventId = $(this).data('event-id');
+            var orgId = $(this).data('org-id');
+            var groupId = $(this).data('group-id');
+
+            // Disable the submit button and show a loading message
+            $('button[type="submit"]').prop('disabled', true).text('Deleting...');
+
+            // AJAX request to the server
+            $.ajax({
+                type: 'POST',
+                url: '/groups/delete_event/' + orgId + '/' + groupId + '/' + eventId + '/',
+                data: {
+                    'password': password,
+                    'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val()
+                },
+                success: function (response) {
+                    if (response.success) {
+                        $('#deleteMessage').html('<div class="alert alert-success">' + response.success + '</div>');
+                        setTimeout(function () {
+                            location.reload(); // Reload the page after deletion
+                        }, 2000);
+                    } else {
+                        $('#deleteMessage').html('<div class="alert alert-danger">' + response.error + '</div>');
+                    }
+                },
+                error: function () {
+                    $('#deleteMessage').html('<div class="alert alert-danger">An error occurred. Please try again.</div>');
+                },
+                complete: function () {
+                    // Re-enable the submit button
+                    $('button[type="submit"]').prop('disabled', false).text('Delete Event');
+                }
+            });
+        });
+    });
+
+    // Handle recurrence
+    // Handle recurrence
+$(document).ready(function() {
+    $('#recurrenceForm').on('submit', function(e) {
+        e.preventDefault();
+
+        const eventId = $('.add-recurrence').data('event-id');
+        const orgId = $('.add-recurrence').data('org-id');
+        const groupId = $('.add-recurrence').data('group-id');
+
+        const recurrenceType = $('#recurrence_type').val();  // Changed from frequency
+        const recurrenceDays = $('#recurrence_days').val();  // Changed from days_of_week
+        const recurrenceEndDate = $('#recurrence_end_date').val();
+
+        $.ajax({
+            url: `/groups/save-recurrence/${orgId}/${groupId}/${eventId}/`,
+            method: 'POST',
+            data: {
+                recurrence_type: recurrenceType,  // Send correct data
+                recurrence_days: recurrenceDays,  // Send correct data
+                recurrence_end_date: recurrenceEndDate,
+                csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
+            },
+            success: function(response) {
+                alert('Recurrence info saved successfully!');
+                $('#recurrenceModal').modal('hide');
+            },
+            error: function(xhr, status, error) {
+                alert('Failed to save recurrence info. Please try again.');
+                console.error(error);
+            }
+        });
+    });
+});
+
+
+// Handle the search
+$(document).ready(function() {
+    // Handle Search and Filter by Title, Date, Location
+    $('#apply-filters').on('click', function() {
+        const titleQuery = $('#search-title').val();
+        const dateQuery = $('#filter-date').val();
+        const locationQuery = $('#filter-location').val();
+
+        const orgId = {{ organization.id }};  // Assuming `organization.id` is available
+        const groupId = {{ group.id }};  // Assuming `group.id` is available
+
+        $.ajax({
+            url: `/groups/search-events/${orgId}/${groupId}/`,  // The endpoint to search events
+            method: 'GET',
+            data: {
+                search_title: titleQuery,
+                filter_date: dateQuery,
+                filter_location: locationQuery,
+                csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
+            },
+            success: function(response) {
+                // Assuming you already have a container to display the events
+                // Clear the previous events
+                $('#events-container').empty();
+
+                if(response.events.length > 0) {
+                    // Add the filtered events to the page
+                    response.events.forEach(function(event) {
+                        const eventCard = `
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="card h-100 shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-primary">${event.title}</h5>
+                                        <p class="card-text">
+                                            <strong>Date:</strong> ${event.date}<br>
+                                            <strong>Time:</strong> ${event.start_time} - ${event.end_time}<br>
+                                            <strong>Location:</strong> ${event.location}<br>
+                                            <strong>Slots:</strong> ${event.slots} Remaining!<br>
+                                            ${event.meeting_link ? `<strong>Launch:</strong> <a href="${event.meeting_link}" target="_blank">Join Meeting</a><br>` : ''}
+                                            <strong>Created At:</strong> ${event.created_at}
+                                        </p>
+                                        ${event.is_booked_by_user ?
+                                            `<button class="btn btn-secondary booked-btn" disabled>Event Booked</button>
+                                             <button class="btn btn-info view-bookings" data-event-id="${event.id}" data-org-id="${organization.id}" data-group-id="${group.id}" data-bs-toggle="modal" data-bs-target="#bookingModal">Check Bookings</button>
+                                             <button class="btn btn-primary view-user-analytics" data-event-id="${event.id}" data-org-id="${organization.id}" data-group-id="${group.id}" data-bs-toggle="modal" data-bs-target="#userAnalyticsModal"><i class="bi bi-person-lines-fill me-2"></i> Dashboard</button>`
+                                        :
+                                            `<button class="btn btn-success book-event" data-event-id="${event.id}" data-org-id="${organization.id}" data-group-id="${group.id}">Book Now</button>
+                                             <button class="btn btn-danger mark-absent" data-event-id="${event.id}" data-org-id="${organization.id}" data-group-id="${group.id}" data-bs-toggle="modal" data-bs-target="#absenceModal">Mark as Absent</button>
+                                             <button class="btn btn-success remind-me" data-org-id="${organization.id}" data-group-id="${group.id}" data-event-id="${event.id}" data-bs-toggle="modal" data-bs-target="#reminderModal">Remind Me</button>`
+                                        }
+                                    </div>
+                                    <div class="card-footer bg-white">
+                                        <small class="text-muted">Created by: ${event.created_by}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        $('#events-container').append(eventCard);
+                    });
+                } else {
+                    $('#events-container').append(`
+                        <div class="col-12">
+                            <div class="alert alert-info text-center">
+                                No events found based on the selected filters.
+                            </div>
+                        </div>
+                    `);
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Error during search and filter. Please try again.');
+                console.error(error);
+            }
+        });
+    });
+});
+
+
+// blur the menu
+document.addEventListener('DOMContentLoaded', () => {
+    const dropdownButtons = document.querySelectorAll('.dropdown-toggle');
+    
+    // Function to handle opening and closing of the dropdown
+    function handleDropdownClick(event) {
+        const clickedDropdown = event.target.closest('.dropdown'); // Get the parent dropdown of the clicked button
+        const dropdownMenu = clickedDropdown.querySelector('.dropdown-menu'); // Get the dropdown menu
+        const allCards = document.querySelectorAll('.card'); // Get all event cards
+        
+        // Toggle the dropdown menu
+        if (dropdownMenu.style.display === 'block') {
+            dropdownMenu.style.display = 'none';
+            restoreCardInteractions(allCards); // Restore pointer events to all cards
+        } else {
+            // Hide all dropdowns first
+            document.querySelectorAll('.dropdown-menu').forEach(menu => menu.style.display = 'none');
+            // Show the clicked dropdown
+            dropdownMenu.style.display = 'block';
+            disableOtherCards(allCards, clickedDropdown); // Disable pointer events for other cards
+        }
+
+        // Prevent event propagation to stop closing dropdown
+        event.stopPropagation();
+    }
+
+    // Function to disable interaction with other event cards
+    function disableOtherCards(allCards, activeCard) {
+        allCards.forEach(card => {
+            if (card !== activeCard.closest('.card')) {
+                card.style.pointerEvents = 'none'; // Disable interaction with other cards
+            }
+        });
+    }
+
+    // Function to restore interaction with all event cards
+    function restoreCardInteractions(allCards) {
+        allCards.forEach(card => {
+            card.style.pointerEvents = 'auto'; // Restore interaction with all cards
+        });
+    }
+
+    // Add event listener to all dropdown buttons
+    dropdownButtons.forEach(button => {
+        button.addEventListener('click', handleDropdownClick);
+    });
+
+    // Close the dropdown when clicking outside of any dropdown menu
+    document.addEventListener('click', (event) => {
+        if (!event.target.closest('.dropdown')) {
+            // Hide all dropdowns and restore pointer events to all cards if clicking outside
+            document.querySelectorAll('.dropdown-menu').forEach(menu => menu.style.display = 'none');
+            restoreCardInteractions(document.querySelectorAll('.card'));
+        }
+    });
+});
+
+
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</body>
+</html>
+
+{% endblock %}

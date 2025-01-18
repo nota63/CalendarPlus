@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Favorite Contacts</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7fc;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        h1, p {
+            font-family: 'Montserrat', sans-serif;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-top: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        p.slogan {
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        /* Messages Section */
+        .msg {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .msg strong {
+            font-size: 1rem;
+            color: #28a745;
+        }
+
+        /* Container for Contact Cards */
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: flex-start;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Contact Card Styles */
+        .contact-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 12px;
+            width: 180px;
+            text-align: center;
+            transition: transform 0.3s ease-in-out;
+            opacity: 0;
+            animation: fadeInUp 0.6s forwards;
+        }
+
+        /* Card Animations */
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Contact Name and Icon */
+        .contact-card h3 {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .contact-card i {
+            font-size: 2rem;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        /* Button Styles */
+        .contact-card button {
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            border: none;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+            margin: 3px;
+        }
+
+        .contact-card .view-calendar-btn {
+            background-color: #28a745;
+        }
+
+        .contact-card .view-calendar-btn:hover {
+            background-color: #218838;
+        }
+
+        .contact-card .remove-btn {
+            background-color: #FF6347;
+        }
+
+        .contact-card .remove-btn:hover {
+            background-color: #FF4500;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .contact-card {
+                width: 160px;
+            }
+
+            .container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1><i class="fas fa-address-book"></i> Your Favorite Contacts</h1>
+    <p class="slogan"><i class="fas fa-info-circle"></i> You can remove or add other contacts to your favorites to make scheduling easier.</p>
+
+    <!-- Display Messages -->
+    <section class="msg">
+        {% if messages %}
+          {% for m in messages %}
+            <strong>{{ m }}</strong>
+          {% endfor %}
+        {% endif %}
+    </section>
+
+    <!-- Contacts Container -->
+    <div class="container">
+        {% for favorite in favorite_contacts %}
+        <div class="contact-card" id="contact-{{ favorite.contact.id }}">
+            <!-- User Icon (Font Awesome) -->
+            <i class="fas fa-user-circle"></i>
+
+            <!-- Contact Name -->
+            <h3>{{ favorite.contact.username }}</h3>
+
+            <!-- View Calendar Button -->
+            <button class="view-calendar-btn">
+                <a href="{% url 'view_user_calendar' favorite.contact.id %}" style="color: white; text-decoration: none;">View Calendar</a>
+            </button>
+
+            <!-- Remove Favorite Button -->
+            <form action="{% url 'remove_favorite' %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <input type="hidden" name="contact_id" value="{{ favorite.contact.id }}">
+                <button type="submit" class="remove-btn">Remove from Favorites</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+
+</body>
+</html>

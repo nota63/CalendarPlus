@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Booking for Your Event</title>
+</head>
+<body>
+    <h2>New Booking for Your Event: {{ event.title }}</h2>
+    <p><strong>Event Host:</strong> {{ event.user.username }}</p>
+    <p><strong>Booking Status:</strong> Pending</p>
+    <h3>Booking Details:</h3>
+    <p><strong>Invitee:</strong> {{ booking.invitee.username }}</p>
+    <p><strong>Start Time:</strong> {{ booking.start_time }}</p>
+    <p><strong>End Time:</strong> {{ booking.end_time }}</p>
+    <p><strong>Location:</strong> {{ event.location }}</p>
+    <p><strong>Description:</strong> {{ event.description }}</p>
+    <p><strong>Duration:</strong> {{ event.duration }} minutes</p>
+    <p><strong>Buffer Time:</strong> {{ event.buffer_time }} minutes</p>
+
+    <p>Please confirm or cancel the booking through your dashboard.</p>
+</body>
+</html>

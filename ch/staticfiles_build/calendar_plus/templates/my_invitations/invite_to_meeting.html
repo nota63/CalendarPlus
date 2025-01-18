@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invite Members to Meeting</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <div class="container mx-auto p-6">
+        <div class="bg-white p-8 rounded-lg shadow-md max-w-3xl mx-auto mt-12">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Invite Members to Meeting: <span class="text-indigo-600">{{ meeting.meeting_title }}</span></h2>
+
+            <p class="text-gray-700 mb-4">If they accept the invitation, they will be part of the meeting and it will be rendered on their calendar.</p>
+            
+            <!-- Display the Organization Name -->
+            <p class="font-medium text-gray-600">Organization: <span class="text-gray-900">{{ organization.name }}</span></p>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-2">Select members to invite:</h3>
+            
+            <!-- Invite via selecting users with a searchable dropdown -->
+            <form method="POST" class="space-y-4">
+                {% csrf_token %}
+                
+                <div>
+                    <label for="invitee_user_id" class="block text-sm font-medium text-gray-700">Select members to invite:</label>
+                    <select id="invitee_user_id" name="selected_members" multiple="multiple" class="w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 mt-2">
+                        {% for member in members %}
+                            <option value="{{ member.user.id }}" data-role="{{ member.get_role_display }}">
+                                {{ member.user.username }} - {{ member.get_role_display }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- OR Invite via entering an email -->
+                <div>
+                    <label for="invitee_email" class="block text-sm font-medium text-gray-700">Or enter an email address:</label>
+                    <input type="email" name="invitee_email" id="invitee_email" placeholder="Email address" class="w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 mt-2">
+                </div>
+
+                <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-200">Send Invitation</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initialize Select2 for searchable dropdown
+            $('#invitee_user_id').select2({
+                placeholder: "Search for a member...",
+                allowClear: true,
+                width: '100%',
+                ajax: {
+                    url: '{% url "search_users_ajax" org_id=organization.id %}',  // Update with correct URL to fetch users
+                    dataType: 'json',
+                    processResults: function (data) {
+                        return {
+                            results: data.results.map(function(user) {
+                                return {
+                                    id: user.id,
+                                    text: user.username + ' - ' + user.role
+                                };
+                            })
+                        };
+                    }
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

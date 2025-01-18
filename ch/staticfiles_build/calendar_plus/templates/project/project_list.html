@@ -1,0 +1,124 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+<br><br>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects in {{ organization.name }}</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Roboto', sans-serif;
+        }
+        .container {
+            max-width: 1200px;
+        }
+        .header {
+            color: #2d3e50;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        .btn-info {
+            background-color: #17a2b8;
+            border-color: #17a2b8;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+        }
+        .table-responsive {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <!-- Header Section -->
+    <div class="text-center mb-5">
+        <h2 class="display-4 text-primary fw-bold">
+            <span class="text-success">{{ organization.name }}</span> Projects
+        </h2>
+        <p class="lead">
+            Your projects in <strong class="text-success">{{ organization.name }}</strong> will appear here. You can manage them directly.
+        </p>
+    </div>
+    
+    <!-- Projects Section -->
+    {% if projects %}
+        <div class="card p-4">
+            <div class="card-body">
+                <table class="table table-bordered table-striped table-responsive">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Project Name</th>
+                            <th>Description</th>
+                            <th>Created By</th>
+                            <th>Created At</th>
+                            <th colspan="2" class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for project in projects %}
+                            <tr>
+                                <td>{{ project.name }}</td>
+                                <td>{{ project.description }}</td>
+                                <td>{{ project.created_by.user.username }}</td>
+                                <td>{{ project.created_at|date:"d M Y, H:i" }}</td>
+                                <td class="text-center">
+                                    <a href="{% url 'assign_manager_to_project' organization_id=project.organization.id project_id=project.id %}" class="btn btn-success btn-sm">
+                                        Assign Manager
+                                    </a>
+                                </td>
+                                <td class="text-center">
+                                    <a href="{% url 'assigned_manager_detail' organization_id=project.organization.id project_id=project.id %}" class="btn btn-info btn-sm">
+                                        View Assigned Manager
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info mt-4">
+            No projects found for this organization. Start by creating a new project.
+        </div>
+    {% endif %}
+
+    <!-- Navigation Buttons -->
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'org_detail' org_id=organization.id %}" class="btn btn-secondary px-4 py-2">Back to Organization Details</a>
+        <a href="{% url 'create_project' org_id=organization.id %}" class="btn btn-primary px-4 py-2">Create New Project</a>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
+
+
+{% endblock %}

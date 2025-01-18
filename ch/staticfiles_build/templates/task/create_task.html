@@ -1,0 +1,330 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+<br><br><br><br>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Task</title>
+    <!-- Bootstrap 5 Premium CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        /* Blurring the entire page */
+        body, html {
+            height: 100%;
+            margin: 0;
+            background: url('your-image-url.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+        
+        .blur-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            z-index: -1;
+        }
+
+        /* Styling the form container */
+        .task-form-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10;
+            max-width: 700px;
+            margin: 0 auto;
+            margin-top: 10%;
+            border: 3px solid #007bff; /* Blue border to highlight */
+        }
+
+        .task-form-container h2 {
+            font-weight: bold;
+            color: #007bff; /* Blue color for the heading */
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-label {
+            font-weight: bold;
+        }
+
+        .form-control {
+            border-radius: 5px;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+
+        .invalid-feedback {
+            color: #e74a3b;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        /* Optional: Add more style to the inputs and labels if needed */
+
+        /* Animated tooltips for field guidance */
+        .tooltip-inner {
+            background-color: #007bff;
+            color: white;
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+
+
+/* General Styles */
+body {
+    font-family: 'Roboto', sans-serif; /* Clean and modern Google font */
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+.task-creation-section {
+    padding: 30px 20px;
+    display: flex;
+    justify-content: center;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    max-width: 800px; /* Limits the overall width of the section */
+    margin: 40px auto;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.content-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Image Container */
+.image-container {
+    flex: 0 0 100px; /* Small fixed size for the image */
+    max-width: 100px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.image-container:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.image-container img {
+    width: 100%; /* Makes the image fit the container */
+    display: block;
+    border-radius: 10px;
+}
+
+/* Text Container */
+.text-container {
+    flex: 1;
+    text-align: left;
+}
+
+.text-container h1 {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.text-container p {
+    font-size: 1rem;
+    line-height: 1.4;
+    margin-bottom: 10px;
+}
+
+.text-container .note {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+}
+
+.text-container .learn-more {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #3498db;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.text-container .learn-more:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+    </style>
+</head>
+<body>
+
+    <section class="task-creation-section">
+        <div class="content-wrapper">
+            <div class="image-container">
+                <img
+                    src="https://cdni.iconscout.com/illustration/premium/thumb/girl-working-on-laptop-illustration-download-in-svg-png-gif-file-formats--child-using-gadgets-use-with-gadget-children-pack-couples-illustrations-4146537.png"
+                    alt="Girl Working on Laptop"
+                />
+            </div>
+            <div class="text-container">
+                <h1>Create a Task for Your Group</h1>
+                <p>Assign it by entering member emails.</p>
+                <p class="note">Note: Tasks can only be assigned to group members within your organization.</p>
+                <a href="#" class="learn-more">Learn More</a>
+            </div>
+        </div>
+    </section>
+    
+    {% if messages %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        {% for m in messages %}
+            <strong>{{ m }}</strong>
+        {% endfor %}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+{% endif %}
+ 
+
+    <!-- Blurring the background -->
+    <div class="blur-background"></div>
+
+    <div class="container">
+        <div class="task-form-container">
+            <h2>Create Task</h2>
+            <form method="POST" action="{% url 'create_task' org_id=group.organization.id group_id=group.id %}" class="needs-validation" novalidate>
+                {% csrf_token %}
+                
+                <!-- Task Title Field -->
+                <div class="mb-3">
+                    <label for="title" class="form-label" data-bs-toggle="tooltip" data-bs-placement="top" title="Enter the task's title.">
+                        <i class="bi bi-file-earmark-text"></i> Task Title
+                    </label>
+                    <input type="text" class="form-control" id="title" name="title" required placeholder="Enter task title" data-bs-toggle="tooltip" data-bs-placement="top" title="A brief description of the task.">
+                    <div class="invalid-feedback">
+                        Please enter a task title.
+                    </div>
+                </div>
+                
+                <!-- Task Description Field -->
+                <div class="mb-3">
+                    <label for="description" class="form-label" data-bs-toggle="tooltip" data-bs-placement="top" title="Provide a description of the task.">
+                        <i class="bi bi-pencil-square"></i> Description
+                    </label>
+                    <textarea class="form-control" id="description" name="description" rows="3" required placeholder="Enter task description" data-bs-toggle="tooltip" data-bs-placement="top" title="Include any details or instructions about the task."></textarea>
+                    <div class="invalid-feedback">
+                        Please provide a description.
+                    </div>
+                </div>
+                
+                <!-- Assign User Email Field -->
+                <div class="mb-3">
+                    <label for="email" class="form-label" data-bs-toggle="tooltip" data-bs-placement="top" title="Assign the task by entering the user's email.">
+                        <i class="bi bi-person-fill"></i> Assign to (Email)
+                    </label>
+                    <input type="email" class="form-control" id="email" name="email" required placeholder="Enter user's email" data-bs-toggle="tooltip" data-bs-placement="top" title="Enter the email address of the person you're assigning the task to.">
+                    <div class="invalid-feedback">
+                        Please enter a valid email address.
+                    </div>
+                </div>
+                
+                <!-- Task Priority Field -->
+                <div class="mb-3">
+                    <label for="priority" class="form-label" data-bs-toggle="tooltip" data-bs-placement="top" title="Set the priority level for this task.">
+                        <i class="bi bi-flag-fill"></i> Priority
+                    </label>
+                    <select class="form-select" id="priority" name="priority" required data-bs-toggle="tooltip" data-bs-placement="top" title="Choose the priority level for the task.">
+                        <option value="">Select priority</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                    <div class="invalid-feedback">
+                        Please select a priority.
+                    </div>
+                </div>
+                
+                <!-- Task Deadline Field -->
+                <div class="mb-3">
+                    <label for="deadline" class="form-label" data-bs-toggle="tooltip" data-bs-placement="top" title="Set the deadline for this task.">
+                        <i class="bi bi-calendar-date"></i> Deadline
+                    </label>
+                    <input type="date" class="form-control" id="deadline" name="deadline" required data-bs-toggle="tooltip" data-bs-placement="top" title="Select a deadline for the task.">
+                    <div class="invalid-feedback">
+                        Please select a deadline.
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary w-100" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to create the task.">Create Task</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS & Validation Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Enable Bootstrap Tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+        
+        // Bootstrap 5 Custom Validation
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>
+</body>
+</html>
+
+{% endblock %}

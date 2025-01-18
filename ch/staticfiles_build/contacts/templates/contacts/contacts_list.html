@@ -1,0 +1,398 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+<br><br><br><br><br>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Contacts in Organization</title>
+
+
+    <!-- Custom Styles -->
+    <style>
+        /* Reset some default styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7fafc; /* Light gray background */
+            color: #2d3748; /* Dark text */
+        }
+
+        /* Main container */
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Page header */
+        h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        /* Subtitle */
+        p {
+            font-size: 1rem;
+            color: #4a5568; /* Gray text */
+        }
+
+        /* Contacts List Section */
+        .bg-white {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .bg-gray-50 {
+            background-color: #f7fafc;
+        }
+
+        /* List Item */
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: #f7fafc;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        li .text-lg {
+            font-size: 1.125rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        li .text-sm {
+            font-size: 0.875rem;
+            color: #718096; /* Gray text */
+        }
+
+        .ml-2 {
+            margin-left: 8px;
+        }
+
+        /* Empty State */
+        .text-gray-500 {
+            font-size: 1rem;
+            color: #718096;
+        }
+
+        /* Organization Info */
+        .mt-6 {
+            margin-top: 24px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            p {
+                font-size: 0.875rem;
+            }
+
+            li {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            li .text-lg {
+                font-size: 1rem;
+                margin-bottom: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    
+
+    <div class="container py-4">
+        <!-- Page Header -->
+        <div class="mb-4">
+            <h1>Your Contacts </h1>
+            <p>You can view and manage the contacts you've added in this organization.</p>
+        </div>
+
+        <!-- Contacts List -->
+        <div class="bg-white p-4 rounded shadow">
+            <h2 class="mb-3">Your Contacts</h2>
+
+            <!-- Search and Filter Bar -->
+<div class="d-flex mb-3">
+    <input 
+        type="text" 
+        id="searchInput" 
+        class="form-control me-2" 
+        placeholder="Search by name or email" 
+        aria-label="Search"
+    />
+    <select id="roleFilter" class="form-select me-2">
+        <option value="">All Roles</option>
+        <option value="admin">Admin</option>
+        <option value="manager">Manager</option>
+        <option value="employee">Employee</option>
+    </select>
+    <input 
+        type="date" 
+        id="joinDateFilter" 
+        class="form-control" 
+        placeholder="Filter by join date" 
+    />
+</div>
+
+
+{% if contacts %}
+<ul class="list-group">
+    {% for contact in contacts %}
+
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <!-- Retrieving the username directly from the User model -->
+                <strong>{{ contact.contact.username }}</strong>
+                <small class="text-muted ms-2">ID: {{ contact.contact.id }}</small>
+            </div>
+            <!-- 3-Dots Menu -->
+            <div class="dropdown">
+                <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton{{ contact.contact.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-three-dots"></i>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ contact.contact.id }}">
+                    <li><a class="dropdown-item user-details-btn" href="#" data-user-id="{{ contact.contact.id }}">View Details</a></li>
+
+                    <li><a class="dropdown-item " href="{% url 'fetch_emails' org_id=contact.organization.id user_id=contact.contact.id%}" data-user-id="{{ contact.contact.id }}">Emails</a></li>
+                    <li><a class="dropdown-item " href="{% url 'user_calendar' org_id=contact.organization.id user_id=contact.contact.id%}" data-user-id="{{ contact.contact.id }}">Schedule & View</a></li>
+                    <li>
+                        <a class="dropdown-item remove-contact" 
+                           href="#" 
+                           data-org-id="{{ contact.organization.id }}" 
+                           data-contact-id="{{ contact.contact.id }}">
+                            Remove Contact
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+       
+    {% endfor %}
+</ul>
+
+
+
+{% else %}
+<p class="text-muted">You have not added any contacts in this organization yet.</p>
+{% endif %}
+</div>
+        <br>
+        <br>
+        <a href="{% url 'user_meeting_contacts' org_id=organization_id %}" class="text-blue-500 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            New Contact
+        </a>
+        
+        
+        <!-- Organization Information -->
+        <div class="mt-4">
+            <p>Organization ID: {{ organization_id }}</p>
+        </div>
+
+        <!-- Modal to Display User Details -->
+        <div class="modal fade" id="userDetailsModal" tabindex="-1" aria-labelledby="userDetailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="userDetailsModalLabel">User Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Username:</strong> <span id="modal-username"></span></p>
+                        <p><strong>Email:</strong> <span id="modal-email"></span></p>
+                        <p><strong>First Name:</strong> <span id="modal-first-name"></span></p>
+                        <p><strong>Last Name:</strong> <span id="modal-last-name"></span></p>
+                        <p><strong>Date Joined:</strong> <span id="modal-date-joined"></span></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script>
+        $(document).ready(function () {
+        // Handle the click event for View Details
+        $('.user-details-btn').on('click', function (event) {
+            event.preventDefault();
+
+            const userId = $(this).data('user-id');
+            const orgId = {{ organization_id }};
+            const url = `/contacts/organization/${orgId}/user/${userId}/details/`;
+
+            // AJAX request to fetch user details
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (response) {
+                    if (response.success) {
+                        const userData = response.user_data;
+
+                        // Populate modal with user data
+                        $('#modal-username').text(userData.username);
+                        $('#modal-email').text(userData.email);
+                        $('#modal-first-name').text(userData.first_name);
+                        $('#modal-last-name').text(userData.last_name);
+                        $('#modal-date-joined').text(userData.date_joined);
+
+                        // Show modal
+                        $('#userDetailsModal').modal('show');
+                    }
+                },
+                error: function () {
+                    alert('Failed to fetch user details. Please try again.');
+                }
+            });
+        });
+
+        // Filter contacts functionality
+        const searchInput = document.getElementById("searchInput");
+        const roleFilter = document.getElementById("roleFilter");
+        const joinDateFilter = document.getElementById("joinDateFilter");
+        const contactsList = document.querySelector(".list-group"); // Updated to match Bootstrap's list-group class
+
+        function fetchFilteredContacts() {
+            const query = searchInput.value;
+            const role = roleFilter.value;
+            const joinDate = joinDateFilter.value;
+            const orgId = "{{ organization_id }}";
+
+            const url = `/contacts/organization/${orgId}/contacts/filter/?query=${query}&role=${role}&join_date=${joinDate}`;
+
+            fetch(url)
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        // Clear existing contacts
+                        contactsList.innerHTML = "";
+
+                        // Populate with filtered contacts
+                        data.contacts.forEach((contact) => {
+                            const listItem = document.createElement("li");
+                            listItem.className = "list-group-item d-flex justify-content-between align-items-center";
+                            listItem.innerHTML = `
+                                <div>
+                                    <strong>${contact.username}</strong>
+                                    <small class="text-muted ms-2">ID: ${contact.id}</small>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#">View Details</a></li>
+                                    </ul>
+                                </div>`;
+                            contactsList.appendChild(listItem);
+                        });
+                    } else {
+                        // Display a message if no contacts are found
+                        contactsList.innerHTML = `<li class="list-group-item text-muted">No contacts found.</li>`;
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error fetching contacts:", error);
+                });
+        }
+
+        // Attach event listeners
+        searchInput.addEventListener("input", fetchFilteredContacts);
+        roleFilter.addEventListener("change", fetchFilteredContacts);
+        joinDateFilter.addEventListener("change", fetchFilteredContacts);
+    });
+
+
+    // Remove contact functionality
+    document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".remove-contact").forEach((button) => {
+        button.addEventListener("click", function (e) {
+            e.preventDefault();
+
+            const orgId = this.getAttribute("data-org-id");
+            const contactId = this.getAttribute("data-contact-id");
+
+            // Show confirmation popup
+            if (confirm("Are you sure you want to delete this contact?")) {
+                // Make AJAX request to delete the contact
+                fetch(`/contacts/delete-contact/${orgId}/${contactId}/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": getCSRFToken(), // Correctly fetch the CSRF token
+                        "Content-Type": "application/json",
+                    },
+                })
+                    .then((response) => {
+                        if (response.ok) {
+                            alert("Contact deleted successfully.");
+                            this.closest("li").remove();
+                        } else {
+                            return response.json().then((data) => {
+                                alert(data.error || "Failed to delete the contact.");
+                            });
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error:", error);
+                        alert("An unexpected error occurred.");
+                    });
+            }
+        });
+    });
+
+    // Function to fetch the CSRF token from the cookie
+    function getCSRFToken() {
+        const name = "csrftoken";
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith(name + "=")) {
+                return decodeURIComponent(cookie.substring(name.length + 1));
+            }
+        }
+        return "";
+    }
+});
+
+
+    </script>
+</body>
+</html>
+
+{% endblock %}

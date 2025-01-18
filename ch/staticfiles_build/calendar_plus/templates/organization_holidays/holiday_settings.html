@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holiday Settings</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body class="bg-light">
+<div class="container mt-5 p-4 bg-white shadow rounded">
+    <h2 class="text-primary mb-4">Holiday Settings</h2>
+    <hr>
+    <p><strong>Holiday:</strong> {{ holiday.name }}</p>
+    <p><strong>Date:</strong> {{ holiday.date }}</p>
+
+    <!-- Allow Scheduling Toggle -->
+    <div class="form-check form-switch mt-4">
+        <input
+            class="form-check-input"
+            type="checkbox"
+            id="allowSchedulingToggle"
+            {% if settings.allow_scheduling %}checked{% endif %}
+        >
+        <label class="form-check-label" for="allowSchedulingToggle">Allow Scheduling</label>
+    </div>
+
+    <!-- Holiday Visibility Toggle -->
+    <div class="form-check form-switch mt-3">
+        <input
+            class="form-check-input"
+            type="checkbox"
+            id="holidayVisibilityToggle"
+            {% if settings.holiday_visibility %}checked{% endif %}
+        >
+        <label class="form-check-label" for="holidayVisibilityToggle">Holiday Visibility</label>
+    </div>
+
+    <!-- Recurring Holiday Toggle -->
+    <div class="form-check form-switch mt-3">
+        <input
+            class="form-check-input"
+            type="checkbox"
+            id="recurringHolidayToggle"
+            {% if settings.is_recurring %}checked{% endif %}
+        >
+        <label class="form-check-label" for="recurringHolidayToggle">Recurring Holiday</label>
+    </div>
+
+    <!-- Holiday Type Dropdown -->
+    <div class="mt-4">
+        <label for="holidayTypeSelect" class="form-label">Holiday Type</label>
+        <select id="holidayTypeSelect" class="form-select">
+            <option value="">Select a type</option>
+            {% for holiday_type in holiday_types %}
+                <option value="{{ holiday_type.id }}" {% if holiday_type == settings.holiday_type %}selected{% endif %}>
+                    {{ holiday_type.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Holiday Notifications Toggle -->
+    <div class="form-check form-switch mt-4">
+        <input
+            class="form-check-input"
+            type="checkbox"
+            id="holidayNotificationsToggle"
+            {% if settings.holiday_notifications %}checked{% endif %}
+        >
+        <label class="form-check-label" for="holidayNotificationsToggle">Enable Holiday Notifications</label>
+    </div>
+
+    <!-- Reminder Settings -->
+    <div class="mt-4">
+        <label for="reminderDaysBefore" class="form-label">Reminder Days Before</label>
+        <input
+            type="number"
+            class="form-control"
+            id="reminderDaysBefore"
+            value="{{ settings.reminder_days_before }}"
+            min="1"
+            max="30"
+        >
+    </div>
+    <div class="mt-3">
+        <label for="reminderMessage" class="form-label">Reminder Message</label>
+        <textarea
+            class="form-control"
+            id="reminderMessage"
+            rows="3"
+        >{{ settings.reminder_message }}</textarea>
+    </div>
+
+    <!-- Notify Organization Members Toggle -->
+    <div class="form-check form-switch mt-4">
+        <input
+            class="form-check-input"
+            type="checkbox"
+            id="notifyOrganizationToggle"
+            {% if settings.notify_organization_members %}checked{% endif %}
+        >
+        <label class="form-check-label" for="notifyOrganizationToggle">Notify Organization Members</label>
+    </div>
+
+    <!-- Holiday Carryover Toggle -->
+    <div class="form-check form-switch mt-4">
+        <input
+            class="form-check-input"
+            type="checkbox"
+            id="holidayCarryoverToggle"
+            {% if settings.carryover %}checked{% endif %}
+        >
+        <label class="form-check-label" for="holidayCarryoverToggle">Allow Holiday Carryover</label>
+    </div>
+
+    <!-- Status Messages -->
+    <div id="statusMessage" class="mt-4 alert d-none" role="alert"></div>
+</div>
+
+
+    
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // Handle Allow Scheduling Toggle
+        $('#allowSchedulingToggle').on('change', function () {
+            const allowScheduling = $(this).is(':checked');
+            $.ajax({
+                url: '',
+                method: 'POST',
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    toggle_scheduling: true
+                },
+                success: function (response) {
+                    $('#statusMessage').html(
+                        `<div class="alert alert-success">Allow Scheduling: ${response.allow_scheduling ? 'Enabled' : 'Disabled'}</div>`
+                    );
+                },
+                error: function () {
+                    $('#statusMessage').html(
+                        `<div class="alert alert-danger">An error occurred while updating Allow Scheduling.</div>`
+                    );
+                    $('#allowSchedulingToggle').prop('checked', !allowScheduling); // Revert toggle state
+                }
+            });
+        });
+
+        // Handle Holiday Visibility Toggle
+        $('#holidayVisibilityToggle').on('change', function () {
+            const holidayVisibility = $(this).is(':checked');
+            $.ajax({
+                url: '',
+                method: 'POST',
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    toggle_visibility: true
+                },
+                success: function (response) {
+                    $('#statusMessage').html(
+                        `<div class="alert alert-success">Holiday Visibility: ${response.holiday_visibility ? 'Visible' : 'Hidden'}</div>`
+                    );
+                },
+                error: function () {
+                    $('#statusMessage').html(
+                        `<div class="alert alert-danger">An error occurred while updating Holiday Visibility.</div>`
+                    );
+                    $('#holidayVisibilityToggle').prop('checked', !holidayVisibility); // Revert toggle state
+                }
+            });
+        });
+    });
+
+    // is recurring
+    $('#recurringHolidayToggle').on('change', function () {
+    const isRecurring = $(this).is(':checked');
+    $.ajax({
+        url: '',
+        method: 'POST',
+        data: {
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            toggle_recurring: true
+        },
+        success: function (response) {
+            $('#statusMessage').html(
+                `<div class="alert alert-success">Recurring Holiday: ${response.is_recurring ? 'Enabled' : 'Disabled'}</div>`
+            );
+        },
+        error: function () {
+            $('#statusMessage').html(
+                `<div class="alert alert-danger">An error occurred while updating Recurring Holiday.</div>`
+            );
+            $('#recurringHolidayToggle').prop('checked', !isRecurring); // Revert toggle state
+        }
+    });
+});
+
+
+ // Handle Holiday Type Change
+ $('#holidayTypeSelect').on('change', function () {
+            const holidayType = $(this).val();
+            if (holidayType) {
+                $.ajax({
+                    url: '',
+                    method: 'POST',
+                    data: {
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        holiday_type: holidayType
+                    },
+                    success: function (response) {
+                        $('#statusMessage').html(
+                            `<div class="alert alert-success">Holiday Type: ${response.holiday_type}</div>`
+                        );
+                    },
+                    error: function () {
+                        $('#statusMessage').html(
+                            `<div class="alert alert-danger">An error occurred while updating Holiday Type.</div>`
+                        );
+                    }
+                });
+            }
+        });
+
+
+        // Handle notifications toggle
+         // Handle Holiday Notifications Toggle
+         $('#holidayNotificationsToggle').on('change', function () {
+            const holidayNotifications = $(this).is(':checked');
+            $.ajax({
+                url: '',
+                method: 'POST',
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    toggle_notifications: true
+                },
+                success: function (response) {
+                    $('#statusMessage').html(
+                        `<div class="alert alert-success">Holiday Notifications: ${response.holiday_notifications ? 'Enabled' : 'Disabled'}</div>`
+                    );
+                },
+                error: function () {
+                    $('#statusMessage').html(
+                        `<div class="alert alert-danger">An error occurred while updating Holiday Notifications.</div>`
+                    );
+                    $('#holidayNotificationsToggle').prop('checked', !holidayNotifications); // Revert toggle state
+                }
+            });
+        });
+
+        // Handle reminder settings
+
+          // Handle Reminder Settings
+          $('#reminderDaysBefore').on('change', function () {
+            const reminderDaysBefore = $(this).val();
+            const reminderMessage = $('#reminderMessage').val();
+            $.ajax({
+                url: '',
+                method: 'POST',
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    set_reminder: true,
+                    reminder_days_before: reminderDaysBefore,
+                    reminder_message: reminderMessage
+                },
+                success: function (response) {
+                    $('#statusMessage').html(
+                        `<div class="alert alert-success">Reminder Set: ${response.reminder_days_before} days before. Message: ${response.reminder_message}</div>`
+                    );
+                },
+                error: function () {
+                    $('#statusMessage').html(
+                        `<div class="alert alert-danger">An error occurred while setting the reminder.</div>`
+                    );
+                }
+            });
+        });
+
+        // Notify organization members
+
+        // Handle Notify Organization Members Toggle
+        // Handle Notify Organization Members Toggle
+        $('#notifyOrganizationToggle').on('change', function () {
+            const notifyOrganizationMembers = $(this).is(':checked');
+            console.log("Notify Organization Members:", notifyOrganizationMembers);  // Add console log for debugging
+            $.ajax({
+                url: '',
+                method: 'POST',
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    toggle_notify: true
+                },
+                success: function (response) {
+                    console.log("Response:", response);  // Log response for debugging
+                    $('#statusMessage').html(
+                        `<div class="alert alert-success">Notify Organization Members: ${response.notify_organization_members ? 'Enabled' : 'Disabled'}</div>`
+                    );
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.error("Error:", errorThrown);  // Log the error message
+                    $('#statusMessage').html(
+                        `<div class="alert alert-danger">An error occurred while updating Notify Organization Members. ${errorThrown}</div>`
+                    );
+                    $('#notifyOrganizationToggle').prop('checked', !notifyOrganizationMembers); // Revert toggle state
+                }
+            });
+        });
+
+        // Holiday carryover
+         // Handle Holiday Carryover Toggle
+    $('#holidayCarryoverToggle').on('change', function () {
+        const carryover = $(this).is(':checked');
+        $.ajax({
+            url: '',
+            method: 'POST',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                toggle_carryover: true
+            },
+            success: function (response) {
+                $('#statusMessage').html(
+                    `<div class="alert alert-success">Holiday Carryover: ${response.carryover ? 'Enabled' : 'Disabled'}</div>`
+                );
+            },
+            error: function () {
+                $('#statusMessage').html(
+                    `<div class="alert alert-danger">An error occurred while updating Holiday Carryover.</div>`
+                );
+                $('#holidayCarryoverToggle').prop('checked', !carryover); // Revert toggle state
+            }
+        });
+    });
+
+    
+    
+
+</script>
+</body>
+</html>
+

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo: Meeting Scheduler</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7fc;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            text-align: center;
+            font-size: 2rem;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        p.slogan {
+            font-size: 1rem;
+            color: #555;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        /* Buttons Container */
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        /* Button Styles */
+        .btn {
+            font-size: 0.9rem;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            border: none;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn-add {
+            background-color: #28a745;
+        }
+
+        .btn-add:hover {
+            background-color: #218838;
+        }
+
+        .btn-schedule {
+            background-color: #ffc107;
+        }
+
+        .btn-schedule:hover {
+            background-color: #e0a800;
+        }
+
+        .btn-ease {
+            background-color: #17a2b8;
+        }
+
+        .btn-ease:hover {
+            background-color: #138496;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 0.9rem;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+
+    <h1><i class="fas fa-calendar-alt"></i> introducing Contacts Book For Calendar +</h1>
+    <p class="slogan"><i class="fas fa-info-circle"></i> We make scheduling and managing meetings easier than ever.</p>
+
+    <!-- Buttons Section -->
+    <div class="buttons-container">
+        <!-- Add to Contacts Button -->
+        <a href="{% url 'select_contact'%}" class="btn btn-add">
+            <i class="fas fa-user-plus"></i> Add to Contacts
+        </a>
+
+        <!-- Schedule Your Meetings Button -->
+        <a href="{% url 'contacts'%}" class="btn btn-schedule">
+            <i class="fas fa-calendar-plus"></i> My Contacts
+        </a>
+
+        <!-- Make It Easier Button -->
+        <a href="{% url 'favorite_contacts'%}" class="btn btn-ease">
+            <i class="fas fa-cogs"></i> Favourite Contacts
+        </a>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        &copy; 2024 Calendar +. All rights reserved.
+    </footer>
+
+</body>
+</html>

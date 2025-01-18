@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Reminder</title>
+    <style>
+        body {
+            font-family: "Georgia", serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .header {
+            background-color: #2c3e50;
+            color: #ffffff;
+            padding: 15px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+        .content {
+            padding: 20px;
+        }
+        .content h2 {
+            font-size: 18px;
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .content p {
+            margin: 8px 0;
+        }
+        .meeting-details {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        .meeting-details p {
+            margin: 5px 0;
+            font-weight: bold;
+        }
+        .footer {
+            background-color: #f4f4f4;
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            border-top: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Meeting Reminder</h1>
+        </div>
+        <div class="content">
+            <h2>Dear {{ user }},</h2>
+            <p>This is a friendly reminder about your upcoming meeting:</p>
+            <div class="meeting-details">
+                <p><strong>Meeting Title:</strong> {{ meeting_title }}</p>
+                <p><strong>Date:</strong> {{ meeting_date }}</p>
+                <p><strong>Time:</strong> {{ start_time }} - {{ end_time }}</p>
+                <p><strong>Location:</strong> {{ meeting_location }}</p>
+                {% if meeting_link %}
+                <p><strong>Online Meeting Link:</strong> <a href="{{ meeting_link }}">{{ meeting_link }}</a></p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="footer">
+            <p>You are receiving this email because you are scheduled to participate in this meeting.</p>
+            <p>If you have any questions, please contact your meeting organizer.</p>
+        </div>
+    </div>
+</body>
+</html>

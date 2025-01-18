@@ -1,0 +1,157 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+<br><br><br>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Events in {{ organization_name }}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <section class="intro py-8 px-6 text-center bg-blue-100 mb-6 rounded-xl">
+        <p class="text-lg font-semibold text-gray-700">
+            Manage all your events seamlessly and create new ones with ease. 
+            Let's organize your workspace events like a pro!
+        </p>
+    </section>
+
+    <div class="container py-8">
+        <h2 class="text-3xl font-semibold text-center text-gray-800 mb-6">My Events in {{ organization_name }}</h2>
+
+        <!-- Event Management Links -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <!-- Create Event Link -->
+            <a href="{% url 'event_type_selection' org_id=org_id %}" class="relative block p-6 bg-gradient-to-r from-blue-500 to-teal-500 text-white text-lg rounded-2xl shadow-xl hover:scale-105 transition-all duration-300 ease-in-out transform hover:shadow-2xl">
+                <span class="font-semibold text-2xl">Create New Event</span>
+                <p class="text-sm mt-2">Set up an event and share the link with others.</p>
+                <span class="absolute inset-0 bg-blue-200 opacity-25 rounded-2xl"></span>
+            </a>
+
+            <!-- My Bookings Link -->
+            <a href="{% url 'user_organization_bookings' org_id=org_id %}" class="relative block p-6 bg-gradient-to-r from-green-400 to-green-600 text-white text-lg rounded-2xl shadow-xl hover:scale-105 transition-all duration-300 ease-in-out transform hover:shadow-2xl">
+                <span class="font-semibold text-2xl">My Bookings</span>
+                <p class="text-sm mt-2">View and manage your bookings.</p>
+                <span class="absolute inset-0 bg-green-200 opacity-25 rounded-2xl"></span>
+            </a>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="my-6 flex justify-center space-x-4">
+            <button class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition duration-300" data-filter="all">All Locations</button>
+            <button class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-700 transition duration-300" data-filter="Google Meet">Google Meet</button>
+            <button class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-700 transition duration-300" data-filter="Zoom">Zoom</button>
+            <button class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-700 transition duration-300" data-filter="Phone Call">Phone Call</button>
+            <button class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-700 transition duration-300" data-filter="In Person Meeting">In Person</button>
+        </div>
+
+        <!-- Event Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="event-list">
+            {% for item in page_obj %}
+            <div class="event-card bg-white shadow-md rounded-lg overflow-hidden p-4 relative hover:shadow-xl transition-all duration-300 transform hover:scale-105" data-location="{{ item.event.location }}">
+                <h2 class="text-xl font-semibold text-gray-800">{{ item.event.title }}</h2>
+                <p class="text-gray-600 mb-2">Duration: {{ item.event.duration }} minutes</p>
+                <p class="text-gray-600 mb-2">Location: {{ item.event.location }}</p>
+                <p class="text-gray-600 mb-2">Event Type: {{ item.event.get_event_type_display }}</p>
+                <p class="text-gray-600 mb-2">Created on: {{ item.event.created_at|date:"M d, Y" }}</p>
+
+                <div class="mt-4">
+                    <span class="px-3 py-1 bg-blue-500 text-white text-sm font-medium rounded-full">
+                        Bookings: +{{ item.booking_count }}
+                    </span>
+                </div>
+
+                <!-- 3-dots menu -->
+                <div class="absolute top-4 right-4">
+                    <button class="menu-btn p-2 rounded-full hover:bg-gray-200 focus:outline-none">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M6 10a2 2 0 114 0 2 2 0 01-4 0zm4 0a2 2 0 114 0 2 2 0 01-4 0zm6 0a2 2 0 114 0 2 2 0 01-4 0z" />
+                        </svg>
+                    </button>
+                    <div class="menu hidden absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg">
+                        <a href="{% url 'view_bookings' org_id=org_id event_id=item.event.id %}" 
+                           class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                            View Bookings
+                        </a>
+
+                        <a href="{% url 'delete-event' org_id=org_id event_id=item.event.id %}" 
+                           class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                            Wipe Event
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center text-gray-600">
+                <p>No events found. Create your first event!</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination controls -->
+        <div class="mt-6 flex justify-center">
+            <div class="flex items-center space-x-4">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">First</a>
+                    <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">Previous</a>
+                {% endif %}
+
+                <span class="text-sm text-gray-600">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">Next</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">Last</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript to filter events -->
+    <script>
+        document.querySelectorAll('button[data-filter]').forEach(button => {
+            button.addEventListener('click', function () {
+                const filter = this.getAttribute('data-filter');
+                const eventCards = document.querySelectorAll('.event-card');
+
+                eventCards.forEach(card => {
+                    const location = card.getAttribute('data-location');
+
+                    // Show or hide events based on filter
+                    if (filter === 'all' || location === filter) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Toggle the 3-dots menu visibility
+        document.querySelectorAll('.menu-btn').forEach(button => {
+            button.addEventListener('click', function (e) {
+                const menu = this.nextElementSibling;
+                if (menu) {
+                    menu.classList.toggle('hidden');
+                }
+            });
+        });
+
+        // Close menus when clicking outside
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.menu-btn') && !e.target.closest('.menu')) {
+                document.querySelectorAll('.menu').forEach(menu => menu.classList.add('hidden'));
+            }
+        });
+    </script>
+</body>
+
+</html>
+
+{% endblock %}

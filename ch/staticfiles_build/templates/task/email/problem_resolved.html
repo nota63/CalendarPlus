@@ -1,0 +1,123 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problem Resolved Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .email-header {
+            background-color: #007bff;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+        }
+        .email-header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .email-body {
+            padding: 20px;
+            color: #333333;
+            line-height: 1.6;
+        }
+        .email-body h2 {
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .details-table th, .details-table td {
+            text-align: left;
+            padding: 8px 12px;
+            border-bottom: 1px solid #dddddd;
+        }
+        .details-table th {
+            background-color: #f4f4f4;
+        }
+        .email-footer {
+            background-color: #f9f9f9;
+            text-align: center;
+            padding: 20px;
+            font-size: 14px;
+            color: #777777;
+        }
+        .email-footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="email-header">
+            <h1>🎉 Problem Resolved Notification</h1>
+        </div>
+        <!-- Body -->
+        <div class="email-body">
+            <p>Dear <strong>{{ task_creator_name }}</strong>,</p>
+            <p>
+                We are excited to inform you that a problem reported in one of your tasks has been resolved by 
+                <strong>{{ resolved_by_name }}</strong>.
+            </p>
+            <h2>Task Details</h2>
+            <table class="details-table">
+                <tr>
+                    <th><img class="icon" src="https://img.icons8.com/color/48/null/company.png" alt="Organization"> Organization</th>
+                    <td>{{ organization_name }}</td>
+                </tr>
+                <tr>
+                    <th><img class="icon" src="https://img.icons8.com/color/48/null/team.png" alt="Group"> Group</th>
+                    <td>{{ group_name }}</td>
+                </tr>
+                <tr>
+                    <th><img class="icon" src="https://img.icons8.com/color/48/null/checklist.png" alt="Task"> Task</th>
+                    <td>{{ task_title }}</td>
+                </tr>
+                <tr>
+                    <th><img class="icon" src="https://img.icons8.com/color/48/null/error.png" alt="Problem"> Problem</th>
+                    <td>{{ problem_description }}</td>
+                </tr>
+                <tr>
+                    <th><img class="icon" src="https://img.icons8.com/color/48/null/calendar.png" alt="Resolved On"> Resolved On</th>
+                    <td>{{ resolved_at }}</td>
+                </tr>
+            </table>
+            <p>
+                Thank you for your continued efforts. If you have any questions or need further assistance, feel free to reach out to us.
+            </p>
+        </div>
+        <!-- Footer -->
+        <div class="email-footer">
+            <p>Best regards,</p>
+            <p><strong>The Team</strong></p>
+            <p><a href="{{ organization_website }}">Visit Our Website</a> | <a href="mailto:support@example.com">Contact Support</a></p>
+        </div>
+    </div>
+</body>
+</html>

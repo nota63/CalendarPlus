@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Email Address for Notifications</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+
+    <!-- GSAP Animation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.0/gsap.min.js"></script>
+
+    <style>
+        /* Basic styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        /* Animated Email Banner */
+        .email-banner {
+            background-color: #0078d7;
+            color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+            opacity: 0;
+        }
+
+        .email-icon {
+            margin-right: 10px;
+            font-size: 22px;
+        }
+
+        /* Header Section */
+        h2 {
+            font-size: 20px;
+            color: #0078d7;
+            margin-bottom: 10px;
+            font-weight: 400;
+        }
+
+        p.description {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+
+        /* Form Styling */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: 400;
+            font-size: 13px;
+            color: #444;
+        }
+
+        input[type="email"] {
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            padding: 8px;
+            font-size: 14px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        input[type="email"]:focus {
+            outline: none;
+            border-color: #0078d7;
+            box-shadow: 0 0 8px rgba(0, 120, 215, 0.2);
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            background-color: #0078d7;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 400;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: #005bb5;
+        }
+
+        .icon {
+            font-size: 16px;
+        }
+
+        /* Benefits Section */
+        .benefits {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .benefits h3 {
+            font-size: 16px;
+            color: #0078d7;
+            margin-bottom: 10px;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .benefit-icon {
+            color: #0078d7;
+            font-size: 16px;
+            margin-right: 8px;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+
+        /* Message container */
+        section {
+            position: fixed;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            font-family: 'Roboto', sans-serif;
+            font-size: 1rem;
+            opacity: 0;
+            animation: fadeInOut 5s ease forwards;
+            transition: transform 0.5s, opacity 0.5s;
+        }
+
+        /* Checkmark icon */
+        section::before {
+            content: '✔';
+            margin-right: 8px;
+            color: #28a745;
+            font-size: 1.2rem;
+            animation: bounce 0.5s ease;
+        }
+
+        /* Fade in/out keyframes */
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            10%, 90% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+
+        /* Checkmark bounce animation */
+        @keyframes bounce {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Email Notification Banner -->
+    <div class="email-banner" id="emailBanner">
+        <div class="email-icon">📧</div>
+        <span>Update Email Address To Get Push Notifications</span>
+    </div>
+
+    <!-- Page Heading -->
+    <h2>Keep Up-to-Date!</h2>
+    <p class="description">Ensure you never miss an important update by keeping your email address current. Enjoy personalized notifications and alerts.</p>
+
+    <!-- Email Update Form -->
+    <form method="post" action="{% url 'update_email' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        
+        <!-- Submit Button with Icon -->
+        <button type="submit" class="submit-btn">
+            <span class="icon">📧</span>
+            Update Email
+        </button>
+    </form>
+
+    <!-- Benefits of Updating Email -->
+    <div class="benefits">
+        <h3>Why Update Your Email?</h3>
+        <div class="benefit-item">
+            <span class="benefit-icon">✔️</span>
+            Get notified about upcoming meetings.
+        </div>
+        <div class="benefit-item">
+            <span class="benefit-icon">✔️</span>
+            Stay informed on feature updates.
+        </div>
+        <div class="benefit-item">
+            <span class="benefit-icon">✔️</span>
+            Receive special announcements.
+        </div>
+    </div>
+
+    <!-- Footer Information -->
+    <div class="footer">
+        Your privacy matters. We won’t share your email with anyone.
+    </div>
+</div>
+
+<script>
+    // GSAP animation for email banner
+    document.addEventListener("DOMContentLoaded", function() {
+        const banner = document.getElementById("emailBanner");
+
+        // Animate the banner to fade in and out
+        gsap.fromTo(banner,
+            { opacity: 0, y: -30 },
+            { opacity: 1, y: 0, duration: 1.5, ease: "power2.out" }
+        );
+
+        // Fade-out after 5 seconds
+        gsap.to(banner, {
+            opacity: 0,
+            delay: 5,
+            duration: 1,
+            onComplete: () => banner.style.display = 'none'
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            const messageBox = document.querySelector('section');
+            if (messageBox) {
+                messageBox.style.opacity = '0';
+                messageBox.style.transform = 'translateY(-20px)';
+            }
+        }, 5000);
+    });
+</script>
+
+</body>
+</html>
+
+

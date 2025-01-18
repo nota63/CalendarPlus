@@ -1,0 +1,451 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- FullCalendar and Dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
+    <style>
+       /* General Body Styling */
+       body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center; /* Center the content horizontally */
+    align-items: flex-start; /* Align the content to the top */
+    height: 100vh;
+}
+
+/* Container to align sidebar and calendar */
+.container {
+    display: flex;
+    justify-content: center; /* Center calendar container */
+    width: 100%;
+    max-width: 1200px; /* Set a max-width for the overall container */
+}
+
+/* Sidebar Styling */
+.sidebar {
+    width: 25%; /* Sidebar width */
+    min-width: 250px; /* Minimum width for the sidebar */
+    padding: 10px;
+    border-right: 1px solid #ccc;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    border-radius: 8px;
+    position: fixed; /* Fix the sidebar in place */
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 10; /* Keep it above other content */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for sidebar */
+}
+
+/* Compact Section Styling */
+.section {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.section h4 {
+    font-size: 14px;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+}
+
+.section p {
+    font-size: 12px;
+}
+
+/* Button Styling */
+button,
+#copy-link {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 20px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover,
+#copy-link:hover {
+    background-color: #0056b3;
+}
+
+/* FullCalendar Styling */
+.calendar-container {
+    width: 100%;
+    max-width: 800px; /* Maximum width of the calendar */
+    margin-left: 30%; /* Move the calendar to the right, accounting for the sidebar */
+    padding: 10px;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for calendar */
+}
+
+#calendar {
+    width: 100%; /* Ensure the calendar takes full width of its container */
+    max-width: 100%;
+    margin-top: 10px;
+}
+
+.fc-toolbar {
+    font-size: 12px;
+}
+
+.fc-title {
+    font-size: 14px;
+}
+
+.fc-day-grid-event {
+    font-size: 10px;
+}
+
+.fc-day-header {
+    font-size: 12px;
+}
+
+/* Modal Styling */
+#editModal {
+    display: none;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+#editModal .modal-content {
+    max-width: 350px;
+    margin: 0 auto;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+#editModal input[type="text"],
+#editModal textarea,
+#editModal select,
+#editModal input[type="number"],
+#editModal input[type="checkbox"] {
+    font-size: 12px;
+    padding: 5px;
+}
+
+/* Styling for the availability section */
+#availability-section {
+    margin-top: 10px;
+}
+
+#availability-list .availability-item {
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+#availability-list p {
+    margin: 5px 0;
+}
+
+/* Styling for Event Link Copy */
+#copy-link {
+    font-size: 12px;
+    padding: 5px 10px;
+}
+
+/* Adjustments for the sidebar content spacing */
+.sidebar .section {
+    margin-bottom: 10px;
+}
+
+/* Event Details Section */
+.event-details {
+    background-color: #e9f7fd;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+/* Host Details Section */
+.host-details {
+    background-color: #fef5d7;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+/* Scheduling Settings Section */
+.scheduling-settings {
+    background-color: #e9fbe9;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+/* Selected Date Availability Section */
+.selected-date-availability {
+    background-color: #fff3e6;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+
+    </style>
+</head>
+<body>
+
+
+    <h2 style="text-align: center;">Event Details</h2>
+    <div class="container">
+        <!-- Sidebar Section -->
+        <div class="sidebar">
+            <!-- Event Details -->
+            <div class="section event-details">
+                <h4>Your event created successfully</h4>
+                <h4>Event Details</h4>
+                <p><strong>Title:</strong> {{ event.title }}</p>
+                <p><strong>Description:</strong> {{ event.description }}</p>
+                <button id="edit-button" class="btn btn-primary" style="margin-top: 10px;">Edit Event</button>
+            </div>
+            <!-- Host Information -->
+            <div class="section host-details">
+                <h4>Host</h4>
+                <p><strong>Host Name:</strong> {{ user.username }}</p>
+            </div>
+            <!-- Scheduling Settings -->
+            <div class="section scheduling-settings">
+                <h4>Scheduling Settings</h4>
+                <label for="days-to-highlight">Available Days After Today:</label>
+                <input type="number" id="days-to-highlight" value="2" min="1" class="form-control">
+                <button id="copy-link" class="btn btn-primary" style="margin-top: 10px;">Select</button>
+            </div>
+            <!-- Event Link -->
+            <div class="section event-link">
+                <p>Now share the event link to others and ask them to paste this link into their browser and they will be able to book this event!</p>
+                <h4>Event Link</h4>
+                <!-- <p><a href="{{ event_link }}" target="_blank">{{ event_link }}</a></p> -->
+
+                <!-- Copy Event Link Button -->
+            <button id="copy-link-btn" class="btn">Copy Event Link</button>
+<!-- Confirmation message (hidden initially) -->
+            <p id="copy-link-confirmation" class="copy-link-confirmation" style="display: none;">Event link copied to clipboard!</p>
+
+            </div>
+            <!-- User Availability -->
+            <div class="section selected-date-availability" id="availability-section">
+                <p>Looks like you are free those days</p>
+                <h4>Selected Date Availability</h4>
+                <div id="availability-list">
+                    <p>Select a date to view availability.</p>
+                </div>
+            </div>
+        </div>
+        <!-- FullCalendar Section -->
+        <div class="calendar-container">
+            <div id="calendar"></div>
+        </div>
+    </div>
+    <!-- Modal for Editing Event -->
+    <div id="editModal">
+        <div class="modal-content">
+            <h3>Edit Event</h3>
+            <form id="edit-event-form">
+                {% csrf_token %}
+                <input type="hidden" name="event_slug" value="{{ event.slug }}">
+                
+                <div class="form-group">
+                    <label for="event-title">Title</label>
+                    <input type="text" id="event-title" class="form-control" value="{{ event.title }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="event-description">Description</label>
+                    <textarea id="event-description" class="form-control">{{ event.description }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="event-type">Event Type</label>
+                    <input type="text" id="event-type" class="form-control" value="{{ event.event_type }}">
+                </div>
+                <div class="form-group">
+                    <label for="event-duration">Duration (Minutes)</label>
+                    <input type="number" id="event-duration" class="form-control" value="{{ event.duration }}" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="event-buffer-time">Buffer Time (Minutes)</label>
+                    <input type="number" id="event-buffer-time" class="form-control" value="{{ event.buffer_time }}" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="event-is-recurring">Is Recurring?</label>
+                    <input type="checkbox" id="event-is-recurring" {% if event.is_recurring %}checked{% endif %}>
+                </div>
+                <div class="form-group">
+                    <label for="event-location">Location</label>
+                    <select id="event-location" class="form-control">
+                        <option value="Google Meet" {% if event.location == 'Google Meet' %}selected{% endif %}>Google Meet</option>
+                        <option value="Zoom" {% if event.location == 'Zoom' %}selected{% endif %}>Zoom</option>
+                        <option value="Phone Call" {% if event.location == 'Phone Call' %}selected{% endif %}>Phone Call</option>
+                        <option value="In Person Meeting" {% if event.location == 'In Person Meeting' %}selected{% endif %}>In Person Meeting</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <button type="button" id="close-modal" class="btn btn-secondary" style="margin-left: 10px;">Cancel</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            // Open the modal when the edit button is clicked
+            $('#edit-button').click(function() {
+                $('#editModal').fadeIn();
+            });
+            // Close the modal when the cancel button is clicked
+            $('#close-modal').click(function() {
+                $('#editModal').fadeOut();
+            });
+    
+            // Submit the form via AJAX
+            $('#edit-event-form').submit(function(event) {
+                event.preventDefault();  // Prevent the default form submission
+                var formData = {
+                    'title': $('#event-title').val(),
+                    'description': $('#event-description').val(),
+                    'event_type': $('#event-type').val(),
+                    'duration': $('#event-duration').val(),
+                    'buffer_time': $('#event-buffer-time').val(),
+                    'is_recurring': $('#event-is-recurring').prop('checked'),
+                    'location': $('#event-location').val(),
+                    'event_slug': $('input[name="event_slug"]').val(),
+                    'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val()
+                };
+                $.ajax({
+                    url: '{% url "edit_event" event.slug %}',  // URL for the event edit view
+                    method: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        if (response.success) {
+                            alert(response.message);  // Show success message
+                            // Optionally, update the event details dynamically
+                            $('.section p').each(function() {
+                                if ($(this).text().includes('Title:')) {
+                                    $(this).text('Title: ' + formData.title);
+                                } else if ($(this).text().includes('Description:')) {
+                                    $(this).text('Description: ' + formData.description);
+                                }
+                            });
+                            $('#editModal').fadeOut();  // Close the modal
+                        } else {
+                            alert('Error: ' + response.message);  // Show error message
+                        }
+                    },
+                    error: function(xhr) {
+                        alert('Error: ' + xhr.responseText);
+                    }
+                });
+            });
+    
+            // Fetch highlighted dates
+            function loadHighlightedDates() {
+                $.ajax({
+                    url: '/features_calendar/highlighted-dates/',
+                    method: 'GET',
+                    success: function(data) {
+                        if (data.error) {
+                            console.error('Error from backend:', data.error);
+                            return;
+                        }
+                        data.forEach(function(highlight) {
+                            $('#calendar').fullCalendar('renderEvent', {
+                                start: highlight.start_time,
+                                rendering: 'background',
+                                backgroundColor: '#28a745'
+                            });
+                        });
+                    },
+                    error: function(xhr) {
+                        console.error('Error loading highlighted dates:', xhr.responseText);
+                    }
+                });
+            }
+    
+            // Fetch user availability for a specific date, with holiday check
+            function loadAvailability(date) {
+                $.ajax({
+                    url: '/features_calendar/user-availability-new/',
+                    method: 'GET',
+                    data: { date: date },
+                    success: function(data) {
+                        var availabilityList = $('#availability-list');
+                        availabilityList.empty();
+    
+                        if (data.holiday) {
+                            availabilityList.append('<p>You have a holiday on this date.</p>');
+                            return;
+                        }
+    
+                        if (data.length === 0) {
+                            availabilityList.append('<p>No availability for the selected date.</p>');
+                        } else {
+                            data.forEach(function(slot) {
+                                availabilityList.append(
+                                    `<div class="availability-item">
+                                        <p>${slot.start_time} - ${slot.end_time}</p>
+                                    </div>`
+                                );
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Error loading availability:', xhr.responseText);
+                    }
+                });
+            }
+    
+            // Simple Copy Event Link Button Script
+            document.getElementById('copy-link-btn').addEventListener('click', function() {
+                var eventLink = '{{ event_link }}';  // Assuming `event_link` is the link to the event
+    
+                // Use the Clipboard API to copy the link
+                navigator.clipboard.writeText(eventLink).then(function() {
+                    // Show confirmation message
+                    var confirmation = document.getElementById('copy-link-confirmation');
+                    confirmation.style.display = 'block';
+                    setTimeout(function() {
+                        confirmation.style.display = 'none';  // Hide confirmation after a short delay
+                    }, 2000);  // Hide after 2 seconds
+                }).catch(function(error) {
+                    console.error('Error copying text: ', error);
+                });
+            });
+    
+            // Initialize FullCalendar
+            $('#calendar').fullCalendar({
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,agendaWeek,agendaDay'
+                },
+                selectable: true,
+                dayClick: function(date) {
+                    var selectedDate = date.format('YYYY-MM-DD');
+                    loadAvailability(selectedDate);
+                }
+            });
+    
+            // Load highlighted dates on page load
+            loadHighlightedDates();
+        });
+    </script>
+    
+</body>
+</html>
+

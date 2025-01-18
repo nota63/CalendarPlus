@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Meeting Assistant</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+    <style>
+        /* General Reset */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f4f8;
+            height: 100%;
+            color: #333;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #1E3A8A, #3B82F6);
+            color: white;
+            text-align: center;
+            padding: 120px 40px;
+            border-bottom-left-radius: 40px;
+            border-bottom-right-radius: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero h1 {
+            font-size: 2.5rem; /* Adjusted for smaller devices */
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 1rem; /* Adjusted for smaller devices */
+            opacity: 0.85;
+            margin-bottom: 30px;
+        }
+
+        .get-started-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 30px; /* Adjusted for smaller devices */
+            font-size: 1rem; /* Adjusted for smaller devices */
+            border-radius: 50px;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            text-decoration: none;
+        }
+
+        .get-started-btn:hover {
+            background-color: #218838;
+            transform: translateY(-5px);
+        }
+
+        /* Feature Section */
+        .feature-section {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            padding: 60px 10%;
+            gap: 20px;
+        }
+
+        .feature {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            flex-basis: 30%;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature i {
+            font-size: 2.5rem; /* Adjusted for smaller devices */
+            color: #3B82F6;
+            margin-bottom: 15px;
+        }
+
+        .feature h3 {
+            font-size: 1.3rem; /* Adjusted for smaller devices */
+            margin-bottom: 15px;
+        }
+
+        .feature p {
+            font-size: 0.9rem; /* Adjusted for smaller devices */
+            color: #555;
+        }
+
+        /* Queries Section */
+        .queries {
+            background-color: #ffffff;
+            padding: 50px 10%;
+            text-align: center;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+
+        .queries h2 {
+            font-size: 1.8rem; /* Adjusted for smaller devices */
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .queries ul {
+            list-style: none;
+            padding: 0;
+            display: inline-block;
+            max-width: 600px;
+        }
+
+        .queries ul li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1rem; /* Adjusted for smaller devices */
+            color: #555;
+            position: relative;
+        }
+
+        .queries ul li::before {
+            content: '';
+            position: absolute;
+            left: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background-color: #3B82F6;
+            border-radius: 50%;
+        }
+
+        /* Footer Section */
+        .footer {
+            background-color: #3B82F6;
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-top-left-radius: 40px;
+            border-top-right-radius: 40px;
+        }
+
+        .footer a {
+            color: white;
+            font-size: 1rem; /* Adjusted for smaller devices */
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: #e0e0e0;
+        }
+
+        /* Media Queries for Responsiveness */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 60px 20px;
+            }
+
+            .feature-section {
+                flex-direction: column;
+                padding: 40px 10%;
+            }
+
+            .feature {
+                flex-basis: 100%;
+            }
+
+            .queries ul {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1>AI-Powered Meeting Assistant</h1>
+        <p>Transform the way you manage meetings with AI! Get real-time insights, stay organized, and boost productivity. Simply ask our AI assistant and manage your meetings effortlessly.</p>
+        <a href="{% url 'gemini'%}" class="get-started-btn">Get Started</a>
+    </div>
+
+    <!-- Feature Section -->
+    <div class="feature-section">
+        <div class="feature">
+            <i class="fas fa-calendar-check"></i>
+            <h3>Instant Meeting Check</h3>
+            <p>Get an overview of your meetings for the day and upcoming events with just one command. Stay ahead!</p>
+        </div>
+
+        <div class="feature">
+            <i class="fas fa-users"></i>
+            <h3>Team Collaboration</h3>
+            <p>AI helps you manage and check your team’s schedule, so you’re always in sync with your colleagues.</p>
+        </div>
+
+        <div class="feature">
+            <i class="fas fa-clock"></i>
+            <h3>Efficient Time Management</h3>
+            <p>Optimize your schedule by understanding your priorities and upcoming meetings. Time management made easy!</p>
+        </div>
+    </div>
+
+    <!-- Queries Section -->
+    <div id="queries" class="queries">
+        <h2>Sample Queries for AI</h2>
+        <ul>
+            <li><i class="fas fa-calendar-day"></i> "What meetings do I have today?"</li>
+            <li><i class="fas fa-calendar-week"></i> "What’s on my calendar this week?"</li>
+            <li><i class="fas fa-users"></i> "Do I have any team meetings today?"</li>
+            <li><i class="fas fa-clock"></i> "What time is my next meeting?"</li>
+            <li><i class="fas fa-tasks"></i> "Show me meetings for next Monday."</li>
+        </ul>
+    </div>
+
+    <!-- Footer Section -->
+    <div class="footer">
+        <p>Get started with your AI-powered assistant and revolutionize how you manage meetings!</p>
+        <a href="{% url 'gemini'%}">Start Now</a>
+    </div>
+
+</body>
+</html>

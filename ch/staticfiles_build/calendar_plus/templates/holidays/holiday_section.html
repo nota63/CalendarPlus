@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holiday Selection</title>
+
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.4/index.global.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Select Your Holidays</h1>
+        <p>We will prevent others to book your event on your holidays</p>
+
+        <!-- Calendar Container -->
+        <div id="calendar" class="mb-3"></div>
+
+        <!-- Save Holidays Button -->
+        <div class="d-flex justify-content-center">
+            <button id="saveHolidays" class="btn btn-primary">Save Holidays</button>
+        </div>
+    </div>
+
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.4/index.global.min.js"></script>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Modal for Creating Holiday -->
+    <div class="modal fade" id="createHolidayModal" tabindex="-1" aria-labelledby="createHolidayModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createHolidayModalLabel">Create Holiday</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="holidayForm">
+                        <div class="mb-3">
+                            <label for="start_date" class="form-label">Start Date</label>
+                            <input type="text" class="form-control" id="start_date" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="end_date" class="form-label">End Date</label>
+                            <input type="text" class="form-control" id="end_date" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="holidayDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="holidayDescription" rows="3"></textarea> <!-- Editable field for creating -->
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="submitHolidayForm" class="btn btn-primary">Save Holiday</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Viewing Holiday Details -->
+    <div class="modal fade" id="holidayDetailsModal" tabindex="-1" aria-labelledby="holidayDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="holidayDetailsModalLabel">Holiday Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="start_date_view" class="form-label">Start Date</label>
+                            <input type="text" class="form-control" id="start_date_view" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="end_date_view" class="form-label">End Date</label>
+                            <input type="text" class="form-control" id="end_date_view" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="holidayDescription_view" class="form-label">Description</label>
+                            <textarea class="form-control" id="holidayDescription_view" rows="3" readonly></textarea> <!-- Readonly for viewing -->
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="deleteHolidayBtn" class="btn btn-danger">Delete Holiday</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+       document.addEventListener('DOMContentLoaded', function () {
+    var calendarEl = document.getElementById('calendar');
+    var selectedDates = []; // Store selected dates
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        selectable: true,
+        events: {{ holiday_dates|safe }}, // Preload existing holidays from the server
+        eventClick: function (info) {
+            var holidayId = info.event.id; // Get the holiday ID from the clicked event
+            
+            // Make AJAX request to fetch holiday data
+            $.ajax({
+                url: '/features_calendar/holiday-details/' + holidayId + '/', // Update with the correct URL pattern
+                method: 'GET',
+                success: function (response) {
+                    // Populate the modal with the holiday data
+                    $('#start_date_view').val(response.start_date);
+                    $('#end_date_view').val(response.end_date);
+                    $('#holidayDescription_view').val(response.description);
+                    $('#holidayDetailsModal').modal('show'); // Show the modal
+                    $('#deleteHolidayBtn').data('holiday-id', holidayId); // Store holiday ID in the button
+                },
+                error: function (error) {
+                    alert('Error fetching holiday details!');
+                }
+            });
+        },
+        select: function (info) {
+            const selectedDate = info.startStr;
+
+            // If two dates are already selected, clear them
+            if (selectedDates.length == 2) {
+                selectedDates = []; // Reset
+                calendar.getEvents().forEach(function(event) {
+                    if (event.title === "Selected Holiday") {
+                        event.remove(); // Remove the previous selection marks
+                    }
+                });
+            }
+
+            // Add the selected date
+            if (!selectedDates.includes(selectedDate)) {
+                selectedDates.push(selectedDate);
+                calendar.addEvent({
+                    start: selectedDate,
+                    end: selectedDate,
+                    title: "Selected Holiday",
+                    backgroundColor: "#ffc107",
+                    borderColor: "#ffc107"
+                });
+
+                // If two dates are selected, trigger the popup form
+                if (selectedDates.length === 2) {
+                    const startDate = selectedDates[0];
+                    const endDate = selectedDates[1];
+
+                    // Show popup and set the values in the form
+                    openHolidayForm(startDate, endDate);
+                }
+            }
+        },
+        unselect: function () {
+            // Clear calendar selection
+        }
+    });
+
+    calendar.render();
+
+    // Function to open the pop-up with start and end dates
+    function openHolidayForm(startDate, endDate) {
+        $('#createHolidayModal').modal('show');
+        $('#start_date').val(startDate);
+        $('#end_date').val(endDate);
+    }
+
+    // Save the holidays with the provided description
+    document.getElementById('submitHolidayForm').addEventListener('click', function () {
+        if (selectedDates.length === 0) {
+            alert("Please select at least one date!");
+            return;
+        }
+
+        var description = document.getElementById('holidayDescription').value;  // Editable field for creating holidays
+        var start_date = selectedDates[0]; // First selected date
+        var end_date = selectedDates[1];   // Second selected date
+
+        var formData = new FormData();
+        formData.append('start_date', start_date);
+        formData.append('end_date', end_date);
+        formData.append('description', description);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');  // Include CSRF token
+
+        $.ajax({
+            url: '/features_calendar/create-holiday/',  // URL of the current view
+            method: 'POST',
+            data: formData,
+            contentType: false,  // Don't set content type for FormData
+            processData: false,  // Don't process data, jQuery will handle it
+            success: function (response) {
+                if (response && response.message) {
+                    alert(response.message);
+                    $('#createHolidayModal').modal('hide'); // Close modal after success
+                    location.reload(); // Reload the page to reflect changes
+                } else {
+                    alert("Unexpected response: " + JSON.stringify(response));
+                }
+            },
+            error: function (error) {
+                console.log(error);  // Log the full error to the console for debugging
+                alert("Error saving holidays: " + (error.responseJSON ? error.responseJSON.error : error));
+            }
+        });
+    });
+
+    // Delete the holiday when the Delete button is clicked
+    $('#deleteHolidayBtn').on('click', function () {
+        var holidayId = $(this).data('holiday-id'); // Get the holiday ID from the button
+
+        if (!holidayId) {
+            alert('Holiday ID not found!');
+            return;
+        }
+
+        // Confirm the deletion
+        if (confirm('Are you sure you want to delete this holiday?')) {
+            $.ajax({
+                url: '/features_calendar/delete-holiday/' + holidayId + '/',  // URL for the delete request
+                method: 'DELETE',
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'  // CSRF token for security
+                },
+                success: function (response) {
+                    if (response && response.message) {
+                        alert(response.message);
+                        $('#holidayDetailsModal').modal('hide'); // Close the modal after success
+                        location.reload(); // Reload the page to reflect changes
+                    } else {
+                        alert("Unexpected response: " + JSON.stringify(response));
+                    }
+                },
+                error: function (error) {
+                    console.log(error);  // Log the full error to the console for debugging
+                    alert("Error deleting holiday: " + (error.responseJSON ? error.responseJSON.error : error));
+                }
+            });
+        }
+    });
+});
+
+    </script>
+</body>
+</html>

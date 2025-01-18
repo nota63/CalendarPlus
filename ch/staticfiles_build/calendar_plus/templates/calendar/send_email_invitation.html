@@ -1,0 +1,157 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Link to Google Fonts for better typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Email Invitation</title>
+    <!-- Google Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .intro {
+            text-align: center;
+            padding: 40px;
+            background-color: #e9ecef;
+            margin-bottom: 40px;
+        }
+        .intro p {
+            font-size: 1.2rem;
+            color: #495057;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            font-size: 1.75rem;
+            color: #007bff;
+            font-family: 'Montserrat', sans-serif;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .material-icons {
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        .spinner {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.3);
+            z-index: 999;
+        }
+        .spinner span {
+            display: block;
+            width: 40px;
+            height: 40px;
+            border: 5px solid #007bff;
+            border-top: 5px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        .spinner p {
+            color: white;
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            font-size: 1.1rem;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:focus {
+            outline: none;
+        }
+
+        /* Spin animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Form input styling */
+        .form-control {
+            margin-bottom: 15px;
+        }
+
+    </style>
+    <script>
+        function showSpinner() {
+            document.querySelector('.spinner').style.display = 'flex';
+        }
+    </script>
+</head>
+<body>
+
+    <section class="intro">
+        <p>
+            Please enter the email address of an existing or new user to invite them to join your workspace. Once the invite is accepted, we will create a profile for them within your workspace, granting them the necessary access and permissions to collaborate effectively. Whether they are already part of the organization or are a new addition, we’ll ensure a seamless onboarding process to help them get started and contribute right away.
+        </p>
+    </section>
+
+    <div class="container">
+        <h2>
+            <span class="material-icons">mail_outline</span>
+            Send Email Invitation
+        </h2>
+        <form method="post" onsubmit="showSpinner()">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">
+                <span class="material-icons">send</span>
+                Send Invitation
+            </button>
+        </form>
+    </div>
+
+    <!-- Spinner -->
+    <div class="spinner">
+        <span></span>
+        <p>Fetching user information...</p>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+{% include 'footer.html' %}

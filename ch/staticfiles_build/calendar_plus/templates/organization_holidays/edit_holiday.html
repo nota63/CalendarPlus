@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Holiday</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-roboto">
+    <div class="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">Edit Holiday: {{ holiday.name }}</h2>
+        <h1 class="text-lg font-semibold text-gray-600 mb-6">Organization: {{ organization.name }}</h1>
+
+        <form method="POST" class="space-y-6">
+            {% csrf_token %}
+
+            <!-- Holiday Name -->
+            <div class="flex flex-col">
+                <label for="id_name" class="text-sm font-semibold text-gray-600 mb-1">Holiday Name</label>
+                <div class="mt-1">{{ form.name }}</div>
+            </div>
+
+            <!-- Holiday Description -->
+            <div class="flex flex-col">
+                <label for="id_description" class="text-sm font-semibold text-gray-600 mb-1">Holiday Description</label>
+                <div class="mt-1">{{ form.description }}</div>
+            </div>
+
+            <!-- Start Date -->
+            <div class="flex flex-col">
+                <label for="id_start_date" class="text-sm font-semibold text-gray-600 mb-1">Start Date</label>
+                <div class="mt-1">{{ form.start_date }}</div>
+            </div>
+
+            <!-- End Date -->
+            <div class="flex flex-col">
+                <label for="id_end_date" class="text-sm font-semibold text-gray-600 mb-1">End Date</label>
+                <div class="mt-1">{{ form.end_date }}</div>
+            </div>
+
+            <!-- Message for Invitees -->
+            <div class="flex flex-col">
+                <label for="id_message" class="text-sm font-semibold text-gray-600 mb-1">Message For Invitees</label>
+                <div class="mt-1">{{ form.message_for_invitees }}</div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="flex justify-end">
+                <button type="submit" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+
+        <!-- Back Link -->
+        <div class="mt-4">
+            <a href="{% url 'organization_holidays' org_id=organization.id %}" class="text-blue-600 hover:underline">
+                Back to Holiday Details
+            </a>
+        </div>
+    </div>
+</body>
+</html>
+

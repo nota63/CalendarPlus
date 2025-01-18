@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.8;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 700px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #333333;
+        }
+        p {
+            margin: 0 0 15px;
+            color: #555555;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        ul li {
+            margin: 8px 0;
+        }
+        .details-header {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .details-content {
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+        .footer {
+            text-align: center;
+            font-size: 0.9em;
+            color: #888888;
+            margin-top: 20px;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 15px;
+            color: #ffffff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>New Comment on Task: {{ task.title }}</h2>
+        <p>Hello <strong>{{ task.assigned_to.username }}</strong>,</p>
+        <p><strong>{{ comment_user }}</strong> has commented on the task titled "<strong>{{ task.title }}</strong>". Below are the details:</p>
+        
+        <div class="details-header">Comment Details:</div>
+        <div class="details-content">
+            <p><strong>Comment:</strong> {{ comment_text }}</p>
+            <p><strong>Commented By:</strong> {{ comment_user }}</p>
+            <p><strong>Commented On:</strong> {{ instance.created_at|date:"M d, Y H:i A" }}</p>
+        </div>
+
+        <div class="details-header">Task Details:</div>
+        <div class="details-content">
+            <ul>
+                <li><strong>Organization:</strong> {{ organization.name }}</li>
+                <li><strong>Group:</strong> {{ group.name }}</li>
+                <li><strong>Title:</strong> {{ task.title }}</li>
+                <li><strong>Description:</strong> {{ task.description }}</li>
+                <li><strong>Priority:</strong> {{ task.priority }}</li>
+                <li><strong>Status:</strong> {{ task.status }}</li>
+                <li><strong>Deadline:</strong> {{ task.deadline|date:"M d, Y H:i A" }}</li>
+            </ul>
+        </div>
+
+        <p>Please log in to the system for more details and to take further actions.</p>
+
+        <a href="#" class="btn">View Task</a>
+
+        <div class="footer">
+            <p>Best regards,<br>Your Task Management Team</p>
+        </div>
+    </div>
+</body>
+</html>
+

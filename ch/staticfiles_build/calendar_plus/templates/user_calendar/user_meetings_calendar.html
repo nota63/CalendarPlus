@@ -1,0 +1,154 @@
+{% include 'header.html' %}
+<br>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar View</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+
+
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!-- Include Moment.js -->
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+    <!-- FullCalendar CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@3.2.0/dist/fullcalendar.min.css">
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@3.2.0/dist/fullcalendar.min.js"></script>
+
+    <!-- Bootstrap CSS for Modal -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+    <style>
+         /* Custom CSS to style the image */
+    /* Custom CSS to style the image */
+    .small-img {
+        max-width: 100px; /* Adjust image size */
+        height: auto;
+        border-radius: 10px; /* Rounded corners */
+    }
+    </style>
+
+
+    <section class="text-center py-5" style="background-color: #f7f7f7; border-radius: 15px;">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcDyE4sWPgG_z3D8yJrm96EbbnX1xGTO7b8g&s" alt="Meeting Image" class="small-img mb-4">
+        <strong>
+            <p class="lead" style="font-size: 1.0rem; font-weight: 700; background-image: linear-gradient(to right, #ff6b81, #6c94ff); -webkit-background-clip: text; color: transparent;">
+                Stay on top of your meetings with a streamlined calendar and boost your productivity to achieve your goals effortlessly
+            </p>
+        </strong>
+    </section>
+    
+    
+    
+    <div class="container mt-5">
+        <h1 class="mb-4" style="text-transform: uppercase; font-weight: bold; font-size: 2rem; background-image: linear-gradient(to right, #f8a5d3, #a2c2e3); -webkit-background-clip: text; color: transparent;">
+            Your Meetings 
+        </h1>
+        
+        <div id="calendar" class="container py-5 shadow-lg rounded-3 bg-light border border-0 border-secondary">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+             
+            </div>
+            <!-- FullCalendar will be inserted here -->
+        </div>
+        
+    </div>
+
+    <!-- Modal for displaying meeting details -->
+    <div class="modal fade" id="meetingModal" tabindex="-1" aria-labelledby="meetingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="meetingModalLabel">Meeting Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h6 id="modal-meeting-title"></h6>
+                    <p><strong>Description:</strong> <span id="modal-meeting-description"></span></p>
+                    <p><strong>Date:</strong> <span id="modal-meeting-date"></span></p>
+                    <p><strong>Time:</strong> <span id="modal-meeting-time"></span></p>
+                    <p><strong>Location:</strong> <span id="modal-meeting-location"></span></p>
+                    <p><strong>Type:</strong> <span id="modal-meeting-type"></span></p>
+                    <p><strong>Link:</strong> <span id="modal-meeting-link"></span></p>
+                    <p><strong>User:</strong> <span id="modal-meeting-user"></span></p> <!-- User -->
+                    <p><strong>Invitee:</strong> <span id="modal-meeting-invitee"></span></p> 
+                    <p><strong>Participants:</strong> <span id="modal-meeting-participants"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#calendar').fullCalendar({
+                events: [
+                    {% for event in events %}
+                        {
+                            title: '{{ event.title }}',
+                            start: '{{ event.start }}',
+                            end: '{{ event.end }}',
+                            id: '{{ event.id }}',  // Include event ID to be used for AJAX
+                            org_id: '{{ org_id }}'  // Pass organization ID correctly
+                        },
+                    {% endfor %}
+                ],
+                eventRender: function(event, element) {
+                    element.find('.fc-title').text(event.title);  // Display only the title
+                },
+                eventClick: function(calEvent, jsEvent, view) {
+                    var meetingId = calEvent.id;
+                    var orgId = calEvent.org_id;  // Use correct org_id here
+    
+                    // Correct URL pattern for AJAX request
+                    var url = '/calendar/meeting_details/' + orgId + '/' + meetingId + '/';
+    
+                    // AJAX request to fetch meeting details
+                    $.ajax({
+                        url: url,  // Adjusted URL pattern
+                        method: 'GET',
+                        success: function(data) {
+                            // Populate modal with meeting details
+                            $('#modal-meeting-title').text(data.meeting_title);
+                            $('#modal-meeting-description').text(data.meeting_description);
+                            $('#modal-meeting-date').text(data.meeting_date);
+                            $('#modal-meeting-time').text(data.start_time + ' - ' + data.end_time);
+                            $('#modal-meeting-location').text(data.meeting_location);
+                            $('#modal-meeting-type').text(data.meeting_type);
+                            $('#modal-meeting-link').text(data.meeting_link);
+                           // Display user and invitee
+                            $('#modal-meeting-user').text(data.user ? data.user : 'N/A');  // Show user, or N/A if not available
+                            $('#modal-meeting-invitee').text(data.invitee ? data.invitee : 'N/A');  // Show invitee, or N/A if not available
+
+                            $('#modal-meeting-participants').text(data.participants.join(', '));
+    
+                            // Show the modal
+                            $('#meetingModal').modal('show');
+                        },
+                        error: function() {
+                            alert('Error fetching meeting details');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+    
+    
+
+    <!-- Bootstrap JS for Modal functionality -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
+
