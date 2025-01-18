@@ -200,7 +200,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'ch/static'),  
 ]
 
-STATIC_ROOT =os.path.join(BASE_DIR,'staticfiles_build','static')
+# STATIC_ROOT =os.path.join(BASE_DIR,'staticfiles_build','static')
 
 # rest framework configuration
 
@@ -299,7 +299,7 @@ MEDIA_ROOT = BASE_DIR ,'media'
 # settings.py
 STATIC_URL = '/static/'
 
-# If you have a custom directory for static files
+
 STATICFILES_DIRS = [
     BASE_DIR ,"static",
 ]
