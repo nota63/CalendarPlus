@@ -10,14 +10,13 @@
 
     <div class="max-w-4xl mx-auto mt-10">
         <h1 class="text-2xl font-bold text-center">Chat in Channel: {{ channel.name }}</h1>
-        
+
         <div id="chatWindow" class="bg-white p-4 rounded-lg shadow-lg mb-4 max-h-[400px] overflow-y-auto">
             <!-- Loop through messages and display them -->
             {% for message in messages %}
                 <div class="border-b py-2">
                     <strong>{{ message.user.username }}</strong>: 
                     {% if message.link %}
-                        <!-- Display the link as a clickable hyperlink -->
                         <a href="{{ message.link }}" target="_blank" class="text-blue-500 hover:underline">{{ message.link }}</a>
                     {% else %}
                         {{ message.content }}
@@ -27,7 +26,7 @@
             {% empty %}
                 <p class="text-center text-gray-500">No messages yet. Be the first to send a message!</p>
             {% endfor %}
-        
+
             <!-- Loop through links and display them -->
             {% for link in links %}
                 <div class="border-b py-2">
@@ -41,24 +40,38 @@
         </div>
 
         <div class="flex">
-            <input id="messageInput" type="text" class="border p-2 w-full rounded-l-lg" placeholder="Type a message...">
-            <button id="sendMessage" class="bg-blue-500 text-white p-2 rounded-r-lg">Send</button>
-            <!-- Button to open the modal to send a link -->
+            <button id="mentionButton" class="bg-yellow-500 text-white p-2 rounded-l-lg">Mention User</button>
+            <input id="messageInput" type="text" class="border p-2 w-full rounded-r-lg" placeholder="Type a message...">
+            <button id="sendMessage" class="bg-blue-500 text-white p-2 rounded-lg">Send</button>
             <button id="sendLinkButton" class="bg-green-500 text-white p-2 ml-2 rounded-lg">Send Link</button>
         </div>
-    </div>
 
-    <!-- Modal to send link -->
-    <div id="sendLinkModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-lg w-1/3">
-            <h2 class="text-xl font-bold mb-4">Send a Link</h2>
-            <input id="linkText" type="text" class="border p-2 w-full mb-4" placeholder="Link Text">
-            <input id="linkUrl" type="url" class="border p-2 w-full mb-4" placeholder="URL">
-            <div class="flex justify-end">
-                <button id="sendLink" class="bg-blue-500 text-white p-2 rounded-lg">Send Link</button>
-                <button id="closeModal" class="bg-gray-500 text-white p-2 ml-2 rounded-lg">Cancel</button>
+        <!-- Modal to mention users -->
+        <div id="mentionModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg w-1/3">
+                <h2 class="text-xl font-bold mb-4">Mention a User</h2>
+                <ul id="mentionList" class="space-y-2">
+                    <!-- List of users will be populated here -->
+                </ul>
+                <div class="flex justify-end">
+                    <button id="closeMentionModal" class="bg-gray-500 text-white p-2 rounded-lg">Close</button>
+                </div>
             </div>
         </div>
+
+        <!-- Modal to send link -->
+        <div id="sendLinkModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg w-1/3">
+                <h2 class="text-xl font-bold mb-4">Send a Link</h2>
+                <input id="linkText" type="text" class="border p-2 w-full mb-4" placeholder="Link Text">
+                <input id="linkUrl" type="url" class="border p-2 w-full mb-4" placeholder="URL">
+                <div class="flex justify-end">
+                    <button id="sendLink" class="bg-blue-500 text-white p-2 rounded-lg">Send Link</button>
+                    <button id="closeLinkModal" class="bg-gray-500 text-white p-2 ml-2 rounded-lg">Cancel</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -80,14 +93,11 @@
             // Append the message to the chat window
             const messageElement = document.createElement('div');
             messageElement.className = 'border-b py-2';
+            messageElement.innerHTML = `<strong>${username}</strong>: ${message} <span class="text-sm text-gray-500 ml-2">${data['time']}</span>`;
             
             if (data['link']) {
-                // If the message is a link, display it as a clickable hyperlink
                 messageElement.innerHTML = `<strong>${username}</strong>: <a href="${data['link']}" target="_blank" class="text-blue-500 hover:underline">${data['link']}</a> <span class="text-sm text-gray-500 ml-2">${data['time']}</span>`;
-            } else {
-                messageElement.innerHTML = `<strong>${username}</strong>: ${message} <span class="text-sm text-gray-500 ml-2">${data['time']}</span>`;
             }
-
             document.getElementById('chatWindow').appendChild(messageElement);
             document.getElementById('chatWindow').scrollTop = document.getElementById('chatWindow').scrollHeight;
         };
@@ -114,13 +124,42 @@
             }
         });
 
+        // Open the mention modal when the "Mention User" button is clicked
+        document.getElementById('mentionButton').onclick = function() {
+            // Fetch the members from the organization
+            fetch(`/channels/get_organization_members/{{ channel.organization.id }}/`)
+
+                .then(response => response.json())
+                .then(data => {
+                    const mentionList = document.getElementById('mentionList');
+                    mentionList.innerHTML = '';  // Clear existing list
+                    data.members.forEach(member => {
+                        const listItem = document.createElement('li');
+                        listItem.className = 'cursor-pointer text-blue-500 hover:underline';
+                        listItem.textContent = member.username;
+                        listItem.onclick = function() {
+                            const messageInput = document.getElementById('messageInput');
+                            messageInput.value += `@${member.username} `; // Append mention to input
+                            document.getElementById('mentionModal').classList.add('hidden');
+                        };
+                        mentionList.appendChild(listItem);
+                    });
+                    document.getElementById('mentionModal').classList.remove('hidden');
+                });
+        };
+
+        // Close the mention modal when the "Close" button is clicked
+        document.getElementById('closeMentionModal').onclick = function() {
+            document.getElementById('mentionModal').classList.add('hidden');
+        };
+
         // Open the send link modal when the "Send Link" button is clicked
         document.getElementById('sendLinkButton').onclick = function() {
             document.getElementById('sendLinkModal').classList.remove('hidden');
         };
 
         // Close the send link modal when the "Cancel" button is clicked
-        document.getElementById('closeModal').onclick = function() {
+        document.getElementById('closeLinkModal').onclick = function() {
             document.getElementById('sendLinkModal').classList.add('hidden');
         };
 

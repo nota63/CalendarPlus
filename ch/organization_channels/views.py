@@ -213,5 +213,23 @@ def channel_chat(request, channel_id):
     return render(request, 'channels/rooms/channel_chat.html', {'channel': channel, 'messages': messages, 'links':links})
 
 
+# Get organization members to mention
 
+def get_organization_members(request, organization_id):
+    organization = get_object_or_404(Organization, id=organization_id)
+
+ 
+    members = Profile.objects.filter(organization=organization)
+
+   
+    members_data = [
+        {
+            'id': member.user.id,
+            'username': member.user.username,
+            'full_name': f"{member.user.first_name} {member.user.last_name}"  
+        }
+        for member in members
+    ]
+
+    return JsonResponse({'members': members_data})
 

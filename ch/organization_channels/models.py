@@ -70,6 +70,16 @@ class Link(models.Model):
         return self.text
 
 
+# Mention
 
+class Mention(models.Model):
+    channel = models.ForeignKey(Channel, related_name='mentions', on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, related_name='mentions', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='mentions', on_delete=models.CASCADE)
+    mentioned_user = models.ForeignKey(User, related_name='mentioned_by', on_delete=models.CASCADE)  # User being mentioned
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.user.username} mentioned {self.mentioned_user.username} in {self.channel.name}'
 
 
