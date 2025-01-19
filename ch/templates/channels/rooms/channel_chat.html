@@ -6,6 +6,18 @@
     <title>Chat in Channel: {{ channel.name }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<style>
+
+
+</style>
+
+
+
+
+
+
+
+
 <body class="bg-gray-100">
 
     <div class="max-w-4xl mx-auto mt-10">
@@ -44,6 +56,7 @@
             <input id="messageInput" type="text" class="border p-2 w-full rounded-r-lg" placeholder="Type a message...">
             <button id="sendMessage" class="bg-blue-500 text-white p-2 rounded-lg">Send</button>
             <button id="sendLinkButton" class="bg-green-500 text-white p-2 ml-2 rounded-lg">Send Link</button>
+            <button id="emojiPickerButton" class="bg-purple-500 text-white p-2 ml-2 rounded-lg">😊</button>
         </div>
 
         <!-- Modal to mention users -->
@@ -74,6 +87,21 @@
 
     </div>
 
+
+  <!-- Emoji Picker Modal -->
+<div id="emojiPickerModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg w-1/3 max-h-[80vh] overflow-y-auto">
+        <h2 class="text-xl font-bold mb-4">Pick an Emoji</h2>
+        <div id="emojiContainer" class="grid grid-cols-6 gap-2 max-h-[60vh] overflow-y-auto">
+            <!-- Emoji options will be populated here -->
+        </div>
+        <div class="flex justify-end mt-4">
+            <button id="closeEmojiPickerModal" class="bg-gray-500 text-white p-2 rounded-lg hover:bg-gray-600">Close</button>
+        </div>
+    </div>
+</div>
+
+
     <script>
         // Get the channel ID from the Django template context
         const channelId = "{{ channel.id }}";
@@ -101,6 +129,66 @@
             document.getElementById('chatWindow').appendChild(messageElement);
             document.getElementById('chatWindow').scrollTop = document.getElementById('chatWindow').scrollHeight;
         };
+
+         // Emoji Picker Modal Logic
+         const emojiPickerButton = document.getElementById('emojiPickerButton');
+        const emojiPickerModal = document.getElementById('emojiPickerModal');
+        const closeEmojiPickerModal = document.getElementById('closeEmojiPickerModal');
+        const emojiContainer = document.getElementById('emojiContainer');
+        const emojis = [
+  '🚀', '⚡', '💥', '🔥', '🌟', '🏆', '💯', '✅', '📝', '💻', 
+  '📱', '📊', '💼', '🔧', '🛠️', '⚙️', '🧠', '💡', '⏳', '⏰', 
+  '💪', '🧑‍💻', '👩‍💻', '🤖', '🤩', '👑', '📈', '🔝', '🌍', '🌎', 
+  '🌏', '📅', '🗓️', '🕒', '📍', '🗺️', '🌐', '🏅', '🥇', '🏆', 
+  '🎯', '💭', '🔮', '🧳', '💪', '🚨', '⚠️', '❗', '❕', '💬', 
+  '💭', '💬', '💋', '❤️', '💖', '💙', '💚', '💛', '💜', '🖤',
+  '💝', '💘', '💞', '💌', '💋', '👄', '🤍', '💙', '❤️', '💛', 
+  '💚', '💜', '💖', '❤️‍🔥', '💀', '☠️', '🫀', '🫣', '🙀', 
+  '😳', '😬', '🤭', '🙄', '🤔', '🥲', '😭', '😢', '😤', '😡', 
+  '🤡', '🤣', '😂', '😆', '😹', '😂', '🤣', '😏', '🧐', '🫶', 
+  '🤪', '🥴', '😋', '🤤', '🤩', '😍', '🥰', '😎', '🤓', '🧑‍🎤',
+  '🎤', '🎧', '🎶', '🎸', '🎻', '🥁', '🎷', '🎺', '🎵', '🎼',
+  '🎹', '🎶', '🥳', '🎉', '💃', '🕺', '🤸‍♀️', '🤸‍♂️', '🕺',
+  '💃', '🩰', '🏋️‍♀️', '🏋️‍♂️', '🤸‍♀️', '🤸‍♂️', '🚴‍♀️', 
+  '🚴‍♂️', '⛷️', '🏄‍♀️', '🏄‍♂️', '🤾‍♀️', '🤾‍♂️', '🏃‍♀️', 
+  '🏃‍♂️', '💆‍♀️', '💆‍♂️', '💅', '🧑‍🦰', '🧑‍🦳', '🧑‍🦱',
+  '💅', '🧖‍♀️', '🧖‍♂️', '🧑‍⚖️', '🎯', '🎳', '🏓', '🏸', 
+  '⚽', '🏀', '🏈', '🎾', '🏐', '🏑', '🏒', '🥋', '⛸️', '🏅',
+  '🥇', '🥈', '🥉', '🏆', '🎮', '🎮', '🖥️', '🎲', '🎯', '🧩',
+  '🎲', '🧠', '💡', '📚', '📖', '📝', '📜', '📄', '📋', '📎',
+  '✂️', '📌', '📍', '📅', '📆', '🗓️', '🔖', '🗃️', '📒', 
+  '📚', '📑', '📙', '📘', '📗', '📒', '📓', '📂', '📁', '💼', 
+  '🧳', '🎒', '💼', '🧸', '👕', '👚', '👗', '👖', '👔', '👚', 
+  '👠', '👢', '👡', '👟', '🥿', '👞', '🧢', '👑', '👒', '🎩', 
+  '💍', '📿', '💄', '💅', '👓', '🕶️', '👛', '👝', '💼', '🧳', 
+  '🎒', '👜', '👝', '👛', '🧣', '🧤', '🧥', '👗', '👚', '🧵', 
+  '🧶', '🎨', '🎭', '🎪', '🖼️', '🎬', '🎥', '🎞️', '🎬', '📸', 
+  '📷', '📹', '🎥', '🎬', '🎞️', '🎭', '🖼️', '🎤', '🎧', '🎼',
+  '🎶', '🎵', '🎻', '🎺', '🎷', '🎸', '🥁', '🎤', '🎬', '🎵',
+  '🎶', '🎧', '🎤', '🎼', '🎸', '🥁', '🎻', '🎶', '🎧', '🎷', 
+  '🎺', '🎸', '🪕', '🎶', '🎤', '🎬', '🎶', '🎧', '📻', '🎵',
+  '🎼', '🎸', '🎹', '🎷', '🥁', '🎼', '🎧', '🎻', '🎤', '🎶',
+  '🎸', '🎷', '🎺', '🎻', '🎶', '🎼', '🎤', '🎵', '🎶', '🎹'
+];
+
+        emojiPickerButton.onclick = () => {
+            emojiContainer.innerHTML = '';
+            emojis.forEach(emoji => {
+                const button = document.createElement('button');
+                button.className = 'text-2xl';
+                button.textContent = emoji;
+                button.onclick = () => {
+                    const messageInput = document.getElementById('messageInput');
+                    messageInput.value += emoji;
+                    emojiPickerModal.classList.add('hidden');
+                };
+                emojiContainer.appendChild(button);
+            });
+            emojiPickerModal.classList.remove('hidden');
+        };
+
+        closeEmojiPickerModal.onclick = () => emojiPickerModal.classList.add('hidden');
+
 
         // Handle WebSocket connection closing
         chatSocket.onclose = function(e) {
