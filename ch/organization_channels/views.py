@@ -1,12 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from accounts.models import Organization, Profile
-from .models import Channel
+from .models import Channel, Message
 from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
-from formtools.wizard.views import SessionWizardView
 from .forms import ChannelTypeForm, ChannelNameForm, ChannelVisibilityForm
 from django.template.loader import render_to_string
 from django.conf import settings
@@ -203,13 +202,11 @@ class ChannelListView(LoginRequiredMixin, View):
     
 
 # Redirect to channel room
-
 def channel_chat(request, channel_id):
     channel = get_object_or_404(Channel, id=channel_id)
+    messages = Message.objects.filter(channel=channel).order_by('timestamp')
 
-    return render(request, 'channels/rooms/channel_chat.html', {'channel': channel})
-
-
+    return render(request, 'channels/rooms/channel_chat.html', {'channel': channel, 'messages': messages})
 
 
 

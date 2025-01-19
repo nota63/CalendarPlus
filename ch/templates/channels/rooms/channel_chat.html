@@ -11,8 +11,16 @@
     <div class="max-w-4xl mx-auto mt-10">
         <h1 class="text-2xl font-bold text-center">Chat in Channel: {{ channel.name }}</h1>
         
-        <div id="chatWindow" class="bg-white p-4 rounded-lg shadow-lg mb-4 max-h-80 overflow-y-auto">
-            <!-- Messages will be displayed here -->
+        <div id="chatWindow" class="bg-white p-4 rounded-lg shadow-lg mb-4 max-h-[400px] overflow-y-auto">
+            <!-- Loop through messages and display them -->
+            {% for message in messages %}
+                <div class="border-b py-2">
+                    <strong>{{ message.user.username }}</strong>: {{ message.content }}
+                    <span class="text-sm text-gray-500 ml-2">{{ message.timestamp|date:"H:i" }}</span>
+                </div>
+            {% empty %}
+                <p class="text-center text-gray-500">No messages yet. Be the first to send a message!</p>
+            {% endfor %}
         </div>
 
         <div class="flex">
@@ -40,7 +48,7 @@
             // Append the message to the chat window
             const messageElement = document.createElement('div');
             messageElement.className = 'border-b py-2';
-            messageElement.innerHTML = `<strong>${username}</strong>: ${message}`;
+            messageElement.innerHTML = `<strong>${username}</strong>: ${message} <span class="text-sm text-gray-500 ml-2">${data['time']}</span>`;
             document.getElementById('chatWindow').appendChild(messageElement);
             document.getElementById('chatWindow').scrollTop = document.getElementById('chatWindow').scrollHeight;
         };
@@ -70,3 +78,4 @@
 
 </body>
 </html>
+

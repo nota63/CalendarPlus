@@ -43,7 +43,17 @@ class Channel(models.Model):
 
     
 
+# Save messages into database
 
+class Message(models.Model):
+    channel = models.ForeignKey(Channel, related_name='messages', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='messages', on_delete=models.CASCADE)
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    organization = models.ForeignKey(Organization, related_name='messages', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Message by {self.user.username} in {self.channel.name}"
 
 
 
