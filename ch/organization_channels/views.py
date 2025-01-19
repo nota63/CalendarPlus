@@ -156,8 +156,6 @@ def channel_statistics(request, org_id):
 
 # Display channels 
 
-
-
 class ChannelListView(LoginRequiredMixin, View):
     template_name = 'channels/creation/channels_list.html'
 
@@ -202,3 +200,17 @@ class ChannelListView(LoginRequiredMixin, View):
             'channels': channels.distinct(),
         }
         return render(request, self.template_name, context)
+    
+
+# Redirect to channel room
+
+def channel_chat(request, channel_id):
+    channel = get_object_or_404(Channel, id=channel_id)
+
+    return render(request, 'channels/rooms/channel_chat.html', {'channel': channel})
+
+
+
+
+
+

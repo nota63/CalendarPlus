@@ -17,7 +17,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 
 STATIC_URL = '/static/'
@@ -119,7 +119,7 @@ TEMPLATES = [
 
 ASGI_APPLICATION = 'ch.asgi.application'
 
-WSGI_APPLICATION = 'ch.wsgi.application'
+# WSGI_APPLICATION = 'ch.wsgi.application'
 
 # Database
 DATABASES = {
@@ -170,7 +170,7 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
+
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
@@ -184,9 +184,9 @@ import os
 
 STATIC_URL = '/static/'
 
-# Ensure static files are collected correctly
+
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'ch/static'),  # Adjust path as necessary
+    os.path.join(BASE_DIR, 'ch/static'), 
 ]
 
 
@@ -240,18 +240,6 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 
-# CACHES = {
-#     "default": {
-#         "BACKEND": "django_redis.cache.RedisCache",
-#         "LOCATION": "redis://127.0.0.1:6379/1",  
-#         "OPTIONS": {
-#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-#         }
-#     }
-# }
-
-
-
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_ALL_ORIGINS = True
 
@@ -267,10 +255,9 @@ GOOGLE_CREDENTIALS_FILE = os.path.join(BASE_DIR,'credentials.json')
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 
-# Use the default database-backed sessions
+
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
-# Ensure session cookies are being set
 SESSION_COOKIE_SECURE = False  
 CSRF_COOKIE_SECURE = False  
 
@@ -287,20 +274,16 @@ STATICFILES_DIRS = [BASE_DIR ,'static']
 SITE_URL = ' http://127.0.0.1:8000/calendar'
 
 
-# Ckeditor configurations
-
-
-
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR ,'media'
 
 
 
-# settings.py
+
 STATIC_URL = '/static/'
 
-# If you have a custom directory for static files
+
 STATICFILES_DIRS = [
     BASE_DIR ,"static",
 ]

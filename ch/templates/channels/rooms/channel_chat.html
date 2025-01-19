@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat in Channel: {{ channel.name }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+    <div class="max-w-4xl mx-auto mt-10">
+        <h1 class="text-2xl font-bold text-center">Chat in Channel: {{ channel.name }}</h1>
+        
+        <div id="chatWindow" class="bg-white p-4 rounded-lg shadow-lg mb-4 max-h-80 overflow-y-auto">
+            <!-- Messages will be displayed here -->
+        </div>
+
+        <div class="flex">
+            <input id="messageInput" type="text" class="border p-2 w-full rounded-l-lg" placeholder="Type a message...">
+            <button id="sendMessage" class="bg-blue-500 text-white p-2 rounded-r-lg">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // Get the channel ID from the Django template context
+        const channelId = "{{ channel.id }}";
+        const chatSocket = new WebSocket(`ws://${window.location.host}/ws/channel/${channelId}/`);
+
+        // When the WebSocket connection is opened
+        chatSocket.onopen = function(e) {
+            console.log('WebSocket connection established!');
+        };
+
+        // When a new message is received from the WebSocket
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            const message = data['message'];
+            const username = data['username'];
+
+            // Append the message to the chat window
+            const messageElement = document.createElement('div');
+            messageElement.className = 'border-b py-2';
+            messageElement.innerHTML = `<strong>${username}</strong>: ${message}`;
+            document.getElementById('chatWindow').appendChild(messageElement);
+            document.getElementById('chatWindow').scrollTop = document.getElementById('chatWindow').scrollHeight;
+        };
+
+        // Handle WebSocket connection closing
+        chatSocket.onclose = function(e) {
+            console.log('WebSocket connection closed.');
+        };
+
+        // Send the message when the Send button is clicked
+        document.getElementById('sendMessage').onclick = function(e) {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value;
+            if (message.trim()) {
+                chatSocket.send(JSON.stringify({'message': message}));
+                messageInput.value = '';  // Clear the input
+            }
+        };
+
+        // Allow the Enter key to send the message
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('sendMessage').click();
+            }
+        });
+    </script>
+
+</body>
+</html>
