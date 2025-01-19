@@ -1,6 +1,7 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import Channel, Message, Link, Mention
+from .models import (Channel, Message, Link, Mention, ActivityChannel)
+from django.utils import timezone
 from channels.db import database_sync_to_async
 from datetime import datetime
 import json
@@ -104,6 +105,19 @@ class ChatConsumerNew(AsyncWebsocketConsumer):
             organization=organization
         )
 
+        current_time = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        # Log the activity
+        activity = ActivityChannel.objects.create(
+           user=user,
+           channel=channel,
+           organization=organization,
+           action_type='MESSAGE',
+           content = f"{user.username}  dropped a message: {message} at {current_time} "
+
+        )
+
+
     @database_sync_to_async
     def save_link(self, channel_id, user, link_text, link_url):
         channel = Channel.objects.get(id=channel_id)
@@ -116,6 +130,16 @@ class ChatConsumerNew(AsyncWebsocketConsumer):
             text=link_text,
             link=link_url
         )
+
+        # Log the activity
+        activity = ActivityChannel.objects.create(
+           user=user,
+           channel=channel,
+           organization=organization,
+           action_type='LINK',
+           content=f'{user.username} shared a link {link_url} with wrapped text {link_text}'
+        )
+        
 
     @database_sync_to_async
     def save_audio_video_file(self, channel_id, user, file_data, file_type):
@@ -139,6 +163,15 @@ class ChatConsumerNew(AsyncWebsocketConsumer):
                 organization=organization,
                 audio=file
             )
+
+            # Log the activity
+            activity = ActivityChannel.objects.create(
+               user=user,
+               channel=channel,
+               organization=organization,
+               action_type='FILE_UPLOAD',
+               content=f"{user.username} uploaded a file {file_type} - {file_data}"
+             )
         elif file_type == 'video':
             Message.objects.create(
                 channel=channel,
@@ -147,5 +180,13 @@ class ChatConsumerNew(AsyncWebsocketConsumer):
                 organization=organization,
                 video=file
             )
+             # Log the activity
+            activity = ActivityChannel.objects.create(
+               user=user,
+               channel=channel,
+               organization=organization,
+               action_type='FILE_UPLOAD',
+               content=f"{user.username} uploaded a file {file_type} - {file_data}"
+             )
 
         return f'/media/{file_name}'
