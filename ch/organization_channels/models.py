@@ -49,12 +49,15 @@ class Message(models.Model):
     channel = models.ForeignKey(Channel, related_name='messages', on_delete=models.CASCADE)
     user = models.ForeignKey(User, related_name='messages', on_delete=models.CASCADE)
     content = models.TextField()
+    audio = models.FileField(upload_to='uploads/audio/', null=True, blank=True)  
+    video = models.FileField(upload_to='uploads/video/', null=True, blank=True)  
     timestamp = models.DateTimeField(auto_now_add=True)
     organization = models.ForeignKey(Organization, related_name='messages', on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Message by {self.user.username} in {self.channel.name}"
-
+    
+ 
 
 # Link
 

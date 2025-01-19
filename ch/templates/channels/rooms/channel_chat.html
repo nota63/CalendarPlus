@@ -6,10 +6,6 @@
     <title>Chat in Channel: {{ channel.name }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<style>
-
-
-</style>
 
 
 
@@ -19,7 +15,6 @@
 
 
 <body class="bg-gray-100">
-
     <div class="max-w-4xl mx-auto mt-10">
         <h1 class="text-2xl font-bold text-center">Chat in Channel: {{ channel.name }}</h1>
 
@@ -57,6 +52,10 @@
             <button id="sendMessage" class="bg-blue-500 text-white p-2 rounded-lg">Send</button>
             <button id="sendLinkButton" class="bg-green-500 text-white p-2 ml-2 rounded-lg">Send Link</button>
             <button id="emojiPickerButton" class="bg-purple-500 text-white p-2 ml-2 rounded-lg">😊</button>
+
+            <!-- New buttons for uploading audio and video -->
+            <button id="uploadAudioButton" class="bg-indigo-500 text-white p-2 ml-2 rounded-lg">📀 Upload Audio</button>
+            <button id="uploadVideoButton" class="bg-teal-500 text-white p-2 ml-2 rounded-lg">🎥 Upload Video</button>
         </div>
 
         <!-- Modal to mention users -->
@@ -85,28 +84,50 @@
             </div>
         </div>
 
-    </div>
-
-
-  <!-- Emoji Picker Modal -->
-<div id="emojiPickerModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white p-6 rounded-lg w-1/3 max-h-[80vh] overflow-y-auto">
-        <h2 class="text-xl font-bold mb-4">Pick an Emoji</h2>
-        <div id="emojiContainer" class="grid grid-cols-6 gap-2 max-h-[60vh] overflow-y-auto">
-            <!-- Emoji options will be populated here -->
+        <!-- Emoji Picker Modal -->
+        <div id="emojiPickerModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg w-1/3 max-h-[80vh] overflow-y-auto">
+                <h2 class="text-xl font-bold mb-4">Pick an Emoji</h2>
+                <div id="emojiContainer" class="grid grid-cols-6 gap-2 max-h-[60vh] overflow-y-auto">
+                    <!-- Emoji options will be populated here -->
+                </div>
+                <div class="flex justify-end mt-4">
+                    <button id="closeEmojiPickerModal" class="bg-gray-500 text-white p-2 rounded-lg hover:bg-gray-600">Close</button>
+                </div>
+            </div>
         </div>
-        <div class="flex justify-end mt-4">
-            <button id="closeEmojiPickerModal" class="bg-gray-500 text-white p-2 rounded-lg hover:bg-gray-600">Close</button>
-        </div>
-    </div>
-</div>
 
+        <!-- Audio Upload Modal -->
+        <div id="audioUploadModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg w-1/3">
+                <h2 class="text-xl font-bold mb-4">Upload Audio</h2>
+                <input type="file" id="audioFileInput" class="border p-2 w-full mb-4" accept="audio/*">
+                <div class="flex justify-end">
+                    <button id="uploadAudio" class="bg-blue-500 text-white p-2 rounded-lg">Upload</button>
+                    <button id="closeAudioModal" class="bg-gray-500 text-white p-2 ml-2 rounded-lg">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Upload Modal -->
+        <div id="videoUploadModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg w-1/3">
+                <h2 class="text-xl font-bold mb-4">Upload Video</h2>
+                <input type="file" id="videoFileInput" class="border p-2 w-full mb-4" accept="video/*">
+                <div class="flex justify-end">
+                    <button id="uploadVideo" class="bg-blue-500 text-white p-2 rounded-lg">Upload</button>
+                    <button id="closeVideoModal" class="bg-gray-500 text-white p-2 ml-2 rounded-lg">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
 
     <script>
         // Get the channel ID from the Django template context
         const channelId = "{{ channel.id }}";
         const chatSocket = new WebSocket(`ws://${window.location.host}/ws/channel/${channelId}/`);
-
+   
         // When the WebSocket connection is opened
         chatSocket.onopen = function(e) {
             console.log('WebSocket connection established!');
@@ -117,7 +138,6 @@
             const data = JSON.parse(e.data);
             const message = data['message'];
             const username = data['username'];
-
             // Append the message to the chat window
             const messageElement = document.createElement('div');
             messageElement.className = 'border-b py-2';
@@ -126,50 +146,19 @@
             if (data['link']) {
                 messageElement.innerHTML = `<strong>${username}</strong>: <a href="${data['link']}" target="_blank" class="text-blue-500 hover:underline">${data['link']}</a> <span class="text-sm text-gray-500 ml-2">${data['time']}</span>`;
             }
+
             document.getElementById('chatWindow').appendChild(messageElement);
             document.getElementById('chatWindow').scrollTop = document.getElementById('chatWindow').scrollHeight;
         };
 
-         // Emoji Picker Modal Logic
-         const emojiPickerButton = document.getElementById('emojiPickerButton');
+        // Emoji Picker Modal Logic
+        const emojiPickerButton = document.getElementById('emojiPickerButton');
         const emojiPickerModal = document.getElementById('emojiPickerModal');
         const closeEmojiPickerModal = document.getElementById('closeEmojiPickerModal');
         const emojiContainer = document.getElementById('emojiContainer');
         const emojis = [
-  '🚀', '⚡', '💥', '🔥', '🌟', '🏆', '💯', '✅', '📝', '💻', 
-  '📱', '📊', '💼', '🔧', '🛠️', '⚙️', '🧠', '💡', '⏳', '⏰', 
-  '💪', '🧑‍💻', '👩‍💻', '🤖', '🤩', '👑', '📈', '🔝', '🌍', '🌎', 
-  '🌏', '📅', '🗓️', '🕒', '📍', '🗺️', '🌐', '🏅', '🥇', '🏆', 
-  '🎯', '💭', '🔮', '🧳', '💪', '🚨', '⚠️', '❗', '❕', '💬', 
-  '💭', '💬', '💋', '❤️', '💖', '💙', '💚', '💛', '💜', '🖤',
-  '💝', '💘', '💞', '💌', '💋', '👄', '🤍', '💙', '❤️', '💛', 
-  '💚', '💜', '💖', '❤️‍🔥', '💀', '☠️', '🫀', '🫣', '🙀', 
-  '😳', '😬', '🤭', '🙄', '🤔', '🥲', '😭', '😢', '😤', '😡', 
-  '🤡', '🤣', '😂', '😆', '😹', '😂', '🤣', '😏', '🧐', '🫶', 
-  '🤪', '🥴', '😋', '🤤', '🤩', '😍', '🥰', '😎', '🤓', '🧑‍🎤',
-  '🎤', '🎧', '🎶', '🎸', '🎻', '🥁', '🎷', '🎺', '🎵', '🎼',
-  '🎹', '🎶', '🥳', '🎉', '💃', '🕺', '🤸‍♀️', '🤸‍♂️', '🕺',
-  '💃', '🩰', '🏋️‍♀️', '🏋️‍♂️', '🤸‍♀️', '🤸‍♂️', '🚴‍♀️', 
-  '🚴‍♂️', '⛷️', '🏄‍♀️', '🏄‍♂️', '🤾‍♀️', '🤾‍♂️', '🏃‍♀️', 
-  '🏃‍♂️', '💆‍♀️', '💆‍♂️', '💅', '🧑‍🦰', '🧑‍🦳', '🧑‍🦱',
-  '💅', '🧖‍♀️', '🧖‍♂️', '🧑‍⚖️', '🎯', '🎳', '🏓', '🏸', 
-  '⚽', '🏀', '🏈', '🎾', '🏐', '🏑', '🏒', '🥋', '⛸️', '🏅',
-  '🥇', '🥈', '🥉', '🏆', '🎮', '🎮', '🖥️', '🎲', '🎯', '🧩',
-  '🎲', '🧠', '💡', '📚', '📖', '📝', '📜', '📄', '📋', '📎',
-  '✂️', '📌', '📍', '📅', '📆', '🗓️', '🔖', '🗃️', '📒', 
-  '📚', '📑', '📙', '📘', '📗', '📒', '📓', '📂', '📁', '💼', 
-  '🧳', '🎒', '💼', '🧸', '👕', '👚', '👗', '👖', '👔', '👚', 
-  '👠', '👢', '👡', '👟', '🥿', '👞', '🧢', '👑', '👒', '🎩', 
-  '💍', '📿', '💄', '💅', '👓', '🕶️', '👛', '👝', '💼', '🧳', 
-  '🎒', '👜', '👝', '👛', '🧣', '🧤', '🧥', '👗', '👚', '🧵', 
-  '🧶', '🎨', '🎭', '🎪', '🖼️', '🎬', '🎥', '🎞️', '🎬', '📸', 
-  '📷', '📹', '🎥', '🎬', '🎞️', '🎭', '🖼️', '🎤', '🎧', '🎼',
-  '🎶', '🎵', '🎻', '🎺', '🎷', '🎸', '🥁', '🎤', '🎬', '🎵',
-  '🎶', '🎧', '🎤', '🎼', '🎸', '🥁', '🎻', '🎶', '🎧', '🎷', 
-  '🎺', '🎸', '🪕', '🎶', '🎤', '🎬', '🎶', '🎧', '📻', '🎵',
-  '🎼', '🎸', '🎹', '🎷', '🥁', '🎼', '🎧', '🎻', '🎤', '🎶',
-  '🎸', '🎷', '🎺', '🎻', '🎶', '🎼', '🎤', '🎵', '🎶', '🎹'
-];
+            '🚀', '⚡', '💥', '🔥', '🌟', '🏆', '💯', '✅', '📝', '💻',
+        ];
 
         emojiPickerButton.onclick = () => {
             emojiContainer.innerHTML = '';
@@ -189,9 +178,65 @@
 
         closeEmojiPickerModal.onclick = () => emojiPickerModal.classList.add('hidden');
 
+        // Open the audio upload modal
+        document.getElementById('uploadAudioButton').onclick = function() {
+            document.getElementById('audioUploadModal').classList.remove('hidden');
+        };
 
-        // Handle WebSocket connection closing
-        chatSocket.onclose = function(e) {
+        // Close the audio upload modal
+        document.getElementById('closeAudioModal').onclick = function() {
+            document.getElementById('audioUploadModal').classList.add('hidden');
+        };
+
+        // Open the video upload modal
+        document.getElementById('uploadVideoButton').onclick = function() {
+            document.getElementById('videoUploadModal').classList.remove('hidden');
+        };
+
+        // Close the video upload modal
+        document.getElementById('closeVideoModal').onclick = function() {
+            document.getElementById('videoUploadModal').classList.add('hidden');
+        };
+
+        // Handle file uploads (Audio and Video)
+        document.getElementById('uploadAudio').onclick = function() {
+            const audioFile = document.getElementById('audioFileInput').files[0];
+            if (audioFile) {
+                // Handle audio file upload here (send to server)
+                chatSocket.send(JSON.stringify({'audio': audioFile}));
+                document.getElementById('audioUploadModal').classList.add('hidden');
+            }
+        };
+
+        document.getElementById('uploadVideo').onclick = function() {
+            const videoFile = document.getElementById('videoFileInput').files[0];
+            if (videoFile) {
+                // Handle video file upload here (send to server)
+                chatSocket.send(JSON.stringify({'video': videoFile}));
+                document.getElementById('videoUploadModal').classList.add('hidden');
+            }
+        };
+
+        // Send the message when the Send button is clicked
+        document.getElementById('sendMessage').onclick = function(e) {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value;
+            if (message.trim()) {
+                chatSocket.send(JSON.stringify({'message': message}));
+                messageInput.value = '';  // Clear the input
+            }
+        };
+
+        // Allow the Enter key to send the message
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('sendMessage').click();
+            }
+        });
+
+
+           // Handle WebSocket connection closing
+           chatSocket.onclose = function(e) {
             console.log('WebSocket connection closed.');
         };
 
@@ -262,7 +307,6 @@
                 document.getElementById('sendLinkModal').classList.add('hidden');
             }
         };
-    </script>
 
+    </script>
 </body>
-</html>
