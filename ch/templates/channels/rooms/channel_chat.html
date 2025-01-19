@@ -6,19 +6,19 @@
     <title>Chat in Channel: {{ channel.name }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-
-
 <!-- Button to open the user list modal -->
-<button id="userListButton" class="btn btn-primary">View Users</button>
+<button id="userListButton" class="btn btn-primary bg-blue-500 text-white px-6 py-2 rounded-md shadow-md hover:bg-blue-600 focus:outline-none transition duration-300 ease-in-out transform hover:scale-105">
+    View Users
+</button>
 
 <!-- Modal for displaying the user list -->
-<div id="userListModal" class="modal hidden">
-    <div class="modal-content">
-        <h3 class="modal-title">Channel Users</h3>
+<div id="userListModal" class="modal fixed inset-0 bg-gray-800 bg-opacity-50 hidden justify-center items-center z-50">
+    <div class="modal-content bg-white p-6 rounded-lg max-w-lg w-full transform transition duration-500 ease-in-out scale-95 hover:scale-100">
+        <h3 class="modal-title text-xl font-semibold mb-4">Channel Users</h3>
         <ul id="userList" class="space-y-2">
             <!-- List of users will be dynamically populated here -->
         </ul>
-        <button class="btn-close" onclick="document.getElementById('userListModal').classList.add('hidden')">Close</button>
+        <button class="btn-close bg-red-500 text-white px-4 py-2 rounded-md mt-4 hover:bg-red-600 transition duration-300" onclick="document.getElementById('userListModal').classList.add('hidden')">Close</button>
     </div>
 </div>
 
@@ -362,6 +362,13 @@
             console.error('Error fetching users:', error);
         });
 };
+
+
+
+
+
+
+
 
     </script>
 </body>

@@ -86,3 +86,28 @@ class Mention(models.Model):
         return f'{self.user.username} mentioned {self.mentioned_user.username} in {self.channel.name}'
 
 
+# Track inside channel activity
+
+class ActivityChannel(models.Model):
+    ACTION_CHOICES = [
+        ('MESSAGE', 'Message'),
+        ('MENTION', 'Mention'),
+        ('EMOJI', 'Emoji'),
+        ('LINK', 'Link'),
+        ('FILE_UPLOAD', 'File Upload'),
+        ('JOIN', 'Join'),
+        ('LEAVE', 'Leave'),
+    ]
+
+    user = models.ForeignKey(User, related_name='activities', on_delete=models.CASCADE)
+    channel = models.ForeignKey(Channel, related_name='activities', on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, related_name='activities', on_delete=models.CASCADE)
+    action_type = models.CharField(max_length=20, choices=ACTION_CHOICES)
+    content = models.TextField(null=True, blank=True) 
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} performed {self.get_action_type_display()} in {self.channel.name}"
+
+    class Meta:
+        ordering = ['-timestamp'] 
