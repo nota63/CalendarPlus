@@ -13,6 +13,18 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.http import JsonResponse
 from django.db.models import Count
+from django.views import View
+from .models import Channel
+from accounts.models import Profile, Organization
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
+from django.http import JsonResponse
+
+
+
+
+
+
 # Create your views here.
 
 # Create the channel 
@@ -139,3 +151,54 @@ def channel_statistics(request, org_id):
     }
 
     return JsonResponse(response)
+
+
+
+# Display channels 
+
+
+
+class ChannelListView(LoginRequiredMixin, View):
+    template_name = 'channels/creation/channels_list.html'
+
+    def get(self, request, org_id):
+
+        organization = get_object_or_404(Organization, id=org_id)
+
+     
+        profile = Profile.objects.filter(user=request.user, organization=organization).first()
+        if not profile:
+            return render(request, 'error.html', {'message': 'You are not part of this organization.'})
+
+
+        query = request.GET.get('q', '')
+
+    
+        public_channels = Channel.objects.filter(organization=organization, visibility='PUBLIC')
+        private_channels = Channel.objects.filter(
+            organization=organization, visibility='PRIVATE', allowed_members=request.user
+        )
+        channels = public_channels | private_channels
+
+
+        if query:
+            channels = channels.filter(Q(name__icontains=query) | Q(type__icontains=query))
+
+    
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            channel_data = [
+                {
+                    'name': channel.name,
+                    'type': channel.get_type_display(),
+                    'visibility': channel.get_visibility_display(),
+                    'created_at': channel.created_at.strftime('%B %d, %Y'),
+                }
+                for channel in channels.distinct()
+            ]
+            return JsonResponse({'channels': channel_data})
+
+        context = {
+            'organization': organization,
+            'channels': channels.distinct(),
+        }
+        return render(request, self.template_name, context)

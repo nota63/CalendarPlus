@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Channels - {{ organization.name }}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Simple spinner for loading indication */
+        #loading {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="max-w-4xl mx-auto mt-10">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Channels in {{ organization.name }}</h1>
+
+        <!-- Search Form -->
+        <div class="relative">
+            <input 
+                id="searchInput" 
+                type="text" 
+                placeholder="Search channels..." 
+                class="w-full p-3 border rounded-lg focus:ring focus:ring-blue-300"
+            />
+            <div id="loading" class="absolute top-3 right-5">
+                <span class="text-gray-500">Loading...</span>
+            </div>
+        </div>
+
+        <!-- Channels List -->
+        <div id="channelsList" class="space-y-4 mt-6">
+            {% for channel in channels %}
+                <div class="bg-white p-4 shadow rounded-lg">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xl font-semibold text-gray-700">{{ channel.name }}</h2>
+                        <span class="text-sm text-gray-500 px-3 py-1 rounded bg-gray-100">
+                            {{ channel.get_visibility_display }}
+                        </span>
+                    </div>
+                    <p class="text-gray-600 mt-2">{{ channel.get_type_display }}</p>
+                    <p class="text-sm text-gray-400 mt-1">Created on: {{ channel.created_at|date:"F j, Y" }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- JavaScript for AJAX -->
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const channelsList = document.getElementById('channelsList');
+        const loadingIndicator = document.getElementById('loading');
+
+        searchInput.addEventListener('input', function () {
+            const query = searchInput.value;
+
+            // Show loading indicator
+            loadingIndicator.style.display = 'inline';
+
+            // Make AJAX request
+            fetch(`?q=${query}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Clear current list
+                channelsList.innerHTML = '';
+
+                if (data.channels.length === 0) {
+                    channelsList.innerHTML = `
+                        <div class="bg-white p-6 shadow rounded-lg text-center">
+                            <p class="text-gray-600">No channels match your search.</p>
+                        </div>
+                    `;
+                } else {
+                    // Populate list with new data
+                    data.channels.forEach(channel => {
+                        channelsList.innerHTML += `
+                            <div class="bg-white p-4 shadow rounded-lg">
+                                <div class="flex justify-between items-center">
+                                    <h2 class="text-xl font-semibold text-gray-700">${channel.name}</h2>
+                                    <span class="text-sm text-gray-500 px-3 py-1 rounded bg-gray-100">
+                                        ${channel.visibility}
+                                    </span>
+                                </div>
+                                <p class="text-gray-600 mt-2">${channel.type}</p>
+                                <p class="text-sm text-gray-400 mt-1">Created on: ${channel.created_at}</p>
+                            </div>
+                        `;
+                    });
+                }
+
+                // Hide loading indicator
+                loadingIndicator.style.display = 'none';
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                loadingIndicator.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>

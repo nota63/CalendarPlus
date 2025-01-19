@@ -277,6 +277,11 @@
                 <span class="material-icons">person_add</span>Channels
             </a>
 
+            <a href="{% url 'channels_list' organization.id %}">
+                <span class="material-icons">person_add</span>Workspace Channels
+            </a>
+
+
 
 
 
@@ -322,6 +327,11 @@
                 <span class="material-icons">person_add</span>Groups
             </a>
 
+            <a href="{% url 'channels_list' organization.id %}">
+                <span class="material-icons">person_add</span>Workspace Channels
+            </a>
+
+
         {% else %}
             <h3 class="font-semibold text-lg text-white mb-6">Employee Controls</h3>
             <a href="{% url 'project_views_others' organization_id=organization.id %}">
@@ -358,6 +368,11 @@
             <a href="{% url 'user_groups' organization.id %}">
                 <span class="material-icons">person_add</span>Groups
             </a>
+
+            <a href="{% url 'channels_list' organization.id %}">
+                <span class="material-icons">person_add</span>Workspace Channels
+            </a>
+
 
 
             
