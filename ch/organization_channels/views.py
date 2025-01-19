@@ -233,3 +233,27 @@ def get_organization_members(request, organization_id):
 
     return JsonResponse({'members': members_data})
 
+
+# Get channel members
+def get_channel_members(request, org_id, channel_id):
+
+    organization = get_object_or_404(Organization, id=org_id)
+
+
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+
+    channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+
+    if channel.visibility == 'PUBLIC':
+        members = Profile.objects.filter(organization=organization)
+    else:
+        
+        members = channel.allowed_members.all()
+
+   
+    member_list = [{"id": member.user.id, "username": member.user.username} for member in members]
+
+    return JsonResponse({'members': member_list})
