@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from accounts.models import Organization, Profile
-from .models import Channel, Message
+from .models import (
+    Channel, Message, Link)
+
+
 from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -205,8 +208,9 @@ class ChannelListView(LoginRequiredMixin, View):
 def channel_chat(request, channel_id):
     channel = get_object_or_404(Channel, id=channel_id)
     messages = Message.objects.filter(channel=channel).order_by('timestamp')
+    links=Link.objects.filter(channel=channel).order_by('timestamp')
 
-    return render(request, 'channels/rooms/channel_chat.html', {'channel': channel, 'messages': messages})
+    return render(request, 'channels/rooms/channel_chat.html', {'channel': channel, 'messages': messages, 'links':links})
 
 
 
