@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from accounts.models import Organization, Profile
 from .models import (
-    Channel, Message, Link)
-
+    Channel, Message, Link , ActivityChannel)
+from django.utils.dateparse import parse_datetime
 
 from django.urls import reverse
 from django.contrib import messages
@@ -215,11 +215,12 @@ def channel_chat(request, channel_id):
 
 # Get organization members to mention
 
-def get_organization_members(request, organization_id):
+def get_organization_members(request,organization_id):
     organization = get_object_or_404(Organization, id=organization_id)
 
  
     members = Profile.objects.filter(organization=organization)
+   
 
    
     members_data = [
@@ -230,7 +231,6 @@ def get_organization_members(request, organization_id):
         }
         for member in members
     ]
-
     return JsonResponse({'members': members_data})
 
 
@@ -255,5 +255,24 @@ def get_channel_members(request, org_id, channel_id):
 
    
     member_list = [{"id": member.user.id, "username": member.user.username} for member in members]
+    print("MEMBERS FOUND:", member_list)
 
     return JsonResponse({'members': member_list})
+
+
+# Fetch activity logs
+def fetch_activity_logs(request, channel_id):
+    channel = get_object_or_404(Channel, id=channel_id)
+
+    # Fetch the latest activity logs for the channel
+    activity_logs = ActivityChannel.objects.filter(channel=channel).order_by('-timestamp')
+
+    logs = []
+    for log in activity_logs:
+        logs.append({
+            'user': log.user.username,
+            'content': log.content,
+            'timestamp': log.timestamp.strftime('%Y-%m-%d %H:%M:%S'),  
+        })
+
+    return JsonResponse({'success': True, 'logs': logs})

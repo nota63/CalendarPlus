@@ -5,23 +5,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat in Channel: {{ channel.name }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Add Bootstrap 5 CSS in your <head> section -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<!-- Button to open the user list modal -->
-<button id="userListButton" class="btn btn-primary bg-blue-500 text-white px-6 py-2 rounded-md shadow-md hover:bg-blue-600 focus:outline-none transition duration-300 ease-in-out transform hover:scale-105">
-    View Users
-</button>
+
+
+
+
 
 <!-- Modal for displaying the user list -->
-<div id="userListModal" class="modal fixed inset-0 bg-gray-800 bg-opacity-50 hidden justify-center items-center z-50">
-    <div class="modal-content bg-white p-6 rounded-lg max-w-lg w-full transform transition duration-500 ease-in-out scale-95 hover:scale-100">
-        <h3 class="modal-title text-xl font-semibold mb-4">Channel Users</h3>
-        <ul id="userList" class="space-y-2">
-            <!-- List of users will be dynamically populated here -->
-        </ul>
-        <button class="btn-close bg-red-500 text-white px-4 py-2 rounded-md mt-4 hover:bg-red-600 transition duration-300" onclick="document.getElementById('userListModal').classList.add('hidden')">Close</button>
+<div id="userListModal" class="modal fade" tabindex="-1" aria-labelledby="userListModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userListModalLabel">Channel Users</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="userList" class="list-group list-group-flush">
+                    <!-- List of users will be dynamically populated here -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
     </div>
 </div>
 
+<!-- Bootstrap 5 Modal to show the logs -->
+<div class="modal fade" id="activityLogsModal" tabindex="-1" aria-labelledby="activityLogsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="activityLogsModalLabel">Activity Logs</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="activityLogsList" class="list-group">
+            <!-- Logs will be dynamically populated here -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+<!-- ---------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+
+<!-- Button to trigger fetching logs -->
+<button id="fetchLogsButton" class="btn btn-primary">Fetch Activity Logs</button>
+ <!-- Button to open the user list modal -->
+
+
+<!-- Button to open the user list modal -->
+<button id="userListButton" class="btn btn-primary btn-lg shadow-sm px-3 py-1 rounded-3 text-white hover:bg-blue-600 transition-transform duration-300 transform hover:scale-105" >
+    View Users
+</button>
 
 
 <!-- -------------------------------------------------------------------------------------------------------------------------------------------------------- -->
@@ -329,7 +373,7 @@
 
 
 
-        document.getElementById('userListButton').onclick = function() {
+    document.getElementById('userListButton').onclick = function() {
     const orgId = "{{ channel.organization.id }}";  // The organization ID from the Django template context
     const channelId = "{{ channel.id }}";  // The channel ID from the Django template context
 
@@ -337,7 +381,7 @@
     fetch(`/channels/channels/get_members/${orgId}/${channelId}/`)
         .then(response => response.json())
         .then(data => {
-            const userList = document.getElementById('userList');
+            const userList = document.getElementById('userListButton');
             userList.innerHTML = '';  // Clear existing user list
 
             if (data.members && data.members.length > 0) {
@@ -364,11 +408,50 @@
 };
 
 
+// Fetch activity logs
 
+document.getElementById('fetchLogsButton').onclick = function() {
+    const channelId = "{{ channel.id }}";  // Channel ID from Django template
 
+    // Make an AJAX request to fetch activity logs
+    fetch(`/channels/channels/fetch_activity_logs/${channelId}/`)
+        .then(response => response.json())
+        .then(data => {
+            const logsList = document.getElementById('activityLogsList');
+            logsList.innerHTML = '';  // Clear existing logs
 
+            if (data.success) {
+                // If logs are found, populate the modal with them
+                data.logs.forEach(log => {
+                    const logItem = document.createElement('div');
+                    logItem.className = 'list-group-item list-group-item-action';
+                    logItem.innerHTML = `
+                        <strong>${log.user}</strong> ${log.content} 
+                        <span class="text-muted text-sm">(${log.timestamp})</span>
+                    `;
+                    logsList.appendChild(logItem);
+                });
 
+                // Show the modal
+                var myModal = new bootstrap.Modal(document.getElementById('activityLogsModal'));
+                myModal.show();
+            } else {
+                const noLogsItem = document.createElement('div');
+                noLogsItem.className = 'list-group-item text-center text-muted';
+                noLogsItem.textContent = "No activity logs found.";
+                logsList.appendChild(noLogsItem);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching activity logs:', error);
+        });
+};
 
 
     </script>
+
+   <!-- Add Bootstrap 5 JS just before the closing </body> tag -->
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+</html>
+
