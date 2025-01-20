@@ -286,44 +286,67 @@
 
 
 <body class="bg-gray-100">
+    
     <div class="max-w-4xl mx-auto mt-10">
         <div class="mb-4">
             <input 
                 type="text" 
                 id="searchInput" 
-                placeholder="Search messages and links..." 
-                class="form-control form-control-lg"
+                placeholder="🔍 Search messages and links..." 
+                class="form-control form-control-lg w-full p-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
             />
         </div>
 
-        <div id="chatWindow" class="bg-white p-4 rounded-lg shadow-lg mb-4 max-h-[400px] overflow-y-auto">
+        <div id="chatWindow" class="bg-gradient-to-br from-gray-100 to-white p-4 rounded-xl shadow-2xl mb-4 max-h-[400px] overflow-y-auto border border-gray-300">
             <!-- Loop through messages and display them -->
             {% for message in messages %}
-                <div class="border-b py-2">
-                    <strong>{{ message.user.username }}</strong>: 
-                    {% if message.link %}
-                        <a href="{{ message.link }}" target="_blank" class="text-blue-500 hover:underline">{{ message.link }}</a>
-                    {% else %}
-                        {{ message.content }}
-                    {% endif %}
-                    <span class="text-sm text-gray-500 ml-2">{{ message.timestamp|date:"H:i" }}</span>
+                <div class="flex items-center border-b border-gray-200 py-3 hover:bg-gray-50 rounded-lg px-2 transition duration-200">
+                    <!-- User avatar placeholder -->
+                    <div class="w-10 h-10 flex-shrink-0 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4">
+                        {{ message.user.username|slice:":1" }}
+                    </div>
+                    <!-- Message content -->
+                    <div class="flex flex-col w-full">
+                        <span class="font-semibold text-purple-600">{{ message.user.username }}</span>
+                        <span class="text-gray-700">
+                            {% if message.link %}
+                                <a href="{{ message.link }}" target="_blank" class="text-blue-500 hover:underline font-medium">
+                                    {{ message.link }}
+                                </a>
+                            {% else %}
+                                {{ message.content }}
+                            {% endif %}
+                        </span>
+                        <span class="text-xs text-gray-500 mt-1 self-end">{{ message.timestamp|date:"H:i" }}</span>
+                    </div>
                 </div>
             {% empty %}
-                <p class="text-center text-gray-500">No messages yet. Be the first to send a message!</p>
+                <p class="text-center text-gray-500 italic mt-4">No messages yet. Be the first to spark a conversation! ✨</p>
             {% endfor %}
-
+        
             <!-- Loop through links and display them -->
             {% for link in links %}
-                <div class="border-b py-2">
-                    <strong>{{ link.user.username }}</strong>: 
-                    <a href="{{ link.link }}" target="_blank" class="text-blue-500 hover:underline">{{ link.text }}</a>
-                    <span class="text-sm text-gray-500 ml-2">{{ link.timestamp|date:"H:i" }}</span>
+                <div class="flex items-center border-b border-gray-200 py-3 hover:bg-gray-50 rounded-lg px-2 transition duration-200">
+                    <!-- User avatar placeholder -->
+                    <div class="w-10 h-10 flex-shrink-0 bg-gradient-to-tr from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4">
+                        {{ link.user.username|slice:":1" }}
+                    </div>
+                    <!-- Link content -->
+                    <div class="flex flex-col w-full">
+                        <span class="font-semibold text-green-600">{{ link.user.username }}</span>
+                        <span>
+                            <a href="{{ link.link }}" target="_blank" class="text-blue-600 hover:underline font-medium">
+                                {{ link.text }}
+                            </a>
+                        </span>
+                        <span class="text-xs text-gray-500 mt-1 self-end">{{ link.timestamp|date:"H:i" }}</span>
+                    </div>
                 </div>
             {% empty %}
-                <p class="text-center text-gray-500">No links shared yet!</p>
+                <p class="text-center text-gray-500 italic mt-4">No links shared yet! 🌐</p>
             {% endfor %}
         </div>
-
+        
         <div class="flex items-center space-x-2 bg-gray-100 p-2 rounded-lg">
             <!-- Mention User Icon -->
             <button id="mentionButton" class="p-2 text-yellow-500 hover:text-yellow-600">
