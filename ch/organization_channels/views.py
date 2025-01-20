@@ -3,7 +3,7 @@ from accounts.models import Organization, Profile
 from .models import (
     Channel, Message, Link , ActivityChannel)
 from django.utils.dateparse import parse_datetime
-
+from django.utils import timezone
 from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -21,9 +21,14 @@ from accounts.models import Profile, Organization
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import JsonResponse
-
-
-
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from django.core.mail import send_mail, EmailMessage
+from django.conf import settings
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.pdfgen import canvas
+from io import BytesIO
 
 
 
@@ -338,3 +343,118 @@ def channel_details(request, org_id, channel_id):
     }
 
     return JsonResponse(data)
+
+
+# Export data via email
+
+def export_data(request, org_id, channel_id):
+    try:
+
+        organization = get_object_or_404(Organization, id=org_id)
+        channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+
+        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+        if not user_profile:
+           return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+        
+     
+        messages = Message.objects.filter(channel=channel)
+        links = Link.objects.filter(channel=channel)
+        members = Profile.objects.filter(organization=organization)
+
+        
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="export_{organization.name}_channel_{channel.name}_data.pdf"'
+
+    
+        pdf = canvas.Canvas(response, pagesize=letter)
+        width, height = letter
+
+ 
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.drawString(100, height - 40, f"Organization: {organization.name}")
+        pdf.drawString(100, height - 60, f"Channel: {channel.name}")
+        pdf.drawString(100, height - 80, f"Channel Type: {channel.get_type_display()}")
+        pdf.drawString(100, height - 100, f"Visibility: {channel.get_visibility_display()}")
+        pdf.drawString(100, height - 120, f"Created At: {channel.created_at.strftime('%Y-%m-%d %H:%M:%S')}")
+        pdf.drawString(100, height - 140, f"Created By: {channel.created_by.username}")
+
+   
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.drawString(100, height - 180, "Messages:")
+        y_position = height - 200
+        pdf.setFont("Helvetica", 10)
+        for message in messages:
+            pdf.drawString(100, y_position, f"{message.user.username}: {message.content[:80]}...")  # Display first 80 characters of message
+            y_position -= 20
+            if y_position < 100:
+                pdf.showPage()  
+                y_position = height - 40
+
+
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.drawString(100, y_position, "Links:")
+        y_position -= 20
+        pdf.setFont("Helvetica", 10)
+        for link in links:
+            pdf.drawString(100, y_position, f"{link.text}: {link.link}")  
+            y_position -= 20
+            if y_position < 100:
+                pdf.showPage()
+                y_position = height - 40
+
+
+        pdf.setFont("Helvetica-Bold", 12)
+        pdf.drawString(100, y_position, "Members:")
+        y_position -= 20
+        pdf.setFont("Helvetica", 10)
+        for member in members:
+            pdf.drawString(100, y_position, f"{member.user.username}")
+            y_position -= 20
+            if y_position < 100:
+                pdf.showPage()
+                y_position = height - 40
+
+        pdf.save()
+
+
+        send_email_with_attachment(request.user.email, response)
+
+        current_time = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        activity = ActivityChannel.objects.create(
+          user=request.user,
+          channel=channel,
+          organization=organization,
+          action_type="DATA_EXPORT",
+          content=f'The channel contents were exported by {request.user} at {current_time}.'
+        )
+
+        return response
+
+    except Exception as e:
+        print(f'Error exporting data: {e}')
+        return HttpResponse('Error exporting data', status=500)
+
+def send_email_with_attachment(to_email, pdf_file):
+    subject = "Exported Data: Organization & Channel Details"
+    message = "Please find attached the exported data for the organization and channel."
+    from_email = settings.DEFAULT_FROM_EMAIL
+
+   
+    pdf_buffer = BytesIO(pdf_file.content)
+    
+
+    email = EmailMessage(
+        subject=subject,
+        body=message,
+        from_email=from_email,
+        to=[to_email]
+    )
+    
+
+    email.attach('exported_data.pdf', pdf_buffer.read(), 'application/pdf')
+    
+
+    email.send(fail_silently=False)

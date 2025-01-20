@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Export Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h3 {
+            margin-bottom: 10px;
+            color: #1a73e8;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .table th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>Exported Data: {{ organization.name }} - {{ channel.name }}</h2>
+        <p><strong>Organization Name:</strong> {{ organization.name }}</p>
+        <p><strong>Organization Description:</strong> {{ organization.description }}</p>
+        <p><strong>Channel Name:</strong> {{ channel.name }}</p>
+        <p><strong>Channel Type:</strong> {{ channel.get_type_display }}</p>
+        <p><strong>Channel Visibility:</strong> {{ channel.get_visibility_display }}</p>
+    </div>
+
+    <div class="section">
+        <h3>Messages</h3>
+        <table class="table">
+            <tr>
+                <th>Username</th>
+                <th>Message Content</th>
+                <th>Timestamp</th>
+            </tr>
+            {% for message in messages %}
+            <tr>
+                <td>{{ message.user.username }}</td>
+                <td>{{ message.content }}</td>
+                <td>{{ message.timestamp|date:"H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">No messages yet.</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="section">
+        <h3>Links</h3>
+        <table class="table">
+            <tr>
+                <th>Username</th>
+                <th>Link</th>
+                <th>Timestamp</th>
+            </tr>
+            {% for link in links %}
+            <tr>
+                <td>{{ link.user.username }}</td>
+                <td><a href="{{ link.link }}" target="_blank">{{ link.text }}</a></td>
+                <td>{{ link.timestamp|date:"H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">No links shared yet.</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="section">
+        <h3>Organization Members</h3>
+        <table class="table">
+            <tr>
+                <th>Username</th>
+                <th>Full Name</th>
+                <th>Role</th>
+            </tr>
+            {% for member in members %}
+            <tr>
+                <td>{{ member.user.username }}</td>
+                <td>{{ member.user.get_full_name }}</td>
+                <td>{{ member.get_role_display }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

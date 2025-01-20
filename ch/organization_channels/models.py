@@ -97,6 +97,7 @@ class ActivityChannel(models.Model):
         ('FILE_UPLOAD', 'File Upload'),
         ('JOIN', 'Join'),
         ('LEAVE', 'Leave'),
+        ("DATA_EXPORT",'Data export'),
     ]
 
     user = models.ForeignKey(User, related_name='activities', on_delete=models.CASCADE)
