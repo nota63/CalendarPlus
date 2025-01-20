@@ -30,6 +30,8 @@ from reportlab.lib import colors
 from reportlab.pdfgen import canvas
 from io import BytesIO
 from django.db.models import Q
+from django.utils import timezone
+from datetime import timedelta
 
 
 # Create your views here.
@@ -566,3 +568,80 @@ def channel_statistics(request, org_id, channel_id):
     except Exception as e:
         print(f"Error fetching statistics: {e}")
         return JsonResponse({'error': 'Unable to fetch statistics'}, status=500)
+
+
+
+# Filter messages & links 
+@login_required
+def filter_messages(request, org_id, channel_id):
+    organization=get_object_or_404(Organization, id=org_id)
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+    filter_option = request.GET.get('filter_option')
+    specific_date = request.GET.get('specific_date') 
+    
+
+    now = timezone.now()
+
+    # Filter the messages based on the filter option
+    if filter_option == 'today':
+        start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        messages = Message.objects.filter(channel_id=channel_id, timestamp__gte=start_of_day)
+        links = Link.objects.filter(channel_id=channel_id, timestamp__gte=start_of_day)
+    
+    elif filter_option == 'yesterday':
+        start_of_day = (now - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+        end_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        messages = Message.objects.filter(channel_id=channel_id, timestamp__gte=start_of_day, timestamp__lt=end_of_day)
+        links = Link.objects.filter(channel_id=channel_id, timestamp__gte=start_of_day, timestamp__lt=end_of_day)
+
+    elif filter_option == 'last_week':
+        start_of_week = now - timedelta(days=now.weekday())  
+        end_of_week = start_of_week + timedelta(days=7) 
+        messages = Message.objects.filter(channel_id=channel_id, timestamp__gte=start_of_week, timestamp__lt=end_of_week)
+        links = Link.objects.filter(channel_id=channel_id, timestamp__gte=start_of_week, timestamp__lt=end_of_week)
+
+    elif filter_option == 'last_month':
+        start_of_month = now.replace(day=1) 
+        end_of_month = (start_of_month + timedelta(days=32)).replace(day=1)  
+        messages = Message.objects.filter(channel_id=channel_id, timestamp__gte=start_of_month, timestamp__lt=end_of_month)
+        links = Link.objects.filter(channel_id=channel_id, timestamp__gte=start_of_month, timestamp__lt=end_of_month)
+
+    elif filter_option == 'specific_date' and specific_date:
+        specific_date_obj = timezone.datetime.strptime(specific_date, '%Y-%m-%d').date()
+        messages = Message.objects.filter(channel_id=channel_id, timestamp__date=specific_date_obj)
+        links = Link.objects.filter(channel_id=channel_id, timestamp__date=specific_date_obj)
+
+    else:
+   
+        messages = Message.objects.filter(channel_id=channel_id)
+        links = Link.objects.filter(channel_id=channel_id)
+
+ 
+    response_data = {
+        'messages': [
+            {
+                'user': message.user.username,
+                'content': message.content,
+                'timestamp': message.timestamp.strftime('%H:%M'),
+            
+            }
+            for message in messages
+        ],
+        'links': [
+            {
+                'user': link.user.username,
+                'text': link.text,
+                'timestamp': link.timestamp.strftime('%H:%M'),
+                'link': link.link,
+            }
+            for link in links
+        ],
+    }
+
+    return JsonResponse(response_data)
+
+
+

@@ -603,6 +603,106 @@ p {
 
 
 /* sidebar styles */
+/* Sidebar Style */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100%;
+    background-color: #2f3136; /* Dark background for a polished look */
+    color: #fff;
+    padding-top: 30px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    border-right: 2px solid #444; /* Subtle border for a defined edge */
+    box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.5); /* Shadow effect for depth */
+}
+
+/* Header Section */
+.sidebar-header h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-left: 20px;
+    color: #f1f1f1; /* Lighter text for the header */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+}
+
+/* Menu Items */
+.sidebar-menu {
+    flex-grow: 1;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.menu-item {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 16px;
+    text-align: left;
+    color: #b9bbbe;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.menu-item:hover {
+    background-color: #404850; /* Darker gray background on hover */
+    color: #fff; /* Change text color to white */
+}
+
+/* Active State for Menu Items */
+.menu-item.active {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* Icon next to text (optional) */
+.menu-item i {
+    margin-right: 10px; /* Space for icons */
+}
+
+/* Footer Section */
+.sidebar-footer {
+    margin-top: auto;
+    padding-bottom: 20px;
+    padding-left: 20px;
+}
+
+.sidebar-footer .menu-item {
+    margin-top: 10px;
+    padding: 12px 20px;
+    font-size: 16px;
+    color: #b9bbbe;
+    border-radius: 6px;
+}
+
+.sidebar-footer .menu-item:hover {
+    background-color: #404850;
+}
+
+/* Responsive Design for smaller screens */
+@media screen and (max-width: 768px) {
+    .sidebar {
+        width: 220px; /* Adjust sidebar width for mobile */
+    }
+
+    .sidebar-header h2 {
+        font-size: 20px;
+    }
+
+    .menu-item {
+        font-size: 14px;
+        padding: 10px 15px;
+    }
+}
 
 </style>
 
@@ -760,53 +860,114 @@ p {
         </div>
     </div>
 </div>
+
+
+
+
+<!-- Filter Modal -->
+<div id="filterModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg w-1/3">
+        <h2 class="text-xl font-bold mb-4">Select Filter Option</h2>
+        
+        <!-- Filter options -->
+        <div>
+            <input type="radio" id="today" name="filter" value="today">
+            <label for="today" class="ml-2">Today</label>
+        </div>
+        <div>
+            <input type="radio" id="yesterday" name="filter" value="yesterday">
+            <label for="yesterday" class="ml-2">Yesterday</label>
+        </div>
+        <div>
+            <input type="radio" id="last_week" name="filter" value="last_week">
+            <label for="last_week" class="ml-2">Last Week</label>
+        </div>
+        <div>
+            <input type="radio" id="last_month" name="filter" value="last_month">
+            <label for="last_month" class="ml-2">Last Month</label>
+        </div>
+        <div>
+            <input type="radio" id="specific_date" name="filter" value="specific_date">
+            <label for="specific_date" class="ml-2">Specific Date</label>
+            <input type="date" id="specificDate" class="ml-2 mt-2" style="display:none;">
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex justify-end mt-4">
+            <button id="applyFilter" class="bg-blue-500 text-white p-2 rounded-lg">Apply</button>
+            <button id="closeFilterModal" class="bg-gray-500 text-white p-2 ml-2 rounded-lg">Cancel</button>
+        </div>
+    </div>
+</div>
+
+
+
 <!-- ---------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
 
 
 
-<!-- Button to trigger fetching logs -->
-<button id="fetchLogsButton" class="btn btn-primary">Fetch Activity Logs</button>
- <!-- Button to open the user list modal -->
-
-<!-- Button to open the user list modal -->
-<button id="userListButton" 
-        class="btn btn-primary btn-lg shadow-sm px-3 py-1 rounded text-white">
-    View Users
-</button>
-
-<!-- VIEW CHANNEL DETAILS -->
-<button id="viewChannelDetailsButton" class="btn btn-info">
-    View Channel Details
-</button>
-
-<a href="{% url 'export_data' org_id=channel.organization.id channel_id=channel.id %}" class="btn btn-primary" id="exportDataButton">Export Data</a>
 
 
-<!-- Button to Trigger the Modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#statisticsModal">
-    Show Channel Statistics
-  </button>
-
-
-
-
-
-
+<br><br>
 <!-- -------------------------------------------------------------------------------------------------------------------------------------------------------- -->
-<section class="d-flex align-items-center py-4">
-    <img src="https://th.bing.com/th/id/OIP.MQrqu3lrda8Tc7LOTnisxgHaHa?rs=1&pid=ImgDetMain" class="img-fluid rounded-circle" style="max-width: 80px; height: auto;" alt="Channel Image">
-    <div class="ms-3">
-        <h2 class="text-primary">
-            Everyone’s all here in <strong>#{{channel.name}}</strong>
-        </h2>
-        <p class="text-muted">
-            Share announcements and updates about company news, upcoming events, or teammates who deserve some kudos. ⭐
-        </p>
+<section class="d-flex align-items-center py-3 ml-auto" style="max-width: 80%; justify-content: flex-end; margin-right: 20px;">
+    <div class="d-flex align-items-center">
+        <img src="https://th.bing.com/th/id/OIP.MQrqu3lrda8Tc7LOTnisxgHaHa?rs=1&pid=ImgDetMain" 
+             class="img-fluid rounded-circle" 
+             style="max-width: 80px; height: auto;" 
+             alt="Channel Image">
+        <div class="ms-3">
+            <h2 class="text-primary">
+                Everyone’s all here in <strong>#{{channel.name}}</strong>
+            </h2>
+            <p class="text-muted">
+                Share announcements and updates about company news, upcoming events, or teammates who deserve some kudos. ⭐
+            </p>
+        </div>
     </div>
 </section>
 
 
+<!-- sidebar --------------------------------------------------------------------------------------------------------------------------------------- -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h2># {{channel.name}}</h2>
+    </div>
+    
+    <div class="sidebar-menu">
+        <!-- Button to trigger fetching logs -->
+        <button id="fetchLogsButton" class="menu-item"><i class="fas fa-history"></i> Fetch Activity Logs</button>
+        
+        <!-- Button to open the user list modal -->
+        <button id="userListButton" class="menu-item"><i class="fas fa-users"></i> View Users</button>
+
+        <!-- VIEW CHANNEL DETAILS -->
+        <button id="viewChannelDetailsButton" class="menu-item"><i class="fas fa-info-circle"></i> View Channel Details</button>
+
+        <!-- Export Data Link -->
+        <a href="{% url 'export_data' org_id=channel.organization.id channel_id=channel.id %}" 
+           class="menu-item" id="exportDataButton"><i class="fas fa-download"></i> Export Data</a>
+
+        <!-- Button to Trigger the Modal -->
+        <button type="button" class="menu-item" data-bs-toggle="modal" data-bs-target="#statisticsModal">
+            <i class="fas fa-chart-line"></i> Show Channel Statistics
+        </button>
+
+        <!-- Filter Button -->
+<button id="filterButton" class="bg-blue-500 text-white p-2 rounded-lg">
+    Jump To
+</button>
+    </div>
+    
+    <div class="sidebar-footer">
+        <button class="menu-item"><i class="fas fa-cogs"></i> Settings</button>
+        <button class="menu-item"><i class="fas fa-sign-out-alt"></i> Log Out</button>
+    </div>
+</div>
+
+
+<!-- ------------------------------------------------------------------------------------------------- -->
 
 <body class="bg-gray-100">
 
@@ -1618,6 +1779,87 @@ document.getElementById('callButton').addEventListener('click', function() {
     document.getElementById('closeComingSoonModal').addEventListener('click', function() {
         document.getElementById('comingSoonModal').classList.add('hidden');
     });
+
+
+
+
+
+
+// Open the filter modal
+document.getElementById('filterButton').onclick = function() {
+    document.getElementById('filterModal').classList.remove('hidden');
+};
+
+// Close the filter modal
+document.getElementById('closeFilterModal').onclick = function() {
+    document.getElementById('filterModal').classList.add('hidden');
+};
+
+// Show specific date input when "Specific Date" is selected
+document.getElementById('specific_date').addEventListener('change', function() {
+    document.getElementById('specificDate').style.display = 'block';
+});
+
+// Hide specific date input when other options are selected
+document.querySelectorAll('input[name="filter"]').forEach(function(element) {
+    element.addEventListener('change', function() {
+        if (element.value !== 'specific_date') {
+            document.getElementById('specificDate').style.display = 'none';
+        }
+    });
+});
+
+// Apply the filter and send AJAX request
+document.getElementById('applyFilter').onclick = function() {
+    let filterOption = document.querySelector('input[name="filter"]:checked').value;
+    let specificDate = filterOption === 'specific_date' ? document.getElementById('specificDate').value : null;
+
+    // Replace these with actual org_id and channel_id values
+    let orgId = "{{channel.organization.id}}";  
+    let channelId = "{{channel.id}}";  
+
+    // Send AJAX request to fetch filtered messages
+    fetch(`/channels/filter_messages/${orgId}/${channelId}/?filter_option=${filterOption}&specific_date=${specificDate}`)
+        .then(response => response.json())
+        .then(data => {
+            // Update the UI with filtered messages
+            let messagesContainer = document.getElementById('chatWindow');
+            messagesContainer.innerHTML = '';  // Clear existing messages
+
+            data.messages.forEach(message => {
+                let messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.innerHTML = `
+                    <div>${message.user}</div>
+                    <div>${message.content}</div>
+                    <div>${message.timestamp}</div>
+                    ${message.link ? `<a href="${message.link}" target="_blank">${message.link}</a>` : ''}
+                `;
+                messagesContainer.appendChild(messageDiv);
+            });
+
+            // Update the UI with filtered links
+            let linksContainer = document.getElementById('linksWindow');
+            linksContainer.innerHTML = '';  // Clear existing links
+
+            data.links.forEach(link => {
+                let linkDiv = document.createElement('div');
+                linkDiv.classList.add('link');
+                linkDiv.innerHTML = `
+                    <div>${link.user}</div>
+                    <div><a href="${link.link}" target="_blank">${link.text}</a></div>
+                    <div>${link.timestamp}</div>
+                `;
+                linksContainer.appendChild(linkDiv);
+            });
+        })
+        .catch(error => console.error('Error fetching data:', error));
+
+    // Close the modal after applying the filter
+    document.getElementById('filterModal').classList.add('hidden');
+};
+
+
 </script>
 
    <!-- Add Bootstrap 5 JS just before the closing </body> tag -->
