@@ -703,6 +703,176 @@ p {
         padding: 10px 15px;
     }
 }
+/* Modal Background */
+.hidden {
+    display: none;
+}
+
+.fixed {
+    position: fixed;
+}
+
+.inset-0 {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.bg-gray-600 {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.bg-opacity-50 {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Modal Box */
+.bg-white {
+    background-color: #ffffff;
+}
+
+.p-6 {
+    padding: 1.5rem;
+}
+
+.rounded-lg {
+    border-radius: 0.5rem;
+}
+
+.w-1/3 {
+    width: 33.33%;
+}
+
+/* Modal Title */
+.text-xl {
+    font-size: 1.25rem;
+}
+
+.font-bold {
+    font-weight: bold;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+/* Coming Soon Icon */
+#comingSoonIcon {
+    font-size: 3rem;
+    color: #ffcc00;
+    margin-bottom: 1rem;
+}
+
+/* Modal Content */
+p {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+
+/* Button */
+.bg-gray-500 {
+    background-color: #6b7280;
+}
+
+.text-white {
+    color: #ffffff;
+}
+
+.p-2 {
+    padding: 0.5rem;
+}
+
+.rounded-lg {
+    border-radius: 0.5rem;
+}
+
+/* Modal Animation */
+@keyframes modalFadeIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes modalFadeOut {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
+#filterModal {
+    animation: modalFadeIn 0.5s ease-out forwards;
+}
+
+.hidden #filterModal {
+    animation: modalFadeOut 0.3s ease-in forwards;
+}
+
+
+
+
+
+
+/* Styling the main section */
+.channel-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-color: #1a1a1a; /* Dark background */
+    color: #fff; /* White text color */
+    border-radius: 8px;
+    width: 70%; /* Reduce width */
+    max-width: 600px; /* Maximum width */
+    margin-top: 40px; /* Space from the top of the page */
+}
+
+/* Styling the container holding image and text */
+.channel-info-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+}
+
+/* Styling the image */
+.channel-image {
+    width: 60px; /* Reduced image size */
+    height: auto;
+    border-radius: 50%;
+    margin-right: 15px; /* Space between image and text */
+}
+
+/* Styling the text section */
+.channel-text {
+    max-width: 450px; /* Reduced max width of the text section */
+}
+
+/* Heading Style */
+.text-primary {
+    font-size: 1.2rem; /* Smaller heading */
+    color: #4e73df; /* Blue color for title */
+    margin-bottom: 10px;
+}
+
+/* Text Style */
+.text-muted {
+    font-size: 0.9rem; /* Smaller text size */
+    color: #a0a0a0; /* Muted gray for description text */
+}
+
+
 
 </style>
 
@@ -905,12 +1075,9 @@ p {
 <!-- ---------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
 
-
-
-
-
 <br><br>
 <!-- -------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+
 <section class="d-flex align-items-center py-3 ml-auto" style="max-width: 80%; justify-content: flex-end; margin-right: 20px;">
     <div class="d-flex align-items-center">
         <img src="https://th.bing.com/th/id/OIP.MQrqu3lrda8Tc7LOTnisxgHaHa?rs=1&pid=ImgDetMain" 
@@ -954,10 +1121,28 @@ p {
             <i class="fas fa-chart-line"></i> Show Channel Statistics
         </button>
 
-        <!-- Filter Button -->
-<button id="filterButton" class="bg-blue-500 text-white p-2 rounded-lg">
-    Jump To
-</button>
+        
+        <button id="filterButton" class="menu-item" data-bs-toggle="modal" data-bs-target="">
+            <i class="fas fa-chart-line"></i> Jump to
+        </button>
+
+        <button id="filterButton" class="menu-item" data-bs-toggle="modal" data-bs-target="">
+            <i class="fas fa-building"></i>
+                    <a href="{% url 'org_detail' org_id=channel.organization.id%}">
+                {{channel.organization.name}}
+            </a>
+        </button>
+
+        <button id="filterButton" class="menu-item" data-bs-toggle="modal" data-bs-target="">
+            <i class="fas fa-sync"></i>
+                    <a href="{% url 'channel_chat' channel_id=channel.id%}">
+                Refresh
+            </a>
+        </button>
+
+
+      
+
     </div>
     
     <div class="sidebar-footer">
@@ -970,7 +1155,7 @@ p {
 <!-- ------------------------------------------------------------------------------------------------- -->
 
 <body class="bg-gray-100">
-
+    
     <div class="max-w-4xl mx-auto mt-10">
         <div class="mb-4">
             <input 
@@ -980,7 +1165,8 @@ p {
                 class="form-control form-control-lg w-full p-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
             />
         </div>
-
+     
+       
         <div id="chatWindow" class="bg-gradient-to-br from-gray-100 to-white p-4 rounded-xl shadow-2xl mb-4 max-h-[400px] overflow-y-auto border border-gray-300">
             <!-- Loop through messages and display them -->
             {% for message in messages %}
@@ -1154,7 +1340,7 @@ p {
         </div>
 
     </div>
-
+<!-- ----------------------------------------------------------------------------------------------------------------------------------------------- -->
     <script>
         // Get the channel ID from the Django template context
         const channelId = "{{ channel.id }}";
@@ -1866,5 +2052,5 @@ document.getElementById('applyFilter').onclick = function() {
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
+<br><br>
 {% include 'footer.html' %}
