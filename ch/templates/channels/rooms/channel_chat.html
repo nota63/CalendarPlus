@@ -8,6 +8,8 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
     <!-- Add Bootstrap 5 CSS in your <head> section -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -272,9 +274,9 @@
 <section class="d-flex align-items-center py-4">
     <img src="https://th.bing.com/th/id/OIP.MQrqu3lrda8Tc7LOTnisxgHaHa?rs=1&pid=ImgDetMain" class="img-fluid rounded-circle" style="max-width: 80px; height: auto;" alt="Channel Image">
     <div class="ms-3">
-        <h5 class="text-primary">
+        <h2 class="text-primary">
             Everyone’s all here in <strong>#{{channel.name}}</strong>
-        </h5>
+        </h2>
         <p class="text-muted">
             Share announcements and updates about company news, upcoming events, or teammates who deserve some kudos. ⭐
         </p>
@@ -322,17 +324,43 @@
             {% endfor %}
         </div>
 
-        <div class="flex">
-            <button id="mentionButton" class="bg-yellow-500 text-white p-2 rounded-l-lg">Mention User</button>
-            <input id="messageInput" type="text" class="border p-2 w-full rounded-r-lg" placeholder="Type a message...">
-            <button id="sendMessage" class="bg-blue-500 text-white p-2 rounded-lg">Send</button>
-            <button id="sendLinkButton" class="bg-green-500 text-white p-2 ml-2 rounded-lg">Send Link</button>
-            <button id="emojiPickerButton" class="bg-purple-500 text-white p-2 ml-2 rounded-lg">😊</button>
-
-            <!-- New buttons for uploading audio and video -->
-            <button id="uploadAudioButton" class="bg-indigo-500 text-white p-2 ml-2 rounded-lg">📀 Upload Audio</button>
-            <button id="uploadVideoButton" class="bg-teal-500 text-white p-2 ml-2 rounded-lg">🎥 Upload Video</button>
+        <div class="flex items-center space-x-2 bg-gray-100 p-2 rounded-lg">
+            <!-- Mention User Icon -->
+            <button id="mentionButton" class="p-2 text-yellow-500 hover:text-yellow-600">
+                <i class="fas fa-at text-xl"></i>
+            </button>
+        
+            <!-- Message Input -->
+            <input id="messageInput" type="text" 
+                   class="border border-gray-300 p-2 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                   placeholder="Type a message...">
+        
+            <!-- Send Message Icon -->
+            <button id="sendMessage" class="p-2 text-blue-500 hover:text-blue-600">
+                <i class="fas fa-paper-plane text-xl"></i>
+            </button>
+        
+            <!-- Send Link Icon -->
+            <button id="sendLinkButton" class="p-2 text-green-500 hover:text-green-600">
+                <i class="fas fa-link text-xl"></i>
+            </button>
+        
+            <!-- Emoji Picker Icon -->
+            <button id="emojiPickerButton" class="p-2 text-purple-500 hover:text-purple-600">
+                <i class="fas fa-smile text-xl"></i>
+            </button>
+        
+            <!-- Upload Audio Icon -->
+            <button id="uploadAudioButton" class="p-2 text-indigo-500 hover:text-indigo-600">
+                <i class="fas fa-microphone-alt text-xl"></i>
+            </button>
+        
+            <!-- Upload Video Icon -->
+            <button id="uploadVideoButton" class="p-2 text-teal-500 hover:text-teal-600">
+                <i class="fas fa-video text-xl"></i>
+            </button>
         </div>
+        
 
         <!-- Modal to mention users -->
         <div id="mentionModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
@@ -433,8 +461,40 @@
         const closeEmojiPickerModal = document.getElementById('closeEmojiPickerModal');
         const emojiContainer = document.getElementById('emojiContainer');
         const emojis = [
-            '🚀', '⚡', '💥', '🔥', '🌟', '🏆', '💯', '✅', '📝', '💻',
-        ];
+  '🚀', '⚡', '💥', '🔥', '🌟', '🏆', '💯', '✅', '📝', '💻', 
+  '📱', '📊', '💼', '🔧', '🛠️', '⚙️', '🧠', '💡', '⏳', '⏰', 
+  '💪', '🧑‍💻', '👩‍💻', '🤖', '🤩', '👑', '📈', '🔝', '🌍', '🌎', 
+  '🌏', '📅', '🗓️', '🕒', '📍', '🗺️', '🌐', '🏅', '🥇', '🏆', 
+  '🎯', '💭', '🔮', '🧳', '💪', '🚨', '⚠️', '❗', '❕', '💬', 
+  '💭', '💬', '💋', '❤️', '💖', '💙', '💚', '💛', '💜', '🖤',
+  '💝', '💘', '💞', '💌', '💋', '👄', '🤍', '💙', '❤️', '💛', 
+  '💚', '💜', '💖', '❤️‍🔥', '💀', '☠️', '🫀', '🫣', '🙀', 
+  '😳', '😬', '🤭', '🙄', '🤔', '🥲', '😭', '😢', '😤', '😡', 
+  '🤡', '🤣', '😂', '😆', '😹', '😂', '🤣', '😏', '🧐', '🫶', 
+  '🤪', '🥴', '😋', '🤤', '🤩', '😍', '🥰', '😎', '🤓', '🧑‍🎤',
+  '🎤', '🎧', '🎶', '🎸', '🎻', '🥁', '🎷', '🎺', '🎵', '🎼',
+  '🎹', '🎶', '🥳', '🎉', '💃', '🕺', '🤸‍♀️', '🤸‍♂️', '🕺',
+  '💃', '🩰', '🏋️‍♀️', '🏋️‍♂️', '🤸‍♀️', '🤸‍♂️', '🚴‍♀️', 
+  '🚴‍♂️', '⛷️', '🏄‍♀️', '🏄‍♂️', '🤾‍♀️', '🤾‍♂️', '🏃‍♀️', 
+  '🏃‍♂️', '💆‍♀️', '💆‍♂️', '💅', '🧑‍🦰', '🧑‍🦳', '🧑‍🦱',
+  '💅', '🧖‍♀️', '🧖‍♂️', '🧑‍⚖️', '🎯', '🎳', '🏓', '🏸', 
+  '⚽', '🏀', '🏈', '🎾', '🏐', '🏑', '🏒', '🥋', '⛸️', '🏅',
+  '🥇', '🥈', '🥉', '🏆', '🎮', '🎮', '🖥️', '🎲', '🎯', '🧩',
+  '🎲', '🧠', '💡', '📚', '📖', '📝', '📜', '📄', '📋', '📎',
+  '✂️', '📌', '📍', '📅', '📆', '🗓️', '🔖', '🗃️', '📒', 
+  '📚', '📑', '📙', '📘', '📗', '📒', '📓', '📂', '📁', '💼', 
+  '🧳', '🎒', '💼', '🧸', '👕', '👚', '👗', '👖', '👔', '👚', 
+  '👠', '👢', '👡', '👟', '🥿', '👞', '🧢', '👑', '👒', '🎩', 
+  '💍', '📿', '💄', '💅', '👓', '🕶️', '👛', '👝', '💼', '🧳', 
+  '🎒', '👜', '👝', '👛', '🧣', '🧤', '🧥', '👗', '👚', '🧵', 
+  '🧶', '🎨', '🎭', '🎪', '🖼️', '🎬', '🎥', '🎞️', '🎬', '📸', 
+  '📷', '📹', '🎥', '🎬', '🎞️', '🎭', '🖼️', '🎤', '🎧', '🎼',
+  '🎶', '🎵', '🎻', '🎺', '🎷', '🎸', '🥁', '🎤', '🎬', '🎵',
+  '🎶', '🎧', '🎤', '🎼', '🎸', '🥁', '🎻', '🎶', '🎧', '🎷', 
+  '🎺', '🎸', '🪕', '🎶', '🎤', '🎬', '🎶', '🎧', '📻', '🎵',
+  '🎼', '🎸', '🎹', '🎷', '🥁', '🎼', '🎧', '🎻', '🎤', '🎶',
+  '🎸', '🎷', '🎺', '🎻', '🎶', '🎼', '🎤', '🎵', '🎶', '🎹'
+];
 
         emojiPickerButton.onclick = () => {
             emojiContainer.innerHTML = '';
