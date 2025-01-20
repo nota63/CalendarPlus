@@ -7,6 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Add Bootstrap 5 CSS in your <head> section -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -82,6 +83,23 @@
         background-color: #5a6268;
     }
 
+
+
+    .popup-message {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    font-size: 16px;
+    z-index: 9999;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
 </style>
 
 
@@ -105,27 +123,28 @@
     </div>
 </div>
 
+
 <!-- Bootstrap 5 Modal to show the logs -->
 <div class="modal fade" id="activityLogsModal" tabindex="-1" aria-labelledby="activityLogsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="activityLogsModalLabel">Activity Logs</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="activityLogsModalLabel">Activity Logs</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+                <div id="activityLogsList" class="list-group">
+                    <!-- Logs will be dynamically populated here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
-        <div class="modal-body">
-          <div id="activityLogsList" class="list-group">
-            <!-- Logs will be dynamically populated here -->
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
     </div>
-  </div>
+</div>
 
-<!-- Modal for Channel Details -->
+
 <!-- Modal for Channel Details -->
 <div id="channelDetailsModal" class="modal fade" tabindex="-1" aria-labelledby="channelDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -156,7 +175,72 @@
     </div>
 </div>
 
+<!-- Popup Message -->
+<div id="popupMessage" class="popup-message" style="display: none;">
+    We'll export the data and send it to {{request.user.email}}. You can proceed with other tasks in the meantime...
+</div>
 
+
+
+
+<!-- Modal to Display the Channel Statistics -->
+<div class="modal fade" id="statisticsModal" tabindex="-1" aria-labelledby="statisticsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="statisticsModalLabel">Channel Statistics</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <h5>Total Messages: <span id="totalMessages"></span></h5>
+          <h5>Total Links: <span id="totalLinks"></span></h5>
+          <h5>King User: <span id="kingUser"></span></h5>
+  
+          <!-- Chart Section -->
+          <div class="row">
+            <!-- Messages Chart -->
+            <div class="col-md-6 mb-4">
+              <canvas id="messagesChart"></canvas>
+            </div>
+  
+            <!-- Links Chart -->
+            <div class="col-md-6 mb-4">
+              <canvas id="linksChart"></canvas>
+            </div>
+  
+            <!-- Chart 3: User Message Counts -->
+            <div class="col-md-6 mb-4">
+              <canvas id="userMessageCountsChart"></canvas>
+            </div>
+  
+            <!-- Chart 4: User Link Counts -->
+            <div class="col-md-6 mb-4">
+              <canvas id="userLinkCountsChart"></canvas>
+            </div>
+  
+            <!-- Chart 5: Total Messages -->
+            <div class="col-md-6 mb-4">
+              <canvas id="totalMessagesChart"></canvas>
+            </div>
+  
+            <!-- Chart 6: Total Links -->
+            <div class="col-md-6 mb-4">
+              <canvas id="totalLinksChart"></canvas>
+            </div>
+  
+            <!-- Chart 7: King User Stats -->
+            <div class="col-md-6 mb-4">
+              <canvas id="kingUserChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
 <!-- ---------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
 <!-- Button to trigger fetching logs -->
@@ -174,17 +258,33 @@
     View Channel Details
 </button>
 
-<a href="{% url 'export_data' org_id=channel.organization.id channel_id=channel.id %}" class="btn btn-primary">Export Data</a>
+<a href="{% url 'export_data' org_id=channel.organization.id channel_id=channel.id %}" class="btn btn-primary" id="exportDataButton">Export Data</a>
+
+
+<!-- Button to Trigger the Modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#statisticsModal">
+    Show Channel Statistics
+  </button>
+
+
 
 <!-- -------------------------------------------------------------------------------------------------------------------------------------------------------- -->
-
+<section class="d-flex align-items-center py-4">
+    <img src="https://th.bing.com/th/id/OIP.MQrqu3lrda8Tc7LOTnisxgHaHa?rs=1&pid=ImgDetMain" class="img-fluid rounded-circle" style="max-width: 80px; height: auto;" alt="Channel Image">
+    <div class="ms-3">
+        <h5 class="text-primary">
+            Everyone’s all here in <strong>#{{channel.name}}</strong>
+        </h5>
+        <p class="text-muted">
+            Share announcements and updates about company news, upcoming events, or teammates who deserve some kudos. ⭐
+        </p>
+    </div>
+</section>
 
 
 
 <body class="bg-gray-100">
     <div class="max-w-4xl mx-auto mt-10">
-        <h1 class="text-2xl font-bold text-center">Chat in Channel: {{ channel.name }}</h1>
-
         <div class="mb-4">
             <input 
                 type="text" 
@@ -657,6 +757,209 @@ document.getElementById('viewChannelDetailsButton').onclick = function() {
             console.error('Error fetching channel details:', error);
         });
 };
+
+
+// Exporting data pop up
+
+document.getElementById('exportDataButton').onclick = function(event) {
+    // Prevent the default action (navigating to the export page)
+    event.preventDefault();
+
+    // Show the popup message
+    const popupMessage = document.getElementById('popupMessage');
+    popupMessage.style.display = 'block';
+
+    // Hide the popup after 5 seconds
+    setTimeout(function() {
+        popupMessage.style.display = 'none';
+
+        // Redirect to the export data URL after the message disappears
+        window.location.href = event.target.href;
+    }, 3000);
+};
+
+
+// CHANNEL STATISTICS
+
+ // Event listener for showing the modal
+document.getElementById('statisticsModal').addEventListener('show.bs.modal', function () {
+    // Fetch the org_id and channel_id dynamically, you can pass them from the context
+    var org_id = "{{channel.organization.id}}";  // Replace with dynamic org_id
+    var channel_id = "{{channel.id}}";  // Replace with dynamic channel_id
+
+    // Make the AJAX request
+    fetch(`/channels/channel/statistics/${org_id}/${channel_id}/`, { // Adjust the URL if necessary
+      method: 'GET',
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        alert('Error fetching data: ' + data.error);
+      } else {
+        // Render the charts
+        renderCharts(data);
+      }
+    })
+    .catch(() => {
+      alert('An error occurred while fetching the statistics.');
+    });
+});
+
+// Function to render the charts with data from the response
+function renderCharts(data) {
+    // Messages Chart
+    var ctxMessages = document.getElementById('messagesChart').getContext('2d');
+    var messagesChart = new Chart(ctxMessages, {
+      type: 'bar',
+      data: {
+        labels: data.message_chart.labels,
+        datasets: [{
+          label: data.message_chart.label,
+          data: data.message_chart.data,
+          backgroundColor: data.message_chart.background_color,
+          borderColor: data.message_chart.border_color,
+          borderWidth: data.message_chart.border_width
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+
+    // Links Chart
+    var ctxLinks = document.getElementById('linksChart').getContext('2d');
+    var linksChart = new Chart(ctxLinks, {
+      type: 'bar',
+      data: {
+        labels: data.link_chart.labels,
+        datasets: [{
+          label: data.link_chart.label,
+          data: data.link_chart.data,
+          backgroundColor: data.link_chart.background_color,
+          borderColor: data.link_chart.border_color,
+          borderWidth: data.link_chart.border_width
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+
+    // User Message Counts Chart
+    var ctxUserMessageCounts = document.getElementById('userMessageCountsChart').getContext('2d');
+    var userMessageCountsChart = new Chart(ctxUserMessageCounts, {
+      type: 'pie',
+      data: {
+        labels: data.user_message_counts.map(item => item.user),
+        datasets: [{
+          label: 'User Message Counts',
+          data: data.user_message_counts.map(item => item.message_count),
+          backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(255, 159, 64, 0.2)', 'rgba(54, 162, 235, 0.2)'],
+          borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)', 'rgba(54, 162, 235, 1)'],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true
+      }
+    });
+
+    // User Link Counts Chart
+    var ctxUserLinkCounts = document.getElementById('userLinkCountsChart').getContext('2d');
+    var userLinkCountsChart = new Chart(ctxUserLinkCounts, {
+      type: 'pie',
+      data: {
+        labels: data.user_link_counts.map(item => item.user),
+        datasets: [{
+          label: 'User Link Counts',
+          data: data.user_link_counts.map(item => item.link_count),
+          backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(255, 159, 64, 0.2)', 'rgba(54, 162, 235, 0.2)'],
+          borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)', 'rgba(54, 162, 235, 1)'],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true
+      }
+    });
+
+    // Total Messages Chart (Bar chart)
+    var ctxTotalMessages = document.getElementById('totalMessagesChart').getContext('2d');
+    var totalMessagesChart = new Chart(ctxTotalMessages, {
+      type: 'bar',
+      data: {
+        labels: ['Total Messages'],
+        datasets: [{
+          label: 'Total Messages',
+          data: [data.total_messages],
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+
+    // Total Links Chart (Bar chart)
+    var ctxTotalLinks = document.getElementById('totalLinksChart').getContext('2d');
+    var totalLinksChart = new Chart(ctxTotalLinks, {
+      type: 'bar',
+      data: {
+        labels: ['Total Links'],
+        datasets: [{
+          label: 'Total Links',
+          data: [data.total_links],
+          backgroundColor: 'rgba(153, 102, 255, 0.2)',
+          borderColor: 'rgba(153, 102, 255, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+
+    // King User Chart (Pie chart)
+    var ctxKingUser = document.getElementById('kingUserChart').getContext('2d');
+    var kingUserChart = new Chart(ctxKingUser, {
+      type: 'pie',
+      data: {
+        labels: [data.king_user],
+        datasets: [{
+          label: 'King User Stats',
+          data: [data.total_messages, data.total_links], // Data for the king user
+          backgroundColor: ['rgba(255, 159, 64, 0.2)', 'rgba(54, 162, 235, 0.2)'],
+          borderColor: ['rgba(255, 159, 64, 1)', 'rgba(54, 162, 235, 1)'],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true
+      }
+    });
+}
 
 </script>
 

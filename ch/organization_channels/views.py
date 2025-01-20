@@ -29,7 +29,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.pdfgen import canvas
 from io import BytesIO
-
+from django.db.models import Q
 
 
 # Create your views here.
@@ -458,3 +458,111 @@ def send_email_with_attachment(to_email, pdf_file):
     
 
     email.send(fail_silently=False)
+
+
+# Channel statistics 
+
+def channel_statistics(request, org_id, channel_id):
+    try:
+        organization = get_object_or_404(Organization, id=org_id)
+        channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+
+        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+        if not user_profile:
+           return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+      
+        total_messages = Message.objects.filter(channel=channel).count()
+
+        user_message_counts = Message.objects.filter(channel=channel) \
+            .values('user') \
+            .annotate(message_count=Count('id')) \
+            .order_by('-message_count')
+
+    
+        total_links = Link.objects.filter(channel=channel).count()
+
+       
+        user_link_counts = Link.objects.filter(channel=channel) \
+            .values('user') \
+            .annotate(link_count=Count('id')) \
+            .order_by('-link_count')
+
+        
+        combined_user_stats = (
+            Message.objects.filter(channel=channel)
+            .values('user')
+            .annotate(message_count=Count('id'))
+        ).values('user', 'message_count')
+        
+        link_stats = (
+            Link.objects.filter(channel=channel)
+            .values('user')
+            .annotate(link_count=Count('id'))
+        ).values('user', 'link_count')
+
+      
+        combined_stats = {}
+        for stat in combined_user_stats:
+            combined_stats[stat['user']] = stat['message_count']
+
+        for stat in link_stats:
+            if stat['user'] in combined_stats:
+                combined_stats[stat['user']] += stat['link_count']
+            else:
+                combined_stats[stat['user']] = stat['link_count']
+
+       
+        king_user_id = max(combined_stats, key=combined_stats.get)
+        king_user = get_object_or_404(User, id=king_user_id)
+
+    
+        user_message_labels = [str(user['user']) for user in user_message_counts]  
+        user_message_data = [user['message_count'] for user in user_message_counts]
+
+        user_link_labels = [str(user['user']) for user in user_link_counts] 
+        user_link_data = [user['link_count'] for user in user_link_counts]
+
+  
+        message_chart = {
+            'labels': user_message_labels,
+            'data': user_message_data,
+            'label': 'Messages Sent by Users',
+            'background_color': 'rgba(75, 192, 192, 0.2)',
+            'border_color': 'rgba(75, 192, 192, 1)',
+            'border_width': 1
+        }
+
+        link_chart = {
+            'labels': user_link_labels,
+            'data': user_link_data,
+            'label': 'Links Shared by Users',
+            'background_color': 'rgba(153, 102, 255, 0.2)',
+            'border_color': 'rgba(153, 102, 255, 1)',
+            'border_width': 1
+        }
+
+        
+        response_data = {
+            'total_messages': total_messages,
+            'total_links': total_links,
+            'user_message_counts': [{'user': user['user'], 'message_count': user['message_count']} for user in user_message_counts],
+            'user_link_counts': [{'user': user['user'], 'link_count': user['link_count']} for user in user_link_counts],
+            'king_user': king_user.username,
+            'message_chart': message_chart,
+            'link_chart': link_chart,
+        }
+
+        activity = ActivityChannel.objects.create(
+          user=request.user,
+          channel=channel,
+          organization=organization,
+          action_type="EXPLORE_STATISTICS",
+          content=f'{request.user} viewed channel statistics'
+        )
+
+        return JsonResponse(response_data)
+
+    except Exception as e:
+        print(f"Error fetching statistics: {e}")
+        return JsonResponse({'error': 'Unable to fetch statistics'}, status=500)

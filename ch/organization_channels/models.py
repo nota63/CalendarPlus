@@ -98,6 +98,7 @@ class ActivityChannel(models.Model):
         ('JOIN', 'Join'),
         ('LEAVE', 'Leave'),
         ("DATA_EXPORT",'Data export'),
+        ('EXPLORE_STATISTICS','Explore statistics'),
     ]
 
     user = models.ForeignKey(User, related_name='activities', on_delete=models.CASCADE)
