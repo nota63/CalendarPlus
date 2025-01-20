@@ -310,3 +310,31 @@ def search_messages_links(request, org_id, channel_id):
     ).values('user__username', 'text', 'link', 'timestamp')
 
     return JsonResponse({'messages': list(messages), 'links': list(links)})
+
+
+#  Get channel details
+
+def channel_details(request, org_id, channel_id):
+    organization=get_object_or_404(Organization, id=org_id)
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+    channel = get_object_or_404(Channel, id=channel_id, organization_id=org_id)
+    created_by = channel.created_by.username 
+
+   
+    members = Profile.objects.filter(organization_id=org_id).select_related('user')
+    member_list = [{'full_name': profile.user.username} for profile in members]
+
+ 
+    data = {
+        'name': channel.name,
+        'type': channel.get_type_display(),  
+        'visibility': channel.get_visibility_display(), 
+        'created_at': channel.created_at.strftime('%Y-%m-%d %H:%M'), 
+        'created_by': created_by,
+        'members': member_list,
+    }
+
+    return JsonResponse(data)

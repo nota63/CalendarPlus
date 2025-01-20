@@ -4,12 +4,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat in Channel: {{ channel.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Add Bootstrap 5 CSS in your <head> section -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
+<style>
+  /* Style for the modal */
+  .modal-content {
+        background-color: #f8f9fa; /* Light background for modal */
+        border-radius: 15px;
+        padding: 20px;
+    }
 
+    /* Title of the modal */
+    .modal-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    /* Table style inside modal */
+    .modal-body table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+
+    .modal-body table th,
+    .modal-body table td {
+        padding: 10px;
+        text-align: left;
+        border: 1px solid #ddd;
+    }
+
+    .modal-body table th {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .modal-body table td {
+        background-color: #f1f1f1;
+    }
+
+    /* Members List */
+    #membersList {
+        margin-top: 15px;
+        list-style: none;
+        padding: 0;
+    }
+
+    #membersList li {
+        padding: 5px 0;
+        font-size: 1rem;
+        color: #333;
+    }
+
+    #membersList li:hover {
+        background-color: #f1f1f1;
+    }
+
+    /* Footer styling */
+    .modal-footer {
+        background-color: #f1f1f1;
+        border-top: 1px solid #ddd;
+        padding: 10px;
+    }
+
+    .modal-footer .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .modal-footer .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+</style>
 
 
 <!-- Modal for displaying the user list -->
@@ -52,6 +125,36 @@
     </div>
   </div>
 
+<!-- Modal for Channel Details -->
+<!-- Modal for Channel Details -->
+<div id="channelDetailsModal" class="modal fade" tabindex="-1" aria-labelledby="channelDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="channelDetailsModalLabel">Channel Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- About Section -->
+                <h5>About</h5>
+                <p><i class="bi bi-card-text text-primary" style="font-size: 1.2rem;"></i> <strong>Name:</strong> <span id="channelName"></span></p>
+                <p><i class="bi bi-type text-primary" style="font-size: 1.2rem;"></i> <strong>Type:</strong> <span id="channelType"></span></p>
+                <p><i class="bi bi-eye text-primary" style="font-size: 1.2rem;"></i> <strong>Visibility:</strong> <span id="channelVisibility"></span></p>
+                <p><i class="bi bi-calendar text-primary" style="font-size: 1.2rem;"></i> <strong>Created At:</strong> <span id="channelCreatedAt"></span></p>
+                <p><i class="bi bi-person text-primary" style="font-size: 1.2rem;"></i> <strong>Created By:</strong> <span id="channelCreatedBy"></span></p>
+
+                <!-- Members Section -->
+                <h5>Members</h5>
+                <ul id="membersList" class="list-group">
+                    <!-- Members will be dynamically populated here -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <!-- ---------------------------------------------------------------------------------------------------------------------------------------------------------- -->
@@ -66,6 +169,10 @@
     View Users
 </button>
 
+<!-- VIEW CHANNEL DETAILS -->
+<button id="viewChannelDetailsButton" class="btn btn-info">
+    View Channel Details
+</button>
 
 
 <!-- -------------------------------------------------------------------------------------------------------------------------------------------------------- -->
@@ -514,8 +621,41 @@ document.getElementById('searchInput').addEventListener('input', function () {
 });
 
 
+// CHANNEL DETAILS
+document.getElementById('viewChannelDetailsButton').onclick = function() {
+    const channelId = "{{ channel.id }}";  // Get channel ID dynamically from the template
+    const orgId = "{{ channel.organization.id }}";  // Get organization ID dynamically from the template
 
+    // Make an AJAX request to fetch channel details
+    fetch(`/channels/channels/channel_details/${orgId}/${channelId}/`)
+        .then(response => response.json())
+        .then(data => {
+            // Update the modal with the fetched data
+            document.getElementById('channelName').textContent = data.name;
+            document.getElementById('channelType').textContent = data.type;
+            document.getElementById('channelVisibility').textContent = data.visibility;
+            document.getElementById('channelCreatedAt').textContent = data.created_at;
+            document.getElementById('channelCreatedBy').textContent = data.created_by;
 
+            // Clear existing members
+            const membersList = document.getElementById('membersList');
+            membersList.innerHTML = '';
+
+            // Add members to the list
+            data.members.forEach(member => {
+                const memberItem = document.createElement('li');
+                memberItem.textContent = member.full_name;
+                membersList.appendChild(memberItem);
+            });
+
+            // Show the modal using Bootstrap 5 without jQuery
+            var modal = new bootstrap.Modal(document.getElementById('channelDetailsModal'));
+            modal.show();
+        })
+        .catch(error => {
+            console.error('Error fetching channel details:', error);
+        });
+};
 
 </script>
 
