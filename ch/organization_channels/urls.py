@@ -9,7 +9,8 @@ urlpatterns = [
     path('channel/<int:channel_id>/chat/',channel_chat, name='channel_chat'),
     path('get_organization_members/<int:organization_id>/', get_organization_members, name='get_organization_members'),
     path('channels/get_members/<int:org_id>/<int:channel_id>/',get_channel_members, name='get_channel_members'),
-    path('channels/fetch_activity_logs/<int:channel_id>/', fetch_activity_logs, name='fetch_activity_logs'),
+    path('channels/fetch_activity_logs/<int:channel_id>/<int:org_id>/', fetch_activity_logs, name='fetch_activity_logs'),
+    path('channels/search/<int:org_id>/<int:channel_id>/',search_messages_links, name='search_messages_links'),
 
 
 ]

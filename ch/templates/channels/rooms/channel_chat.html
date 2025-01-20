@@ -17,7 +17,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="userListModalLabel">Channel Users</h5>
+                <h5 class="modal-title" id="userListModalLabel">Channel Users including you</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -76,6 +76,15 @@
 <body class="bg-gray-100">
     <div class="max-w-4xl mx-auto mt-10">
         <h1 class="text-2xl font-bold text-center">Chat in Channel: {{ channel.name }}</h1>
+
+        <div class="mb-4">
+            <input 
+                type="text" 
+                id="searchInput" 
+                placeholder="Search messages and links..." 
+                class="form-control form-control-lg"
+            />
+        </div>
 
         <div id="chatWindow" class="bg-white p-4 rounded-lg shadow-lg mb-4 max-h-[400px] overflow-y-auto">
             <!-- Loop through messages and display them -->
@@ -415,9 +424,10 @@ document.getElementById('userListButton').onclick = function () {
 
 document.getElementById('fetchLogsButton').onclick = function() {
     const channelId = "{{ channel.id }}";  // Channel ID from Django template
+    const orgId = "{{channel.organization.id}}";
 
     // Make an AJAX request to fetch activity logs
-    fetch(`/channels/channels/fetch_activity_logs/${channelId}/`)
+    fetch(`/channels/channels/fetch_activity_logs/${channelId}/${orgId}`)
         .then(response => response.json())
         .then(data => {
             const logsList = document.getElementById('activityLogsList');
@@ -451,7 +461,63 @@ document.getElementById('fetchLogsButton').onclick = function() {
 };
 
 
-    </script>
+
+// SEARCH BAR 
+
+document.getElementById('searchInput').addEventListener('input', function () {
+    const query = this.value.trim(); // Get the search input
+    const orgId = "{{ channel.organization.id }}"; // Pass organization ID dynamically
+    const channelId = "{{ channel.id }}"; // Pass channel ID dynamically
+
+    // AJAX request to fetch filtered messages and links
+    fetch(`/channels/channels/search/${orgId}/${channelId}/?q=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+            const chatWindow = document.getElementById('chatWindow');
+            chatWindow.innerHTML = ''; // Clear the chat window
+
+            // Display filtered messages
+            if (data.messages.length > 0) {
+                data.messages.forEach(message => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'border-b py-2';
+                    messageDiv.innerHTML = `
+                        <strong>${message.user__username}</strong>: ${message.content}
+                        <span class="text-sm text-gray-500 ml-2">${message.timestamp}</span>
+                    `;
+                    chatWindow.appendChild(messageDiv);
+                });
+            }
+
+            // Display filtered links
+            if (data.links.length > 0) {
+                data.links.forEach(link => {
+                    const linkDiv = document.createElement('div');
+                    linkDiv.className = 'border-b py-2';
+                    linkDiv.innerHTML = `
+                        <strong>${link.user__username}</strong>: 
+                        <a href="${link.link}" target="_blank" class="text-blue-500 hover:underline">${link.text}</a>
+                        <span class="text-sm text-gray-500 ml-2">${link.timestamp}</span>
+                    `;
+                    chatWindow.appendChild(linkDiv);
+                });
+            }
+
+            // If no results found
+            if (data.messages.length === 0 && data.links.length === 0) {
+                chatWindow.innerHTML = '<p class="text-center text-gray-500">No results found!</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching search results:', error);
+        });
+});
+
+
+
+
+
+</script>
 
    <!-- Add Bootstrap 5 JS just before the closing </body> tag -->
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

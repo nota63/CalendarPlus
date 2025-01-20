@@ -261,8 +261,13 @@ def get_channel_members(request, org_id, channel_id):
 
 
 # Fetch activity logs
-def fetch_activity_logs(request, channel_id):
-    channel = get_object_or_404(Channel, id=channel_id)
+def fetch_activity_logs(request, channel_id, org_id):
+    organization = get_object_or_404(Organization, id=org_id)
+    channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
 
     # Fetch the latest activity logs for the channel
     activity_logs = ActivityChannel.objects.filter(channel=channel).order_by('-timestamp')
@@ -276,3 +281,32 @@ def fetch_activity_logs(request, channel_id):
         })
 
     return JsonResponse({'success': True, 'logs': logs})
+
+
+
+# Implement search bar 
+
+def search_messages_links(request, org_id, channel_id):
+    organization=get_object_or_404(Organization, id=org_id)
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+    query = request.GET.get('q', '')  
+    if not query:
+        return JsonResponse({'messages': [], 'links': []}) 
+
+   
+    messages = Message.objects.filter(
+        Q(content__icontains=query) | Q(audio__icontains=query) | Q(video__icontains=query),
+        channel_id=channel_id,
+        organization_id=org_id
+    ).values('user__username', 'content', 'timestamp')
+
+    links = Link.objects.filter(
+        Q(text__icontains=query) | Q(link__icontains=query),
+        channel_id=channel_id,
+        organization_id=org_id
+    ).values('user__username', 'text', 'link', 'timestamp')
+
+    return JsonResponse({'messages': list(messages), 'links': list(links)})
