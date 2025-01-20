@@ -101,6 +101,504 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Emoji Picker Modal Styling */
+#emojiPickerModal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    width: 80%;
+    max-width: 500px;
+    padding: 20px;
+    display: none; /* Initially hidden */
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 1000; /* Ensure it's above other content */
+    text-align: center; /* Center content horizontally */
+}
+
+/* When the modal is visible */
+#emojiPickerModal.show {
+    display: block;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* Emoji container styling */
+#emojiContainer {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* 6 emojis per row */
+    gap: 10px;
+    justify-items: center; /* Center emojis in the grid */
+    align-items: center;
+    overflow-y: auto;
+    max-height: 250px;
+    padding: 10px;
+}
+
+/* Adjust the grid layout for smaller screens */
+@media (max-width: 600px) {
+    #emojiContainer {
+        grid-template-columns: repeat(4, 1fr); /* 4 emojis per row on smaller screens */
+    }
+}
+
+@media (max-width: 400px) {
+    #emojiContainer {
+        grid-template-columns: repeat(3, 1fr); /* 3 emojis per row on very small screens */
+    }
+}
+
+/* Individual emoji button styling */
+.emoji {
+    font-size: 30px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px;
+    border-radius: 8px;
+    background-color: #f5f5f5;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    text-align: center;
+}
+
+/* Hover effect on emojis */
+.emoji:hover {
+    background-color: #e0e0e0;
+    transform: scale(1.2);
+}
+
+/* Close button for the modal - Highlighted in red */
+#closeEmojiPickerModal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: red; /* Red color for close button */
+    font-size: 20px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+/* Close button hover effect */
+#closeEmojiPickerModal:hover {
+    color: darkred; /* Darker red on hover */
+}
+
+/* Add smooth fade-in animation */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+#emojiPickerModal.show {
+    animation: fadeIn 0.3s ease forwards;
+}
+
+
+
+
+/* Modal Background */
+.hidden {
+    display: none;
+}
+
+.fixed {
+    position: fixed;
+}
+
+.inset-0 {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.bg-gray-600 {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.bg-opacity-50 {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Modal Box */
+.bg-white {
+    background-color: #ffffff;
+}
+
+.p-6 {
+    padding: 1.5rem;
+}
+
+.rounded-lg {
+    border-radius: 0.5rem;
+}
+
+.w-1/3 {
+    width: 33.33%;
+}
+
+/* Modal Title */
+.text-xl {
+    font-size: 1.25rem;
+}
+
+.font-bold {
+    font-weight: bold;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+/* Input and Buttons */
+.border {
+    border: 1px solid #ccc;
+}
+
+.p-2 {
+    padding: 0.5rem;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+.bg-blue-500 {
+    background-color: #3b82f6;
+}
+
+.text-white {
+    color: #ffffff;
+}
+
+.ml-2 {
+    margin-left: 0.5rem;
+}
+
+.flex {
+    display: flex;
+}
+
+.justify-end {
+    justify-content: flex-end;
+}
+
+/* Modal Animation */
+@keyframes modalFadeIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes modalFadeOut {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
+#audioUploadModal, #videoUploadModal {
+    animation: modalFadeIn 0.3s ease-out forwards;
+}
+
+.hidden #audioUploadModal, .hidden #videoUploadModal {
+    animation: modalFadeOut 0.3s ease-in forwards;
+}
+
+
+
+
+
+/* Modal Background */
+.hidden {
+    display: none;
+}
+
+.fixed {
+    position: fixed;
+}
+
+.inset-0 {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.bg-gray-600 {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.bg-opacity-50 {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Modal Box */
+.bg-white {
+    background-color: #ffffff;
+}
+
+.p-6 {
+    padding: 1.5rem;
+}
+
+.rounded-lg {
+    border-radius: 0.5rem;
+}
+
+.w-1/3 {
+    width: 33.33%;
+}
+
+/* Modal Title */
+.text-xl {
+    font-size: 1.25rem;
+}
+
+.font-bold {
+    font-weight: bold;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+/* Input Fields */
+.border {
+    border: 1px solid #ccc;
+}
+
+.p-2 {
+    padding: 0.5rem;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+/* List of Users (Mention Modal) */
+#mentionList {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+}
+
+#mentionList li {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#mentionList li:hover {
+    background-color: #f0f0f0;
+}
+
+/* Buttons */
+.bg-blue-500 {
+    background-color: #3b82f6;
+}
+
+.bg-gray-500 {
+    background-color: #6b7280;
+}
+
+.text-white {
+    color: #ffffff;
+}
+
+.ml-2 {
+    margin-left: 0.5rem;
+}
+
+.flex {
+    display: flex;
+}
+
+.justify-end {
+    justify-content: flex-end;
+}
+
+/* Modal Animation */
+@keyframes modalFadeIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes modalFadeOut {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
+#mentionModal, #sendLinkModal {
+    animation: modalFadeIn 0.3s ease-out forwards;
+}
+
+.hidden #mentionModal, .hidden #sendLinkModal {
+    animation: modalFadeOut 0.3s ease-in forwards;
+}
+
+
+
+
+/* Modal Background */
+.hidden {
+    display: none;
+}
+
+.fixed {
+    position: fixed;
+}
+
+.inset-0 {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.bg-gray-600 {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.bg-opacity-50 {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Modal Box */
+.bg-white {
+    background-color: #ffffff;
+}
+
+.p-6 {
+    padding: 1.5rem;
+}
+
+.rounded-lg {
+    border-radius: 0.5rem;
+}
+
+.w-1/3 {
+    width: 33.33%;
+}
+
+/* Modal Title */
+.text-xl {
+    font-size: 1.25rem;
+}
+
+.font-bold {
+    font-weight: bold;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+/* Coming Soon Icon */
+#comingSoonIcon {
+    font-size: 3rem;
+    color: #ffcc00;
+    margin-bottom: 1rem;
+}
+
+/* Modal Content */
+p {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+
+/* Button */
+.bg-gray-500 {
+    background-color: #6b7280;
+}
+
+.text-white {
+    color: #ffffff;
+}
+
+.p-2 {
+    padding: 0.5rem;
+}
+
+.rounded-lg {
+    border-radius: 0.5rem;
+}
+
+/* Modal Animation */
+@keyframes modalFadeIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes modalFadeOut {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
+#comingSoonModal {
+    animation: modalFadeIn 0.5s ease-out forwards;
+}
+
+.hidden #comingSoonModal {
+    animation: modalFadeOut 0.3s ease-in forwards;
+}
 
 </style>
 
@@ -243,6 +741,21 @@
     </div>
   </div>
   
+
+
+  <!-- Coming Soon Modal -->
+<div id="comingSoonModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg w-1/3">
+        <div id="comingSoonIcon" class="flex justify-center">
+            <i class="fas fa-clock"></i> <!-- Clock icon for "Coming Soon" -->
+        </div>
+        <h2 class="text-xl font-bold mb-4">Coming Soon...</h2>
+        <p>This feature will be available soon. Stay tuned!</p>
+        <div class="flex justify-end mt-4">
+            <button id="closeComingSoonModal" class="bg-gray-500 text-white p-2 rounded-lg">Close</button>
+        </div>
+    </div>
+</div>
 <!-- ---------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
 <!-- Button to trigger fetching logs -->
@@ -286,7 +799,7 @@
 
 
 <body class="bg-gray-100">
-    
+
     <div class="max-w-4xl mx-auto mt-10">
         <div class="mb-4">
             <input 
@@ -382,7 +895,23 @@
             <button id="uploadVideoButton" class="p-2 text-teal-500 hover:text-teal-600">
                 <i class="fas fa-video text-xl"></i>
             </button>
+
+
+            <!-- Call Icon -->
+<button id="callButton" class="p-2 text-green-500 hover:text-green-600">
+    <i class="fas fa-phone-alt text-xl"></i>
+</button>
+
+<!-- Screen Share Icon -->
+<button id="screenShareButton" class="p-2 text-blue-500 hover:text-blue-600">
+    <i class="fas fa-desktop text-xl"></i>
+</button>
         </div>
+
+
+
+       
+
         
 
         <!-- Modal to mention users -->
@@ -482,6 +1011,17 @@
         const emojiPickerButton = document.getElementById('emojiPickerButton');
         const emojiPickerModal = document.getElementById('emojiPickerModal');
         const closeEmojiPickerModal = document.getElementById('closeEmojiPickerModal');
+
+        
+// Toggle the emoji picker modal
+emojiPickerButton.addEventListener('click', () => {
+    emojiPickerModal.classList.add('show');
+});
+
+// Close the modal when the close button is clicked
+closeEmojiPickerModal.addEventListener('click', () => {
+    emojiPickerModal.classList.remove('show');
+});
         const emojiContainer = document.getElementById('emojiContainer');
         const emojis = [
   '🚀', '⚡', '💥', '🔥', '🌟', '🏆', '💯', '✅', '📝', '💻', 
@@ -518,6 +1058,8 @@
   '🎼', '🎸', '🎹', '🎷', '🥁', '🎼', '🎧', '🎻', '🎤', '🎶',
   '🎸', '🎷', '🎺', '🎻', '🎶', '🎼', '🎤', '🎵', '🎶', '🎹'
 ];
+
+
 
         emojiPickerButton.onclick = () => {
             emojiContainer.innerHTML = '';
@@ -1044,6 +1586,23 @@ function renderCharts(data) {
     });
 }
 
+
+// Coming soon modal
+
+// Open "Coming Soon" modal for Call button
+document.getElementById('callButton').addEventListener('click', function() {
+        document.getElementById('comingSoonModal').classList.remove('hidden');
+    });
+
+    // Open "Coming Soon" modal for Screen Share button
+    document.getElementById('screenShareButton').addEventListener('click', function() {
+        document.getElementById('comingSoonModal').classList.remove('hidden');
+    });
+
+    // Close "Coming Soon" modal
+    document.getElementById('closeComingSoonModal').addEventListener('click', function() {
+        document.getElementById('comingSoonModal').classList.add('hidden');
+    });
 </script>
 
    <!-- Add Bootstrap 5 JS just before the closing </body> tag -->
