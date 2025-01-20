@@ -12,7 +12,6 @@
 
 
 
-
 <!-- Modal for displaying the user list -->
 <div id="userListModal" class="modal fade" tabindex="-1" aria-labelledby="userListModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -22,7 +21,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <ul id="userList" class="list-group list-group-flush">
+                <ul id="userList" class="list-group">
                     <!-- List of users will be dynamically populated here -->
                 </ul>
             </div>
@@ -61,11 +60,12 @@
 <button id="fetchLogsButton" class="btn btn-primary">Fetch Activity Logs</button>
  <!-- Button to open the user list modal -->
 
-
 <!-- Button to open the user list modal -->
-<button id="userListButton" class="btn btn-primary btn-lg shadow-sm px-3 py-1 rounded-3 text-white hover:bg-blue-600 transition-transform duration-300 transform hover:scale-105" >
+<button id="userListButton" 
+        class="btn btn-primary btn-lg shadow-sm px-3 py-1 rounded text-white">
     View Users
 </button>
+
 
 
 <!-- -------------------------------------------------------------------------------------------------------------------------------------------------------- -->
@@ -373,39 +373,42 @@
 
 
 
-    document.getElementById('userListButton').onclick = function() {
-    const orgId = "{{ channel.organization.id }}";  // The organization ID from the Django template context
-    const channelId = "{{ channel.id }}";  // The channel ID from the Django template context
+document.getElementById('userListButton').onclick = function () {
+    const orgId = "{{ channel.organization.id }}"; // Organization ID from Django template
+    const channelId = "{{ channel.id }}"; // Channel ID from Django template
 
     // Make an AJAX request to fetch users associated with the channel
     fetch(`/channels/channels/get_members/${orgId}/${channelId}/`)
         .then(response => response.json())
         .then(data => {
-            const userList = document.getElementById('userListButton');
-            userList.innerHTML = '';  // Clear existing user list
+            const userList = document.getElementById('userList');
+            userList.innerHTML = ''; // Clear existing user list
 
             if (data.members && data.members.length > 0) {
                 // Populate the user list with members
                 data.members.forEach(user => {
                     const listItem = document.createElement('li');
-                    listItem.className = 'cursor-pointer py-2 text-blue-500 hover:underline';
-                    listItem.textContent = user.username;  // Display the username
+                    listItem.className = 'list-group-item cursor-pointer text-primary';
+                    listItem.textContent = user.username; // Display the username
                     userList.appendChild(listItem);
                 });
             } else {
                 // Handle case when no users are found
                 const noUsersItem = document.createElement('li');
+                noUsersItem.className = 'list-group-item text-danger';
                 noUsersItem.textContent = "No users found!";
                 userList.appendChild(noUsersItem);
             }
 
-            // Show the modal with the user list
-            document.getElementById('userListModal').classList.remove('hidden');
+            // Show the modal using Bootstrap 5's modal JavaScript
+            const modal = new bootstrap.Modal(document.getElementById('userListModal'));
+            modal.show();
         })
         .catch(error => {
             console.error('Error fetching users:', error);
         });
 };
+
 
 
 // Fetch activity logs
