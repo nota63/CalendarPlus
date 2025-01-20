@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -600,6 +601,9 @@ p {
     animation: modalFadeOut 0.3s ease-in forwards;
 }
 
+
+/* sidebar styles */
+
 </style>
 
 
@@ -758,6 +762,9 @@ p {
 </div>
 <!-- ---------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
+
+
+
 <!-- Button to trigger fetching logs -->
 <button id="fetchLogsButton" class="btn btn-primary">Fetch Activity Logs</button>
  <!-- Button to open the user list modal -->
@@ -780,6 +787,9 @@ p {
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#statisticsModal">
     Show Channel Statistics
   </button>
+
+
+
 
 
 
@@ -906,7 +916,12 @@ p {
 <button id="screenShareButton" class="p-2 text-blue-500 hover:text-blue-600">
     <i class="fas fa-desktop text-xl"></i>
 </button>
-        </div>
+
+<!-- Screen Share Icon -->
+<button id="screenShareButton" class="p-2 text-blue-500 hover:text-blue-600">
+    <i class="fas fa-plus text-xl"></i>
+</button>
+</div>
 
 
 
@@ -1610,3 +1625,4 @@ document.getElementById('callButton').addEventListener('click', function() {
 </body>
 </html>
 
+{% include 'footer.html' %}
