@@ -1230,6 +1230,28 @@ p {
 </div>
 
 
+
+<!-- Edit Message Modal -->
+<div class="modal fade" id="editMessageModal" tabindex="-1" aria-labelledby="editMessageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editMessageModalLabel">Edit Message</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <textarea id="editMessageContent" class="form-control" rows="4"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveEditButton">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <!-- ---------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
 
@@ -1367,6 +1389,10 @@ p {
                                         Delete
                                     </button>
                                 </form>
+                               <!-- edit message button -->
+                                <button class="edit-button text-green-500 px-4 py-2 w-full hover:bg-green-50" data-bs-toggle="modal" data-bs-target="#editMessageModal" data-message-id="{{ message.id }}" data-current-content="{{ message.content }}">
+                                    <i class="fas fa-ellipsis-v"></i> Edit
+                                </button>
                                 
                                
         
@@ -2340,8 +2366,107 @@ document.addEventListener('click', function (event) {
 
 
 
-// Delete messages or links
+// Edit message 
+document.addEventListener('DOMContentLoaded', function () {
+    let currentMessageId = null;
+    let currentMessageElement = null;
 
+    // When the edit button is clicked, set up the modal
+    const editButtons = document.querySelectorAll('.edit-button');
+    editButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            currentMessageId = this.dataset.messageId;
+            currentMessageElement = this.closest('.flex.items-center'); // The element that contains the message
+            const currentContent = this.dataset.currentContent;
+            document.getElementById('editMessageContent').value = currentContent; // Populate the textarea with current message content
+        });
+    });
+
+    // When the save button is clicked, send AJAX request to update the message
+    document.getElementById('saveEditButton').addEventListener('click', function () {
+        const newContent = document.getElementById('editMessageContent').value.trim(); // Remove leading/trailing spaces
+        if (!newContent) {
+            alert("Message content cannot be empty or just spaces.");
+            return;
+        }
+
+        // Get the CSRF token from the page
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const orgId = "{{ channel.organization.id }}";
+        const channelId = "{{ channel.id }}";
+
+        // Send AJAX request to update the message
+        fetch(`/channels/channels/edit_message/${orgId}/${channelId}/${currentMessageId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                content: newContent
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the message content in the DOM immediately for the user
+                currentMessageElement.querySelector('.message-content').textContent = newContent;
+                $('#editMessageModal').modal('hide'); // Hide the modal after successful edit
+            } else {
+                alert(data.error || 'Failed to update the message.');
+            }
+        })
+        .catch(error => {
+           
+        showNotification('Message updated successfully. Please refresh the page for new changes.', 'Refresh', window.location.href);
+        });
+    });
+});
+
+
+
+
+
+
+
+
+// CUSTOM NOTIFICATION FUNCTION
+
+// Custom function to display a notification with a clickable link
+function showNotification(message, linkText, linkUrl) {
+    const notificationContainer = document.createElement('div');
+    notificationContainer.style.position = 'fixed';
+    notificationContainer.style.top = '10px';
+    notificationContainer.style.right = '10px';
+    notificationContainer.style.padding = '15px';
+    notificationContainer.style.backgroundColor = '#28a745';
+    notificationContainer.style.color = 'white';
+    notificationContainer.style.borderRadius = '5px';
+    notificationContainer.style.fontSize = '16px';
+    notificationContainer.style.zIndex = '1000';
+
+    const messageElement = document.createElement('span');
+    messageElement.textContent = message;
+
+    const linkElement = document.createElement('a');
+    linkElement.textContent = linkText;
+    linkElement.href = linkUrl;
+    linkElement.style.color = '#ffffff';
+    linkElement.style.textDecoration = 'underline';
+    linkElement.style.marginLeft = '10px';
+
+    // Append the message and link to the notification
+    notificationContainer.appendChild(messageElement);
+    notificationContainer.appendChild(linkElement);
+
+    // Append the notification to the body
+    document.body.appendChild(notificationContainer);
+
+    // Remove the notification after 5 seconds
+    setTimeout(() => {
+        notificationContainer.remove();
+    }, 5000);
+}
 
 
 

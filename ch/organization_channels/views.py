@@ -758,8 +758,70 @@ def delete_link(request, org_id, channel_id, link_id):
              )
 
         else:
-            messages.error(request, "Message not found or you do not have permission to delete it.")
+            messages.error(request, "Link not found or you do not have permission to delete it.")
         
         return redirect('channel_chat', channel_id=channel.id)  
     else:
+        return JsonResponse({'success': False, 'error': 'Invalid method. Only POST is allowed.'})
+    
+
+
+# Edit message 
+import logging
+
+logger = logging.getLogger(__name__)
+
+def edit_message(request, org_id, channel_id, message_id):
+    if request.method == 'POST':
+        try:
+       
+            logger.debug(f"Received request body: {request.body}")
+
+  
+            data = json.loads(request.body)
+            content = data.get('content')
+
+        
+            logger.debug(f"Received content: {content}")
+
+       
+            if not content or content.strip() == '':
+                logger.warning("Message content is empty or only spaces.")
+                return JsonResponse({'success': False, 'error': 'Message content cannot be empty.'})
+
+            organization = get_object_or_404(Organization, id=org_id)
+            logger.debug(f"Found organization: {organization.name} (ID: {organization.id})")
+
+            channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+            logger.debug(f"Found channel: {channel.name} (ID: {channel.id})")
+            user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+            if not user_profile:
+               return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+
+     
+            message = get_object_or_404(Message, id=message_id, channel=channel, user=request.user)
+            logger.debug(f"Found message to edit: {message.content} (ID: {message.id})")
+
+            message.content = content
+            message.save()
+            logger.info(f"Message successfully updated: {message.content} (ID: {message.id})")
+
+            activity = ActivityChannel.objects.create(
+               user=request.user,
+               channel=channel,
+                organization=organization,
+                action_type="MESSAGE_EDITED",
+               content=f'{request.user} Edited the message and new message is {content}'
+            )
+
+
+            return JsonResponse({'success': True, 'message': 'Message updated successfully.'})
+
+        except Exception as e:
+            logger.error(f"Error occurred while processing the request: {e}")
+            return JsonResponse({'success': False, 'error': f'An error occurred: {str(e)}'})
+
+    else:
+        logger.warning(f"Invalid method: {request.method}. Only POST is allowed.")
         return JsonResponse({'success': False, 'error': 'Invalid method. Only POST is allowed.'})
