@@ -40,7 +40,8 @@ class Channel(models.Model):
     
     def __str__(self):
         return f"{self.name} ({self.get_type_display()}) - {self.get_visibility_display()}"
-
+    
+   
     
 
 # Save messages into database

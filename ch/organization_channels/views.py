@@ -1043,3 +1043,78 @@ def filter_by_user(request, org_id, channel_id, user_id):
         return JsonResponse({"messages": messages_data, "links": links_data}, status=200)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+
+# DELETE ALL CHANNEL DATA (ONLY ADMIN)
+
+
+@login_required
+@csrf_exempt
+def delete_channel_data(request, org_id, channel_id):
+    if request.method == "POST":
+     
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON payload.'}, status=400)
+
+  
+        organization = get_object_or_404(Organization, id=org_id)
+        channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+
+        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+        if not user_profile:
+           return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+
+  
+        if channel.created_by != request.user:
+            return JsonResponse({'error': 'You are not authorized to delete data for this channel.'}, status=403)
+
+        # Get the password entered by the user
+        password = data.get('password')
+        if not password:
+            return JsonResponse({'error': 'Password is required.'}, status=400)
+
+
+        if not check_password(password, request.user.password):
+            return JsonResponse({'error': 'Invalid password. Please try again.'}, status=400)
+
+  
+        data_to_delete = data.get('data_to_delete', [])
+        if not isinstance(data_to_delete, list):
+            return JsonResponse({'error': 'Invalid data to delete format.'}, status=400)
+
+     
+        if 'messages' in data_to_delete:
+            Message.objects.filter(channel=channel).delete()
+
+     
+        if 'links' in data_to_delete:
+            Link.objects.filter(channel=channel).delete()
+
+     
+        if 'audio' in data_to_delete:
+            Message.objects.filter(channel=channel, audio__isnull=False).delete()
+
+       
+        if 'video' in data_to_delete:
+            Message.objects.filter(channel=channel, video__isnull=False).delete()
+
+    
+        if 'activity' in data_to_delete:
+            ActivityChannel.objects.filter(channel=channel).delete()
+
+     
+        ActivityChannel.objects.create(
+            user=request.user,
+            channel=channel,
+            organization=organization,
+            action_type="DATA_EXPORT",
+            content=f"Deleted the following data: {', '.join(data_to_delete)}"
+        )
+
+        return JsonResponse({'message': 'Data deleted successfully.'})
+
+    return JsonResponse({'error': 'Invalid request method. Only POST is allowed.'}, status=405)

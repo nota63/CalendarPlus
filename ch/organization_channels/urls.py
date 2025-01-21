@@ -23,6 +23,7 @@ urlpatterns = [
     path('channel-data/<int:org_id>/<int:channel_id>/', get_channel_data, name='channel-data'),
     path('fetch-users/<int:org_id>/<int:channel_id>/', fetch_users, name='fetch_users'),
     path('filter-by-user/<int:org_id>/<int:channel_id>/<int:user_id>/',filter_by_user, name='filter_by_user'),
+    path('delete_channel_data/<int:org_id>/<int:channel_id>/',delete_channel_data, name='delete_channel_data'),
 
 
 
