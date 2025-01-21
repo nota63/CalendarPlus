@@ -1276,6 +1276,35 @@ p {
     </div>
 </div>
 
+
+
+<!-- Modal for channel stats -->
+<div 
+    class="modal fade" 
+    id="statsModal" 
+    tabindex="-1" 
+    aria-labelledby="statsModalLabel" 
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="statsModalLabel">Memory usage of your messages links & media</h5>
+                <button 
+                    type="button" 
+                    class="btn-close" 
+                    data-bs-dismiss="modal" 
+                    aria-label="Close"
+                ></button>
+            </div>
+            <div class="modal-body">
+                <canvas id="chartContainer" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- ---------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
 
@@ -1349,6 +1378,17 @@ p {
          <i class="fas fa-trash-alt"></i> Delete All My Messages
       </button>
 
+      <!-- Button to Trigger Modal -->
+<!-- Button to Trigger Modal -->
+<button 
+    id="showStatsButton" 
+    class="menu-item"
+    data-bs-toggle="modal" 
+    data-bs-target="#statsModal"
+>
+<i class="fas fa-database"></i>
+My memory usage
+</button>
 
 
       
@@ -2532,6 +2572,118 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+
+// CHANNEL STATS
+
+document.addEventListener("DOMContentLoaded", function () {
+    const showStatsButton = document.getElementById("showStatsButton");
+
+    const orgId = "{{channel.organization.id}}";  
+    const channelId = "{{channel.id}}";  
+
+    // Show Stats Modal
+    showStatsButton.addEventListener("click", async () => {
+        try {
+            // Fetch data via AJAX
+            const response = await fetch(`/channels/channel-data/${orgId}/${channelId}/`);
+            if (!response.ok) throw new Error("Failed to fetch data");
+            const data = await response.json();
+
+            // Render both Pie and Bar charts
+            renderPieChart(data);
+            renderBarChart(data);
+        } catch (error) {
+            console.error("Error fetching stats:", error);
+        }
+    });
+
+    // Function to render Pie Chart
+    function renderPieChart(data) {
+        const ctx = document.getElementById("chartContainer").getContext("2d");
+
+        // Destroy previous chart if it exists
+        if (window.pieChart) {
+            window.pieChart.destroy();
+        }
+
+        window.pieChart = new Chart(ctx, {
+            type: "pie",
+            data: {
+                labels: ["Messages", "Links"],
+                datasets: [
+                    {
+                        label: "Memory Usage (KB)",
+                        data: [
+                            data.total_message_memory / 1024,  // Convert bytes to KB
+                            data.total_links_memory_combined / 1024,   // Convert bytes to KB
+                        ],
+                        backgroundColor: ["#007bff", "#28a745"],
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: "top",
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: (tooltipItem) => {
+                                return `${tooltipItem.label}: ${tooltipItem.raw.toFixed(2)} KB`;
+                            },
+                        },
+                    },
+                },
+            },
+        });
+    }
+
+    // Function to render Bar Chart
+    function renderBarChart(data) {
+        const ctx = document.getElementById("chartContainer").getContext("2d");
+
+        // Destroy previous chart if it exists
+        if (window.barChart) {
+            window.barChart.destroy();
+        }
+
+        window.barChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: ["Text Memory", "Audio Memory", "Video Memory", "Links Text Memory", "Links URL Memory"],
+                datasets: [
+                    {
+                        label: "Memory Usage (KB)",
+                        data: [
+                            data.total_text_memory / 1024,
+                            data.total_audio_memory / 1024,
+                            data.total_video_memory / 1024,
+                            data.total_links_text_memory / 1024,
+                            data.total_links_memory / 1024,
+                        ],
+                        backgroundColor: ["#007bff", "#28a745", "#ffc107", "#17a2b8", "#e83e8c"],
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: "top",
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: (tooltipItem) => {
+                                return `${tooltipItem.label}: ${tooltipItem.raw.toFixed(2)} KB`;
+                            },
+                        },
+                    },
+                },
+            },
+        });
+    }
+});
 
 
 

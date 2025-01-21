@@ -29,7 +29,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.pdfgen import canvas
 from io import BytesIO
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.auth import authenticate
@@ -882,3 +882,73 @@ def edit_link(request, org_id, channel_id, link_id):
     else:
         logger.warning(f"Invalid method: {request.method}. Only POST is allowed.")
         return JsonResponse({'success': False, 'error': 'Invalid method. Only POST is allowed.'})
+
+
+
+# Calculate memory usages of messages and links
+
+def calculate_memory_usage_file(file_field):
+    """Helper to calculate memory usage of file."""
+    if file_field and file_field.name:
+        try:
+            return file_field.size
+        except Exception:
+            return 0
+    return 0
+
+
+def calculate_memory_usage_text(text):
+    """Helper to calculate memory usage of text."""
+    return len(text.encode('utf-8')) if text else 0
+
+
+def get_channel_data(request, org_id, channel_id):
+    """Fetch all relevant statistics for a channel."""
+
+    organization=get_object_or_404(Organization, id=org_id)
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+                return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+    try:
+      
+        if not org_id or not channel_id:
+            return JsonResponse({"error": "org_id and channel_id are required."}, status=400)
+
+      
+        messages = Message.objects.filter(user=request.user,channel_id=channel_id, organization_id=org_id)
+        links = Link.objects.filter(user=request.user,channel_id=channel_id, organization_id=org_id)
+
+        total_messages_count = messages.count()
+        total_links_count = links.count()
+
+       
+        total_text_memory = sum(calculate_memory_usage_text(msg.content) for msg in messages)
+        total_audio_memory = sum(calculate_memory_usage_file(msg.audio) for msg in messages)
+        total_video_memory = sum(calculate_memory_usage_file(msg.video) for msg in messages)
+        total_links_text_memory = sum(calculate_memory_usage_text(link.text) for link in links)
+        total_links_memory = sum(calculate_memory_usage_text(link.link) for link in links)
+
+  
+        total_message_memory = total_text_memory + total_audio_memory + total_video_memory
+        total_links_memory_combined = total_links_text_memory + total_links_memory
+        total_memory = total_message_memory + total_links_memory_combined
+
+ 
+        response_data = {
+            "total_messages_count": total_messages_count,
+            "total_links_count": total_links_count,
+            "total_text_memory": total_text_memory, 
+            "total_audio_memory": total_audio_memory, 
+            "total_video_memory": total_video_memory, 
+            "total_links_text_memory": total_links_text_memory, 
+            "total_links_memory": total_links_memory, 
+            "total_message_memory": total_message_memory, 
+            "total_links_memory_combined": total_links_memory_combined, 
+            "total_memory": total_memory,  
+        }
+
+        return JsonResponse(response_data, status=200)
+
+    except Exception as e:
+        print(f"Error fetching channel data: {e}")
+        return JsonResponse({"error": "An unexpected error occurred."}, status=500)
