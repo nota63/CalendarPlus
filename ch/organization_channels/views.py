@@ -952,3 +952,94 @@ def get_channel_data(request, org_id, channel_id):
     except Exception as e:
         print(f"Error fetching channel data: {e}")
         return JsonResponse({"error": "An unexpected error occurred."}, status=500)
+
+
+# FILTER MESSAGES AND LINKS BASED ON USER 
+
+# FETCH USERS
+
+@csrf_exempt
+def fetch_users(request, org_id, channel_id):
+    organization = get_object_or_404(Organization, id=org_id)
+
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+
+    channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+
+  
+    if channel.visibility == 'PUBLIC':
+        members = Profile.objects.filter(organization=organization)
+    else:
+        members = channel.allowed_members.all()
+
+ 
+    user_list = [{"id": member.user.id, "username": member.user.username} for member in members]
+    print("USERS FOUND:", user_list)
+
+    
+    return JsonResponse({'users': user_list, 'channel_name': channel.name})
+
+
+# Filter messages and links based on user
+
+def filter_by_user(request, org_id, channel_id, user_id):
+    if request.method == "GET":
+        
+        organization = get_object_or_404(Organization, id=org_id)
+        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+        if not user_profile:
+           return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+        channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+        user = get_object_or_404(User, id=user_id)
+
+        activity = ActivityChannel.objects.create(
+          user=user,
+          channel=channel,
+          organization=organization,
+          action_type="FILTERED_MESSAGES",
+          content=F'{request.user} filtered the messages of {user.username}'
+    )
+
+        
+      
+        messages = Message.objects.filter(
+            organization=organization,
+            channel=channel,
+            user=user
+        ).order_by('-timestamp')
+        
+        links = Link.objects.filter(
+            organization=organization,
+            channel=channel,
+            user=user
+        ).order_by('-timestamp')
+        
+   
+        messages_data = [
+            {
+                "id": message.id,
+                "content": message.content,
+                "timestamp": message.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+                "audio": message.audio.url if message.audio else None,
+                "video": message.video.url if message.video else None,
+            }
+            for message in messages
+        ]
+        
+        links_data = [
+            {
+                "id": link.id,
+                "text": link.text,
+                "link": link.link,
+                "timestamp": link.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            }
+            for link in links
+        ]
+
+        return JsonResponse({"messages": messages_data, "links": links_data}, status=200)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)

@@ -1305,6 +1305,36 @@ p {
 </div>
 
 
+<!-- Filter by User Modal -->
+<div
+    class="modal fade"
+    id="filterByUserModal"
+    tabindex="-1"
+    aria-labelledby="filterByUserModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterByUserModalLabel">Filter by User</h5>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+            </div>
+            <div class="modal-body">
+                <ul id="userListt" class="list-group">
+                    <!-- Users will be dynamically added here -->
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <!-- ---------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
 
@@ -1387,13 +1417,10 @@ p {
     data-bs-target="#statsModal"
 >
 <i class="fas fa-database"></i>
-My memory usage
+  My memory usage
 </button>
 
-
-      
-
-    </div>
+</div>
     
     <div class="sidebar-footer">
         <button class="menu-item"><i class="fas fa-cogs"></i> Settings</button>
@@ -1572,6 +1599,17 @@ My memory usage
 <button id="screenShareButton" class="p-2 text-blue-500 hover:text-blue-600">
     <i class="fas fa-plus text-xl"></i>
 </button>
+
+<!-- Filter by User Button -->
+<button
+    class=" p-2 text-blue-500 hover:text-blue-600 "
+    data-bs-toggle="modal"
+    data-bs-target="#filterByUserModal"
+>
+<i class="fas fa-user text-xl"></i>
+</button>
+
+
 </div>
 
 
@@ -2684,6 +2722,112 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+
+// FILTER BY USER 
+document.addEventListener("DOMContentLoaded", function () {
+    const orgId = "{{ channel.organization.id }}";
+    const channelId = "{{ channel.id }}";
+
+    // Populate the user list
+    async function fetchUsers() {
+        console.log("Fetching users...");  // Added log to check if this is being triggered
+        try {
+            const response = await fetch(`/channels/fetch-users/${orgId}/${channelId}/`);
+            const data = await response.json();
+
+            const userList = document.getElementById("userListt");
+            userList.innerHTML = ""; // Clear previous list
+
+            data.users.forEach((user) => {
+                const listItem = document.createElement("li");
+                listItem.className =
+                    "list-group-item d-flex justify-content-between align-items-center cursor-pointer";
+                listItem.textContent = user.username;
+                listItem.dataset.userId = user.id;
+                listItem.addEventListener("click", () => filterMessages(user.id));
+                userList.appendChild(listItem);
+            });
+        } catch (error) {
+            console.error("Error fetching users:", error);
+        }
+    }
+
+    // Filter messages by user
+    async function filterMessages(userId) {
+        console.log(`Filtering by user: ${userId}`);  // Added log to check if this is being triggered
+        try {
+            const response = await fetch(
+                `/channels/filter-by-user/${orgId}/${channelId}/${userId}/`
+            );
+            const data = await response.json();
+
+            const chatWindow = document.getElementById("chatWindow");
+            chatWindow.innerHTML = ""; // Clear existing messages and links
+
+            // Display filtered messages
+            data.messages.forEach((message) => {
+                const messageDiv = document.createElement("div");
+                messageDiv.className =
+                    "flex items-center border-b border-gray-200 py-3 hover:bg-gray-50 rounded-lg px-2 transition duration-200 relative";
+                messageDiv.innerHTML = ` 
+                    <div class="w-10 h-10 flex-shrink-0 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4">
+                        ${message.content.slice(0, 1)}
+                    </div>
+                    <div class="flex flex-col w-full">
+                        <span class="font-semibold text-purple-600">User</span>
+                        <span class="text-gray-700">${message.content}</span>
+                        <span class="text-xs text-gray-500 mt-1 self-end">${message.timestamp}</span>
+                    </div>
+                `;
+                chatWindow.appendChild(messageDiv);
+            });
+
+            // Display filtered links
+            data.links.forEach((link) => {
+                const linkDiv = document.createElement("div");
+                linkDiv.className =
+                    "flex items-center border-b border-gray-200 py-3 hover:bg-gray-50 rounded-lg px-2 transition duration-200 relative";
+                linkDiv.innerHTML = `
+                    <div class="w-10 h-10 flex-shrink-0 bg-gradient-to-tr from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4">
+                        ${link.text.slice(0, 1)}
+                    </div>
+                    <div class="flex flex-col w-full">
+                        <span class="font-semibold text-green-600">User</span>
+                        <span>
+                            <a href="${link.link}" target="_blank" class="text-blue-600 hover:underline font-medium">
+                                ${link.text}
+                            </a>
+                        </span>
+                        <span class="text-xs text-gray-500 mt-1 self-end">${link.timestamp}</span>
+                    </div>
+                `;
+                chatWindow.appendChild(linkDiv);
+            });
+
+            // Close the modal
+            const filterByUserModal = bootstrap.Modal.getInstance(
+                document.getElementById("filterByUserModal")
+            );
+            filterByUserModal.hide();
+        } catch (error) {
+            console.error("Error filtering messages:", error);
+        }
+    }
+
+    // Fetch users when the modal is shown
+    const filterByUserModal = document.getElementById("filterByUserModal");
+    filterByUserModal.addEventListener("show.bs.modal", function () {
+        console.log("Modal is opening..."); // Log to check if the modal is triggering the fetch
+        setTimeout(fetchUsers, 100); // Delay to ensure modal fully loads
+    });
+});
+
+
+
+
+
+
 
 
 

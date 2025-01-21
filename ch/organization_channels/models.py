@@ -104,6 +104,7 @@ class ActivityChannel(models.Model):
         ("LINK_DELETE",'Link delete'),
         ('MESSAGE_EDITED','Message edited'),
         ("LINK_EDITED",'Link edited'),
+        ('FILTERED_MESSAGES','Filtered messages'),
     ]
 
     user = models.ForeignKey(User, related_name='activities', on_delete=models.CASCADE)
