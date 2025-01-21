@@ -32,6 +32,11 @@ from io import BytesIO
 from django.db.models import Q
 from django.utils import timezone
 from datetime import timedelta
+from django.contrib.auth import authenticate
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+import json
+from django.contrib.auth.hashers import check_password
 
 
 # Create your views here.
@@ -643,5 +648,47 @@ def filter_messages(request, org_id, channel_id):
 
     return JsonResponse(response_data)
 
+# Delete users messages 
 
 
+@csrf_exempt 
+def delete_user_messages(request, org_id, channel_id):
+    organization=get_object_or_404(Organization,id=org_id)
+    channel=get_object_or_404(Channel,id=channel_id,organization=organization)
+
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+
+    if request.method == 'POST':
+        try:
+      
+            body = json.loads(request.body)
+            password = body.get('password')
+
+        
+            if not request.user.is_authenticated:
+                return JsonResponse({'success': False, 'message': 'User not authenticated.'}, status=403)
+
+            user = request.user
+            if not check_password(password, user.password):
+                return JsonResponse({'success': False, 'message': 'Incorrect password.'}, status=403)
+
+            
+            Message.objects.filter(user=user, channel_id=channel_id, organization_id=org_id).delete()
+            Link.objects.filter(user=user, channel_id=channel_id, organization_id=org_id).delete()
+            activity = ActivityChannel.objects.create(
+                user=user,
+                channel=channel,
+                organization=organization,
+                action_type="MESSAGES_DELETE",
+                content=f'{user} deleted his messages'
+            )
+
+            return JsonResponse({'success': True, 'message': 'All your messages have been deleted successfully.'})
+        
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+    return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=405)
