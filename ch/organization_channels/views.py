@@ -37,7 +37,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
 from django.contrib.auth.hashers import check_password
-
+from django.contrib import messages
 
 # Create your views here.
 
@@ -649,8 +649,6 @@ def filter_messages(request, org_id, channel_id):
     return JsonResponse(response_data)
 
 # Delete users messages 
-
-
 @csrf_exempt 
 def delete_user_messages(request, org_id, channel_id):
     organization=get_object_or_404(Organization,id=org_id)
@@ -692,3 +690,44 @@ def delete_user_messages(request, org_id, channel_id):
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
 
     return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=405)
+
+
+
+
+# Delete messages or links
+
+def delete_message(request, org_id, channel_id, message_id):
+    if request.method == 'POST':
+        organization = get_object_or_404(Organization, id=org_id)
+        channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+
+        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+        if not user_profile:
+           return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+
+   
+        message = Message.objects.filter(id=message_id, channel=channel, organization=organization, user=request.user).first()
+
+        if message:
+            message.delete()
+            messages.success(request, "Message deleted successfully")
+          
+            activity = ActivityChannel.objects.create(
+               user=request.user,
+               channel=channel,
+               organization=organization,
+               action_type="MESSAGE_DELETE",
+               content=f'{request.user} deleted his message {message.content}'
+             )
+
+        else:
+            messages.error(request, "Message not found or you do not have permission to delete it.")
+        
+        return redirect('channel_chat', channel_id=channel.id)  
+    else:
+        return JsonResponse({'success': False, 'error': 'Invalid method. Only POST is allowed.'})
+    
+
+
+    

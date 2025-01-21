@@ -16,6 +16,7 @@ urlpatterns = [
     path('channel/statistics/<int:org_id>/<int:channel_id>/', channel_statistics, name='channel_statistics'),
     path('filter_messages/<int:org_id>/<int:channel_id>/',filter_messages, name='filter_messages'),
     path('api/delete-messages/<int:org_id>/<int:channel_id>/', delete_user_messages, name='delete_user_messages'),
+    path('delete_message/<int:org_id>/<int:channel_id>/<int:message_id>/',delete_message, name='delete_message'),
 
 
 ]
