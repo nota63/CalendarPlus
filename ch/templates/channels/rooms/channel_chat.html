@@ -1251,6 +1251,30 @@ p {
 </div>
 
 
+<!-- Modal for editing link -->
+<div class="modal fade" id="editLinkModal" tabindex="-1" aria-labelledby="editLinkModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editLinkModalLabel">Edit Link</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editLinkForm">
+                    <div class="mb-3">
+                        <label for="editLinkText" class="form-label">Link Text</label>
+                        <input type="text" class="form-control" id="editLinkText" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editLinkUrl" class="form-label">Link URL</label>
+                        <input type="url" class="form-control" id="editLinkUrl" required>
+                    </div>
+                    <button type="button" id="saveEditLinkButton" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- ---------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
@@ -1434,6 +1458,20 @@ p {
                                         Delete
                                     </button>
                                 </form>
+
+                               
+                               <!-- Edit Link Button -->
+                               <button class="edit-link-button text-green-500 px-4 py-2 w-full hover:bg-green-50" 
+                               data-link-id="{{ link.id }}" 
+                               data-current-text="{{ link.text }}" 
+                               data-current-link="{{ link.link }}" 
+                               type="button" 
+                               data-bs-toggle="modal" 
+                               data-bs-target="#editLinkModal">
+                           Edit Link
+                       </button>
+                       
+
                                 
                             </div>
                         </div>
@@ -2423,9 +2461,76 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+// Edit the link
 
+document.addEventListener('DOMContentLoaded', function() {
+    // When the edit button is clicked, open the modal and populate fields
+    const editLinkButtons = document.querySelectorAll('.edit-link-button');
+    editLinkButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Get link data from the button's data attributes
+            const linkId = this.dataset.linkId;
+            const currentText = this.dataset.currentText;
+            const currentLink = this.dataset.currentLink;
 
+            // Populate the modal's input fields with the existing data
+            document.getElementById('editLinkText').value = currentText;
+            document.getElementById('editLinkUrl').value = currentLink;
 
+            // Update the modal's save button with the correct link ID
+            const saveButton = document.getElementById('saveEditLinkButton');
+            saveButton.dataset.linkId = linkId;
+        });
+    });
+
+    // When the save button is clicked, send AJAX request to update the link
+    document.getElementById('saveEditLinkButton').addEventListener('click', function() {
+        const newText = document.getElementById('editLinkText').value.trim();
+        const newLink = document.getElementById('editLinkUrl').value.trim();
+
+        // Validate inputs
+        if (!newText || !newLink) {
+            alert("Both link text and URL are required.");
+            return;
+        }
+
+        // Get the CSRF token from the page
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const linkId = this.dataset.linkId;
+        const orgId = "{{ channel.organization.id }}";
+        const channelId = "{{ channel.id }}";
+
+        // Send AJAX request to update the link
+        fetch(`/channels/channels/edit_link/${orgId}/${channelId}/${linkId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                text: newText,
+                link: newLink
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the link content in the DOM immediately for the user
+                const linkElement = document.querySelector(`.link[data-link-id="${linkId}"]`);
+                linkElement.querySelector('.link-text').textContent = newText;
+                linkElement.querySelector('.link-url').textContent = newLink;
+
+                // Hide the modal after successful update
+                $('#editLinkModal').modal('hide');
+            } else {
+                alert(data.error || 'Failed to update the link.');
+            }
+        })
+        .catch(error => {
+            showNotification('Link updated successfully. Please refresh the page for new changes.', 'Refresh', window.location.href);
+        });
+    });
+});
 
 
 

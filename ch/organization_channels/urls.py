@@ -19,6 +19,8 @@ urlpatterns = [
     path('delete_message/<int:org_id>/<int:channel_id>/<int:message_id>/',delete_message, name='delete_message'),
     path('delete_link/<int:org_id>/<int:channel_id>/<int:link_id>/',delete_link, name='delete_link'),
     path('channels/edit_message/<int:org_id>/<int:channel_id>/<int:message_id>/', edit_message, name='edit_message'),
+    path('channels/edit_link/<int:org_id>/<int:channel_id>/<int:link_id>/', edit_link, name='edit_link'),
+
 
 
 

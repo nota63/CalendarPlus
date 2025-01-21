@@ -825,3 +825,60 @@ def edit_message(request, org_id, channel_id, message_id):
     else:
         logger.warning(f"Invalid method: {request.method}. Only POST is allowed.")
         return JsonResponse({'success': False, 'error': 'Invalid method. Only POST is allowed.'})
+    
+
+# Edit the link 
+
+logger = logging.getLogger(__name__)
+
+def edit_link(request, org_id, channel_id, link_id):
+    if request.method == 'POST':
+        try:
+            logger.debug(f"Received request body: {request.body}")
+            data = json.loads(request.body)
+            text = data.get('text')
+            link_url = data.get('link')
+
+            logger.debug(f"Received link text: {text} and link URL: {link_url}")
+
+            if not text or not link_url:
+                logger.warning("Link text or URL is empty.")
+                return JsonResponse({'success': False, 'error': 'Both link text and URL are required.'})
+
+            organization = get_object_or_404(Organization, id=org_id)
+            logger.debug(f"Found organization: {organization.name} (ID: {organization.id})")
+            channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+            logger.debug(f"Found channel: {channel.name} (ID: {channel.id})")
+
+          
+            user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+            if not user_profile:
+                return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+
+            link_obj = get_object_or_404(Link, id=link_id, channel=channel, organization=organization, user=request.user)
+            logger.debug(f"Found link to edit: {link_obj.text} (ID: {link_obj.id})")
+
+            link_obj.text = text
+            link_obj.link = link_url
+            link_obj.save()
+            logger.info(f"Link successfully updated: {link_obj.text} (ID: {link_obj.id})")
+
+            
+            activity = ActivityChannel.objects.create(
+                user=request.user,
+                channel=channel,
+                organization=organization,
+                action_type="LINK_EDITED",
+                content=f'{request.user} edited the link: {text}'
+            )
+
+            return JsonResponse({'success': True, 'message': 'Link updated successfully.'})
+
+        except Exception as e:
+            logger.error(f"Error occurred while processing the request: {e}")
+            return JsonResponse({'success': False, 'error': f'An error occurred: {str(e)}'})
+
+    else:
+        logger.warning(f"Invalid method: {request.method}. Only POST is allowed.")
+        return JsonResponse({'success': False, 'error': 'Invalid method. Only POST is allowed.'})
