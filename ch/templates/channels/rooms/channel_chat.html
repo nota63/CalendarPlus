@@ -1402,9 +1402,13 @@ p {
                             </button>
                             <div class="menu-options hidden absolute top-6 right-0 bg-white shadow-md rounded-lg text-sm">
                                 <!-- Inside the menu options for links -->
-                           <button class="delete-link text-red-500 px-4 py-2 w-full hover:bg-red-50" data-id="{{ link.id }}">
-                               Delete
-                            </button>
+                                <form action="{% url 'delete_link' org_id=channel.organization.id channel_id=channel.id link_id=link.id %}" method="POST" class="inline-block">
+                                    {% csrf_token %}
+                                    <button type="submit" class="delete-message text-red-500 px-4 py-2 w-full hover:bg-red-50">
+                                        Delete
+                                    </button>
+                                </form>
+                                
                             </div>
                         </div>
                     {% endif %}

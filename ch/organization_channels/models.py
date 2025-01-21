@@ -101,6 +101,7 @@ class ActivityChannel(models.Model):
         ('EXPLORE_STATISTICS','Explore statistics'),
         ("MESSAGES_DELETE",'Messages delete'),
         ("MESSAGE_DELETE",'Message_delete'),
+        ("LINK_DELETE",'Link delete'),
     ]
 
     user = models.ForeignKey(User, related_name='activities', on_delete=models.CASCADE)

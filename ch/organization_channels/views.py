@@ -730,4 +730,36 @@ def delete_message(request, org_id, channel_id, message_id):
     
 
 
-    
+# Delete link    
+
+def delete_link(request, org_id, channel_id, link_id):
+    if request.method == 'POST':
+        organization = get_object_or_404(Organization, id=org_id)
+        channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+
+        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+        if not user_profile:
+           return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+
+   
+        link = Link.objects.filter(id=link_id, channel=channel, organization=organization, user=request.user).first()
+
+        if link:
+            link.delete()
+            messages.success(request, "Message deleted successfully")
+          
+            activity = ActivityChannel.objects.create(
+               user=request.user,
+               channel=channel,
+               organization=organization,
+               action_type="LINK_DELETE",
+               content=f'{request.user} deleted his link {link.link} wrapped text {link.text}'
+             )
+
+        else:
+            messages.error(request, "Message not found or you do not have permission to delete it.")
+        
+        return redirect('channel_chat', channel_id=channel.id)  
+    else:
+        return JsonResponse({'success': False, 'error': 'Invalid method. Only POST is allowed.'})
