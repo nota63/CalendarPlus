@@ -18,6 +18,7 @@ from tinymce.models import HTMLField
 
 
 # Models 
+
 # organization model 
 class Organization(models.Model):
     name = models.CharField(max_length=255)

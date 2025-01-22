@@ -1670,6 +1670,11 @@ p {
           </div>
   
           <!-- Organizations List -->
+          <div class="alert alert-info text-center fw-semibold fs-6 mt-3" role="alert">
+            Channel access can only be shared with organizations you own and manage.
+        </div>
+        
+        
           <ul id="organizationList" class="list-group">
             <!-- List of organizations will be injected here -->
           </ul>
@@ -1682,6 +1687,72 @@ p {
       </div>
     </div>
   </div>
+
+
+
+  <!-- Set retention policy -->
+
+  <!-- Modal -->
+<div class="modal fade" id="retentionPolicyModal" tabindex="-1" aria-labelledby="retentionPolicyModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="retentionPolicyModalLabel">Set Retention Policy</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="retentionForm">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="retentionPeriod" id="retention30" value="30">
+              <label class="form-check-label" for="retention30">
+                30 Days
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="retentionPeriod" id="retention45" value="45">
+              <label class="form-check-label" for="retention45">
+                45 Days
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="retentionPeriod" id="retention90" value="90">
+              <label class="form-check-label" for="retention90">
+                90 Days (3 Months)
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="retentionPeriod" id="retention180" value="180">
+              <label class="form-check-label" for="retention180">
+                180 Days (6 Months)
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="retentionPeriod" id="retention365" value="365">
+              <label class="form-check-label" for="retention365">
+                365 Days (1 Year)
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="retentionPeriod" id="customRetention" value="0">
+              <label class="form-check-label" for="customRetention">
+                Custom Period (Enter Days)
+              </label>
+              <input type="number" id="customDays" class="form-control mt-2" placeholder="Enter custom days" style="display: none;">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="saveRetentionPolicy">Save Policy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+
+
+
 
 
   <!-- Include Bootstrap 5 JS -->
@@ -1786,6 +1857,11 @@ p {
     <button class="menu-item" data-bs-toggle="modal" data-bs-target="#userSelectionModal">
         <i class="fas fa-user-shield"></i>
         Ban User</button>
+
+    <!-- Set retention policy -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#retentionPolicyModal">
+    Set Retention Policy
+  </button>    
 
        <!-- Button to Open Modal -->
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shareModal">
@@ -3676,7 +3752,74 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
 
+// SET RETENTION POLICY
 
+document.addEventListener('DOMContentLoaded', function() {
+    const customRetentionRadio = document.getElementById('customRetention');
+    const customDaysInput = document.getElementById('customDays');
+
+    // Show the custom input field when "Custom Period" is selected
+    customRetentionRadio.addEventListener('change', function() {
+      if (customRetentionRadio.checked) {
+        customDaysInput.style.display = 'block'; // Show input
+      }
+    });
+
+    // Hide the custom input field if another period is selected
+    document.querySelectorAll('input[name="retentionPeriod"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        if (radio.value !== '0') {
+          customDaysInput.style.display = 'none'; // Hide input
+        }
+      });
+    });
+
+    // Save the retention policy when the button is clicked
+    document.getElementById('saveRetentionPolicy').addEventListener('click', function() {
+      const retentionPeriod = document.querySelector('input[name="retentionPeriod"]:checked');
+      let customDays = customDaysInput.value;
+
+      if (!retentionPeriod) {
+        alert('Please select a retention period.');
+        return;
+      }
+
+      if (retentionPeriod.value === '0' && !customDays) {
+        alert('Please enter a custom number of days.');
+        return;
+      }
+
+      const data = {
+        retention_period: retentionPeriod.value,
+        custom_days: customDays ? customDays : null
+      };
+
+      const orgId="{{channel.organization.id}}";
+      const channelId="{{channel.id}}";
+
+      // Send data to the backend (Assuming a POST request to '/set_retention_policy/')
+      fetch(`/channels/set_retention_policy/${orgId}/${channelId}/`, {// Replace with the actual org_id and channel_id
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.success || data.error);
+        if (data.success) {
+          // Close the modal if successful
+          var myModal = new bootstrap.Modal(document.getElementById('retentionPolicyModal'));
+          myModal.hide();
+        }
+      })
+      .catch(error => {
+        alert('An error occurred. Please try again later.');
+        console.error(error);
+      });
+    });
+  });
 
 
 

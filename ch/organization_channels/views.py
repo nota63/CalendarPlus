@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from accounts.models import Organization, Profile
 from .models import (
-    Channel, Message, Link , ActivityChannel, ChannelAccess)
+    Channel, Message, Link , ActivityChannel, ChannelAccess,RetentionPolicy)
 from django.utils.dateparse import parse_datetime
 from django.utils import timezone
 from django.urls import reverse
@@ -40,7 +40,7 @@ from django.contrib.auth.hashers import check_password
 from django.contrib import messages
 from .models import Ban
 from django.utils.timezone import now
-
+from django.core.exceptions import ValidationError
 
 
 # Create your views here.
@@ -1352,6 +1352,64 @@ def grant_channel_access(request, org_id, channel_id, selected_org_id):
 
 
 
+# RETENTION POLICY
 
+@login_required
+@csrf_exempt
+def set_retention_policy(request, org_id, channel_id):
+   
+    organization = get_object_or_404(Organization, id=org_id)
+    channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+    if request.user != organization.created_by:
+        return JsonResponse({'error': 'You must be the admin of the organization to set policies.'}, status=403)
+
+    if request.method == "POST":
+        try:
+        
+            payload = json.loads(request.body)
+
+            retention_period = payload.get('retention_period')
+            custom_days = payload.get('custom_days')
+
+      
+            retention_period = int(retention_period)
+            if retention_period == 0:  
+                if not custom_days:
+                    return JsonResponse({'error': 'Custom days must be provided for a custom retention period.'}, status=400)
+                custom_days = int(custom_days)
+                if custom_days <= 0:
+                    return JsonResponse({'error': 'Custom days must be a positive integer.'}, status=400)
+            else:
+                custom_days = None 
+
+            
+            retention_policy, created = RetentionPolicy.objects.update_or_create(
+                organization=organization,
+                channel=channel,
+                defaults={'retention_period': retention_period, 'custom_days': custom_days, 'created_by': request.user}
+            )
+
+            activity = ActivityChannel.objects.create(
+              user=request.user,
+              channel=channel,
+              organization=organization,
+              action_type="SET_RETENTION_POLICY",
+              content=f'{request.user} has set Retention Policy to {retention_period} days  {custom_days}'
+           )
+
+
+            return JsonResponse({'success': 'Retention policy saved successfully.'})
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON format.'}, status=400)
+        except ValidationError as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    return JsonResponse({'error': 'Only POST requests are allowed.'}, status=405)
 
 

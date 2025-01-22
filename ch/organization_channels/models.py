@@ -111,6 +111,7 @@ class ActivityChannel(models.Model):
         ('FILTERED_MESSAGES','Filtered messages'),
         ("BAN_USER",'Ban user'),
         ("CHANNEL_ACCESS",'Channel access'),
+        ("SET_RETENTION_POLICY",'Set retention policy'),
     ]
 
     user = models.ForeignKey(User, related_name='activities', on_delete=models.CASCADE)
@@ -212,7 +213,53 @@ class ChannelAccess(models.Model):
         )
 
 
+# RETENTION POLICY
 
+class RetentionPolicy(models.Model):
+    organization = models.ForeignKey(
+        Organization,
+        on_delete=models.CASCADE,
+        related_name='retention_policies'
+    )
+    channel = models.ForeignKey(
+        Channel,
+        on_delete=models.CASCADE,
+        related_name='retention_policies'
+    )
+    retention_period = models.IntegerField(
+        choices=[
+            (30, '30 Days'),
+            (45, '45 Days'),
+            (90, '3 Months'),
+            (180, '6 Months'),
+            (365, '1 Year'),
+            (0, 'Custom'),  
+        ],
+        default=30,
+        help_text="Retention period for auto-deleting messages"
+    )
+    custom_days = models.PositiveIntegerField(
+        null=True, blank=True,
+        help_text="Enter custom days if retention period is set to 'Custom'"
+    )
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='created_retention_policies'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return f"Retention Policy: {self.get_retention_period_display()} for {self.channel.name}"
 
+    class Meta:
+        unique_together = ('organization', 'channel')
 
+    def clean(self):
+        from django.core.exceptions import ValidationError
+
+        if self.retention_period == 0 and not self.custom_days:
+            raise ValidationError("Custom days must be specified when retention period is set to 'Custom'.")
+        if self.retention_period != 0 and self.custom_days:
+            raise ValidationError("Custom days should only be specified for 'Custom' retention period.")

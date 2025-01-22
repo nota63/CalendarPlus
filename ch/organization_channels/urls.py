@@ -34,6 +34,8 @@ urlpatterns = [
     path('grant-channel-access/<int:org_id>/<int:channel_id>/<int:selected_org_id>/', 
          grant_channel_access, 
          name='grant_channel_access'),
+
+    path('set_retention_policy/<int:org_id>/<int:channel_id>/',set_retention_policy, name='set_retention_policy')     
    
 
 
