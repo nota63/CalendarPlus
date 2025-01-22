@@ -3581,7 +3581,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // GIVE ACCESS OF THIS CHANNEL TO ANOTHER ORGANIZATION
-
 document.addEventListener("DOMContentLoaded", function () {
     // Modal show event
     const shareModal = document.getElementById('shareModal');
@@ -3613,10 +3612,19 @@ document.addEventListener("DOMContentLoaded", function () {
               listItem.classList.add('list-group-item');
               listItem.textContent = `${org.name} - ${org.description}`;
               listItem.dataset.orgId = org.id;
+
+              // Disable organizations that already have access to the channel
+              if (org.hasAccess) {
+                listItem.classList.add('disabled');
+                listItem.style.pointerEvents = 'none'; // Prevent clicks
+              }
+
               listItem.addEventListener('click', function () {
                 // Handle the organization selection
-                selectedOrganizationId = org.id;
-                grantAccessBtn.disabled = false;
+                if (!listItem.classList.contains('disabled')) {
+                  selectedOrganizationId = org.id;
+                  grantAccessBtn.disabled = false;
+                }
               });
 
               organizationList.appendChild(listItem);
@@ -3624,7 +3632,7 @@ document.addEventListener("DOMContentLoaded", function () {
           } else {
             const noDataItem = document.createElement('li');
             noDataItem.classList.add('list-group-item');
-            noDataItem.textContent = 'No organizations found where you are an admin.';
+            noDataItem.textContent = 'No organizations found who dont have access to this channel.';
             organizationList.appendChild(noDataItem);
           }
         })
@@ -3639,8 +3647,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Grant access button click handler
-   // Grant access button click handler
-   grantAccessBtn.addEventListener('click', function () {
+    grantAccessBtn.addEventListener('click', function () {
       if (selectedOrganizationId) {
         const orgId = "{{ channel.organization.id }}"; // Channel's organization ID
         const channelId = "{{ channel.id }}"; // Channel ID
@@ -3667,7 +3674,6 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   });
-
 
 
 

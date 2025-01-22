@@ -1244,12 +1244,11 @@ def ban_user(request, org_id, channel_id, user_id):
 
 def fetch_admin_organizations(request, org_id, channel_id):
     """
-    Fetch all organizations where the request.user is an admin.
+    Fetch all organizations where the request.user is an admin, excluding those that already have access to the channel.
     """
     if not request.user.is_authenticated:
         return JsonResponse({'error': 'Unauthorized access'}, status=401)
 
-    
     current_org = get_object_or_404(Organization, id=org_id)
     user_profile = Profile.objects.filter(user=request.user, organization=current_org).first()
     if not user_profile:
@@ -1258,15 +1257,23 @@ def fetch_admin_organizations(request, org_id, channel_id):
     if not current_org.profiles.filter(user=request.user, is_admin=True).exists():
         return JsonResponse({'error': 'You are not an admin of this organization'}, status=403)
 
-    
+
     admin_organizations = Organization.objects.filter(
         profiles__user=request.user,
         profiles__is_admin=True
     ).exclude(id=org_id)  
 
+    
+    organizations_with_access = ChannelAccess.objects.filter(channel_id=channel_id)
+    organizations_with_access_ids = organizations_with_access.values_list('granted_to_organization', flat=True)
+
+   
+    admin_organizations = admin_organizations.exclude(id__in=organizations_with_access_ids)
 
     org_data = [{'id': org.id, 'name': org.name, 'description': org.description} for org in admin_organizations]
     return JsonResponse({'organizations': org_data}, status=200)
+
+
 
 
 # Grant access to other organization
@@ -1322,7 +1329,7 @@ def grant_channel_access(request, org_id, channel_id, selected_org_id):
 
         Channel Details:
         - Channel Name: {channel.name}
-        - Description: {channel.description}
+        - Description: {channel.type}
         - Organization: {owning_org.name}
 
         If you have any questions or need further assistance, feel free to reach out.
