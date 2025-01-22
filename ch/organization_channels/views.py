@@ -279,9 +279,10 @@ def get_channel_members(request, org_id, channel_id):
     organization = get_object_or_404(Organization, id=org_id)
 
 
-    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
-    if not user_profile:
-        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+    user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+    if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+        return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
 
 
     channel = get_object_or_404(Channel, id=channel_id, organization=organization)
@@ -304,9 +305,10 @@ def fetch_activity_logs(request, channel_id, org_id):
     organization = get_object_or_404(Organization, id=org_id)
     channel = get_object_or_404(Channel, id=channel_id, organization=organization)
 
-    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
-    if not user_profile:
-        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+    user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+    if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+        return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
 
     # Fetch the latest activity logs for the channel
     activity_logs = ActivityChannel.objects.filter(channel=channel).order_by('-timestamp')
@@ -327,9 +329,10 @@ def fetch_activity_logs(request, channel_id, org_id):
 
 def search_messages_links(request, org_id, channel_id):
     organization=get_object_or_404(Organization, id=org_id)
-    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
-    if not user_profile:
-        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+    user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+    if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+        return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
 
     query = request.GET.get('q', '')  
     if not query:
@@ -355,9 +358,10 @@ def search_messages_links(request, org_id, channel_id):
 
 def channel_details(request, org_id, channel_id):
     organization=get_object_or_404(Organization, id=org_id)
-    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
-    if not user_profile:
-        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+    user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+    if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+        return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
 
     channel = get_object_or_404(Channel, id=channel_id, organization_id=org_id)
     created_by = channel.created_by.username 
@@ -387,11 +391,11 @@ def export_data(request, org_id, channel_id):
         organization = get_object_or_404(Organization, id=org_id)
         channel = get_object_or_404(Channel, id=channel_id, organization=organization)
 
-        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
-        if not user_profile:
-           return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+        user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+        if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+            return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
 
-        
      
         messages = Message.objects.filter(channel=channel)
         links = Link.objects.filter(channel=channel)
@@ -501,9 +505,10 @@ def channel_statistics(request, org_id, channel_id):
         organization = get_object_or_404(Organization, id=org_id)
         channel = get_object_or_404(Channel, id=channel_id, organization=organization)
 
-        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
-        if not user_profile:
-           return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+        user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+        if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+           return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
 
       
         total_messages = Message.objects.filter(channel=channel).count()
@@ -607,9 +612,10 @@ def channel_statistics(request, org_id, channel_id):
 @login_required
 def filter_messages(request, org_id, channel_id):
     organization=get_object_or_404(Organization, id=org_id)
-    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
-    if not user_profile:
-        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+    user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+    if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+        return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
 
     filter_option = request.GET.get('filter_option')
     specific_date = request.GET.get('specific_date') 
@@ -681,9 +687,10 @@ def delete_user_messages(request, org_id, channel_id):
     organization=get_object_or_404(Organization,id=org_id)
     channel=get_object_or_404(Channel,id=channel_id,organization=organization)
 
-    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
-    if not user_profile:
-        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+    user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+    if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+        return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
 
 
     if request.method == 'POST':
@@ -728,9 +735,10 @@ def delete_message(request, org_id, channel_id, message_id):
         organization = get_object_or_404(Organization, id=org_id)
         channel = get_object_or_404(Channel, id=channel_id, organization=organization)
 
-        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
-        if not user_profile:
-           return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+        user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+        if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+           return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
 
 
    
@@ -764,9 +772,10 @@ def delete_link(request, org_id, channel_id, link_id):
         organization = get_object_or_404(Organization, id=org_id)
         channel = get_object_or_404(Channel, id=channel_id, organization=organization)
 
-        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
-        if not user_profile:
-           return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+        user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+        if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+           return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
 
 
    
@@ -821,9 +830,10 @@ def edit_message(request, org_id, channel_id, message_id):
 
             channel = get_object_or_404(Channel, id=channel_id, organization=organization)
             logger.debug(f"Found channel: {channel.name} (ID: {channel.id})")
-            user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
-            if not user_profile:
-               return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+            user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+            if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+              return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
 
 
      
@@ -878,9 +888,10 @@ def edit_link(request, org_id, channel_id, link_id):
             logger.debug(f"Found channel: {channel.name} (ID: {channel.id})")
 
           
-            user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
-            if not user_profile:
-                return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+            user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+            if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+              return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
 
 
             link_obj = get_object_or_404(Link, id=link_id, channel=channel, organization=organization, user=request.user)
@@ -933,9 +944,11 @@ def get_channel_data(request, org_id, channel_id):
     """Fetch all relevant statistics for a channel."""
 
     organization=get_object_or_404(Organization, id=org_id)
-    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
-    if not user_profile:
-                return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+    user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+    if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+        return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
+
     try:
       
         if not org_id or not channel_id:
@@ -989,9 +1002,10 @@ def get_channel_data(request, org_id, channel_id):
 def fetch_users(request, org_id, channel_id):
     organization = get_object_or_404(Organization, id=org_id)
 
-    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
-    if not user_profile:
-        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+    user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+    if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+        return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
 
 
     channel = get_object_or_404(Channel, id=channel_id, organization=organization)
@@ -1016,9 +1030,10 @@ def filter_by_user(request, org_id, channel_id, user_id):
     if request.method == "GET":
         
         organization = get_object_or_404(Organization, id=org_id)
-        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
-        if not user_profile:
-           return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+        user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+        if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+          return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
 
         channel = get_object_or_404(Channel, id=channel_id, organization=organization)
         user = get_object_or_404(User, id=user_id)
@@ -1090,9 +1105,10 @@ def delete_channel_data(request, org_id, channel_id):
         organization = get_object_or_404(Organization, id=org_id)
         channel = get_object_or_404(Channel, id=channel_id, organization=organization)
 
-        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
-        if not user_profile:
-           return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+        user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+        if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+          return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
 
 
   
@@ -1153,9 +1169,10 @@ def delete_channel_data(request, org_id, channel_id):
 @csrf_exempt
 def ban_user(request, org_id, channel_id, user_id):
     organization = get_object_or_404(Organization, id=org_id)
-    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
-    if not user_profile:
-        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+    user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+    if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+        return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
 
     channel = get_object_or_404(Channel, id=channel_id, organization=organization)
     user_to_ban = get_object_or_404(User, id=user_id)
