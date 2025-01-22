@@ -1120,4 +1120,6 @@ def delete_channel_data(request, org_id, channel_id):
     return JsonResponse({'error': 'Invalid request method. Only POST is allowed.'}, status=405)
 
 
-# BAN A USER (ADMIN ONLY)
+# SHOW NETWORK INFO 
+
+

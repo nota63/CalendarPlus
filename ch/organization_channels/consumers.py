@@ -51,20 +51,19 @@ class ChatConsumerNew(AsyncWebsocketConsumer):
         link_url = data.get('linkUrl', '')
         file_data = data.get('fileData', None)  
         file_type = data.get('fileType', None)  
-        typing_status = data.get('typing', None)  
+        event_type = data.get('event'), 
 
         username = self.scope['user'].username
         channel_id = self.channel_id
         user = self.scope['user']
-
-        if typing_status is not None:
-            # Handle typing status
+# New line
+        if event_type == 'typing':
+            username = data.get('username')
             await self.channel_layer.group_send(
-                self.room_group_name,
+                self.channel_group_name,
                 {
-                    'type': 'user_typing',
+                    'type': 'show_typing',
                     'username': username,
-                    'is_typing': typing_status
                 }
             )
             return
@@ -88,6 +87,12 @@ class ChatConsumerNew(AsyncWebsocketConsumer):
                 'file_type': file_type if file_type else None,
             }
         )
+# New file
+    async def show_typing(self, event):
+        await self.send(text_data=json.dumps({
+            'event': 'typing',
+            'username': event['username'],
+        })) 
 
     async def chat_message(self, event):
         await self.send(text_data=json.dumps({
