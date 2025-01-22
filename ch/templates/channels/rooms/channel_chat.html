@@ -18,6 +18,41 @@
 
 <style>
 
+.custom-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.custom-modal-content {
+    position: relative;
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    width: 50%;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.custom-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #aaa;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+
+
+
 /* General Modal Styling */
 #networkStatusModal .modal-content {
   background-color: #f7f7f7; /* Light background for readability */
@@ -1570,6 +1605,53 @@ p {
     </div>
   </div>
 
+
+  <!-- User Selection Modal -->
+   <!-- User Selection Modal -->
+<div class="modal fade" id="userSelectionModal" tabindex="-1" aria-labelledby="userSelectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userSelectionModalLabel">Select a User to Ban</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="userListtt" class="list-group">
+                    <!-- Users will be populated here dynamically -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Custom Ban Details Modal -->
+<div id="customBanModal" class="custom-modal hidden">
+    <div class="custom-modal-content">
+        <span id="closeCustomBanModal" class="custom-close">&times;</span>
+        <h5 id="customBanModalLabel">Set Ban Duration and Reason</h5>
+        <!-- Ban Duration Choices -->
+        <div class="mb-3">
+            <label for="customBanDuration" class="form-label">Select Ban Duration</label>
+            <select class="form-select" id="customBanDuration">
+                <option value="1 day">1 Day</option>
+                <option value="1 week">1 Week</option>
+                <option value="1 month">1 Month</option>
+                <option value="permanent">Permanent</option>
+            </select>
+        </div>
+        <!-- Reason Input -->
+        <div class="mb-3">
+            <label for="customBanReason" class="form-label">Reason for Ban</label>
+            <textarea class="form-control" id="customBanReason" rows="3"></textarea>
+        </div>
+        <button type="button" id="customSubmitBan" class="btn btn-primary">Ban User</button>
+    </div>
+</div>
+
+
+
   <!-- Include Bootstrap 5 JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   
@@ -1667,6 +1749,10 @@ p {
     <i class="fas fa-user-shield"></i>
 
     Delete Channel Data</button>
+
+    <!-- First Modal: User Selection -->
+<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#userSelectionModal">Ban User</button>
+
 
 {% endif %}
 
@@ -3005,6 +3091,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // FILTER BY USER 
+
 document.addEventListener("DOMContentLoaded", function () {
     const orgId = "{{ channel.organization.id }}";
     const channelId = "{{ channel.id }}";
@@ -3327,6 +3414,129 @@ function displayNetworkStatus() {
 
 
 
+// BAN USERS (ADMIN ONLY)
+
+document.addEventListener("DOMContentLoaded", function () {
+    const orgId = "{{ channel.organization.id }}";
+    const channelId = "{{ channel.id }}";
+
+    let selectedUserId = null;
+
+    // Function to fetch users and populate the user list
+    async function fetchUsers() {
+        console.log("Fetching users...");
+        try {
+            const response = await fetch(`/channels/fetch-users/${orgId}/${channelId}/`);
+            const data = await response.json();
+            console.log("Users fetched:", data);
+
+            const userList = document.getElementById("userListtt");
+            if (userList) {
+                userList.innerHTML = ""; // Clear the list before adding new items
+
+                if (data && data.users) {
+                    data.users.forEach((user) => {
+                        const listItem = document.createElement("li");
+                        listItem.className =
+                            "list-group-item d-flex justify-content-between align-items-center cursor-pointer user-list-item";
+                        listItem.textContent = user.username;
+                        listItem.dataset.userId = user.id;
+
+                        listItem.addEventListener("click", () => {
+                            selectedUserId = user.id;
+                            openCustomBanModal(user.id, user.username);
+                        });
+
+                        userList.appendChild(listItem);
+                    });
+                } else {
+                    console.error("No users found in response.");
+                }
+            } else {
+                console.error("User list element not found.");
+            }
+        } catch (error) {
+            console.error("Error fetching users:", error);
+        }
+    }
+
+    // Open custom ban modal
+    function openCustomBanModal(userId, userName) {
+        selectedUserId = userId;
+
+        const customBanModal = document.getElementById("customBanModal");
+        const customBanModalLabel = document.getElementById("customBanModalLabel");
+
+        if (customBanModal && customBanModalLabel) {
+            customBanModalLabel.textContent = `Ban ${userName}`;
+            customBanModal.style.display = "block";
+        } else {
+            console.error("Custom ban modal or label not found.");
+        }
+    }
+
+    // Close custom ban modal
+    function closeCustomBanModal() {
+        const customBanModal = document.getElementById("customBanModal");
+        if (customBanModal) {
+            customBanModal.style.display = "none";
+        } else {
+            console.error("Custom ban modal not found.");
+        }
+    }
+
+    // Attach event to close button
+    const closeBanButton = document.getElementById("closeCustomBanModal");
+    if (closeBanButton) {
+        closeBanButton.addEventListener("click", closeCustomBanModal);
+    } else {
+        console.error("Close button for custom ban modal not found.");
+    }
+
+    // Handle ban submission
+    const submitBanButton = document.getElementById("customSubmitBan");
+    if (submitBanButton) {
+        submitBanButton.addEventListener("click", function () {
+            const banDuration = document.getElementById("customBanDuration").value;
+            const banReason = document.getElementById("customBanReason").value;
+
+            if (!selectedUserId || !banDuration || !banReason) {
+                alert("Please select a user, ban duration, and reason.");
+                return;
+            }
+
+            fetch(`/channels/ban-user/${orgId}/${channelId}/${selectedUserId}/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+                body: JSON.stringify({
+                    duration: banDuration,
+                    reason: banReason,
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        alert("User banned successfully!");
+                        closeCustomBanModal();
+                    } else {
+                        showNotification("User banned successfully and wont be able to access this group again")
+                    }
+                })
+                .catch(error => {
+                    console.error("Error banning user:", error);
+                    alert("An error occurred while banning the user.");
+                });
+        });
+    } else {
+        console.error("Submit ban button not found.");
+    }
+
+    // Initial fetch of users
+    fetchUsers();
+});
 
 
 // CUSTOM NOTIFICATION FUNCTION

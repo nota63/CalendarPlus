@@ -5,7 +5,9 @@ from django.core.mail import send_mail
 from django.contrib.sites.shortcuts import get_current_site
 from django.conf import settings
 from django.contrib.auth.models import User
-from .models import Channel
+from .models import Channel, Ban
+
+
 
 @receiver(post_save, sender=Channel)
 def send_channel_email(sender, instance, created, **kwargs):
@@ -29,3 +31,41 @@ def send_channel_notification_email(user, channel):
     recipient_list = [user.email]
 
     send_mail(subject, message, from_email, recipient_list)
+
+
+
+# Signal to send email to banned user 
+
+@receiver(post_save, sender=Ban)
+def send_ban_notification(sender, instance, created, **kwargs):
+    if created:  
+        user = instance.user
+        channel = instance.channel
+        organization = instance.organization
+        banned_by = instance.banned_by
+        reason = instance.reason
+        duration = "Permanent" if not instance.end_time else f"until {instance.end_time.strftime('%Y-%m-%d %H:%M:%S')}"
+
+        # Email subject and body
+        subject = f"You have been banned from the channel: {channel.name}"
+        message = (
+            f"Hello {user.username},\n\n"
+            f"You have been banned from the channel '{channel.name}' in the organization '{organization.name}'.\n"
+            f"Details:\n"
+            f"- Banned by: {banned_by.username}\n"
+            f"- Reason: {reason or 'No specific reason provided'}\n"
+            f"- Ban Duration: {duration}\n\n"
+            f"If you think this is a mistake, please contact the organization admin.\n\n"
+            f"Best regards,\n"
+            f"The {organization.name} Team"
+        )
+
+        # Send the email
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],  
+            fail_silently=False,
+        )
+

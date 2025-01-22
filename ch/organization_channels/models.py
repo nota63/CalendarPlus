@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from accounts.models import Organization , Profile
+from django.utils import timezone
+from datetime import timedelta
 
 # Create your models here.
 
@@ -107,6 +109,7 @@ class ActivityChannel(models.Model):
         ('MESSAGE_EDITED','Message edited'),
         ("LINK_EDITED",'Link edited'),
         ('FILTERED_MESSAGES','Filtered messages'),
+        ("BAN_USER",'Ban user'),
     ]
 
     user = models.ForeignKey(User, related_name='activities', on_delete=models.CASCADE)
@@ -124,8 +127,6 @@ class ActivityChannel(models.Model):
 
 
 # BAN USERS FROM CHANNEL
-from django.utils import timezone
-from datetime import timedelta
 
 
 class Ban(models.Model):
@@ -150,7 +151,7 @@ class Ban(models.Model):
     )
     reason = models.TextField(null=True, blank=True)
     start_time = models.DateTimeField(auto_now_add=True)
-    end_time = models.DateTimeField(null=True, blank=True)  # Null for permanent bans
+    end_time = models.DateTimeField(null=True, blank=True)  
     duration = models.CharField(max_length=10, choices=BAN_CHOICES, default='permanent')
 
     def set_end_time(self):
@@ -164,7 +165,7 @@ class Ban(models.Model):
         elif self.duration == '1_month':
             self.end_time = self.start_time + timedelta(weeks=4)
         elif self.duration == 'permanent':
-            self.end_time = None  # Permanent bans have no end time
+            self.end_time = None  
         self.save()
 
     def is_active(self):

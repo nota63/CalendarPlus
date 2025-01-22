@@ -13,7 +13,7 @@ from .forms import ChannelTypeForm, ChannelNameForm, ChannelVisibilityForm
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.core.mail import send_mail
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from django.db.models import Count
 from django.views import View
 from .models import Channel
@@ -38,6 +38,10 @@ from django.utils.decorators import method_decorator
 import json
 from django.contrib.auth.hashers import check_password
 from django.contrib import messages
+from .models import Ban
+from django.utils.timezone import now
+
+
 
 # Create your views here.
 
@@ -217,12 +221,27 @@ class ChannelListView(LoginRequiredMixin, View):
     
 
 # Redirect to channel room
+
 def channel_chat(request, channel_id):
     channel = get_object_or_404(Channel, id=channel_id)
     messages = Message.objects.filter(channel=channel).order_by('timestamp')
-    links=Link.objects.filter(channel=channel).order_by('timestamp')
+    links = Link.objects.filter(channel=channel).order_by('timestamp')
 
-    return render(request, 'channels/rooms/channel_chat.html', {'channel': channel, 'messages': messages, 'links':links})
+
+    ban_entry = Ban.objects.filter(
+        user=request.user,
+        channel=channel,
+        organization=channel.organization,
+    ).first()
+
+    if ban_entry:
+        
+        if ban_entry.end_time is None or ban_entry.end_time > now():
+            return HttpResponseForbidden("You are banned from accessing this channel.")
+
+    return render(request, 'channels/rooms/channel_chat.html', {'channel': channel, 'messages': messages, 'links': links})
+
+
 
 
 # Get organization members to mention
@@ -1120,6 +1139,72 @@ def delete_channel_data(request, org_id, channel_id):
     return JsonResponse({'error': 'Invalid request method. Only POST is allowed.'}, status=405)
 
 
-# SHOW NETWORK INFO 
+# BAN USER (ADMIN ONLY)
 
 
+@csrf_exempt
+def ban_user(request, org_id, channel_id, user_id):
+    organization = get_object_or_404(Organization, id=org_id)
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+    channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+    user_to_ban = get_object_or_404(User, id=user_id)
+
+    banning_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not banning_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+    
+  
+    if not banning_profile.is_admin:
+        return JsonResponse({'error': 'You do not have permission to ban users.'}, status=403)
+
+    
+    existing_ban = Ban.objects.filter(user=user_to_ban, channel=channel).first()
+
+  
+    ban_duration = request.POST.get('ban_duration', 'permanent')  
+    reason = request.POST.get('reason', '')
+
+  
+    if ban_duration == '1 day':
+        end_time = now() + timedelta(days=1)
+    elif ban_duration == '1 week':
+        end_time = now() + timedelta(weeks=1)
+    elif ban_duration == '1 month':
+        end_time = now() + timedelta(weeks=4)
+    elif ban_duration == 'permanent':
+        end_time = None  
+    else:
+        return JsonResponse({'error': 'Invalid ban duration'}, status=400)
+
+    if existing_ban:
+       
+        existing_ban.reason = reason
+        existing_ban.end_time = end_time
+        existing_ban.save()
+
+        return JsonResponse({'message': 'User banned successfully', 'ban_duration': ban_duration})
+
+   
+    Ban.objects.create(
+        organization=organization,
+        channel=channel,
+        user=user_to_ban,
+        banned_by=request.user,
+        reason=reason,
+        start_time=now(),
+        end_time=end_time
+    )
+
+    ActivityChannel.objects.create(
+            user=request.user,
+            channel=channel,
+            organization=organization,
+            action_type="BAN_USER",
+            content=f"{request.user} Banned {user_to_ban} from the channel"
+        )
+
+
+    return JsonResponse({'message': 'User banned successfully', 'ban_duration': ban_duration})
