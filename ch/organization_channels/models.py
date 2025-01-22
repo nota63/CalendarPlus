@@ -185,19 +185,19 @@ class Ban(models.Model):
 class ChannelAccess(models.Model):
     channel = models.ForeignKey('Channel', on_delete=models.CASCADE, related_name='accesses')
     owning_organization = models.ForeignKey(
-        'Organization', 
+        Organization, 
         on_delete=models.CASCADE, 
         related_name='owned_channel_accesses',
         help_text="The organization that owns the channel."
     )
     granted_to_organization = models.ForeignKey(
-        'Organization', 
+        Organization, 
         on_delete=models.CASCADE, 
         related_name='granted_channel_accesses',
         help_text="The organization being granted access to the channel."
     )
     granted_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='granted_accesses')
-    granted_at = models.DateTimeField(default=now)
+    granted_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ('channel', 'granted_to_organization')  

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from accounts.models import Organization, Profile
 from .models import (
-    Channel, Message, Link , ActivityChannel)
+    Channel, Message, Link , ActivityChannel, ChannelAccess)
 from django.utils.dateparse import parse_datetime
 from django.utils import timezone
 from django.urls import reverse
@@ -1211,4 +1211,115 @@ def ban_user(request, org_id, channel_id, user_id):
 
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+# Give channel access to other organizations
+
+# fetch admin organizations
+
+def fetch_admin_organizations(request, org_id, channel_id):
+    """
+    Fetch all organizations where the request.user is an admin.
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Unauthorized access'}, status=401)
+
+    
+    current_org = get_object_or_404(Organization, id=org_id)
+    user_profile = Profile.objects.filter(user=request.user, organization=current_org).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+    if not current_org.profiles.filter(user=request.user, is_admin=True).exists():
+        return JsonResponse({'error': 'You are not an admin of this organization'}, status=403)
+
+    
+    admin_organizations = Organization.objects.filter(
+        profiles__user=request.user,
+        profiles__is_admin=True
+    ).exclude(id=org_id)  
+
+
+    org_data = [{'id': org.id, 'name': org.name, 'description': org.description} for org in admin_organizations]
+    return JsonResponse({'organizations': org_data}, status=200)
+
+
+# Grant access to other organization
+
+@csrf_exempt
+def grant_channel_access(request, org_id, channel_id, selected_org_id):
+    """
+    Grant access of a channel to a selected organization.
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Unauthorized access'}, status=401)
+
+  
+    owning_org = get_object_or_404(Organization, id=org_id)
+    user_profile = Profile.objects.filter(user=request.user, organization=owning_org).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+    if not owning_org.profiles.filter(user=request.user, is_admin=True).exists():
+        return JsonResponse({'error': 'You are not an admin of this organization'}, status=403)
+
+    channel = get_object_or_404(Channel, id=channel_id, organization=owning_org)
+
+   
+    selected_org = get_object_or_404(Organization, id=selected_org_id)
+
+    if ChannelAccess.objects.filter(channel=channel, granted_to_organization=selected_org).exists():
+        return JsonResponse({'error': 'Access already granted to this organization'}, status=400)
+
+    # Grant access
+    ChannelAccess.objects.create(
+        channel=channel,
+        owning_organization=owning_org,
+        granted_to_organization=selected_org,
+        granted_by=request.user
+    )
+
+    activity = ActivityChannel.objects.create(
+        user=request.user,
+        channel=channel,
+        organization=owning_org,
+        action_type="CHANNEL_ACCESS",
+        content=f"{request.user} give channel accesss to other workspace {selected_org.name}"
+    )
+
+    selected_org_admin = Profile.objects.filter(organization=selected_org, is_admin=True).first()
+    if selected_org_admin:
+        subject = f"Channel Access Granted to {channel.name} for {selected_org.name}"
+        message = f"""
+        Dear {selected_org_admin.user.first_name} {selected_org_admin.user.last_name},
+
+        We are pleased to inform you that your organization, {selected_org.name}, has been granted access to the channel "{channel.name}" in the organization "{owning_org.name}".
+
+        Channel Details:
+        - Channel Name: {channel.name}
+        - Description: {channel.description}
+        - Organization: {owning_org.name}
+
+        If you have any questions or need further assistance, feel free to reach out.
+
+        Best regards,
+        {request.user.first_name} {request.user.last_name}
+        {owning_org.name} Admin
+        """
+
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL, 
+            [selected_org_admin.user.email], 
+            fail_silently=False,
+        )
+
+
+    return JsonResponse({'success': f'Access granted to {selected_org.name}'}, status=200)
+
+
+
+
+
 

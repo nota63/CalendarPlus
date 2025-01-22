@@ -25,6 +25,15 @@ urlpatterns = [
     path('filter-by-user/<int:org_id>/<int:channel_id>/<int:user_id>/',filter_by_user, name='filter_by_user'),
     path('delete_channel_data/<int:org_id>/<int:channel_id>/',delete_channel_data, name='delete_channel_data'),
     path('ban-user/<int:org_id>/<int:channel_id>/<int:user_id>/',ban_user, name='ban_user'),
+    # Fetch organizations where the user is an admin
+    path('fetch-admin-organizations/<int:org_id>/<int:channel_id>/', 
+         fetch_admin_organizations, 
+         name='fetch_admin_organizations'),
+    
+    # Grant access to a selected organization
+    path('grant-channel-access/<int:org_id>/<int:channel_id>/<int:selected_org_id>/', 
+         grant_channel_access, 
+         name='grant_channel_access'),
    
 
 

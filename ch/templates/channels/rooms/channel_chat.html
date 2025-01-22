@@ -1626,6 +1626,8 @@ p {
         </div>
     </div>
 </div>
+
+
 <!-- Custom Ban Details Modal -->
 <div id="customBanModal" class="custom-modal hidden">
     <div class="custom-modal-content">
@@ -1650,6 +1652,36 @@ p {
     </div>
 </div>
 
+
+<!-- Modal to share access of this channel -->
+<div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="shareModalLabel">Select Organization to Share With</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Loading Spinner -->
+          <div id="loadingSpinner" class="text-center" style="display:none;">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+  
+          <!-- Organizations List -->
+          <ul id="organizationList" class="list-group">
+            <!-- List of organizations will be injected here -->
+          </ul>
+  
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" id="grantAccessBtn" class="btn btn-primary" disabled>Grant Access</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
   <!-- Include Bootstrap 5 JS -->
@@ -1754,6 +1786,12 @@ p {
     <button class="menu-item" data-bs-toggle="modal" data-bs-target="#userSelectionModal">
         <i class="fas fa-user-shield"></i>
         Ban User</button>
+
+       <!-- Button to Open Modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shareModal">
+    Share Channel with Another Organization
+  </button>
+   
 
 
 {% endif %}
@@ -3539,6 +3577,105 @@ document.addEventListener("DOMContentLoaded", function () {
     // Initial fetch of users
     fetchUsers();
 });
+
+
+
+// GIVE ACCESS OF THIS CHANNEL TO ANOTHER ORGANIZATION
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Modal show event
+    const shareModal = document.getElementById('shareModal');
+    const organizationList = document.getElementById('organizationList');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const grantAccessBtn = document.getElementById('grantAccessBtn');
+
+    let selectedOrganizationId = null;
+
+    // Fetch organizations when modal is shown
+    shareModal.addEventListener('show.bs.modal', function () {
+      // Show the loading spinner while fetching data
+      loadingSpinner.style.display = 'block';
+      organizationList.innerHTML = '';  // Clear previous list
+      grantAccessBtn.disabled = true;   // Disable the button initially
+
+      const orgId = "{{ channel.organization.id }}"; // Channel's organization ID
+      const channelId = "{{ channel.id }}";          // Channel ID
+
+      // Fetch organizations where the user is an admin
+      fetch(`/channels/fetch-admin-organizations/${orgId}/${channelId}/`)  // Correct URL with template variable
+        .then(response => response.json())
+        .then(data => {
+          loadingSpinner.style.display = 'none';  // Hide the loading spinner
+
+          if (data.organizations.length > 0) {
+            data.organizations.forEach(org => {
+              const listItem = document.createElement('li');
+              listItem.classList.add('list-group-item');
+              listItem.textContent = `${org.name} - ${org.description}`;
+              listItem.dataset.orgId = org.id;
+              listItem.addEventListener('click', function () {
+                // Handle the organization selection
+                selectedOrganizationId = org.id;
+                grantAccessBtn.disabled = false;
+              });
+
+              organizationList.appendChild(listItem);
+            });
+          } else {
+            const noDataItem = document.createElement('li');
+            noDataItem.classList.add('list-group-item');
+            noDataItem.textContent = 'No organizations found where you are an admin.';
+            organizationList.appendChild(noDataItem);
+          }
+        })
+        .catch(err => {
+          console.error("Error fetching organizations:", err);
+          loadingSpinner.style.display = 'none';
+          const errorItem = document.createElement('li');
+          errorItem.classList.add('list-group-item');
+          errorItem.textContent = 'Failed to load organizations.';
+          organizationList.appendChild(errorItem);
+        });
+    });
+
+    // Grant access button click handler
+   // Grant access button click handler
+   grantAccessBtn.addEventListener('click', function () {
+      if (selectedOrganizationId) {
+        const orgId = "{{ channel.organization.id }}"; // Channel's organization ID
+        const channelId = "{{ channel.id }}"; // Channel ID
+        const grantedToOrgId = selectedOrganizationId; // Selected organization ID to grant access
+
+        // Grant access using URL parameters directly
+        fetch(`/channels/grant-channel-access/${orgId}/${channelId}/${grantedToOrgId}/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          alert(data.message || 'Access granted successfully!');
+          // Close the modal after success
+          let modal = bootstrap.Modal.getInstance(shareModal);
+          modal.hide();
+        })
+        .catch(error => {
+          console.error('Error granting access:', error);
+          alert('Failed to grant access.');
+        });
+      }
+    });
+  });
+
+
+
+
+
+
+
+
+
 
 
 // CUSTOM NOTIFICATION FUNCTION
