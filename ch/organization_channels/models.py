@@ -263,3 +263,22 @@ class RetentionPolicy(models.Model):
             raise ValidationError("Custom days must be specified when retention period is set to 'Custom'.")
         if self.retention_period != 0 and self.custom_days:
             raise ValidationError("Custom days should only be specified for 'Custom' retention period.")
+        
+
+
+# Abused Messages 
+
+class AbusedMessage(models.Model):
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="abused_messages")
+    channel = models.ForeignKey(Channel, on_delete=models.CASCADE, related_name="abused_messages")
+    message_content = models.TextField(help_text="Content of the abused message")
+    flagged_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="flagged_abused_messages")
+    flagged_at = models.DateTimeField(auto_now_add=True, help_text="Timestamp when the message was flagged")
+
+    def __str__(self):
+        return f"Abused Message in {self.channel.name} flagged by {self.flagged_by.username if self.flagged_by else 'Unknown'}"
+
+    class Meta:
+        verbose_name = "Abused Message"
+        verbose_name_plural = "Abused Messages"
+        ordering = ['-flagged_at']
