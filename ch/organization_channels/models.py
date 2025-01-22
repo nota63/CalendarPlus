@@ -125,8 +125,17 @@ class ActivityChannel(models.Model):
 
 # BAN USERS FROM CHANNEL
 from django.utils import timezone
+from datetime import timedelta
+
 
 class Ban(models.Model):
+    BAN_CHOICES = [
+        ('1_day', '1 Day'),
+        ('1_week', '1 Week'),
+        ('1_month', '1 Month'),
+        ('permanent', 'Permanent'),
+    ]
+
     organization = models.ForeignKey(
         Organization, related_name="bans", on_delete=models.CASCADE
     )
@@ -142,6 +151,21 @@ class Ban(models.Model):
     reason = models.TextField(null=True, blank=True)
     start_time = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField(null=True, blank=True)  # Null for permanent bans
+    duration = models.CharField(max_length=10, choices=BAN_CHOICES, default='permanent')
+
+    def set_end_time(self):
+        """
+        Set the end time based on the ban duration.
+        """
+        if self.duration == '1_day':
+            self.end_time = self.start_time + timedelta(days=1)
+        elif self.duration == '1_week':
+            self.end_time = self.start_time + timedelta(weeks=1)
+        elif self.duration == '1_month':
+            self.end_time = self.start_time + timedelta(weeks=4)
+        elif self.duration == 'permanent':
+            self.end_time = None  # Permanent bans have no end time
+        self.save()
 
     def is_active(self):
         """
@@ -151,6 +175,3 @@ class Ban(models.Model):
 
     def __str__(self):
         return f"{self.user.username} banned from {self.channel.name} by {self.banned_by.username}"
-
-
-
