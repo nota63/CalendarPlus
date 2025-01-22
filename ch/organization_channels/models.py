@@ -36,6 +36,7 @@ class Channel(models.Model):
     allowed_members = models.ManyToManyField(User, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
 
     
     def __str__(self):
@@ -120,3 +121,36 @@ class ActivityChannel(models.Model):
 
     class Meta:
         ordering = ['-timestamp'] 
+
+
+# BAN USERS FROM CHANNEL
+from django.utils import timezone
+
+class Ban(models.Model):
+    organization = models.ForeignKey(
+        Organization, related_name="bans", on_delete=models.CASCADE
+    )
+    channel = models.ForeignKey(
+        Channel, related_name="bans", on_delete=models.CASCADE
+    )
+    user = models.ForeignKey(
+        User, related_name="banned_entries", on_delete=models.CASCADE
+    )
+    banned_by = models.ForeignKey(
+        User, related_name="issued_bans", on_delete=models.CASCADE
+    )
+    reason = models.TextField(null=True, blank=True)
+    start_time = models.DateTimeField(auto_now_add=True)
+    end_time = models.DateTimeField(null=True, blank=True)  # Null for permanent bans
+
+    def is_active(self):
+        """
+        Checks if the ban is still active.
+        """
+        return self.end_time is None or timezone.now() < self.end_time
+
+    def __str__(self):
+        return f"{self.user.username} banned from {self.channel.name} by {self.banned_by.username}"
+
+
+
