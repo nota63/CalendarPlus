@@ -176,3 +176,42 @@ class Ban(models.Model):
 
     def __str__(self):
         return f"{self.user.username} banned from {self.channel.name} by {self.banned_by.username}"
+    
+
+
+
+# Give Channel accesss to other organization
+
+class ChannelAccess(models.Model):
+    channel = models.ForeignKey('Channel', on_delete=models.CASCADE, related_name='accesses')
+    owning_organization = models.ForeignKey(
+        'Organization', 
+        on_delete=models.CASCADE, 
+        related_name='owned_channel_accesses',
+        help_text="The organization that owns the channel."
+    )
+    granted_to_organization = models.ForeignKey(
+        'Organization', 
+        on_delete=models.CASCADE, 
+        related_name='granted_channel_accesses',
+        help_text="The organization being granted access to the channel."
+    )
+    granted_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='granted_accesses')
+    granted_at = models.DateTimeField(default=now)
+
+    class Meta:
+        unique_together = ('channel', 'granted_to_organization')  
+        verbose_name = 'Channel Access'
+        verbose_name_plural = 'Channel Accesses'
+
+    def __str__(self):
+        return (
+            f"{self.granted_to_organization.name} has access to {self.channel.name} "
+            f"(granted by {self.granted_by.username}, owned by {self.owning_organization.name})"
+        )
+
+
+
+
+
+

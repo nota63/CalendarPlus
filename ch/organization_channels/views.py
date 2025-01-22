@@ -1208,3 +1208,7 @@ def ban_user(request, org_id, channel_id, user_id):
 
 
     return JsonResponse({'message': 'User banned successfully', 'ban_duration': ban_duration})
+
+
+# ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
