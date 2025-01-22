@@ -3,6 +3,9 @@ from django.contrib.auth.models import User
 from accounts.models import Organization , Profile
 from django.utils import timezone
 from datetime import timedelta
+from better_profanity import profanity
+from django.core.mail import send_mail
+from .utils import send_abusive_message_notification 
 
 # Create your models here.
 
@@ -60,6 +63,25 @@ class Message(models.Model):
 
     def __str__(self):
         return f"Message by {self.user.username} in {self.channel.name}"
+    
+
+    def save(self, *args, **kwargs):
+        # Check if the message contains profanity
+        if profanity.contains_profanity(self.content):
+            self.content = profanity.censor(self.content)
+
+         
+            abused_message=AbusedMessage.objects.create(
+                message_content=self.content,
+                flagged_by=self.user,
+                organization=self.organization,
+                channel=self.channel,
+            )
+
+         
+            send_abusive_message_notification(self.user, self.content, self.channel.name, abused_message.message_content,self.organization)
+
+        super().save(*args, **kwargs)
     
  
 
