@@ -18,11 +18,103 @@
 
 <style>
 
-#typingIndicator {
-    font-size: 0.9rem;
-    margin-top: 5px;
-    color: #888;
+/* General Modal Styling */
+#networkStatusModal .modal-content {
+  background-color: #f7f7f7; /* Light background for readability */
+  padding: 20px;
 }
+
+/* Container for the whole network status section */
+#networkStatus {
+  font-family: 'Arial', sans-serif;
+  color: #333;
+}
+
+/* Signal Strength Bar */
+#signalStrengthBar {
+  background-color: #28a745; /* Green by default */
+}
+
+/* Chart Sizing and Styling */
+canvas {
+  width: 100% !important;  /* Ensure charts take up full available width */
+  max-width: 300px; /* Max width of charts to keep them compact */
+  margin: 0 auto;  /* Center charts */
+  display: block;
+}
+
+/* Specific Chart Styles */
+
+/* Network Speed (Line Chart) */
+#networkSpeedChart {
+  max-width: 350px;
+  height: 150px;
+  margin-bottom: 20px;
+}
+
+/* Network Load (Bar Chart) */
+#networkLoadChart {
+  max-width: 350px;
+  height: 100px;
+  margin-bottom: 20px;
+}
+
+/* Bandwidth Usage (Pie Chart) */
+#bandwidthUsageChart {
+  max-width: 250px;
+  height: 250px;
+  margin-bottom: 20px;
+}
+
+/* Server Response Time (Mini Graph) */
+#serverResponseChart {
+  max-width: 250px;
+  height: 100px;
+  margin-bottom: 20px;
+}
+
+/* Latency, Jitter, Packet Loss Section */
+#pingValue,
+#jitterValue,
+#packetLoss {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Signal Strength Section */
+#signalStrengthText {
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* Diagnostic Suggestions Section */
+#diagnosticSuggestions {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+#diagnosticSuggestions p {
+  margin-bottom: 8px;
+}
+
+/* Activity Log Styling */
+#activityLog {
+  margin-top: 20px;
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 14px;
+}
+
+/* Tooltip Styling */
+#networkStatus .tooltip-inner {
+  font-size: 12px;
+  background-color: #333;
+  color: #fff;
+}
+
+
+
+
 .hidden {
     display: none;
 }
@@ -1413,33 +1505,71 @@ p {
 
 
   <!-- Bootstrap Modal to display network stats-->
-   
-<!-- Modal -->
+   <!-- Modal -->
 <div class="modal fade" id="networkStatusModal" tabindex="-1" aria-labelledby="networkStatusModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="networkStatusModalLabel">Network Status</h5>
+          <h5 class="modal-title" id="networkStatusModalLabel">Complete Network Status</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div id="networkStatus">
+            <!-- General Information -->
             <p id="connectionType"></p>
             <p id="connectionStatus"></p>
-            <p id="pingValue"></p>
-            <p id="jitterValue"></p>
-            <p id="packetLoss"></p>
-            <p id="networkLoad"></p>
-            <canvas id="networkSpeedChart" height="100"></canvas>
+            <p id="networkProvider"></p>
+  
+            <!-- Signal Strength (Progress Bar) -->
+            <div>
+              <strong>Signal Strength</strong>
+              <div class="progress">
+                <div id="signalStrengthBar" class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+              <p id="signalStrengthText"></p>
+            </div>
+  
+            <!-- Speed (Line Chart) -->
+            <canvas id="networkSpeedChart" height="150"></canvas>
+  
+            <!-- Latency, Jitter, Packet Loss (Progress Bars and Text) -->
+            <div>
+              <strong>Ping: <span id="pingValue"></span> ms</strong>
+              <br>
+              <strong>Jitter: <span id="jitterValue"></span> ms</strong>
+              <br>
+              <strong>Packet Loss: <span id="packetLoss"></span>%</strong>
+            </div>
+  
+            <!-- Network Load (Bar Chart) -->
+            <div>
+              <canvas id="networkLoadChart" height="100"></canvas>
+            </div>
+  
+            <!-- Bandwidth Usage (Pie Chart) -->
+            <div>
+              <strong>Bandwidth Usage</strong>
+              <canvas id="bandwidthUsageChart" height="150"></canvas>
+            </div>
+  
+            <!-- Server Response Time -->
+            <div>
+              <strong>Server Response Time</strong>
+              <canvas id="serverResponseChart" height="100"></canvas>
+            </div>
+  
+            <!-- Activity Log (List) -->
             <ul id="activityLog" class="list-group mt-3"></ul>
+  
+            <!-- Diagnostic Suggestions -->
+            <div id="diagnosticSuggestions"></div>
+  
           </div>
         </div>
       </div>
     </div>
   </div>
 
-
-  
   <!-- Include Bootstrap 5 JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   
@@ -1528,9 +1658,6 @@ p {
 <i class="fas fa-database"></i>
   My memory usage
 </button>
-
-<!-- Trigger Button to display the network stats -->
-<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#networkStatusModal" onclick="displayNetworkStatus()">Check Network Status</button>
 
 
 {% if channel.created_by == request.user %}
@@ -1735,6 +1862,11 @@ p {
 <i class="fas fa-user text-xl"></i>
 </button>
 
+
+<!-- Trigger Button to display the network stats -->
+<button class="p-2 text-blue-500 hover:text-blue-600" data-bs-toggle="modal" data-bs-target="#networkStatusModal" onclick="displayNetworkStatus()"><i class="fas fa-wifi text-xl"></i>
+
+</button>
 
 </div>
 
@@ -3038,55 +3170,135 @@ const deleteChannelDataModal = new bootstrap.Modal(document.getElementById('dele
 
 
 // DISPLAY NETWORK STATS
-
 function displayNetworkStatus() {
-  // Simulated network data for demonstration purposes
+  // Simulated data for demonstration purposes (feel free to replace this with actual data from API)
   const simulatedData = {
     signal_strength: Math.random() * 100, // Percentage
     upload_speed: (Math.random() * 100).toFixed(2), // Mbps
     download_speed: (Math.random() * 150).toFixed(2), // Mbps
     ping: Math.floor(Math.random() * 300), // ms
-    connection_type: ["Ethernet", "Wi-Fi", "4G", "5G"][Math.floor(Math.random() * 4)],
+    connection_type: ["Wi-Fi", "4G",][Math.floor(Math.random() * 4)],
     connection_status: ["Online", "Reconnecting", "Offline"][Math.floor(Math.random() * 3)],
     packet_loss: (Math.random() * 5).toFixed(2), // Percentage
     network_load: (Math.random() * 50).toFixed(2), // Mbps
     jitter: Math.floor(Math.random() * 50), // ms
+    network_provider: "Simulated ISP",
+    server_response_time: Math.floor(Math.random() * 500), // ms
+    bandwidth_usage: {
+      current: (Math.random() * 200).toFixed(2), // Mbps
+      average: (Math.random() * 100).toFixed(2), // Mbps
+    },
     activity_log: [
       { event: "Reconnected", timestamp: Date.now() - 60000 },
       { event: "Packet loss detected", timestamp: Date.now() - 120000 },
     ],
+    diagnostic_suggestions: [
+      "Check router and cables for loose connections.",
+      "Consider upgrading to a higher speed plan for better performance.",
+      "Try restarting the router and modem.",
+    ],
   };
 
-  // Update connection type and status
+  // Update general information
   document.getElementById("connectionType").innerText = `Connection Type: ${simulatedData.connection_type}`;
   document.getElementById("connectionStatus").innerText = `Connection Status: ${simulatedData.connection_status}`;
+  document.getElementById("networkProvider").innerText = `Network Provider: ${simulatedData.network_provider}`;
 
-  // Update latency, jitter, and packet loss
-  document.getElementById("pingValue").innerText = `Ping: ${simulatedData.ping} ms`;
-  document.getElementById("jitterValue").innerText = `Jitter: ${simulatedData.jitter} ms`;
-  document.getElementById("packetLoss").innerText = `Packet Loss: ${simulatedData.packet_loss}%`;
-  document.getElementById("networkLoad").innerText = `Network Load: ${simulatedData.network_load} Mbps`;
+  // Signal Strength (Progress Bar)
+  const signalStrengthBar = document.getElementById("signalStrengthBar");
+  signalStrengthBar.style.width = `${simulatedData.signal_strength}%`;
+  signalStrengthBar.setAttribute("aria-valuenow", simulatedData.signal_strength);
+  document.getElementById("signalStrengthText").innerText = `${simulatedData.signal_strength.toFixed(2)}%`;
 
-  // Render network speed chart
-  const ctx = document.getElementById("networkSpeedChart").getContext("2d");
-  new Chart(ctx, {
-    type: "bar",
+  // Render network speed chart (Line Chart)
+  const ctxSpeed = document.getElementById("networkSpeedChart").getContext("2d");
+  new Chart(ctxSpeed, {
+    type: "line",
     data: {
-      labels: ["Upload Speed", "Download Speed"],
+      labels: ["Upload", "Download"],
       datasets: [
         {
           label: "Speed (Mbps)",
           data: [simulatedData.upload_speed, simulatedData.download_speed],
+          borderColor: ["blue", "green"],
           backgroundColor: ["blue", "green"],
+          fill: false,
         },
       ],
     },
     options: {
       responsive: true,
       plugins: {
-        legend: {
-          display: true,
+        legend: { display: true },
+      },
+    },
+  });
+
+  // Update latency, jitter, and packet loss (Text & Progress Bars)
+  document.getElementById("pingValue").innerText = `${simulatedData.ping} ms`;
+  document.getElementById("jitterValue").innerText = `${simulatedData.jitter} ms`;
+  document.getElementById("packetLoss").innerText = `${simulatedData.packet_loss}%`;
+
+  // Render network load chart (Bar Chart)
+  const ctxLoad = document.getElementById("networkLoadChart").getContext("2d");
+  new Chart(ctxLoad, {
+    type: "bar",
+    data: {
+      labels: ["Network Load"],
+      datasets: [
+        {
+          label: "Network Load (Mbps)",
+          data: [simulatedData.network_load],
+          backgroundColor: "orange",
         },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+    },
+  });
+
+  // Render bandwidth usage (Pie Chart)
+  const ctxUsage = document.getElementById("bandwidthUsageChart").getContext("2d");
+  new Chart(ctxUsage, {
+    type: "pie",
+    data: {
+      labels: ["Current Usage", "Average Usage"],
+      datasets: [
+        {
+          label: "Bandwidth Usage",
+          data: [simulatedData.bandwidth_usage.current, simulatedData.bandwidth_usage.average],
+          backgroundColor: ["#28a745", "#007bff"],
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: "top" } },
+    },
+  });
+
+  // Render server response time (Mini Graph)
+  const ctxServerResponse = document.getElementById("serverResponseChart").getContext("2d");
+  new Chart(ctxServerResponse, {
+    type: "line",
+    data: {
+      labels: ["Response Time"],
+      datasets: [
+        {
+          label: "Server Response (ms)",
+          data: [simulatedData.server_response_time],
+          borderColor: ["purple"],
+          backgroundColor: ["purple"],
+          fill: false,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
       },
     },
   });
@@ -3099,6 +3311,15 @@ function displayNetworkStatus() {
     logItem.className = "list-group-item";
     logItem.innerText = `${log.event} - ${new Date(log.timestamp).toLocaleString()}`;
     activityLog.appendChild(logItem);
+  });
+
+  // Display diagnostic suggestions
+  const diagnosticSuggestions = document.getElementById("diagnosticSuggestions");
+  diagnosticSuggestions.innerHTML = "<strong>Diagnostic Suggestions:</strong>";
+  simulatedData.diagnostic_suggestions.forEach((suggestion) => {
+    const suggestionItem = document.createElement("p");
+    suggestionItem.innerText = suggestion;
+    diagnosticSuggestions.appendChild(suggestionItem);
   });
 }
 
