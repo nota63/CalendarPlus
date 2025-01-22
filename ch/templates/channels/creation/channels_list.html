@@ -33,20 +33,30 @@
         <!-- Channels List -->
         <div id="channelsList" class="space-y-4 mt-6">
             {% for channel in channels %}
-                <div class="bg-white p-4 shadow rounded-lg">
-                    <div class="flex justify-between items-center">
-                        <h2 class="text-xl font-semibold text-gray-700">{{ channel.name }}</h2>
-                        <span class="text-sm text-gray-500 px-3 py-1 rounded bg-gray-100">
-                            {{ channel.get_visibility_display }}
+            <div class="bg-white p-4 shadow rounded-lg">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-semibold text-gray-700">{{ channel.name }}</h2>
+                    <span class="text-sm text-gray-500 px-3 py-1 rounded bg-gray-100">
+                        {{ channel.get_visibility_display }}
+                    </span>
+                </div>
+                <p class="text-gray-600 mt-2">{{ channel.get_type_display }}</p>
+                <p class="text-sm text-gray-400 mt-1">Created on: {{ channel.created_at|date:"F j, Y" }}</p>
+        
+                <!-- Check if the channel was granted to your organization -->
+                {% if channel.accesses.exists %}
+                    <div class="mt-2">
+                        <span class="text-sm text-green-500 bg-green-100 px-2 py-1 rounded">
+                            Access granted by: {{ channel.accesses.first.owning_organization.name }}
                         </span>
                     </div>
-                    <p class="text-gray-600 mt-2">{{ channel.get_type_display }}</p>
-                    <p class="text-sm text-gray-400 mt-1">Created on: {{ channel.created_at|date:"F j, Y" }}</p>
-                </div>
-                <a href="{% url 'channel_chat' channel_id=channel.id %}">
-                    <button type="submit">Launch channel</button>
-                </a>                
-            {% endfor %}
+                {% endif %}
+            </div>
+            <a href="{% url 'channel_chat' channel_id=channel.id %}">
+                <button type="submit">Launch channel</button>
+            </a>
+        {% endfor %}
+        
         </div>
     </div>
 

@@ -173,34 +173,37 @@ def channel_statistics(request, org_id):
 
 
 # Display channels 
-
 class ChannelListView(LoginRequiredMixin, View):
     template_name = 'channels/creation/channels_list.html'
 
     def get(self, request, org_id):
-
         organization = get_object_or_404(Organization, id=org_id)
 
-     
         profile = Profile.objects.filter(user=request.user, organization=organization).first()
         if not profile:
             return render(request, 'error.html', {'message': 'You are not part of this organization.'})
 
-
         query = request.GET.get('q', '')
 
-    
+        
         public_channels = Channel.objects.filter(organization=organization, visibility='PUBLIC')
         private_channels = Channel.objects.filter(
             organization=organization, visibility='PRIVATE', allowed_members=request.user
         )
         channels = public_channels | private_channels
 
+        # Fetch channels granted to the organization through access
+        granted_channels = Channel.objects.filter(
+            accesses__granted_to_organization=organization
+        )
 
+        
+        channels = channels | granted_channels
+
+      
         if query:
             channels = channels.filter(Q(name__icontains=query) | Q(type__icontains=query))
 
-    
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             channel_data = [
                 {
@@ -208,6 +211,7 @@ class ChannelListView(LoginRequiredMixin, View):
                     'type': channel.get_type_display(),
                     'visibility': channel.get_visibility_display(),
                     'created_at': channel.created_at.strftime('%B %d, %Y'),
+                    'granted_to_org': channel.accesses.first().granted_to_organization.name if channel.accesses.exists() else None,  # Fetch granted organization
                 }
                 for channel in channels.distinct()
             ]
@@ -218,7 +222,11 @@ class ChannelListView(LoginRequiredMixin, View):
             'channels': channels.distinct(),
         }
         return render(request, self.template_name, context)
-    
+
+
+
+
+
 
 # Redirect to channel room
 

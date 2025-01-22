@@ -110,6 +110,7 @@ class ActivityChannel(models.Model):
         ("LINK_EDITED",'Link edited'),
         ('FILTERED_MESSAGES','Filtered messages'),
         ("BAN_USER",'Ban user'),
+        ("CHANNEL_ACCESS",'Channel access'),
     ]
 
     user = models.ForeignKey(User, related_name='activities', on_delete=models.CASCADE)
