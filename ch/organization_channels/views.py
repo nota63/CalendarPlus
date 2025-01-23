@@ -1068,6 +1068,7 @@ def filter_by_user(request, org_id, channel_id, user_id):
         messages_data = [
             {
                 "id": message.id,
+                'user':user.username,
                 "content": message.content,
                 "timestamp": message.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
                 "audio": message.audio.url if message.audio else None,
@@ -1079,6 +1080,7 @@ def filter_by_user(request, org_id, channel_id, user_id):
         links_data = [
             {
                 "id": link.id,
+                'user':user.username,
                 "text": link.text,
                 "link": link.link,
                 "timestamp": link.timestamp.strftime("%Y-%m-%d %H:%M:%S"),

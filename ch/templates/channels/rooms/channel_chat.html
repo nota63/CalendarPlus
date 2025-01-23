@@ -2189,10 +2189,35 @@ p {
     const username = data['username'];
     const messageElement = document.createElement('div');
     messageElement.className = 'border-b py-2';
-    messageElement.innerHTML = `<strong>${username}</strong>: ${message} <span class="text-sm text-gray-500 ml-2">${data['time']}</span>`;
+    messageElement.innerHTML = `
+    <div class="w-10 h-10 flex-shrink-0 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4">
+        ${username.slice(0, 1)}  <!-- Display first letter of username -->
+    </div>
+    <div class="flex flex-col w-full">
+        <span class="font-semibold text-purple-600">${username}</span>
+        <span class="text-gray-700">${message}</span>
+        <span class="text-xs text-gray-500 mt-1 self-end">${data['time']}</span>
+    </div>
+`;
+
 
     if (data['link']) {
-        messageElement.innerHTML = `<strong>${username}</strong>: <a href="${data['link']}" target="_blank" class="text-blue-500 hover:underline">${data['link']}</a> <span class="text-sm text-gray-500 ml-2">${data['time']}</span>`;
+        messageElement.innerHTML = `
+    <div class="w-10 h-10 flex-shrink-0 bg-gradient-to-tr from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4">
+        ${username.slice(0, 1)}  <!-- Display first letter of username -->
+    </div>
+    <div class="flex flex-col w-full">
+        <span class="font-semibold text-green-600">${username}</span>
+        <span>
+            <a href="${data['link']}" target="_blank" class="text-blue-600 hover:underline font-medium">
+                ${data['link']}
+            </a>
+        </span>
+        <span class="text-xs text-gray-500 mt-1 self-end">${data['time']}</span>
+    </div>
+`;
+
+
     }
 
     document.getElementById('chatWindow').appendChild(messageElement);
@@ -2509,9 +2534,15 @@ document.getElementById('searchInput').addEventListener('input', function () {
                     const messageDiv = document.createElement('div');
                     messageDiv.className = 'border-b py-2';
                     messageDiv.innerHTML = `
-                        <strong>${message.user__username}</strong>: ${message.content}
-                        <span class="text-sm text-gray-500 ml-2">${message.timestamp}</span>
-                    `;
+    <div class="w-10 h-10 flex-shrink-0 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4">
+        ${message.user__username.slice(0, 1)}  <!-- Display first letter of username -->
+    </div>
+    <div class="flex flex-col w-full">
+        <span class="font-semibold text-purple-600">${message.user__username}</span>
+        <span class="text-gray-700">${message.content}</span>
+        <span class="text-xs text-gray-500 mt-1 self-end">${message.timestamp}</span>
+    </div>
+`;
                     chatWindow.appendChild(messageDiv);
                 });
             }
@@ -2522,10 +2553,24 @@ document.getElementById('searchInput').addEventListener('input', function () {
                     const linkDiv = document.createElement('div');
                     linkDiv.className = 'border-b py-2';
                     linkDiv.innerHTML = `
-                        <strong>${link.user__username}</strong>: 
-                        <a href="${link.link}" target="_blank" class="text-blue-500 hover:underline">${link.text}</a>
-                        <span class="text-sm text-gray-500 ml-2">${link.timestamp}</span>
-                    `;
+    <div class="flex items-center border-b border-gray-200 py-3 hover:bg-gray-50 rounded-lg px-2 transition duration-200 relative">
+        <!-- User avatar placeholder -->
+        <div class="w-10 h-10 flex-shrink-0 bg-gradient-to-tr from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4">
+            ${link.user__username.slice(0, 1)}
+        </div>
+        <!-- Link content -->
+        <div class="flex flex-col w-full">
+            <span class="font-semibold text-green-600">${link.user__username}</span>
+            <span>
+                <a href="${link.link}" target="_blank" class="text-blue-600 hover:underline font-medium">
+                    ${link.text}
+                </a>
+            </span>
+            <span class="text-xs text-gray-500 mt-1 self-end">${link.timestamp}</span>
+        </div>
+    </div>
+`;
+
                     chatWindow.appendChild(linkDiv);
                 });
             }
@@ -2848,11 +2893,16 @@ document.getElementById('applyFilter').onclick = function() {
                 let messageDiv = document.createElement('div');
                 messageDiv.classList.add('message');
                 messageDiv.innerHTML = `
-                    <div>${message.user}</div>
-                    <div>${message.content}</div>
-                    <div>${message.timestamp}</div>
-                    ${message.link ? `<a href="${message.link}" target="_blank">${message.link}</a>` : ''}
-                `;
+    <div class="w-10 h-10 flex-shrink-0 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4">
+        ${message.user.slice(0, 1)}  <!-- Display first letter of username -->
+    </div>
+    <div class="flex flex-col w-full">
+        <span class="font-semibold text-purple-600">${message.user}</span>
+        <span class="text-gray-700">${message.content}</span>
+        ${message.link ? `<a href="${message.link}" target="_blank" class="text-blue-500 hover:underline font-medium">${message.link}</a>` : ''}
+        <span class="text-xs text-gray-500 mt-1 self-end">${message.timestamp}</span>
+    </div>
+`;
                 messagesContainer.appendChild(messageDiv);
             });
 
@@ -3261,16 +3311,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 const messageDiv = document.createElement("div");
                 messageDiv.className =
                     "flex items-center border-b border-gray-200 py-3 hover:bg-gray-50 rounded-lg px-2 transition duration-200 relative";
-                messageDiv.innerHTML = ` 
-                    <div class="w-10 h-10 flex-shrink-0 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4">
-                        ${message.content.slice(0, 1)}
-                    </div>
-                    <div class="flex flex-col w-full">
-                        <span class="font-semibold text-purple-600">User</span>
-                        <span class="text-gray-700">${message.content}</span>
-                        <span class="text-xs text-gray-500 mt-1 self-end">${message.timestamp}</span>
-                    </div>
-                `;
+                    messageDiv.innerHTML = `
+    <div class="w-10 h-10 flex-shrink-0 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4">
+        ${message.content.slice(0, 1)}
+    </div>
+    <div class="flex flex-col w-full">
+        <span class="font-semibold text-purple-600">${message.user}</span>
+        <span class="text-gray-700">${message.content}</span>
+        <span class="text-xs text-gray-500 mt-1 self-end">${message.timestamp}</span>
+    </div>
+`;
+
                 chatWindow.appendChild(messageDiv);
             });
 
@@ -3284,7 +3335,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         ${link.text.slice(0, 1)}
                     </div>
                     <div class="flex flex-col w-full">
-                        <span class="font-semibold text-green-600">User</span>
+                        <span class="font-semibold text-green-600">${link.user}</span>
                         <span>
                             <a href="${link.link}" target="_blank" class="text-blue-600 hover:underline font-medium">
                                 ${link.text}
