@@ -1963,8 +1963,6 @@ p {
         {% if message.is_starred %} Starred {% else %} Unstarred {% endif %}
     </span>
 </div>
-
-            
         <!-- 3-dot menu -->
         {% if message.user == request.user %}
             <div class="relative">
@@ -4026,6 +4024,8 @@ $(document).on('click', '.star-icon', function () {
     });
 });
 
+
+// Replies
 
 
 

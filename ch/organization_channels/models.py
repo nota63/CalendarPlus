@@ -63,6 +63,18 @@ class Message(models.Model):
     is_pinned=models.BooleanField(default=False, null=True, blank=True)
     is_starred=models.BooleanField(default=False,null=True,blank=True)
 
+    # Parent field for replies
+
+    # New parent field for threading
+    parent = models.ForeignKey(
+        'self', 
+        on_delete=models.CASCADE, 
+        related_name='replies', 
+        blank=True, 
+        null=True
+    )
+
+
     def __str__(self):
         return f"Message by {self.user.username} in {self.channel.name}"
     
