@@ -62,9 +62,6 @@ class Message(models.Model):
     organization = models.ForeignKey(Organization, related_name='messages', on_delete=models.CASCADE)
     is_pinned=models.BooleanField(default=False, null=True, blank=True)
     is_starred=models.BooleanField(default=False,null=True,blank=True)
-
-    # Parent field for replies
-
     # New parent field for threading
     parent = models.ForeignKey(
         'self', 
@@ -150,6 +147,7 @@ class ActivityChannel(models.Model):
         ("SET_RETENTION_POLICY",'Set retention policy'),
         ("PINNED_MESSAGE",'Pinned message'),
         ('STARRED_MESSAGE','Starred message'),
+        ('MESSAGE_REPLY','Message reply'),
     ]
 
     user = models.ForeignKey(User, related_name='activities', on_delete=models.CASCADE)

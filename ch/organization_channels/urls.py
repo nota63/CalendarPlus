@@ -38,6 +38,7 @@ urlpatterns = [
     path('set_retention_policy/<int:org_id>/<int:channel_id>/',set_retention_policy, name='set_retention_policy'),
     path('pin-message/<int:org_id>/<int:channel_id>/<int:message_id>/', pin_message, name='pin_message'),  
     path('toggle_star_message/<int:org_id>/<int:channel_id>/<int:message_id>/', toggle_star_message, name='toggle_star_message'),
+    path('reply/<int:org_id>/<int:channel_id>/<int:message_id>/', handle_reply, name='handle_reply'),
    
 
 

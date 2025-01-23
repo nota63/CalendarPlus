@@ -1926,32 +1926,43 @@ p {
 <div id="chatWindow" class="bg-gradient-to-br from-gray-100 to-white p-4 rounded-xl shadow-2xl mb-4 max-h-[590px] overflow-y-auto border border-gray-300 w-full max-w-4xl">
 
 {% if messages %}
-             <!-- Loop through messages and display them -->
-    {% for message in messages %}
-    <div class="flex items-center border-b border-gray-200 py-3 hover:bg-gray-50 rounded-lg px-2 transition duration-200 relative 
-    {% if message.is_pinned %} bg-yellow-100 border-yellow-400 {% endif %}">
-        <!-- User avatar placeholder -->
-        <div class="w-10 h-10 flex-shrink-0 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4">
-            {{ message.user.username|slice:":1" }}
-        </div>
-        <!-- Message content -->
-        <div class="flex flex-col w-full">
-            <span class="font-semibold text-purple-600">{{ message.user.username }}</span>
-            <span class="text-gray-700">
-                {% if message.link %}
-                    <a href="{{ message.link }}" target="_blank" class="text-blue-500 hover:underline font-medium">
-                        {{ message.link }}
-                    </a>
-                {% else %}
-                    {{ message.content }}
-                {% endif %}
-            </span>
-            <span class="text-xs text-gray-500 mt-1 self-end">{{ message.timestamp|date:"H:i" }}</span>
-        </div>
 
-        <!-- Star/Unstar icon -->
-      <!-- Star/Unstar icon -->
-      <!-- Star/Unstar icon -->
+             <!-- Loop through messages and display them -->
+             {% for message in messages %}
+            
+             <div class="flex items-center border-b border-gray-200 py-3 hover:bg-gray-50 rounded-lg px-2 transition duration-200 relative 
+                 {% if message.is_pinned %} bg-yellow-100 border-yellow-400 {% endif %}">
+                 <!-- User avatar -->
+                 <div class="w-10 h-10 flex-shrink-0 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4">
+                     {{ message.user.username|slice:":1" }}
+                 </div>
+                 <!-- Message content -->
+                 <div class="flex flex-col w-full">
+                     <!-- Parent message display -->
+                     {% if message.parent %}
+                     <div class="text-sm italic text-gray-500 border-l-4 border-gray-300 pl-3 mb-2">
+                         Replied to: <span class="text-gray-800">{{ message.parent.user.username }}</span> - "{{ message.parent.content }}" 
+                     </div> 
+                     {% endif %}
+
+                     <!-- Current message -->
+                     <span class="font-semibold text-purple-600">{{ message.user.username }}</span>
+                     <span class="text-gray-700">
+                         {% if message.link %}
+                             <a href="{{ message.link }}" target="_blank" class="text-blue-500 hover:underline font-medium">
+                                 {{ message.link }}
+                             </a>
+                         {% else %}
+                             {{ message.content }}
+                         {% endif %}
+                     </span>
+                     <span class="text-xs text-gray-500 mt-1 self-end">{{ message.timestamp|date:"H:i" }}</span>
+                     <br>
+
+                  
+                 </div>
+       
+    <!-- Star/Unstar icon -->
 <div class="absolute right-2 top-2">
     <button class="star-icon text-yellow-500 text-xl {% if message.is_starred %}filled{% endif %}" 
             data-message-id="{{ message.id }}" 
@@ -1962,7 +1973,19 @@ p {
     <span class="star-status text-xs {% if message.is_starred %}starred{% else %}unstarred{% endif %}">
         {% if message.is_starred %} Starred {% else %} Unstarred {% endif %}
     </span>
-</div>
+</div>  
+<br><br>                                  
+ <!-- Reply Button -->
+ <div class="absolute right-2 bottom-2">
+    <button class="reply-btn text-sm text-blue-500 hover:underline" 
+            data-message-id="{{ message.id }}" 
+            data-org-id="{{ channel.organization.id }}" 
+            data-channel-id="{{ channel.id }}">
+        Reply
+    </button>
+</div>       
+
+
         <!-- 3-dot menu -->
         {% if message.user == request.user %}
             <div class="relative">
@@ -3394,6 +3417,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 chatWindow.appendChild(linkDiv);
             });
 
+
+
+
+
             // Close the modal
             const filterByUserModal = bootstrap.Modal.getInstance(
                 document.getElementById("filterByUserModal")
@@ -3414,68 +3441,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // DELETE CHANNEL DATA (ONLY ADMIN)
-// Bootstrap 5 Modal Instances
-const deleteChannelDataModal = new bootstrap.Modal(document.getElementById('deleteChannelDataModal'));
-  const deleteChannelPasswordModal = new bootstrap.Modal(document.getElementById('deleteChannelPasswordModal'));
 
-  // Open the Select Data Modal
-  document.getElementById('deleteChannelDataBtn').addEventListener('click', () => {
-    deleteChannelDataModal.show();
-  });
 
-  // Handle Next Button in Select Data Modal
-  document.getElementById('nextToPasswordModalBtn').addEventListener('click', () => {
-    const selectedOptions = [];
-    if (document.getElementById('deleteMessagesOption').checked) selectedOptions.push('messages');
-    if (document.getElementById('deleteLinksOption').checked) selectedOptions.push('links');
-    if (document.getElementById('deleteAudioOption').checked) selectedOptions.push('audio');
-    if (document.getElementById('deleteVideoOption').checked) selectedOptions.push('video');
-    if (document.getElementById('deleteActivityLogsOption').checked) selectedOptions.push('activity');
 
-    if (selectedOptions.length > 0) {
-      deleteChannelDataModal.hide();
-      deleteChannelPasswordModal.show();
-    } else {
-      alert('Please select at least one type of data to delete.');
-    }
-  });
-
-  // Handle Submit Button in Password Modal
-  document.getElementById('submitChannelPasswordBtn').addEventListener('click', () => {
-    const password = document.getElementById('channelPasswordInput').value;
-    const selectedOptions = [];
-    if (document.getElementById('deleteMessagesOption').checked) selectedOptions.push('messages');
-    if (document.getElementById('deleteLinksOption').checked) selectedOptions.push('links');
-    if (document.getElementById('deleteAudioOption').checked) selectedOptions.push('audio');
-    if (document.getElementById('deleteVideoOption').checked) selectedOptions.push('video');
-    if (document.getElementById('deleteActivityLogsOption').checked) selectedOptions.push('activity');
-
-    fetch('{% url "delete_channel_data" org_id=channel.organization.id channel_id=channel.id %}', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': '{{ csrf_token }}',
-      },
-      body: JSON.stringify({
-        password: password,
-        data_to_delete: selectedOptions,
-      }),
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          alert('Data deleted successfully!');
-        } else {
-            showNotification('Channels selected data deleted successfully. Please refresh the page for new changes.', 'Refresh', window.location.href);
-        }
-        deleteChannelPasswordModal.hide();
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred. Please try again.');
-        deleteChannelPasswordModal.hide();
-      });
-  });
 
 
 // DISPLAY NETWORK STATS
@@ -3931,6 +3899,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 //   PIN MESSAGES
 
+
 function getCSRFToken() {
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     return csrfToken;
@@ -3979,7 +3948,10 @@ function togglePinMessage(orgId, channelId, messageId) {
 
 
 
+
 // STAR/UNSTAR THE MESSAGE
+
+
 // STAR/UNSTAR THE MESSAGE
 $(document).on('click', '.star-icon', function () {
     var button = $(this); // Reference to the clicked button
@@ -4025,9 +3997,160 @@ $(document).on('click', '.star-icon', function () {
 });
 
 
-// Replies
 
 
+
+// HANDLE REPLIES
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Use event delegation to handle the reply button clicks
+    document.body.addEventListener("click", function (event) {
+        if (event.target && event.target.classList.contains("reply-btn")) {
+            const messageId = event.target.dataset.messageId;
+            const orgId = event.target.dataset.orgId;
+            const channelId = event.target.dataset.channelId;
+
+            // Display the reply input field dynamically
+            const replyInputHtml = `
+                <div class="mt-2 flex">
+                    <input type="text" id="reply-input-${messageId}" 
+                        class="border border-gray-300 rounded-md p-2 w-full text-sm" 
+                        placeholder="Write your reply..." />
+                    <button class="ml-2 px-3 py-2 bg-blue-500 text-white rounded-md text-sm send-reply-btn" 
+                        data-message-id="${messageId}" 
+                        data-org-id="${orgId}" 
+                        data-channel-id="${channelId}">
+                        Send
+                    </button>
+                </div>`;
+            event.target.insertAdjacentHTML("afterend", replyInputHtml);
+
+            // Handle sending the reply
+            document.querySelector(`#reply-input-${messageId}`).nextElementSibling.addEventListener("click", function () {
+                const content = document.querySelector(`#reply-input-${messageId}`).value.trim();
+                if (!content) return alert("Reply content cannot be empty!");
+
+                // Send AJAX POST request
+                fetch(`/channels/reply/${orgId}/${channelId}/${messageId}/`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCSRFToken(), // CSRF token to protect against CSRF attacks
+                    },
+                    body: JSON.stringify({ content: content }),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data.error) {
+                            alert(data.error);
+                        } else {
+                            // Append the reply to the chat window
+                            const replyHtml = `
+                                <div class="flex items-center ml-6 mt-2 border-l-4 border-blue-400 pl-2">
+                                    <div class="w-8 h-8 flex-shrink-0 bg-blue-400 rounded-full flex items-center justify-center text-white font-bold text-xs mr-3">
+                                        ${data.reply.user[0]}
+                                    </div>
+                                    <div>
+                                        <span class="font-semibold text-blue-600">${data.reply.user}</span>
+                                        <span class="text-gray-700">${data.reply.content}</span>
+                                        <span class="text-xs text-gray-500">${data.reply.timestamp}</span>
+                                    </div>
+                                </div>`;
+                            document.querySelector(`#reply-input-${messageId}`).closest(".flex").insertAdjacentHTML("afterend", replyHtml);
+                            document.querySelector(`#reply-input-${messageId}`).remove(); // Remove the input field after sending
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error:", error);
+                        alert("An error occurred. Please try again.");
+                    });
+            });
+        }
+    });
+
+    // Function to get CSRF token (for Django)
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// DELETE CHANNEL DATA
+
+// Bootstrap 5 Modal Instances
+const deleteChannelDataModal = new bootstrap.Modal(document.getElementById('deleteChannelDataModal'));
+  const deleteChannelPasswordModal = new bootstrap.Modal(document.getElementById('deleteChannelPasswordModal'));
+
+  // Open the Select Data Modal
+  document.getElementById('deleteChannelDataBtn').addEventListener('click', () => {
+    deleteChannelDataModal.show();
+  });
+
+  // Handle Next Button in Select Data Modal
+  document.getElementById('nextToPasswordModalBtn').addEventListener('click', () => {
+    const selectedOptions = [];
+    if (document.getElementById('deleteMessagesOption').checked) selectedOptions.push('messages');
+    if (document.getElementById('deleteLinksOption').checked) selectedOptions.push('links');
+    if (document.getElementById('deleteAudioOption').checked) selectedOptions.push('audio');
+    if (document.getElementById('deleteVideoOption').checked) selectedOptions.push('video');
+    if (document.getElementById('deleteActivityLogsOption').checked) selectedOptions.push('activity');
+
+    if (selectedOptions.length > 0) {
+      deleteChannelDataModal.hide();
+      deleteChannelPasswordModal.show();
+    } else {
+      alert('Please select at least one type of data to delete.');
+    }
+  });
+
+  // Handle Submit Button in Password Modal
+  document.getElementById('submitChannelPasswordBtn').addEventListener('click', () => {
+    const password = document.getElementById('channelPasswordInput').value;
+    const selectedOptions = [];
+    if (document.getElementById('deleteMessagesOption').checked) selectedOptions.push('messages');
+    if (document.getElementById('deleteLinksOption').checked) selectedOptions.push('links');
+    if (document.getElementById('deleteAudioOption').checked) selectedOptions.push('audio');
+    if (document.getElementById('deleteVideoOption').checked) selectedOptions.push('video');
+    if (document.getElementById('deleteActivityLogsOption').checked) selectedOptions.push('activity');
+
+    fetch('{% url "delete_channel_data" org_id=channel.organization.id channel_id=channel.id %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}',
+      },
+      body: JSON.stringify({
+        password: password,
+        data_to_delete: selectedOptions,
+      }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Data deleted successfully!');
+        } else {
+            showNotification('Channels selected data deleted successfully. Please refresh the page for new changes.', 'Refresh', window.location.href);
+        }
+        deleteChannelPasswordModal.hide();
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+        deleteChannelPasswordModal.hide();
+      });
+  });
 
 
 // CUSTOM NOTIFICATION FUNCTION

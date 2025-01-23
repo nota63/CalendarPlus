@@ -261,6 +261,7 @@ def channel_chat(request, channel_id):
 def get_organization_members(request,organization_id):
     organization = get_object_or_404(Organization, id=organization_id)
 
+
  
     members = Profile.objects.filter(organization=organization)
    
@@ -281,6 +282,8 @@ def get_organization_members(request,organization_id):
 def get_channel_members(request, org_id, channel_id):
 
     organization = get_object_or_404(Organization, id=org_id)
+
+
 
 
     user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
@@ -1430,10 +1433,10 @@ def pin_message(request, org_id, channel_id, message_id):
     try:
         
         organization = get_object_or_404(Organization, id=org_id)
-        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
-        if not user_profile:
-          return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
-
+        user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+        if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+          return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
 
       
         channel = get_object_or_404(Channel, id=channel_id, organization=organization)
@@ -1473,9 +1476,10 @@ def toggle_star_message(request, org_id, channel_id, message_id):
     
     organization = get_object_or_404(Organization, id=org_id)
     channel = get_object_or_404(Channel, id=channel_id, organization=organization)
-    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
-    if not user_profile:
-        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+    user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+    if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+        return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
 
 
 
@@ -1505,5 +1509,56 @@ def toggle_star_message(request, org_id, channel_id, message_id):
 
 # Handle parent replies
 
+@csrf_exempt
+def handle_reply(request, org_id, channel_id, message_id):
+    if request.method == "POST":
+        try:
+         
+            data = json.loads(request.body)
+            content = data.get("content", "").strip()
+
+            if not content:
+                return JsonResponse({"error": "Reply content cannot be empty."}, status=400)
+
+            organization = get_object_or_404(Organization, id=org_id)
+            channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+            parent_message = get_object_or_404(Message, id=message_id, channel=channel)
+
+            user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+            if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+               return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
 
 
+            reply = Message.objects.create(
+                channel=channel,
+                user=request.user,  
+                content=content,
+                parent=parent_message,
+                organization=organization
+            )
+
+            activity = ActivityChannel.objects.create(
+               user=request.user,
+               channel=channel,
+              organization=organization,
+              action_type="MESSAGE_REPLY",
+              content=f'{request.user} Replied to {parent_message.user.username} - {parent_message.content} -- {reply.parent}'
+
+        )
+
+            return JsonResponse({
+                "message": "Reply created successfully.",
+                "reply": {
+                    "id": reply.id,
+                    "content": reply.content,
+                    "user": reply.user.username,
+                    "timestamp": reply.timestamp.strftime("%H:%M"),
+                    "parent_id": parent_message.id
+                }
+            })
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON body."}, status=400)
+
+    return JsonResponse({"error": "Invalid request method."}, status=405)
