@@ -1904,65 +1904,59 @@ p {
 
         <div id="chatWindow" class="bg-gradient-to-br from-gray-100 to-white p-4 rounded-xl shadow-2xl mb-4 max-h-[400px] overflow-y-auto border border-gray-300">
             
-            <!-- Loop through messages and display them -->
-            {% for message in messages %}
-                <div class="flex items-center border-b border-gray-200 py-3 hover:bg-gray-50 rounded-lg px-2 transition duration-200 relative">
-                    <!-- User avatar placeholder -->
-                    <div class="w-10 h-10 flex-shrink-0 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4">
-                        {{ message.user.username|slice:":1" }}
-                    </div>
-                    <!-- Message content -->
-                    <div class="flex flex-col w-full">
-                        <span class="font-semibold text-purple-600">{{ message.user.username }}</span>
-                        <span class="text-gray-700">
-                            {% if message.link %}
-                                <a href="{{ message.link }}" target="_blank" class="text-blue-500 hover:underline font-medium">
-                                    {{ message.link }}
-                                </a>
-                            {% else %}
-                                {{ message.content }}
-                            {% endif %}
-                        </span>
-                        <span class="text-xs text-gray-500 mt-1 self-end">{{ message.timestamp|date:"H:i" }}</span>
-                    </div>
-                    <!-- 3-dot menu -->
-                    {% if message.user == request.user %}
-                        <div class="relative">
-                            <button class="menu-button text-gray-400 hover:text-gray-600 focus:outline-none">
-                                &#x22EE;
-                            </button>
-                            <div class="menu-options hidden absolute top-6 right-0 bg-white shadow-md rounded-lg text-sm">
-                                <!-- Inside the menu options for links -->
-
-                                <form action="{% url 'delete_message' org_id=channel.organization.id channel_id=channel.id message_id=message.id %}" method="POST" class="inline-block">
-                                    {% csrf_token %}
-                                    <button type="submit" class="delete-message text-red-500 px-4 py-2 w-full hover:bg-red-50">
-                                        Delete
-                                    </button>
-                                </form>
-                               <!-- edit message button -->
-                                <button class="edit-button text-green-500 px-4 py-2 w-full hover:bg-green-50" data-bs-toggle="modal" data-bs-target="#editMessageModal" data-message-id="{{ message.id }}" data-current-content="{{ message.content }}">
-                                    <i class="fas fa-ellipsis-v"></i> Edit
-                                </button>
-
-                                <!-- Pin message -->
-                                <button onclick="togglePinMessage({{ message.organization.id }}, {{ message.channel.id }}, {{ message.id }})" class="edit-button text-green-500 px-4 py-2 w-full hover:bg-green-50">
-                                    {% if message.is_pinned %}
-                                        Unpin
-                                    {% else %}
-                                        Pin
-                                    {% endif %}
-                                </button>
-                                
-                               
-        
-                                
-                            </div>
-                        </div>
-                    {% endif %}
+             <!-- Loop through messages and display them -->
+    {% for message in messages %}
+    <div class="flex items-center border-b border-gray-200 py-3 hover:bg-gray-50 rounded-lg px-2 transition duration-200 relative 
+    {% if message.is_pinned %} bg-yellow-100 border-yellow-400 {% endif %}">
+        <!-- User avatar placeholder -->
+        <div class="w-10 h-10 flex-shrink-0 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4">
+            {{ message.user.username|slice:":1" }}
+        </div>
+        <!-- Message content -->
+        <div class="flex flex-col w-full">
+            <span class="font-semibold text-purple-600">{{ message.user.username }}</span>
+            <span class="text-gray-700">
+                {% if message.link %}
+                    <a href="{{ message.link }}" target="_blank" class="text-blue-500 hover:underline font-medium">
+                        {{ message.link }}
+                    </a>
+                {% else %}
+                    {{ message.content }}
+                {% endif %}
+            </span>
+            <span class="text-xs text-gray-500 mt-1 self-end">{{ message.timestamp|date:"H:i" }}</span>
+        </div>
+        <!-- 3-dot menu -->
+        {% if message.user == request.user %}
+            <div class="relative">
+                <button class="menu-button text-gray-400 hover:text-gray-600 focus:outline-none">
+                    &#x22EE;
+                </button>
+                <div class="menu-options hidden absolute top-6 right-0 bg-white shadow-md rounded-lg text-sm">
+                    <!-- Inside the menu options for links -->
+                    <form action="{% url 'delete_message' org_id=channel.organization.id channel_id=channel.id message_id=message.id %}" method="POST" class="inline-block">
+                        {% csrf_token %}
+                        <button type="submit" class="delete-message text-red-500 px-4 py-2 w-full hover:bg-red-50">
+                            Delete
+                        </button>
+                    </form>
+                    <!-- edit message button -->
+                    <button class="edit-button text-green-500 px-4 py-2 w-full hover:bg-green-50" data-bs-toggle="modal" data-bs-target="#editMessageModal" data-message-id="{{ message.id }}" data-current-content="{{ message.content }}">
+                        <i class="fas fa-ellipsis-v"></i> Edit
+                    </button>
+                    <!-- Pin message -->
+                    <button onclick="togglePinMessage({{ message.organization.id }}, {{ message.channel.id }}, {{ message.id }})" class="edit-button text-green-500 px-4 py-2 w-full hover:bg-green-50">
+                        {% if message.is_pinned %}
+                            Unpin
+                        {% else %}
+                            Pin
+                        {% endif %}
+                    </button>
                 </div>
-            {% endfor %}
-        
+            </div>
+        {% endif %}
+    </div>
+{% endfor %}
             <!-- Loop through links and display them -->
             {% for link in links %}
                 <div class="flex items-center border-b border-gray-200 py-3 hover:bg-gray-50 rounded-lg px-2 transition duration-200 relative">
@@ -3881,8 +3875,7 @@ function togglePinMessage(orgId, channelId, messageId) {
             }
         })
         .catch(error => {
-            console.error("Error:", error);
-            alert("An error occurred while pinning/unpinning the message.");
+            showNotification('Operation Sucessfull please refresh the page to reflect the changes', 'Refresh', window.location.href);
         });
 }
 

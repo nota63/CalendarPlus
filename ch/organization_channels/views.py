@@ -229,10 +229,16 @@ class ChannelListView(LoginRequiredMixin, View):
 
 
 # Redirect to channel room
-
 def channel_chat(request, channel_id):
     channel = get_object_or_404(Channel, id=channel_id)
-    messages = Message.objects.filter(channel=channel).order_by('timestamp')
+
+    
+    pinned_messages = Message.objects.filter(channel=channel, is_pinned=True).order_by('-timestamp')
+    unpinned_messages = Message.objects.filter(channel=channel, is_pinned=False).order_by('timestamp')
+
+
+    messages = list(pinned_messages) + list(unpinned_messages)
+
     links = Link.objects.filter(channel=channel).order_by('timestamp')
 
 
@@ -242,10 +248,8 @@ def channel_chat(request, channel_id):
         organization=channel.organization,
     ).first()
 
-    if ban_entry:
-        
-        if ban_entry.end_time is None or ban_entry.end_time > now():
-            return HttpResponseForbidden("You are banned from accessing this channel.")
+    if ban_entry and (ban_entry.end_time is None or ban_entry.end_time > now()):
+        return HttpResponseForbidden("You are banned from accessing this channel.")
 
     return render(request, 'channels/rooms/channel_chat.html', {'channel': channel, 'messages': messages, 'links': links})
 
