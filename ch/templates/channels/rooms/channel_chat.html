@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{% csrf_token %}">
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    <!-- Include jQuery from a CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
     <title>Chat in Channel: {{ channel.name }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
@@ -19,6 +22,38 @@
 </head>
 
 <style>
+
+ /* Default star status text color */
+.star-status {
+    transition: color 0.3s ease, transform 0.3s ease;  /* Added transform for animations */
+}
+
+/* If message is starred, make the text green and apply extra effects */
+.star-status.starred {
+    color: green; /* Green color when starred */
+    font-weight: bold;  /* Make the text bold */
+    text-shadow: 0 2px 4px rgba(0, 255, 0, 0.4);  /* Add glowing green shadow effect */
+    transform: scale(1.1);  /* Slightly enlarge the text */
+    animation: pulse 1s infinite;  /* Pulsing effect */
+}
+
+/* If message is unstarred, keep the text in default color */
+.star-status.unstarred {
+    color: gray; /* Default color when unstarred */
+}
+
+/* Add a pulsing animation when the message is starred */
+@keyframes pulse {
+    0% {
+        transform: scale(1.1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
+    100% {
+        transform: scale(1.1);
+    }
+}
 
 .custom-modal {
     display: none;
@@ -1143,10 +1178,14 @@ p {
 }
 
 
+
+
 </style>
 
 
 
+<!-- Success message container -->
+<div id="successMessage" class="hidden text-green-500 font-semibold p-2 rounded-lg bg-green-100 mb-4 w-full max-w-4xl"></div>
 
 
 <!-- Modal for displaying the user list -->
@@ -1909,6 +1948,23 @@ p {
             </span>
             <span class="text-xs text-gray-500 mt-1 self-end">{{ message.timestamp|date:"H:i" }}</span>
         </div>
+
+        <!-- Star/Unstar icon -->
+      <!-- Star/Unstar icon -->
+      <!-- Star/Unstar icon -->
+<div class="absolute right-2 top-2">
+    <button class="star-icon text-yellow-500 text-xl {% if message.is_starred %}filled{% endif %}" 
+            data-message-id="{{ message.id }}" 
+            data-org-id="{{ channel.organization.id }}" 
+            data-channel-id="{{ channel.id }}">
+        ★
+    </button>
+    <span class="star-status text-xs {% if message.is_starred %}starred{% else %}unstarred{% endif %}">
+        {% if message.is_starred %} Starred {% else %} Unstarred {% endif %}
+    </span>
+</div>
+
+            
         <!-- 3-dot menu -->
         {% if message.user == request.user %}
             <div class="relative">
@@ -3922,6 +3978,54 @@ function togglePinMessage(orgId, channelId, messageId) {
             showNotification('Operation Sucessfull please refresh the page to reflect the changes', 'Refresh', window.location.href);
         });
 }
+
+
+
+// STAR/UNSTAR THE MESSAGE
+// STAR/UNSTAR THE MESSAGE
+$(document).on('click', '.star-icon', function () {
+    var button = $(this); // Reference to the clicked button
+    var messageId = button.data('message-id');
+    var orgId = button.data('org-id');
+    var channelId = button.data('channel-id');
+
+    // Send AJAX request to toggle star status
+    $.ajax({
+        url: '/channels/toggle_star_message/' + orgId + '/' + channelId + '/' + messageId + '/',
+        type: 'GET',
+        success: function (response) {
+            if (response.status === 'success') {
+                // Toggle the star icon's "filled" class based on the updated is_starred state
+                if (response.is_starred) {
+                    button.addClass('filled'); // Add filled class to show it's starred
+                } else {
+                    button.removeClass('filled'); // Remove filled class to unstar it
+                }
+
+                // Update the star status text and style dynamically
+                var starStatus = button.siblings('.star-status');
+                if (response.is_starred) {
+                    starStatus.text('Starred').removeClass('unstarred').addClass('starred');
+                } else {
+                    starStatus.text('Unstarred').removeClass('starred').addClass('unstarred');
+                }
+
+                // Show a notification or success message (optional)
+                showNotification(
+                    response.is_starred ? 'Message has been starred!' : 'Message has been unstarred!',
+                    'Dismiss'
+                );
+            } else {
+                // Optional: Handle errors if needed
+                console.error('Failed to update the star status:', response.message);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('An error occurred:', error);
+        }
+    });
+});
+
 
 
 

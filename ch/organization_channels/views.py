@@ -1465,3 +1465,39 @@ def pin_message(request, org_id, channel_id, message_id):
             "error": str(e),
         }, status=400)
 
+
+
+# Star / Unstar message
+
+def toggle_star_message(request, org_id, channel_id, message_id):
+    
+    organization = get_object_or_404(Organization, id=org_id)
+    channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+
+
+    message = get_object_or_404(Message, id=message_id, channel=channel,user=request.user,organization=organization)
+
+  
+    message.is_starred = not message.is_starred
+    message.save()
+
+    activity = ActivityChannel.objects.create(
+          user=request.user,
+          channel=channel,
+          organization=organization,
+          action_type="STARRED_MESSAGE",
+          content=f'{request.user} Starred the message {message.content}',
+    )
+
+
+   
+    return JsonResponse({
+        'message_id': message.id,
+        'is_starred': message.is_starred,
+        'status': 'success',
+        'message': 'Message starred' if message.is_starred else 'Message unstarred'
+    })

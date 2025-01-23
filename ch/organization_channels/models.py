@@ -61,6 +61,7 @@ class Message(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     organization = models.ForeignKey(Organization, related_name='messages', on_delete=models.CASCADE)
     is_pinned=models.BooleanField(default=False, null=True, blank=True)
+    is_starred=models.BooleanField(default=False,null=True,blank=True)
 
     def __str__(self):
         return f"Message by {self.user.username} in {self.channel.name}"
@@ -136,6 +137,7 @@ class ActivityChannel(models.Model):
         ("CHANNEL_ACCESS",'Channel access'),
         ("SET_RETENTION_POLICY",'Set retention policy'),
         ("PINNED_MESSAGE",'Pinned message'),
+        ('STARRED_MESSAGE','Starred message'),
     ]
 
     user = models.ForeignKey(User, related_name='activities', on_delete=models.CASCADE)
