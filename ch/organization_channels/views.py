@@ -41,7 +41,7 @@ from django.contrib import messages
 from .models import Ban
 from django.utils.timezone import now
 from django.core.exceptions import ValidationError
-
+from django.views.decorators.http import require_POST
 
 # Create your views here.
 
@@ -1413,5 +1413,49 @@ def set_retention_policy(request, org_id, channel_id):
     return JsonResponse({'error': 'Only POST requests are allowed.'}, status=405)
 
 
-# Track And Save Abused messages
+# Pin message
+
+@require_POST
+@csrf_exempt
+def pin_message(request, org_id, channel_id, message_id):
+    """
+    View to pin or unpin a message in a channel.
+    """
+    try:
+        
+        organization = get_object_or_404(Organization, id=org_id)
+        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+        if not user_profile:
+          return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+
+      
+        channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+
+        
+        message = get_object_or_404(Message, id=message_id, channel=channel)
+
+   
+        message.is_pinned = not message.is_pinned
+        message.save()
+        activity = ActivityChannel.objects.create(
+          user=request.user,
+          channel=channel,
+          organization=organization,
+          action_type="PINNED_MESSAGE",
+          content=f'{request.user} Pinned the message {message.content}',
+    )
+
+
+        return JsonResponse({
+            "success": True,
+            "message": f"Message {'pinned' if message.is_pinned else 'unpinned'} successfully.",
+            "is_pinned": message.is_pinned,
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            "success": False,
+            "error": str(e),
+        }, status=400)
 

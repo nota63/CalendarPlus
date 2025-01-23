@@ -60,6 +60,7 @@ class Message(models.Model):
     video = models.FileField(upload_to='uploads/video/', null=True, blank=True)  
     timestamp = models.DateTimeField(auto_now_add=True)
     organization = models.ForeignKey(Organization, related_name='messages', on_delete=models.CASCADE)
+    is_pinned=models.BooleanField(default=False, null=True, blank=True)
 
     def __str__(self):
         return f"Message by {self.user.username} in {self.channel.name}"
@@ -134,6 +135,7 @@ class ActivityChannel(models.Model):
         ("BAN_USER",'Ban user'),
         ("CHANNEL_ACCESS",'Channel access'),
         ("SET_RETENTION_POLICY",'Set retention policy'),
+        ("PINNED_MESSAGE",'Pinned message'),
     ]
 
     user = models.ForeignKey(User, related_name='activities', on_delete=models.CASCADE)

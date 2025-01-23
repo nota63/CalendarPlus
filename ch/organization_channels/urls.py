@@ -35,7 +35,8 @@ urlpatterns = [
          grant_channel_access, 
          name='grant_channel_access'),
 
-    path('set_retention_policy/<int:org_id>/<int:channel_id>/',set_retention_policy, name='set_retention_policy')     
+    path('set_retention_policy/<int:org_id>/<int:channel_id>/',set_retention_policy, name='set_retention_policy'),
+    path('pin-message/<int:org_id>/<int:channel_id>/<int:message_id>/', pin_message, name='pin_message'),  
    
 
 

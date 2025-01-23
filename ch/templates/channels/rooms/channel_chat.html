@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{% csrf_token %}">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
     <title>Chat in Channel: {{ channel.name }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
@@ -1942,6 +1944,15 @@ p {
                                 <button class="edit-button text-green-500 px-4 py-2 w-full hover:bg-green-50" data-bs-toggle="modal" data-bs-target="#editMessageModal" data-message-id="{{ message.id }}" data-current-content="{{ message.content }}">
                                     <i class="fas fa-ellipsis-v"></i> Edit
                                 </button>
+
+                                <!-- Pin message -->
+                                <button onclick="togglePinMessage({{ message.organization.id }}, {{ message.channel.id }}, {{ message.id }})" class="edit-button text-green-500 px-4 py-2 w-full hover:bg-green-50">
+                                    {% if message.is_pinned %}
+                                        Unpin
+                                    {% else %}
+                                        Pin
+                                    {% endif %}
+                                </button>
                                 
                                
         
@@ -3826,6 +3837,54 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
+//   PIN MESSAGES
+
+function getCSRFToken() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    return csrfToken;
+}
+
+function togglePinMessage(orgId, channelId, messageId) {
+    fetch(`/channels/pin-message/${orgId}/${channelId}/${messageId}/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken(), // Use the CSRF token here
+        },
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const messageElement = document.getElementById(`message-${messageId}`);
+                const chatWindow = document.getElementById("chatWindow");
+
+                if (data.is_pinned) {
+                    // Highlight the pinned message
+                    messageElement.classList.add("bg-yellow-100");
+
+                    // Move the pinned message to the top
+                    chatWindow.prepend(messageElement);
+                } else {
+                    // Remove the highlight
+                    messageElement.classList.remove("bg-yellow-100");
+
+                    // Append the unpinned message back to its original position
+                    const originalMessages = [...chatWindow.querySelectorAll(".flex.items-center")].filter(
+                        el => el !== messageElement
+                    );
+
+                    const lastMessage = originalMessages[originalMessages.length - 1];
+                    chatWindow.insertBefore(messageElement, lastMessage.nextSibling);
+                }
+            } else {
+                alert(data.message || "Failed to pin/unpin the message.");
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("An error occurred while pinning/unpinning the message.");
+        });
+}
 
 
 
