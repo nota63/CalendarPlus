@@ -318,3 +318,31 @@ class AbusedMessage(models.Model):
         verbose_name = "Abused Message"
         verbose_name_plural = "Abused Messages"
         ordering = ['-flagged_at']
+
+
+# Set recurring Message 
+
+
+class RecurringMessage(models.Model):
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField()
+    recurrence_type = models.CharField(
+        max_length=50,
+        choices=[
+            ('daily', 'Daily'),
+            ('weekly', 'Weekly'),
+            ('monthly', 'Monthly'),
+            ('yearly', 'Yearly'),
+            ('custom', 'Custom')
+        ]
+    )
+    recurrence_days = models.JSONField(null=True, blank=True)  
+    start_date = models.DateField(auto_now_add=True)  
+    end_date = models.DateField(null=True, blank=True)  
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.text} ({self.recurrence_type})"

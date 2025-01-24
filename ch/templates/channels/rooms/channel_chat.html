@@ -1176,17 +1176,55 @@ p {
 .menu-button:focus + .menu-dropdown {
     display: block;
 }
+/* Success message styles */
+#successMessage {
+  background: linear-gradient(45deg, #5cb3f7, #7ad9e6); /* Light blue gradient */
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2); /* Soft shadow for depth */
+  color: #fff; /* White text for contrast */
+  border-radius: 8px;
+  padding: 16px 20px;
+  font-weight: bold;
+  font-size: 18px;
+  display: inline-block;
+  width: auto;
+  position: relative;
+  opacity: 0;
+  transform: translateX(50px); /* Start from right */
+  transition: all 0.5s ease-out;
+  box-sizing: border-box;
+}
 
+#successMessage.show {
+  opacity: 1;
+  transform: translateX(0); /* Slide in */
+  animation: bounceIn 0.6s ease-out; /* Bounce-in effect */
+}
+
+/* Bounce-in animation */
+@keyframes bounceIn {
+  0% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
 
 
 
 </style>
 
 
-
 <!-- Success message container -->
-<div id="successMessage" class="hidden text-green-500 font-semibold p-2 rounded-lg bg-green-100 mb-4 w-full max-w-4xl"></div>
-
+<div id="successMessage" class="hidden text-white font-semibold p-4 rounded-lg bg-gradient-to-r from-green-400 via-green-500 to-green-600 mb-4 w-full max-w-4xl transform scale-0 transition-all duration-500 ease-out opacity-0">
+    <span class="text-xl">Success! Your action was completed successfully.</span>
+  </div>
+  
 
 <!-- Modal for displaying the user list -->
 <div id="userListModal" class="modal fade" tabindex="-1" aria-labelledby="userListModalLabel" aria-hidden="true">
