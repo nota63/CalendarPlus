@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from accounts.models import Organization, Profile
 from .models import (
-    Channel, Message, Link , ActivityChannel, ChannelAccess,RetentionPolicy)
+    Channel, Message, Link , ActivityChannel, ChannelAccess,RetentionPolicy, RecurringMessage)
 from django.utils.dateparse import parse_datetime
 from django.utils import timezone
 from django.urls import reverse
@@ -1562,3 +1562,58 @@ def handle_reply(request, org_id, channel_id, message_id):
             return JsonResponse({"error": "Invalid JSON body."}, status=400)
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
+
+
+# HANDLE RECURRING MESSAGES
+
+@csrf_exempt 
+def set_recurring_message(request, org_id, channel_id, message_id):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Invalid HTTP method. Use POST.'}, status=405)
+
+    try:
+        
+        data = json.loads(request.body)
+        recurrence_type = data.get('recurrence_type')
+        recurrence_days = data.get('recurrence_days', [])
+        end_date = data.get('end_date')
+
+    
+        valid_types = ['daily', 'weekly', 'monthly', 'yearly', 'custom']
+        if recurrence_type not in valid_types:
+            return JsonResponse({'error': 'Invalid recurrence type.'}, status=400)
+
+ 
+        organization = get_object_or_404(Organization, id=org_id)
+        channel = get_object_or_404(Channel, id=channel_id)
+        message = get_object_or_404(Message, id=message_id)
+
+       
+        if message.channel != channel or channel.organization != organization:
+            return JsonResponse({'error': 'Message does not belong to the specified organization or channel.'}, status=400)
+
+      
+        recurring_message, created = RecurringMessage.objects.update_or_create(
+            organization=organization,
+            channel=channel,
+            user=message.user,
+            text=message.content,
+            defaults={
+                'recurrence_type': recurrence_type,
+                'recurrence_days': recurrence_days,
+                'end_date': end_date,
+            }
+        )
+
+        response = {
+            'message': 'Recurring message set successfully.',
+            'recurring_message_id': recurring_message.id,
+            'status': 'created' if created else 'updated'
+        }
+        return JsonResponse(response, status=201)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+

@@ -23,6 +23,12 @@
 
 <style>
 
+
+
+
+
+
+
  /* Default star status text color */
 .star-status {
     transition: color 0.3s ease, transform 0.3s ease;  /* Added transform for animations */
@@ -1831,6 +1837,50 @@ p {
   </div>
 
   
+  <!-- Set message as recurring -->
+
+
+<!-- Recurrence Modal -->
+<div id="recurrenceModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+    <div class="bg-white rounded-lg shadow-lg w-1/3 p-6">
+        <h2 class="text-xl font-semibold mb-4">Set Recurrence Details</h2>
+        
+        <!-- Recurrence Form -->
+        <form id="recurrenceForm">
+            <div class="mb-4">
+                <label class="block font-medium mb-2">Recurrence Type</label>
+                <select id="recurrenceType" name="recurrence_type" class="border border-gray-300 rounded w-full p-2">
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
+                    <option value="custom">Custom</option>
+                </select>
+            </div>
+            <div class="mb-4" id="recurrenceDaysContainer" style="display: none;">
+                <label class="block font-medium mb-2">Select Days (For Weekly/Custom)</label>
+                <div class="flex flex-wrap gap-2">
+                    <label><input type="checkbox" name="recurrence_days" value="Monday"> Monday</label>
+                    <label><input type="checkbox" name="recurrence_days" value="Tuesday"> Tuesday</label>
+                    <label><input type="checkbox" name="recurrence_days" value="Wednesday"> Wednesday</label>
+                    <label><input type="checkbox" name="recurrence_days" value="Thursday"> Thursday</label>
+                    <label><input type="checkbox" name="recurrence_days" value="Friday"> Friday</label>
+                    <label><input type="checkbox" name="recurrence_days" value="Saturday"> Saturday</label>
+                    <label><input type="checkbox" name="recurrence_days" value="Sunday"> Sunday</label>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block font-medium mb-2">End Date (Optional)</label>
+                <input type="date" id="endDate" name="end_date" class="border border-gray-300 rounded w-full p-2">
+            </div>
+            <div class="flex justify-end gap-2">
+                <button type="button" id="closeModalButton" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
+                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 
 
 
@@ -2050,6 +2100,18 @@ p {
                             Pin
                         {% endif %}
                     </button>
+                    <!-- recurring message -->
+
+                    <!-- Updated Button with Data Attributes -->
+
+    <button id="setRecurringButton" 
+            class="reply-btn text-sm text-blue-500 hover:underline" 
+            data-message-id="{{ message.id }}" 
+            data-org-id="{{ channel.organization.id }}" 
+            data-channel-id="{{ channel.id }}">
+        Set as Recurring
+    </button>
+
                 </div>
             </div>
         {% endif %}
@@ -4114,6 +4176,79 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+// SET MESSAGE AS RECURRING
+
+document.addEventListener("DOMContentLoaded", () => {
+    const modal = document.getElementById("recurrenceModal");
+    const closeModalButton = document.getElementById("closeModalButton");
+    const recurrenceForm = document.getElementById("recurrenceForm");
+    const recurrenceType = document.getElementById("recurrenceType");
+    const recurrenceDaysContainer = document.getElementById("recurrenceDaysContainer");
+
+    let orgId, channelId, messageId; // Variables to hold IDs dynamically
+
+    // Show modal and capture IDs dynamically
+    document.addEventListener("click", (event) => {
+        if (event.target && event.target.classList.contains("reply-btn")) {
+            orgId = event.target.getAttribute("data-org-id");
+            channelId = event.target.getAttribute("data-channel-id");
+            messageId = event.target.getAttribute("data-message-id");
+
+            modal.classList.remove("hidden");
+        }
+    });
+
+    // Hide modal
+    closeModalButton.addEventListener("click", () => {
+        modal.classList.add("hidden");
+    });
+
+    // Show/Hide "Select Days" based on recurrence type
+    recurrenceType.addEventListener("change", () => {
+        if (recurrenceType.value === "weekly" || recurrenceType.value === "custom") {
+            recurrenceDaysContainer.style.display = "block";
+        } else {
+            recurrenceDaysContainer.style.display = "none";
+        }
+    });
+
+    // Handle form submission
+    recurrenceForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        // Collect form data
+        const formData = new FormData(recurrenceForm);
+        const recurrenceTypeValue = formData.get("recurrence_type");
+        const recurrenceDays = formData.getAll("recurrence_days");
+        const endDate = formData.get("end_date");
+
+        try {
+            const response = await fetch(`/channels/message_recurring/${orgId}/${channelId}/${messageId}/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    recurrence_type: recurrenceTypeValue,
+                    recurrence_days: recurrenceDays,
+                    end_date: endDate,
+                }),
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                alert(result.message);
+                modal.classList.add("hidden");
+            } else {
+                alert(result.error || "Something went wrong!");
+            }
+        } catch (error) {
+            alert("Failed to set recurring message. Please try again later.");
+        }
+    });
+});
+
+
 
 
 
@@ -4237,5 +4372,5 @@ function showNotification(message, linkText, linkUrl) {
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-<br><br><br><br>
+<br><br><br><br><br><br><br>
 {% include 'footer.html' %}
