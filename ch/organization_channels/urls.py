@@ -40,6 +40,11 @@ urlpatterns = [
     path('toggle_star_message/<int:org_id>/<int:channel_id>/<int:message_id>/', toggle_star_message, name='toggle_star_message'),
     path('reply/<int:org_id>/<int:channel_id>/<int:message_id>/', handle_reply, name='handle_reply'),
     path('message_recurring/<int:org_id>/<int:channel_id>/<int:message_id>/',set_recurring_message, name='message_recurring'),
+        # Monitor Recurring Messages
+    path('monitor-recurring-messages/<int:org_id>/<int:channel_id>/',monitor_recurring_messages, name='monitor_recurring_messages'),
+
+    # Delete Recurring Message
+    path('delete-recurring-message/<int:recurring_message_id>/',delete_recurring_message, name='delete_recurring_message'),
    
 
 

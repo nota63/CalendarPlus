@@ -1882,6 +1882,48 @@ p {
 </div>
 
 
+<!-- Monitor recurrence messages  -->
+ <!-- Recurrence Monitor Modal -->
+<div class="modal fade" id="recurrenceMonitorModal" tabindex="-1" aria-labelledby="recurrenceMonitorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="recurrenceMonitorModalLabel">Monitor Recurring Messages</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <h5>Pending Messages</h5>
+          <table class="table table-bordered" id="pendingMessagesTable">
+            <thead>
+              <tr>
+                <th>Message Text</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+  
+          <h5>Sent Messages</h5>
+          <table class="table table-bordered" id="sentMessagesTable">
+            <thead>
+              <tr>
+                <th>Message Text</th>
+                <th>Sent At</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+</div>
 
 
 
@@ -1904,6 +1946,12 @@ p {
     </div>
     
     <div class="sidebar-menu">
+
+        <!-- Button to open Recurring Messages Modal -->
+<!-- Button to trigger the modal -->
+<button id="monitor-recurring-messages-btn" class="btn btn-primary">Monitor Recurring Messages</button>
+
+
         <!-- Button to trigger fetching logs -->
         <button id="fetchLogsButton" class="menu-item"><i class="fas fa-history"></i> Fetch Activity Logs</button>
         
@@ -4244,6 +4292,95 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         } catch (error) {
             alert("Failed to set recurring message. Please try again later.");
+        }
+    });
+});
+
+
+
+
+// MONITOR RECURRENCE MESSAGES
+
+$(document).ready(function() {
+    // Trigger the modal when button is clicked
+    $("#monitor-recurring-messages-btn").click(function() {
+        var org_id = 2;  // Example, replace with actual org_id
+        var channel_id = 5;  // Example, replace with actual channel_id
+
+        $.ajax({
+            url: `/channels/monitor-recurring-messages/${org_id}/${channel_id}/`,
+            method: 'GET',
+            success: function(data) {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    // Populate pending messages table
+                    var pendingMessages = data.pending_messages.map(function(message) {
+                        return `
+                            <tr>
+                                <td>${message.text}</td>
+                                <td>${message.start_date}</td>
+                                <td>${message.end_date || 'N/A'}</td>
+                                <td>
+                                    <button class="btn btn-danger delete-recurring-message" data-id="${message.id}">Delete</button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+
+                    // Populate sent messages table
+                    var sentMessages = data.sent_messages.map(function(record) {
+                        return `
+                            <tr>
+                                <td>${record.message_text}</td>
+                                <td>${record.sent_at}</td>
+                                <td>${record.status || 'N/A'}</td>
+                                <td>
+                                    <button class="btn btn-danger delete-recurring-message" data-id="${record.id}">Delete</button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join(''); 
+
+                    // Add data to the modal body
+                    $("#pendingMessagesTable tbody").html(pendingMessages);
+                    $("#sentMessagesTable tbody").html(sentMessages);
+
+                    // Show the modal
+                    $("#recurrenceMonitorModal").modal('show');
+                }
+            },
+            error: function(error) {
+                console.log('Error:', error);
+            }
+        });
+    });
+
+    // Handle the deletion of recurring messages
+    $(document).on('click', '.delete-recurring-message', function() {
+        var messageId = $(this).data('id');
+        var confirmation = confirm('Are you sure you want to delete this recurring message?');
+
+        if (confirmation) {
+            $.ajax({
+                url: `/channels/delete-recurring-message/${messageId}/`,
+                method: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        alert('Message deleted successfully');
+                        // Refresh the modal to reflect the change
+                        $("#monitor-recurring-messages-btn").click();
+                    } else {
+                        alert('Error: Could not delete the message');
+                    }
+                },
+                error: function(error) {
+                    console.log('Error:', error);
+                }
+            });
         }
     });
 });

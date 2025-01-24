@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from accounts.models import Organization, Profile
 from .models import (
-    Channel, Message, Link , ActivityChannel, ChannelAccess,RetentionPolicy, RecurringMessage)
+    Channel, Message, Link , ActivityChannel, ChannelAccess,RetentionPolicy, RecurringMessage,RecurrenceHistory)
 from django.utils.dateparse import parse_datetime
 from django.utils import timezone
 from django.urls import reverse
@@ -1633,10 +1633,94 @@ def set_recurring_message(request, org_id, channel_id, message_id):
 
 # RECURRING MESSAGES DASHBOARD & MONITOR 
 
+import datetime 
 
 
+logger = logging.getLogger(__name__)
+def monitor_recurring_messages(request, org_id, channel_id):
+    """
+    View to monitor recurring messages and their history.
+    Displays both pending and sent recurring messages.
+    """
+    try:
+        
+        organization = get_object_or_404(Organization, id=org_id)
+        channel = get_object_or_404(Channel, id=channel_id)
+
+        user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+        if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+          return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
 
 
+       
+        recurring_messages = RecurringMessage.objects.filter(
+            organization=organization, channel=channel
+        ).order_by('-start_date')
+
+     
+        history = RecurrenceHistory.objects.filter(
+            organization=organization, channel=channel
+        ).order_by('-sent_at')
+
+     
+        pending_messages = recurring_messages.filter(end_date__gte=datetime.datetime.now().date())
+        sent_messages = history.filter(sent_at__lte=datetime.datetime.now()).order_by('-sent_at')
 
 
+        response_data = {
+            'organization': organization.name,
+            'channel': channel.name,
+            'pending_messages': [
+                {
+                    'id': message.id,
+                    'text': message.text,
+                    'start_date': message.start_date,
+                    'end_date': message.end_date,
+                    'recurrence_type': message.recurrence_type,
+                } for message in pending_messages
+            ],
+            'sent_messages': [
+                {
+                    'id': record.id,
+                    'sent_at': record.sent_at,
+                    'status': record.recurrence_type,  
+                    'message_text': record.recurring_message.text,
+                } for record in sent_messages
+            ],
+        }
 
+     
+        logger.info(f"Found {len(pending_messages)} pending messages and {len(sent_messages)} sent messages.")
+
+ 
+        return JsonResponse(response_data)
+
+    except Exception as e:
+     
+        logger.error(f"Error in monitor_recurring_messages: {e}")
+        return JsonResponse({'error': 'An error occurred while fetching recurring messages.'}, status=500)
+    
+
+# Handle deletion of recurring messages
+
+@csrf_exempt
+def delete_recurring_message(request, recurring_message_id):
+    """
+    View to delete a recurring message based on its ID.
+    """
+    try:
+   
+        recurring_message = get_object_or_404(RecurringMessage, id=recurring_message_id)
+
+    
+        recurring_message.delete()
+
+     
+        RecurrenceHistory.objects.filter(recurring_message=recurring_message).delete()
+
+        return JsonResponse({'success': 'Recurring message deleted successfully.'}, status=200)
+
+    except Exception as e:
+        logger.error(f"Error deleting recurring message ID {recurring_message_id}: {e}")
+        return JsonResponse({'error': 'An error occurred while deleting the recurring message.'}, status=500)
