@@ -4467,42 +4467,66 @@ const deleteChannelDataModal = new bootstrap.Modal(document.getElementById('dele
 
 // CUSTOM NOTIFICATION FUNCTION
 
-// Custom function to display a notification with a clickable link
 function showNotification(message, linkText, linkUrl) {
     const notificationContainer = document.createElement('div');
     notificationContainer.style.position = 'fixed';
-    notificationContainer.style.top = '10px';
-    notificationContainer.style.right = '10px';
-    notificationContainer.style.padding = '15px';
-    notificationContainer.style.backgroundColor = '#28a745';
+    notificationContainer.style.top = '20px';
+    notificationContainer.style.right = '20px';
+    notificationContainer.style.padding = '15px 20px';
+    notificationContainer.style.backgroundColor = '#007bff'; // Fresh blue
     notificationContainer.style.color = 'white';
-    notificationContainer.style.borderRadius = '5px';
+    notificationContainer.style.borderRadius = '15px';
     notificationContainer.style.fontSize = '16px';
     notificationContainer.style.zIndex = '1000';
+    notificationContainer.style.display = 'flex';
+    notificationContainer.style.alignItems = 'center';
+    notificationContainer.style.opacity = '0';
+    notificationContainer.style.transform = 'translateX(100%)';
+    notificationContainer.style.transition = 'transform 0.6s ease-out, opacity 0.6s ease-out'; // Smooth animation
+
+    // Adding a checkmark icon with a bit of style
+    const checkmark = document.createElement('span');
+    checkmark.textContent = '✔'; // Checkmark symbol
+    checkmark.style.fontSize = '24px';
+    checkmark.style.marginRight = '15px';
+    checkmark.style.transform = 'rotate(10deg)'; // Slightly rotate for a fun touch
 
     const messageElement = document.createElement('span');
     messageElement.textContent = message;
+    messageElement.style.flexGrow = '1'; // Allow message to grow and use remaining space
+    messageElement.style.fontWeight = '500';
 
     const linkElement = document.createElement('a');
     linkElement.textContent = linkText;
     linkElement.href = linkUrl;
     linkElement.style.color = '#ffffff';
     linkElement.style.textDecoration = 'underline';
-    linkElement.style.marginLeft = '10px';
+    linkElement.style.marginLeft = '15px';
+    linkElement.style.fontWeight = 'bold';
 
-    // Append the message and link to the notification
+    // Append the checkmark, message, and link to the notification
+    notificationContainer.appendChild(checkmark);
     notificationContainer.appendChild(messageElement);
     notificationContainer.appendChild(linkElement);
 
     // Append the notification to the body
     document.body.appendChild(notificationContainer);
 
+    // Trigger animation to make the notification slide in
+    setTimeout(() => {
+        notificationContainer.style.opacity = '1';
+        notificationContainer.style.transform = 'translateX(0)';
+    }, 100);
+
     // Remove the notification after 5 seconds
     setTimeout(() => {
-        notificationContainer.remove();
+        notificationContainer.style.opacity = '0';
+        notificationContainer.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            notificationContainer.remove();
+        }, 600); // Allow time for animation to finish
     }, 5000);
 }
-
 
 
 </script>
