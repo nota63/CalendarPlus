@@ -2104,13 +2104,13 @@ p {
 
                     <!-- Updated Button with Data Attributes -->
 
-    <button id="setRecurringButton" 
-            class="reply-btn text-sm text-blue-500 hover:underline" 
+         <button id="setRecurringButton" 
+            class="edt-button text-green-500 px-4 py-2 w-full hover:bg-green-50" 
             data-message-id="{{ message.id }}" 
             data-org-id="{{ channel.organization.id }}" 
             data-channel-id="{{ channel.id }}">
-        Set as Recurring
-    </button>
+            Set as Recurring
+        </button>
 
                 </div>
             </div>
@@ -4189,7 +4189,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Show modal and capture IDs dynamically
     document.addEventListener("click", (event) => {
-        if (event.target && event.target.classList.contains("reply-btn")) {
+        if (event.target && event.target.classList.contains("edt-button")) {
             orgId = event.target.getAttribute("data-org-id");
             channelId = event.target.getAttribute("data-channel-id");
             messageId = event.target.getAttribute("data-message-id");
