@@ -1614,7 +1614,7 @@ def set_recurring_message(request, org_id, channel_id, message_id):
                user=request.user,
                channel=channel,
                organization=organization,
-              action_type="SET-UP_RECURRING_MESSAGE",
+              action_type="SET_RECURRING_MESSAGE",
               content=f'{request.user} Set-up the message as recurring - {message.content}  For  {recurrence_type} -- End Date - {end_date}'
 
         )
