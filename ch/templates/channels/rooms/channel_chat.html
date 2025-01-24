@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{% csrf_token %}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
     <!-- Include jQuery from a CDN -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -2238,7 +2240,9 @@ Monitor My Storage
                                  {{ message.link }}
                              </a>
                          {% else %}
-                             {{ message.content }}
+                         <div style="font-family: 'Montserrat', sans-serif;" class="font-weight-bold">
+                            {{ message.content }}
+                        </div>
                          {% endif %}
                      </span>
                      <span class="text-xs text-gray-500 mt-1 self-end">{{ message.timestamp|date:"H:i" }}</span>
@@ -2444,6 +2448,36 @@ Monitor My Storage
 <button class="p-2 text-blue-500 hover:text-blue-600" data-bs-toggle="modal" data-bs-target="#networkStatusModal" onclick="displayNetworkStatus()"><i class="fas fa-wifi text-xl"></i>
 
 </button>
+<!-- New 
+  -->
+
+<button class="p-2 text-blue-500 hover:text-blue-600" data-bs-toggle="modal" data-bs-target="">
+    <i class="fab fa-slack text-xl"></i>
+
+</button>
+
+
+
+<button class="p-2 text-blue-500 hover:text-blue-600" data-bs-toggle="modal" data-bs-target="">
+    <i class="fas fa-tasks text-xl"></i>
+
+</button>
+
+
+<button class="p-2 text-blue-500 hover:text-blue-600" data-bs-toggle="modal" data-bs-target="">
+    <i class="fas fa-poll text-xl"></i>
+
+
+</button>
+
+
+<button class="p-2 text-blue-500 hover:text-blue-600" data-bs-toggle="modal" data-bs-target="">
+    <i class="fas fa-code text-xl"></i>
+
+
+
+</button>
+
 
 </div>
 
