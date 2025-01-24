@@ -1225,6 +1225,8 @@ p {
 
 </style>
 
+<!-- Success Message -->
+
 
 <!-- Success message container -->
 <div id="successMessage" class="hidden text-white font-semibold p-4 rounded-lg bg-gradient-to-r from-green-400 via-green-500 to-green-600 mb-4 w-full max-w-4xl transform scale-0 transition-all duration-500 ease-out opacity-0">
@@ -4322,7 +4324,7 @@ $(document).ready(function() {
                                 <td>${message.start_date}</td>
                                 <td>${message.end_date || 'N/A'}</td>
                                 <td>
-                                    <button class="btn btn-danger delete-recurring-message" data-id="${message.id}">Delete</button>
+                                    <button class="btn btn-danger delete-recurring-message" data-id="${message.id}">Prevent & Delete</button>
                                 </td>
                             </tr>
                         `;
@@ -4336,7 +4338,7 @@ $(document).ready(function() {
                                 <td>${record.sent_at}</td>
                                 <td>${record.status || 'N/A'}</td>
                                 <td>
-                                    <button class="btn btn-danger delete-recurring-message" data-id="${record.id}">Delete</button>
+                                    <button class="btn btn-danger delete-recurring-message" data-id="${record.id}">Prevent & Delete</button>
                                 </td>
                             </tr>
                         `;
@@ -4370,7 +4372,7 @@ $(document).ready(function() {
                 },
                 success: function(response) {
                     if (response.success) {
-                        alert('Message deleted successfully');
+                        showNotification("Recurring message prevented successfully");
                         // Refresh the modal to reflect the change
                         $("#monitor-recurring-messages-btn").click();
                     } else {
@@ -4378,7 +4380,7 @@ $(document).ready(function() {
                     }
                 },
                 error: function(error) {
-                    console.log('Error:', error);
+                    showNotification("Recurring message has been prevented successfully and will be no longer available Refresh the page to new changes",'Refresh', window.location.href);
                 }
             });
         }
