@@ -148,6 +148,7 @@ class ActivityChannel(models.Model):
         ("PINNED_MESSAGE",'Pinned message'),
         ('STARRED_MESSAGE','Starred message'),
         ('MESSAGE_REPLY','Message reply'),
+        ("SET-UP_RECURRING_MESSAGE",'Set-up recurring message'),
     ]
 
     user = models.ForeignKey(User, related_name='activities', on_delete=models.CASCADE)

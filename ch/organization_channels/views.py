@@ -1588,7 +1588,12 @@ def set_recurring_message(request, org_id, channel_id, message_id):
         channel = get_object_or_404(Channel, id=channel_id)
         message = get_object_or_404(Message, id=message_id)
 
-       
+        user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+        if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+          return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
+
+
         if message.channel != channel or channel.organization != organization:
             return JsonResponse({'error': 'Message does not belong to the specified organization or channel.'}, status=400)
 
@@ -1604,6 +1609,16 @@ def set_recurring_message(request, org_id, channel_id, message_id):
                 'end_date': end_date,
             }
         )
+
+        activity = ActivityChannel.objects.create(
+               user=request.user,
+               channel=channel,
+               organization=organization,
+              action_type="SET-UP_RECURRING_MESSAGE",
+              content=f'{request.user} Set-up the message as recurring - {message.content}  For  {recurrence_type} -- End Date - {end_date}'
+
+        )
+
 
         response = {
             'message': 'Recurring message set successfully.',
