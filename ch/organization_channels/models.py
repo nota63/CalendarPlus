@@ -347,3 +347,29 @@ class RecurringMessage(models.Model):
 
     def __str__(self):
         return f"{self.text} ({self.recurrence_type})"
+    
+
+# RECURRENCE MESSAGE HISTORY 
+
+class RecurrenceHistory(models.Model):
+    recurring_message = models.ForeignKey(RecurringMessage, on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  
+    sent_at = models.DateTimeField(auto_now_add=True)
+    recurrence_type = models.CharField(
+        max_length=50,
+        choices=[
+            ('daily', 'Daily'),
+            ('weekly', 'Weekly'),
+            ('monthly', 'Monthly'),
+            ('yearly', 'Yearly'),
+            ('custom', 'Custom')
+        ]
+    )
+
+    def __str__(self):
+        return f"Message '{self.recurring_message.text}' sent on {self.sent_at}"
+
+    class Meta:
+        ordering = ['-sent_at']

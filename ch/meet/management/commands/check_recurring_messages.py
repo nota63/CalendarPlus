@@ -4,7 +4,8 @@ import time
 import logging
 from datetime import datetime
 from django.core.management.base import BaseCommand
-from organization_channels.models import RecurringMessage, Message, Channel 
+from organization_channels.models import RecurringMessage, Message, Channel, RecurrenceHistory
+from django.core.exceptions import ValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +18,6 @@ def send_recurring_messages():
         now = datetime.now()
         today = now.strftime('%A').lower()  
 
-     
         recurring_messages = RecurringMessage.objects.filter(is_active=True)
         logger.info(f"Processing {len(recurring_messages)} recurring messages.")
 
@@ -44,18 +44,17 @@ def send_recurring_messages():
 def send_message(recurring):
     """
     Send the recurring message and log it.
-    Includes error handling for message creation.
+    Includes error handling for message creation and recurrence history.
     """
     try:
-     
         if recurring.end_date and recurring.end_date < datetime.now().date():
             recurring.is_active = False
             recurring.save()
             logger.info(f"Recurring message ID {recurring.id} is expired and deactivated.")
             return
 
-      
-        Message.objects.create(
+  
+        message = Message.objects.create(
             organization=recurring.organization,
             channel=recurring.channel,
             content=recurring.text,
@@ -63,10 +62,33 @@ def send_message(recurring):
             is_recurring=True,
         )
 
+
+        RecurrenceHistory.objects.create(
+            recurring_message=recurring,
+            organization=recurring.organization,
+            channel=recurring.channel,
+            user=recurring.created_by,  
+            sent_at=datetime.now(),
+            recurrence_type=recurring.recurrence_type,
+        )
+
         logger.info(f"Sent recurring message: {recurring.text} in channel {recurring.channel.name}")
 
     except Exception as e:
+      
         logger.error(f"Error sending recurring message ID {recurring.id}: {e}")
+        
+        try:
+            RecurrenceHistory.objects.create(
+                recurring_message=recurring,
+                organization=recurring.organization,
+                channel=recurring.channel,
+                user=recurring.created_by,  
+                sent_at=datetime.now(),
+                recurrence_type=recurring.recurrence_type,
+            )
+        except Exception as history_error:
+            logger.error(f"Failed to log RecurrenceHistory for recurring message ID {recurring.id}: {history_error}")
 
 def run_scheduler():
     """
@@ -85,10 +107,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         try:
-         
             schedule.every(1).minute.do(send_recurring_messages)
 
-            
             threading.Thread(target=run_scheduler, daemon=True).start()
 
             self.stdout.write(self.style.SUCCESS("Recurring message scheduler is running..."))
@@ -103,4 +123,3 @@ class Command(BaseCommand):
         except Exception as e:
             logger.error(f"Error in handle method: {e}")
             self.stdout.write(self.style.ERROR("An error occurred while running the scheduler."))
-
