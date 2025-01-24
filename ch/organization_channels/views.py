@@ -1716,6 +1716,13 @@ def delete_recurring_message(request, recurring_message_id):
     
         recurring_message.delete()
 
+        activity = ActivityChannel.objects.create(
+               user=request.user,
+               action_type="PREVENT_RECURRING_MESSAGE",
+               content=f'{request.user} prevent the message from recurrance -- {recurring_message.text}'
+
+        )
+
      
         RecurrenceHistory.objects.filter(recurring_message=recurring_message).delete()
 

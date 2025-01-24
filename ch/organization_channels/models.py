@@ -149,11 +149,12 @@ class ActivityChannel(models.Model):
         ('STARRED_MESSAGE','Starred message'),
         ('MESSAGE_REPLY','Message reply'),
         ("SET_RECURRING_MESSAGE",'Set recurring message'),
+        ("PREVENT_RECURRING_MESSAGE",'Prevent recurring message'),
     ]
 
     user = models.ForeignKey(User, related_name='activities', on_delete=models.CASCADE)
-    channel = models.ForeignKey(Channel, related_name='activities', on_delete=models.CASCADE)
-    organization = models.ForeignKey(Organization, related_name='activities', on_delete=models.CASCADE)
+    channel = models.ForeignKey(Channel, related_name='activities', on_delete=models.CASCADE, null=True, blank=True)
+    organization = models.ForeignKey(Organization, related_name='activities', on_delete=models.CASCADE,null=True, blank=True)
     action_type = models.CharField(max_length=50, choices=ACTION_CHOICES)
     content = models.TextField(null=True, blank=True) 
     timestamp = models.DateTimeField(auto_now_add=True)
