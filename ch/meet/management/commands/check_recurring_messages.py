@@ -58,7 +58,7 @@ def send_message(recurring):
             organization=recurring.organization,
             channel=recurring.channel,
             content=recurring.text,
-            created_by=recurring.created_by, 
+            created_by=recurring.user, 
             is_recurring=True,
         )
 
@@ -67,7 +67,7 @@ def send_message(recurring):
             recurring_message=recurring,
             organization=recurring.organization,
             channel=recurring.channel,
-            user=recurring.created_by,  
+            user=recurring.user,  
             sent_at=datetime.now(),
             recurrence_type=recurring.recurrence_type,
         )
