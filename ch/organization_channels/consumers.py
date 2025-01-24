@@ -52,11 +52,12 @@ class ChatConsumerNew(AsyncWebsocketConsumer):
         file_data = data.get('fileData', None)  
         file_type = data.get('fileType', None)  
         event_type = data.get('event'), 
+        screen_share = data.get('screenShare')  # If screen share event is present
 
         username = self.scope['user'].username
         channel_id = self.channel_id
         user = self.scope['user']
-# New line
+
         if event_type == 'typing':
             username = data.get('username')
             await self.channel_layer.group_send(
@@ -66,8 +67,42 @@ class ChatConsumerNew(AsyncWebsocketConsumer):
                     'username': username,
                 }
             )
+
+        # Handle Screen Share 
+            if event_type == 'screen-share':
+            # Handle screen share start event
+               video_track = screen_share.get('videoTrack')  # The video track can be a base64 or URL
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'start_screen_share',
+                    'video_track': video_track,
+                    'username': username,
+                }
+            )
             return
 
+        if event_type == 'stop-screen-share':
+            # Handle screen share stop event
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'stop_screen_share',
+                    'username': username,
+                }
+            )
+
+
+
+
+
+
+
+
+
+            return
+        
+        
         if link_text and link_url:
             await self.save_link(channel_id, user, link_text, link_url)
         elif message:
@@ -87,7 +122,27 @@ class ChatConsumerNew(AsyncWebsocketConsumer):
                 'file_type': file_type if file_type else None,
             }
         )
-# New file
+
+
+       # New screen share event handlers
+    async def start_screen_share(self, event):
+        # This sends the video track (screen share) to the other users
+        await self.send(text_data=json.dumps({
+            'event': 'screen-share-start',
+            'videoTrack': event['video_track'],
+            'username': event['username'],
+        }))
+
+
+
+        async def stop_screen_share(self, event):
+        # This stops the screen share for all users
+          await self.send(text_data=json.dumps({
+            'event': 'screen-share-stop',
+            'username': event['username'],
+        }))
+
+
     async def show_typing(self, event):
         await self.send(text_data=json.dumps({
             'event': 'typing',

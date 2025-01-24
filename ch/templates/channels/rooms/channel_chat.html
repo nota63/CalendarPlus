@@ -24,6 +24,26 @@
 </head>
 
 <style>
+   #screen-share-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: none; /* Initially hidden */
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.8); /* Dark semi-transparent overlay */
+    z-index: 1000; /* Ensure it appears on top of other elements */
+}
+
+#screen-share-video {
+    max-width: 90%;
+    max-height: 90%;
+    border: 2px solid white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
 
 
 
@@ -2093,6 +2113,74 @@ p {
     </div>
     
     <div class="sidebar-menu">
+       
+<div id="screenShareContainer">
+    <!-- Local video stream -->
+    <video id="localVideo" autoplay muted></video>
+
+    <!-- Remote video streams -->
+    <div id="remoteVideos"></div>
+</div>
+
+<style>
+    #screenShareContainer {
+    display: none; /* Hidden by default, shown dynamically */
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    width: 80%;
+    max-width: 800px;
+    background-color: rgba(0, 0, 0, 0.9); /* Slight transparency for elegance */
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000; /* Ensure it is on top */
+    overflow: hidden;
+}
+
+#localVideo {
+    width: 100%;
+    height: auto;
+    border: 2px solid #fff; /* Border for better visibility */
+    border-radius: 5px;
+}
+
+#remoteVideos {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center; /* Center remote video elements */
+}
+
+#remoteVideos video {
+    width: calc(33.33% - 10px); /* Three videos per row */
+    height: auto;
+    border: 2px solid #fff;
+    border-radius: 5px;
+}
+
+
+#screenShareContainer {
+    cursor: grab; /* Default cursor for draggable element */
+}
+
+#screenShareContainer:active {
+    cursor: grabbing; /* Cursor while dragging */
+}
+
+</style>
+
+
+
+
+
+
+        
+
+
+
         <button class="menu-item"><i class="fas fa-plug"></i></i>Integrate Slack & Other Tools for This Channel</button>
 
         <!-- Button to open Recurring Messages Modal -->
@@ -2424,15 +2512,16 @@ Monitor My Storage
     <i class="fas fa-phone-alt text-xl"></i>
 </button>
 
-<!-- Screen Share Icon -->
-<button id="screenShareButton" class="p-2 text-blue-500 hover:text-blue-600">
-    <i class="fas fa-desktop text-xl"></i>
-</button>
 
 <!-- Screen Share Icon -->
 <button id="screenShareButton" class="p-2 text-blue-500 hover:text-blue-600">
     <i class="fas fa-plus text-xl"></i>
 </button>
+
+<!-- Screen share btn  -->
+<button id="shareScreenBtn" onclick="startScreenShare()" class="p-2 text-blue-500 hover:text-blue-600">
+    
+    <i class="fas fa-desktop text-xl"></i></button>
 
 <!-- Filter by User Button -->
 <button
@@ -2473,9 +2562,6 @@ Monitor My Storage
 
 <button class="p-2 text-blue-500 hover:text-blue-600" data-bs-toggle="modal" data-bs-target="">
     <i class="fas fa-code text-xl"></i>
-
-
-
 </button>
 
 
@@ -2553,13 +2639,221 @@ Monitor My Storage
     </div>
 <!-- ----------------------------------------------------------------------------------------------------------------------------------------------- -->
     <script>
-        // Get the channel ID from the Django template context
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // -----------------------------------------------------------------------------------------
       
         const channelId = "{{ channel.id }}";
         const chatSocket = new WebSocket(`ws://${window.location.host}/ws/channel/${channelId}/`);
 
+        // Video element to display the shared screen
+        const screenShareVideo = document.getElementById('screen-share-video');
+
+
         const username = "{{ user.username }}"; // Get the current username from the template.
 
+       // Screen sharing variables
+let localStream;
+let peerConnections = {};
+let typingTimeout;
+
+// WebRTC Configuration
+const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+
+// Initialize a Peer Connection if not already present
+function getOrCreatePeerConnection(userId) {
+    if (!peerConnections[userId]) {
+        const peerConnection = new RTCPeerConnection(configuration);
+
+        // Handle incoming tracks
+        peerConnection.ontrack = event => {
+            const remoteVideo = document.getElementById(`remoteScreen_${userId}`) || document.createElement('video');
+            if (!remoteVideo.id) {
+                remoteVideo.id = `remoteScreen_${userId}`;
+                remoteVideo.autoplay = true;
+                remoteVideo.controls = true; // Optional for user control
+                document.getElementById('remoteVideos').appendChild(remoteVideo);
+            }
+            if (event.track.kind === 'video') remoteVideo.srcObject = event.streams[0];
+        };
+
+        // Handle disconnection or error cleanup
+        peerConnection.oniceconnectionstatechange = () => {
+            if (peerConnection.iceConnectionState === 'disconnected' || peerConnection.iceConnectionState === 'failed') {
+                removeRemoteScreen(userId);
+                delete peerConnections[userId];
+            }
+        };
+
+        peerConnections[userId] = peerConnection;
+    }
+    return peerConnections[userId];
+}
+
+// Start screen sharing
+async function startScreenShare() {
+    try {
+        localStream = await navigator.mediaDevices.getDisplayMedia({ video: { mediaSource: "screen" } });
+        document.getElementById('localVideo').srcObject = localStream;
+
+        // Show the screen share container
+        const screenShareContainer = document.getElementById('screenShareContainer');
+        screenShareContainer.style.display = 'block';
+
+        document.getElementById('shareScreenBtn').style.display = 'none';
+        document.getElementById('stopShareBtn').style.display = 'block';
+
+        const videoTrack = localStream.getVideoTracks()[0];
+        Object.keys(peerConnections).forEach(peerId => {
+            const sender = peerConnections[peerId].getSenders().find(s => s.track.kind === "video");
+            if (sender) sender.replaceTrack(videoTrack);
+        });
+
+        socket.send(JSON.stringify({ type: 'screen-share-start', user_id: userId }));
+    } catch (error) {
+        console.error('Error starting screen share:', error);
+    }
+}
+
+// Stop screen sharing
+function stopScreenShare() {
+    if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+        document.getElementById('localVideo').srcObject = null;
+
+        // Hide the screen share container
+        const screenShareContainer = document.getElementById('screenShareContainer');
+        screenShareContainer.style.display = 'none';
+
+        document.getElementById('shareScreenBtn').style.display = 'block';
+        document.getElementById('stopShareBtn').style.display = 'none';
+
+        socket.send(JSON.stringify({ type: 'screen-share-stop', user_id: userId }));
+    }
+}
+
+// Display remote screen
+function displayRemoteScreen(userId) {
+    const peerConnection = getOrCreatePeerConnection(userId);
+    // Ensure signaling or offer-answer mechanism is established
+    if (!peerConnection.currentRemoteDescription) {
+        console.warn(`No remote description for ${userId}. Ensure proper signaling.`);
+    }
+}
+
+// Remove remote screen
+function removeRemoteScreen(userId) {
+    const remoteVideo = document.getElementById(`remoteScreen_${userId}`);
+    if (remoteVideo) remoteVideo.remove();
+    if (peerConnections[userId]) {
+        peerConnections[userId].close();
+        delete peerConnections[userId];
+    }
+}
+
+function makeDraggable(element) {
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    element.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        offsetX = e.clientX - element.offsetLeft;
+        offsetY = e.clientY - element.offsetTop;
+        element.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+            element.style.left = `${e.clientX - offsetX}px`;
+            element.style.top = `${e.clientY - offsetY}px`;
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (isDragging) {
+            isDragging = false;
+            element.style.cursor = 'grab';
+        }
+    });
+
+    // Optional: Reset cursor on mouse leave
+    element.addEventListener('mouseleave', () => {
+        if (isDragging) {
+            isDragging = false;
+            element.style.cursor = 'grab';
+        }
+    });
+}
+
+// Initialize draggable feature for the screen share container
+document.addEventListener('DOMContentLoaded', () => {
+    const screenShareContainer = document.getElementById('screenShareContainer');
+    makeDraggable(screenShareContainer);
+});
+
+// --------------------------------------------------------------------------------------------------
         // When the WebSocket connection is opened
         chatSocket.onopen = function(e) {
             console.log('WebSocket connection established!');
@@ -2567,7 +2861,7 @@ Monitor My Storage
 
         // When a new message is received from the WebSocket
         chatSocket.onmessage = function (e) {
-    const data = JSON.parse(e.data);
+        const data = JSON.parse(e.data);
 
     // Handle typing indicator
     if (data['event'] === 'typing') {
@@ -2625,8 +2919,6 @@ Monitor My Storage
     document.getElementById('chatWindow').scrollTop = document.getElementById('chatWindow').scrollHeight;
 };
 
-
-      
         // Emoji Picker Modal Logic
         const emojiPickerButton = document.getElementById('emojiPickerButton');
         const emojiPickerModal = document.getElementById('emojiPickerModal');
