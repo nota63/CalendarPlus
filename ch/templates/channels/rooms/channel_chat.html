@@ -2364,7 +2364,8 @@ Monitor My Storage
 </button>
 
 <!-- Manage events -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#EventHandleModal">
+<button type="button" class="menu-item" data-bs-toggle="modal" data-bs-target="#EventHandleModal">
+    <i class="fas fa-building"></i>
     Manage Events
 </button>
 
@@ -5165,7 +5166,74 @@ document.querySelector("#eventsTable").addEventListener("input", (event) => {
 });
 
 
-// 
+// DRAG AND DROP COLOMS
+document.addEventListener("DOMContentLoaded", () => {
+    const table = document.querySelector("#eventsTable");
+
+    // Add draggable attribute to each column header
+    const headers = table.querySelectorAll("th");
+    headers.forEach((header, index) => {
+        header.setAttribute("draggable", true);
+        header.setAttribute("data-index", index);
+
+        // Handle drag start
+        header.addEventListener("dragstart", (event) => {
+            event.dataTransfer.setData("text/plain", index);
+        });
+
+        // Allow drop
+        header.addEventListener("dragover", (event) => {
+            event.preventDefault();
+        });
+
+        // Handle drop
+        header.addEventListener("drop", (event) => {
+            event.preventDefault();
+            const draggedIndex = event.dataTransfer.getData("text/plain");
+            const targetIndex = header.getAttribute("data-index");
+
+            if (draggedIndex !== targetIndex) {
+                swapColumns(draggedIndex, targetIndex);
+            }
+        });
+    });
+
+    // Function to swap columns
+    function swapColumns(draggedIndex, targetIndex) {
+        const rows = table.querySelectorAll("tr");
+
+        rows.forEach((row) => {
+            const cells = row.querySelectorAll("td, th");
+            if (cells[draggedIndex] && cells[targetIndex]) {
+                // Swap the dragged and target columns
+                row.insertBefore(cells[draggedIndex], cells[targetIndex]);
+            }
+        });
+
+        // Update header indices after swap
+        headers.forEach((header, index) => {
+            header.setAttribute("data-index", index);
+        });
+    }
+
+    // Add new rows dynamically
+    const addRowButton = document.querySelector("#addRow");
+    addRowButton.addEventListener("click", () => {
+        const tableBody = document.querySelector("#eventsTableBody");
+        const newRow = document.createElement("tr");
+
+        // Add contenteditable cells
+        ["event-name", "event-date", "event-details", "event-link"].forEach((className) => {
+            const cell = document.createElement("td");
+            cell.setAttribute("contenteditable", "true");
+            cell.classList.add(className);
+            newRow.appendChild(cell);
+        });
+
+        tableBody.appendChild(newRow);
+    });
+});
+
 
 
 
