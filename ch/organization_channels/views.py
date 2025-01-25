@@ -1903,4 +1903,26 @@ def save_event_data(request, org_id, channel_id):
         return JsonResponse({'error': 'Invalid HTTP method. Use POST or GET.'}, status=405)
 
 
-# GET USER DETAILS TO SEND TO FRONTEND
+# DISPLAY EVENT DETAILS TO CHANNEL MEMBERS 
+
+def fetch_event_details(request, org_id, channel_id):
+    # Fetch organization and channel based on provided IDs
+    organization = get_object_or_404(Organization, id=org_id)
+    channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+    
+    # Retrieve all events related to the given organization and channel
+    events = ChannelEvents.objects.filter(organization=organization, channel=channel)
+
+    # Prepare the event data to send as JSON
+    event_data = []
+    for event in events:
+        event_data.append({
+            'event_name': event.event_name,
+            'event_date': event.event_date.strftime("%B %d, %Y, %I:%M %p"),
+            'event_details': event.event_details,
+            'event_attachment': event.event_attachment.url if event.event_attachment else None,
+            'event_link': event.event_link if event.event_link else None,
+            'created_by': event.user.username,
+        })
+
+    return JsonResponse({'events': event_data})

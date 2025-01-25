@@ -24,6 +24,165 @@
 </head>
 
 <style>
+    /* Global Styling for Modal */
+#eventDetailsModalPremium .modal-dialog.modal-lg {
+    max-width: 80%;
+    border-radius: 12px;
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Modal Content */
+#eventDetailsModalPremium .modal-content {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s ease;
+}
+
+#eventDetailsModalPremium .modal-content:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Modal Header */
+#eventDetailsModalPremium .modal-header {
+    background-color: #1E2A38;
+    color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 20px 30px;
+    border-radius: 12px 12px 0 0;
+}
+
+#eventDetailsModalPremium .modal-header h5 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+/* Modal Body */
+#eventDetailsModalPremium .modal-body {
+    background-color: #f9f9f9;
+    padding: 30px;
+    font-size: 1rem;
+    color: #333;
+    max-height: 500px;
+    overflow-y: auto;
+    border-radius: 0 0 12px 12px;
+}
+
+#eventDetailsModalPremium .modal-body h6 {
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+/* Table Styling */
+#eventDetailsModalPremium .table {
+    width: 100%;
+    margin-top: 30px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+}
+
+#eventDetailsModalPremium .table th,
+#eventDetailsModalPremium .table td {
+    padding: 20px;
+    text-align: left;
+    vertical-align: middle;
+    font-size: 1rem;
+    color: #2C3E50;
+    border: none;
+}
+
+#eventDetailsModalPremium .table th {
+    background-color: #2980b9;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+#eventDetailsModalPremium .table td {
+    background-color: #ecf0f1;
+    color: #34495e;
+    font-size: 1rem;
+    border-radius: 8px;
+}
+
+#eventDetailsModalPremium .table td a {
+    color: #2980b9;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+#eventDetailsModalPremium .table td a:hover {
+    color: #16a085;
+    text-decoration: underline;
+}
+
+/* Hover Effects on Table Rows */
+#eventDetailsModalPremium .table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Footer Styling */
+#eventDetailsModalPremium .modal-footer {
+    background-color: #f1f1f1;
+    padding: 20px 30px;
+    text-align: right;
+    border-top: 1px solid #e0e0e0;
+    border-radius: 0 0 12px 12px;
+}
+
+#eventDetailsModalPremium .btn-secondary {
+    background-color: #16a085;
+    color: #ffffff;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+#eventDetailsModalPremium .btn-secondary:hover {
+    background-color: #1abc9c;
+    cursor: pointer;
+}
+
+/* Close Button */
+#eventDetailsModalPremium .btn-close {
+    background-color: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: #333;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+#eventDetailsModalPremium .btn-close:hover {
+    color: #16a085;
+    transform: rotate(180deg);
+}
+
+/* Responsive Styling for Mobile */
+@media (max-width: 768px) {
+    #eventDetailsModalPremium .modal-dialog {
+        max-width: 95%;
+        margin: 10px;
+    }
+
+    #eventDetailsModalPremium .modal-body {
+        padding: 15px;
+    }
+
+    #eventDetailsModalPremium .table th,
+    #eventDetailsModalPremium .table td {
+        padding: 15px;
+        font-size: 0.9rem;
+    }
+}
+
+
+
+
+
+
+
 
 
 .user-tooltip {
@@ -2373,8 +2532,45 @@ p {
     </div>
 </div>
 
+<!-- Modal to display events details -->
 
+<!-- Modal -->
+<div class="modal fade" id="eventDetailsModalPremium" tabindex="-1" aria-labelledby="eventDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg"> <!-- modal-lg for larger size -->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="eventDetailsModalLabel">Event Details</h5>
 
+          <div>
+            <strong>
+                2024 milestones/Company-wide announcements
+            </strong>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <table id="eventDetailsTable" class="table table-bordered">
+              <thead>
+                  <tr>
+                      <th>Event Name</th>
+                      <th>Event Date/Time</th>
+                      <th>Event Details</th>
+                      <th>Event Attachment</th>
+                      <th>Event Link</th>
+                      <th>Created By</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <!-- Table rows will be dynamically filled with event data -->
+              </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
   <!-- Include Bootstrap 5 JS -->
@@ -2395,6 +2591,12 @@ p {
     </div>
     
     <div class="sidebar-menu">
+        <!-- Button to trigger the modal -->
+<button id="fetchEventDetailsBtn" class="menu-item" data-org-id="{{ channel.organization.id }}" data-channel-id="{{ channel.id }}" data-bs-toggle="modal" data-bs-target="#eventDetailsModalPremium">
+    <i class="fas fa-database"></i>
+    Workspace Handbook Info
+</button>
+
        
 <div id="screenShareContainer">
     <!-- Local video stream -->
@@ -5434,6 +5636,80 @@ document.addEventListener("DOMContentLoaded", () => {
 
         tableBody.appendChild(newRow);
     });
+});
+
+
+// DISPLAY EVENT DETAILS 
+
+document.getElementById("fetchEventDetailsBtn").addEventListener("click", function() {
+    // Get the event details from the button's data attributes
+    const orgId = this.getAttribute("data-org-id");
+    const channelId = this.getAttribute("data-channel-id");
+
+    // Fetch event details using AJAX (example URL)
+    fetch(`/channels/events/fetch/${orgId}/${channelId}/`)
+        .then(response => response.json())
+        .then(data => {
+            // Clear previous data in the table
+            const tableBody = document.getElementById("eventDetailsTable").getElementsByTagName("tbody")[0];
+            tableBody.innerHTML = ""; // Reset the table body
+
+            // Check if there are events
+            if (data.events.length === 0) {
+                const row = tableBody.insertRow();
+                const cell = row.insertCell(0);
+                cell.colSpan = 6;  // Make the message span across all 6 columns
+                cell.innerText = "No events found.";
+            } else {
+                // Dynamically fill the table with event details
+                data.events.forEach(event => {
+                    const row = tableBody.insertRow();
+
+                    // Event Name
+                    const cell1 = row.insertCell(0);
+                    cell1.innerText = event.event_name;
+
+                    // Event Date/Time
+                    const cell2 = row.insertCell(1);
+                    cell2.innerText = event.event_date;
+
+                    // Event Details
+                    const cell3 = row.insertCell(2);
+                    cell3.innerText = event.event_details;
+
+                    // Event Attachment (if any)
+                    const cell4 = row.insertCell(3);
+                    if (event.event_attachment) {
+                        const attachmentLink = document.createElement("a");
+                        attachmentLink.href = event.event_attachment;
+                        attachmentLink.target = "_blank";
+                        attachmentLink.innerText = "Download";
+                        cell4.appendChild(attachmentLink);
+                    } else {
+                        cell4.innerText = "No Attachment";
+                    }
+
+                    // Event Link (if any)
+                    const cell5 = row.insertCell(4);
+                    if (event.event_link) {
+                        const eventLink = document.createElement("a");
+                        eventLink.href = event.event_link;
+                        eventLink.target = "_blank";
+                        eventLink.innerText = "Go to Event";
+                        cell5.appendChild(eventLink);
+                    } else {
+                        cell5.innerText = "No Link";
+                    }
+
+                    // Created By
+                    const cell6 = row.insertCell(5);
+                    cell6.innerText = event.created_by;
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching event details:', error);
+        });
 });
 
 

@@ -51,6 +51,7 @@ urlpatterns = [
     # URL to warn the user who flagged a message
     path('warn-user/<int:message_id>/', warn_user, name='warn_user'),
     path('channels/<int:org_id>/save/<int:channel_id>/',save_event_data, name='save_event_data'),
+    path('events/fetch/<int:org_id>/<int:channel_id>/',fetch_event_details, name='fetch_event_details'),
    
 
 
