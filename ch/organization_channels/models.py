@@ -89,6 +89,15 @@ class Message(models.Model):
                 channel=self.channel,
             )
 
+            activity = ActivityChannel.objects.create(
+                user=self.user,
+                channel=self.channel,
+                organization=self.organization,
+                action_type="WARN",
+                content=f' Profinity System Detected an Abused message from {abused_message.flagged_by} & Reported to Workspace admin {Channel.created_by} | Warned {abused_message.flagged_by}!'
+
+           )
+
          
             send_abusive_message_notification(self.user, self.content, self.channel.name, abused_message.message_content,self.organization)
 

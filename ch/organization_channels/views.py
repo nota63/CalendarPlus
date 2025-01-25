@@ -1796,13 +1796,16 @@ def warn_user(request, message_id):
             recipient_list=[abused_message.flagged_by.email],
         )
 
-        activity = ActivityChannel.objects.create(
-            
-               user=request.user,
-               action_type="WARN",
-               content=f'{request.user} Warned to {abused_message.flagged_by} about his abusive message {abused_message.message_content}'
-
-        )
+        try:
+           activity=ActivityChannel.objects.create(
+           user=request.user,
+           action_type="WARN",
+           content=f'{request.user} warned {abused_message.flagged_by.username} about their abusive message: {abused_message.message_content}'
+          )
+           
+           
+        except Exception as e:
+            return JsonResponse({"success": False, "error": f"Error creating activity log: {str(e)}"})
 
      
         return JsonResponse({"success": True, "message": "Warning email sent successfully."})
