@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import (Channel, Message, Link, Mention, ActivityChannel, Ban, ChannelAccess,RetentionPolicy,AbusedMessage,RecurringMessage,RecurrenceHistory)
+from .models import (Channel, Message, Link, Mention, ActivityChannel, Ban, ChannelAccess,RetentionPolicy,AbusedMessage,RecurringMessage,RecurrenceHistory,
+                     
+                     ChannelEvents)
 
 
 # Register your models here.
@@ -14,4 +16,5 @@ admin.site.register(RetentionPolicy)
 admin.site.register(AbusedMessage)
 admin.site.register(RecurringMessage)
 admin.site.register(RecurrenceHistory)
+admin.site.register(ChannelEvents)
 
