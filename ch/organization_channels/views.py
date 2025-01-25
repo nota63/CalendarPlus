@@ -1903,4 +1903,4 @@ def save_event_data(request, org_id, channel_id):
         return JsonResponse({'error': 'Invalid HTTP method. Use POST or GET.'}, status=405)
 
 
-# GET EXISTING EVENTS IF ANY
+# GET USER DETAILS TO SEND TO FRONTEND

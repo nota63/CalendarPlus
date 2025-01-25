@@ -25,6 +25,41 @@
 
 <style>
 
+
+.user-tooltip {
+    max-width: 250px;
+    font-size: 14px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    display: none;
+    padding: 10px;
+}
+
+.user-tooltip .user-icon {
+    width: 40px;
+    height: 40px;
+    background-color: #ccc;
+    border-radius: 50%;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.user-tooltip p {
+    margin: 0;
+    padding: 5px 0;
+}
+
+.mentioned-user {
+    color: #007bff;
+    cursor: pointer;
+}
+
+.mentioned-user:hover {
+    text-decoration: underline;
+}
+
+
+
 /* Styling for the user list dropdown */
 .user-list {
     position: absolute;
@@ -71,7 +106,30 @@ td[contenteditable="true"] {
     overflow: hidden;
 }
 
+/* Style for the mentioned username */
+.mentioned-user {
+    color: green; /* Change the color to green */
+    font-weight: bold;
+    background-color: #e0f7e0; /* Light green background for emphasis */
+    border-radius: 3px;
+    padding: 2px 5px;
+    display: inline-block;
+    margin-right: 5px;
+}
 
+/* Style for the contenteditable column when a user is mentioned */
+td[contenteditable="true"] .mentioned-user {
+    color: green; /* Color of the mentioned username */
+    font-weight: bold;
+    background-color: #e0f7e0; /* Light green background */
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+/* Optional: Style for empty contenteditable fields (to show placeholder text) */
+td[contenteditable="true"]:empty {
+    color: #888; /* Light grey placeholder color when the cell is empty */
+}
 
 
    #screen-share-container {
@@ -2241,6 +2299,14 @@ p {
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="EventHandleModalLabel">Manage Events</h5>
+                <div class="container">
+                    <div class="card p-3 border-0 shadow-sm">
+                        <h5 class="card-title fs-5">Company Handbook</h5>
+                        <p class="card-text text-muted fs-6">
+                            A place to reference company-wide announcements, upcoming events, and helpful resources. use @ to mention your team-mates.
+                        </p>
+                    </div>
+                </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -2439,7 +2505,7 @@ Monitor My Storage
 <!-- Manage events -->
 <button type="button" class="menu-item" data-bs-toggle="modal" data-bs-target="#EventHandleModal">
     <i class="fas fa-building"></i>
-    Manage Events
+    Company Handbook
 </button>
 
 
@@ -5369,6 +5435,11 @@ document.addEventListener("DOMContentLoaded", () => {
         tableBody.appendChild(newRow);
     });
 });
+
+
+
+
+
 
 
 // DELETE CHANNEL DATA
