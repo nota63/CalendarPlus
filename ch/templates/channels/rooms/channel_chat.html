@@ -2201,6 +2201,7 @@ p {
                             <th>Date/Time</th>
                             <th>Event Details</th>
                             <th>Event Link</th>
+                            <th>Attachment</th> 
                         </tr>
                     </thead>
                     <tbody id="eventsTableBody">
@@ -2210,18 +2211,21 @@ p {
                             <td contenteditable="true" class="event-date"></td>
                             <td contenteditable="true" class="event-details"></td>
                             <td contenteditable="true" class="event-link"></td>
+                            <td class="attachment-column" data-bs-toggle="modal" data-bs-target="#attachmentModal">Add Attachment</td>
                         </tr>
                         <tr>
                             <td contenteditable="true" class="event-name"></td>
                             <td contenteditable="true" class="event-date"></td>
                             <td contenteditable="true" class="event-details"></td>
                             <td contenteditable="true" class="event-link"></td>
+                            <td class="attachment-column" data-bs-toggle="modal" data-bs-target="#attachmentModal">Add Attachment</td>
                         </tr>
                         <tr>
                             <td contenteditable="true" class="event-name"></td>
                             <td contenteditable="true" class="event-date"></td>
                             <td contenteditable="true" class="event-details"></td>
                             <td contenteditable="true" class="event-link"></td>
+                            <td class="attachment-column" data-bs-toggle="modal" data-bs-target="#attachmentModal">Add Attachment</td>
                         </tr>
                     </tbody>
                 </table>
@@ -2232,7 +2236,26 @@ p {
 </div>
 
 
-
+<!-- Attachment Modal -->
+<div class="modal fade" id="attachmentModal" tabindex="-1" aria-labelledby="attachmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="attachmentModalLabel">Upload Attachment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="attachmentForm" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="fileInput" class="form-label">Choose File</label>
+                        <input type="file" class="form-control" id="fileInput" name="attachment">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -5062,7 +5085,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // MANAGE EVENTS(ADMIN ONLY)
-
 // CSRF token setup for Django
 const getCookie = (name) => {
     let cookieValue = null;
@@ -5166,6 +5188,16 @@ document.querySelector("#eventsTable").addEventListener("input", (event) => {
 });
 
 
+
+
+
+
+
+
+
+
+
+
 // DRAG AND DROP COLOMS
 document.addEventListener("DOMContentLoaded", () => {
     const table = document.querySelector("#eventsTable");
@@ -5233,10 +5265,6 @@ document.addEventListener("DOMContentLoaded", () => {
         tableBody.appendChild(newRow);
     });
 });
-
-
-
-
 
 
 // DELETE CHANNEL DATA

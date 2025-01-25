@@ -43,7 +43,7 @@ from .models import Ban
 from django.utils.timezone import now
 from django.core.exceptions import ValidationError
 from django.views.decorators.http import require_POST
-
+from django.core.files.storage import FileSystemStorage
 # Create your views here.
 
 # Create the channel 
@@ -1817,6 +1817,8 @@ def warn_user(request, message_id):
 
 
 # HANDLE CHANNEL EVENT CREATION
+
+
 @csrf_exempt
 def save_event_data(request, org_id, channel_id):
     if request.method == "POST":
@@ -1827,8 +1829,15 @@ def save_event_data(request, org_id, channel_id):
             event_date = data.get("event_date", None)
             event_details = data.get("event_details", "").strip()
             event_link=data.get('event_link',"").strip()
-            event_attachment = data.get("event_attachment", None)
-           
+            event_attachment = request.FILES.get('event_attachment', None)
+
+      
+            if event_attachment:
+                fs = FileSystemStorage()
+                filename = fs.save(event_attachment.name, event_attachment)
+                file_url = fs.url(filename)
+
+
 
             if not event_name or not event_date:
                 return JsonResponse({'error': 'Event name and date are required.'}, status=400)
@@ -1852,6 +1861,7 @@ def save_event_data(request, org_id, channel_id):
                     'event_date': event_date,
                     'event_details': event_details,
                     'event_link':event_link,
+                  
                 },
             )
 
@@ -1866,7 +1876,7 @@ def save_event_data(request, org_id, channel_id):
 
   
             events = ChannelEvents.objects.filter(organization=organization, channel=channel).values(
-                'event_name', 'event_date', 'event_details', 'event_link','id',
+                'event_name', 'event_date', 'event_details', 'event_link','event_attachment','id',
             )
 
          
@@ -1886,7 +1896,7 @@ def save_event_data(request, org_id, channel_id):
         organization = get_object_or_404(Organization, id=org_id)
         channel = get_object_or_404(Channel, id=channel_id)
         events = ChannelEvents.objects.filter(organization=organization, channel=channel).values(
-            'event_name', 'event_date', 'event_details', 'event_link','id',
+            'event_name', 'event_date', 'event_details', 'event_link','event_attachment','id',
         )
         return JsonResponse({'events': list(events)}, status=200)
     else:
