@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from accounts.models import Organization, Profile
 from .models import (
-    Channel, Message, Link , ActivityChannel, ChannelAccess,RetentionPolicy, RecurringMessage,RecurrenceHistory,AbusedMessage)
+    Channel, Message, Link , ActivityChannel, ChannelAccess,RetentionPolicy, RecurringMessage,RecurrenceHistory,AbusedMessage,
+    ChannelEvents)
 from django.utils.dateparse import parse_datetime
 from django.utils import timezone
 from django.urls import reverse
@@ -1815,5 +1816,63 @@ def warn_user(request, message_id):
 
 
 
+# HANDLE CHANNEL EVENT CREATION
 
+@csrf_exempt
+def save_event_data(request, org_id, channel_id):
+    if request.method != "POST":
+        return JsonResponse({'error': 'Invalid HTTP method. Use POST.'}, status=405)
 
+    try:
+        # Parse JSON data from request body
+        data = json.loads(request.body)
+        event_name = data.get("event_name", "").strip()
+        event_date = data.get("event_date", None)
+        event_details = data.get("event_details", "").strip()
+        event_attachment = data.get("event_attachment", None)
+
+        # Validate required fields
+        if not event_name or not event_date:
+            return JsonResponse({'error': 'Event name and date are required.'}, status=400)
+
+        # Fetch related objects
+        organization = get_object_or_404(Organization, id=org_id)
+        channel = get_object_or_404(Channel, id=channel_id)
+
+        # Check if user is part of the organization or has channel access
+        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+        if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+            return JsonResponse({'error': 'You are not part of this organization or do not have access to this channel.'}, status=403)
+
+        # Save or update the event
+        event, created = ChannelEvents.objects.update_or_create(
+            user=request.user,
+            organization=organization,
+            channel=channel,
+            event_name=event_name,
+            defaults={
+                'event_date': event_date,
+                'event_details': event_details,
+                  
+            },
+        )
+
+        # Log the activity (if applicable)
+        ActivityChannel.objects.create(
+            user=request.user,
+            channel=channel,
+            organization=organization,
+            action_type="SAVE_EVENT",
+            content=f'{request.user} created/updated an event: {event_name} on {event_date}',
+        )
+
+        # Response
+        response = {
+            'message': 'Event saved successfully.',
+            'event_id': event.id,
+            'status': 'created' if created else 'updated',
+        }
+        return JsonResponse(response, status=201)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
