@@ -45,6 +45,11 @@ urlpatterns = [
 
     # Delete Recurring Message
     path('delete-recurring-message/<int:recurring_message_id>/',delete_recurring_message, name='delete_recurring_message'),
+      # URL to fetch all flagged messages
+    path('fetch-flagged-messages/<int:org_id>/<int:channel_id>/',fetch_flagged_messages, name='fetch_flagged_messages'),
+
+    # URL to warn the user who flagged a message
+    path('warn-user/<int:message_id>/', warn_user, name='warn_user'),
    
 
 

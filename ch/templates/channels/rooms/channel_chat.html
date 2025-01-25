@@ -1374,6 +1374,54 @@ p {
 }
 
 
+
+#screenShareContainer {
+    display: none; /* Hidden by default, shown dynamically */
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    width: 80%;
+    max-width: 800px;
+    background-color: rgba(0, 0, 0, 0.9); /* Slight transparency for elegance */
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000; /* Ensure it is on top */
+    overflow: hidden;
+}
+
+#localVideo {
+    width: 100%;
+    height: auto;
+    border: 2px solid #fff; /* Border for better visibility */
+    border-radius: 5px;
+}
+
+#remoteVideos {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center; /* Center remote video elements */
+}
+
+#remoteVideos video {
+    width: calc(33.33% - 10px); /* Three videos per row */
+    height: auto;
+    border: 2px solid #fff;
+    border-radius: 5px;
+}
+
+
+#screenShareContainer {
+    cursor: grab; /* Default cursor for draggable element */
+}
+
+#screenShareContainer:active {
+    cursor: grabbing; /* Cursor while dragging */
+}
+
 </style>
 
 
@@ -2093,7 +2141,37 @@ p {
 </div>
 
 
-
+<!-- Warn Modal -->
+<div class="modal fade" id="warnModal" tabindex="-1" aria-labelledby="warnModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="warnModalLabel">Flagged Messages</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Table to display flagged messages -->
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Message Content</th>
+                            <th>Flagged By</th>
+                            <th>Flagged At</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="flaggedMessagesTable">
+                        <!-- Flagged messages will be dynamically added here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
   <!-- Include Bootstrap 5 JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
@@ -2122,57 +2200,10 @@ p {
     <div id="remoteVideos"></div>
 </div>
 
-<style>
-    #screenShareContainer {
-    display: none; /* Hidden by default, shown dynamically */
-    position: fixed;
-    top: 10%;
-    left: 50%;
-    transform: translate(-50%, 0);
-    width: 80%;
-    max-width: 800px;
-    background-color: rgba(0, 0, 0, 0.9); /* Slight transparency for elegance */
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    z-index: 1000; /* Ensure it is on top */
-    overflow: hidden;
-}
-
-#localVideo {
-    width: 100%;
-    height: auto;
-    border: 2px solid #fff; /* Border for better visibility */
-    border-radius: 5px;
-}
-
-#remoteVideos {
-    margin-top: 20px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: center; /* Center remote video elements */
-}
-
-#remoteVideos video {
-    width: calc(33.33% - 10px); /* Three videos per row */
-    height: auto;
-    border: 2px solid #fff;
-    border-radius: 5px;
-}
-
-
-#screenShareContainer {
-    cursor: grab; /* Default cursor for draggable element */
-}
-
-#screenShareContainer:active {
-    cursor: grabbing; /* Cursor while dragging */
-}
-
-</style>
-
-
+<!-- Button to trigger the modal warn modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#warnModal">
+    View Flagged Messages
+</button>
 
 
 
@@ -2181,10 +2212,9 @@ p {
 
 
 
-        <button class="menu-item"><i class="fas fa-plug"></i></i>Integrate Slack & Other Tools for This Channel</button>
+<button class="menu-item"><i class="fas fa-plug"></i></i>Integrate Slack & Other Tools for This Channel</button>
+<!-- Button to open Recurring Messages Modal -->
 
-        <!-- Button to open Recurring Messages Modal -->
-<!-- Button to trigger the modal -->
 <button id="monitor-recurring-messages-btn" class="menu-item">
     <i class="fas fa-random"></i>
 
@@ -4858,6 +4888,81 @@ $(document).ready(function() {
             });
         }
     });
+});
+
+
+
+// MANAGE ABUSIVE MESSAGES IN CHANNEL 
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const orgId = "{{channel.organization.id}}"; // Replace with dynamic organization ID
+    const channelId = "{{channel.id}}"; // Replace with dynamic channel ID
+
+    // Fetch flagged messages when the modal is opened
+    document.getElementById("warnModal").addEventListener("show.bs.modal", function () {
+        fetch(`/channels/fetch-flagged-messages/${orgId}/${channelId}/`)
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById("flaggedMessagesTable");
+                tableBody.innerHTML = ""; // Clear previous entries
+
+                if (data.messages.length > 0) {
+                    data.messages.forEach((message, index) => {
+                        const row = `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${message.message_content}</td>
+                                <td>${message.flagged_by}</td>
+                                <td>${message.flagged_at}</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm warn-button" data-message-id="${message.id}">
+                                        Warn User
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                        tableBody.insertAdjacentHTML("beforeend", row);
+                    });
+
+                    // Attach event listeners to warn buttons
+                    document.querySelectorAll(".warn-button").forEach(button => {
+                        button.addEventListener("click", function () {
+                            const messageId = this.dataset.messageId;
+                            sendWarning(messageId);
+                        });
+                    });
+                } else {
+                    tableBody.innerHTML = "<tr><td colspan='5'>No flagged messages found.</td></tr>";
+                }
+            })
+            .catch(error => console.error("Error fetching flagged messages:", error));
+    });
+
+    // Send warning email
+    function sendWarning(messageId) {
+        fetch(`/channels/warn-user/${messageId}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCSRFToken(),
+                "Content-Type": "application/json",
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Warning email sent successfully!");
+                } else {
+                    alert("Failed to send warning: " + data.error);
+                }
+            })
+            .catch(error => console.error("Error sending warning:", error));
+    }
+
+    // Function to get CSRF token
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
 });
 
 

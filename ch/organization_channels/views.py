@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from accounts.models import Organization, Profile
 from .models import (
-    Channel, Message, Link , ActivityChannel, ChannelAccess,RetentionPolicy, RecurringMessage,RecurrenceHistory)
+    Channel, Message, Link , ActivityChannel, ChannelAccess,RetentionPolicy, RecurringMessage,RecurrenceHistory,AbusedMessage)
 from django.utils.dateparse import parse_datetime
 from django.utils import timezone
 from django.urls import reverse
@@ -1731,3 +1731,70 @@ def delete_recurring_message(request, recurring_message_id):
     except Exception as e:
         logger.error(f"Error deleting recurring message ID {recurring_message_id}: {e}")
         return JsonResponse({'error': 'An error occurred while deleting the recurring message.'}, status=500)
+
+
+
+# RETRIVE ABUSED MESSAGES & WARN THE USER
+
+
+# View 1: Fetch flagged messages
+def fetch_flagged_messages(request, org_id, channel_id):
+    """
+    Fetch all flagged messages for a specific organization and channel.
+    """
+    # Fetch organization and channel
+    organization = get_object_or_404(Organization, id=org_id)
+    channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+
+    # Retrieve all abused messages
+    abused_messages = AbusedMessage.objects.filter(organization=organization, channel=channel).select_related('flagged_by')
+
+    # Format the data for response
+    messages_data = [
+        {
+            "id": message.id,
+            "message_content": message.message_content,
+            "flagged_by": message.flagged_by.username if message.flagged_by else "Unknown",
+            "flagged_at": message.flagged_at.strftime("%Y-%m-%d %H:%M:%S"),
+        }
+        for message in abused_messages
+    ]
+
+    # Send data as JSON response
+    return JsonResponse({"messages": messages_data})
+
+
+# View 2: Warn the user who flagged the message
+def warn_user(request, message_id):
+    """
+    Send a warning email to the user who flagged the message.
+    """
+    # Fetch the abused message
+    abused_message = get_object_or_404(AbusedMessage, id=message_id)
+
+    # Ensure the message has a valid flagged_by user
+    if abused_message.flagged_by and abused_message.flagged_by.email:
+        # Send warning email
+        send_mail(
+            subject="Warning Regarding Flagged Message",
+            message=(
+                f"Dear {abused_message.flagged_by.username},\n\n"
+                "We have noticed that you flagged a message in the channel "
+                f"'{abused_message.channel.name}' of the organization '{abused_message.organization.name}'. "
+                "Please ensure this action was done with genuine intent. Abuse of the flagging system can lead to penalties.\n\n"
+                "Thank you,\nSupport Team"
+            ),
+            from_email="support@yourapp.com",
+            recipient_list=[abused_message.flagged_by.email],
+        )
+
+        # Respond with success
+        return JsonResponse({"success": True, "message": "Warning email sent successfully."})
+    else:
+        # Handle missing flagged_by user or email
+        return JsonResponse({"success": False, "error": "The user who flagged this message has no email associated."})
+
+
+
+
+
