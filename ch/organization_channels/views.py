@@ -1826,7 +1826,9 @@ def save_event_data(request, org_id, channel_id):
             event_name = data.get("event_name", "").strip()
             event_date = data.get("event_date", None)
             event_details = data.get("event_details", "").strip()
+            event_link=data.get('event_link',"").strip()
             event_attachment = data.get("event_attachment", None)
+           
 
             if not event_name or not event_date:
                 return JsonResponse({'error': 'Event name and date are required.'}, status=400)
@@ -1849,6 +1851,7 @@ def save_event_data(request, org_id, channel_id):
                 defaults={
                     'event_date': event_date,
                     'event_details': event_details,
+                    'event_link':event_link,
                 },
             )
 
@@ -1863,7 +1866,7 @@ def save_event_data(request, org_id, channel_id):
 
   
             events = ChannelEvents.objects.filter(organization=organization, channel=channel).values(
-                'event_name', 'event_date', 'event_details', 'id'
+                'event_name', 'event_date', 'event_details', 'event_link','id',
             )
 
          
@@ -1883,7 +1886,7 @@ def save_event_data(request, org_id, channel_id):
         organization = get_object_or_404(Organization, id=org_id)
         channel = get_object_or_404(Channel, id=channel_id)
         events = ChannelEvents.objects.filter(organization=organization, channel=channel).values(
-            'event_name', 'event_date', 'event_details', 'id'
+            'event_name', 'event_date', 'event_details', 'event_link','id',
         )
         return JsonResponse({'events': list(events)}, status=200)
     else:

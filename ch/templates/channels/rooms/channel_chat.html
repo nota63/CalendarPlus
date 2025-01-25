@@ -2200,6 +2200,7 @@ p {
                             <th>Event Name</th>
                             <th>Date/Time</th>
                             <th>Event Details</th>
+                            <th>Event Link</th>
                         </tr>
                     </thead>
                     <tbody id="eventsTableBody">
@@ -2208,16 +2209,19 @@ p {
                             <td contenteditable="true" class="event-name"></td>
                             <td contenteditable="true" class="event-date"></td>
                             <td contenteditable="true" class="event-details"></td>
+                            <td contenteditable="true" class="event-link"></td>
                         </tr>
                         <tr>
                             <td contenteditable="true" class="event-name"></td>
                             <td contenteditable="true" class="event-date"></td>
                             <td contenteditable="true" class="event-details"></td>
+                            <td contenteditable="true" class="event-link"></td>
                         </tr>
                         <tr>
                             <td contenteditable="true" class="event-name"></td>
                             <td contenteditable="true" class="event-date"></td>
                             <td contenteditable="true" class="event-details"></td>
+                            <td contenteditable="true" class="event-link"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -5096,6 +5100,9 @@ fetch(`/channels/channels/${orgIId}/save/${channellId}/`, {
                     <td contenteditable="true" class="event-name">${event.event_name}</td>
                     <td contenteditable="true" class="event-date">${event.event_date}</td>
                     <td contenteditable="true" class="event-details">${event.event_details}</td>
+                    <td contenteditable="true" class="event-link">${event.event_link}</td>
+                
+
                 </tr>`;
             tableBody.insertAdjacentHTML("beforeend", newRow);
         });
@@ -5113,6 +5120,7 @@ document.getElementById("addRow").addEventListener("click", () => {
             <td contenteditable="true" class="event-name"></td>
             <td contenteditable="true" class="event-date"></td>
             <td contenteditable="true" class="event-details"></td>
+            <td contenteditable="true" class="event-link"></td>
         </tr>`;
     tableBody.insertAdjacentHTML("beforeend", newRow);
 });
@@ -5124,9 +5132,10 @@ document.querySelector("#eventsTable").addEventListener("input", (event) => {
         const eventName = targetRow.querySelector(".event-name").innerText.trim();
         const eventDate = targetRow.querySelector(".event-date").innerText.trim();
         const eventDetails = targetRow.querySelector(".event-details").innerText.trim();
+        const eventLink = targetRow.querySelector(".event-link").innerText.trim();
 
         // Check if all fields are filled
-        if (eventName && eventDate && eventDetails) {
+        if (eventName && eventDate && eventDetails && eventLink) {
             fetch(`/channels/channels/${orgIId}/save/${channellId}/`, {
                 method: "POST",
                 headers: {
@@ -5137,6 +5146,7 @@ document.querySelector("#eventsTable").addEventListener("input", (event) => {
                     event_name: eventName,
                     event_date: eventDate,
                     event_details: eventDetails,
+                    event_link:eventLink,
                 }),
             })
             .then((response) => response.json())
@@ -5155,7 +5165,7 @@ document.querySelector("#eventsTable").addEventListener("input", (event) => {
 });
 
 
-// GET EXISTING EVENTS IF ANY 
+// 
 
 
 
