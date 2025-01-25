@@ -2185,7 +2185,7 @@ p {
 
 
 <!-- Manage Events Modal -->
-<!-- Modal Structure -->
+ <!-- Modal Structure -->
 <div class="modal fade" id="EventHandleModal" tabindex="-1" aria-labelledby="EventHandleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -2202,8 +2202,8 @@ p {
                             <th>Event Details</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <!-- Initial rows -->
+                    <tbody id="eventsTableBody">
+                        <!-- Initial rows that can be filled by the admin -->
                         <tr>
                             <td contenteditable="true" class="event-name"></td>
                             <td contenteditable="true" class="event-date"></td>
@@ -2226,8 +2226,6 @@ p {
         </div>
     </div>
 </div>
-
-
 
 
 
@@ -5059,6 +5057,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // MANAGE EVENTS(ADMIN ONLY)
+
 // CSRF token setup for Django
 const getCookie = (name) => {
     let cookieValue = null;
@@ -5075,6 +5074,36 @@ const getCookie = (name) => {
     return cookieValue;
 };
 const csrftoken = getCookie("csrftoken");
+
+// Fetch and display existing events on page load
+const orgIId = "{{ channel.organization.id }}";
+const channellId = "{{ channel.id }}";
+
+fetch(`/channels/channels/${orgIId}/save/${channellId}/`, {
+    method: "GET",
+    headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrftoken,
+    },
+})
+.then(response => response.json())
+.then(data => {
+    if (data.events) {
+        const tableBody = document.querySelector("#eventsTable tbody");
+        data.events.forEach(event => {
+            const newRow = `
+                <tr>
+                    <td contenteditable="true" class="event-name">${event.event_name}</td>
+                    <td contenteditable="true" class="event-date">${event.event_date}</td>
+                    <td contenteditable="true" class="event-details">${event.event_details}</td>
+                </tr>`;
+            tableBody.insertAdjacentHTML("beforeend", newRow);
+        });
+    } else {
+        console.log("No events found.");
+    }
+})
+.catch(error => console.error("Error fetching events:", error));
 
 // Add a new row to the table
 document.getElementById("addRow").addEventListener("click", () => {
@@ -5098,12 +5127,7 @@ document.querySelector("#eventsTable").addEventListener("input", (event) => {
 
         // Check if all fields are filled
         if (eventName && eventDate && eventDetails) {
-            // Replace with actual org_id and channel_id
-            const orgId = "{{channel.organization.id}}"; 
-            const channelId = "{{channel.id}}";
-
-            // AJAX request to save the data
-            fetch(`/channels/channels/${orgId}/save/${channelId}/`, {
+            fetch(`/channels/channels/${orgIId}/save/${channellId}/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -5130,6 +5154,8 @@ document.querySelector("#eventsTable").addEventListener("input", (event) => {
     }
 });
 
+
+// GET EXISTING EVENTS IF ANY 
 
 
 
