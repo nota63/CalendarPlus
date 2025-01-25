@@ -1738,18 +1738,26 @@ def delete_recurring_message(request, recurring_message_id):
 
 
 # View 1: Fetch flagged messages
+
 def fetch_flagged_messages(request, org_id, channel_id):
     """
     Fetch all flagged messages for a specific organization and channel.
     """
-    # Fetch organization and channel
+  
     organization = get_object_or_404(Organization, id=org_id)
     channel = get_object_or_404(Channel, id=channel_id, organization=organization)
 
-    # Retrieve all abused messages
+    if request.user != organization.created_by:
+        return JsonResponse({'error': 'You must be the admin of the organization to set policies.'}, status=403)
+    
+    user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+   
+    if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+          return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
+
     abused_messages = AbusedMessage.objects.filter(organization=organization, channel=channel).select_related('flagged_by')
 
-    # Format the data for response
+  
     messages_data = [
         {
             "id": message.id,
@@ -1760,7 +1768,7 @@ def fetch_flagged_messages(request, org_id, channel_id):
         for message in abused_messages
     ]
 
-    # Send data as JSON response
+
     return JsonResponse({"messages": messages_data})
 
 
@@ -1769,12 +1777,12 @@ def warn_user(request, message_id):
     """
     Send a warning email to the user who flagged the message.
     """
-    # Fetch the abused message
+
     abused_message = get_object_or_404(AbusedMessage, id=message_id)
 
-    # Ensure the message has a valid flagged_by user
+
     if abused_message.flagged_by and abused_message.flagged_by.email:
-        # Send warning email
+       
         send_mail(
             subject="Warning Regarding Flagged Message",
             message=(
@@ -1788,10 +1796,17 @@ def warn_user(request, message_id):
             recipient_list=[abused_message.flagged_by.email],
         )
 
-        # Respond with success
+        activity = ActivityChannel.objects.create(
+               user=request.user,
+               action_type="WARN_ABOUT_ABUSIVE_BEHAVIOUR",
+               content=f'{request.user} Warned to {abused_message.flagged_by} about his abusive message {abused_message.message_content}'
+
+        )
+
+     
         return JsonResponse({"success": True, "message": "Warning email sent successfully."})
     else:
-        # Handle missing flagged_by user or email
+       
         return JsonResponse({"success": False, "error": "The user who flagged this message has no email associated."})
 
 

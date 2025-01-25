@@ -2142,6 +2142,7 @@ p {
 
 
 <!-- Warn Modal -->
+ <!-- Modal -->
 <div class="modal fade" id="warnModal" tabindex="-1" aria-labelledby="warnModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -2149,7 +2150,7 @@ p {
                 <h5 class="modal-title" id="warnModalLabel">Flagged Messages</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
                 <!-- Table to display flagged messages -->
                 <table class="table table-striped">
                     <thead>
@@ -2165,6 +2166,14 @@ p {
                         <!-- Flagged messages will be dynamically added here -->
                     </tbody>
                 </table>
+
+                <!-- Spinner and loading text (hidden initially) -->
+                <div id="loadingSpinner" class="text-center" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p>Warning the user, please hold...</p>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -2200,10 +2209,6 @@ p {
     <div id="remoteVideos"></div>
 </div>
 
-<!-- Button to trigger the modal warn modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#warnModal">
-    View Flagged Messages
-</button>
 
 
 
@@ -2294,6 +2299,16 @@ Monitor My Storage
     <i class="fas fa-shield-alt"></i>
     Configure Retention Settings
   </button>    
+
+
+  <!-- Button to trigger the modal warn modal -->
+<button type="button" class="menu-item" data-bs-toggle="modal" data-bs-target="#warnModal">
+    <i class="fas fa-flag"></i>
+    flagged texts & warn
+</button>
+
+
+
 
        <!-- Button to Open Modal -->
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shareModal">
@@ -4894,10 +4909,9 @@ $(document).ready(function() {
 
 // MANAGE ABUSIVE MESSAGES IN CHANNEL 
 
-
 document.addEventListener("DOMContentLoaded", function () {
-    const orgId = "{{channel.organization.id}}"; // Replace with dynamic organization ID
-    const channelId = "{{channel.id}}"; // Replace with dynamic channel ID
+    const orgId = "{{channel.organization.id}}"; 
+    const channelId = "{{channel.id}}"; 
 
     // Fetch flagged messages when the modal is opened
     document.getElementById("warnModal").addEventListener("show.bs.modal", function () {
@@ -4941,6 +4955,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Send warning email
     function sendWarning(messageId) {
+        // Show the loading spinner and message
+        document.getElementById("loadingSpinner").style.display = "block";
+
+        // Hide the table while loading
+        document.getElementById("flaggedMessagesTable").style.display = "none";
+
         fetch(`/channels/warn-user/${messageId}/`, {
             method: "POST",
             headers: {
@@ -4950,13 +4970,27 @@ document.addEventListener("DOMContentLoaded", function () {
         })
             .then(response => response.json())
             .then(data => {
+                // Hide the spinner after the request completes
+                document.getElementById("loadingSpinner").style.display = "none";
+                
+                // Show the table again
+                document.getElementById("flaggedMessagesTable").style.display = "table-row-group";
+
                 if (data.success) {
                     alert("Warning email sent successfully!");
                 } else {
                     alert("Failed to send warning: " + data.error);
                 }
             })
-            .catch(error => console.error("Error sending warning:", error));
+            .catch(error => {
+                console.error("Error sending warning:", error);
+
+                // Hide the spinner if there was an error
+                document.getElementById("loadingSpinner").style.display = "none";
+                
+                // Show the table again
+                document.getElementById("flaggedMessagesTable").style.display = "table-row-group";
+            });
     }
 
     // Function to get CSRF token
@@ -4964,9 +4998,6 @@ document.addEventListener("DOMContentLoaded", function () {
         return document.querySelector('[name=csrfmiddlewaretoken]').value;
     }
 });
-
-
-
 
 
 
