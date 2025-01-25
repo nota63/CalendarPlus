@@ -24,6 +24,56 @@
 </head>
 
 <style>
+
+/* Styling for the user list dropdown */
+.user-list {
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+    z-index: 1000; /* Make sure it appears above other elements */
+    margin-top: 2px;
+    padding: 5px 0;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Styling for each user in the list */
+.user-list li {
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+/* Hover effect for list items */
+.user-list li:hover {
+    background-color: #f0f0f0;
+}
+
+/* Highlight the selected user */
+.user-list li.selected {
+    background-color: #e0e0e0;
+}
+
+/* Make sure to position the user list correctly */
+td[contenteditable="true"] {
+    position: relative; /* Ensure the user list is positioned relative to the cell */
+}
+
+.user-list li {
+    white-space: nowrap; /* Prevent text from wrapping */
+    text-overflow: ellipsis; /* Add an ellipsis if the name is too long */
+    overflow: hidden;
+}
+
+
+
+
    #screen-share-container {
     position: fixed;
     top: 0;
@@ -5124,8 +5174,6 @@ fetch(`/channels/channels/${orgIId}/save/${channellId}/`, {
                     <td contenteditable="true" class="event-date">${event.event_date}</td>
                     <td contenteditable="true" class="event-details">${event.event_details}</td>
                     <td contenteditable="true" class="event-link">${event.event_link}</td>
-                
-
                 </tr>`;
             tableBody.insertAdjacentHTML("beforeend", newRow);
         });
@@ -5134,6 +5182,66 @@ fetch(`/channels/channels/${orgIId}/save/${channellId}/`, {
     }
 })
 .catch(error => console.error("Error fetching events:", error));
+
+// Function to fetch users based on the current @ input
+const fetchUsers = async () => {
+    try {
+        const response = await fetch(`/channels/fetch-users/${orgIId}/${channellId}/`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrftoken,
+            },
+        });
+        const data = await response.json();
+        if (data.users) {
+            return data.users;
+        } else {
+            console.error("No users found.");
+            return [];
+        }
+    } catch (error) {
+        console.error("Error fetching users:", error);
+        return [];
+    }
+};
+
+// Function to show the list of users
+const showUserList = (users, targetElement) => {
+    const userList = document.createElement("ul");
+    userList.classList.add("user-list"); // You can style this in CSS
+    
+    users.forEach(user => {
+        const userItem = document.createElement("li");
+        userItem.innerText = user.username;
+        userItem.addEventListener("click", () => {
+            targetElement.innerText = "@" + user.username; // Insert username in the target column
+            userList.remove(); // Hide the user list after selection
+        });
+        userList.appendChild(userItem);
+    });
+
+    targetElement.appendChild(userList);
+};
+
+// Add Event Listener for editable fields
+document.querySelector("#eventsTable").addEventListener("input", async (event) => {
+    const targetElement = event.target;
+    if (targetElement.contentEditable === "true" && targetElement.innerText.includes("@")) {
+        const atSignPosition = targetElement.innerText.indexOf("@");
+        const users = await fetchUsers();
+        
+        // Remove previous user list if any
+        const existingList = targetElement.querySelector(".user-list");
+        if (existingList) {
+            existingList.remove();
+        }
+
+        if (users.length > 0) {
+            showUserList(users, targetElement);
+        }
+    }
+});
 
 // Add a new row to the table
 document.getElementById("addRow").addEventListener("click", () => {
@@ -5169,7 +5277,7 @@ document.querySelector("#eventsTable").addEventListener("input", (event) => {
                     event_name: eventName,
                     event_date: eventDate,
                     event_details: eventDetails,
-                    event_link:eventLink,
+                    event_link: eventLink,
                 }),
             })
             .then((response) => response.json())
@@ -5186,10 +5294,6 @@ document.querySelector("#eventsTable").addEventListener("input", (event) => {
         }
     }
 });
-
-
-
-
 
 
 
