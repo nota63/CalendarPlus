@@ -150,7 +150,7 @@ class ActivityChannel(models.Model):
         ('MESSAGE_REPLY','Message reply'),
         ("SET_RECURRING_MESSAGE",'Set recurring message'),
         ("PREVENT_RECURRING_MESSAGE",'Prevent recurring message'),
-        ("WARN_ABOUT_ABUSIVE_BEHAVIOUR",'Warn about abusive behaviour'),
+        ("WARN",'Warn'),
     ]
 
     user = models.ForeignKey(User, related_name='activities', on_delete=models.CASCADE)

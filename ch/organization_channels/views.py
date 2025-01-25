@@ -1792,13 +1792,14 @@ def warn_user(request, message_id):
                 "Please ensure this action was done with genuine intent. Abuse of the flagging system can lead to penalties.\n\n"
                 "Thank you,\nSupport Team"
             ),
-            from_email="support@yourapp.com",
+            from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[abused_message.flagged_by.email],
         )
 
         activity = ActivityChannel.objects.create(
+            
                user=request.user,
-               action_type="WARN_ABOUT_ABUSIVE_BEHAVIOUR",
+               action_type="WARN",
                content=f'{request.user} Warned to {abused_message.flagged_by} about his abusive message {abused_message.message_content}'
 
         )
