@@ -1949,12 +1949,12 @@ def mark_attending(request, org_id, channel_id, event_id):
         return JsonResponse({'error': 'You are not part of this organization or do not have access to this channel.'}, status=403)
 
 
-    # Fetch current user details
+   
     user = request.user
     if not user.is_authenticated:
         return JsonResponse({'error': 'User must be logged in to mark attendance.'}, status=401)
 
-    # Event creator email
+
     recipient_email = event.user.email  
     subject = f"Attendance Confirmation for {event.event_name}"
     message = (
@@ -1964,12 +1964,21 @@ def mark_attending(request, org_id, channel_id, event_id):
         "Best regards,\nYour Team"
     )
 
-    # Send email notification
+
     send_mail(
         subject=subject,
         message=message,
         from_email=settings.DEFAULT_FROM_EMAIL,  
         recipient_list=[recipient_email],
     )
+
+    activity = ActivityChannel.objects.create(
+        user=user,
+        channel=channel,
+        organization=organization,
+        action_type="ATTENDING_EVENT",
+        content=f'{request.user} will be attending the event {event.event_name} on {event.event_date}'
+    )
+
 
     return JsonResponse({'message': 'Attendance confirmed and notification sent.'})
