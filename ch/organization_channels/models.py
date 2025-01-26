@@ -395,13 +395,13 @@ class ChannelEvents(models.Model):
     event_name = models.CharField(max_length=255)
     event_date = models.DateTimeField()
     event_details = models.TextField()
-
-  
     event_attachment = models.FileField(upload_to='event_attachments/', null=True, blank=True)
     event_link = models.URLField(null=True, blank=True)
 
     def __str__(self):
         return self.event_name
+
+
 
 
 

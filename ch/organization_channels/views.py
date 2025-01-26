@@ -2000,9 +2000,6 @@ def channel_settings_view(request, org_id, channel_id):
     if request.user != organization.created_by:
         return JsonResponse({'error': 'You must be the admin of the organization to set policies.'}, status=403)
 
-
-
-
     if request.method == 'GET':
         try:
             settings = ChannelSettingsOrganization.objects.get(organization_id=org_id, channel_id=channel_id)
@@ -2027,7 +2024,7 @@ def channel_settings_view(request, org_id, channel_id):
             settings, created = ChannelSettingsOrganization.objects.update_or_create(
                 organization=organization,
                 channel=channel,
-                defaults={  # Using the correct fields directly
+                defaults={  
                     'allow_media_uploads': data.get('allow_media_uploads', False),
                     'allow_codes': data.get('allow_codes', False),
                     'secure_from_unwanted_requests': data.get('secure_from_unwanted_requests', False),
@@ -2044,3 +2041,9 @@ def channel_settings_view(request, org_id, channel_id):
             return JsonResponse({'error': 'Invalid JSON data'}, status=400)
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+
+
+# DISPLAY CHANNEL CALENDAR
+
