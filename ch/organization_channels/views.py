@@ -1906,14 +1906,19 @@ def save_event_data(request, org_id, channel_id):
 # DISPLAY EVENT DETAILS TO CHANNEL MEMBERS 
 
 def fetch_event_details(request, org_id, channel_id):
-    # Fetch organization and channel based on provided IDs
+  
     organization = get_object_or_404(Organization, id=org_id)
     channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+        return JsonResponse({'error': 'You are not part of this organization or do not have access to this channel.'}, status=403)
+
     
-    # Retrieve all events related to the given organization and channel
+
     events = ChannelEvents.objects.filter(organization=organization, channel=channel)
 
-    # Prepare the event data to send as JSON
+  
     event_data = []
     for event in events:
         event_data.append({
