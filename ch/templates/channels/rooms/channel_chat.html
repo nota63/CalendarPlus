@@ -24,23 +24,20 @@
 </head>
 
 <style>
-    /* Global Styling for Modal */
+    /* Modal Dialog - Thinner and Lightweight */
 #eventDetailsModalPremium .modal-dialog.modal-lg {
-    max-width: 80%;
-    border-radius: 12px;
+    max-width: 60%; /* Thinner modal for Slack-like look */
+    border-radius: 10px;
     transition: transform 0.3s ease-in-out;
+    margin: 20px auto;
 }
 
 /* Modal Content */
 #eventDetailsModalPremium .modal-content {
     background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     transition: box-shadow 0.3s ease;
-}
-
-#eventDetailsModalPremium .modal-content:hover {
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
 }
 
 /* Modal Header */
@@ -48,94 +45,90 @@
     background-color: #1E2A38;
     color: #ffffff;
     border-bottom: 1px solid #e0e0e0;
-    padding: 20px 30px;
-    border-radius: 12px 12px 0 0;
-}
-
-#eventDetailsModalPremium .modal-header h5 {
-    font-size: 1.5rem;
+    padding: 15px 25px;
+    border-radius: 10px 10px 0 0;
+    font-size: 1.25rem;
     font-weight: 600;
 }
 
-/* Modal Body */
+/* Modal Body - Enable Scroll */
 #eventDetailsModalPremium .modal-body {
     background-color: #f9f9f9;
-    padding: 30px;
+    padding: 20px;
     font-size: 1rem;
     color: #333;
-    max-height: 500px;
+    max-height: 400px; /* Restrict height to allow scrolling */
     overflow-y: auto;
-    border-radius: 0 0 12px 12px;
+    border-radius: 0 0 10px 10px;
 }
 
-#eventDetailsModalPremium .modal-body h6 {
-    font-weight: 600;
-    margin-bottom: 20px;
+/* Custom Scrollbar Styling */
+#eventDetailsModalPremium .modal-body::-webkit-scrollbar {
+    width: 6px; /* Thin scrollbar */
 }
 
-/* Table Styling */
+#eventDetailsModalPremium .modal-body::-webkit-scrollbar-thumb {
+    background-color: #2980b9; /* Stylish thumb color */
+    border-radius: 3px;
+}
+
+#eventDetailsModalPremium .modal-body::-webkit-scrollbar-thumb:hover {
+    background-color: #1abc9c; /* Change color on hover */
+}
+
+#eventDetailsModalPremium .modal-body::-webkit-scrollbar-track {
+    background-color: #ecf0f1; /* Light background for scrollbar track */
+}
+
+/* Table Styling - Thin Look */
 #eventDetailsModalPremium .table {
     width: 100%;
-    margin-top: 30px;
+    margin-top: 15px;
     background-color: #ffffff;
     border-radius: 8px;
     border: 1px solid #e0e0e0;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 #eventDetailsModalPremium .table th,
 #eventDetailsModalPremium .table td {
-    padding: 20px;
+    padding: 12px 15px; /* Reduce padding for thinner look */
     text-align: left;
     vertical-align: middle;
-    font-size: 1rem;
+    font-size: 0.95rem;
     color: #2C3E50;
     border: none;
 }
 
 #eventDetailsModalPremium .table th {
-    background-color: #2980b9;
+    background-color: #34495e;
     color: #ffffff;
     font-weight: 700;
 }
 
 #eventDetailsModalPremium .table td {
-    background-color: #ecf0f1;
-    color: #34495e;
-    font-size: 1rem;
-    border-radius: 8px;
-}
-
-#eventDetailsModalPremium .table td a {
-    color: #2980b9;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-#eventDetailsModalPremium .table td a:hover {
-    color: #16a085;
-    text-decoration: underline;
-}
-
-/* Hover Effects on Table Rows */
-#eventDetailsModalPremium .table tr:hover {
-    background-color: #f1f1f1;
+    background-color: #f7f9fb;
+    color: #2d3e50;
+    font-size: 0.9rem;
+    border-radius: 4px;
 }
 
 /* Footer Styling */
 #eventDetailsModalPremium .modal-footer {
-    background-color: #f1f1f1;
-    padding: 20px 30px;
+    background-color: #f4f6f8;
+    padding: 15px 25px;
     text-align: right;
     border-top: 1px solid #e0e0e0;
-    border-radius: 0 0 12px 12px;
+    border-radius: 0 0 10px 10px;
 }
 
+/* Buttons */
 #eventDetailsModalPremium .btn-secondary {
-    background-color: #16a085;
+    background-color: #2980b9;
     color: #ffffff;
-    padding: 12px 25px;
-    border-radius: 8px;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 0.9rem;
     font-weight: 600;
     transition: background-color 0.3s ease;
 }
@@ -145,37 +138,8 @@
     cursor: pointer;
 }
 
-/* Close Button */
-#eventDetailsModalPremium .btn-close {
-    background-color: transparent;
-    border: none;
-    font-size: 1.5rem;
-    color: #333;
-    transition: color 0.3s ease, transform 0.3s ease;
-}
 
-#eventDetailsModalPremium .btn-close:hover {
-    color: #16a085;
-    transform: rotate(180deg);
-}
 
-/* Responsive Styling for Mobile */
-@media (max-width: 768px) {
-    #eventDetailsModalPremium .modal-dialog {
-        max-width: 95%;
-        margin: 10px;
-    }
-
-    #eventDetailsModalPremium .modal-body {
-        padding: 15px;
-    }
-
-    #eventDetailsModalPremium .table th,
-    #eventDetailsModalPremium .table td {
-        padding: 15px;
-        font-size: 0.9rem;
-    }
-}
 
 
 
@@ -2533,14 +2497,12 @@ p {
 </div>
 
 <!-- Modal to display events details -->
-
 <!-- Modal -->
 <div class="modal fade" id="eventDetailsModalPremium" tabindex="-1" aria-labelledby="eventDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg"> <!-- modal-lg for larger size -->
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="eventDetailsModalLabel">Event Details</h5>
-
           <div>
             <strong>
                 2024 milestones/Company-wide announcements
@@ -2558,6 +2520,7 @@ p {
                       <th>Event Attachment</th>
                       <th>Event Link</th>
                       <th>Created By</th>
+                      <th>Action</th> <!-- New column for the button -->
                   </tr>
               </thead>
               <tbody>
@@ -2570,7 +2533,8 @@ p {
         </div>
       </div>
     </div>
-  </div>
+</div>
+
 
 
   <!-- Include Bootstrap 5 JS -->
@@ -2594,7 +2558,7 @@ p {
         <!-- Button to trigger the modal -->
 <button id="fetchEventDetailsBtn" class="menu-item" data-org-id="{{ channel.organization.id }}" data-channel-id="{{ channel.id }}" data-bs-toggle="modal" data-bs-target="#eventDetailsModalPremium">
     <i class="fas fa-database"></i>
-    Workspace Handbook Info
+    {{channel.organization.name}} Handbook Info
 </button>
 
        
@@ -5640,13 +5604,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // DISPLAY EVENT DETAILS 
-
 document.getElementById("fetchEventDetailsBtn").addEventListener("click", function() {
     // Get the event details from the button's data attributes
     const orgId = this.getAttribute("data-org-id");
     const channelId = this.getAttribute("data-channel-id");
 
-    // Fetch event details using AJAX (example URL)
+    // Fetch event details using AJAX
     fetch(`/channels/events/fetch/${orgId}/${channelId}/`)
         .then(response => response.json())
         .then(data => {
@@ -5658,7 +5621,7 @@ document.getElementById("fetchEventDetailsBtn").addEventListener("click", functi
             if (data.events.length === 0) {
                 const row = tableBody.insertRow();
                 const cell = row.insertCell(0);
-                cell.colSpan = 6;  // Make the message span across all 6 columns
+                cell.colSpan = 7; // Adjust for new column
                 cell.innerText = "No events found.";
             } else {
                 // Dynamically fill the table with event details
@@ -5666,18 +5629,15 @@ document.getElementById("fetchEventDetailsBtn").addEventListener("click", functi
                     const row = tableBody.insertRow();
 
                     // Event Name
-                    const cell1 = row.insertCell(0);
-                    cell1.innerText = event.event_name;
+                    row.insertCell(0).innerText = event.event_name;
 
                     // Event Date/Time
-                    const cell2 = row.insertCell(1);
-                    cell2.innerText = event.event_date;
+                    row.insertCell(1).innerText = event.event_date;
 
                     // Event Details
-                    const cell3 = row.insertCell(2);
-                    cell3.innerText = event.event_details;
+                    row.insertCell(2).innerText = event.event_details;
 
-                    // Event Attachment (if any)
+                    // Event Attachment
                     const cell4 = row.insertCell(3);
                     if (event.event_attachment) {
                         const attachmentLink = document.createElement("a");
@@ -5689,7 +5649,7 @@ document.getElementById("fetchEventDetailsBtn").addEventListener("click", functi
                         cell4.innerText = "No Attachment";
                     }
 
-                    // Event Link (if any)
+                    // Event Link
                     const cell5 = row.insertCell(4);
                     if (event.event_link) {
                         const eventLink = document.createElement("a");
@@ -5702,8 +5662,31 @@ document.getElementById("fetchEventDetailsBtn").addEventListener("click", functi
                     }
 
                     // Created By
-                    const cell6 = row.insertCell(5);
-                    cell6.innerText = event.created_by;
+                    row.insertCell(5).innerText = event.created_by;
+
+                    // Action: Mark as Attending
+                    const cell7 = row.insertCell(6);
+                    const attendButton = document.createElement("button");
+                    attendButton.className = "btn btn-primary btn-sm";
+                    attendButton.innerText = "Mark as Attending";
+                    attendButton.addEventListener("click", () => {
+                        // Send attendance information via URL
+                        fetch(`/channels/mark_attending/${orgId}/${channelId}/${event.id}/`, {
+                            method: "GET" // Using GET for simplicity, adjust as per your backend
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                alert(`Marked as attending for ${event.event_name}`);
+                            } else {
+                                alert(`Failed to mark attendance for ${event.event_name}`);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert("An error occurred while marking attendance.");
+                        });
+                    });
+                    cell7.appendChild(attendButton);
                 });
             }
         })

@@ -1923,6 +1923,7 @@ def fetch_event_details(request, org_id, channel_id):
     for event in events:
         event_data.append({
             'event_name': event.event_name,
+            'id':event.id,
             'event_date': event.event_date.strftime("%B %d, %Y, %I:%M %p"),
             'event_details': event.event_details,
             'event_attachment': event.event_attachment.url if event.event_attachment else None,
@@ -1931,3 +1932,44 @@ def fetch_event_details(request, org_id, channel_id):
         })
 
     return JsonResponse({'events': event_data})
+
+
+
+
+# Mark attending the event
+@csrf_exempt
+def mark_attending(request, org_id, channel_id, event_id):
+
+    organization = get_object_or_404(Organization, id=org_id)
+    channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+    event = get_object_or_404(ChannelEvents, id=event_id, channel=channel, organization=organization)
+
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+        return JsonResponse({'error': 'You are not part of this organization or do not have access to this channel.'}, status=403)
+
+
+    # Fetch current user details
+    user = request.user
+    if not user.is_authenticated:
+        return JsonResponse({'error': 'User must be logged in to mark attendance.'}, status=401)
+
+    # Event creator email
+    recipient_email = event.user.email  
+    subject = f"Attendance Confirmation for {event.event_name}"
+    message = (
+        f"Hello {event.user.username},\n\n"
+        f"The user {user.username} from the organization '{organization.name}' and channel '{channel.name}' "
+        f"has marked themselves as attending your event '{event.event_name}'.\n\n"
+        "Best regards,\nYour Team"
+    )
+
+    # Send email notification
+    send_mail(
+        subject=subject,
+        message=message,
+        from_email=settings.DEFAULT_FROM_EMAIL,  
+        recipient_list=[recipient_email],
+    )
+
+    return JsonResponse({'message': 'Attendance confirmed and notification sent.'})
