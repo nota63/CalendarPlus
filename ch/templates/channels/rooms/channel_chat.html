@@ -5604,6 +5604,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // DISPLAY EVENT DETAILS 
+
 document.getElementById("fetchEventDetailsBtn").addEventListener("click", function() {
     // Get the event details from the button's data attributes
     const orgId = this.getAttribute("data-org-id");
@@ -5670,6 +5671,10 @@ document.getElementById("fetchEventDetailsBtn").addEventListener("click", functi
                     attendButton.className = "btn btn-primary btn-sm";
                     attendButton.innerText = "Mark as Attending";
                     attendButton.addEventListener("click", () => {
+                        // Show a spinner while processing
+                        attendButton.disabled = true; // Disable button
+                        attendButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+
                         // Send attendance information via URL
                         fetch(`/channels/mark_attending/${orgId}/${channelId}/${event.id}/`, {
                             method: "GET" // Using GET for simplicity, adjust as per your backend
@@ -5684,6 +5689,11 @@ document.getElementById("fetchEventDetailsBtn").addEventListener("click", functi
                         .catch(error => {
                             console.error('Error:', error);
                             alert("An error occurred while marking attendance.");
+                        })
+                        .finally(() => {
+                            // Re-enable button and restore text
+                            attendButton.disabled = false;
+                            attendButton.innerHTML = "Mark as Attending";
                         });
                     });
                     cell7.appendChild(attendButton);
