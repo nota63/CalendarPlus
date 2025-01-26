@@ -5681,7 +5681,9 @@ document.getElementById("fetchEventDetailsBtn").addEventListener("click", functi
                         })
                         .then(response => {
                             if (response.ok) {
-                                alert(`Marked as attending for ${event.event_name}`);
+                             
+                                showNotification(`Marked as attending for ${event.event_name}`);
+
                             } else {
                                 alert(`Failed to mark attendance for ${event.event_name}`);
                             }

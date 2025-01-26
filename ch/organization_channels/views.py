@@ -1937,6 +1937,7 @@ def fetch_event_details(request, org_id, channel_id):
 
 
 # Mark attending the event
+
 @csrf_exempt
 def mark_attending(request, org_id, channel_id, event_id):
 
