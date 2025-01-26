@@ -1993,6 +1993,16 @@ def channel_settings_view(request, org_id, channel_id):
     organization = get_object_or_404(Organization, id=org_id)
     channel = get_object_or_404(Channel, id=channel_id, organization=organization)
 
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+        return JsonResponse({'error': 'You are not part of this organization or do not have access to this channel.'}, status=403)
+    
+    if request.user != organization.created_by:
+        return JsonResponse({'error': 'You must be the admin of the organization to set policies.'}, status=403)
+
+
+
+
     if request.method == 'GET':
         try:
             settings = ChannelSettingsOrganization.objects.get(organization_id=org_id, channel_id=channel_id)
@@ -2012,7 +2022,7 @@ def channel_settings_view(request, org_id, channel_id):
 
     elif request.method == 'POST':
         try:
-            data = json.loads(request.body)  # Use JSON decoding here for AJAX data
+            data = json.loads(request.body)  
 
             settings, created = ChannelSettingsOrganization.objects.update_or_create(
                 organization=organization,
