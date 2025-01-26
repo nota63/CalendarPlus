@@ -2547,6 +2547,62 @@ p {
 
 
 <!-- CHANNEL SETTINGS MODAL -->
+<!-- Modal -->
+<div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="settingsModalLabel">Channel Settings</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="settingsForm">
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="allowMediaUploads">
+                        <label class="form-check-label" for="allowMediaUploads">Allow Media Uploads</label>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="allowCodes">
+                        <label class="form-check-label" for="allowCodes">Allow Codes</label>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="secureFromUnwantedRequests">
+                        <label class="form-check-label" for="secureFromUnwantedRequests">Secure from Unwanted Requests</label>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="allowPolls">
+                        <label class="form-check-label" for="allowPolls">Allow Polls</label>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="allowSharingAccess">
+                        <label class="form-check-label" for="allowSharingAccess">Allow Sharing Access to Another Workspace</label>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="trackAbusiveMessages">
+                        <label class="form-check-label" for="trackAbusiveMessages">Track Abusive Messages</label>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="allowIntegrations">
+                        <label class="form-check-label" for="allowIntegrations">Allow Integrations</label>
+                    </div>
+                    <div class="mb-3">
+                        <label for="integrationChoices" class="form-label">Integration Choices</label>
+                        <select class="form-select" id="integrationChoices">
+                            <option value="Slack">Slack</option>
+                            <option value="Trello">Trello</option>
+                            <option value="Calendly">Calendly</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 
 
@@ -2687,6 +2743,10 @@ Monitor My Storage
     Company Handbook
 </button>
 
+<!-- Button to open modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#settingsModal">
+    Open Channel Settings
+</button>
 
 
 
@@ -5726,6 +5786,92 @@ document.getElementById("fetchEventDetailsBtn").addEventListener("click", functi
 
 
 // CHANNEL SETTINGS
+// Get CSRF token from the DOM (ensure it's rendered in your template)
+const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+// When the modal is opened, fetch and display settings
+document.getElementById('settingsModal').addEventListener('show.bs.modal', function () {
+    const orgId = "{{channel.organization.id}}";  // Replace with actual organization ID
+    const channelId = "{{channel.id}}";  // Replace with actual channel ID
+
+    // Fetch the settings
+    fetch(`/channels/channel_settings/${orgId}/${channelId}/`, {
+        method: 'GET',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.allow_media_uploads !== undefined) {
+            document.getElementById('allowMediaUploads').checked = data.allow_media_uploads;
+        }
+        if (data.allow_codes !== undefined) {
+            document.getElementById('allowCodes').checked = data.allow_codes;
+        }
+        if (data.secure_from_unwanted_requests !== undefined) {
+            document.getElementById('secureFromUnwantedRequests').checked = data.secure_from_unwanted_requests;
+        }
+        if (data.allow_polls !== undefined) {
+            document.getElementById('allowPolls').checked = data.allow_polls;
+        }
+        if (data.allow_sharing_access_to_another_workspace !== undefined) {
+            document.getElementById('allowSharingAccess').checked = data.allow_sharing_access_to_another_workspace;
+        }
+        if (data.track_abusive_messages !== undefined) {
+            document.getElementById('trackAbusiveMessages').checked = data.track_abusive_messages;
+        }
+        if (data.allow_integrations !== undefined) {
+            document.getElementById('allowIntegrations').checked = data.allow_integrations;
+        }
+        if (data.integration_choices) {
+            document.getElementById('integrationChoices').value = data.integration_choices;
+        }
+    })
+    .catch(error => console.error('Failed to fetch settings:', error));
+});
+
+// Save settings automatically as user toggles
+const settingsForm = document.getElementById('settingsForm');
+settingsForm.addEventListener('change', function () {
+    const settingsData = {
+        allow_media_uploads: document.getElementById('allowMediaUploads').checked,
+        allow_codes: document.getElementById('allowCodes').checked,
+        secure_from_unwanted_requests: document.getElementById('secureFromUnwantedRequests').checked,
+        allow_polls: document.getElementById('allowPolls').checked,
+        allow_sharing_access_to_another_workspace: document.getElementById('allowSharingAccess').checked,
+        track_abusive_messages: document.getElementById('trackAbusiveMessages').checked,
+        allow_integrations: document.getElementById('allowIntegrations').checked,
+        integration_choices: document.getElementById('integrationChoices').value
+    };
+
+    const orgId = "{{channel.organization.id}}";  // Replace with actual organization ID
+    const channelId = "{{channel.id}}";  // Replace with actual channel ID
+
+    // Send settings to the server via AJAX
+    fetch(`/channels/channel_settings/${orgId}/${channelId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(settingsData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Settings saved successfully');
+    })
+    .catch(error => console.error('Failed to save settings:', error));
+});
+
+
+
+
+
+
+
+
 
 
 

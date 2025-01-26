@@ -1986,73 +1986,51 @@ def mark_attending(request, org_id, channel_id, event_id):
 
 
 # CONFIGURE CHANNEL SETTINGS
-from .models import ChannelSettings
+from .models import ChannelSettingsOrganization
 
-@login_required
 @csrf_exempt
 def channel_settings_view(request, org_id, channel_id):
-    # Fetch organization and channel
     organization = get_object_or_404(Organization, id=org_id)
     channel = get_object_or_404(Channel, id=channel_id, organization=organization)
 
-    # Fetch or create the settings for the channel
-    settings, created = ChannelSettings.objects.get_or_create(
-        channel=channel,
-        organization=organization,
-        defaults={'created_by': request.user}  # Set created_by to the current user
-    )
-
     if request.method == 'GET':
-        # Return current settings for the channel as JSON
-        data = {
-            'enable_notifications': settings.enable_notifications,
-            'enable_message_moderation': settings.enable_message_moderation,
-            'allow_file_uploads': settings.allow_file_uploads,
-            'allow_emoji_usage': settings.allow_emoji_usage,
-            'allow_mentions': settings.allow_mentions,
-            'enable_event_creation': settings.enable_event_creation,
-            'enable_public_access': settings.enable_public_access,
-            'allow_external_links': settings.allow_external_links,
-            'allow_invites': settings.allow_invites,
-            'allow_remove_members': settings.allow_remove_members,
-            'can_edit_channel_name': settings.can_edit_channel_name,
-            'custom_description': settings.custom_description,
-            'event_reminder_text': settings.event_reminder_text,
-            'banned_keywords': settings.banned_keywords,
-            'channel_logo': settings.channel_logo.url if settings.channel_logo else None,
-            'message_timeout': settings.message_timeout,
-            # Add other fields as needed
-        }
-        return JsonResponse(data)
+        try:
+            settings = ChannelSettingsOrganization.objects.get(organization_id=org_id, channel_id=channel_id)
+            data = {
+                'allow_media_uploads': settings.allow_media_uploads,
+                'allow_codes': settings.allow_codes,
+                'secure_from_unwanted_requests': settings.secure_from_unwanted_requests,
+                'allow_polls': settings.allow_polls,
+                'allow_sharing_access_to_another_workspace': settings.allow_sharing_access_to_another_workspace,
+                'track_abusive_messages': settings.track_abusive_messages,
+                'allow_integrations': settings.allow_integrations,
+                'integration_choices': settings.integration_choices,
+            }
+            return JsonResponse(data)
+        except ChannelSettingsOrganization.DoesNotExist:
+            return JsonResponse({'error': 'Settings not found'}, status=404)
 
     elif request.method == 'POST':
-        # Save updated settings
-        updated_settings = request.POST
+        try:
+            data = json.loads(request.body)  # Use JSON decoding here for AJAX data
 
-        # Update each setting
-        # Update each setting
-        settings.enable_notifications = updated_settings.get('enable_notifications') == 'true'
-        settings.enable_message_moderation = updated_settings.get('enable_message_moderation') == 'true'
-        settings.allow_file_uploads = updated_settings.get('allow_file_uploads') == 'true'
-        settings.allow_emoji_usage = updated_settings.get('allow_emoji_usage') == 'true'
-        settings.allow_mentions = updated_settings.get('allow_mentions') == 'true'
-        settings.enable_event_creation = updated_settings.get('enable_event_creation') == 'true'
-        settings.enable_public_access = updated_settings.get('enable_public_access') == 'true'
-        settings.allow_external_links = updated_settings.get('allow_external_links') == 'true'
-        settings.allow_invites = updated_settings.get('allow_invites') == 'true'
-        settings.allow_remove_members = updated_settings.get('allow_remove_members') == 'true'
-        settings.can_edit_channel_name = updated_settings.get('can_edit_channel_name') == 'true'
-        settings.custom_description = updated_settings.get('custom_description', settings.custom_description)
-        settings.event_reminder_text = updated_settings.get('event_reminder_text', settings.event_reminder_text)
-        settings.banned_keywords = updated_settings.get('banned_keywords', settings.banned_keywords)
-        settings.message_timeout = int(updated_settings.get('message_timeout', settings.message_timeout))
+            settings, created = ChannelSettingsOrganization.objects.update_or_create(
+                organization=organization,
+                channel=channel,
+                defaults={  # Using the correct fields directly
+                    'allow_media_uploads': data.get('allow_media_uploads', False),
+                    'allow_codes': data.get('allow_codes', False),
+                    'secure_from_unwanted_requests': data.get('secure_from_unwanted_requests', False),
+                    'allow_polls': data.get('allow_polls', False),
+                    'allow_sharing_access_to_another_workspace': data.get('allow_sharing_access_to_another_workspace', False),
+                    'track_abusive_messages': data.get('track_abusive_messages', False),
+                    'allow_integrations': data.get('allow_integrations', False),
+                    'integration_choices': data.get('integration_choices', ''),
+                }
+            )
+            return JsonResponse({'message': 'Settings saved successfully'})
 
-        # Update channel logo if provided (Handle file uploads)
-        if request.FILES.get('channel_logo'):
-            settings.channel_logo = request.FILES['channel_logo']
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
 
-        # Save the updated settings
-        settings.save()
-
-        # Return success response
-        return JsonResponse({'status': 'success', 'message': 'Settings updated successfully'})
+    return JsonResponse({'error': 'Invalid request method'}, status=405)

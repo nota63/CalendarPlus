@@ -1,13 +1,8 @@
 from django.contrib import admin
 from .models import (Channel, Message, Link, Mention, ActivityChannel, Ban, ChannelAccess,RetentionPolicy,AbusedMessage,RecurringMessage,RecurrenceHistory,
                      
-                     ChannelEvents, ChannelSettings)
+                     ChannelEvents,ChannelSettingsOrganization)
 
-
-
-@admin.register(ChannelSettings)
-class ChannelSettingsAdmin(admin.ModelAdmin):
-    list_display = ('channel', 'organization', 'created_by', 'created_at', 'updated_at')
 
 
 
@@ -25,4 +20,5 @@ admin.site.register(AbusedMessage)
 admin.site.register(RecurringMessage)
 admin.site.register(RecurrenceHistory)
 admin.site.register(ChannelEvents)
+admin.site.register(ChannelSettingsOrganization)
 
