@@ -24,7 +24,88 @@
 </head>
 
 <style>
-    /* Modal Styles */
+    /* settings Modal Styles */
+  /* Specific styles for Settings Modal */
+  #settingsModal .modal-content {
+    background-color: #ffffff; /* White background for a clean look */
+    color: #333333; /* Dark text for contrast */
+    border-radius: 12px; /* Smooth rounded corners */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  }
+
+  /* Modal Header */
+  #settingsModal .modal-header {
+    background-color: #f7f7f7; /* Light gray for a soft, neutral background */
+    padding: 20px 30px; /* Ample padding for spaciousness */
+    border-radius: 12px 12px 0 0; /* Rounded corners at the top */
+  }
+
+  /* Modal Title */
+  #settingsModal .modal-title {
+    font-size: 1.5rem;
+    font-weight: 600; /* Bold and prominent title */
+    color: #007bff; /* Soft blue for a modern touch */
+    text-transform: uppercase; /* Uppercase letters for emphasis */
+  }
+
+  /* Form Labels */
+  #settingsModal .form-label {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #555; /* Slightly muted text for labels */
+    margin-bottom: 8px; /* Space between label and input */
+  }
+
+  /* Switches */
+  #settingsModal .form-check-input {
+    border-radius: 20px; /* Rounded switch for a modern appearance */
+    background-color: #007bff; /* Blue switch for a premium look */
+    border-color: #007bff; /* Matching border color */
+  }
+
+  #settingsModal .form-check-input:checked {
+    background-color: #28a745; /* Green color for the active state */
+    border-color: #28a745; /* Matching border color */
+  }
+
+  /* Form Select */
+  #settingsModal .form-select {
+    border-radius: 8px;
+    border: 1px solid #007bff;
+    background-color: #f8f9fa;
+    padding: 10px;
+    font-size: 1.1rem;
+  }
+
+  #settingsModal .form-select:focus {
+    border-color: #0056b3; /* Darker blue on focus */
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Blue shadow on focus */
+  }
+
+  /* Modal Footer */
+  #settingsModal .modal-footer {
+    background-color: #f7f7f7;
+    border-top: 1px solid #ececec;
+    padding: 15px 30px; /* Slightly more space for footer */
+  }
+
+  /* Close Button */
+  #settingsModal .btn-close {
+    background-color: transparent;
+    border: none;
+    font-size: 1.2rem;
+  }
+
+  /* Modal Body */
+  #settingsModal .modal-body {
+    padding: 30px; /* More padding for a spacious feel */
+  }
+
+  /* Form Input/Checkbox Styling */
+  #settingsModal .form-check {
+    margin-bottom: 20px; /* Extra space between options */
+  }
+
 
 
 
@@ -2547,61 +2628,83 @@ p {
 
 
 <!-- CHANNEL SETTINGS MODAL -->
-<!-- Modal -->
+<!-- CHANNEL SETTINGS MODAL -->
+<!-- Settings Modal -->
 <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="settingsModalLabel">Channel Settings</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="modal-dialog modal-lg"> <!-- Increase width to 'modal-lg' for a larger modal -->
+    <div class="modal-content shadow-lg rounded-3 border-0"> <!-- Added shadow and rounded corners for a premium feel -->
+      <div class="modal-header border-bottom-0">
+        <h5 class="modal-title text-primary" id="settingsModalLabel">{{channel.name}} Settings</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="settingsForm">
+          <!-- Setting Options -->
+          <div class="mb-4">
+            <label for="allowMediaUploads" class="form-label">Allow Media Uploads</label>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="allowMediaUploads">
             </div>
-            <div class="modal-body">
-                <form id="settingsForm">
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="allowMediaUploads">
-                        <label class="form-check-label" for="allowMediaUploads">Allow Media Uploads</label>
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="allowCodes">
-                        <label class="form-check-label" for="allowCodes">Allow Codes</label>
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="secureFromUnwantedRequests">
-                        <label class="form-check-label" for="secureFromUnwantedRequests">Secure from Unwanted Requests</label>
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="allowPolls">
-                        <label class="form-check-label" for="allowPolls">Allow Polls</label>
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="allowSharingAccess">
-                        <label class="form-check-label" for="allowSharingAccess">Allow Sharing Access to Another Workspace</label>
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="trackAbusiveMessages">
-                        <label class="form-check-label" for="trackAbusiveMessages">Track Abusive Messages</label>
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="allowIntegrations">
-                        <label class="form-check-label" for="allowIntegrations">Allow Integrations</label>
-                    </div>
-                    <div class="mb-3">
-                        <label for="integrationChoices" class="form-label">Integration Choices</label>
-                        <select class="form-select" id="integrationChoices">
-                            <option value="Slack">Slack</option>
-                            <option value="Trello">Trello</option>
-                            <option value="Calendly">Calendly</option>
-                        </select>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
+          </div>
 
+          <div class="mb-4">
+            <label for="allowCodes" class="form-label">Allow Codes</label>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="allowCodes">
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="secureFromUnwantedRequests" class="form-label">Secure From Unwanted Requests</label>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="secureFromUnwantedRequests">
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="allowPolls" class="form-label">Allow Polls</label>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="allowPolls">
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="allowSharingAccess" class="form-label">Allow Sharing Access</label>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="allowSharingAccess">
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="trackAbusiveMessages" class="form-label">Track Abusive Messages</label>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="trackAbusiveMessages">
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="allowIntegrations" class="form-label">Allow Integrations</label>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="allowIntegrations">
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="integrationChoices" class="form-label">Integration Choices</label>
+            <select class="form-select" id="integrationChoices">
+              <option value="slack">Slack</option>
+              <option value="trello">Trello</option>
+              <option value="calendly">Calendly</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer border-top-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 
@@ -2744,8 +2847,9 @@ Monitor My Storage
 </button>
 
 <!-- Button to open modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#settingsModal">
-    Open Channel Settings
+<button type="button" class="menu-item" data-bs-toggle="modal" data-bs-target="#settingsModal">
+    <i class="fas fa-sliders-h"></i>
+    Open {{channel.name}} Settings
 </button>
 
 
