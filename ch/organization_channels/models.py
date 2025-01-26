@@ -402,3 +402,57 @@ class ChannelEvents(models.Model):
 
     def __str__(self):
         return self.event_name
+
+
+
+# CHANNEL SETTINGS
+
+
+class ChannelSettings(models.Model):
+    # Link to Organization
+    organization = models.ForeignKey(
+        Organization, on_delete=models.CASCADE, related_name="channel_settings"
+    )
+
+    # Link to Channel
+    channel = models.ForeignKey(
+        Channel, on_delete=models.CASCADE, related_name="settings"
+    )
+
+    # Boolean fields for enabling/disabling specific settings
+    enable_notifications = models.BooleanField(default=True,  null=True, blank=True)  # Enable notifications for this channel
+    enable_message_moderation = models.BooleanField(default=False, null=True, blank=True )  # Moderate messages
+    allow_file_uploads = models.BooleanField(default=True, null=True, blank=True )  # Allow file uploads in the channel
+    allow_emoji_usage = models.BooleanField(default=True, null=True, blank=True )  # Allow emojis in messages
+    allow_mentions = models.BooleanField(default=True, null=True, blank=True )  # Allow user mentions
+    enable_event_creation = models.BooleanField(default=True, null=True, blank=True )  # Allow events to be created in this channel
+    enable_public_access = models.BooleanField(default=False, null=True, blank=True )  # Public access (if visibility is private)
+    allow_external_links = models.BooleanField(default=True, null=True, blank=True )  # Allow users to send external links
+    allow_invites = models.BooleanField(default=True, null=True, blank=True )  # Allow the creator to invite members
+    allow_remove_members = models.BooleanField(default=True, null=True, blank=True )  # Allow the creator to remove members
+    can_edit_channel_name = models.BooleanField(default=True, null=True, blank=True )  # Allow editing the channel name
+
+    # Text fields for additional settings or descriptions
+    custom_description = models.TextField(blank=True, null=True)  # Custom description for the channel settings
+    event_reminder_text = models.TextField(blank=True, null=True)  # Custom reminder text for events
+    banned_keywords = models.TextField(blank=True, null=True)  # Keywords that are banned in the channel
+
+    # File upload field for the channel logo/icon
+    channel_logo = models.ImageField(upload_to='channel_logos/', blank=True, null=True)
+
+    # Date/Time settings for specific channel operations
+    message_timeout = models.IntegerField(default=24, null=True, blank=True )  # Timeout (in hours) for message expiry or visibility
+
+    # ForeignKey to the user (channel creator) for permissions
+    created_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="channel_settings_created_by"
+    )
+
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Settings for {self.channel.name} (Channel ID: {self.channel.id})"
+
+
