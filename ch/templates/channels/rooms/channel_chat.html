@@ -4,6 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <!-- FullCalendar and Dependencies -->
+
+      <!-- FullCalendar CSS -->
+    <link
+    href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css"
+    rel="stylesheet"
+/>
+
+
+
+
+
+
+
+
     <meta name="csrf-token" content="{% csrf_token %}">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
@@ -24,6 +39,7 @@
 </head>
 
 <style>
+
     /* settings Modal Styles */
   /* Specific styles for Settings Modal */
   #settingsModal .modal-content {
@@ -2707,17 +2723,35 @@ p {
 </div>
 
 
+<!-- EVENTS CALENDAR -->
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   <!-- Include Bootstrap 5 JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   
-
+ <!-- FullCalendar JavaScript -->
+ <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 <!-- ---------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
 
 <br><br>
 <!-- -------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+<div id="calendar-container" class="mt-5 hidden">
+    <div id="calendar"></div>
+</div>
 
 
 <!-- sidebar --------------------------------------------------------------------------------------------------------------------------------------- -->
@@ -2727,6 +2761,16 @@ p {
     </div>
     
     <div class="sidebar-menu">
+
+        <button
+        id="show-calendar-btn"
+        class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600"
+    >
+        Show Calendar
+    </button>
+
+        
+  
         <!-- Button to trigger the modal -->
 <button id="fetchEventDetailsBtn" class="menu-item" data-org-id="{{ channel.organization.id }}" data-channel-id="{{ channel.id }}" data-bs-toggle="modal" data-bs-target="#eventDetailsModalPremium">
     <i class="fas fa-database"></i>
@@ -5968,6 +6012,63 @@ settingsForm.addEventListener('change', function () {
     })
     .catch(error => console.error('Failed to save settings:', error));
 });
+
+
+// EVENTS CALENDAR 
+
+document.getElementById("show-calendar-btn").addEventListener("click", function () {
+        const calendarContainer = document.getElementById("calendar-container");
+
+        if (calendarContainer.classList.contains("hidden")) {
+            calendarContainer.classList.remove("hidden");
+
+            const calendarEl = document.getElementById("calendar");
+
+            // Initialize the FullCalendar
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: "dayGridMonth",
+                headerToolbar: {
+                    left: "prev,next today",
+                    center: "title",
+                    right: "dayGridMonth,timeGridWeek,timeGridDay",
+                },
+                events: async function (info, successCallback, failureCallback) {
+                    try {
+                        // Replace 'org_id' and 'channel_id' with actual values
+                        const orgId = "{{channel.organization.id}}"; // Example: Replace with dynamic org_id
+                        const channelId = "{{channel.id}}"; // Example: Replace with dynamic channel_id
+
+                        // Fetch events from the server
+                        const response = await fetch(`/channels/channel_events/${orgId}/${channelId}/`);
+                        if (!response.ok) {
+                            throw new Error("Failed to fetch events");
+                        }
+
+                        const eventData = await response.json();
+                        successCallback(eventData);
+                    } catch (error) {
+                        console.error("Error fetching events:", error);
+                        failureCallback(error);
+                    }
+                },
+                eventClick: function (info) {
+                    // Display event details on click
+                    alert(`Event: ${info.event.title}\nDetails: ${info.event.extendedProps.details}`);
+                },
+            });
+
+            calendar.render();
+        }
+    });
+
+
+
+
+
+
+
+
+
 
 
 

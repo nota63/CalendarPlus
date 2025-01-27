@@ -53,6 +53,7 @@ urlpatterns = [
     path('channels/<int:org_id>/save/<int:channel_id>/',save_event_data, name='save_event_data'),
     path('events/fetch/<int:org_id>/<int:channel_id>/',fetch_event_details, name='fetch_event_details'),
     path('mark_attending/<int:org_id>/<int:channel_id>/<int:event_id>/',mark_attending, name='mark_attending'),
-    path('channel_settings/<int:org_id>/<int:channel_id>/',channel_settings_view, name='channel_settings')
+    path('channel_settings/<int:org_id>/<int:channel_id>/',channel_settings_view, name='channel_settings'),
+    path('channel_events/<int:org_id>/<int:channel_id>/',channel_events_calendar, name='channel_events')
 
 ]

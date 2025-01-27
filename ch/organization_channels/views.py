@@ -2047,3 +2047,25 @@ def channel_settings_view(request, org_id, channel_id):
 
 # DISPLAY CHANNEL CALENDAR
 
+def channel_events_calendar(request, org_id, channel_id):
+
+    organization = get_object_or_404(Organization, id=org_id)
+    channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+
+    events = ChannelEvents.objects.filter(organization=organization, channel=channel)
+    print("EVENTS FOUND:",events)
+
+    event_data = []
+    for event in events:
+        event_data.append({
+            'id': event.id,
+            'title': event.event_name,
+            'start': event.event_date.isoformat(),  
+            'end': event.event_date.isoformat(),  
+            'details': event.event_details,
+            'attachment': event.event_attachment.url if event.event_attachment else None,
+            'link': event.event_link,
+        })
+
+ 
+    return JsonResponse(event_data, safe=False)
