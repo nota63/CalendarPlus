@@ -16,7 +16,7 @@
 <body class="bg-gray-100">
     <div class="max-w-4xl mx-auto mt-10">
         <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Channels in {{ organization.name }}</h1>
-
+    
         <!-- Search Form -->
         <div class="relative">
             <input 
@@ -29,7 +29,7 @@
                 <span class="text-gray-500">Loading...</span>
             </div>
         </div>
-
+    
         <!-- Channels List -->
         <div id="channelsList" class="space-y-4 mt-6">
             {% for channel in channels %}
@@ -39,28 +39,46 @@
                     <span class="text-sm text-gray-500 px-3 py-1 rounded bg-gray-100">
                         {{ channel.get_visibility_display }}
                     </span>
+    
+                    <!-- 3-dot menu -->
+                    <div class="relative">
+                        <button class="text-gray-500 hover:text-gray-700 focus:outline-none" id="dotsMenu{{ channel.id }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 12h12M6 6h12M6 18h12" />
+                            </svg>
+                        </button>
+    
+                        <!-- Dropdown Menu -->
+                        <div id="menu{{ channel.id }}" class="absolute right-0 hidden bg-white border rounded-lg shadow-lg mt-2 w-40">
+                            <ul class="py-2">
+                                <li>
+                                    <a href="{% url 'channel_chat' channel_id=channel.id %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                        Launch channel
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
                 <p class="text-gray-600 mt-2">{{ channel.get_type_display }}</p>
                 <p class="text-sm text-gray-400 mt-1">Created on: {{ channel.created_at|date:"F j, Y" }}</p>
-        
+    
                 <!-- Check if the channel was granted to your organization -->
                 {% if channel.accesses.exists %}
-                    <div class="mt-2">
+                <div class="mt-2">
+                    {% for access in channel.accesses.all %}
                         <span class="text-sm text-green-500 bg-green-100 px-2 py-1 rounded">
-                            Access granted by: {{ channel.accesses.first.owning_organization.name }}
-                            To: {{ channel.accesses.first.granted_to_organization.name }}
-                        </span>
-                    </div>
+                            Access granted by: {{ access.owning_organization.name }}
+                            To: {{ access.granted_to_organization.name }}
+                        </span><br>
+                    {% endfor %}
+                </div>
                 {% endif %}
             </div>
-            <a href="{% url 'channel_chat' channel_id=channel.id %}">
-                <button type="submit">Launch channel</button>
-            </a>
-        {% endfor %}
-        
+            {% endfor %}
         </div>
     </div>
-
+    
     <!-- JavaScript for AJAX -->
     <script>
         const searchInput = document.getElementById('searchInput');
@@ -98,9 +116,29 @@
                                     <span class="text-sm text-gray-500 px-3 py-1 rounded bg-gray-100">
                                         ${channel.visibility}
                                     </span>
+
+                                    <!-- 3-dot menu -->
+                                    <div class="relative">
+                                        <button class="text-gray-500 hover:text-gray-700 focus:outline-none" id="dotsMenu${channel.id}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 12h12M6 6h12M6 18h12" />
+                                            </svg>
+                                        </button>
+
+                                        <!-- Dropdown Menu -->
+                                        <div id="menu${channel.id}" class="absolute right-0 hidden bg-white border rounded-lg shadow-lg mt-2 w-40">
+                                            <ul class="py-2">
+                                                <li>
+                                                    <a href="/channels/channel/${channel.id}/chat/" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                                        Launch channel
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
                                 <p class="text-gray-600 mt-2">${channel.type}</p>
-                                <p class="text-sm text-gray-400 mt-1">Created on: ${channel.created_at}</p>
+                                <p class="text-sm text-gray-400 mt-1">Created on: ${new Date(channel.created_at).toLocaleDateString()}</p>
                             </div>
                         `;
                     });
@@ -112,6 +150,28 @@
             .catch(error => {
                 console.error('Error fetching data:', error);
                 loadingIndicator.style.display = 'none';
+            });
+        });
+
+        // FOR 3 DOT MENU
+        document.addEventListener("DOMContentLoaded", function() {
+            const dotsButtons = document.querySelectorAll('[id^="dotsMenu"]');
+            dotsButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const channelId = button.id.replace('dotsMenu', '');
+                    const menu = document.getElementById('menu' + channelId);
+
+                    // Toggle the dropdown menu visibility
+                    menu.classList.toggle('hidden');
+                });
+            });
+
+            // Close menus if clicking outside
+            document.addEventListener('click', function(e) {
+                const openMenu = document.querySelector('.menu:not(.hidden)');
+                if (openMenu && !openMenu.contains(e.target) && !e.target.closest('[id^="dotsMenu"]')) {
+                    openMenu.classList.add('hidden');
+                }
             });
         });
     </script>

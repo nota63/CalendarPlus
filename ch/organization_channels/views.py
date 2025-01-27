@@ -2074,3 +2074,8 @@ def channel_events_calendar(request, org_id, channel_id):
 
  
     return JsonResponse(event_data, safe=False)
+
+
+# Channel end 
+
+    
