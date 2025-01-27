@@ -40,6 +40,83 @@
 
 <style>
 
+#calendar-container {
+    background-color: #ffffff; /* White background for a clean look */
+    border-radius: 12px; /* Rounded corners for a premium feel */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    padding: 15px; /* Padding around the calendar */
+    width: 70%; /* Smaller width to make it compact */
+    max-width: 800px; /* Limit the maximum width */
+    margin: 0 auto; /* Center align the container */
+    font-family: 'Arial', sans-serif; /* Clean, professional font */
+}
+
+#calendar {
+    font-size: 0.85rem; /* Smaller font size for compact view */
+}
+
+.fc-header-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.fc-toolbar-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333333; /* Darker shade for premium contrast */
+}
+
+.fc-button {
+    background-color: #4A90E2; /* Premium blue button color */
+    color: #ffffff;
+    border: none;
+    border-radius: 8px; /* Rounded buttons */
+    padding: 5px 10px;
+    font-size: 0.85rem;
+    transition: background-color 0.3s ease;
+}
+
+.fc-button:hover {
+    background-color: #357ABD; /* Darker blue on hover */
+}
+
+.fc-daygrid-day-number {
+    color: #4A90E2; /* Highlighted date numbers */
+    font-weight: bold;
+}
+
+.fc-daygrid-event {
+    background-color: #F5F7FA; /* Light gray background for events */
+    color: #333333;
+    border-radius: 6px; /* Rounded event items */
+    padding: 2px 5px;
+    font-size: 0.8rem;
+}
+
+.fc-day-today {
+    background-color: rgba(74, 144, 226, 0.1); /* Light blue highlight for today */
+}
+
+.fc-scrollgrid {
+    border: 1px solid #E0E0E0; /* Subtle border for a polished look */
+    border-radius: 12px; /* Match the outer container's radius */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /* settings Modal Styles */
   /* Specific styles for Settings Modal */
   #settingsModal .modal-content {
