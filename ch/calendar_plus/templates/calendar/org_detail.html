@@ -233,12 +233,13 @@
             <a href="{% url 'project_list' organization.id %}">
                 <span class="material-icons">assignment</span> My Projects
             </a>
-            <a href="{% url 'members_action' organization_id=organization.id %}">
-                <span class="material-icons">group</span> Manage Members
+          
+
+            <a href="{% url 'manage_members' organization.id %}">
+                <span class="material-icons">group</span> Manage Workspace Members
             </a>
-            <a href="{% url 'send_email_invitation' organization_id=organization.id %}">
-                <span class="material-icons">email</span> Send Email Invite
-            </a>
+
+            
             <a href="{% url 'invitation_status' organization.id %}">
                 <span class="material-icons">person_add</span> Invitations Status
             </a>
@@ -301,12 +302,11 @@
                 <span class="material-icons">event</span> Organization Holidays
             </a>
 
-            <a href="{% url 'members_action' organization_id=organization.id %}">
-                <span class="material-icons">group</span> Manage Members
+            <a href="{% url 'manage_members' organization.id %}">
+                <span class="material-icons">group</span> Manage Workspace Members
             </a>
-            <a href="{% url 'send_email_invitation' organization_id=organization.id %}">
-                <span class="material-icons">email</span> Send Email Invite
-            </a>
+
+            
             <a href="{% url 'organizations_members' organization.id %}">
                 <span class="material-icons">person_add</span> Calendars
             </a>
