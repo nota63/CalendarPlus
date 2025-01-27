@@ -2724,6 +2724,22 @@ p {
 
 
 <!-- EVENTS CALENDAR -->
+<div class="modal fade" id="eventCalendarModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Event details will be populated here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -2752,6 +2768,7 @@ p {
 <div id="calendar-container" class="mt-5 hidden">
     <div id="calendar"></div>
 </div>
+
 
 
 <!-- sidebar --------------------------------------------------------------------------------------------------------------------------------------- -->
@@ -6017,50 +6034,71 @@ settingsForm.addEventListener('change', function () {
 // EVENTS CALENDAR 
 
 document.getElementById("show-calendar-btn").addEventListener("click", function () {
-        const calendarContainer = document.getElementById("calendar-container");
+    const calendarContainer = document.getElementById("calendar-container");
 
-        if (calendarContainer.classList.contains("hidden")) {
-            calendarContainer.classList.remove("hidden");
+    if (calendarContainer.classList.contains("hidden")) {
+        calendarContainer.classList.remove("hidden");
 
-            const calendarEl = document.getElementById("calendar");
+        const calendarEl = document.getElementById("calendar");
 
-            // Initialize the FullCalendar
-            const calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: "dayGridMonth",
-                headerToolbar: {
-                    left: "prev,next today",
-                    center: "title",
-                    right: "dayGridMonth,timeGridWeek,timeGridDay",
-                },
-                events: async function (info, successCallback, failureCallback) {
-                    try {
-                        // Replace 'org_id' and 'channel_id' with actual values
-                        const orgId = "{{channel.organization.id}}"; // Example: Replace with dynamic org_id
-                        const channelId = "{{channel.id}}"; // Example: Replace with dynamic channel_id
+        // Initialize the FullCalendar
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: "dayGridMonth",
+            headerToolbar: {
+                left: "prev,next today",
+                center: "title",
+                right: "dayGridMonth,timeGridWeek,timeGridDay",
+            },
+            events: async function (info, successCallback, failureCallback) {
+                try {
+                    // Replace 'org_id' and 'channel_id' with actual values
+                    const orgId = "{{channel.organization.id}}"; // Dynamic org_id
+                    const channelId = "{{channel.id}}"; // Dynamic channel_id
 
-                        // Fetch events from the server
-                        const response = await fetch(`/channels/channel_events/${orgId}/${channelId}/`);
-                        if (!response.ok) {
-                            throw new Error("Failed to fetch events");
-                        }
-
-                        const eventData = await response.json();
-                        successCallback(eventData);
-                    } catch (error) {
-                        console.error("Error fetching events:", error);
-                        failureCallback(error);
+                    // Fetch events from the server
+                    const response = await fetch(`/channels/channel_events/${orgId}/${channelId}/`);
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch events");
                     }
-                },
-                eventClick: function (info) {
-                    // Display event details on click
-                    alert(`Event: ${info.event.title}\nDetails: ${info.event.extendedProps.details}`);
-                },
-            });
 
-            calendar.render();
-        }
-    });
+                    const eventData = await response.json();
+                    successCallback(eventData);
+                } catch (error) {
+                    console.error("Error fetching events:", error);
+                    failureCallback(error);
+                }
+            },
+            eventClick: function (info) {
+                // Populate modal with event details
+                const modalTitle = document.getElementById("modal-title");
+                const modalBody = document.getElementById("modal-body");
 
+                modalTitle.textContent = info.event.title;
+                modalBody.innerHTML = `
+                    <p><strong>Start:</strong> ${info.event.start}</p>
+                    <p><strong>End:</strong> ${info.event.end || "N/A"}</p>
+                    <p><strong>Details:</strong> ${info.event.extendedProps.details || "No details provided."}</p>
+                    ${
+                        info.event.extendedProps.attachment
+                            ? `<p><strong>Attachment:</strong> <a href="${info.event.extendedProps.attachment}" target="_blank">View</a></p>`
+                            : ""
+                    }
+                    ${
+                        info.event.extendedProps.link
+                            ? `<p><strong>Link:</strong> <a href="${info.event.extendedProps.link}" target="_blank">${info.event.extendedProps.link}</a></p>`
+                            : ""
+                    }
+                `;
+
+                // Show the modal
+                const modal = new bootstrap.Modal(document.getElementById("eventCalendarModal"));
+                modal.show();
+            },
+        });
+
+        calendar.render();
+    }
+});
 
 
 
