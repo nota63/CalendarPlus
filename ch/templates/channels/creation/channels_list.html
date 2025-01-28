@@ -25,6 +25,64 @@
 
 <style>
 
+ /* Specific styling for the Send Alert Notification Modal */
+ #alertModal .modal-dialog {
+    max-width: 80% !important;  /* Set max-width for this modal */
+    width: 100% !important;     /* Ensure full width */
+    height: 70vh !important;    /* Increase the height of the modal */
+    margin-top: 5vh;            /* Add some margin from the top of the screen */
+  }
+
+  /* Specific styling for modal content */
+  #alertModal .modal-content {
+    border-radius: 10px !important; /* Rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Soft shadow */
+  }
+
+  /* Specific styling for modal header */
+  #alertModal .modal-header {
+    background-color: #f5f5f5 !important;
+    border-bottom: 1px solid #ddd !important;
+  }
+
+  #alertModal .modal-title {
+    font-size: 1.25rem;
+    color: #4A4A4A;
+  }
+
+  /* Specific styling for modal footer */
+  #alertModal .modal-footer {
+    background-color: #f9f9f9 !important;
+  }
+
+  /* Specific styling for TinyMCE */
+  #alertModal .tox .tox-editor-container {
+    height: 400px !important; /* Set height of the TinyMCE editor */
+    width: 100% !important;    /* Make editor width 100% of the modal */
+  }
+
+  #alertModal textarea {
+    width: 100% !important; /* Ensure textarea covers full width */
+  }
+
+  .btn-close {
+    color: #6c757d;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+  }
+
+
+  
+
+
 /* Banned Users Modal Styling */
 #BannedUsersModal .modal-content {
     border-radius: 10px;
@@ -1546,6 +1604,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 // HANDLE SENDING ALERT NOTIFICATION IN CHANNEL 
+
+
   // Initialize TinyMCE on the alert message textarea
   tinymce.init({
     selector: '#alertMessage', // Target the alertMessage textarea
