@@ -612,7 +612,27 @@
 </div>
 
 
-
+<!-- BANNED USERS MODAL -->
+<div class="modal fade" id="BannedUsersModal" tabindex="-1" aria-labelledby="BannedUsersModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="BannedUsersModalLabel">Banned Users</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Select a user to unban:</h6>
+                <div id="bannedUsersList" class="list-group">
+                    <!-- Dynamically populated banned users will go here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="unbanUserBtnModal">Unban</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <!-- ---------------------------------------------------------------------------------------------------------------- -->
@@ -766,7 +786,19 @@ data-bs-target="#userSelectionModal">
 </svg>
 <span class="font-medium text-purple-600/90">Manage User Permissions</span>
 </button>
-                                {% endif %}
+<button 
+    class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200"
+    id="unbanUserBtn"
+    data-channel-id="{{channel.id}}"
+    data-org-id="{{channel.organization.id}}"
+    data-bs-toggle="modal"
+    data-bs-target="#BannedUsersModal">
+    <svg class="w-5 h-5 mr-3 text-purple-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16 11l4-4m0 0l-4-4m4 4H4m16 4l-4 4m0 0l4 4m-4-4H4" />
+    </svg>
+    <span class="font-medium text-purple-600/90">Manage Banned Users</span>
+</button>
+                  {% endif %}
                             </div>
                         </div>
                     </div>
@@ -1263,6 +1295,91 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+
+
+
+// MANAGE BANNED USERS 
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+        const managePermissionsBtn = document.getElementById('unbanUserBtn');
+
+        if (managePermissionsBtn) {
+            managePermissionsBtn.addEventListener('click', function () {
+                const channelId = managePermissionsBtn.getAttribute('data-channel-id');
+                const orgId = managePermissionsBtn.getAttribute('data-org-id');
+
+                // Fetch banned users
+                fetch(`/channels/api/manage_banned_users/${orgId}/${channelId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            const bannedUsersList = document.getElementById('bannedUsersList');
+                            bannedUsersList.innerHTML = '';  // Clear any existing list
+
+                            data.banned_users.forEach(bannedUser => {
+                                const userItem = document.createElement('button');
+                                userItem.classList.add('list-group-item', 'list-group-item-action');
+                                userItem.innerHTML = `${bannedUser.username} - ${bannedUser.duration}`;
+                                userItem.setAttribute('data-user-id', bannedUser.user_id);
+                                bannedUsersList.appendChild(userItem);
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching banned users:', error);
+                    });
+            });
+        }
+
+        const unbanUserBtnModal = document.getElementById('unbanUserBtnModal');
+        if (unbanUserBtnModal) {
+            unbanUserBtnModal.addEventListener('click', function () {
+                const selectedUserButton = document.querySelector('.list-group-item.active');
+                if (selectedUserButton) {
+                    const userId = selectedUserButton.getAttribute('data-user-id');
+                    const channelId = managePermissionsBtn.getAttribute('data-channel-id');
+                    const orgId = managePermissionsBtn.getAttribute('data-org-id');
+
+                    // Send unban request via POST
+                    fetch(`/channels/api/manage_banned_users/${orgId}/${channelId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ user_id: userId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            const myModal = new bootstrap.Modal(document.getElementById('BannedUsersModal'));
+                            myModal.hide();
+
+                            alert(data.message); // Show success message
+                        } else {
+                            alert(data.message); // Show error message
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error unbanning user:', error);
+                    });
+                } else {
+                    alert('Please select a user to unban!');
+                }
+            });
+        }
+
+        // Handle user selection to unban
+        document.addEventListener('click', function (event) {
+            if (event.target && event.target.classList.contains('list-group-item')) {
+                const allItems = document.querySelectorAll('.list-group-item');
+                allItems.forEach(item => item.classList.remove('active')); // Remove active class from all items
+
+                event.target.classList.add('active'); // Add active class to the clicked item
+            }
+        });
+    });
 
 
 

@@ -2393,3 +2393,60 @@ def manage_user_permissions(request, org_id, channel_id, user_id):
     except Exception as e:
         logger.error(f"Error occurred: {str(e)}")
         return JsonResponse({'status': 'error', 'message': str(e)})
+
+
+
+# MANAGE BANNED USERS (ADMIN ONLY)
+
+@csrf_exempt
+@login_required
+def manage_banned_users(request, org_id, channel_id):
+    try:
+    
+        organization = get_object_or_404(Organization, id=org_id)
+ 
+        channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+
+       
+        if request.method == 'GET':
+            banned_users = Ban.objects.filter(organization=organization, channel=channel)
+            banned_user_data = []
+
+     
+            for ban in banned_users:
+                ban_data = {
+                    'user_id': ban.user.id,
+                    'username': ban.user.username,
+                    'reason': ban.reason,
+                    'start_time': ban.start_time,
+                    'end_time': ban.end_time,
+                    'duration': ban.duration,
+                    'is_active': ban.is_active(),
+                }
+                banned_user_data.append(ban_data)
+
+            return JsonResponse({'status': 'success', 'banned_users': banned_user_data})
+
+      
+        elif request.method == 'POST':
+            data = json.loads(request.body.decode('utf-8'))
+            user_id_to_unban = data.get('user_id')
+            if user_id_to_unban:
+              
+                ban_to_unban = Ban.objects.filter(
+                    user__id=user_id_to_unban,
+                    organization=organization,
+                    channel=channel
+                ).first()
+
+                if ban_to_unban:
+                    
+                    ban_to_unban.unban()
+                    return JsonResponse({'status': 'success', 'message': f'User {ban_to_unban.user.username} has been unbanned.'})
+                else:
+                    return JsonResponse({'status': 'error', 'message': 'Ban entry not found.'})
+
+            return JsonResponse({'status': 'error', 'message': 'No user ID provided for unban.'})
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
