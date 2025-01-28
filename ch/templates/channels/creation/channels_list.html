@@ -731,7 +731,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // MANAGE USERS 
-
 document.addEventListener("DOMContentLoaded", function () {
     const managePermissionsBtn = document.getElementById('managePermissionsBtn');
     const usersList = document.getElementById('users-list');
@@ -789,9 +788,8 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(data => {
                 console.log('Fetched permissions data:', data); // Log the response to check
 
-                // Clear previous containers
+                // Clear previous containers but keep assigned permissions visible
                 permissionsToGiveContainer.innerHTML = '';
-                assignedPermissionsContainer.innerHTML = '';
 
                 // Access the correct data structure: data.data.assignedPermissions and data.data.availablePermissions
                 const assignedPermissions = data.data.assignedPermissions || [];
@@ -807,7 +805,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     item.addEventListener('dragstart', dragStart);
                 });
 
-                // Populate assigned permissions
+                // Always keep assigned permissions persistent
                 assignedPermissions.forEach(permission => {
                     const item = document.createElement('div');
                     item.classList.add('permission-item');
@@ -873,6 +871,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(data => {
             if (data.status === 'success') {
                 alert('Permissions updated successfully!');
+                // No need to re-fetch assigned permissions here
                 permissionsManagementModal.hide(); // Close modal
             } else {
                 alert('Error saving permissions.');
@@ -884,6 +883,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+
+
 
     </script>
 </body>

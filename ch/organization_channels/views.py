@@ -2307,6 +2307,7 @@ def manage_channel_access(request, channel_id):
 # Retrive & handle permissions
 # Set up logging
 logger = logging.getLogger(__name__)
+
 @csrf_exempt
 @login_required
 def manage_user_permissions(request, org_id, channel_id, user_id):
@@ -2333,8 +2334,12 @@ def manage_user_permissions(request, org_id, channel_id, user_id):
         )
         logger.debug(f"Fetched {user_permissions.count()} permission(s) for user {user_id} in channel {channel.id}")
 
-        # Ensure we handle empty permissions gracefully
-        assigned_permissions = user_permissions.first().permissions if user_permissions.exists() else []
+        # Check if user has permissions, else default to empty list
+        if user_permissions.exists():
+            assigned_permissions = [perm.permission for perm in user_permissions]  # Assuming `permission` is a CharField
+        else:
+            assigned_permissions = []  # If no permissions exist for the user
+
         logger.debug(f"Assigned permissions: {assigned_permissions}")
 
         # Assuming available permissions are predefined or come from another model
@@ -2366,7 +2371,7 @@ def manage_user_permissions(request, org_id, channel_id, user_id):
                     user_id=user_id, 
                     organization=organization, 
                     channel=channel, 
-                    permissions=[permission],
+                    permissions=[permission],  # Ensure this is stored as a list/array, or update to your actual structure
                     granted_by=request.user
                 )
                 logger.debug(f"Granted permission: {permission} to user {user_id} in channel {channel.id}")
