@@ -23,6 +23,64 @@
 </head>
 <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 <style>
+
+@keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        @keyframes particle-network {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+        .particle-network-animation::before {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(99, 102, 241, 0.8);
+            animation: particle-network 2s infinite;
+        }
+        .channel-card {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .quantum-menu {
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+        .quantum-menu-btn:hover + .quantum-menu,
+        .quantum-menu:hover {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .dot-pulse {
+            position: relative;
+            width: 6px;
+            height: 6px;
+            background: #3B82F6;
+            border-radius: 50%;
+            animation: dot-pulse 1.4s infinite linear;
+        }
+        @keyframes dot-pulse {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+
+
+
+
+
+
+
+
+
+
 /* Style for the modal dialog */
 .modal-dialog {
     max-width: 600px; /* Adjusts the modal width */
@@ -379,6 +437,25 @@
 }
 
 
+
+@keyframes fade-in-down {
+    0% { opacity: 0; transform: translateY(-10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-down {
+    animation: fade-in-down 0.5s ease-out;
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 </style>
 
 
@@ -539,133 +616,165 @@
 
 
 <!-- ---------------------------------------------------------------------------------------------------------------- -->
-<body class="bg-gray-100">
-    <div class="max-w-4xl mx-auto mt-10">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Channels in {{ organization.name }}</h1>
-    
-        <!-- Search Form -->
-        <div class="relative">
-            <input 
-                id="searchInput" 
-                type="text" 
-                placeholder="Search channels..." 
-                class="w-full p-3 border rounded-lg focus:ring focus:ring-blue-300"
-            />
-            <div id="loading" class="absolute top-3 right-5">
-                <span class="text-gray-500">Loading...</span>
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Header Section -->
+        <div class="mb-12 text-center space-y-3 animate-fade-in-down">
+            <h1 class="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent tracking-tight mb-2">
+                {{ organization.name }} Channels
+            </h1>
+            <p class="text-gray-600 text-lg font-medium opacity-90">
+                Seamlessly manage cross-organization communication channels
+            </p>
+        </div>
+
+        <!-- Search Container -->
+        <div class="mb-10 relative transform transition-all duration-300 hover:scale-[1.005]">
+            <div class="relative backdrop-blur-lg bg-white/50 ring-1 ring-white/30 rounded-xl shadow-soft-lg">
+                <input 
+                    id="searchInput"
+                    type="text" 
+                    placeholder="Search channels..."
+                    class="w-full px-6 py-4 bg-transparent border-0 focus:ring-0 placeholder-gray-400/80 text-gray-700 text-lg font-medium"
+                >
+                <div id="loading" class="absolute inset-y-0 right-0 pr-5 hidden items-center">
+                    <div class="animate-pulse">
+                        <div class="h-6 w-6 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-60"></div>
+                    </div>
+                </div>
             </div>
         </div>
-    
+
         <!-- Channels List -->
-        <div id="channelsList" class="space-y-4 mt-6">
+        <div id="channelsList" class="space-y-4">
             {% for channel in channels %}
-            <div class="bg-white p-4 shadow rounded-lg">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-semibold text-gray-700">{{ channel.name }}</h2>
-                    <span class="text-sm text-gray-500 px-3 py-1 rounded bg-gray-100">
-                        {{ channel.get_visibility_display }}
-                    </span>
-    
-                    <!-- 3-dot menu -->
-                    <div class="relative">
+            <div 
+                class="group relative bg-gradient-to-br from-white to-blue-50/50 p-6 rounded-2xl shadow-soft-lg hover:shadow-xl transition-all duration-300 border border-white/50 hover:border-white/80 animate-card-in"
+                style="animation-delay: {{ forloop.counter0|divisibleby:2|yesno:'0ms,50ms' }}; animation-fill-mode: backwards;"
+            >
+                <div class="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity duration-300"></div>
+                
+                <div class="relative flex items-start justify-between">
+                    <!-- Channel Info -->
+                    <div class="flex-1 min-w-0 space-y-3">
+                        <div class="flex items-center space-x-4">
+                            <h2 class="text-xl font-semibold text-gray-900 truncate tracking-tight">
+                                {{ channel.name }}
+                            </h2>
+                            <span class="px-3 py-1 rounded-full text-sm font-medium bg-opacity-10 backdrop-blur-sm 
+                                    {% if channel.visibility == 'public' %}bg-emerald-500/20 text-emerald-700{% else %}bg-indigo-500/20 text-indigo-700{% endif %}">
+                                {{ channel.get_visibility_display }}
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-center space-x-6 text-sm">
+                            <div class="flex items-center space-x-1.5 text-gray-500/90">
+                                <svg class="w-5 h-5 text-gray-400/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 7.125C2.25 6.504 2.754 6 3.375 6h6c.621 0 1.125.504 1.125 1.125v3.75c0 .621-.504 1.125-1.125 1.125h-6a1.125 1.125 0 01-1.125-1.125v-3.75zM14.25 8.625c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125v8.25c0 .621-.504 1.125-1.125 1.125h-5.25a1.125 1.125 0 01-1.125-1.125v-8.25zM3.75 16.125c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125v2.25c0 .621-.504 1.125-1.125 1.125h-5.25a1.125 1.125 0 01-1.125-1.125v-2.25z" />
+                                </svg>
+                                <span class="font-medium">{{ channel.get_type_display }}</span>
+                            </div>
+                            <span class="text-gray-300">•</span>
+                            <span class="text-gray-500/85 italic font-light">
+                                Created {{ channel.created_at|date:"M j, Y" }}
+                            </span>
+                        </div>
+
+                        <!-- Access Indicators -->
+                        {% if channel.accesses.exists %}
+                        <div class="mt-4 space-y-2">
+                            {% for access in channel.accesses.all %}
+                            <div class="inline-flex items-center px-3 py-1.5 bg-purple-500/10 backdrop-blur-sm rounded-lg text-sm text-purple-700/90 font-medium">
+                                <svg class="w-4 h-4 mr-2 text-purple-500/80" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                                </svg>
+                                Shared by {{ access.owning_organization.name }} → {{ access.granted_to_organization.name }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Action Menu -->
+                      <!-- 3-dot menu -->
+                      <div class="relative">
                         <button class="text-gray-500 hover:text-gray-700 focus:outline-none" id="dotsMenu{{ channel.id }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 12h12M6 6h12M6 18h12" />
                             </svg>
                         </button>
-    
-                        <!-- Dropdown Menu -->
-                        <div id="menu{{ channel.id }}" class="absolute right-0 hidden bg-white border rounded-lg shadow-lg mt-2 w-40">
-                            <ul class="py-2">
-                                <li>
-                                    <a href="{% url 'channel_chat' channel_id=channel.id %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                                        Launch channel
-                                    </a>
-                                </li>
-                                <li>
+
+
+                        <!-- Dropdown Card -->
+                        <div id="menu{{ channel.id }}" class="hidden absolute right-0 z-20 mt-2 w-56 origin-top-right bg-white/95 backdrop-blur-xl divide-y divide-gray-100/20 rounded-xl shadow-2xl shadow-blue-100/30 ring-1 ring-black/5">
+                            <div class="py-2">
+                                <a href="{% url 'channel_chat' channel_id=channel.id %}" class="flex items-center px-5 py-3 text-sm text-gray-600 hover:bg-gray-50/80 transition-all duration-200">
+                                    <svg class="w-5 h-5 mr-3 text-blue-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                    </svg>
+                                    <span class="font-medium">Open Channel</span>
+                                </a>
                                 {% if user_profile.is_admin %}
-                                   <li>
-                                     <!-- Delete Button -->
-                                       <button
-                                       class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                         id="delete-channel-btn"
-                                        data-channel-id="{{channel.id}}"
-                                           data-org-id="{{channel.organization.id}}"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#deleteChannelModal"
-                                     >
-                                       Wipe Channel
-                         
-                                    </button>
-                                  </li>  
-                                  <li>
-                                       <button
-                                           class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                            id="download-channel-btn"
-                                            data-channel-id="{{channel.id}}"
-                                            data-org-id="{{channel.organization.id}}"
-                                            data-bs-toggle="modal"
-                                             data-bs-target="#downloadChannelModal"
-                                         >
-                                           Download channel data
-                                        </button>
-                                  </li>
-                                  <li>
-                                    <button
-                                          class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                          id="manage-access-btn"
-                                          data-channel-id="{{ channel.id }}"
-                                          data-bs-toggle="modal"
-                                          data-bs-target="#manageAccessModal"
-                                          >
-                                         Manage Channel Access
-                                    </button>
-                                  </li>
-                                  <li>
+                                <button class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200"
+                                    data-channel-id="{{channel.id}}"
+                                    data-org-id="{{channel.organization.id}}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteChannelModal">
+                                    <svg class="w-5 h-5 mr-3 text-red-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                    </svg>
+                                    <span class="font-medium text-red-600/90">Secure Wipe</span>
+                                </button>
 
-                                    <button
-                                          class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                          id="managePermissionsBtn"
-                                          data-channel-id="{{ channel.id }}"
-                                          data-org-id="{{ channel.organization.id }}"
-                                          data-bs-toggle="modal"
-                                         data-bs-target="#userSelectionModal"
-                                        >
-                                       Manage User Permissions
-                                    </button>
+                                <!-- Download Channel Data Button -->
+<button 
+class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200"
+id="download-channel-btn"
+data-channel-id="{{channel.id}}"
+data-org-id="{{channel.organization.id}}"
+data-bs-toggle="modal"
+data-bs-target="#downloadChannelModal">
+<svg class="w-5 h-5 mr-3 text-blue-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+</svg>
+<span class="font-medium text-blue-600/90">Download Channel Data</span>
+</button>
 
+<!-- Manage Channel Access Button -->
+<button 
+class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200"
+id="manage-access-btn"
+data-channel-id="{{channel.id}}"
+data-bs-toggle="modal"
+data-bs-target="#manageAccessModal">
+<svg class="w-5 h-5 mr-3 text-green-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m0-6a9 9 0 11-9 9 9 9 0 019-9z" />
+</svg>
+<span class="font-medium text-green-600/90">Manage Channel Access</span>
+</button>
 
-                                  </li>
-                          
-                                {% endif %}    
-                                    
-                             
-                            </ul>
+<!-- Manage User Permissions Button -->
+<button 
+class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200"
+id="managePermissionsBtn"
+data-channel-id="{{channel.id}}"
+data-org-id="{{channel.organization.id}}"
+data-bs-toggle="modal"
+data-bs-target="#userSelectionModal">
+<svg class="w-5 h-5 mr-3 text-purple-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M16 11l4-4m0 0l-4-4m4 4H4m16 4l-4 4m0 0l4 4m-4-4H4" />
+</svg>
+<span class="font-medium text-purple-600/90">Manage User Permissions</span>
+</button>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
-                <p class="text-gray-600 mt-2">{{ channel.get_type_display }}</p>
-                <p class="text-sm text-gray-400 mt-1">Created on: {{ channel.created_at|date:"F j, Y" }}</p>
-    
-                <!-- Check if the channel was granted to your organization -->
-                {% if channel.accesses.exists %}
-                <div class="mt-2">
-                    {% for access in channel.accesses.all %}
-                        <span class="text-sm text-green-500 bg-green-100 px-2 py-1 rounded">
-                            Access granted by: {{ access.owning_organization.name }}
-                            To: {{ access.granted_to_organization.name }}
-                        </span><br>
-                    {% endfor %}
-                </div>
-                {% endif %}
             </div>
             {% endfor %}
         </div>
     </div>
-    
-
-
-
 
 
 
