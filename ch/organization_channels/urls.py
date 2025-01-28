@@ -62,4 +62,5 @@ urlpatterns = [
     path('manage-channel-access/<int:channel_id>/',manage_channel_access, name='manage_channel_access'),
     path('manage-user-permissions/<int:org_id>/<int:channel_id>/<int:user_id>/',manage_user_permissions, name='manage_use_permissions'),
     path('api/manage_banned_users/<int:org_id>/<int:channel_id>/',manage_banned_users, name='manage_banned_users'),
+    path('send_alert_notification/<int:org_id>/<int:channel_id>/', send_alert_notification, name='send_alert_notification'),
 ]

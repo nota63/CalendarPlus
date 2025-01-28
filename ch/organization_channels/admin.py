@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (Channel, Message, Link, Mention, ActivityChannel, Ban, ChannelAccess,RetentionPolicy,AbusedMessage,RecurringMessage,RecurrenceHistory,
                      
-                     ChannelEvents,ChannelSettingsOrganization,Permission)
+                     ChannelEvents,ChannelSettingsOrganization,Permission,AlertNotification)
 
 
 
@@ -22,3 +22,5 @@ admin.site.register(RecurrenceHistory)
 admin.site.register(ChannelEvents)
 admin.site.register(ChannelSettingsOrganization)
 admin.site.register(Permission)
+admin.site.register(AlertNotification)
+

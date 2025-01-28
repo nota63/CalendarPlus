@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from accounts.models import Organization, Profile
 from .models import (
     Channel, Message, Link , ActivityChannel, ChannelAccess,RetentionPolicy, RecurringMessage,RecurrenceHistory,AbusedMessage,
-    ChannelEvents,Permission)
+    ChannelEvents,Permission,AlertNotification)
+
 from django.utils.dateparse import parse_datetime
 from django.utils import timezone
 from django.urls import reverse
@@ -2466,3 +2467,63 @@ def manage_banned_users(request, org_id, channel_id):
 
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)})
+    
+
+
+
+
+# SEND ALERT NOTIFICATIONS IN CHANNEL (ADMIN ONLY)
+
+@csrf_exempt
+@login_required
+def send_alert_notification(request, org_id, channel_id):
+    try:
+       
+        organization = get_object_or_404(Organization, id=org_id)
+        channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+
+        if request.method == 'POST':
+            data = json.loads(request.body.decode('utf-8'))
+            message = data.get('message', None)
+
+            if message:
+                # Create the alert notification
+                alert = AlertNotification.objects.create(
+                    organization=organization,
+                    channel=channel,
+                    created_by=request.user,
+                    message=message,
+                )
+
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Alert notification sent successfully.',
+                    'alert_id': alert.id,
+                    'message': alert.message,
+                    'sent_at': alert.sent_at,
+                })
+            else:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'No message provided.'
+                })
+
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Invalid request method.'
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        })
+
+
+
+
+
+
+
+
+

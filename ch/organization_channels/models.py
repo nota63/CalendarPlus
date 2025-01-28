@@ -491,3 +491,27 @@ class Permission(models.Model):
         if permission in self.permissions:
             self.permissions.remove(permission)
             self.save()
+
+
+
+# ALERT NOTIFICATION MODEL 
+
+class AlertNotification(models.Model):
+    organization = models.ForeignKey(Organization, related_name="alert_notifications", on_delete=models.CASCADE)
+    channel = models.ForeignKey(Channel, related_name="alert_notifications", on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, related_name="created_alert_notifications", on_delete=models.CASCADE)
+    message = models.TextField() 
+    sent_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True) 
+    is_read = models.BooleanField(default=False)  
+
+    def __str__(self):
+        return f"Alert: {self.message[:50]}... for {self.channel.name} in {self.organization.name}"
+
+    def mark_as_read(self):
+        self.is_read = True
+        self.save()
+
+    def deactivate_alert(self):
+        self.is_active = False
+        self.save()
