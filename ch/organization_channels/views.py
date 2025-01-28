@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from accounts.models import Organization, Profile
 from .models import (
     Channel, Message, Link , ActivityChannel, ChannelAccess,RetentionPolicy, RecurringMessage,RecurrenceHistory,AbusedMessage,
-    ChannelEvents)
+    ChannelEvents,Permission)
 from django.utils.dateparse import parse_datetime
 from django.utils import timezone
 from django.urls import reverse
@@ -2301,4 +2301,78 @@ def manage_channel_access(request, channel_id):
         })
     
 
-    
+# MANAGE PERMISSIONS (ADMIN ONLY) 
+
+
+# Retrive & handle permissions
+# Set up logging
+logger = logging.getLogger(__name__)
+@csrf_exempt
+@login_required
+def manage_user_permissions(request, org_id, channel_id, user_id):
+    try:
+        # Fetch the organization and check if the user belongs to it
+        organization = get_object_or_404(Organization, id=org_id)
+        logger.debug(f"Organization fetched: {organization.id}, {organization.name}")
+
+        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+
+        if not user_profile:
+            logger.debug(f"User {request.user.id} does not belong to this organization.")
+            return JsonResponse({'error': 'You do not belong to this organization.'}, status=403)
+
+        # Fetch the channel
+        channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+        logger.debug(f"Channel fetched: {channel.id}, {channel.name}")
+
+        # Fetch the permissions for the specific user in the given channel
+        user_permissions = Permission.objects.filter(
+            user__id=user_id, 
+            organization=organization, 
+            channel=channel
+        )
+        logger.debug(f"Fetched {user_permissions.count()} permission(s) for user {user_id} in channel {channel.id}")
+
+        # Ensure we handle empty permissions gracefully
+        assigned_permissions = user_permissions.first().permissions if user_permissions.exists() else []
+        logger.debug(f"Assigned permissions: {assigned_permissions}")
+
+        # Assuming available permissions are predefined or come from another model
+        available_permissions = ['can_send_messages', 'can_edit_messages', 'can_send_files']
+        logger.debug(f"Available permissions: {available_permissions}")
+
+        # Prepare permissions data
+        permissions_data = {
+            'user_id': user_id,
+            'assignedPermissions': assigned_permissions,
+            'availablePermissions': available_permissions
+        }
+
+        if request.method == 'GET':
+            logger.debug(f"GET request: Returning permissions data for user {user_id}")
+            return JsonResponse({'status': 'success', 'data': permissions_data})
+
+        elif request.method == 'POST':
+            # Extract new permissions from the request
+            new_permissions = request.POST.getlist('permissions[]')
+            logger.debug(f"POST request: New permissions received: {new_permissions}")
+
+            # Update permissions for the user
+            Permission.objects.filter(user__id=user_id, organization=organization, channel=channel).delete()
+            logger.debug(f"Deleted existing permissions for user {user_id} in channel {channel.id}")
+
+            for permission in new_permissions:
+                Permission.objects.create(
+                    user_id=user_id, 
+                    organization=organization, 
+                    channel=channel, 
+                    permissions=[permission],
+                    granted_by=request.user
+                )
+                logger.debug(f"Granted permission: {permission} to user {user_id} in channel {channel.id}")
+
+            return JsonResponse({'status': 'success', 'message': 'Permissions updated successfully.'})
+
+    except Exception as e:
+        logger.error(f"Error occurred: {str(e)}")
+        return JsonResponse({'status': 'error', 'message': str(e)})

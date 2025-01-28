@@ -452,8 +452,8 @@ class Permission(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='permissions')
-    organization = models.ForeignKey('Organization', on_delete=models.CASCADE, related_name='permissions')
-    channel = models.ForeignKey('Channel', on_delete=models.CASCADE, related_name='permissions')
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='permissions')
+    channel = models.ForeignKey(Channel, on_delete=models.CASCADE, related_name='permissions')
     granted_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='permissions_granted')
     granted_at = models.DateTimeField(auto_now_add=True)
 

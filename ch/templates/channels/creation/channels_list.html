@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <!-- Bootstrap 5 CSS (for styling the modal and components) -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
@@ -19,7 +21,7 @@
         }
     </style>
 </head>
-
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 <style>
 /* Style for the modal dialog */
 .modal-dialog {
@@ -215,10 +217,56 @@
 </div>
 
 
+<!-- MANAGE USER PERMISSIONS  -->
 
 
+<!-- Modal to select user -->
+<div class="modal fade" id="userSelectionModal" tabindex="-1" aria-labelledby="userSelectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userSelectionModalLabel">Select User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="users-list" class="list-group">
+                    <!-- List of users will be dynamically injected here -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
+<!-- Modal to manage permissions -->
+<div class="modal fade" id="permissionsManagementModal" tabindex="-1" aria-labelledby="permissionsManagementModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="permissionsManagementModalLabel">Manage User Permissions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Available Permissions to Give:</h6>
+                <div id="permissions-to-give" class="permission-container" style="min-height: 150px; border: 2px dashed #ddd; margin-bottom: 15px;">
+                    <!-- Drag and Drop available permissions will appear here -->
+                </div>
+
+                <h6>Assigned Permissions:</h6>
+                <div id="assigned-permissions" class="permission-container" style="min-height: 150px; border: 2px dashed #ddd;">
+                    <!-- Assigned permissions will appear here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="save-permissions-btn">Save Permissions</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -306,6 +354,20 @@
                                           >
                                          Manage Channel Access
                                     </button>
+                                  </li>
+                                  <li>
+
+                                    <button
+                                          class="btn btn-primary"
+                                          id="managePermissionsBtn"
+                                          data-channel-id="{{ channel.id }}"
+                                          data-org-id="{{ channel.organization.id }}"
+                                          data-bs-toggle="modal"
+                                         data-bs-target="#userSelectionModal"
+                                        >
+                                       Manage User Permissions
+                                    </button>
+
 
                                   </li>
                           
@@ -663,6 +725,163 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
             alert('Please select an organization to remove access.');
         }
+    });
+});
+
+
+
+// MANAGE USERS 
+
+document.addEventListener("DOMContentLoaded", function () {
+    const managePermissionsBtn = document.getElementById('managePermissionsBtn');
+    const usersList = document.getElementById('users-list');
+    const permissionsToGiveContainer = document.getElementById('permissions-to-give');
+    const assignedPermissionsContainer = document.getElementById('assigned-permissions');
+    const savePermissionsBtn = document.getElementById('save-permissions-btn');
+    let selectedUserId = null;
+    let channelId = null;
+    let orgId = null;
+
+    // Initialize Bootstrap modal elements
+    const userSelectionModal = new bootstrap.Modal(document.getElementById('userSelectionModal'));
+    const permissionsManagementModal = new bootstrap.Modal(document.getElementById('permissionsManagementModal'));
+
+    // Trigger to fetch users
+    managePermissionsBtn.addEventListener('click', function () {
+        channelId = managePermissionsBtn.getAttribute('data-channel-id');
+        orgId = managePermissionsBtn.getAttribute('data-org-id');
+
+        // Fetch users from fetch_users view
+        fetch(`/channels/fetch-users/${orgId}/${channelId}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.users) {
+                    usersList.innerHTML = ''; // Clear previous users
+
+                    data.users.forEach(user => {
+                        const listItem = document.createElement('li');
+                        listItem.classList.add('list-group-item');
+                        listItem.textContent = user.username;
+                        listItem.setAttribute('data-user-id', user.id);
+                        listItem.addEventListener('click', function () {
+                            selectedUserId = user.id; // Set selected user id
+                            openPermissionsModal(user.id, channelId, orgId);
+                        });
+                        usersList.appendChild(listItem);
+                    });
+                } else {
+                    alert('Error fetching users.');
+                }
+            })
+            .catch(err => console.error('Error:', err));
+    });
+
+    // Open permissions modal and fetch permissions for the selected user
+    function openPermissionsModal(userId, channelId, orgId) {
+        // Close user selection modal
+        userSelectionModal.hide();
+        // Open permissions management modal
+        permissionsManagementModal.show();
+
+        // Fetch permissions for selected user from manage_user_permissions view
+        fetch(`/channels/manage-user-permissions/${orgId}/${channelId}/${userId}/`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched permissions data:', data); // Log the response to check
+
+                // Clear previous containers
+                permissionsToGiveContainer.innerHTML = '';
+                assignedPermissionsContainer.innerHTML = '';
+
+                // Access the correct data structure: data.data.assignedPermissions and data.data.availablePermissions
+                const assignedPermissions = data.data.assignedPermissions || [];
+                const availablePermissions = data.data.availablePermissions || [];
+
+                // Populate available permissions
+                availablePermissions.forEach(permission => {
+                    const item = document.createElement('div');
+                    item.classList.add('permission-item');
+                    item.setAttribute('draggable', true);
+                    item.textContent = permission;
+                    permissionsToGiveContainer.appendChild(item);
+                    item.addEventListener('dragstart', dragStart);
+                });
+
+                // Populate assigned permissions
+                assignedPermissions.forEach(permission => {
+                    const item = document.createElement('div');
+                    item.classList.add('permission-item');
+                    item.textContent = permission;
+                    assignedPermissionsContainer.appendChild(item);
+                    item.addEventListener('dragstart', dragStart);
+                });
+            })
+            .catch(err => {
+                console.error('Error fetching permissions:', err);
+                alert('Error fetching permissions');
+            });
+    }
+
+    // Handle drag-and-drop functionality
+    let draggedPermission = null;
+
+    function dragStart(event) {
+        draggedPermission = event.target;
+    }
+
+    permissionsToGiveContainer.addEventListener('dragover', function(event) {
+        event.preventDefault();
+    });
+
+    assignedPermissionsContainer.addEventListener('dragover', function(event) {
+        event.preventDefault();
+    });
+
+    permissionsToGiveContainer.addEventListener('drop', function(event) {
+        event.preventDefault();
+        if (draggedPermission) {
+            assignedPermissionsContainer.appendChild(draggedPermission); // Move permission to assigned
+        }
+    });
+
+    assignedPermissionsContainer.addEventListener('drop', function(event) {
+        event.preventDefault();
+        if (draggedPermission) {
+            permissionsToGiveContainer.appendChild(draggedPermission); // Move permission back to available
+        }
+    });
+
+    // Save permissions
+    savePermissionsBtn.addEventListener('click', function () {
+        const assignedPermissions = [];
+        assignedPermissionsContainer.querySelectorAll('.permission-item').forEach(item => {
+            assignedPermissions.push(item.textContent);
+        });
+
+        // Send updated permissions to manage_user_permissions view via POST
+        fetch(`/channels/manage-user-permissions/${orgId}/${channelId}/${selectedUserId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value // CSRF Token
+            },
+            body: JSON.stringify({
+                permissions: assignedPermissions
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Permissions updated successfully!');
+                permissionsManagementModal.hide(); // Close modal
+            } else {
+                alert('Error saving permissions.');
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            alert('An error occurred while saving permissions.');
+        });
     });
 });
 
