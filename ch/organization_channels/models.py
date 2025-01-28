@@ -223,6 +223,12 @@ class Ban(models.Model):
         Checks if the ban is still active.
         """
         return self.end_time is None or timezone.now() < self.end_time
+    
+    def unban(self):
+        """
+        Permanently unban the user by deleting the ban record.
+        """
+        self.delete()
 
     def __str__(self):
         return f"{self.user.username} banned from {self.channel.name} by {self.banned_by.username}"
