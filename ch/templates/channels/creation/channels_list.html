@@ -113,6 +113,128 @@
 }
 
 
+
+
+
+
+
+/* General Modal Styles */
+#permissionsManagementModal .modal-content {
+    border-radius: 15px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+#permissionsManagementModal .modal-header {
+    background-color: #007bff;
+    color: #fff;
+    border-bottom: none;
+    border-radius: 15px 15px 0 0;
+    padding: 20px;
+}
+
+#permissionsManagementModal .modal-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+#permissionsManagementModal .btn-close {
+    background-color: transparent;
+    color: #fff;
+    opacity: 0.8;
+}
+
+#permissionsManagementModal .btn-close:hover {
+    opacity: 1;
+}
+
+/* Modal Footer */
+#permissionsManagementModal .modal-footer {
+    border-top: none;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Buttons */
+#permissionsManagementModal .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+#permissionsManagementModal .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    font-weight: 600;
+}
+
+#permissionsManagementModal .btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* Permission Containers */
+.permission-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 10px;
+}
+
+.permission-container .permission-item {
+    background-color: #e9ecef;
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    cursor: grab;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #333;
+    user-select: none;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.permission-container .permission-item:hover {
+    background-color: #f1f1f1;
+}
+
+.permission-container .permission-item:active {
+    transform: scale(0.95);
+}
+
+/* Drag-and-Drop Zones */
+#permissions-to-give, #assigned-permissions {
+    transition: border-color 0.2s ease;
+}
+
+#permissions-to-give.dragover,
+#assigned-permissions.dragover {
+    border-color: #007bff;
+    background-color: #eef6ff;
+}
+
+/* Scrollbars for Overflow */
+.permission-container {
+    overflow-y: auto;
+    max-height: 200px;
+}
+
+.permission-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.permission-container::-webkit-scrollbar-thumb {
+    background-color: #007bff;
+    border-radius: 10px;
+}
+
+.permission-container::-webkit-scrollbar-thumb:hover {
+    background-color: #0056b3;
+}
+
+
 </style>
 
 

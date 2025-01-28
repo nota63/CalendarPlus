@@ -2308,11 +2308,12 @@ def manage_channel_access(request, channel_id):
 # Set up logging
 logger = logging.getLogger(__name__)
 
+
 @csrf_exempt
 @login_required
 def manage_user_permissions(request, org_id, channel_id, user_id):
     try:
-        # Fetch the organization and check if the user belongs to it
+       
         organization = get_object_or_404(Organization, id=org_id)
         logger.debug(f"Organization fetched: {organization.id}, {organization.name}")
 
@@ -2322,11 +2323,11 @@ def manage_user_permissions(request, org_id, channel_id, user_id):
             logger.debug(f"User {request.user.id} does not belong to this organization.")
             return JsonResponse({'error': 'You do not belong to this organization.'}, status=403)
 
-        # Fetch the channel
+      
         channel = get_object_or_404(Channel, id=channel_id, organization=organization)
         logger.debug(f"Channel fetched: {channel.id}, {channel.name}")
 
-        # Fetch the permissions for the specific user in the given channel
+  
         user_permissions = Permission.objects.filter(
             user__id=user_id, 
             organization=organization, 
@@ -2334,19 +2335,15 @@ def manage_user_permissions(request, org_id, channel_id, user_id):
         )
         logger.debug(f"Fetched {user_permissions.count()} permission(s) for user {user_id} in channel {channel.id}")
 
-        # Check if user has permissions, else default to empty list
-        if user_permissions.exists():
-            assigned_permissions = [perm.permission for perm in user_permissions]  # Assuming `permission` is a CharField
-        else:
-            assigned_permissions = []  # If no permissions exist for the user
-
+        
+        assigned_permissions = user_permissions.first().permissions if user_permissions.exists() else []
         logger.debug(f"Assigned permissions: {assigned_permissions}")
 
-        # Assuming available permissions are predefined or come from another model
+  
         available_permissions = ['can_send_messages', 'can_edit_messages', 'can_send_files']
         logger.debug(f"Available permissions: {available_permissions}")
 
-        # Prepare permissions data
+        
         permissions_data = {
             'user_id': user_id,
             'assignedPermissions': assigned_permissions,
@@ -2358,11 +2355,11 @@ def manage_user_permissions(request, org_id, channel_id, user_id):
             return JsonResponse({'status': 'success', 'data': permissions_data})
 
         elif request.method == 'POST':
-            # Extract new permissions from the request
+          
             new_permissions = request.POST.getlist('permissions[]')
             logger.debug(f"POST request: New permissions received: {new_permissions}")
 
-            # Update permissions for the user
+    
             Permission.objects.filter(user__id=user_id, organization=organization, channel=channel).delete()
             logger.debug(f"Deleted existing permissions for user {user_id} in channel {channel.id}")
 
@@ -2371,7 +2368,7 @@ def manage_user_permissions(request, org_id, channel_id, user_id):
                     user_id=user_id, 
                     organization=organization, 
                     channel=channel, 
-                    permissions=[permission],  # Ensure this is stored as a list/array, or update to your actual structure
+                    permissions=[permission],
                     granted_by=request.user
                 )
                 logger.debug(f"Granted permission: {permission} to user {user_id} in channel {channel.id}")
@@ -2381,3 +2378,4 @@ def manage_user_permissions(request, org_id, channel_id, user_id):
     except Exception as e:
         logger.error(f"Error occurred: {str(e)}")
         return JsonResponse({'status': 'error', 'message': str(e)})
+
