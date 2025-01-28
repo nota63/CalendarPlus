@@ -2088,6 +2088,8 @@ def channel_events_calendar(request, org_id, channel_id):
 
 # CHANNEL_LIST FEATURES 
 
+# Delete channel  (ADMIN ONLY)
+
 @csrf_exempt
 def delete_channel(request, org_id, channel_id):
     if request.method == "POST":
@@ -2126,8 +2128,7 @@ def delete_channel(request, org_id, channel_id):
 
 
 
-# DOWNLOAD ALL CHANNEL DATA
-
+# DOWNLOAD ALL CHANNEL DATA (ADMIN ONLY)
 
 @login_required
 def export_channel_data(request, org_id, channel_id):
