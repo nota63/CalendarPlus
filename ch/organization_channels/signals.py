@@ -1,12 +1,12 @@
 
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save,post_delete
 from django.dispatch import receiver
 from django.core.mail import send_mail
 from django.contrib.sites.shortcuts import get_current_site
 from django.conf import settings
 from django.contrib.auth.models import User
 from .models import Channel, Ban
-
+from accounts.models import Organization, Profile
 
 
 @receiver(post_save, sender=Channel)
@@ -69,3 +69,32 @@ def send_ban_notification(sender, instance, created, **kwargs):
             fail_silently=False,
         )
 
+
+
+# SEND CHANNEL DELETION MAIL!
+
+@receiver(post_delete, sender=Channel)
+def send_channel_deletion_email(sender, instance, **kwargs):
+
+    organization = instance.organization
+    user = instance.created_by
+
+
+    profiles = Profile.objects.filter(organization=organization)
+    
+ 
+    recipient_emails = [profile.user.email for profile in profiles if profile.user.email]
+
+   
+    subject = f"Channel Deleted: {instance.name}"
+    message = f"Dear Members,\n\nWe wanted to inform you that {user.username} has deleted the channel '{instance.name}' from the organization '{organization.name}'.\n\nBest regards,\nYour Team"
+
+
+    if recipient_emails:
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            recipient_emails,
+            fail_silently=False,
+        )
