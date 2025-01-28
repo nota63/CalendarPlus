@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap 5 CSS (for styling the modal and components) -->
+<link
+href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+rel="stylesheet"
+/>
+
     <title>Channels - {{ organization.name }}</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,6 +19,51 @@
         }
     </style>
 </head>
+<!-- Modals ---------------------------------------------------------------------------------------- -->
+<!-- Delete Confirmation Modal -->
+<div
+    class="modal fade"
+    id="deleteChannelModal"
+    tabindex="-1"
+    aria-labelledby="deleteChannelModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteChannelModalLabel">Confirm Deletion</h5>
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this channel? Please enter your password to confirm.</p>
+                <form id="delete-channel-form">
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            class="form-control"
+                            name="password"
+                            placeholder="Enter your password"
+                            required
+                        />
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ---------------------------------------------------------------------------------------------------------------- -->
 <body class="bg-gray-100">
     <div class="max-w-4xl mx-auto mt-10">
         <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Channels in {{ organization.name }}</h1>
@@ -56,6 +107,23 @@
                                         Launch channel
                                     </a>
                                 </li>
+                                <li>
+                                {% if user_profile.is_admin %}
+                              <!-- Delete Button -->
+                              <button
+                              class="btn btn-danger"
+                              id="delete-channel-btn"
+                              data-channel-id="{{channel.id}}"
+                              data-org-id="{{channel.organization.id}}"
+                              data-bs-toggle="modal"
+                              data-bs-target="#deleteChannelModal"
+                          >
+                              Delete Channel
+                          </button>
+                          
+                                {% endif %}    
+                                    
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -79,8 +147,25 @@
         </div>
     </div>
     
+
+
+
+
+
+
+
+
+
+
+<!-------------------------------------------------------------------------------------------------------------------------------------  -->
+<!-- Bootstrap JS Bundle -->
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+></script>
+
+
     <!-- JavaScript for AJAX -->
-    <script>
+<script>
         const searchInput = document.getElementById('searchInput');
         const channelsList = document.getElementById('channelsList');
         const loadingIndicator = document.getElementById('loading');
@@ -174,6 +259,77 @@
                 }
             });
         });
+
+
+        
+
+
+
+// DELETE CHANNEL 
+
+document.addEventListener("DOMContentLoaded", function () {
+    const deleteForm = document.getElementById("delete-channel-form");
+
+    // Add debugging for modal visibility
+    const deleteModalElement = document.getElementById("deleteChannelModal");
+    deleteModalElement.addEventListener("shown.bs.modal", function () {
+        console.log("Delete modal is now visible.");
+    });
+
+    deleteModalElement.addEventListener("hidden.bs.modal", function () {
+        console.log("Delete modal has been closed.");
+    });
+
+    // Handle form submission
+    deleteForm.addEventListener("submit", function (e) {
+        e.preventDefault(); // Prevent default form submission
+
+        console.log("Form submission triggered."); // Debugging step
+
+        // Get data from the form and attributes
+        const password = document.getElementById("password").value;
+        const deleteButton = document.getElementById("delete-channel-btn");
+        const orgId = deleteButton.getAttribute("data-org-id");
+        const channelId = deleteButton.getAttribute("data-channel-id");
+
+        console.log(`Org ID: ${orgId}, Channel ID: ${channelId}`); // Debugging step
+
+        // Send an AJAX request to delete the channel
+        fetch(`/channels/delete-channel/${orgId}/${channelId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": getCSRFToken(), // Include CSRF token
+            },
+            body: new URLSearchParams({
+                password: password,
+            }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("Response from server:", data); // Debugging step
+                if (data.success) {
+                    alert(data.message); // Success message
+                    const modalInstance = bootstrap.Modal.getInstance(deleteModalElement);
+                    modalInstance.hide(); // Close modal
+                    location.reload(); // Reload page
+                } else {
+                    alert(data.error); // Show error message
+                }
+            })
+            .catch((error) => {
+                console.error("Error during request:", error);
+                alert("Something went wrong. Please try again.");
+            });
+    });
+
+    // Helper function to fetch CSRF token
+    function getCSRFToken() {
+        const csrfTokenElement = document.querySelector('[name=csrfmiddlewaretoken]');
+        return csrfTokenElement ? csrfTokenElement.value : "";
+    }
+});
+
     </script>
 </body>
 </html>

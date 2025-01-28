@@ -201,6 +201,8 @@ class ChannelListView(LoginRequiredMixin, View):
         
         channels = channels | granted_channels
 
+        user_profile=Profile.objects.filter(organization=organization,user=request.user).first()
+
       
         if query:
             channels = channels.filter(Q(name__icontains=query) | Q(type__icontains=query))
@@ -221,6 +223,7 @@ class ChannelListView(LoginRequiredMixin, View):
         context = {
             'organization': organization,
             'channels': channels.distinct(),
+            'user_profile':user_profile,
         }
         return render(request, self.template_name, context)
 
@@ -2076,6 +2079,69 @@ def channel_events_calendar(request, org_id, channel_id):
     return JsonResponse(event_data, safe=False)
 
 
-# Channel end 
+# Channel end --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    
+
+
+# CHANNEL_LIST FEATURES 
+
+@csrf_exempt
+def delete_channel(request, org_id, channel_id):
+    if request.method == "POST":
+        password = request.POST.get('password')
+
+  
+        user = authenticate(username=request.user.username, password=password)
+        if user is None:
+            return JsonResponse({"success": False, "error": "Invalid password."}, status=403)
+
+       
+        organization = get_object_or_404(Organization, id=org_id)
+        channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+
+        
+        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+        if not user_profile:
+           return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+        if channel.created_by != request.user:
+            return JsonResponse({"success": False, "error": "You are not authorized to delete this channel."}, status=403)
+
+     
+        channel.delete()
+        return JsonResponse({"success": True, "message": "Channel deleted successfully!"})
+
+    return JsonResponse({"success": False, "error": "Invalid request method."}, status=405)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
