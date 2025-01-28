@@ -2473,21 +2473,22 @@ def manage_banned_users(request, org_id, channel_id):
 
 
 # SEND ALERT NOTIFICATIONS IN CHANNEL (ADMIN ONLY)
-
 @csrf_exempt
 @login_required
 def send_alert_notification(request, org_id, channel_id):
     try:
-       
+        
         organization = get_object_or_404(Organization, id=org_id)
         channel = get_object_or_404(Channel, id=channel_id, organization=organization)
 
+    
         if request.method == 'POST':
+            
             data = json.loads(request.body.decode('utf-8'))
             message = data.get('message', None)
 
+         
             if message:
-                # Create the alert notification
                 alert = AlertNotification.objects.create(
                     organization=organization,
                     channel=channel,
@@ -2495,6 +2496,7 @@ def send_alert_notification(request, org_id, channel_id):
                     message=message,
                 )
 
+           
                 return JsonResponse({
                     'status': 'success',
                     'message': 'Alert notification sent successfully.',
@@ -2503,27 +2505,21 @@ def send_alert_notification(request, org_id, channel_id):
                     'sent_at': alert.sent_at,
                 })
             else:
+              
                 return JsonResponse({
                     'status': 'error',
                     'message': 'No message provided.'
                 })
 
+       
         return JsonResponse({
             'status': 'error',
             'message': 'Invalid request method.'
         })
 
     except Exception as e:
+       
         return JsonResponse({
             'status': 'error',
             'message': str(e)
         })
-
-
-
-
-
-
-
-
-

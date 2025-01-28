@@ -6,7 +6,7 @@ from datetime import timedelta
 from better_profanity import profanity
 from django.core.mail import send_mail
 from .utils import send_abusive_message_notification 
-
+from tinymce.models import HTMLField  
 # Create your models here.
 
 
@@ -500,7 +500,7 @@ class AlertNotification(models.Model):
     organization = models.ForeignKey(Organization, related_name="alert_notifications", on_delete=models.CASCADE)
     channel = models.ForeignKey(Channel, related_name="alert_notifications", on_delete=models.CASCADE)
     created_by = models.ForeignKey(User, related_name="created_alert_notifications", on_delete=models.CASCADE)
-    message = models.TextField() 
+    message = HTMLField(null=True, blank=True)
     sent_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True) 
     is_read = models.BooleanField(default=False)  
