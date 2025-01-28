@@ -65,6 +65,33 @@ rel="stylesheet"
 </div>
 
 
+<!-- Download channel data modal -->
+
+<!-- Modal for Confirmation -->
+<div class="modal fade" id="downloadChannelModal" tabindex="-1" aria-labelledby="downloadChannelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="downloadChannelModalLabel">Download Channel Data</h5>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to download all channel data? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Deny</button>
+                <button type="button" class="btn btn-primary" id="proceed-download-btn">Proceed</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
 
 
 
@@ -115,22 +142,37 @@ rel="stylesheet"
                                 </li>
                                 <li>
                                 {% if user_profile.is_admin %}
-                              <!-- Delete Button -->
-                              <button
-                              class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                              id="delete-channel-btn"
-                              data-channel-id="{{channel.id}}"
-                              data-org-id="{{channel.organization.id}}"
-                              data-bs-toggle="modal"
-                              data-bs-target="#deleteChannelModal"
-                          >
-                              Wipe Channel
-                        
-                          </button>
+                                   <li>
+                                     <!-- Delete Button -->
+                                       <button
+                                       class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                         id="delete-channel-btn"
+                                        data-channel-id="{{channel.id}}"
+                                           data-org-id="{{channel.organization.id}}"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteChannelModal"
+                                     >
+                                       Wipe Channel
+                         
+                                    </button>
+                                  </li>  
+                                  <li>
+                                    <button
+                                    class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                    id="download-channel-btn"
+                                    data-channel-id="{{channel.id}}"
+                                    data-org-id="{{channel.organization.id}}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#downloadChannelModal"
+                                >
+                                    Download channel data
+                                </button>
+                                    
+                                  </li>
                           
                                 {% endif %}    
                                     
-                                </li>
+                             
                             </ul>
                         </div>
                     </div>
@@ -339,6 +381,60 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+// DOWNLOAD CHANNEL DATA
+
+
+// Capture channel and organization IDs when the button is clicked
+document.getElementById('download-channel-btn').addEventListener('click', function () {
+        var channelId = this.getAttribute('data-channel-id');
+        var orgId = this.getAttribute('data-org-id');
+        
+        // Store these IDs in the Proceed button in the modal for later use
+        document.getElementById('proceed-download-btn').setAttribute('data-channel-id', channelId);
+        document.getElementById('proceed-download-btn').setAttribute('data-org-id', orgId);
+    });
+
+    // Handle Proceed Button Click
+    document.getElementById('proceed-download-btn').addEventListener('click', function () {
+        // Get the stored channel and organization IDs
+        var channelId = this.getAttribute('data-channel-id');
+        var orgId = this.getAttribute('data-org-id');
+        
+        // Show loading spinner in the modal
+        var modalBody = document.querySelector('#downloadChannelModal .modal-body');
+        modalBody.innerHTML = '<p>Downloading Channel Data...</p><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+
+        // Disable the proceed button to prevent multiple clicks
+        this.disabled = true;
+
+        // Start AJAX request for downloading the channel data
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/channels/export-channel-data/' + orgId + '/' + channelId + '/', true);
+        xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}'); // CSRF Token for security
+        
+        // Handle response
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                // Create a link to trigger the file download
+                var link = document.createElement('a');
+                link.href = window.URL.createObjectURL(xhr.response);
+                link.download = 'channel_' + channelId + '_export.pdf';
+                link.click();
+                
+                // Close the modal after download
+                $('#downloadChannelModal').modal('hide');
+            } else {
+                alert('Something went wrong, please try again!');
+                $('#downloadChannelModal').modal('hide');
+            }
+        };
+        
+        // Set responseType to handle PDF blob
+        xhr.responseType = 'blob';
+        
+        // Send the request
+        xhr.send();
+    });
 
 
     </script>

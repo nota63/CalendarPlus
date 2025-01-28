@@ -21,7 +21,7 @@ from .models import Channel
 from accounts.models import Profile, Organization
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
-from django.http import JsonResponse
+from django.http import JsonResponse,StreamingHttpResponse
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.core.mail import send_mail, EmailMessage
@@ -44,6 +44,9 @@ from django.utils.timezone import now
 from django.core.exceptions import ValidationError
 from django.views.decorators.http import require_POST
 from django.core.files.storage import FileSystemStorage
+from django.utils.timezone import localtime
+
+
 # Create your views here.
 
 # Create the channel 
@@ -2126,7 +2129,102 @@ def delete_channel(request, org_id, channel_id):
 # DOWNLOAD ALL CHANNEL DATA
 
 
+@login_required
+def export_channel_data(request, org_id, channel_id):
+    organization = get_object_or_404(Organization, id=org_id)
+    channel = get_object_or_404(Channel, id=channel_id, organization=organization)
 
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+           return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+    if channel.created_by != request.user:
+            return JsonResponse({"success": False, "error": "You are not authorized to download this channel data."}, status=403)
+
+    
+ 
+    messages = Message.objects.filter(channel=channel, organization=organization)
+    links = Link.objects.filter(channel=channel, organization=organization)
+    activities = ActivityChannel.objects.filter(channel=channel, organization=organization)
+    banned_users = Ban.objects.filter(channel=channel, organization=organization)
+    channel_accesses = ChannelAccess.objects.filter(channel=channel, owning_organization=organization)
+    events = ChannelEvents.objects.filter(channel=channel, organization=organization)
+    abused_messages = AbusedMessage.objects.filter(channel=channel, organization=organization)
+
+
+    buffer = BytesIO()
+    p = canvas.Canvas(buffer, pagesize=letter)
+
+   
+    y_position = 670
+    p.drawString(100, y_position, f"Channel Export: {channel.name}")
+    p.drawString(100, y_position - 15, f"Organization: {organization.name}")
+    p.drawString(100, y_position - 30, f"Export Date: {localtime().strftime('%Y-%m-%d %H:%M:%S')}")
+
+    y_position -= 45
+    p.drawString(100, y_position, "Messages:")
+    for message in messages:
+        y_position -= 15
+        p.drawString(100, y_position, f"- {message.timestamp}: {message.content} (By {message.user.username})")
+
+
+    y_position -= 30
+    p.drawString(100, y_position, "Links:")
+    for link in links:
+        y_position -= 15
+        p.drawString(100, y_position, f"- {link.timestamp}: {link.text} ({link.link})")
+
+
+    y_position -= 30
+    p.drawString(100, y_position, "Activities:")
+    for activity in activities:
+        y_position -= 15
+        p.drawString(100, y_position, f"- {activity.timestamp}: {activity.get_action_type_display()} (By {activity.user.username})")
+
+
+    y_position -= 30
+    p.drawString(100, y_position, "Banned Users:")
+    for ban in banned_users:
+        y_position -= 15
+        p.drawString(100, y_position, f"- {ban.user.username} banned by {ban.banned_by.username} until {ban.end_time if ban.end_time else 'Permanent'}")
+
+
+    y_position -= 30
+    p.drawString(100, y_position, "Channel Access:")
+    for access in channel_accesses:
+        y_position -= 15
+        p.drawString(100, y_position, f"- {access.granted_to_organization.name} (By {access.granted_by.username})")
+
+
+    y_position -= 30
+    p.drawString(100, y_position, "Channel Events:")
+    for event in events:
+        y_position -= 15
+        p.drawString(100, y_position, f"- {event.event_name} on {event.event_date} ({event.event_details})")
+
+
+    y_position -= 30
+    p.drawString(100, y_position, "Abused Messages:")
+    for abused_message in abused_messages:
+        y_position -= 15
+        p.drawString(100, y_position, f"- {abused_message.message_content} (Flagged by {abused_message.flagged_by.username if abused_message.flagged_by else 'Unknown'})")
+
+
+    p.save()
+
+    activity = ActivityChannel.objects.create(
+          user=request.user,
+          organization=organization,
+          channel=channel,
+          action_type="DOWNLOAD_CHANNEL_DATA",
+          content=f'{request.user} Downloaded all the channel data'
+        )
+
+   
+    buffer.seek(0)
+    response = StreamingHttpResponse(buffer, content_type="application/pdf")
+    response["Content-Disposition"] = f"attachment; filename=channel_{channel.id}_export.pdf"
+    return response
 
 
 
