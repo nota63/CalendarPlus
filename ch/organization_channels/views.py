@@ -2407,7 +2407,14 @@ def manage_banned_users(request, org_id, channel_id):
  
         channel = get_object_or_404(Channel, id=channel_id, organization=organization)
 
-       
+        if channel.created_by != request.user:
+            return JsonResponse({"success": False, "error": "You are not authorized to perform this action!."}, status=403)
+        
+        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+        if not user_profile:
+            logger.debug(f"User {request.user.id} does not belong to this organization.")
+            return JsonResponse({'error': 'You do not belong to this organization.'}, status=403)
+
         if request.method == 'GET':
             banned_users = Ban.objects.filter(organization=organization, channel=channel)
             banned_user_data = []
@@ -2431,6 +2438,7 @@ def manage_banned_users(request, org_id, channel_id):
         elif request.method == 'POST':
             data = json.loads(request.body.decode('utf-8'))
             user_id_to_unban = data.get('user_id')
+            user=get_object_or_404(User,id=user_id_to_unban)
             if user_id_to_unban:
               
                 ban_to_unban = Ban.objects.filter(
@@ -2442,6 +2450,14 @@ def manage_banned_users(request, org_id, channel_id):
                 if ban_to_unban:
                     
                     ban_to_unban.unban()
+                    activity = ActivityChannel.objects.create(
+                         user=request.user,
+                         channel=channel,
+                         organization=organization,
+                         action_type="REVOKE_RESTRICTION",
+                         content=f"{request.user} Revoked channel restriction for {user.username}"
+                          )
+
                     return JsonResponse({'status': 'success', 'message': f'User {ban_to_unban.user.username} has been unbanned.'})
                 else:
                     return JsonResponse({'status': 'error', 'message': 'Ban entry not found.'})
