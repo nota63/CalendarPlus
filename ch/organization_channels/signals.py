@@ -99,4 +99,31 @@ def send_channel_deletion_email(sender, instance, **kwargs):
             fail_silently=False,
         )
 
+
+
+# NOTIFY THE USER ABOUT UNBANNED
+
+@receiver(post_save, sender=Ban)
+def send_unban_email(sender, instance, created, **kwargs):
+   
+    if not instance.is_active() and created:  
+        try:
+            subject = f'You have been unbanned from {instance.channel.name}'
+            message = (
+                f"Hello {instance.user.username},\n\n"
+                f"We wanted to inform you that you have been unbanned from the channel '{instance.channel.name}' "
+                f"in the organization '{instance.organization.name}'.\n\n"
+                f"The unban was initiated by {instance.banned_by.username}.\n\n"
+                f"Reason: {instance.reason or 'No specific reason provided'}\n"
+                f"Your ban started on: {instance.start_time}\n"
+                f"Your ban ended on: {instance.end_time}\n\n"
+                "Feel free to rejoin the discussions!\n\n"
+                "Best regards,\n"
+                f"The {instance.organization.name} Team"
+            )
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [instance.user.email])
+        except Exception as e:
+            print(f"Error sending unban email: {e}")
+
+
         
