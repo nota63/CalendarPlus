@@ -458,11 +458,9 @@ class Permission(models.Model):
     granted_at = models.DateTimeField(auto_now_add=True)
 
   
-    permissions = models.JSONField(default=list, blank=True)
+    permissions = models.JSONField(default=list, blank=True,null=True)
 
-    class Meta:
-        unique_together = ('user', 'organization', 'channel')
-
+   
     def __str__(self):
         return f"{self.user.username} permissions in {self.channel.name} (Granted by {self.granted_by.username})"
 

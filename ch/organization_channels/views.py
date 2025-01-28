@@ -2308,48 +2308,51 @@ def manage_channel_access(request, channel_id):
 # Set up logging
 logger = logging.getLogger(__name__)
 
-
 @csrf_exempt
 @login_required
 def manage_user_permissions(request, org_id, channel_id, user_id):
     try:
-       
+    
         organization = get_object_or_404(Organization, id=org_id)
         logger.debug(f"Organization fetched: {organization.id}, {organization.name}")
 
+        
         user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
-
         if not user_profile:
             logger.debug(f"User {request.user.id} does not belong to this organization.")
             return JsonResponse({'error': 'You do not belong to this organization.'}, status=403)
 
-      
         channel = get_object_or_404(Channel, id=channel_id, organization=organization)
         logger.debug(f"Channel fetched: {channel.id}, {channel.name}")
 
-  
+    
+        user = get_object_or_404(User, id=user_id)
+
+
         user_permissions = Permission.objects.filter(
-            user__id=user_id, 
+            user=user, 
             organization=organization, 
             channel=channel
         )
         logger.debug(f"Fetched {user_permissions.count()} permission(s) for user {user_id} in channel {channel.id}")
 
         
-        assigned_permissions = user_permissions.first().permissions if user_permissions.exists() else []
-
+        assigned_permissions = []
+        for permission in user_permissions:
+            assigned_permissions.extend(permission.permissions)  
         logger.debug(f"Assigned permissions: {assigned_permissions}")
 
-  
-        available_permissions = ['can_suspend_users', 'can_share_audio', 'can_send_files','can_see_channel_activities','can_bypass_inappropriate_messages','can_edit_channel','bypass_message_deletion','can_invite_others',
-                                 'can_kick_users',' can_manage_announcements ','can_connect_integrations',
-                                 'can_use_advanced_search','can_configure_retention_settings','can_manage_shared_content']
+        available_permissions = [
+            'can_suspend_users', 'can_share_audio', 'can_send_files', 'can_see_channel_activities', 
+            'can_bypass_inappropriate_messages', 'can_edit_channel', 'bypass_message_deletion', 
+            'can_invite_others', 'can_kick_users', 'can_manage_announcements', 'can_connect_integrations', 
+            'can_use_advanced_search', 'can_configure_retention_settings', 'can_manage_shared_content'
+        ]
         logger.debug(f"Available permissions: {available_permissions}")
 
-        
         permissions_data = {
             'user_id': user_id,
-            'assignedPermissions': assigned_permissions,
+            'assignedPermissions': assigned_permissions, 
             'availablePermissions': available_permissions
         }
 
@@ -2358,26 +2361,35 @@ def manage_user_permissions(request, org_id, channel_id, user_id):
             return JsonResponse({'status': 'success', 'data': permissions_data})
 
         elif request.method == 'POST':
-          
-            new_permissions = request.POST.getlist('permissions[]')
+         
+            data = json.loads(request.body.decode('utf-8'))
+            new_permissions = data.get('permissions', [])
             logger.debug(f"POST request: New permissions received: {new_permissions}")
 
-            
-            
-           
             for permission in new_permissions:
-                Permission.objects.create(
-                    user_id=user_id, 
+                
+                existing_permission = Permission.objects.filter(
+                    user=user, 
                     organization=organization, 
-                    channel=channel, 
-                    permissions=[permission],
-                    granted_by=request.user
-                )
-                logger.debug(f"Granted permission: {permission} to user {user_id} in channel {channel.id}")
+                    channel=channel,
+                    permissions__contains=[permission]  
+                ).first()
+
+                if existing_permission:
+                    logger.debug(f"Permission {permission} already exists for user {user_id} in channel {channel.id}. Skipping.")
+                else:
+                    # Save new permission
+                    Permission.objects.create(
+                        user=user, 
+                        organization=organization, 
+                        channel=channel, 
+                        permissions=[permission],
+                        granted_by=request.user
+                    )
+                    logger.debug(f"Granted permission: {permission} to user {user_id} in channel {channel.id}")
 
             return JsonResponse({'status': 'success', 'message': 'Permissions updated successfully.'})
 
     except Exception as e:
         logger.error(f"Error occurred: {str(e)}")
         return JsonResponse({'status': 'error', 'message': str(e)})
-

@@ -1118,8 +1118,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // Save permissions
     savePermissionsBtn.addEventListener('click', function () {
         const assignedPermissions = [];
+       
         assignedPermissionsContainer.querySelectorAll('.permission-item').forEach(item => {
             assignedPermissions.push(item.textContent);
+            
         });
 
         // Send updated permissions to manage_user_permissions view via POST
@@ -1131,8 +1133,10 @@ document.addEventListener("DOMContentLoaded", function () {
             },
             body: JSON.stringify({
                 permissions: assignedPermissions
+            
             })
         })
+    
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
