@@ -437,3 +437,53 @@ class ChannelSettingsOrganization(models.Model):
         return f'{self.channel.name} settings'
     
 
+
+# TRACK PERMISSIONS WITHIN THE CHANNEL
+
+class Permission(models.Model):
+    CAN_SEND_MESSAGES = 'can_send_messages'
+    CAN_EDIT_MESSAGES = 'can_edit_messages'
+    CAN_SEND_FILES = 'can_send_files'
+    
+    PERMISSION_CHOICES = [
+        (CAN_SEND_MESSAGES, 'Can Send Messages'),
+        (CAN_EDIT_MESSAGES, 'Can Edit Messages'),
+        (CAN_SEND_FILES, 'Can Send Files'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='permissions')
+    organization = models.ForeignKey('Organization', on_delete=models.CASCADE, related_name='permissions')
+    channel = models.ForeignKey('Channel', on_delete=models.CASCADE, related_name='permissions')
+    granted_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='permissions_granted')
+    granted_at = models.DateTimeField(auto_now_add=True)
+
+  
+    permissions = models.JSONField(default=list, blank=True)
+
+    class Meta:
+        unique_together = ('user', 'organization', 'channel')
+
+    def __str__(self):
+        return f"{self.user.username} permissions in {self.channel.name} (Granted by {self.granted_by.username})"
+
+    def grant_default_permissions(self):
+        """Grant default permissions to a user by default."""
+        default_permissions = [
+            self.CAN_SEND_MESSAGES,
+            self.CAN_EDIT_MESSAGES,
+            self.CAN_SEND_FILES
+        ]
+        self.permissions = default_permissions
+        self.save()
+
+    def add_permission(self, permission):
+        """Add a permission to the user."""
+        if permission not in self.permissions:
+            self.permissions.append(permission)
+            self.save()
+
+    def remove_permission(self, permission):
+        """Remove a permission from the user."""
+        if permission in self.permissions:
+            self.permissions.remove(permission)
+            self.save()
