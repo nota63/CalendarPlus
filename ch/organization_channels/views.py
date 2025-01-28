@@ -2237,10 +2237,7 @@ def manage_channel_access(request, channel_id):
   
         channel = get_object_or_404(Channel, id=channel_id)
 
-        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
-        if not user_profile:
-           return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
-
+      
         if channel.created_by != request.user:
             return JsonResponse({"success": False, "error": "You are not authorized to download this channel data."}, status=403)
 

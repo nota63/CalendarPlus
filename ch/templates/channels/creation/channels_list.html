@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap 5 CSS (for styling the modal and components) -->
-<link
-href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
-rel="stylesheet"
-/>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
 
     <title>Channels - {{ organization.name }}</title>
     <!-- Tailwind CSS CDN -->
@@ -19,6 +19,23 @@ rel="stylesheet"
         }
     </style>
 </head>
+
+<style>
+
+
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
 <!-- Modals ---------------------------------------------------------------------------------------- -->
 <!-- Delete Confirmation Modal -->
 
@@ -473,87 +490,93 @@ document.getElementById('download-channel-btn').addEventListener('click', functi
 
 // MANAGE CHANNEL ACCESSS
 document.addEventListener("DOMContentLoaded", function () {
-        const manageAccessBtn = document.getElementById("manage-access-btn");
-        const removeAccessBtn = document.getElementById("remove-access-btn");
-        const organizationsList = document.getElementById("organizations-list");
-        let selectedOrgId = null;  // Track selected organization ID
-        let channelId = null;      // Store the channel ID
+    const manageAccessBtn = document.getElementById("manage-access-btn");
+    const removeAccessBtn = document.getElementById("remove-access-btn");
+    const organizationsList = document.getElementById("organizations-list");
+    let selectedOrgId = null;  // Track selected organization ID
+    let channelId = null;      // Store the channel ID
 
-        // Fetch organizations that have access when the modal is triggered
-        const manageAccessModal = new bootstrap.Modal(document.getElementById('manageAccessModal'));
+    // Fetch organizations that have access when the modal is triggered
+    const manageAccessModal = new bootstrap.Modal(document.getElementById('manageAccessModal'));
 
-        document.getElementById('manageAccessModal').addEventListener('show.bs.modal', function () {
-            // Get channel ID from the data attribute of the button
-            channelId = manageAccessBtn.getAttribute('data-channel-id');
+    document.getElementById('manageAccessModal').addEventListener('show.bs.modal', function () {
+        // Get channel ID from the data attribute of the button
+        channelId = manageAccessBtn.getAttribute('data-channel-id');
 
-            // Clear any previous data
-            organizationsList.innerHTML = '';
+        // Clear any previous data
+        organizationsList.innerHTML = '';
 
-            // Make AJAX request to fetch organizations with access
-            fetch(`/channels/manage-channel-access/${channelId}/`, {
-                method: 'GET',
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    const organizations = data.organizations;
+        // Make AJAX request to fetch organizations with access
+        fetch(`/channels/manage-channel-access/${channelId}/`, {
+            method: 'GET',
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const organizations = data.organizations;
 
-                    organizations.forEach(org => {
-                        const listItem = document.createElement('li');
-                        listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
-                        listItem.innerHTML = `${org.name} <button class="btn btn-danger btn-sm select-org-btn" data-org-id="${org.id}">Select</button>`;
-                        organizationsList.appendChild(listItem);
-                    });
+                organizations.forEach(org => {
+                    const listItem = document.createElement('li');
+                    listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+                    listItem.innerHTML = `${org.name} <button class="btn btn-outline-primary btn-sm select-org-btn" data-org-id="${org.id}">Select</button>`;
+                    organizationsList.appendChild(listItem);
+                });
 
-                    // Add event listeners to select buttons
-                    const selectOrgBtns = document.querySelectorAll('.select-org-btn');
-                    selectOrgBtns.forEach(btn => {
-                        btn.addEventListener('click', function () {
-                            selectedOrgId = btn.getAttribute('data-org-id');
-                            // Highlight the selected organization
-                            selectOrgBtns.forEach(b => b.classList.remove('active'));
-                            btn.classList.add('active');
+                // Add event listeners to select buttons
+                const selectOrgBtns = document.querySelectorAll('.select-org-btn');
+                selectOrgBtns.forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        selectedOrgId = btn.getAttribute('data-org-id');
+                        
+                        // Highlight the selected organization
+                        selectOrgBtns.forEach(b => {
+                            b.classList.remove('btn-primary', 'text-white');  // Remove previously applied styles
+                            b.classList.add('btn-outline-primary');           // Reset other buttons to default
                         });
-                    });
-                } else {
-                    alert('Error fetching organizations.');
-                }
-            })
-            .catch(err => console.error('Error:', err));
-        });
 
-        // Handle removing access when the "Remove Access" button is clicked
-        removeAccessBtn.addEventListener('click', function () {
-            if (selectedOrgId) {
-                const confirmation = confirm('Are you sure you want to remove access for this organization?');
-                if (confirmation) {
-                    // Make AJAX request to remove access
-                    fetch(`/channels/manage-channel-access/${channelId}/`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            organization_id: selectedOrgId,
-                        }),
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            alert(data.message);
-                            // Close the modal
-                            manageAccessModal.hide();
-                        } else {
-                            alert('Error removing access.');
-                        }
-                    })
-                    .catch(err => console.error('Error:', err));
-                }
+                        // Add 'btn-primary' to the selected organization for highlighting
+                        btn.classList.add('btn-primary', 'text-white');
+                    });
+                });
             } else {
-                alert('Please select an organization to remove access.');
+                alert('Error fetching organizations.');
             }
-        });
+        })
+        .catch(err => console.error('Error:', err));
     });
+
+    // Handle removing access when the "Remove Access" button is clicked
+    removeAccessBtn.addEventListener('click', function () {
+        if (selectedOrgId) {
+            const confirmation = confirm('Are you sure you want to remove access for this organization?');
+            if (confirmation) {
+                // Make AJAX request to remove access
+                fetch(`/channels/manage-channel-access/${channelId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        organization_id: selectedOrgId,
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert(data.message);
+                        // Close the modal
+                        manageAccessModal.hide();
+                    } else {
+                        alert('Error removing access.');
+                    }
+                })
+                .catch(err => console.error('Error:', err));
+            }
+        } else {
+            alert('Please select an organization to remove access.');
+        }
+    });
+});
 
     </script>
 </body>
