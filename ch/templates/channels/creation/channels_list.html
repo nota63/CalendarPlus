@@ -21,6 +21,8 @@ rel="stylesheet"
 </head>
 <!-- Modals ---------------------------------------------------------------------------------------- -->
 <!-- Delete Confirmation Modal -->
+
+<!-- Delete Confirmation Modal -->
 <div
     class="modal fade"
     id="deleteChannelModal"
@@ -61,6 +63,10 @@ rel="stylesheet"
         </div>
     </div>
 </div>
+
+
+
+
 
 
 <!-- ---------------------------------------------------------------------------------------------------------------- -->
@@ -111,14 +117,15 @@ rel="stylesheet"
                                 {% if user_profile.is_admin %}
                               <!-- Delete Button -->
                               <button
-                              class="btn btn-danger"
+                              class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                               id="delete-channel-btn"
                               data-channel-id="{{channel.id}}"
                               data-org-id="{{channel.organization.id}}"
                               data-bs-toggle="modal"
                               data-bs-target="#deleteChannelModal"
                           >
-                              Delete Channel
+                              Wipe Channel
+                        
                           </button>
                           
                                 {% endif %}    
@@ -267,6 +274,7 @@ rel="stylesheet"
 
 // DELETE CHANNEL 
 
+
 document.addEventListener("DOMContentLoaded", function () {
     const deleteForm = document.getElementById("delete-channel-form");
 
@@ -329,6 +337,9 @@ document.addEventListener("DOMContentLoaded", function () {
         return csrfTokenElement ? csrfTokenElement.value : "";
     }
 });
+
+
+
 
     </script>
 </body>

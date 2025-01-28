@@ -98,3 +98,5 @@ def send_channel_deletion_email(sender, instance, **kwargs):
             recipient_emails,
             fail_silently=False,
         )
+
+        

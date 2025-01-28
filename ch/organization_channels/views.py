@@ -2109,10 +2109,21 @@ def delete_channel(request, org_id, channel_id):
 
      
         channel.delete()
+        activity = ActivityChannel.objects.create(
+          user=user,
+ 
+          organization=organization,
+          action_type="DELETE_CHANNEL",
+          content=f'{request.user} deleted the channel {channel.name} and its no longer available!'
+        )
+
         return JsonResponse({"success": True, "message": "Channel deleted successfully!"})
 
     return JsonResponse({"success": False, "error": "Invalid request method."}, status=405)
 
+
+
+# DOWNLOAD ALL CHANNEL DATA
 
 
 
