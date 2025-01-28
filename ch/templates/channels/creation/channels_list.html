@@ -86,6 +86,29 @@ rel="stylesheet"
 </div>
 
 
+<!-- MANAGE CHANNEL ACCESS MODAL -->
+
+<div class="modal fade" id="manageAccessModal" tabindex="-1" aria-labelledby="manageAccessModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="manageAccessModalLabel">Manage Channel Access</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Organizations with Access:</h6>
+                <ul id="organizations-list" class="list-group">
+                    <!-- List of organizations will be injected here -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" id="remove-access-btn">Remove Access</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 
@@ -157,17 +180,28 @@ rel="stylesheet"
                                     </button>
                                   </li>  
                                   <li>
+                                       <button
+                                           class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                            id="download-channel-btn"
+                                            data-channel-id="{{channel.id}}"
+                                            data-org-id="{{channel.organization.id}}"
+                                            data-bs-toggle="modal"
+                                             data-bs-target="#downloadChannelModal"
+                                         >
+                                           Download channel data
+                                        </button>
+                                  </li>
+                                  <li>
                                     <button
-                                    class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                                    id="download-channel-btn"
-                                    data-channel-id="{{channel.id}}"
-                                    data-org-id="{{channel.organization.id}}"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#downloadChannelModal"
-                                >
-                                    Download channel data
-                                </button>
-                                    
+                                          class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                          id="manage-access-btn"
+                                          data-channel-id="{{ channel.id }}"
+                                          data-bs-toggle="modal"
+                                          data-bs-target="#manageAccessModal"
+                                          >
+                                         Manage Channel Access
+                                    </button>
+
                                   </li>
                           
                                 {% endif %}    
@@ -436,6 +470,90 @@ document.getElementById('download-channel-btn').addEventListener('click', functi
         xhr.send();
     });
 
+
+// MANAGE CHANNEL ACCESSS
+document.addEventListener("DOMContentLoaded", function () {
+        const manageAccessBtn = document.getElementById("manage-access-btn");
+        const removeAccessBtn = document.getElementById("remove-access-btn");
+        const organizationsList = document.getElementById("organizations-list");
+        let selectedOrgId = null;  // Track selected organization ID
+        let channelId = null;      // Store the channel ID
+
+        // Fetch organizations that have access when the modal is triggered
+        const manageAccessModal = new bootstrap.Modal(document.getElementById('manageAccessModal'));
+
+        document.getElementById('manageAccessModal').addEventListener('show.bs.modal', function () {
+            // Get channel ID from the data attribute of the button
+            channelId = manageAccessBtn.getAttribute('data-channel-id');
+
+            // Clear any previous data
+            organizationsList.innerHTML = '';
+
+            // Make AJAX request to fetch organizations with access
+            fetch(`/channels/manage-channel-access/${channelId}/`, {
+                method: 'GET',
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const organizations = data.organizations;
+
+                    organizations.forEach(org => {
+                        const listItem = document.createElement('li');
+                        listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+                        listItem.innerHTML = `${org.name} <button class="btn btn-danger btn-sm select-org-btn" data-org-id="${org.id}">Select</button>`;
+                        organizationsList.appendChild(listItem);
+                    });
+
+                    // Add event listeners to select buttons
+                    const selectOrgBtns = document.querySelectorAll('.select-org-btn');
+                    selectOrgBtns.forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            selectedOrgId = btn.getAttribute('data-org-id');
+                            // Highlight the selected organization
+                            selectOrgBtns.forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
+                        });
+                    });
+                } else {
+                    alert('Error fetching organizations.');
+                }
+            })
+            .catch(err => console.error('Error:', err));
+        });
+
+        // Handle removing access when the "Remove Access" button is clicked
+        removeAccessBtn.addEventListener('click', function () {
+            if (selectedOrgId) {
+                const confirmation = confirm('Are you sure you want to remove access for this organization?');
+                if (confirmation) {
+                    // Make AJAX request to remove access
+                    fetch(`/channels/manage-channel-access/${channelId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            organization_id: selectedOrgId,
+                        }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            alert(data.message);
+                            // Close the modal
+                            manageAccessModal.hide();
+                        } else {
+                            alert('Error removing access.');
+                        }
+                    })
+                    .catch(err => console.error('Error:', err));
+                }
+            } else {
+                alert('Please select an organization to remove access.');
+            }
+        });
+    });
 
     </script>
 </body>

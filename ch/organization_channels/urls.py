@@ -59,5 +59,6 @@ urlpatterns = [
     # Channel list features
     path('delete-channel/<int:org_id>/<int:channel_id>/',delete_channel, name='delete_channel'),
     path('export-channel-data/<int:org_id>/<int:channel_id>/',export_channel_data, name='export_channel_data'),
+    path('manage-channel-access/<int:channel_id>/',manage_channel_access, name='manage_channel_access'),
 
 ]

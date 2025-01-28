@@ -2229,29 +2229,69 @@ def export_channel_data(request, org_id, channel_id):
 
 
 
+# REMOVE ACCESS OF THE ORGANIZATION (ADMIN ONLY)
+@csrf_exempt
+@login_required
+def manage_channel_access(request, channel_id):
+    try:
+  
+        channel = get_object_or_404(Channel, id=channel_id)
+
+        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+        if not user_profile:
+           return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+        if channel.created_by != request.user:
+            return JsonResponse({"success": False, "error": "You are not authorized to download this channel data."}, status=403)
 
 
+        if request.method == "GET":
+           
+            accesses = ChannelAccess.objects.filter(channel=channel)
 
+      
+            organizations_with_access = [
+                {
+                    'id': access.granted_to_organization.id,
+                    'name': access.granted_to_organization.name,
+                    'granted_at': access.granted_at.strftime('%Y-%m-%d %H:%M:%S'),
+                    'granted_by': access.granted_by.username
+                }
+                for access in accesses
+            ]
 
+            return JsonResponse({
+                'status': 'success',
+                'organizations': organizations_with_access
+            })
 
+        elif request.method == "POST":
+            
+            data = json.loads(request.body)
+            organization_id = data.get('organization_id')
 
+            
+            organization = get_object_or_404(Organization, id=organization_id)
 
+            access = ChannelAccess.objects.filter(channel=channel, granted_to_organization=organization).first()
 
+            if not access:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'The specified organization does not have access to this channel.'
+                })
 
+    
+            access.remove_access()
 
+            return JsonResponse({
+                'status': 'success',
+                'message': f'Access removed for {organization.name} from channel {channel.name}.'
+            })
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    except Exception as e:
+        
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        })
