@@ -2281,6 +2281,13 @@ def manage_channel_access(request, channel_id):
     
             access.remove_access()
 
+            activity = ActivityChannel.objects.create(
+              user=request.user,
+              channel=channel,
+              action_type="REMOVE_CHANNEL_ACCESS",
+             content=f'{request.user} Removed this channel access from {organization.name}'
+           )
+
             return JsonResponse({
                 'status': 'success',
                 'message': f'Access removed for {organization.name} from channel {channel.name}.'

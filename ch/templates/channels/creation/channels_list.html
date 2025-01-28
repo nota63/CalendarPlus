@@ -21,6 +21,94 @@
 </head>
 
 <style>
+/* Style for the modal dialog */
+.modal-dialog {
+    max-width: 600px; /* Adjusts the modal width */
+}
+
+/* Style for the modal header */
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* Title of the modal */
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+/* Close button */
+.btn-close {
+    color: #6c757d;
+    font-size: 1.25rem;
+}
+
+/* Style for modal body */
+.modal-body {
+    padding: 20px;
+}
+
+/* Heading inside modal body */
+.modal-body h6 {
+    font-weight: 600;
+    color: #343a40;
+}
+
+/* List of organizations */
+#organizations-list {
+    margin-top: 10px;
+}
+
+/* Style for the list items */
+.list-group-item {
+    font-size: 1rem;
+    padding: 10px 15px;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    transition: background-color 0.3s;
+}
+
+.list-group-item:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
+
+/* Style for the selected organization (highlighted) */
+.list-group-item.active {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Style for the remove access button */
+#remove-access-btn {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    font-weight: 600;
+}
+
+#remove-access-btn:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+/* Style for modal footer */
+.modal-footer {
+    background-color: #f8f9fa;
+    border-top: 2px solid #dee2e6;
+    padding: 15px;
+}
+
+/* Style for Close button */
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
 
 
 </style>
