@@ -119,6 +119,8 @@
 
 
 /* General Modal Styles */
+/* Dragging Effect */
+/* Modal Styling */
 #permissionsManagementModal .modal-content {
     border-radius: 15px;
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
@@ -181,6 +183,9 @@
     padding: 10px;
     background-color: #fff;
     border-radius: 10px;
+    border: 2px dashed #ddd;
+    min-height: 150px;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
 .permission-container .permission-item {
@@ -204,15 +209,53 @@
     transform: scale(0.95);
 }
 
-/* Drag-and-Drop Zones */
-#permissions-to-give, #assigned-permissions {
-    transition: border-color 0.2s ease;
+/* Dragging Effect */
+.permission-item.dragging {
+    opacity: 0.6;
+    background-color: #cce5ff;
+    color: #0056b3;
+    transform: rotate(-5deg) scale(1.05);
+    box-shadow: 0px 5px 15px rgba(0, 123, 255, 0.4);
+    transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
+/* Drop Zone - Dragging Over */
 #permissions-to-give.dragover,
 #assigned-permissions.dragover {
-    border-color: #007bff;
-    background-color: #eef6ff;
+    border-color: #28a745;
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    box-shadow: inset 0 0 10px rgba(40, 167, 69, 0.3);
+    animation: pulse-border 1.5s infinite;
+}
+
+/* Drop Zone - Item Dropped */
+#permissions-to-give.drop-complete,
+#assigned-permissions.drop-complete {
+    border-color: #ffc107;
+    background: linear-gradient(135deg, #fff3cd, #ffeeba);
+    animation: glow 0.8s ease-in-out;
+}
+
+/* Animations */
+@keyframes pulse-border {
+    0% {
+        box-shadow: inset 0 0 10px rgba(40, 167, 69, 0.3);
+    }
+    50% {
+        box-shadow: inset 0 0 20px rgba(40, 167, 69, 0.5);
+    }
+    100% {
+        box-shadow: inset 0 0 10px rgba(40, 167, 69, 0.3);
+    }
+}
+
+@keyframes glow {
+    0% {
+        box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+    }
+    100% {
+        box-shadow: 0 0 30px rgba(255, 193, 7, 0.8);
+    }
 }
 
 /* Scrollbars for Overflow */
@@ -232,6 +275,107 @@
 
 .permission-container::-webkit-scrollbar-thumb:hover {
     background-color: #0056b3;
+}
+
+
+
+
+
+
+
+
+
+
+/* Modal Content Styling */
+#userSelectionModal .modal-content {
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    border: none;
+}
+
+/* Modal Header */
+#userSelectionModal .modal-header {
+    background-color: #007bff;
+    color: #fff;
+    padding: 20px;
+    border-bottom: 2px solid #0056b3;
+}
+
+#userSelectionModal .modal-title {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+#userSelectionModal .btn-close {
+    background-color: #fff;
+    border-radius: 50%;
+    opacity: 1;
+}
+
+/* Modal Body */
+#userSelectionModal .modal-body {
+    padding: 20px;
+    background-color: #f9f9f9;
+    max-height: 400px;
+    overflow-y: auto;
+    border-top: 2px solid #e9ecef;
+    border-bottom: 2px solid #e9ecef;
+}
+
+/* User List Styling */
+#users-list {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+#users-list .list-group-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background: #fff;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+#users-list .list-group-item:hover {
+    background-color: #f8f9fa;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+/* Selected User Highlight */
+#users-list .list-group-item.active {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #0056b3;
+}
+
+/* Modal Footer */
+#userSelectionModal .modal-footer {
+    padding: 15px;
+    background-color: #f1f1f1;
+    border-top: 2px solid #e9ecef;
+}
+
+#userSelectionModal .btn-secondary {
+    background-color: #6c757d;
+    color: #fff;
+    font-weight: 500;
+    padding: 8px 20px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+#userSelectionModal .btn-secondary:hover {
+    background-color: #5a6268;
 }
 
 
@@ -347,7 +491,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="userSelectionModalLabel">Select User</h5>
+                <h5 class="modal-title" id="userSelectionModalLabel">Select User to manage permissions</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -480,7 +624,7 @@
                                   <li>
 
                                     <button
-                                          class="btn btn-primary"
+                                          class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                                           id="managePermissionsBtn"
                                           data-channel-id="{{ channel.id }}"
                                           data-org-id="{{ channel.organization.id }}"

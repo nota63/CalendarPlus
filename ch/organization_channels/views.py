@@ -2337,10 +2337,13 @@ def manage_user_permissions(request, org_id, channel_id, user_id):
 
         
         assigned_permissions = user_permissions.first().permissions if user_permissions.exists() else []
+
         logger.debug(f"Assigned permissions: {assigned_permissions}")
 
   
-        available_permissions = ['can_send_messages', 'can_edit_messages', 'can_send_files']
+        available_permissions = ['can_suspend_users', 'can_share_audio', 'can_send_files','can_see_channel_activities','can_bypass_inappropriate_messages','can_edit_channel','bypass_message_deletion','can_invite_others',
+                                 'can_kick_users',' can_manage_announcements ','can_connect_integrations',
+                                 'can_use_advanced_search','can_configure_retention_settings','can_manage_shared_content']
         logger.debug(f"Available permissions: {available_permissions}")
 
         
@@ -2359,10 +2362,9 @@ def manage_user_permissions(request, org_id, channel_id, user_id):
             new_permissions = request.POST.getlist('permissions[]')
             logger.debug(f"POST request: New permissions received: {new_permissions}")
 
-    
-            Permission.objects.filter(user__id=user_id, organization=organization, channel=channel).delete()
-            logger.debug(f"Deleted existing permissions for user {user_id} in channel {channel.id}")
-
+            
+            
+           
             for permission in new_permissions:
                 Permission.objects.create(
                     user_id=user_id, 
