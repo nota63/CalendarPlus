@@ -259,6 +259,18 @@ class ChannelAccess(models.Model):
             f"{self.granted_to_organization.name} has access to {self.channel.name} "
             f"(granted by {self.granted_by.username}, owned by {self.owning_organization.name})"
         )
+    
+
+     # Method to remove access
+    def remove_access(self):
+        try:
+            
+            self.delete()
+            return True 
+        except Exception as e:
+       
+            print(f"Error removing access: {str(e)}")
+            return False
 
 
 # RETENTION POLICY
