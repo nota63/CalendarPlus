@@ -1,6 +1,4 @@
-{% extends 'custom.html' %}
 
-{% block content %}
 <br><br><br><br>
 
 <!DOCTYPE html>
@@ -9,515 +7,999 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Groups - {{ organization.name }}</title>
-    <!-- Include Bootstrap Icons CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
-      
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
- 
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
-
-   
 </head>
 <body>
 
     <style>
-        /* Style for the dropdown button (3 dots) */
-.dropdown-toggle {
-    background-color: transparent;
-    border: none;
-    font-size: 1.5rem;
-    color: #495057;  /* Dark gray color */
-    padding: 0.3rem 0.6rem;
-    transition: all 0.3s ease;
-}
+        :root {
+            --primary: #0066FF;
+            --primary-dark: #0052CC;
+            --primary-light: #E5F0FF;
+            --secondary: #64748B;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --background: #F8FAFC;
+            --surface: #FFFFFF;
+            --text-primary: #1E293B;
+            --text-secondary: #64748B;
+            --border: #E2E8F0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
 
-/* Change color of the 3-dot button when hovered */
-.dropdown-toggle:hover {
-    color: #007bff;  /* Bootstrap primary color */
-}
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
 
-/* Style for the dropdown menu */
-.dropdown-menu {
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 0.375rem;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 0.5rem;
-    min-width: 150px;
-}
+        .container {
+            max-width: 1200px;
+            padding: 2.5rem;
+            margin: 0 auto;
+        }
 
-/* Style for each dropdown item */
-.dropdown-item {
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    color: #333;
-    transition: background-color 0.3s ease;
-}
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: var(--text-primary);
+        }
 
-/* Hover effect for dropdown items */
-.dropdown-item:hover {
-    background-color: #f8f9fa;
-    color: #007bff;  /* Bootstrap primary color */
-}
+        /* Card Styles */
+        .card {
+            background: var(--surface);
+            border: none;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0,0,0,0.02);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 2rem;
+        }
 
-/* Styling for the dropdown icon (3 dots) */
-.dropdown-toggle::before {
-    content: "\2022 \2022 \2022";  /* Unicode for vertical ellipsis */
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-right: 0.5rem;
-}
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -5px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.02);
+        }
 
+        .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #3B82F6 100%);
+            padding: 1.75rem 2rem;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
 
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 0%, rgba(255,255,255,0.1) 100%);
+            z-index: 1;
+        }
 
-#loading-spinner {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 9999;
-}
+        .card-header h4 {
+            color: white;
+            font-weight: 800;
+            margin: 0;
+            font-size: 1.5rem;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
 
+        .card-header h4 i {
+            font-size: 1.25rem;
+        }
 
+        .card-body {
+            padding: 2rem;
+        }
 
-/* Modal container */
-.modal-content {
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-}
+        /* Table Styles */
+        .table {
+            margin: 0;
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+        }
 
-/* Modal header */
-.modal-header {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #dee2e6;
-  padding: 15px 20px;
-}
+        .table th {
+            font-weight: 700;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border);
+            padding: 1.25rem 1.5rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: var(--background);
+        }
 
-.modal-title {
-  font-weight: 600;
-  font-size: 1.25rem;
-  color: #343a40;
-}
+        .table td {
+            padding: 1.5rem;
+            vertical-align: middle;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9375rem;
+            line-height: 1.5;
+        }
 
-/* Close button */
-.modal-header .btn-close {
-  filter: brightness(80%);
-}
+        .table tbody tr {
+            transition: all 0.2s ease;
+            background: var(--surface);
+        }
 
-.modal-header .btn-close:hover {
-  filter: brightness(100%);
-}
+        .table tbody tr:hover {
+            background: var(--primary-light);
+        }
 
-/* Modal body */
-.modal-body {
-  padding: 20px;
-  background-color: #ffffff;
-  max-height: 400px; /* Scrollable content */
-  overflow-y: auto;
-}
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
 
-/* List group in modal */
-.modal-body .list-group {
-  margin-top: 10px;
-}
+        /* Dropdown Styles */
+        .dropdown-toggle {
+            background: transparent;
+            border: none;
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            color: var(--text-secondary);
+        }
 
-.modal-body .list-group-item {
-  border: 1px solid #dee2e6;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  background-color: #fdfdfe;
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
+        .dropdown-toggle:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
 
-.modal-body .list-group-item:hover {
-  transform: scale(1.02);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
+        .dropdown-toggle::before {
+            content: "\2022 \2022 \2022";
+            font-size: 1.25rem;
+            line-height: 1;
+        }
 
-/* Highlighted user name */
-.modal-body .list-group-item strong {
-  color: #0d6efd; /* Bootstrap primary color */
-  font-weight: 600;
-}
+        .dropdown-menu {
+            background: var(--surface);
+            border: none;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0,0,0,0.02);
+            padding: 0.5rem;
+            min-width: 200px;
+            animation: dropdownFade 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: top right;
+        }
 
-/* Small text */
-.modal-body .list-group-item small {
-  display: block;
-  color: #6c757d;
-  margin-top: 5px;
-  font-size: 0.9rem;
-}
+        @keyframes dropdownFade {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
 
-/* Modal footer */
-.modal-footer {
-  background-color: #f8f9fa;
-  border-top: 1px solid #dee2e6;
-  padding: 10px 20px;
-}
+        .dropdown-item {
+            padding: 0.75rem 1rem;
+            font-size: 0.9375rem;
+            color: var(--text-primary);
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+        }
 
-/* Buttons */
-.modal-footer .btn {
-  padding: 8px 20px;
-  font-size: 0.95rem;
-  border-radius: 5px;
-}
+        .dropdown-item i {
+            font-size: 1.125rem;
+            color: var(--primary);
+            transition: all 0.2s ease;
+        }
 
-.modal-footer .btn-secondary {
-  background-color: #6c757d;
-  border: none;
-}
+        .dropdown-item:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
 
-.modal-footer .btn-secondary:hover {
-  background-color: #5a6268;
-}
-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Poppins', Arial, sans-serif;
-    background-color: #f0f4f8;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-  }
+        .dropdown-item:hover i {
+            transform: translateX(2px);
+        }
 
-  section {
-    text-align: center;
-    padding: 20px;
-    max-width: 600px;
-    color: #333; /* Text color */
-  }
+        /* Modal Styles */
+        .modal-content {
+            background: var(--surface);
+            border: none;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
 
-  section strong {
-    font-size: 24px;
-    font-weight: 700;
-    color: #4a4a4a; /* Darker color for emphasis */
-    line-height: 1.4;
-    margin-bottom: 15px;
-    display: block;
-  }
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #3B82F6 100%);
+            padding: 1.75rem 2rem;
+            border: none;
+            position: relative;
+        }
 
-  section strong .organization-name {
-    color: #28a745; /* Green color */
-  }
+        .modal-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 0%, rgba(255,255,255,0.1) 100%);
+        }
 
-  section p {
-    font-size: 16px;
-    line-height: 1.6;
-    color: #666; /* Lighter color for secondary text */
-    margin-top: 10px;
-  }
+        .modal-title {
+            color: white;
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            padding: 0;
+            color: white;
+            opacity: 0.8;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-close:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 2rem;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border);
+            background: var(--background);
+        }
+
+        /* List Group Styles */
+        .list-group {
+            margin: 0;
+            padding: 0;
+        }
+
+        .list-group-item {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md) !important;
+            margin-bottom: 0.75rem;
+            padding: 1.25rem;
+            background: var(--surface);
+            transition: all 0.3s ease;
+        }
+
+        .list-group-item:hover {
+            transform: translateX(4px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .list-group-item strong {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1rem;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .list-group-item small {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            display: block;
+            font-weight: 500;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9375rem;
+        }
+
+        .btn i {
+            font-size: 1.125rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #3B82F6 100%);
+            border: none;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,102,255,0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,102,255,0.3);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            border: none;
+            color: white;
+            box-shadow: 0 4px 12px rgba(100,116,139,0.2);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(100,116,139,0.3);
+        }
+
+        /* Loading Spinner */
+        #loading-spinner {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            background: rgba(255,255,255,0.98);
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        #loading-spinner .spinner-border {
+            color: var(--primary);
+            width: 3rem;
+            height: 3rem;
+        }
+
+        #loading-spinner p {
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3.5rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+
+        .empty-state h5 {
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+            max-width: 400px;
+            margin: 0 auto;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Status Badges */
+        .badge {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-success {
+            background: rgba(16,185,129,0.1);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background: rgba(245,158,11,0.1);
+            color: var(--warning);
+        }
+
+        .badge-danger {
+            background: rgba(239,68,68,0.1);
+            color: var(--danger);
+        }
+
+        /* Tooltips */
+        [data-tooltip] {
+            position: relative;
+        }
+
+        [data-tooltip]:before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.5rem 0.75rem;
+            background: var(--text-primary);
+            color: white;
+            font-size: 0.75rem;
+            border-radius: var(--radius-sm);
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+        }
+
+        [data-tooltip]:hover:before {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(-8px);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--background);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* Premium SaaS Header Section */
+        .saas-header-section {
+            padding: 3.5rem 0 2.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, var(--surface) 0%, var(--background) 100%);
+        }
+
+        .saas-header-section::before {
+            content: '';
+            position: absolute;
+            width: 1000px;
+            height: 1000px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(0, 102, 255, 0.03) 0%, rgba(59, 130, 246, 0.03) 100%);
+            top: -500px;
+            right: -300px;
+            z-index: 0;
+        }
+
+        .saas-header-section::after {
+            content: '';
+            position: absolute;
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(0, 102, 255, 0.03) 0%, rgba(59, 130, 246, 0.03) 100%);
+            bottom: -400px;
+            left: -200px;
+            z-index: 0;
+        }
+
+        .header-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-title {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1.3;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .header-title::after {
+            content: '';
+            position: absolute;
+            bottom: -0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary) 0%, #3B82F6 100%);
+            border-radius: 2px;
+            opacity: 0.7;
+        }
+
+        .organization-name {
+            background: linear-gradient(90deg, var(--primary) 0%, #3B82F6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            position: relative;
+            display: inline-block;
+        }
+
+        .organization-name::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary) 0%, #3B82F6 100%);
+            opacity: 0.3;
+        }
+
+        .header-subtitle {
+            font-size: 1.125rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            margin: 0 auto;
+            max-width: 600px;
+            font-weight: 500;
+        }
+
+        /* Stats Section */
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            animation-fill-mode: both;
+        }
+
+        .stat-item:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .stat-item:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Feature Pills */
+        .feature-pills {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .feature-pill {
+            padding: 0.75rem 1.25rem;
+            background: var(--surface);
+            border-radius: 100px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+
+        .feature-pill i {
+            color: var(--primary);
+            font-size: 1rem;
+        }
+
+        .feature-pill:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            color: var(--primary);
+        }
     </style>
 
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 
-
     <!-- Modals  -->
 
     <!-- Modal to display group members -->
-<div class="modal fade" id="membersModal" tabindex="-1" aria-labelledby="membersModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="membersModalLabel">Group Members</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div id="teamLeaderDetails">
-                    <!-- Team Leader details will go here -->
+    <div class="modal fade" id="membersModal" tabindex="-1" aria-labelledby="membersModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="membersModalLabel">Group Members</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <h5>Members:</h5>
-                <ul id="membersList">
-                    <!-- Members will be listed here -->
-                </ul>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <div class="modal-body">
+                    <div id="teamLeaderDetails">
+                        <!-- Team Leader details will go here -->
+                    </div>
+                    <h5>Members:</h5>
+                    <ul id="membersList">
+                        <!-- Members will be listed here -->
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal for Activity Logs -->
-<div class="modal fade" id="activityLogsModal" tabindex="-1" aria-labelledby="activityLogsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="activityLogsModalLabel">Activity Logs</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Modal for Activity Logs -->
+    <div class="modal fade" id="activityLogsModal" tabindex="-1" aria-labelledby="activityLogsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="activityLogsModalLabel">Activity Logs</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="activityLogsModalBody">
+                    <!-- Activity logs will be dynamically loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
         </div>
-        <div class="modal-body" id="activityLogsModalBody">
-          <!-- Activity logs will be dynamically loaded here -->
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
     </div>
-  </div>
-  
 
-<!-- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+    <div class="saas-header-section">
+        <div class="header-content">
+            <h1 class="header-title">
+                Effortlessly monitor all your workspace groups in 
+                <span class="organization-name">{{organization.name}}</span>
+            </h1>
+            <p class="header-subtitle">
+                Track your team's daily activities, stay updated on group progress, and achieve goals faster with streamlined monitoring.
+            </p>
 
+            <div class="feature-pills">
+                <div class="feature-pill">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                    Real-time Updates
+                </div>
+                <div class="feature-pill">
+                    <i class="bi bi-graph-up"></i>
+                    Progress Tracking
+                </div>
+                <div class="feature-pill">
+                    <i class="bi bi-people-fill"></i>
+                    Team Collaboration
+                </div>
+            </div>
 
-
-<section>
-    <p>
-      <strong>
-        Effortlessly monitor all your workspace groups in <span class="organization-name">{{organization.name}}</span> from one centralized dashboard
-      </strong>
-    </p>
-    <p>
-      Track your team's daily activities, stay updated on group progress, and achieve goals faster with streamlined monitoring.
-    </p>
-  </section>
-
-  <section class="btn">
-    <a href="{% url 'group_create' organization.id %}">
-        <button type="submit" class="btn btn-primary rounded-pill d-flex align-items-center px-4 py-2">
-            <!-- Add an icon before the text -->
-            <i class="bi bi-plus-circle me-2"></i> <!-- Bootstrap icon for a plus sign -->
-            Create New One
-        </button>
-    </a>
-</section>
-
-<div class="container mt-5">
-    <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">Groups in {{ organization.name }}</h4>
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Uptime</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Monitoring</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Active Teams</div>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            {% if groups %}
-                <div class="row">
-                    {% for group in groups %}
-                        <div class="col-md-4 mb-4">
-                            <div class="card">
-                                <div class="card-header bg-light">
-                                    <h5 class="card-title">{{ group.name }}</h5>
+    </div>
+
+    <section class="position-fixed top-0 end-0 p-3">
+        <a href="{% url 'group_create' organization.id %}">
+            <button type="submit" class="btn btn-primary rounded-pill d-flex align-items-center px-4 py-2">
+                <!-- Add an icon before the text -->
+                <i class="bi bi-plus-circle me-2"></i> <!-- Bootstrap icon for a plus sign -->
+                Create New One
+            </button>
+        </a>
+    </section>
+    
+
+    <div class="container mt-5">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Groups in {{ organization.name }}</h4>
+            </div>
+            <div class="card-body">
+                {% if groups %}
+                    <div class="row">
+                        {% for group in groups %}
+                            <div class="col-md-4 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h5 class="card-title">{{ group.name }}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">{{ group.description|default:"No description available." }}</p>
+                                        <p><strong>Team Leader:</strong> {{ group.team_leader.username|default:"No team leader assigned" }}</p>
+                                        <p><strong>Created by:</strong> {{ group.created_by.username }}</p>
+                                        <p><small class="text-muted">Created on: {{ group.created_at }}</small></p>
+                                    </div>
+                                    <!-- Dropdown for 3-dot menu -->
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                            &#x22EE; <!-- This is the Unicode character for 3 dots -->
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'invite_members_to_group' org_id=group.organization.id group_id=group.id %}">
+                                                    Invite Teammates
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:void(0);" onclick="fetchGroupMembers({{ group.organization.id }}, {{ group.id }})">
+                                                    Fetch Members
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <a class="dropdown-item text-danger" href="javascript:void(0);" onclick="deleteGroup({{ group.organization.id }}, {{ group.id }})">
+                                                    Delete Group
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:void(0);" onclick="fetchGroupActivityLogs({{ group.organization.id }}, {{ group.id }})">
+                                                    View Activity Logs
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <!-- Spinner (Initially hidden) -->
+                                    <div id="loading-spinner" style="display:none;">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="card-body">
-                                    <p class="card-text">{{ group.description|default:"No description available." }}</p>
-                                    <p><strong>Team Leader:</strong> {{ group.team_leader.username|default:"No team leader assigned" }}</p>
-                                    <p><strong>Created by:</strong> {{ group.created_by.username }}</p>
-                                    <p><small class="text-muted">Created on: {{ group.created_at }}</small></p>
-                                </div>
-                                 <!-- Dropdown for 3-dot menu -->
-                              <!-- Dropdown for 3-dot menu -->
-                              <div class="dropdown">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                &#x22EE; <!-- This is the Unicode character for 3 dots -->
-                           </button>
-                          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                             <li>
-                                <a class="dropdown-item" href="{% url 'invite_members_to_group' org_id=group.organization.id group_id=group.id %}">
-                                   Invite Teammates
-                                 </a>
-                               </li>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No groups available for this organization.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+
+    <script>
+        function fetchGroupMembers(org_id, group_id) {
+            // Generate the dynamic URL
+            const url = `/groups/groups/${org_id}/${group_id}/fetch_group_members/`;
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,  // Assuming you have CSRF token in your template
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Error:', data.error);
+                    alert('Error fetching members.');
+                } else {
+                    // Show team leader details
+                    const teamLeaderDetails = `
+                        <p><strong>Team Leader:</strong> ${data.team_leader.username}</p>
+                        <p><strong>Role:</strong> ${data.team_leader.role}</p>
+                    `;
+                    document.getElementById('teamLeaderDetails').innerHTML = teamLeaderDetails;
+
+                    // List the group members
+                    let membersHtml = '';
+                    data.members.forEach(member => {
+                        membersHtml += `
                             <li>
-                               <a class="dropdown-item" href="javascript:void(0);" onclick="fetchGroupMembers({{ group.organization.id }}, {{ group.id }})">
-                                    Fetch Members
-                                </a>
-                             </li>
+                                <strong>${member.username}</strong> (${member.role})
+                                <p>Joined at: ${member.joined_at}</p>
+                            </li>
+                        `;
+                    });
+                    document.getElementById('membersList').innerHTML = membersHtml;
 
-                             <li>
-                                 <a class="dropdown-item text-danger" href="javascript:void(0);" onclick="deleteGroup({{ group.organization.id }}, {{ group.id }})">
-                                  Delete Group
-                                </a>
-                             </li>
-
-                             <li>
-                                <a class="dropdown-item" href="javascript:void(0);" onclick="fetchGroupActivityLogs({{ group.organization.id }}, {{ group.id }})">
-                                  View Activity Logs
-                                </a>
-                             </li>
-              
-                             </div>
-                         </ul>
-                               <!-- Spinner (Initially hidden) -->
-                               <div id="loading-spinner" style="display:none;">
-                                <div class="spinner-border text-primary" role="status">
-                               <span class="visually-hidden">Loading...</span>
-                            </div>
-
-                            </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p>No groups available for this organization.</p>
-            {% endif %}
-        </div>
-    </div>
-</div>
-
-<!-- Bootstrap 5 JS -->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
-
-
-<script>
-    function fetchGroupMembers(org_id, group_id) {
-    // Generate the dynamic URL
-    const url = `/groups/groups/${org_id}/${group_id}/fetch_group_members/`;
-
-    fetch(url, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,  // Assuming you have CSRF token in your template
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            console.error('Error:', data.error);
-            alert('Error fetching members.');
-        } else {
-            // Show team leader details
-            const teamLeaderDetails = `
-                <p><strong>Team Leader:</strong> ${data.team_leader.username}</p>
-                <p><strong>Role:</strong> ${data.team_leader.role}</p>
-            `;
-            document.getElementById('teamLeaderDetails').innerHTML = teamLeaderDetails;
-
-            // List the group members
-            let membersHtml = '';
-            data.members.forEach(member => {
-                membersHtml += `
-                    <li>
-                        <strong>${member.username}</strong> (${member.role})
-                        <p>Joined at: ${member.joined_at}</p>
-                    </li>
-                `;
+                    // Show the modal
+                    const modal = new bootstrap.Modal(document.getElementById('membersModal'));
+                    modal.show();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to fetch data.');
             });
-            document.getElementById('membersList').innerHTML = membersHtml;
+        }
+
+        // Function to delete the group
+        function deleteGroup(orgId, groupId) {
+            // Show the loading spinner
+            document.getElementById('loading-spinner').style.display = 'block';
+
+            // Confirm the action before proceeding
+            if (confirm("Are you sure you want to delete this group? This action cannot be undone.")) {
+                // Make an AJAX request to delete the group
+                fetch(`/groups/groups/${orgId}/${groupId}/delete_group/`, {
+                    method: 'POST', // Using POST for deletion
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken') // Get CSRF token for POST request (if CSRF is enabled)
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Hide the spinner once the request is complete
+                    document.getElementById('loading-spinner').style.display = 'none';
+                    
+                    if (data.success) {
+                        alert(data.message);  // Success message
+                        // Optionally, remove the group's HTML element from the DOM
+                        document.getElementById(`group-card-${groupId}`).remove();
+                    } else {
+                        alert(data.message);  // Failure message
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the group.');
+                    // Hide the spinner in case of error
+                    document.getElementById('loading-spinner').style.display = 'none';
+                });
+            } else {
+                // Hide the spinner if the user cancels the action
+                document.getElementById('loading-spinner').style.display = 'none';
+            }
+        }
+
+        // Utility function to get the CSRF token (if needed for POST)
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Function to fetch activity logs
+        function fetchGroupActivityLogs(orgId, groupId) {
+            const url = `/groups/groups/${orgId}/${groupId}/activities`; // Adjust the URL pattern as needed
+
+            // Show a loading spinner while fetching data
+            const modalBody = document.getElementById("activityLogsModalBody");
+            modalBody.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div></div>';
+
+            // Make an AJAX call to fetch the logs
+            fetch(url)
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  const activities = data.activities;
+
+                  // Prepare the logs to display
+                  if (activities.length === 0) {
+                    modalBody.innerHTML = "<p>No activity logs available for this group.</p>";
+                  } else {
+                    let logsHTML = '<ul class="list-group">';
+                    activities.forEach(activity => {
+                      logsHTML += `
+                        <li class="list-group-item">
+                          <strong>${activity.user}</strong>: ${activity.action_type}<br>
+                          <small>${activity.details}</small><br>
+                          <small class="text-muted">${activity.timestamp}</small>
+                        </li>
+                      `;
+                    });
+                    logsHTML += "</ul>";
+                    modalBody.innerHTML = logsHTML;
+                  }
+                } else {
+                  modalBody.innerHTML = "<p>Failed to fetch activity logs. Please try again later.</p>";
+                }
+              })
+              .catch(error => {
+                console.error("Error fetching activity logs:", error);
+                modalBody.innerHTML = "<p>There was an error fetching the activity logs.</p>";
+              });
 
             // Show the modal
-            const modal = new bootstrap.Modal(document.getElementById('membersModal'));
-            modal.show();
+            const activityLogsModal = new bootstrap.Modal(document.getElementById("activityLogsModal"));
+            activityLogsModal.show();
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Failed to fetch data.');
-    });
-}
-
-// Function to delete the group
-// Function to delete the group
-function deleteGroup(orgId, groupId) {
-    // Show the loading spinner
-    document.getElementById('loading-spinner').style.display = 'block';
-
-    // Confirm the action before proceeding
-    if (confirm("Are you sure you want to delete this group? This action cannot be undone.")) {
-        // Make an AJAX request to delete the group
-        fetch(`/groups/groups/${orgId}/${groupId}/delete_group/`, {
-            method: 'POST', // Using POST for deletion
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken') // Get CSRF token for POST request (if CSRF is enabled)
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Hide the spinner once the request is complete
-            document.getElementById('loading-spinner').style.display = 'none';
-            
-            if (data.success) {
-                alert(data.message);  // Success message
-                // Optionally, remove the group's HTML element from the DOM
-                document.getElementById(`group-card-${groupId}`).remove();
-            } else {
-                alert(data.message);  // Failure message
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while deleting the group.');
-            // Hide the spinner in case of error
-            document.getElementById('loading-spinner').style.display = 'none';
-        });
-    } else {
-        // Hide the spinner if the user cancels the action
-        document.getElementById('loading-spinner').style.display = 'none';
-    }
-}
-
-// Utility function to get the CSRF token (if needed for POST)
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-
-// Function to fetch activity logs
-
-// Function to fetch the activity logs via AJAX
- // Function to fetch group activity logs
- function fetchGroupActivityLogs(orgId, groupId) {
-    const url = `/groups/groups/${orgId}/${groupId}/activities`; // Adjust the URL pattern as needed
-
-    // Show a loading spinner while fetching data
-    const modalBody = document.getElementById("activityLogsModalBody");
-    modalBody.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"></div></div>';
-
-    // Make an AJAX call to fetch the logs
-    fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          const activities = data.activities;
-
-          // Prepare the logs to display
-          if (activities.length === 0) {
-            modalBody.innerHTML = "<p>No activity logs available for this group.</p>";
-          } else {
-            let logsHTML = '<ul class="list-group">';
-            activities.forEach(activity => {
-              logsHTML += `
-                <li class="list-group-item">
-                  <strong>${activity.user}</strong>: ${activity.action_type}<br>
-                  <small>${activity.details}</small><br>
-                  <small class="text-muted">${activity.timestamp}</small>
-                </li>
-              `;
-            });
-            logsHTML += "</ul>";
-            modalBody.innerHTML = logsHTML;
-          }
-        } else {
-          modalBody.innerHTML = "<p>Failed to fetch activity logs. Please try again later.</p>";
-        }
-      })
-      .catch(error => {
-        console.error("Error fetching activity logs:", error);
-        modalBody.innerHTML = "<p>There was an error fetching the activity logs.</p>";
-      });
-
-    // Show the modal
-    const activityLogsModal = new bootstrap.Modal(document.getElementById("activityLogsModal"));
-    activityLogsModal.show();
-  }
-</script>
+    </script>
 
 </body>
 </html>
 
-{% endblock %}
