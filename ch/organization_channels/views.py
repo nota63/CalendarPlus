@@ -2740,3 +2740,6 @@ def unschedule_alert(request):
         except json.JSONDecodeError:
             return JsonResponse({'status': 'error', 'message': 'Invalid JSON data.'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+
+
+
