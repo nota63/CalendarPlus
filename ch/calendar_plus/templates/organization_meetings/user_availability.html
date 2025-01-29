@@ -1,81 +1,286 @@
-{% extends 'custom.html' %}
-
-{% block content %}
-<br><br><br>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Availability Slots</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
+    
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #4A154B;
+            --primary-light: #9D5BD2;
+            --success-color: #10B981;
+            --success-light: #D1FAE5;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+            --danger-light: #FEE2E2;
+        }
+
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Inter', sans-serif;
+            background: #F8F9FA;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .slots-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .slots-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .time-slot {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .time-slot:not(.booked):hover {
+            transform: translateX(4px);
+            background: var(--success-light);
+        }
+
+        .time-slot.booked {
+            background: var(--danger-light);
+            opacity: 0.7;
+        }
+
+        /* Custom radio button styles */
+        .custom-radio {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .custom-radio input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .radio-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #CBD5E1;
+            position: relative;
+            margin-right: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .radio-dot:after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: all 0.2s ease;
+        }
+
+        .custom-radio input:checked ~ .radio-dot {
+            border-color: var(--primary-color);
+        }
+
+        .custom-radio input:checked ~ .radio-dot:after {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .proceed-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            transition: all 0.3s ease;
+        }
+
+        .proceed-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 21, 75, 0.2);
+        }
+
+        .notification {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 50;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        /* Loading animation */
+        .loading-dots span {
+            animation: loading 1.4s infinite both;
+        }
+
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes loading {
+            0% { opacity: 0.2; }
+            20% { opacity: 1; }
+            100% { opacity: 0.2; }
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen bg-gray-50 py-12">
+    <!-- Header Section -->
+    <header class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+        <div class="text-center">
+            <h1 class="text-4xl font-bold gradient-text tracking-tight mb-4">
+                Availability Slots
+            </h1>
+            <div class="flex items-center justify-center space-x-2 text-gray-600">
+                <i class="ri-user-line text-xl"></i>
+                <span class="font-medium">{{ user.username }}</span>
+                <span class="text-gray-400">•</span>
+                <i class="ri-calendar-line text-xl"></i>
+                <span class="font-medium">{{ selected_date }}</span>
+            </div>
+        </div>
+    </header>
 
-    <section class="py-4 bg-light">
-        <div class="container text-center">
-            <p class="fs-5 text-muted">
-                Select a slot to schedule your meeting effortlessly. If the chosen slot is already booked, 
-                Calendar Plus will automatically block the scheduling to prevent any conflicts and ensure smooth coordination.
-            </p>
+    <!-- Info Section -->
+    <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+        <div class="bg-white rounded-2xl p-6 shadow-sm">
+            <div class="flex items-start space-x-4">
+                <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+                    <i class="ri-information-line text-2xl text-purple-600"></i>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-lg">
+                        Select a slot to schedule your meeting effortlessly. Calendar Plus automatically prevents double bookings to ensure smooth coordination.
+                    </p>
+                </div>
+            </div>
         </div>
     </section>
-    
 
-<div class="container py-5">
-    <h2 class="text-center mb-4">
-        Availability Slots for <strong>{{ user.username }}</strong> on 
-        <span class="text-primary">{{ selected_date }}</span> 
-       
-    </h2>
-
-    <form method="GET" action="{% url 'schedule_next_step' org_id=organization.id user_id=user.id %}">
-        <div class="card shadow-sm">
-            <div class="card-body">
+    <!-- Slots Section -->
+    <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <form method="GET" action="{% url 'schedule_next_step' org_id=organization.id user_id=user.id %}" class="space-y-8">
+            <div class="slots-card rounded-2xl p-8">
                 {% if available_slots %}
-                    <ul class="list-group list-group-flush">
+                    <div class="space-y-4">
                         {% for slot in available_slots %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            {% if slot.booked %}
-                                <span class="text-danger">
-                                    {{ slot.start_time }} - {{ slot.end_time }} (Booked)
-                                </span>
-                            {% else %}
-                                <div class="form-check">
-                                    <input type="radio" class="form-check-input" name="selected_slot" value="{{ slot.start_time }} - {{ slot.end_time }}" id="slot{{ forloop.counter }}" required>
-                                    <label class="form-check-label" for="slot{{ forloop.counter }}">
-                                        {{ slot.start_time }} - {{ slot.end_time }}
+                            <div class="time-slot {% if slot.booked %}booked{% endif %} rounded-xl">
+                                {% if slot.booked %}
+                                    <div class="flex items-center justify-between p-4 text-red-500">
+                                        <div class="flex items-center space-x-3">
+                                            <i class="ri-time-line text-xl"></i>
+                                            <span class="font-medium">{{ slot.start_time }} - {{ slot.end_time }}</span>
+                                        </div>
+                                        <span class="text-sm font-medium bg-red-100 px-3 py-1 rounded-full">Booked</span>
+                                    </div>
+                                {% else %}
+                                    <label class="custom-radio w-full">
+                                        <input type="radio" name="selected_slot" value="{{ slot.start_time }} - {{ slot.end_time }}" required>
+                                        <span class="radio-dot"></span>
+                                        <div class="flex items-center justify-between flex-1">
+                                            <div class="flex items-center space-x-3">
+                                                <i class="ri-time-line text-xl text-gray-500"></i>
+                                                <span class="font-medium text-gray-900">{{ slot.start_time }} - {{ slot.end_time }}</span>
+                                            </div>
+                                            <span class="text-sm font-medium text-green-500 bg-green-100 px-3 py-1 rounded-full">Available</span>
+                                        </div>
                                     </label>
-                                </div>
-                            {% endif %}
-                        </li>
+                                {% endif %}
+                            </div>
                         {% endfor %}
-                    </ul>
+                    </div>
                 {% else %}
-                    <p class="text-center text-danger fw-bold mt-3">No availability slots for this day.</p>
+                    <div class="text-center py-12">
+                        <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+                            <i class="ri-calendar-close-line text-3xl text-red-500"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No Available Slots</h3>
+                        <p class="text-gray-500">There are no availability slots for this day. Please try another date.</p>
+                    </div>
                 {% endif %}
             </div>
-        </div>
 
-        {% if available_slots %}
-            <div class="text-center mt-4">
-                <input type="hidden" name="selected_date" value="{{ selected_date }}">
-                <button type="submit" class="btn btn-primary btn-lg px-5">
-                    Proceed
-                </button>
+            {% if available_slots %}
+                <div class="text-center">
+                    <input type="hidden" name="selected_date" value="{{ selected_date }}">
+                    <button type="submit" class="proceed-btn px-8 py-4 rounded-xl text-white font-medium inline-flex items-center space-x-2 hover:opacity-90">
+                        <span>Proceed to Next Step</span>
+                        <i class="ri-arrow-right-line"></i>
+                    </button>
+                </div>
+            {% endif %}
+        </form>
+    </section>
+
+    <!-- Loading State -->
+    <div class="fixed inset-0 bg-white bg-opacity-90 flex items-center justify-center hidden" id="loadingState">
+        <div class="text-center">
+            <div class="loading-dots flex space-x-2 text-3xl text-purple-600 mb-4">
+                <span>•</span>
+                <span>•</span>
+                <span>•</span>
             </div>
-        {% endif %}
-    </form>
-</div>
+            <p class="text-gray-600 font-medium">Processing your request...</p>
+        </div>
+    </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Notification -->
+    <div class="notification bg-white rounded-lg shadow-lg p-4" id="notification">
+        <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                <i class="ri-check-line text-green-500"></i>
+            </div>
+            <div>
+                <h4 class="font-medium text-gray-900">Success!</h4>
+                <p class="text-sm text-gray-600">Your slot has been selected.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Show loading state on form submit
+        document.querySelector('form').addEventListener('submit', function() {
+            document.getElementById('loadingState').classList.remove('hidden');
+        });
+
+        // Function to show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Add animation to radio selections
+        document.querySelectorAll('.custom-radio input').forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.checked) {
+                    showNotification('Time slot selected');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
-
-{% endblock %}
