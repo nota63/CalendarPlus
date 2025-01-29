@@ -3,49 +3,370 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking Details</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.2/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <title>Booking Details - {{ booking.event.title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;500;600;700&display=swap');
+
+        :root {
+            --slack-purple: #611f69;
+            --slack-aubergine: #4a154b;
+            --slack-blue: #1264a3;
+            --slack-green: #2bac76;
+            --slack-red: #e01e5a;
+            --slack-yellow: #ecb22e;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background: #f8f9fa;
+            color: #1d1c1d;
+        }
+
+        .slack-header {
+            background: var(--slack-aubergine);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .detail-card {
+            background: white;
+            border: 1px solid #e2e2e2;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .detail-card:hover {
+            border-color: var(--slack-purple);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+
+        .status-badge:hover {
+            transform: scale(1.05);
+        }
+
+        .status-confirmed {
+            background: #ecf4ff;
+            color: var(--slack-blue);
+        }
+
+        .status-pending {
+            background: #fff7e6;
+            color: var(--slack-yellow);
+        }
+
+        .status-cancelled {
+            background: #fee7ef;
+            color: var(--slack-red);
+        }
+
+        .action-btn {
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .action-btn:hover::after {
+            opacity: 1;
+        }
+
+        .info-section {
+            animation: fadeIn 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 1.5rem;
+            animation: slideInLeft 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 1px;
+            height: 100%;
+            background: #e2e2e2;
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: -4px;
+            top: 0;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--slack-purple);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover::after {
+            transform: scale(1.5);
+            box-shadow: 0 0 0 4px rgba(97, 31, 105, 0.2);
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .join-btn {
+            background: var(--slack-purple);
+            color: white;
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        .join-btn:hover {
+            background: var(--slack-aubergine);
+            transform: translateY(-2px);
+        }
+
+        .icon-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .icon-circle:hover {
+            transform: rotate(15deg);
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
 
-<div class="container mx-auto mt-10">
-    <h1 class="text-3xl font-bold text-center mb-10">Booking Details</h1>
+<body>
+    <!-- Header -->
+    <header class="slack-header py-12 px-4 sm:px-6 lg:px-8 animate__animated animate__fadeIn">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center">
+                <h1 class="text-3xl font-bold text-white mb-3">
+                    Booking Details
+                </h1>
+                <p class="text-lg text-gray-300">
+                    {{ booking.event.title }}
+                </p>
+            </div>
+        </div>
+    </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- Booking Details Section -->
-        <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Booking Details</h2>
-            <p class="text-gray-600"><i class="fas fa-calendar-day"></i> Start Time: {{ booking.start_time|date:"l, F j, Y, H:i" }}</p>
-            <p class="text-gray-600"><i class="fas fa-calendar-check"></i> End Time: {{ booking.end_time|date:"l, F j, Y, H:i" }}</p>
-            <p class="text-gray-600"><i class="fas fa-clock"></i> Duration: {{ booking.event.duration }} mins</p>
-            <p class="text-gray-600"><i class="fas fa-users"></i> Invitee: {{ booking.invitee.username }}</p>
-            <p class="text-gray-600"><i class="fas fa-users"></i> Event Host: {{ booking.event_host.username }}</p>
-            <p class="text-gray-600"><i class="fas fa-tag"></i> Status: {{ booking.status|capfirst }}</p>
-            <p class="text-gray-600"><i class="fas fa-map-marker-alt"></i> Location: {{ booking.event.location }}</p>
-            <p class="text-gray-600"><i class="fas fa-pencil-alt"></i> Buffer Time: {{ booking.event.buffer_time }} mins</p>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Main Details Card -->
+        <div class="detail-card p-8 mb-8">
+            <div class="flex flex-col md:flex-row md:items-start md:justify-between">
+                <div class="flex-1">
+                    <div class="flex items-center mb-6">
+                        <div class="icon-circle bg-purple-100 mr-4">
+                            <i class="ri-calendar-event-line text-2xl text-purple-600"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900">{{ booking.event.title }}</h2>
+                            <p class="text-gray-500">Organized by {{ booking.event_host.username }}</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <div class="icon-circle bg-blue-100 mr-4">
+                                    <i class="ri-time-line text-xl text-blue-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Date & Time</p>
+                                    <p class="font-semibold">{{ booking.start_time|date:"l, F j, Y" }}</p>
+                                    <p class="text-gray-600">{{ booking.start_time|date:"H:i" }} - {{ booking.end_time|date:"H:i" }}</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center">
+                                <div class="icon-circle bg-green-100 mr-4">
+                                    <i class="ri-map-pin-line text-xl text-green-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Location</p>
+                                    <p class="font-semibold">{{ booking.event.location }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <div class="icon-circle bg-yellow-100 mr-4">
+                                    <i class="ri-timer-line text-xl text-yellow-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Duration</p>
+                                    <p class="font-semibold">{{ booking.event.duration }} minutes</p>
+                                    <p class="text-gray-600">Buffer time: {{ booking.event.buffer_time }} minutes</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center">
+                                <div class="icon-circle bg-red-100 mr-4">
+                                    <i class="ri-user-line text-xl text-red-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Invitee</p>
+                                    <p class="font-semibold">{{ booking.invitee.username }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 md:mt-0 md:ml-8 flex flex-col items-center">
+                    <span class="status-badge status-{{ booking.get_status_display|lower }} mb-4">
+                        {{ booking.get_status_display }}
+                    </span>
+                    {% if booking.status == 'CONFIRMED' and booking.meeting_link %}
+                    <a href="{{ booking.meeting_link }}" target="_blank" 
+                       class="join-btn px-6 py-3 rounded-lg shadow-lg flex items-center">
+                        <i class="ri-video-add-line mr-2"></i>
+                        Join Meeting
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
         </div>
 
-        <!-- Event Details Section -->
-        <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Event Details</h2>
-            <p class="text-gray-600"><i class="fas fa-pen"></i> Event Title: {{ booking.event.title }}</p>
-            <p class="text-gray-600"><i class="fas fa-align-left"></i> Description: {{ booking.event.description }}</p>
-            <p class="text-gray-600"><i class="fas fa-clock"></i> Event Type: {{ booking.event.event_type }}</p>
-            <p class="text-gray-600"><i class="fas fa-users"></i> Invitee: {{ booking.invitee.username }}</p>
-            <p class="text-gray-600"><i class="fas fa-users"></i> Host: {{ booking.event_host.username }}</p>
-            <p class="text-gray-600"><i class="fas fa-location-arrow"></i> Location: {{ booking.event.location }}</p>
-            <p class="text-gray-600"><i class="fas fa-clock"></i> Duration: {{ booking.event.duration }} mins</p>
-            <p class="text-gray-600"><i class="fas fa-calendar-check"></i> Buffer Time: {{ booking.event.buffer_time }} mins</p>
+        <!-- Timeline Section -->
+        <div class="detail-card p-8">
+            <h3 class="text-xl font-bold text-gray-900 mb-6">Booking Timeline</h3>
+            <div class="timeline-item" style="animation-delay: 0.1s">
+                <h4 class="font-semibold text-gray-900">Booking Created</h4>
+                <p class="text-gray-500">{{ booking.created_at|date:"M d, Y H:i" }}</p>
+            </div>
+            <div class="timeline-item" style="animation-delay: 0.2s">
+                <h4 class="font-semibold text-gray-900">Last Updated</h4>
+                <p class="text-gray-500">{{ booking.updated_at|date:"M d, Y H:i" }}</p>
+            </div>
+            {% if booking.status == 'CONFIRMED' %}
+            <div class="timeline-item" style="animation-delay: 0.3s">
+                <h4 class="font-semibold text-gray-900">Booking Confirmed</h4>
+                <p class="text-gray-500">Meeting link generated and ready</p>
+            </div>
+            {% endif %}
         </div>
-    </div>
 
-    <div class="mt-6 text-center">
-        <a href="{% url 'user_organization_bookings' org_id=booking.event.organization.id %}" class="bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600 transition-all duration-200">
-            Back to Bookings
-        </a>
-    </div>
-</div>
+        <!-- Action Buttons -->
+        <div class="flex justify-center mt-8 space-x-4">
+            <a href="{% url 'user_bookings' org_id=booking.event.organization.id %}" 
+               class="action-btn px-6 py-3 bg-gray-100 rounded-lg hover:bg-gray-200 text-gray-700">
+                <i class="ri-arrow-left-line mr-2"></i>
+                Back to Bookings
+            </a>
+            {% if booking.status != 'CANCELLED' %}
+            <form method="POST" action="{% url 'cancel-booking' org_id=booking.event.organization.id booking_id=booking.id %}">
+                {% csrf_token %}
+                <button type="submit" 
+                        class="action-btn px-6 py-3 bg-red-100 text-red-600 rounded-lg hover:bg-red-200">
+                    <i class="ri-close-circle-line mr-2"></i>
+                    Cancel Booking
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </main>
 
+    <script>
+        // Add staggered animation to timeline items
+        document.querySelectorAll('.timeline-item').forEach((item, index) => {
+            item.style.animationDelay = `${index * 0.1}s`;
+        });
+
+        // Add hover animations to icon circles
+        document.querySelectorAll('.icon-circle').forEach(circle => {
+            circle.addEventListener('mouseenter', () => {
+                circle.style.transform = 'rotate(15deg) scale(1.1)';
+            });
+            
+            circle.addEventListener('mouseleave', () => {
+                circle.style.transform = 'rotate(0) scale(1)';
+            });
+        });
+
+        // Add ripple effect to buttons
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const ripple = document.createElement('div');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size/2;
+                const y = e.clientY - rect.top - size/2;
+                
+                ripple.style.width = ripple.style.height = `${size}px`;
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+                ripple.classList.add('ripple');
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+    </script>
 </body>
 </html>

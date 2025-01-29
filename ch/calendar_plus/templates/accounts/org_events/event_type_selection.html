@@ -1,100 +1,346 @@
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select Event Type</title>
+    <title>Select Event Type - Calendar Plus</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
     <style>
-        @keyframes fadeIn {
-            0% {
-                opacity: 0;
-                transform: translateY(10px);
-            }
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;500;600;700&display=swap');
 
-            100% {
+        :root {
+            --slack-purple: #611f69;
+            --slack-aubergine: #4a154b;
+            --slack-blue: #1264a3;
+            --slack-green: #2bac76;
+            --slack-red: #e01e5a;
+            --slack-yellow: #ecb22e;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+        }
+
+        .event-card {
+            background: white;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideIn 0.5s ease-out forwards;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .event-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--slack-purple), var(--slack-blue));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .event-card:hover::before {
+            opacity: 1;
+        }
+
+        .event-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+            border-color: rgba(97, 31, 105, 0.1);
+        }
+
+        @keyframes slideIn {
+            to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
 
-        .fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
+        .icon-circle {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, rgba(97, 31, 105, 0.1), rgba(18, 100, 163, 0.1));
         }
 
-        /* Force the form to stay centered */
-        .form-container {
+        .event-card:hover .icon-circle {
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        .event-card:hover .icon {
+            transform: scale(1.1);
+        }
+
+        .icon {
+            font-size: 2rem;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, var(--slack-purple), var(--slack-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-gradient {
+            background: linear-gradient(135deg, var(--slack-aubergine), var(--slack-purple));
+        }
+
+        .header-text {
+            background: linear-gradient(135deg, #fff, rgba(255, 255, 255, 0.9));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle-gradient {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .card-link:focus {
+            outline: none;
+        }
+
+        .card-link:focus .event-card {
+            border-color: var(--slack-purple);
+            box-shadow: 0 0 0 3px rgba(97, 31, 105, 0.3);
+        }
+
+        .shimmer {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            100% {
+                left: 200%;
+            }
+        }
+
+        .pro-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: linear-gradient(135deg, var(--slack-yellow), var(--slack-red));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: rotate(5deg);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .pro-badge::before {
+            content: '✨';
+            margin-right: 4px;
+        }
+
+        .event-card:hover .pro-badge {
+            transform: rotate(0deg) scale(1.05);
+        }
+
+        .disabled-card {
+            opacity: 0.75;
+            cursor: not-allowed;
+        }
+
+        .disabled-card:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .disabled-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 16px;
+            pointer-events: none;
+        }
+
+        .upgrade-btn {
+            background: linear-gradient(135deg, var(--slack-purple), var(--slack-blue));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .disabled-card:hover .upgrade-btn {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .active-card {
+            border: 2px solid var(--slack-green);
+        }
+
+        .active-card::before {
+            background: linear-gradient(90deg, var(--slack-green), var(--slack-blue));
+        }
+
+        .recommended-badge {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: var(--slack-green);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            opacity: 0.9;
+            transform: translateY(-5px);
+            animation: fadeInDown 0.5s ease-out forwards 0.5s;
+        }
+
+        @keyframes fadeInDown {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
 
-<body class="bg-gray-50">
+<body>
+    <!-- Header Section -->
+    <header class="header-gradient py-16 px-4 mb-12">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 header-text animate__animated animate__fadeIn">
+                Choose Your Event Type
+            </h1>
+            <p class="text-xl subtitle-gradient animate__animated animate__fadeIn animate__delay-1s">
+                Start with our free One-on-One events, or upgrade to unlock more options
+            </p>
+        </div>
+    </header>
 
-    <!-- Include your header here -->
-    {% include 'header.html' %}
-    <br><br>
-
-
-    <!-- Text Section at the Top -->
-    <section class="text-center mb-8 w-full max-w-4xl px-4 mt-16">
-        <p class="text-lg text-gray-700 font-medium mb-4">
-            Please select the event type. We offer only one-on-one event scheduling in our free plan. If you want to
-            purchase the pro plan, check out the details.
-        </p>
-        <a href="#" class="text-blue-600 hover:text-blue-800 font-medium text-lg">
-            Click here to explore plans
-        </a>
-    </section>
-
-    <!-- Form Section (Centered) -->
-    <div class="form-container bg-white rounded-xl shadow-xl w-full max-w-sm p-8 fade-in">
-        <h1 class="text-2xl font-semibold text-center text-gray-800 mb-6">Please Select Event Type</h1>
-
-        <form method="POST">
-            {% csrf_token %}
-
-            <div class="space-y-5">
-                <!-- One-on-One Event Type -->
-                <div class="flex items-center space-x-3">
-                    <input type="checkbox" id="one_on_one" name="event_type" value="one_on_one" checked
-                        class="w-6 h-6 text-blue-500 focus:ring-2 focus:ring-blue-300 transition duration-300">
-                    <label for="one_on_one" class="text-lg font-medium text-gray-700">One-on-One</label>
+    <!-- Event Types Grid -->
+    <main class="max-w-6xl mx-auto px-4 pb-16">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- One-on-One Event Card -->
+            <a href="{% url 'event_details' org_id=org_id%}" class="card-link" style="animation-delay: 0.1s">
+                <div class="event-card active-card p-6">
+                    <div class="shimmer"></div>
+                    <span class="recommended-badge">
+                        <i class="ri-star-line mr-1"></i> Recommended
+                    </span>
+                    <div class="flex flex-col items-center text-center">
+                        <div class="icon-circle mb-6">
+                            <i class="ri-user-line icon"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-3">One-on-One Event</h3>
+                        <p class="text-gray-600 mb-6">Schedule individual meetings with participants. Perfect for interviews, consultations, or personal sessions.</p>
+                        <span class="inline-flex items-center text-purple-600 font-semibold hover:text-purple-700 transition-colors">
+                            Create Event <i class="ri-arrow-right-line ml-2"></i>
+                        </span>
+                    </div>
                 </div>
+            </a>
 
-                <!-- Group Event Type (disabled) -->
-                <div class="flex items-center space-x-3">
-                    <input type="checkbox" id="group" name="event_type" value="group" disabled
-                        class="w-6 h-6 text-gray-400 cursor-not-allowed">
-                    <label for="group" class="text-lg font-medium text-gray-400 italic">Group Meeting (disabled)</label>
+            <!-- Group Event Card -->
+            <div class="card-link" style="animation-delay: 0.2s">
+                <div class="event-card disabled-card p-6">
+                    <div class="shimmer"></div>
+                    <span class="pro-badge">PRO</span>
+                    <div class="flex flex-col items-center text-center">
+                        <div class="icon-circle mb-6">
+                            <i class="ri-team-line icon"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-3">Group Event</h3>
+                        <p class="text-gray-600 mb-6">Host events with multiple participants. Ideal for team meetings, workshops, or group training sessions.</p>
+                        <span class="upgrade-btn inline-flex items-center">
+                            <i class="ri-vip-crown-line mr-2"></i> Upgrade to Pro
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            <button type="submit"
-                class="w-full mt-6 bg-blue-600 text-white text-lg font-semibold py-3 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out transform hover:scale-105">
-                Next
-            </button>
-        </form> 
-        <!-- The container can be hidden using a simple style or class -->
-        <style>
-            /* Hides the container */
-            .container {
-                display: none;
-            }
-        </style>
-        
-        {% if message %}
-        <p class="text-center text-red-500 mt-4">{{ message }}</p>
-        {% endif %}
-    </div>
+            <!-- Collective Event Card -->
+            <div class="card-link" style="animation-delay: 0.3s">
+                <div class="event-card disabled-card p-6">
+                    <div class="shimmer"></div>
+                    <span class="pro-badge">PRO</span>
+                    <div class="flex flex-col items-center text-center">
+                        <div class="icon-circle mb-6">
+                            <i class="ri-global-line icon"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-3">Collective Event</h3>
+                        <p class="text-gray-600 mb-6">Create open events for your community. Perfect for webinars, conferences, or public speaking engagements.</p>
+                        <span class="upgrade-btn inline-flex items-center">
+                            <i class="ri-vip-crown-line mr-2"></i> Upgrade to Pro
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 
+    <script>
+        // Add staggered animation to cards
+        document.querySelectorAll('.event-card').forEach((card, index) => {
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+
+        // Add hover effect to icon circles
+        document.querySelectorAll('.icon-circle').forEach(circle => {
+            circle.addEventListener('mouseenter', () => {
+                circle.style.transform = 'scale(1.1) rotate(10deg)';
+            });
+            
+            circle.addEventListener('mouseleave', () => {
+                circle.style.transform = 'scale(1) rotate(0)';
+            });
+        });
+
+        // Add shimmer effect on hover
+        document.querySelectorAll('.event-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                const shimmer = card.querySelector('.shimmer');
+                shimmer.style.animation = 'none';
+                shimmer.offsetHeight; // Trigger reflow
+                shimmer.style.animation = 'shimmer 2s infinite';
+            });
+        });
+    </script>
 </body>
-
 </html>
-<br><br><br><br><br><br><br><br><br><br><br>
-{% include 'footer.html' %}
