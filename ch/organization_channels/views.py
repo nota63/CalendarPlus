@@ -46,6 +46,8 @@ from django.core.exceptions import ValidationError
 from django.views.decorators.http import require_POST
 from django.core.files.storage import FileSystemStorage
 from django.utils.timezone import localtime
+from django.utils import timezone
+from datetime import timedelta
 
 
 # Create your views here.
@@ -2604,6 +2606,66 @@ def mark_notification_as_read(request, alert_id):
         return JsonResponse({'status': 'error', 'message': str(e)})
 
 
+
+# HANDLE SCHEDULE ALERTS
+
+@login_required
+def schedule_alert(request, org_id, channel_id):
+  
+    organization = get_object_or_404(Organization, id=org_id)
+    channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+
+    if channel.created_by != request.user:
+            return JsonResponse({"success": False, "error": "You are not authorized to perform this action!."}, status=403)
+      
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+  
+
+    # Check if the user has permission to schedule in this channel
+    
+    if request.method == 'POST':
+        message = request.POST.get('message')
+        schedule_type = request.POST.get('schedule_type')  
+        schedule_value = request.POST.get('schedule_value') 
+        schedule_days = None
+        scheduled_for = None
+
+    
+        if schedule_type == 'after_days':
+            try:
+                schedule_days = int(schedule_value)  
+                
+                scheduled_for = timezone.now() + timedelta(days=schedule_days)
+            except ValueError:
+                return JsonResponse({"error": "Invalid number of days."}, status=400)
+
+        elif schedule_type == 'custom_date':
+            try:
+                scheduled_for = datetime.strptime(schedule_value, '%Y-%m-%d %H:%M:%S')  
+            except ValueError:
+                return JsonResponse({"error": "Invalid date format. Please use YYYY-MM-DD HH:MM:SS."}, status=400)
+        
+        else:
+            return JsonResponse({"error": "Invalid schedule type."}, status=400)
+
+        alert_notification = AlertNotification(
+            organization=organization,
+            channel=channel,
+            message=message,
+            created_by=request.user,
+            schedule_type=schedule_type,
+            scheduled_for=scheduled_for,
+            schedule_days=schedule_days if schedule_type == 'after_days' else None
+        )
+        alert_notification.save()
+
+        return JsonResponse({"success": "Alert scheduled successfully!"}, status=200)
+
+   
+    return JsonResponse({"error": "Invalid request method. Use POST to schedule."}, status=405)
 
 
 

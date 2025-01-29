@@ -65,4 +65,5 @@ urlpatterns = [
     path('send-alert-notification/<int:org_id>/<int:channel_id>/', send_alert_notification, name='send_alert_notification'),
     path('notifications/<int:org_id>/<int:channel_id>/', fetch_channel_notifications, name='fetch_notifications'),
     path('notifications/mark-read/<int:alert_id>/', mark_notification_as_read, name='mark_notification_read'),
+    path('schedule-alert/<int:org_id>/<int:channel_id>/',schedule_alert, name='schedule_alert'),
 ]

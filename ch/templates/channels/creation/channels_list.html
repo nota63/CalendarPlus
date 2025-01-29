@@ -24,6 +24,132 @@
 <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 
 <style>
+/* Schedule Alert Modal Styling */
+#scheduleAlertModal .modal-dialog {
+    max-width: 500px;
+}
+
+#scheduleAlertModal .modal-content {
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    border: none;
+}
+
+#scheduleAlertModal .modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 12px 12px 0 0;
+    padding: 1.2rem 1.5rem;
+}
+
+#scheduleAlertModal .modal-title {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+#scheduleAlertModal .btn-close {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+#scheduleAlertModal .modal-body {
+    padding: 1.5rem;
+}
+
+#scheduleAlertModal .form-label {
+    color: #4a5568;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+#scheduleAlertModal .form-control,
+#scheduleAlertModal .form-select {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+#scheduleAlertModal .form-control:focus,
+#scheduleAlertModal .form-select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+#scheduleAlertModal textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+}
+
+#scheduleAlertModal #scheduleValueWrapper {
+    margin-top: 1.5rem;
+}
+
+#scheduleAlertModal .modal-footer {
+    border-top: 1px solid #dee2e6;
+    padding: 1rem 1.5rem;
+}
+
+#scheduleAlertModal .btn-primary {
+    background-color: #3b82f6;
+    border: none;
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+#scheduleAlertModal .btn-primary:hover {
+    background-color: #2563eb;
+    transform: translateY(-1px);
+}
+
+#scheduleAlertModal .btn-secondary {
+    background-color: #64748b;
+    border: none;
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+#scheduleAlertModal .btn-secondary:hover {
+    background-color: #475569;
+}
+
+#scheduleAlertModal #loadingSpinner {
+    padding: 1.5rem 0;
+}
+
+#scheduleAlertModal .spinner-border {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-width: 0.2em;
+}
+
+#scheduleAlertModal #loadingSpinner p {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-top: 0.75rem;
+    margin-bottom: 0;
+}
+
+/* Input placeholder styling */
+#scheduleAlertModal ::placeholder {
+    color: #94a3b8 !important;
+    opacity: 1;
+}
+
+
+
+
+
+
+
+
 
 /* CSS specific to the notification modal */
 #notificationModal .modal-dialog {
@@ -979,6 +1105,51 @@
 </div>
 
 
+<!-- Schedule Alert Modal  -->
+
+<!-- Modal Structure for Alert Scheduling -->
+<div class="modal fade" id="scheduleAlertModal" tabindex="-1" aria-labelledby="scheduleAlertModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="scheduleAlertModalLabel">Schedule Alert Notification</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Form to enter alert message and schedule -->
+                <div class="mb-3">
+                    <label for="alertMessage" class="form-label">Alert Message</label>
+                    <textarea class="form-control" id="alertMessage" rows="3" placeholder="Enter the alert message"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="scheduleType" class="form-label">Schedule Type</label>
+                    <select class="form-select" id="scheduleType">
+                        <option value="after_days">After X Days</option>
+                        <option value="custom_date">Custom Date</option>
+                    </select>
+                </div>
+                <div class="mb-3" id="scheduleValueWrapper">
+                    <label for="scheduleValue" class="form-label">Schedule Value</label>
+                    <input type="text" class="form-control" id="scheduleValue" placeholder="Enter number of days or custom date (YYYY-MM-DD HH:MM:SS)">
+                </div>
+                <div class="text-center" id="loadingSpinner" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Scheduling...</span>
+                    </div>
+                    <p class="mt-2">Scheduling notification...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="scheduleAlertBtn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
 
 <!-- ---------------------------------------------------------------------------------------------------------------- -->
 <body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
@@ -1159,6 +1330,23 @@ data-bs-target="#userSelectionModal">
     </svg>
     <span class="font-medium text-purple-600/90">Send Alert Notification</span>
 </button>
+
+
+<!-- Trigger button to open schedule modal -->
+<button 
+    class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200"
+    id="openScheduleModalBtn"
+    data-channel-id="{{channel.id}}"
+    data-org-id="{{channel.organization.id}}"
+    data-bs-toggle="modal"
+    data-bs-target="#scheduleAlertModal">
+    <svg class="w-5 h-5 mr-3 text-blue-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405M19 13V9a7 7 0 10-14 0v4M9 21h6" />
+    </svg>
+    <span class="font-medium text-blue-600/90">Schedule Alert</span>
+</button>
+
+
 
                   {% endif %}
 
@@ -1901,8 +2089,72 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 
+// SCHEDULE NOTIFICATION 
+document.addEventListener('DOMContentLoaded', function () {
+    // When the "Schedule Alert" button is clicked to open the modal
+    document.getElementById('openScheduleModalBtn').addEventListener('click', function () {
+        const channelId = this.getAttribute('data-channel-id');
+        const orgId = this.getAttribute('data-org-id');
 
+        // Store the organization and channel ids in modal for later use
+        const modal = document.getElementById('scheduleAlertModal');
+        modal.setAttribute('data-channel-id', channelId);
+        modal.setAttribute('data-org-id', orgId);
+    });
 
+    // When the "Save" button in the modal is clicked
+    document.getElementById('scheduleAlertBtn').addEventListener('click', function () {
+        const message = document.getElementById('alertMessage').value;
+        const scheduleType = document.getElementById('scheduleType').value;
+        const scheduleValue = document.getElementById('scheduleValue').value;
+        const modal = document.getElementById('scheduleAlertModal');
+        const channelId = modal.getAttribute('data-channel-id');
+        const orgId = modal.getAttribute('data-org-id');
+
+        // Show the loading spinner and hide the button
+        document.getElementById('loadingSpinner').style.display = 'block';
+        this.disabled = true;
+        this.innerText = 'Saving...';
+
+        // Perform the AJAX request to schedule the alert
+        const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+        const url = '/channels/schedule-alert/' + orgId + '/' + channelId + '/';  // Adjust URL with actual values
+
+        const data = new FormData();
+        data.append('message', message);
+        data.append('schedule_type', scheduleType);
+        data.append('schedule_value', scheduleValue);
+        data.append('csrfmiddlewaretoken', csrfToken);
+
+        fetch(url, {
+            method: 'POST',
+            body: data,
+        })
+        .then(response => response.json())
+        .then(data => {
+            setTimeout(function () {
+                // Hide the loading spinner and show success message
+                document.getElementById('loadingSpinner').style.display = 'none';
+                alert('Alert scheduled successfully!');
+                document.getElementById('scheduleAlertBtn').disabled = false;
+                document.getElementById('scheduleAlertBtn').innerText = 'Save';
+                
+                // Close the modal after success
+                const modalInstance = new bootstrap.Modal(document.getElementById('scheduleAlertModal'));
+                modalInstance.hide();
+            }, 3000);  // Wait for 3 seconds before showing the success message
+        })
+        .catch(error => {
+            setTimeout(function () {
+                // Hide the loading spinner and show error message
+                document.getElementById('loadingSpinner').style.display = 'none';
+                alert('Error: ' + error.message);
+                document.getElementById('scheduleAlertBtn').disabled = false;
+                document.getElementById('scheduleAlertBtn').innerText = 'Save';
+            }, 3000);  // Wait for 3 seconds before showing the error message
+        });
+    });
+});
 
     </script>
 </body>
