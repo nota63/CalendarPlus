@@ -1,129 +1,325 @@
-{% extends 'custom.html' %}
-
-{% block content %}
-<br><br><br>
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Events in {{ organization_name }}</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap');
+
+        :root {
+            --slack-purple: #611f69;
+            --slack-aubergine: #4a154b;
+            --slack-blue: #1264a3;
+            --slack-green: #2bac76;
+            --slack-red: #e01e5a;
+            --slack-yellow: #ecb22e;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background: #f8f9fa;
+            color: #1d1c1d;
+        }
+
+        .slack-header {
+            background: var(--slack-aubergine);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .slack-btn {
+            font-weight: 700;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .slack-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .slack-btn:active {
+            transform: translateY(0);
+        }
+
+        .slack-btn-primary {
+            background: var(--slack-purple);
+            color: white;
+        }
+
+        .slack-btn-primary:hover {
+            background: var(--slack-aubergine);
+        }
+
+        .slack-card {
+            background: white;
+            border: 1px solid #e2e2e2;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .slack-card:hover {
+            border-color: #1d1c1d;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .action-card {
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .filter-btn {
+            font-weight: 600;
+            border: 1px solid #e2e2e2;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            border-color: #1d1c1d;
+            background: #f8f9fa;
+        }
+
+        .filter-btn.active {
+            background: var(--slack-purple);
+            color: white;
+            border-color: var(--slack-purple);
+        }
+
+        .badge {
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .badge-admin {
+            background: var(--slack-red);
+            color: white;
+        }
+
+        .badge-manager {
+            background: var(--slack-yellow);
+            color: #1d1c1d;
+        }
+
+        .badge-employee {
+            background: var(--slack-blue);
+            color: white;
+        }
+
+        .menu-dropdown {
+            border: 1px solid #e2e2e2;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .menu-item {
+            transition: all 0.2s ease;
+        }
+
+        .menu-item:hover {
+            background: #f8f9fa;
+        }
+
+        .menu-item-danger:hover {
+            background: #fef2f2;
+            color: var(--slack-red);
+        }
+
+        .pagination-btn {
+            border: 1px solid #e2e2e2;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .pagination-btn:hover {
+            border-color: #1d1c1d;
+            background: #f8f9fa;
+        }
+    </style>
 </head>
+<body>
+    <!-- Header -->
+    <header class="slack-header py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center">
+                <h1 class="text-3xl font-bold text-white mb-3">
+                    My Events in {{ organization_name }}
+                </h1>
+                <p class="text-lg text-gray-300">
+                    Manage your events and bookings efficiently
+                </p>
+            </div>
+        </div>
+    </header>
 
-<body class="bg-gray-100">
-
-    <section class="intro py-8 px-6 text-center bg-blue-100 mb-6 rounded-xl">
-        <p class="text-lg font-semibold text-gray-700">
-            Manage all your events seamlessly and create new ones with ease. 
-            Let's organize your workspace events like a pro!
-        </p>
-    </section>
-
-    <div class="container py-8">
-        <h2 class="text-3xl font-semibold text-center text-gray-800 mb-6">My Events in {{ organization_name }}</h2>
-
-        <!-- Event Management Links -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <!-- Create Event Link -->
-            <a href="{% url 'event_type_selection' org_id=org_id %}" class="relative block p-6 bg-gradient-to-r from-blue-500 to-teal-500 text-white text-lg rounded-2xl shadow-xl hover:scale-105 transition-all duration-300 ease-in-out transform hover:shadow-2xl">
-                <span class="font-semibold text-2xl">Create New Event</span>
-                <p class="text-sm mt-2">Set up an event and share the link with others.</p>
-                <span class="absolute inset-0 bg-blue-200 opacity-25 rounded-2xl"></span>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Action Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">
+            <!-- Create Event Card -->
+            <a href="{% url 'event_type_selection' org_id=org_id %}" 
+               class="action-card block p-6 rounded-lg bg-white shadow-md hover:shadow-xl">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center mr-4">
+                        <i class="ri-add-line text-2xl text-purple-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900">Create New Event</h3>
+                        <p class="text-gray-600">Set up an event and share the link</p>
+                    </div>
+                </div>
             </a>
 
-            <!-- My Bookings Link -->
-            <a href="{% url 'user_organization_bookings' org_id=org_id %}" class="relative block p-6 bg-gradient-to-r from-green-400 to-green-600 text-white text-lg rounded-2xl shadow-xl hover:scale-105 transition-all duration-300 ease-in-out transform hover:shadow-2xl">
-                <span class="font-semibold text-2xl">My Bookings</span>
-                <p class="text-sm mt-2">View and manage your bookings.</p>
-                <span class="absolute inset-0 bg-green-200 opacity-25 rounded-2xl"></span>
+            <!-- My Bookings Card -->
+            <a href="{% url 'user_organization_bookings' org_id=org_id %}" 
+               class="action-card block p-6 rounded-lg bg-white shadow-md hover:shadow-xl">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center mr-4">
+                        <i class="ri-calendar-check-line text-2xl text-blue-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900">My Bookings</h3>
+                        <p class="text-gray-600">View and manage your bookings</p>
+                    </div>
+                </div>
             </a>
         </div>
 
         <!-- Filter Buttons -->
-        <div class="my-6 flex justify-center space-x-4">
-            <button class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition duration-300" data-filter="all">All Locations</button>
-            <button class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-700 transition duration-300" data-filter="Google Meet">Google Meet</button>
-            <button class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-700 transition duration-300" data-filter="Zoom">Zoom</button>
-            <button class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-700 transition duration-300" data-filter="Phone Call">Phone Call</button>
-            <button class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-700 transition duration-300" data-filter="In Person Meeting">In Person</button>
+        <div class="mb-8">
+            <div class="flex flex-wrap gap-2">
+                <button class="filter-btn px-4 py-2 rounded-md text-sm active" data-filter="all">
+                    <i class="ri-apps-line mr-1"></i> All
+                </button>
+                <button class="filter-btn px-4 py-2 rounded-md text-sm" data-filter="Google Meet">
+                    <i class="ri-google-line mr-1"></i> Google Meet
+                </button>
+                <button class="filter-btn px-4 py-2 rounded-md text-sm" data-filter="Zoom">
+                    <i class="ri-video-chat-line mr-1"></i> Zoom
+                </button>
+                <button class="filter-btn px-4 py-2 rounded-md text-sm" data-filter="Phone Call">
+                    <i class="ri-phone-line mr-1"></i> Phone
+                </button>
+                <button class="filter-btn px-4 py-2 rounded-md text-sm" data-filter="In Person Meeting">
+                    <i class="ri-map-pin-line mr-1"></i> In Person
+                </button>
+            </div>
         </div>
 
-        <!-- Event Grid -->
+        <!-- Events Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="event-list">
             {% for item in page_obj %}
-            <div class="event-card bg-white shadow-md rounded-lg overflow-hidden p-4 relative hover:shadow-xl transition-all duration-300 transform hover:scale-105" data-location="{{ item.event.location }}">
-                <h2 class="text-xl font-semibold text-gray-800">{{ item.event.title }}</h2>
-                <p class="text-gray-600 mb-2">Duration: {{ item.event.duration }} minutes</p>
-                <p class="text-gray-600 mb-2">Location: {{ item.event.location }}</p>
-                <p class="text-gray-600 mb-2">Event Type: {{ item.event.get_event_type_display }}</p>
-                <p class="text-gray-600 mb-2">Created on: {{ item.event.created_at|date:"M d, Y" }}</p>
-
-                <div class="mt-4">
-                    <span class="px-3 py-1 bg-blue-500 text-white text-sm font-medium rounded-full">
-                        Bookings: +{{ item.booking_count }}
-                    </span>
+            <div class="slack-card p-4" data-location="{{ item.event.location }}">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-lg font-bold text-gray-900">{{ item.event.title }}</h3>
+                    <div class="relative">
+                        <button class="menu-btn p-1 rounded hover:bg-gray-100">
+                            <i class="ri-more-2-fill text-gray-500"></i>
+                        </button>
+                        <div class="menu-dropdown hidden absolute right-0 mt-2 w-48 rounded-md bg-white py-1">
+                            <a href="{% url 'view_bookings' org_id=org_id event_id=item.event.id %}" 
+                               class="menu-item flex items-center px-4 py-2 text-sm text-gray-700">
+                                <i class="ri-eye-line mr-2"></i> View Bookings
+                            </a>
+                            <a href="{% url 'delete-event' org_id=org_id event_id=item.event.id %}" 
+                               class="menu-item menu-item-danger flex items-center px-4 py-2 text-sm text-gray-700">
+                                <i class="ri-delete-bin-line mr-2"></i> Delete Event
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- 3-dots menu -->
-                <div class="absolute top-4 right-4">
-                    <button class="menu-btn p-2 rounded-full hover:bg-gray-200 focus:outline-none">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M6 10a2 2 0 114 0 2 2 0 01-4 0zm4 0a2 2 0 114 0 2 2 0 01-4 0zm6 0a2 2 0 114 0 2 2 0 01-4 0z" />
-                        </svg>
-                    </button>
-                    <div class="menu hidden absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg">
-                        <a href="{% url 'view_bookings' org_id=org_id event_id=item.event.id %}" 
-                           class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                            View Bookings
-                        </a>
-
-                        <a href="{% url 'delete-event' org_id=org_id event_id=item.event.id %}" 
-                           class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                            Wipe Event
-                        </a>
+                <div class="space-y-2 mb-4">
+                    <div class="flex items-center text-gray-600 text-sm">
+                        <i class="ri-time-line w-5"></i>
+                        <span>{{ item.event.duration }} minutes</span>
                     </div>
+                    <div class="flex items-center text-gray-600 text-sm">
+                        <i class="ri-map-pin-line w-5"></i>
+                        <span>{{ item.event.location }}</span>
+                    </div>
+                    <div class="flex items-center text-gray-600 text-sm">
+                        <i class="ri-calendar-event-line w-5"></i>
+                        <span>{{ item.event.get_event_type_display }}</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-4 border-t">
+                    <span class="text-sm text-gray-500">
+                        Created {{ item.event.created_at|date:"M d, Y" }}
+                    </span>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                        {{ item.booking_count }} Bookings
+                    </span>
                 </div>
             </div>
             {% empty %}
-            <div class="col-span-full text-center text-gray-600">
-                <p>No events found. Create your first event!</p>
+            <div class="col-span-full">
+                <div class="text-center py-12 bg-white rounded-lg border border-gray-200">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                        <i class="ri-calendar-line text-2xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-1">No Events Found</h3>
+                    <p class="text-gray-600">Create your first event to get started</p>
+                </div>
             </div>
             {% endfor %}
         </div>
 
-        <!-- Pagination controls -->
-        <div class="mt-6 flex justify-center">
-            <div class="flex items-center space-x-4">
+        <!-- Pagination -->
+        {% if page_obj.paginator.num_pages > 1 %}
+        <div class="mt-8 flex justify-center">
+            <nav class="flex items-center space-x-2">
                 {% if page_obj.has_previous %}
-                    <a href="?page=1{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">First</a>
-                    <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">Previous</a>
+                <a href="?page=1{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}" 
+                   class="pagination-btn inline-flex items-center px-3 py-2 rounded-md text-sm">
+                    <i class="ri-arrow-left-line mr-1"></i> First
+                </a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}" 
+                   class="pagination-btn inline-flex items-center px-3 py-2 rounded-md text-sm">
+                    Previous
+                </a>
                 {% endif %}
 
-                <span class="text-sm text-gray-600">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                <span class="px-3 py-2 text-sm text-gray-700">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </span>
 
                 {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">Next</a>
-                    <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">Last</a>
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}" 
+                   class="pagination-btn inline-flex items-center px-3 py-2 rounded-md text-sm">
+                    Next
+                </a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}" 
+                   class="pagination-btn inline-flex items-center px-3 py-2 rounded-md text-sm">
+                    Last <i class="ri-arrow-right-line ml-1"></i>
+                </a>
                 {% endif %}
-            </div>
+            </nav>
         </div>
+        {% endif %}
     </div>
 
-    <!-- JavaScript to filter events -->
     <script>
-        document.querySelectorAll('button[data-filter]').forEach(button => {
-            button.addEventListener('click', function () {
+        // Filter functionality
+        document.querySelectorAll('.filter-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                this.classList.add('active');
+                
                 const filter = this.getAttribute('data-filter');
-                const eventCards = document.querySelectorAll('.event-card');
+                const eventCards = document.querySelectorAll('.slack-card');
 
                 eventCards.forEach(card => {
                     const location = card.getAttribute('data-location');
-
-                    // Show or hide events based on filter
                     if (filter === 'all' || location === filter) {
                         card.style.display = 'block';
                     } else {
@@ -133,25 +329,33 @@
             });
         });
 
-        // Toggle the 3-dots menu visibility
+        // Menu functionality
         document.querySelectorAll('.menu-btn').forEach(button => {
-            button.addEventListener('click', function (e) {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
                 const menu = this.nextElementSibling;
-                if (menu) {
-                    menu.classList.toggle('hidden');
-                }
+                
+                document.querySelectorAll('.menu-dropdown').forEach(m => {
+                    if (m !== menu) m.classList.add('hidden');
+                });
+                
+                menu.classList.toggle('hidden');
             });
         });
 
         // Close menus when clicking outside
-        document.addEventListener('click', function (e) {
-            if (!e.target.closest('.menu-btn') && !e.target.closest('.menu')) {
-                document.querySelectorAll('.menu').forEach(menu => menu.classList.add('hidden'));
-            }
+        document.addEventListener('click', function() {
+            document.querySelectorAll('.menu-dropdown').forEach(menu => {
+                menu.classList.add('hidden');
+            });
+        });
+
+        // Prevent menu close when clicking inside menu
+        document.querySelectorAll('.menu-dropdown').forEach(menu => {
+            menu.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
         });
     </script>
 </body>
-
 </html>
-
-{% endblock %}
