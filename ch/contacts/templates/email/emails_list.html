@@ -6,140 +6,256 @@
     <title>Email Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body class="font-sans bg-gray-100">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .hover-scale {
+            transition: transform 0.2s ease-in-out;
+        }
+        
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+        
+        .table-row-animate {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .table-row-animate:hover {
+            background-color: #F8FAFC;
+        }
 
-    <div class="container mx-auto px-4 py-6">
-        <!-- Button to Send Email -->
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold text-gray-700">Emails For {{user}}</h1>
-            <br>
-          
-            <a href="{% url 'send_email' org_id=organization.id user_id=user.id %}" class="inline-block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Send Email</a>
-           
+        .gradient-bg {
+            background: linear-gradient(135deg, #6366F1 0%, #818CF8 100%);
+        }
+        
+        .custom-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <!-- Header Section -->
+        <div class="mb-8 animate__animated animate__fadeIn">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h1 class="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-indigo-400 bg-clip-text text-transparent">Emails For {{user}}</h1>
+                    <p class="mt-3 text-lg text-gray-600">Here's your sentbox, {{request.user}}! You can effortlessly manage all the emails you've sent to {{user}} from {{organization.name}}.</p>
+                </div>
+                <a href="{% url 'send_email' org_id=organization.id user_id=user.id %}" 
+                   class="inline-flex items-center px-6 py-3 rounded-lg gradient-bg text-white font-medium hover:opacity-90 transform hover:-translate-y-0.5 transition-all duration-200 custom-shadow">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                    </svg>
+                    Compose Email
+                </a>
+            </div>
         </div>
 
-        <p class="text-2xl font-sans text-gray-600">Here’s your sentbox, {{request.user}}! You can effortlessly manage all the emails you've sent to {{user}} from {{organization.name}}.</p>
-        <br>
-
-
-        <!-- Check if there are emails -->
+        <!-- Emails Table Section -->
         {% if emails %}
-            <div class="overflow-x-auto bg-white shadow-md rounded-md">
-                <table class="min-w-full table-auto">
-                    <thead class="bg-gray-200 text-left">
-                        <tr>
-                            <th class="py-2 px-4 text-sm font-medium text-gray-600">Sender</th>
-                            <th class="py-2 px-4 text-sm font-medium text-gray-600">Participant</th>
-                            <th class="py-2 px-4 text-sm font-medium text-gray-600">Message</th>
-                            <th class="py-2 px-4 text-sm font-medium text-gray-600">Sent At</th>
-                            <th class="py-2 px-4 text-sm font-medium text-gray-600">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for email in emails %}
-                            <tr class="border-b">
-                                <td class="py-2 px-4 text-gray-700">{{ email.sender.username }}</td>
-                                <td class="py-2 px-4 text-gray-700">{{ email.participant.username }}</td>
-                                <td class="py-2 px-4 text-gray-700">{{ email.message|slice:":100" }}{% if email.message|length > 100 %}...{% endif %}</td>
-                                <td class="py-2 px-4 text-gray-700">{{ email.sent_at|date:"F j, Y, H:i" }}</td>
-                                <td class="py-2 px-4 text-gray-700">
-                                    <!-- 3-Dots Menu -->
-                                    <button class="text-gray-600 hover:text-gray-800" onclick="showDetails({{ organization.id }}, {{ user.id }}, {{ email.id }})">
-                                        &#x22EE; <!-- Ellipsis (3-dots) -->
-                                    </button>
-                                </td>
+            <div class="bg-white rounded-xl custom-shadow animate__animated animate__fadeInUp">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Sender</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Participant</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Message</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Sent At</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white">
+                            {% for email in emails %}
+                                <tr class="table-row-animate">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ email.sender.username }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ email.participant.username }}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-700">
+                                        <div class="max-w-md truncate">{{ email.message|slice:":100" }}{% if email.message|length > 100 %}...{% endif %}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ email.sent_at|date:"F j, Y, H:i" }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                        <button class="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200" 
+                                                onclick="showDetails({{ organization.id }}, {{ user.id }}, {{ email.id }})">
+                                            <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                                            </svg>
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         {% else %}
-            <p class="mt-4 text-gray-600">No emails found for this user in this organization.</p>
+            <div class="text-center py-12 bg-white rounded-xl custom-shadow animate__animated animate__fadeIn">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                <p class="mt-4 text-lg text-gray-600">No emails found for this user in this organization.</p>
+            </div>
         {% endif %}
     </div>
-    <br>
-   
 
-   <!-- Modal to Show Email Details -->
-<div id="email-details-modal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
-    <div class="bg-white p-6 rounded-md w-1/2">
-        <h3 class="text-xl font-semibold mb-4" id="email-subject">Email Subject</h3>
-        <p><strong>Sender:</strong> <span id="email-sender"></span></p>
-        <p><strong>Participant:</strong> <span id="email-participant"></span></p>
-        <p><strong>Message:</strong></p>
-        <p id="email-message"></p>
-        <p><strong>Status:</strong> <span id="email-status"></span></p>
-        <p><strong>Sent At:</strong> <span id="email-sent-at"></span></p>
-        <button id="close-modal" class="mt-4 bg-red-500 text-white px-4 py-2 rounded-md">Close</button>
-        <a id="download-pdf" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md">Download PDF</a>
-        <a id="delete-btn" class="mt-4 bg-red-500 text-white px-4 py-2 rounded-md">Wipe Email</a>
-        <a id="email-analysis" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md">Analyse</a>
-        <a id="resend-email" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md">Modify And Resend</a>
-        <a id="schedule-email" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md">Schedule Email</a>
-        <br>
-        <br>
-        <a id="scheduled-emails" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md">Followed-Up</a>
+    <!-- Modal -->
+    <div id="email-details-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center hidden animate__animated animate__fadeIn">
+        <div class="bg-white rounded-xl p-8 w-full max-w-3xl mx-4 transform transition-all">
+            <div class="flex justify-between items-start mb-6">
+                <h3 class="text-2xl font-semibold text-gray-800" id="email-subject">Email Subject</h3>
+                <button id="close-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-500">Sender</p>
+                        <p class="font-medium text-gray-800" id="email-sender"></p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Participant</p>
+                        <p class="font-medium text-gray-800" id="email-participant"></p>
+                    </div>
+                </div>
+                
+                <div>
+                    <p class="text-sm text-gray-500">Message</p>
+                    <div class="mt-1 p-4 bg-gray-50 rounded-lg">
+                        <p class="text-gray-800" id="email-message"></p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-500">Status</p>
+                        <p class="font-medium text-gray-800" id="email-status"></p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Sent At</p>
+                        <p class="font-medium text-gray-800" id="email-sent-at"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <a id="download-pdf" class="inline-flex justify-center items-center px-4 py-2 border border-indigo-600 rounded-lg text-indigo-600 hover:bg-indigo-50 transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        Download PDF
+                    </a>
+                    <a id="email-analysis" class="inline-flex justify-center items-center px-4 py-2 border border-indigo-600 rounded-lg text-indigo-600 hover:bg-indigo-50 transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                        Analyze
+                    </a>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <a id="resend-email" class="inline-flex justify-center items-center px-4 py-2 gradient-bg text-white rounded-lg hover:opacity-90 transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        Modify & Resend
+                    </a>
+                    <a id="schedule-email" class="inline-flex justify-center items-center px-4 py-2 gradient-bg text-white rounded-lg hover:opacity-90 transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Schedule Email
+                    </a>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <a id="delete-btn" class="inline-flex justify-center items-center px-4 py-2 border border-red-600 rounded-lg text-red-600 hover:bg-red-50 transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        Delete Email
+                    </a>
+                    <a id="scheduled-emails" class="inline-flex justify-center items-center px-4 py-2 border border-indigo-600 rounded-lg text-indigo-600 hover:bg-indigo-50 transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        View Follow-ups
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 
-<script>
-    function showDetails(orgId, userId, emailId) {
-        $.ajax({
-            url: `/contacts/contacts/email-detail/${orgId}/${userId}/${emailId}/`,
-            method: 'GET',
-            success: function(response) {
-                if (response.success) {
-                    // Populate modal with email details
-                    $('#email-subject').text(response.email.subject || 'No Subject');
-                    $('#email-sender').text(response.email.sender || 'Unknown');
-                    $('#email-participant').text(response.email.participant || 'Unknown');
-                    $('#email-message').text(response.email.message || 'No Message');
-                    $('#email-status').text(response.email.status || 'N/A');
-                    $('#email-sent-at').text(response.email.sent_at || 'Unknown');
+    <script>
+        function showDetails(orgId, userId, emailId) {
+            $.ajax({
+                url: `/contacts/contacts/email-detail/${orgId}/${userId}/${emailId}/`,
+                method: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        // Populate modal with email details
+                        $('#email-subject').text(response.email.subject || 'No Subject');
+                        $('#email-sender').text(response.email.sender || 'Unknown');
+                        $('#email-participant').text(response.email.participant || 'Unknown');
+                        $('#email-message').text(response.email.message || 'No Message');
+                        $('#email-status').text(response.email.status || 'N/A');
+                        $('#email-sent-at').text(response.email.sent_at || 'Unknown');
 
-                    // Update "Download PDF" link dynamically
-                    const downloadUrl = `/contacts/emails/download/${orgId}/${userId}/${emailId}/`;
-                    $('#download-pdf').attr('href', downloadUrl);
+                        // Update "Download PDF" link dynamically
+                        const downloadUrl = `/contacts/emails/download/${orgId}/${userId}/${emailId}/`;
+                        $('#download-pdf').attr('href', downloadUrl);
 
-                    // Update "Delete button " link dynamically
-                    const deleteButton = `/contacts/contacts/delete-email/${orgId}/${userId}/${emailId}/`;
-                    $('#delete-btn').attr('href', deleteButton);
+                        // Update "Delete button " link dynamically
+                        const deleteButton = `/contacts/contacts/delete-email/${orgId}/${userId}/${emailId}/`;
+                        $('#delete-btn').attr('href', deleteButton);
 
-                     // Update "Email analysis " link dynamically
-                    const emailAnalysis = `/contacts/email-analysis/${orgId}/${userId}/${emailId}/`;
-                    $('#email-analysis').attr('href', emailAnalysis);
+                        // Update "Email analysis " link dynamically
+                        const emailAnalysis = `/contacts/email-analysis/${orgId}/${userId}/${emailId}/`;
+                        $('#email-analysis').attr('href', emailAnalysis);
 
-                    // modify and resend email
-                    const resendEmail = `/contacts/edit-resend-email/${orgId}/${userId}/${emailId}/`;
-                    $('#resend-email').attr('href', resendEmail);
+                        // modify and resend email
+                        const resendEmail = `/contacts/edit-resend-email/${orgId}/${userId}/${emailId}/`;
+                        $('#resend-email').attr('href', resendEmail);
 
-                    // schedule email
-                    const scheduleEmail = `/contacts/schedule-email/${orgId}/${userId}/`;
-                    $('#schedule-email').attr('href', scheduleEmail);
+                        // schedule email
+                        const scheduleEmail = `/contacts/schedule-email/${orgId}/${userId}/`;
+                        $('#schedule-email').attr('href', scheduleEmail);
 
-                    const followedUp = `/contacts/scheduled-emails/${orgId}/${userId}/`;
-                    $('#scheduled-emails').attr('href', followedUp);
+                        const followedUp = `/contacts/scheduled-emails/${orgId}/${userId}/`;
+                        $('#scheduled-emails').attr('href', followedUp);
 
-
-
-
-
-                    // Show modal
-                    $('#email-details-modal').removeClass('hidden');
-                } else {
-                    alert('Failed to load email details.');
+                        // Show modal
+                        $('#email-details-modal').removeClass('hidden');
+                    } else {
+                        alert('Failed to load email details.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert('Failed to load email details. Please try again.');
+                    console.error('AJAX Error:', error);
                 }
-            },
-            error: function(xhr, status, error) {
-                alert('Failed to load email details. Please try again.');
-                console.error('AJAX Error:', error);
-            }
-        });
-    }
+            });
+        }
 
-    // Close modal
-    $('#close-modal').on('click', function() {
-        $('#email-details-modal').addClass('hidden');
-    });
-</script>
+        // Close modal
+        $('#close-modal').on('click', function() {
+            $('#email-details-modal').addClass('hidden');
+        });
+    </script>
+</body>
+</html>
