@@ -2481,6 +2481,15 @@ def send_alert_notification(request, org_id, channel_id):
         organization = get_object_or_404(Organization, id=org_id)
         channel = get_object_or_404(Channel, id=channel_id, organization=organization)
 
+        if channel.created_by != request.user:
+            return JsonResponse({"success": False, "error": "You are not authorized to perform this action!."}, status=403)
+        
+        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+        if not user_profile:
+            logger.debug(f"User {request.user.id} does not belong to this organization.")
+            return JsonResponse({'error': 'You do not belong to this organization.'}, status=403)
+
+
     
         if request.method == 'POST':
             
@@ -2495,6 +2504,16 @@ def send_alert_notification(request, org_id, channel_id):
                     created_by=request.user,
                     message=message,
                 )
+
+                activity = ActivityChannel.objects.create(
+                   user=request.user,
+                   channel=channel,
+                    organization=organization,
+                    action_type="SENT_NOTIFICATION",
+                    content=f'{request.user} Sent the notification {alert.message}'
+                   )
+                
+
 
            
                 return JsonResponse({
