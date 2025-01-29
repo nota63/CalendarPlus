@@ -1,7 +1,3 @@
-{% extends 'custom.html' %}
-
-{% block content %}
-<br><br><br>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -9,129 +5,283 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ group.name }} Tasks</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
+    
+    <!-- Modern Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     
     <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- Optional: Add custom styles for modern card & progress bar -->
     <style>
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary: #f3f4f6;
+            --accent: #818cf8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --border-color: #e5e7eb;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+            color: var(--text-primary);
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            padding: 2.5rem 0;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+            opacity: 0.1;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-title {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .header-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border: none;
+            border-radius: 1rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+
         .card:hover {
             transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
         }
+
+        .card-header {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.25rem;
+            border-radius: 1rem 1rem 0 0 !important;
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .priority-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .priority-urgent {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .priority-high {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .priority-medium {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+        }
+
+        .priority-low {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .progress {
+            height: 0.75rem;
+            border-radius: 1rem;
+            background-color: var(--secondary);
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
         .progress-bar {
-            border-radius: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 1rem;
+            transition: width 0.6s ease;
         }
-        .modal-content {
-            border-radius: 10px;
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
         }
 
+        .btn-primary {
+            background: var(--primary);
+            border: none;
+        }
 
-        /* Custom Styles for Sidebar */
-  .offcanvas-header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
-    font-family: 'Poppins', sans-serif;
-  }
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
 
-  .offcanvas-body {
-    background-color: #ffffff;
-    color: #495057;
-    font-family: 'Poppins', sans-serif;
-    padding: 20px;
-  }
+        .btn-success {
+            background: var(--success);
+            border: none;
+        }
 
-  .offcanvas-body h6 {
-    font-size: 1.1rem;
-    color: #007bff;
-  }
+        .btn-warning {
+            background: var(--warning);
+            border: none;
+            color: white;
+        }
 
-  .offcanvas-body p {
-    font-size: 0.95rem;
-    line-height: 1.6;
-    margin-bottom: 1.25rem;
-  }
+        .form-select {
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            max-width: 200px;
+            background-position: right 1rem center;
+        }
 
-  .btn-close {
-    background-color: #007bff;
-    opacity: 0.7;
-  }
+        .task-meta {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
 
-  .btn-close:hover {
-    opacity: 1;
-  }
+        .task-meta i {
+            font-size: 1.25rem;
+            margin-right: 0.5rem;
+        }
 
-  .fw-bold {
-    font-weight: 600;
-    color: #007bff;
-  }
+        .offcanvas {
+            border-radius: 1rem 0 0 1rem;
+        }
 
-  .fw-semibold {
-    font-weight: 500;
-    color: #343a40;
-  }
+        .offcanvas-header {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 1.5rem;
+        }
+
+        .offcanvas-title {
+            font-weight: 600;
+        }
+
+        .offcanvas-body {
+            padding: 1.5rem;
+        }
+
+        .pagination {
+            gap: 0.25rem;
+        }
+
+        .page-link {
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .page-link:hover {
+            background-color: var(--secondary);
+            color: var(--primary);
+        }
+
+        .page-item.active .page-link {
+            background: var(--primary);
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .empty-state img {
+            width: 200px;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
     </style>
 </head>
 <body>
-
-    <section class="container mt-5 text-center">
-        <div class="row justify-content-center align-items-center">
-            <!-- Image Section -->
-            <div class="col-12 col-md-4">
-                <img src="https://th.bing.com/th/id/OIP.YXOaT62xuLoeHUYbf3MdtQHaHa?rs=1&pid=ImgDetMain" class="img-fluid rounded-circle" alt="Intro Image" style="max-width: 150px;">
-            </div>
-    
-            <!-- Text Section -->
-            <div class="col-12 col-md-8">
-                <p class="lead mt-4">
-                    Manage all your tasks within the group by adding them to your day to kickstart your work. Complete tasks ahead of the deadline to prevent overdue issues and ensure smooth progress.
-                </p>
-                <br>
-                <p>
-                    <button class="btn btn-primary btn-sm" data-bs-toggle="offcanvas" data-bs-target="#learnMoreSidebar" aria-controls="learnMoreSidebar">Learn More</button>
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="header-content text-center">
+                <h1 class="header-title">{{ group.name }} Tasks</h1>
+                <p class="header-subtitle">
+                    Streamline your workflow and enhance team productivity with our powerful task management tools
                 </p>
             </div>
         </div>
-    </section>
-    
-    <!-- Offcanvas Sidebar for Detailed Guide -->
-  <!-- Offcanvas Sidebar for Detailed Guide -->
-<div class="offcanvas offcanvas-end" tabindex="-1" id="learnMoreSidebar" aria-labelledby="learnMoreSidebarLabel">
-    <div class="offcanvas-header">
-      <h5 id="learnMoreSidebarLabel" class="fw-bold">Detailed Guide</h5>
-      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
-    <div class="offcanvas-body">
-      <h6 class="fw-semibold">Getting Started with Task Management</h6>
-      <p>
-          To manage your tasks effectively within the group, you can add them to your day. By doing so, you kickstart your workflow and keep track of deadlines. 
-          Completing tasks ahead of the deadline helps to prevent any overdue issues and ensures smooth progress across all your tasks.
-      </p>
-      <p>
-          You can prioritize tasks based on urgency and importance, assign them to team members, and even track their progress in real-time.
-      </p>
-      <p>
-          Stay organized and efficient by leveraging these tools for better task management within your group.
-      </p>
-    </div>
-  </div>
-  
-    
-    <div class="container mt-5">
-        <h1 class="mb-4" style="font-size: 2rem; color: #2c3e50; font-weight: bold;">
-            {{ group.name }} Tasks
-        </h1>
 
-        <!-- Priority Filter Dropdown -->
-        <div class="mb-4">
-            <form method="get" class="d-flex justify-content-end">
+    <div class="container">
+        <!-- Priority Filter -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#learnMoreSidebar">
+                <i class="material-icons-round align-middle me-2" style="font-size: 1.1rem;">help_outline</i>
+                Learn More
+            </button>
+            <form method="get" class="d-flex align-items-center">
+                <label class="me-2 text-secondary">Filter by Priority:</label>
                 <select class="form-select" name="priority" onchange="this.form.submit()">
                     <option value="">All Priorities</option>
                     <option value="low" {% if request.GET.priority == 'low' %}selected{% endif %}>Low</option>
@@ -142,104 +292,173 @@
             </form>
         </div>
 
+        <!-- Tasks Grid -->
         <div class="row">
             {% for task in tasks %}
-                <div class="col-md-4 mb-4">
-                    <div class="card border-light">
-                        <div class="card-header bg-primary text-white">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="card-title">{{ task.title }}</h5>
+                            <span class="priority-badge priority-{{ task.priority|lower }}">
+                                {{ task.priority }}
+                            </span>
                         </div>
                         <div class="card-body">
-                            <p><strong>Description:</strong> {{ task.description }}</p>
-                            <p><strong>Priority:</strong> {{ task.priority }}</p>
-                            <p><strong>Deadline:</strong> {{ task.start }}</p>
-        
-                            <!-- Modern Progress Bar -->
-                            <div class="progress mb-3">
-                                <div class="progress-bar" role="progressbar" style="width: {{ task.progress }}%" aria-valuenow="{{ task.progress }}" aria-valuemin="0" aria-valuemax="100">{{ task.progress }}%</div>
+                            <div class="task-meta">
+                                <i class="material-icons-round">description</i>
+                                {{ task.description }}
                             </div>
-                        </div>
-                        <div class="card-footer text-end">
-                            <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#taskModal" onclick="populateModal('{{ task.title }}', '{{ task.description }}', '{{ task.priority }}', '{{ task.start }}', {{ task.progress }})">View Details</button>
-        
-                            {% if task.in_my_day %}
-                                <!-- If the task is already added to My Day, show Launch Task button -->
-                                <a href="{% url 'task_detail' org_id=group.organization.id group_id=group.id task_id=task.id %}" class="btn btn-success">
-                                    Launch Task
-                                </a>
-                            {% else %}
-                                <!-- If the task is not in My Day, show Add to My Day button -->
-                                <button 
-                                    class="btn btn-warning" 
-                                    onclick="addToMyDay('{{ group.organization.id }}', '{{ group.id }}', '{{ task.id }}')">
-                                    Add to My Day
+                            <div class="task-meta">
+                                <i class="material-icons-round">event</i>
+                                {{ task.start }}
+                            </div>
+                            
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" 
+                                     style="width: {{ task.progress }}%" 
+                                     aria-valuenow="{{ task.progress }}" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100">
+                                    {{ task.progress }}%
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#taskModal" 
+                                        onclick="populateModal('{{ task.title }}', '{{ task.description }}', '{{ task.priority }}', '{{ task.start }}', {{ task.progress }})">
+                                    <i class="material-icons-round align-middle me-1" style="font-size: 1.1rem;">visibility</i>
+                                    View Details
                                 </button>
-                            {% endif %}
+
+                                {% if task.in_my_day %}
+                                    <a href="{% url 'task_detail' org_id=group.organization.id group_id=group.id task_id=task.id %}" 
+                                       class="btn btn-success">
+                                        <i class="material-icons-round align-middle me-1" style="font-size: 1.1rem;">launch</i>
+                                        Launch Task
+                                    </a>
+                                {% else %}
+                                    <button class="btn btn-warning" 
+                                            onclick="addToMyDay('{{ group.organization.id }}', '{{ group.id }}', '{{ task.id }}')">
+                                        <i class="material-icons-round align-middle me-1" style="font-size: 1.1rem;">add_task</i>
+                                        Add to My Day
+                                    </button>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
             {% endfor %}
         </div>
 
-        <!-- Pagination Controls -->
-        <div class="d-flex justify-content-center mt-4">
+        <!-- Pagination -->
+        <div class="d-flex justify-content-center mt-5">
             <nav aria-label="Page navigation">
                 <ul class="pagination">
                     {% if page_obj.has_previous %}
                         <li class="page-item">
                             <a class="page-link" href="?page=1" aria-label="First">
-                                <span aria-hidden="true">&laquo;&laquo;</span>
+                                <i class="material-icons-round">first_page</i>
                             </a>
                         </li>
                         <li class="page-item">
                             <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
+                                <i class="material-icons-round">chevron_left</i>
                             </a>
                         </li>
                     {% endif %}
 
-                    <li class="page-item active" aria-current="page">
-                        <span class="page-link">
-                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-                        </span>
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_obj.number }}</span>
                     </li>
 
                     {% if page_obj.has_next %}
                         <li class="page-item">
                             <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
+                                <i class="material-icons-round">chevron_right</i>
                             </a>
                         </li>
                         <li class="page-item">
                             <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
-                                <span aria-hidden="true">&raquo;&raquo;</span>
+                                <i class="material-icons-round">last_page</i>
                             </a>
                         </li>
                     {% endif %}
                 </ul>
             </nav>
         </div>
-
     </div>
 
-    <!-- Modal for Task Details -->
-    <div class="modal fade" id="taskModal" tabindex="-1" aria-labelledby="taskModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="taskModalLabel">Task Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Learn More Sidebar -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="learnMoreSidebar" aria-labelledby="learnMoreSidebarLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="learnMoreSidebarLabel">
+                <i class="material-icons-round align-middle me-2">school</i>
+                Task Management Guide
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="mb-4">
+                <h6 class="fw-bold text-primary mb-3">Getting Started</h6>
+                <p>
+                    Manage your tasks effectively within the group by adding them to your day. This helps you:
+                </p>
+                <ul class="list-unstyled ps-3">
+                    <li class="mb-2">
+                        <i class="material-icons-round align-middle me-2 text-primary">check_circle</i>
+                        Kickstart your workflow
+                    </li>
+                    <li class="mb-2">
+                        <i class="material-icons-round align-middle me-2 text-primary">check_circle</i>
+                        Track deadlines efficiently
+                    </li>
+                    <li class="mb-2">
+                        <i class="material-icons-round align-middle me-2 text-primary">check_circle</i>
+                        Prevent overdue issues
+                    </li>
+                </ul>
+            </div>
+
+            <div class="mb-4">
+                <h6 class="fw-bold text-primary mb-3">Task Priority Levels</h6>
+                <div class="d-flex align-items-center mb-2">
+                    <span class="priority-badge priority-urgent me-2">Urgent</span>
+                    <span>Immediate attention required</span>
                 </div>
-                <div class="modal-body">
-                    <h4 id="taskTitle"></h4>
-                    <p id="taskDescription"></p>
-                    <p><strong>Priority:</strong> <span id="taskPriority"></span></p>
-                    <p><strong>Deadline:</strong> <span id="taskDeadline"></span></p>
-                    <p><strong>Progress:</strong> <span id="taskProgress"></span>%</p>
+                <div class="d-flex align-items-center mb-2">
+                    <span class="priority-badge priority-high me-2">High</span>
+                    <span>Important tasks to focus on</span>
                 </div>
+                <div class="d-flex align-items-center mb-2">
+                    <span class="priority-badge priority-medium me-2">Medium</span>
+                    <span>Regular priority tasks</span>
+                </div>
+                <div class="d-flex align-items-center mb-2">
+                    <span class="priority-badge priority-low me-2">Low</span>
+                    <span>Can be done when time permits</span>
+                </div>
+            </div>
+
+            <div>
+                <h6 class="fw-bold text-primary mb-3">Pro Tips</h6>
+                <p>
+                    <i class="material-icons-round align-middle me-2 text-warning">tips_and_updates</i>
+                    Use the priority filter to focus on what matters most right now
+                </p>
+                <p>
+                    <i class="material-icons-round align-middle me-2 text-warning">tips_and_updates</i>
+                    Add important tasks to "My Day" for better focus and tracking
+                </p>
+                <p>
+                    <i class="material-icons-round align-middle me-2 text-warning">tips_and_updates</i>
+                    Regular updates to task progress help team members stay informed
+                </p>
             </div>
         </div>
     </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         function populateModal(title, description, priority, deadline, progress) {
@@ -278,10 +497,5 @@
         });
     }
     </script>
-
-    <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-{% endblock %}
