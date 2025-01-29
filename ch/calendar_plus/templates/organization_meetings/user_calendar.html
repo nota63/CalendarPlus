@@ -1,6 +1,3 @@
-{% include 'header.html' %}
-<br>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,176 +5,362 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ user.username }}'s Calendar</title>
 
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Core CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
 
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+        :root {
+            --primary-color: #4A154B;
+            --primary-light: #9D5BD2;
+            --success-color: #10B981;
+            --success-light: #D1FAE5;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+        }
 
-    <!-- FullCalendar CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@3.10.2/dist/fullcalendar.min.css" rel="stylesheet">
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #F8F9FA;
+        }
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .calendar-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .calendar-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .fc {
+            font-family: 'Inter', sans-serif !important;
+        }
+
+        .fc-button {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light)) !important;
+            border: none !important;
+            padding: 0.75rem 1.5rem !important;
+            font-weight: 500 !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .fc-button:hover {
+            opacity: 0.9 !important;
+            transform: translateY(-1px) !important;
+        }
+
+        .fc-daygrid-day {
+            transition: all 0.2s ease !important;
+        }
+
+        .fc-daygrid-day:hover {
+            background: var(--success-light) !important;
+            cursor: pointer;
+        }
+
+        .fc-event {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light)) !important;
+            border: none !important;
+            padding: 0.25rem !important;
+            border-radius: 0.5rem !important;
+        }
+
+        .modal-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .availability-item {
+            transition: all 0.2s ease;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+        }
+
+        .availability-item:hover {
+            background: var(--success-light);
+            transform: translateX(4px);
+        }
+
+        .holiday-item {
+            transition: all 0.2s ease;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+        }
+
+        .holiday-item:hover {
+            background: #FEF3C7;
+            transform: translateX(4px);
+        }
+
+        .schedule-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            transition: all 0.3s ease;
+        }
+
+        .schedule-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 21, 75, 0.2);
+        }
+
+        .notification {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 50;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+    </style>
 </head>
-<body>
-
-
-    <section class="py-5 bg-light">
-        <div class="container text-center">
-            <p class="mb-3 fs-5 text-muted">
-                Select a specific date to check {{user.username}}'s availability. Once confirmed, proceed with the scheduling process by clicking on the 'Schedule' button for a seamless experience.
+<body class="min-h-screen bg-gray-50">
+    <!-- Header Section -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <h1 class="text-4xl font-bold gradient-text tracking-tight">
+                {{ user.username }}'s Calendar
+            </h1>
+            <p class="mt-2 text-gray-600 text-lg">
+                Select a date to check availability and schedule meetings
             </p>
-            <p class="text-danger fw-bold">
-                Note: Calendar Plus automatically prevents scheduling on public holidays to avoid conflicts.
-            </p>
+        </div>
+    </header>
+
+    <!-- Info Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white rounded-2xl p-6 shadow-sm">
+            <div class="flex items-start space-x-4">
+                <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+                    <i class="ri-information-line text-2xl text-purple-600"></i>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-lg">
+                        Select a specific date to check {{user.username}}'s availability. Once confirmed, proceed with the scheduling process by clicking on the 'Schedule' button.
+                    </p>
+                    <p class="mt-2 text-red-500 font-medium flex items-center">
+                        <i class="ri-error-warning-line mr-2"></i>
+                        Calendar Plus automatically prevents scheduling on public holidays to avoid conflicts.
+                    </p>
+                </div>
+            </div>
         </div>
     </section>
-    
 
-<div class="container mt-5">
-    <div class="container mt-5">
-        <h1 class="mb-4" style="text-transform: uppercase; font-weight: bold; font-size: 2rem; background-image: linear-gradient(to right, #f8a5d3, #a2c2e3); -webkit-background-clip: text; color: transparent;">
-            {{ user.username }}'s' Calendar and Availability
-        </h1>
-        
-        <div id="calendar" class="container py-5 shadow-lg rounded-3 bg-light border border-0 border-secondary">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-             
+    <!-- Calendar Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <div class="calendar-card rounded-2xl p-8">
+            <div id="calendar"></div>
+        </div>
+    </section>
+
+    <!-- Modal -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4" id="modal">
+        <div class="modal-card w-full max-w-md p-6 animate__animated animate__fadeInUp">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold gradient-text">Availability Details</h3>
+                <button class="text-gray-400 hover:text-gray-600" onclick="closeModal()">
+                    <i class="ri-close-line text-2xl"></i>
+                </button>
             </div>
-            <!-- FullCalendar will be inserted here -->
+
+            <!-- Availability Section -->
+            <div class="mb-6">
+                <h4 class="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                    <i class="ri-time-line mr-2 text-green-500"></i>
+                    Available Time Slots
+                </h4>
+                <ul id="availabilityList" class="space-y-2"></ul>
+            </div>
+
+            <!-- Holidays Section -->
+            <div class="mb-6">
+                <h4 class="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                    <i class="ri-calendar-event-line mr-2 text-yellow-500"></i>
+                    Holidays
+                </h4>
+                <ul id="holidayList" class="space-y-2"></ul>
+            </div>
+
+            <!-- Schedule Button -->
+            <div id="scheduleMeetingButton" class="hidden">
+                <button class="schedule-btn w-full py-3 px-4 rounded-xl text-white font-medium flex items-center justify-center space-x-2" id="scheduleMeetingBtn">
+                    <i class="ri-calendar-check-line"></i>
+                    <span>Schedule Meeting</span>
+                </button>
+            </div>
         </div>
-        
     </div>
-</div>
 
-<!-- Modal for displaying availability and holidays -->
-<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="detailsModalLabel">User Details</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <h4>Availability</h4>
-        <ul id="availabilityList"></ul>
-
-        <h4>Holidays</h4>
-        <ul id="holidayList"></ul>
-
-        <!-- Button for scheduling a meeting -->
-        <div id="scheduleMeetingButton" class="mt-3" style="display:none;">
-            <button class="btn btn-primary" id="scheduleMeetingBtn">Schedule Meeting</button>
+    <!-- Notification -->
+    <div class="notification bg-white rounded-lg shadow-lg p-4" id="notification">
+        <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                <i class="ri-check-line text-green-500"></i>
+            </div>
+            <div>
+                <h4 class="font-medium text-gray-900">Success!</h4>
+                <p class="text-sm text-gray-600">Your meeting has been scheduled.</p>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-</div>
 
-<!-- jQuery and FullCalendar JS -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@3.10.2/dist/fullcalendar.min.js"></script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-$(document).ready(function () {
-    let clickedDate = null; // Variable to store the clicked date
-
-    // The events are passed from the backend (Python view)
-    const eventsFromBackend = {{ events|safe }}; // Use 'safe' to ensure the events are rendered as valid JSON
-
-    $('#calendar').fullCalendar({
-        header: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'month,agendaWeek,agendaDay'
-        },
-        events: eventsFromBackend, // Directly pass the events here
-
-        // When a date is clicked, show availability and holidays
-        dayClick: function (date, jsEvent, view) {
-            clickedDate = date.format('YYYY-MM-DD'); // Update clickedDate
-            const dayOfWeek = date.day(); // Get the day of the week (0 = Sunday, 6 = Saturday)
-
-            // Get user_id and org_id from the context (you can pass them dynamically)
-            const userId = '{{ user.id }}';
-            const orgId = '{{ organization.id }}';
-
-            // Make an AJAX request to fetch availability and holidays for the selected day
-            $.ajax({
-                url: `/calendar/user/${userId}/org/${orgId}/availability_and_holidays/`,
-                method: 'GET',
-                data: {
-                    date: clickedDate, // Send the clicked date to the backend
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let clickedDate = null;
+            const calendarEl = document.getElementById('calendar');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
-                success: function (data) {
-                    // Clear previous lists
-                    $('#availabilityList').empty();
-                    $('#holidayList').empty();
-                    $('#scheduleMeetingButton').hide(); // Hide the schedule meeting button initially
-
-                    // Display availability for the selected day
-                    if (data.availability.length > 0) {
-                        data.availability.forEach(function (availability) {
-                            const timeSlot = availability.start_time + ' - ' + availability.end_time;
-                            $('#availabilityList').append('<li>' + timeSlot + '</li>');
-                        });
-
-                        // Show the Schedule Meeting button if there is availability
-                        $('#scheduleMeetingButton').show();
-                    } else {
-                        $('#availabilityList').append('<li>No availability for this day</li>');
-                    }
-
-                    // Display holidays for the selected day
-                    if (data.holidays.length > 0) {
-                        data.holidays.forEach(function (holiday) {
-                            // If holiday visibility is true, display holiday details
-                            if (holiday.holiday_visibility) {
-                                const holidayInfo = holiday.name + ' (' + holiday.start_date + ' - ' + holiday.end_date + ')';
-                                const holidayType = holiday.holiday_type || "No Type"; // Display holiday type if set
-                                $('#holidayList').append('<li>' + holidayInfo + ' - Type: ' + holidayType + '</li>');
-
-                                // Show message if scheduling is allowed on this holiday
-                                if (holiday.allow_scheduling) {
-                                    $('#holidayList').append('<li><strong>Scheduling is allowed on this holiday!</strong></li>');
-                                }
-                            }
-                        });
-                    } else {
-                        $('#holidayList').append('<li>No holidays on this day</li>');
-                    }
-
-                    // Show the modal
-                    $('#detailsModal').modal('show');
+                events: {{ events|safe }},
+                dateClick: function(info) {
+                    handleDateClick(info.dateStr);
                 },
-                error: function (xhr, status, error) {
-                    alert('Error fetching details');
+                eventDidMount: function(info) {
+                    // Add hover effect to events
+                    info.el.addEventListener('mouseenter', function() {
+                        info.el.style.transform = 'scale(1.05)';
+                    });
+                    info.el.addEventListener('mouseleave', function() {
+                        info.el.style.transform = 'scale(1)';
+                    });
                 }
             });
-        }
-    });
+            calendar.render();
 
-    // When the "Schedule Meeting" button is clicked, redirect to the meeting scheduling page
-    $(document).on('click', '#scheduleMeetingBtn', function () {
-        if (!clickedDate) {
-            alert('Please select a date first!');
-            return;
-        }
-        const userId = '{{ user.id }}';
-        const orgId = '{{ organization.id }}';
+            function handleDateClick(date) {
+                clickedDate = date;
+                const userId = '{{ user.id }}';
+                const orgId = '{{ organization.id }}';
 
-        // Redirect to the scheduling page with org_id, user_id, and clickedDate parameters
-        window.location.href = '/calendar/user-availability-org/' + orgId + '/' + userId + '/' + clickedDate + '/';
-    });
-});
+                fetch(`/calendar/user/${userId}/org/${orgId}/availability_and_holidays/?date=${date}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        updateModal(data);
+                        showModal();
+                    })
+                    .catch(error => showNotification('Error fetching details', 'error'));
+            }
 
+            function updateModal(data) {
+                const availabilityList = document.getElementById('availabilityList');
+                const holidayList = document.getElementById('holidayList');
+                const scheduleButton = document.getElementById('scheduleMeetingButton');
 
-</script>
+                // Clear previous content
+                availabilityList.innerHTML = '';
+                holidayList.innerHTML = '';
 
+                // Update availability
+                if (data.availability.length > 0) {
+                    data.availability.forEach(slot => {
+                        availabilityList.innerHTML += `
+                            <li class="availability-item flex items-center space-x-2">
+                                <i class="ri-time-line text-green-500"></i>
+                                <span>${slot.start_time} - ${slot.end_time}</span>
+                            </li>
+                        `;
+                    });
+                    scheduleButton.classList.remove('hidden');
+                } else {
+                    availabilityList.innerHTML = `
+                        <li class="text-gray-500 italic">
+                            No availability for this day
+                        </li>
+                    `;
+                    scheduleButton.classList.add('hidden');
+                }
+
+                // Update holidays
+                if (data.holidays.length > 0) {
+                    data.holidays.forEach(holiday => {
+                        if (holiday.holiday_visibility) {
+                            holidayList.innerHTML += `
+                                <li class="holiday-item">
+                                    <div class="font-medium text-gray-900">${holiday.name}</div>
+                                    <div class="text-sm text-gray-600">
+                                        ${holiday.start_date} - ${holiday.end_date}
+                                    </div>
+                                    <div class="text-sm text-gray-500">
+                                        Type: ${holiday.holiday_type || "No Type"}
+                                    </div>
+                                    ${holiday.allow_scheduling ? `
+                                        <div class="text-green-500 text-sm font-medium mt-1">
+                                            <i class="ri-checkbox-circle-line"></i>
+                                            Scheduling allowed
+                                        </div>
+                                    ` : ''}
+                                </li>
+                            `;
+                        }
+                    });
+                } else {
+                    holidayList.innerHTML = `
+                        <li class="text-gray-500 italic">
+                            No holidays on this day
+                        </li>
+                    `;
+                }
+            }
+
+            // Modal functions
+            window.showModal = function() {
+                document.getElementById('modal').classList.remove('hidden');
+                document.getElementById('modal').classList.add('flex');
+            }
+
+            window.closeModal = function() {
+                document.getElementById('modal').classList.remove('flex');
+                document.getElementById('modal').classList.add('hidden');
+            }
+
+            // Schedule meeting button handler
+            document.getElementById('scheduleMeetingBtn').addEventListener('click', function() {
+                if (!clickedDate) {
+                    showNotification('Please select a date first', 'error');
+                    return;
+                }
+                const userId = '{{ user.id }}';
+                const orgId = '{{ organization.id }}';
+                window.location.href = `/calendar/user-availability-org/${orgId}/${userId}/${clickedDate}/`;
+            });
+
+            // Notification function
+            window.showNotification = function(message, type = 'success') {
+                const notification = document.getElementById('notification');
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+        });
+    </script>
 </body>
 </html>
-
