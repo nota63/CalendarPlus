@@ -2513,9 +2513,6 @@ def send_alert_notification(request, org_id, channel_id):
                     content=f'{request.user} Sent the notification {alert.message}'
                    )
                 
-
-
-           
                 return JsonResponse({
                     'status': 'success',
                     'message': 'Alert notification sent successfully.',
@@ -2542,3 +2539,71 @@ def send_alert_notification(request, org_id, channel_id):
             'status': 'error',
             'message': str(e)
         })
+    
+
+# FETCH CHANNEL NOTIFICATIONS
+
+@login_required
+def fetch_channel_notifications(request, org_id, channel_id):
+    try:
+        organization = get_object_or_404(Organization, id=org_id)
+        channel = get_object_or_404(Channel, id=channel_id, organization=organization)
+
+        user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
+        if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
+           return JsonResponse({'error': 'You are not part of this organization or you do not have access to this channel.'}, status=403)
+
+        notifications = AlertNotification.objects.filter(channel=channel).order_by('-sent_at')
+        
+        data = []
+        for index, alert in enumerate(notifications):
+            data.append({
+                'id': alert.id,
+                'message': alert.message,
+                'sent_at': alert.sent_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'is_read': alert.is_read,
+                'is_most_recent': index == 0  
+            })
+
+        return JsonResponse({'status': 'success', 'notifications': data})
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
+
+
+
+# mark notification as read
+
+@csrf_exempt
+@login_required
+def mark_notification_as_read(request, alert_id):
+    try:
+        if request.method == 'POST':
+            alert = get_object_or_404(AlertNotification, id=alert_id, created_by=request.user)
+
+            # Mark as read
+            if not alert.is_read:
+                alert.is_read = True
+                alert.save()
+
+                activity = ActivityChannel.objects.create(
+                     user=request.user,
+                     channel=alert.channel,
+                     organization=alert.organization,
+                     action_type="MARKED_NOTIFICATION_AS_READ",
+                     content=f'{request.user} Marked the notification as read {alert.message}'
+                  )
+
+
+
+            return JsonResponse({'status': 'success', 'message': 'Notification marked as read.'})
+
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
+
+
+
+
+

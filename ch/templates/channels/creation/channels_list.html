@@ -24,6 +24,49 @@
 <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 
 <style>
+ @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .animate-rotate {
+            animation: rotate 20s linear infinite;
+        }
+
+        .shadow-cyber {
+            box-shadow: 0 8px 32px rgba(8, 145, 178, 0.1),
+                        inset 0 4px 12px rgba(255, 255, 255, 0.05);
+        }
+
+        .shadow-cyber-lg {
+            box-shadow: 0 12px 48px rgba(8, 145, 178, 0.15),
+                        inset 0 6px 16px rgba(255, 255, 255, 0.08);
+        }
+
+        @keyframes float-in {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-float-in {
+            animation: float-in 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+
+        .animate-fade-in-down {
+            animation: fade-in-down 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+
+        @keyframes fade-in-down {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+
+
+
+
+
+
 
  /* Specific styling for the Send Alert Notification Modal */
  #alertModal .modal-dialog {
@@ -834,6 +877,27 @@
   </div>
   
 
+
+
+<!-- Notifications Modal -->
+<div class="modal fade" id="notificationsModal" tabindex="-1" aria-labelledby="notificationsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="notificationsModalLabel">Channel Notifications</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="notificationsList" class="list-group">
+                    <li class="text-center py-3 text-gray-500">Loading notifications...</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <!-- ---------------------------------------------------------------------------------------------------------------- -->
 <body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -1014,11 +1078,24 @@ data-bs-target="#userSelectionModal">
     <span class="font-medium text-purple-600/90">Send Alert Notification</span>
 </button>
 
-
-
-
-
                   {% endif %}
+
+
+ <!-- Button to trigger notifications modal -->
+<button 
+class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200"
+id="viewNotificationsBtn"
+data-channel-id="{{channel.id}}"
+data-org-id="{{channel.organization.id}}"
+data-bs-toggle="modal"
+data-bs-target="#notificationsModal">
+<svg class="w-5 h-5 mr-3 text-blue-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405M19 13V9a7 7 0 10-14 0v4M9 21h6" />
+</svg>
+<span class="font-medium text-blue-600/90">View Notifications</span>
+</button>
+             
+
                             </div>
                         </div>
                     </div>
@@ -1027,8 +1104,6 @@ data-bs-target="#userSelectionModal">
             {% endfor %}
         </div>
     </div>
-
-
 
 
 
@@ -1652,6 +1727,93 @@ document.addEventListener('DOMContentLoaded', function () {
       alert('An error occurred while sending the notification.');
     });
   });
+
+
+
+// FETCH AND HANDLE NOTIFICATIONS 
+
+document.addEventListener("DOMContentLoaded", function() {
+    const notificationsModal = document.getElementById("notificationsModal");
+    const notificationsList = document.getElementById("notificationsList");
+    const viewNotificationsBtn = document.getElementById("viewNotificationsBtn");
+
+    // Fetch notifications when modal opens
+    notificationsModal.addEventListener("show.bs.modal", function() {
+        const orgId = viewNotificationsBtn.getAttribute("data-org-id");
+        const channelId = viewNotificationsBtn.getAttribute("data-channel-id");
+
+        fetch(`/channels/notifications/${orgId}/${channelId}/`)
+            .then(response => response.json())
+            .then(data => {
+                notificationsList.innerHTML = "";
+
+                if (data.status === "success" && data.notifications.length > 0) {
+                    data.notifications.forEach(notification => {
+                        const listItem = document.createElement("li");
+                        listItem.className = "list-group-item d-flex justify-content-between align-items-center";
+
+                        listItem.innerHTML = `
+                            <div>
+                                <strong>${notification.is_most_recent ? "📌 Most Recent: " : ""}</strong>
+                                ${notification.message}
+                                <br>
+                                <small class="text-muted">${notification.sent_at}</small>
+                            </div>
+                            <button 
+                                class="btn btn-sm ${notification.is_read ? 'btn-secondary' : 'btn-primary'} mark-read-btn"
+                                data-alert-id="${notification.id}"
+                                ${notification.is_read ? "disabled" : ""}>
+                                ${notification.is_read ? "Marked as Read" : "Mark as Read"}
+                            </button>
+                        `;
+
+                        notificationsList.appendChild(listItem);
+                    });
+
+                    // Attach event listeners for "Mark as Read" buttons
+                    document.querySelectorAll(".mark-read-btn").forEach(button => {
+                        button.addEventListener("click", function() {
+                            markAsRead(this);
+                        });
+                    });
+
+                } else {
+                    notificationsList.innerHTML = `<li class="text-center py-3 text-gray-500">No notifications found.</li>`;
+                }
+            })
+            .catch(error => {
+                notificationsList.innerHTML = `<li class="text-center py-3 text-danger">Error loading notifications.</li>`;
+            });
+    });
+
+    // Function to mark notification as read
+    function markAsRead(button) {
+        const alertId = button.getAttribute("data-alert-id");
+
+        fetch(`/channels/notifications/mark-read/${alertId}/`, {
+            method: "POST",
+            headers: { "X-CSRFToken": getCSRFToken() },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                button.classList.remove("btn-primary");
+                button.classList.add("btn-secondary");
+                button.textContent = "Marked as Read";
+                button.disabled = true;
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    }
+
+    // Function to get CSRF token
+    function getCSRFToken() {
+        return document.querySelector("[name=csrfmiddlewaretoken]")?.value || "";
+    }
+});
+
+
+
 
 
     </script>
