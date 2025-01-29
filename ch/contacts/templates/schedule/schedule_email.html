@@ -1,5 +1,4 @@
 
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -7,105 +6,256 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Schedule Email</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary-color: #4A154B;
+            --primary-hover: #611f5d;
+            --success-color: #007a5a;
+            --success-hover: #006c4f;
+        }
+        
         body {
-            background-color: #f8f9fa;
+            font-family: 'Inter', sans-serif;
+            background: #F8F9FA;
         }
-        .guide {
-            background-color: #e9ecef;
-            border-left: 5px solid #0d6efd;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
+        
+        .compose-area {
+            border: 2px solid #E9EEF2;
+            transition: border-color 0.2s ease;
         }
-        .template-option {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
+        
+        .compose-area:focus-within {
+            border-color: var(--primary-color);
         }
-        .template-option:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #4A154B 0%, #9D5BD2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .template-option input {
-            display: none;
+        
+        .schedule-button {
+            background: var(--success-color);
+            transition: all 0.2s ease;
         }
-        .template-option img {
-            width: 120px;
-            height: 120px;
-            border-radius: 5px;
+        
+        .schedule-button:hover {
+            background: var(--success-hover);
+            transform: translateY(-1px);
         }
-        .template-option p {
-            margin-top: 5px;
-            font-size: 14px;
-            text-align: center;
+
+        .template-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .template-card:hover {
+            transform: translateY(-4px);
+        }
+        
+        .template-card.selected {
+            border-color: var(--success-color);
+            background-color: #F0FDF4;
+        }
+
+        .template-card input:checked + img {
+            border-color: var(--success-color);
+            box-shadow: 0 0 0 2px var(--success-color);
+        }
+
+        /* Custom styles for flatpickr */
+        .flatpickr-calendar {
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .flatpickr-day.selected {
+            background: var(--success-color) !important;
+            border-color: var(--success-color) !important;
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #4A154B 0%, #9D5BD2 100%);
         }
     </style>
 </head>
-<body>
-    <div class="container mt-5">
-        <h1 class="text-center mb-4">Schedule an Email</h1>
-        
-        <!-- Guide Section -->
-        <div class="guide">
-            <p>
-                <strong>Guide:</strong> You are scheduling an email for 
-                <span class="text-primary">{{ participant.username }}</span> in the organization 
-                <span class="text-primary">{{ organization.name }}</span>. 
-                <br><br>
-                Follow these steps to schedule your email:
-                <ol>
-                    <li>Enter the email message in the provided text area.</li>
-                    <li>Select the date and time for the email to be sent.</li>
-                    <li>Choose a design template style by clicking on the images below.</li>
-                    <li>Click the <strong>"Schedule Email"</strong> button to save your schedule.</li>
-                </ol>
-            </p>
+<body class="min-h-screen py-8">
+    <div class="max-w-4xl mx-auto px-4">
+        <!-- Header Section -->
+        <div class="bg-white rounded-2xl shadow-sm p-8 mb-6 animate__animated animate__fadeIn">
+            <div class="flex items-center justify-between mb-6">
+                <div class="p-3 bg-white shadow-sm rounded border border-light">
+                    <h1 class="text-3xl font-bold text-gray-900">📅 Schedule Email</h1>
+                    <p class="mt-2 text-gray-600">
+                        To: <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">{{ participant.username }}</span>
+                        from <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">{{ organization.name }}</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Steps Guide -->
+        <div class="bg-white rounded-2xl shadow-sm p-8 mb-6 animate__animated animate__fadeInUp animate__delay-1s">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="flex items-start space-x-3">
+                    <div class="step-number w-8 h-8 rounded-full flex items-center justify-center text-white font-medium flex-shrink-0">1</div>
+                    <div>
+                        <h3 class="font-medium text-gray-900">Compose</h3>
+                        <p class="text-sm text-gray-500">Write your email message</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <div class="step-number w-8 h-8 rounded-full flex items-center justify-center text-white font-medium flex-shrink-0">2</div>
+                    <div>
+                        <h3 class="font-medium text-gray-900">Schedule</h3>
+                        <p class="text-sm text-gray-500">Pick date and time</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <div class="step-number w-8 h-8 rounded-full flex items-center justify-center text-white font-medium flex-shrink-0">3</div>
+                    <div>
+                        <h3 class="font-medium text-gray-900">Style</h3>
+                        <p class="text-sm text-gray-500">Choose template design</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <div class="step-number w-8 h-8 rounded-full flex items-center justify-center text-white font-medium flex-shrink-0">4</div>
+                    <div>
+                        <h3 class="font-medium text-gray-900">Confirm</h3>
+                        <p class="text-sm text-gray-500">Schedule your email</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Form Section -->
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="message" class="form-label">Email Message</label>
-                <textarea id="message" name="message" class="form-control" rows="5" placeholder="Write your email message here..." required></textarea>
-            </div>
-            
-            <div class="mb-3">
-                <label for="schedule_time" class="form-label">Schedule Time</label>
-                <input type="datetime-local" id="schedule_time" name="schedule_time" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Template Style</label>
-                <div class="d-flex justify-content-around flex-wrap">
-                    <label class="template-option">
-                        <input type="radio" name="template_style" value="Professional" required>
-                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxDThVIebsxNfVB4AwZMH3miEbb0oin1k1tg&s" alt="Professional">
-                        <p>Professional</p>
-                    </label>
-                    <label class="template-option">
-                        <input type="radio" name="template_style" value="Modern" required>
-                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRG6jDj0txQ8KHF0noufbqiHiyzN8zhl-xq6A&s" alt="Modern">
-                        <p>Modern</p>
-                    </label>
-                    <label class="template-option">
-                        <input type="radio" name="template_style" value="Attractive" required>
-                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROTuB0TeDLUV5kcfuK9sSo4u2iEU-aNZXeHA&s" alt="Attractive">
-                        <p>Attractive</p>
-                    </label>
-                    <label class="template-option">
-                        <input type="radio" name="template_style" value="Playful" required>
-                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdaQa8y_8ODrEzVJR7iatLnmRp4_ZEDqdgaA&s" alt="Playful">
-                        <p>Playful</p>
-                    </label>
+        <div class="bg-white rounded-2xl shadow-sm p-8 animate__animated animate__fadeInUp animate__delay-2s">
+            <form method="post" enctype="multipart/form-data" class="space-y-8">
+                {% csrf_token %}
+                
+                <!-- Message Compose Area -->
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700">Email Message</label>
+                    <div class="compose-area rounded-xl overflow-hidden">
+                        <div class="bg-gray-50 px-4 py-2 border-b border-gray-200">
+                            <div class="flex items-center space-x-4">
+                                <button type="button" class="text-gray-500 hover:text-gray-700" disabled>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </button>
+                                <button type="button" class="text-gray-500 hover:text-gray-700" disabled>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                    </svg>
+                                </button>
+                                <button type="button" class="text-gray-500 hover:text-gray-700" disabled>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <textarea 
+                            id="message" 
+                            name="message" 
+                            rows="6"
+                            class="w-full p-4 text-gray-800 focus:outline-none" 
+                            placeholder="Write your email message here..."
+                            required
+                        ></textarea>
+                    </div>
                 </div>
-            </div>
 
-            <button type="submit" class="btn btn-primary w-100">Schedule Email</button>
-        </form>
+                <!-- Schedule Time Picker -->
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700">Schedule Time</label>
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="schedule_time" 
+                            name="schedule_time" 
+                            class="w-full p-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            placeholder="Select date and time"
+                            required
+                        >
+                        <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Template Selection -->
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700">Choose Template Style</label>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <label class="template-card bg-white rounded-xl p-4 cursor-pointer">
+                            <input type="radio" name="template_style" value="Professional" class="hidden" required>
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxDThVIebsxNfVB4AwZMH3miEbb0oin1k1tg&s" 
+                                 alt="Professional" 
+                                 class="w-full h-32 object-cover rounded-lg mb-2">
+                            <p class="text-center text-sm font-medium text-gray-700">Professional</p>
+                        </label>
+                        <label class="template-card bg-white rounded-xl p-4 cursor-pointer">
+                            <input type="radio" name="template_style" value="Modern" class="hidden" required>
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRG6jDj0txQ8KHF0noufbqiHiyzN8zhl-xq6A&s" 
+                                 alt="Modern" 
+                                 class="w-full h-32 object-cover rounded-lg mb-2">
+                            <p class="text-center text-sm font-medium text-gray-700">Modern</p>
+                        </label>
+                        <label class="template-card bg-white rounded-xl p-4 cursor-pointer">
+                            <input type="radio" name="template_style" value="Attractive" class="hidden" required>
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROTuB0TeDLUV5kcfuK9sSo4u2iEU-aNZXeHA&s" 
+                                 alt="Attractive" 
+                                 class="w-full h-32 object-cover rounded-lg mb-2">
+                            <p class="text-center text-sm font-medium text-gray-700">Attractive</p>
+                        </label>
+                        <label class="template-card bg-white rounded-xl p-4 cursor-pointer">
+                            <input type="radio" name="template_style" value="Playful" class="hidden" required>
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdaQa8y_8ODrEzVJR7iatLnmRp4_ZEDqdgaA&s" 
+                                 alt="Playful" 
+                                 class="w-full h-32 object-cover rounded-lg mb-2">
+                            <p class="text-center text-sm font-medium text-gray-700">Playful</p>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="schedule-button w-full py-4 rounded-lg text-white font-medium shadow-sm hover:shadow flex items-center justify-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <span>Schedule Email</span>
+                </button>
+            </form>
+        </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize flatpickr for datetime picker
+        flatpickr("#schedule_time", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            minDate: "today",
+            time_24hr: true
+        });
+
+        // Handle template selection
+        document.querySelectorAll('.template-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+            });
+        });
+    </script>
 </body>
 </html>
