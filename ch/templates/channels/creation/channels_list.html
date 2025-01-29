@@ -24,6 +24,88 @@
 <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 
 <style>
+
+/* CSS specific to the notification modal */
+#notificationModal .modal-dialog {
+    max-width: 800px; /* Increased width */
+    max-height: 90vh; /* Increased height */
+    margin: auto;
+}
+
+#notificationModal .modal-content {
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    overflow-y: auto;
+}
+
+#notificationModal .modal-header {
+    background-color: #6b46c1; /* Purple header */
+    color: white;
+    border-bottom: 2px solid #ddd;
+}
+
+#notificationModal .modal-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+#notificationModal .modal-body {
+    padding: 1.5rem;
+    background-color: #f9f9f9; /* Light gray background */
+}
+
+#notificationModal .notification-item {
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: white;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#notificationModal .notification-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+#notificationModal .notification-item .recent-tag {
+    display: inline-block;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: white;
+    background-color: #f56565; /* Red tag for recent */
+    border-radius: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+#notificationModal .mark-read-btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: bold;
+    color: white;
+    background-color: #48bb78; /* Green button */
+    border: none;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s, transform 0.2s;
+    cursor: pointer;
+}
+
+#notificationModal .mark-read-btn:hover {
+    background-color: #38a169; /* Darker green on hover */
+    transform: scale(1.05);
+}
+
+#notificationModal .mark-read-btn:disabled {
+    background-color: #a0aec0; /* Gray when disabled */
+    cursor: not-allowed;
+    transform: none;
+}
+
+
+
+
  @keyframes rotate {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -1753,19 +1835,25 @@ document.addEventListener("DOMContentLoaded", function() {
                         listItem.className = "list-group-item d-flex justify-content-between align-items-center";
 
                         listItem.innerHTML = `
-                            <div>
-                                <strong>${notification.is_most_recent ? "📌 Most Recent: " : ""}</strong>
-                                ${notification.message}
-                                <br>
-                                <small class="text-muted">${notification.sent_at}</small>
-                            </div>
-                            <button 
-                                class="btn btn-sm ${notification.is_read ? 'btn-secondary' : 'btn-primary'} mark-read-btn"
-                                data-alert-id="${notification.id}"
-                                ${notification.is_read ? "disabled" : ""}>
-                                ${notification.is_read ? "Marked as Read" : "Mark as Read"}
-                            </button>
-                        `;
+    <div class="notification-item p-3 rounded-lg shadow-sm bg-white flex justify-between items-center border border-gray-200">
+        <div class="notification-content">
+            <span class="text-sm font-medium text-gray-700">
+                ${notification.is_most_recent ? '<span class="text-red-500 font-bold">📌 Most Recent:</span> ' : ""}
+                ${notification.message}
+            </span>
+            <br>
+            <small class="text-gray-500">${notification.sent_at}</small>
+        </div>
+        <button 
+            class="mark-read-btn px-3 py-1 rounded-md text-sm font-semibold transition-all duration-200 
+                ${notification.is_read ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}"
+            data-alert-id="${notification.id}"
+            ${notification.is_read ? "disabled" : ""}>
+            ${notification.is_read ? "✔ Marked as Read" : "✅ Mark as Read"}
+        </button>
+    </div>
+`;
+
 
                         notificationsList.appendChild(listItem);
                     });
