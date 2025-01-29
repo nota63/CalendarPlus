@@ -4,139 +4,303 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meeting Contacts</title>
-    <!-- Bootstrap 5 CSS CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Optional: Font Awesome for icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary-color: #4A154B;
+            --primary-hover: #611f5d;
+            --success-color: #007a5a;
+            --success-hover: #006c4f;
+            --warning-color: #e8912d;
+            --warning-hover: #d68326;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #F8F9FA;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #4A154B 0%, #9D5BD2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .contact-card {
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+        
+        .contact-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .meeting-badge {
+            transition: all 0.2s ease;
+        }
+
+        .meeting-badge.past {
+            background: linear-gradient(135deg, #4A154B 0%, #9D5BD2 100%);
+        }
+
+        .meeting-badge.future {
+            background: linear-gradient(135deg, #007a5a 0%, #00b98d 100%);
+        }
+
+        .add-contact-btn {
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #4A154B 0%, #9D5BD2 100%);
+        }
+
+        .add-contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 21, 75, 0.2);
+        }
+
+        .add-contact-btn:active {
+            transform: translateY(0);
+        }
+
+        .role-badge {
+            background: linear-gradient(135deg, #F0F4FF 0%, #E5E9FF 100%);
+        }
+
+        .org-badge {
+            background: linear-gradient(135deg, #FFF4E5 0%, #FFE9CC 100%);
+        }
+
+        .meeting-info {
+            transition: all 0.2s ease;
+        }
+
+        .meeting-info:hover {
+            background: #F8F9FA;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(74, 21, 75, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(74, 21, 75, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(74, 21, 75, 0);
+            }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            transform: translateY(100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
 </head>
+<body class="min-h-screen py-12">
+    <!-- CSRF Token Form -->
+    <form method="post" class="hidden">
+        {% csrf_token %}
+    </form>
 
-<body class="bg-light text-dark">
+    <div class="max-w-7xl mx-auto px-4">
+        <!-- Header Section -->
+        <div class="text-center mb-12 animate__animated animate__fadeIn">
+            <div class="inline-flex items-center justify-center space-x-3 mb-4">
+                <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
+                    <i class="ri-team-line text-2xl text-purple-600"></i>
+                </div>
+                <h1 class="text-4xl font-bold gradient-text">Meeting Contacts</h1>
+            </div>
+            <div class="flex items-center justify-center space-x-2 mb-4">
+                <span class="bg-purple-100 text-purple-800 px-4 py-1 rounded-full text-sm font-medium">
+                    {{ organization.name }}
+                </span>
+            </div>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                Connect with people you've met or will meet. Add them to your contacts for easier scheduling and collaboration.
+            </p>
+        </div>
 
-<!-- CSRF Token Form -->
-<form method="post">
-    {% csrf_token %}
-</form>
-
-<!-- Main Content Container -->
-<div class="container my-5">
-    <h1 class="text-center text-primary fw-bold mb-5">Contacts for {{ organization.name }}</h1>
-    <p class="text-center text-muted mb-5">Users you've had or will have future meetings with are listed here. Add them to your contact list to simplify scheduling!</p>
-
-    <!-- Organization Info Section -->
-    <div class="mb-4">
-        <h2 class="h4 text-uppercase text-primary mb-3">Organization: {{ organization.name }}</h2>
-        <p class="text-muted">These are users with whom you have scheduled meetings.</p>
-    </div>
-
-    <!-- User Contacts List -->
-    <div class="row">
-        {% for user_info in user_details %}
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card shadow-sm border-0 rounded-3">
-                    <div class="card-body">
-                        <!-- User Info Section -->
-                        <div class="d-flex justify-content-between mb-3">
-                            <div>
-                                <h5 class="fw-bold">{{ user_info.user.username }}</h5>
-                                <p class="text-muted small">{{ user_info.role }}</p>
-                            </div>
-                            <span class="badge bg-secondary">{{ user_info.organization_name }}</span>
+        <!-- Contacts Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for user_info in user_details %}
+            <div class="contact-card rounded-2xl p-6 shadow-sm animate__animated animate__fadeInUp" style="animation-delay:">
+                <!-- User Header -->
+                <div class="flex items-start justify-between mb-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white font-medium text-lg">
+                            {{ user_info.user.username|make_list|first|upper }}
                         </div>
-
-                        <!-- Last Meeting Info Section -->
-                        <div class="mb-3">
-                            <strong class="h6">Last Meeting:</strong>
-                            {% if user_info.last_meeting.date %}
-                                <div class="mt-2 text-muted">
-                                    <p><strong>Date:</strong> {{ user_info.last_meeting.date }}</p>
-                                    <p><strong>Time:</strong> {{ user_info.last_meeting.time }}</p>
-                                    <p><strong>Title:</strong> {{ user_info.last_meeting.title }}</p>
-                                </div>
-                            {% else %}
-                                <p class="mt-2 text-muted">No past meetings</p>
-                            {% endif %}
-                        </div>
-
-                        <!-- Next Meeting Info Section -->
                         <div>
-                            <strong class="h6">Next Meeting:</strong>
-                            {% if user_info.next_meeting.date %}
-                                <div class="mt-2 text-muted">
-                                    <p><strong>Date:</strong> {{ user_info.next_meeting.date }}</p>
-                                    <p><strong>Time:</strong> {{ user_info.next_meeting.time }}</p>
-                                    <p><strong>Title:</strong> {{ user_info.next_meeting.title }}</p>
-                                </div>
-                            {% else %}
-                                <p class="mt-2 text-muted">No upcoming meetings</p>
-                            {% endif %}
-                        </div>
-
-                        <!-- Add to Contacts Button -->
-                        <div class="mt-4 text-center">
-                            <button 
-                                class="add-contact-btn btn btn-primary btn-sm"
-                                data-org-id="{{ organization.id }}" 
-                                data-user-id="{{ user_info.user.id }}">
-                                <i class="fas fa-user-plus"></i> Add to Contacts
-                            </button>
+                            <h3 class="font-semibold text-gray-900">{{ user_info.user.username }}</h3>
+                            <span class="role-badge text-purple-700 text-sm px-3 py-1 rounded-full">{{ user_info.role }}</span>
                         </div>
                     </div>
+                    <span class="org-badge text-orange-700 text-sm px-3 py-1 rounded-full">{{ user_info.organization_name }}</span>
                 </div>
-            </div>
-        {% endfor %}
-    </div>
-</div>
 
-<!-- Bootstrap 5 JS and Popper.js CDN -->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+                <!-- Meetings Section -->
+                <div class="space-y-4">
+                    <!-- Last Meeting -->
+                    <div class="meeting-info rounded-xl p-4 border border-gray-100">
+                        <div class="flex items-center space-x-2 mb-3">
+                            <i class="ri-history-line text-purple-600"></i>
+                            <h4 class="font-medium text-gray-900">Last Meeting</h4>
+                        </div>
+                        {% if user_info.last_meeting.date %}
+                        <div class="space-y-2">
+                            <div class="flex items-center space-x-2 text-sm text-gray-600">
+                                <i class="ri-calendar-2-line"></i>
+                                <span>{{ user_info.last_meeting.date }}</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-sm text-gray-600">
+                                <i class="ri-time-line"></i>
+                                <span>{{ user_info.last_meeting.time }}</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-sm text-gray-600">
+                                <i class="ri-chat-1-line"></i>
+                                <span>{{ user_info.last_meeting.title }}</span>
+                            </div>
+                        </div>
+                        {% else %}
+                        <p class="text-sm text-gray-500 italic">No past meetings</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Next Meeting -->
+                    <div class="meeting-info rounded-xl p-4 border border-gray-100">
+                        <div class="flex items-center space-x-2 mb-3">
+                            <i class="ri-calendar-check-line text-green-600"></i>
+                            <h4 class="font-medium text-gray-900">Next Meeting</h4>
+                        </div>
+                        {% if user_info.next_meeting.date %}
+                        <div class="space-y-2">
+                            <div class="flex items-center space-x-2 text-sm text-gray-600">
+                                <i class="ri-calendar-2-line"></i>
+                                <span>{{ user_info.next_meeting.date }}</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-sm text-gray-600">
+                                <i class="ri-time-line"></i>
+                                <span>{{ user_info.next_meeting.time }}</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-sm text-gray-600">
+                                <i class="ri-chat-1-line"></i>
+                                <span>{{ user_info.next_meeting.title }}</span>
+                            </div>
+                        </div>
+                        {% else %}
+                        <p class="text-sm text-gray-500 italic">No upcoming meetings</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Add Contact Button -->
+                <button 
+                    class="add-contact-btn w-full mt-6 py-3 px-4 rounded-xl text-white font-medium flex items-center justify-center space-x-2 hover:opacity-90"
+                    data-org-id="{{ organization.id }}" 
+                    data-user-id="{{ user_info.user.id }}">
+                    <i class="ri-user-add-line"></i>
+                    <span>Add to Contacts</span>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast rounded-xl bg-white shadow-lg p-4 max-w-md flex items-center space-x-3">
+        <div class="flex-shrink-0">
+            <i class="ri-checkbox-circle-line text-2xl text-green-500"></i>
+        </div>
+        <div class="flex-1">
+            <h4 class="font-medium text-gray-900" id="toast-title"></h4>
+            <p class="text-sm text-gray-600" id="toast-message"></p>
+        </div>
+        <button onclick="hideToast()" class="text-gray-400 hover:text-gray-600">
+            <i class="ri-close-line text-xl"></i>
+        </button>
+    </div>
 
     <script>
+        // Toast functionality
+        const toast = document.getElementById('toast');
+        const toastTitle = document.getElementById('toast-title');
+        const toastMessage = document.getElementById('toast-message');
+
+        function showToast(title, message, type = 'success') {
+            toastTitle.textContent = title;
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            setTimeout(hideToast, 5000);
+        }
+
+        function hideToast() {
+            toast.classList.remove('show');
+        }
+
+        // Add contact functionality
         document.querySelectorAll('.add-contact-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', async function() {
                 const orgId = btn.getAttribute('data-org-id');
                 const userId = btn.getAttribute('data-user-id');
+                
+                // Add loading state
+                btn.disabled = true;
+                btn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i><span>Adding...</span>';
 
-                fetch(`/contacts/add_to_contacts/${orgId}/${userId}/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                    },
-                    body: JSON.stringify({
-                        'org_id': orgId,
-                        'user_id': userId
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
+                try {
+                    const response = await fetch(`/contacts/add_to_contacts/${orgId}/${userId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        },
+                        body: JSON.stringify({
+                            'org_id': orgId,
+                            'user_id': userId
+                        })
+                    });
+
+                    const data = await response.json();
+
                     if (data.message) {
-                        alert(data.message);  // Success message
+                        showToast('Success!', data.message);
+                        btn.innerHTML = '<i class="ri-check-line"></i><span>Added to Contacts</span>';
+                        btn.classList.add('bg-success');
                     } else if (data.error) {
-                        alert(data.error);  // Error message
+                        showToast('Error', data.error, 'error');
+                        // Reset button
+                        btn.innerHTML = '<i class="ri-user-add-line"></i><span>Add to Contacts</span>';
+                        btn.disabled = false;
                     }
-                })
-                .catch(error => {
+                } catch (error) {
                     console.error('Error:', error);
-                    alert('An error occurred while adding the contact.');
-                });
+                    showToast('Error', 'An error occurred while adding the contact.', 'error');
+                    // Reset button
+                    btn.innerHTML = '<i class="ri-user-add-line"></i><span>Add to Contacts</span>';
+                    btn.disabled = false;
+                }
             });
         });
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
