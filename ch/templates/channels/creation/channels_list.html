@@ -2245,15 +2245,26 @@ document.getElementById('unscheduleBtn').addEventListener('click', function () {
                 const alertItem = document.createElement('li');
                 alertItem.classList.add('list-group-item');
                 alertItem.innerHTML = `
-                    <strong>Message:</strong> ${alert.message} <br>
-                    <strong>Scheduled for:</strong> ${alert.scheduled_for} <br>
-                    <strong>Schedule Type:</strong> ${alert.schedule_type} <br>
-                    <strong>Schedule Days:</strong> ${alert.schedule_days} <br>
-                    <strong>Status:</strong> ${alert.status} <br>
-                    <strong>Time Left:</strong> ${alert.days_message} <br>
-                    <button class="btn btn-danger btn-sm unscheduleBtn" data-alert-id="${alert.id}">Unschedule</button>
-                `;
-                alertsList.appendChild(alertItem);
+    <div class="alert-item card shadow-sm mb-4 p-4">
+        <div class="card-body">
+            <h5 class="card-title text-primary">Scheduled Alert</h5>
+            <p class="card-text">
+                <strong>Message:</strong> <span class="text-muted">${alert.message}</span> <br>
+                <strong>Scheduled for:</strong> <span class="text-muted">${alert.scheduled_for}</span> <br>
+                <strong>Schedule Type:</strong> <span class="badge bg-info">${alert.schedule_type}</span> <br>
+                <strong>Schedule Days:</strong> <span class="badge bg-secondary">${alert.schedule_days}</span> <br>
+                <strong>Status:</strong> <span class="badge bg-${alert.status === 'Active' ? 'success' : 'warning'}">${alert.status}</span> <br>
+                <strong>Time Left:</strong> <span class="text-muted">${alert.days_message}</span> <br>
+            </p>
+            <button class="btn btn-danger btn-sm unscheduleBtn" data-alert-id="${alert.id}">
+                <i class="bi bi-calendar-x"></i> Unschedule
+            </button>
+        </div>
+    </div>
+`;
+
+alertsList.appendChild(alertItem);
+
             });
 
             // Add event listeners for unschedule buttons

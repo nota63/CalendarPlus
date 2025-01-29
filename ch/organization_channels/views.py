@@ -2710,11 +2710,11 @@ def fetch_scheduled_alerts(request, org_id, channel_id):
 def unschedule_alert(request):
     if request.method == 'POST':
         try:
-            data = json.loads(request.body)  # Get the JSON data from the body
-            alert_id = data.get('alert_id')  # Access the alert_id from the JSON body
+            data = json.loads(request.body)  
+            alert_id = data.get('alert_id')  
             
             alert = AlertNotification.objects.get(id=alert_id)
-            alert.is_active = False  # Deactivate the alert
+            alert.is_active = False  
             alert.save()
             return JsonResponse({'status': 'success', 'message': 'Alert unscheduled successfully!'})
         except AlertNotification.DoesNotExist:
