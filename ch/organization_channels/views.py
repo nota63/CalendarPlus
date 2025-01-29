@@ -2622,18 +2622,13 @@ def schedule_alert(request, org_id, channel_id):
     if not user_profile:
         return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
 
-  
-
-    # Check if the user has permission to schedule in this channel
-    
     if request.method == 'POST':
         message = request.POST.get('message')
         schedule_type = request.POST.get('schedule_type')  
         schedule_value = request.POST.get('schedule_value') 
         schedule_days = None
         scheduled_for = None
-
-    
+        
         if schedule_type == 'after_days':
             try:
                 schedule_days = int(schedule_value)  
