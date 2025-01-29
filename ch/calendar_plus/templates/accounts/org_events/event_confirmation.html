@@ -1,356 +1,447 @@
-{% include 'header.html' %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Confirmation</title>
+    <title>Event Confirmation | Calendar+</title>
      <!-- Bootstrap 5 CSS -->
      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
 
 
-    <!-- Tailwind CSS via CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Slack Color Scheme -->
     <style>
-        /* .container {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
+        :root {
+            --slack-purple: #4A154B;
+            --slack-cyan: #36C5F0;
+            --slack-green: #2EB67D;
+            --slack-red: #E01E5A;
+            --slack-yellow: #ECB22E;
+            --slack-gray-1: #F4EDE4;
+            --slack-gray-2: #D3CDC3;
+            --slack-gray-3: #3F0E40;
         }
-
-        .section {
-            border: 1px solid #ccc;
-            padding: 20px;
-            margin: 10px;
-            width: 45%;
-        }
-
-        .button-container {
-            margin-top: 20px;
-        }
-
-        .copy-btn {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .copy-btn:hover {
-            background-color: #45a049;
-        }
-
-        FullCalendar styling */
-        #calendar {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-
-
-
-        /* General Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Roboto', sans-serif;
-}
-
-/* Body Styling */
-body {
-    background-color: #f9f9f9;
-    color: #333;
-    line-height: 1.6;
-    padding: 30px;
-}
-
-/* Container for page content */
-.container {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-/* General body styling */
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f7fc;
-    margin: 0;
-    padding: 0;
-    color: #333;
-}
-
-/* Main container */
-.container {
-    display: flex;
-    justify-content: space-between;
-    padding: 40px 50px;
-    gap: 30px;
-}
-
-/* Event details section styling */
-.section {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    padding: 30px;
-    width: 48%;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.section:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
-
-h3 {
-    font-size: 24px;
-    color: #2c3e50;
-    margin-bottom: 15px;
-}
-
-/* Button container and copy button */
-.button-container {
-    margin-top: 30px;
-}
-
-.copy-btn {
-    background-color: #1abc9c;
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    font-size: 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.copy-btn:hover {
-    background-color: #16a085;
-}
-
-.copy-btn:focus {
-    outline: none;
-}
-
-/* Event link styling */
-#event_link {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-bottom: 20px;
-    background-color: #f9f9f9;
-}
-
-/* FullCalendar styling */
-#calendar {
-    width: 100%;
-    max-width: 700px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Modal styling */
-.modal-content {
-    border-radius: 8px;
-}
-
-.modal-header {
-    background-color: #1abc9c;
-    color: white;
-    padding: 15px 25px;
-    border-radius: 8px 8px 0 0;
-}
-
-.modal-body {
-    padding: 30px;
-    background-color: #f9f9f9;
-}
-
-.close {
-    color: white;
-    font-size: 1.5em;
-}
-
-.close:hover,
-.close:focus {
-    color: #ddd;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-/* Form and input fields */
-.form-group label {
-    font-size: 16px;
-    color: #555;
-    margin-bottom: 5px;
-}
-
-.form-control {
-    padding: 10px 15px;
-    font-size: 16px;
-    border-radius: 5px;
-    width: 100%;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    transition: border-color 0.3s ease;
-}
-
-.form-control:focus {
-    border-color: #1abc9c;
-    outline: none;
-}
-
-/* Event Details Header */
-h1 {
-    font-size: 32px;
-    color: #2c3e50;
-    margin-top: 40px;
-    text-align: center;
-}
-
-/* Spacing adjustments */
-.container {
-    display: flex;
-    justify-content: space-between;
-    gap: 40px;
-    padding: 0 50px;
-}
-
-@media (max-width: 1024px) {
-    /* Responsiveness: Stacking sections on smaller screens */
-    .container {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .section {
-        width: 90%;
-        margin-bottom: 30px;
-    }
-
-    #calendar {
-        width: 90%;
-    }
-}
-
-@media (max-width: 768px) {
-    .button-container {
-        text-align: center;
-    }
-}
-
-/* Hover effects for the sections */
-.section:hover {
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    transform: translateY(-8px);
-}
-
-h3, p {
-    color: #444;
-}
-
-/* Add transition for event details */
-#event_link {
-    transition: background-color 0.3s ease;
-}
-
-#event_link:focus {
-    background-color: #eaf0f5;
-    border-color: #1abc9c;
-}
-
-
-/* Premium styling for the "Event Created Successfully!" text */
-.intro {
-    font-size: 36px; /* Reduced font size */
-    font-weight: bold;
-    background: linear-gradient(45deg, #ff6f91, #6a9fff); /* Pink to Light Blue gradient */
-    -webkit-background-clip: text;
-    color: transparent;
-    animation: fadeIn 1.5s ease-in-out;
-    text-align: center;
-    letter-spacing: 1px;
-    padding: 10px 0;
-    margin-top: 50px;
-}
-
-/* Smooth fade-in animation */
-@keyframes fadeIn {
-    0% {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-
     </style>
-    <!-- FullCalendar and jQuery dependencies -->
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@3.0.1/dist/fullcalendar.min.css" rel="stylesheet" />
+
+    <!-- Custom Slack-like Styles -->
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: var(--slack-gray-1);
+            color: var(--slack-gray-3);
+            line-height: 1.6;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Slack-like Headers */
+        h1, h2, h3 {
+            font-family: 'Lato', sans-serif;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+
+        .intro {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, var(--slack-purple), var(--slack-cyan));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+            margin: 2rem 0;
+            animation: textGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes textGlow {
+            0% { text-shadow: 0 0 10px rgba(74, 21, 75, 0.2); }
+            100% { text-shadow: 0 0 20px rgba(54, 197, 240, 0.3); }
+        }
+
+        /* Section Cards */
+        .slack-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border: 1px solid rgba(211, 205, 195, 0.2);
+        }
+
+        .slack-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        /* Slack-style Buttons */
+        .slack-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--slack-purple);
+            color: white !important;
+        }
+
+        .btn-primary:hover {
+            background: #3A1040;
+            transform: scale(1.02);
+        }
+
+        .btn-secondary {
+            background: var(--slack-cyan);
+            color: var(--slack-gray-3);
+        }
+
+        /* Input Fields */
+        .slack-input {
+            padding: 14px 20px;
+            border: 2px solid var(--slack-gray-2);
+            border-radius: 6px;
+            width: 100%;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .slack-input:focus {
+            border-color: var(--slack-cyan);
+            box-shadow: 0 0 0 3px rgba(54, 197, 240, 0.2);
+            outline: none;
+        }
+
+        /* Calendar Container */
+        .calendar-container {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Modal Styling */
+        .slack-modal .modal-header {
+            background: var(--slack-purple);
+            color: white;
+            border-radius: 12px 12px 0 0;
+            padding: 1.5rem;
+        }
+
+        .slack-modal .modal-title {
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .slack-modal .close {
+            color: white;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+        }
+
+        .slack-modal .close:hover {
+            opacity: 1;
+        }
+
+        /* Availability Slots */
+        .time-slot {
+            background: var(--slack-gray-1);
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin: 4px 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .time-slot:hover {
+            background: var(--slack-cyan);
+            color: white;
+        }
+
+        /* Progress Animation */
+        @keyframes slackProgress {
+            0% { transform: scaleX(0); opacity: 0.4; }
+            100% { transform: scaleX(1); opacity: 1; }
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: var(--slack-cyan);
+            animation: slackProgress 0.8s ease-out;
+            transform-origin: left;
+        }
+
+        /* Checkmark Animation */
+        .checkmark {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: block;
+            stroke-width: 2;
+            stroke: white;
+            stroke-miterlimit: 10;
+            margin-left: 8px;
+            animation: fillCheck 0.4s ease-in-out;
+        }
+
+        @keyframes fillCheck {
+            0% { transform: scale(0); }
+            90% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .intro {
+                font-size: 2rem;
+                padding: 0 1rem;
+            }
+
+            .slack-card {
+                padding: 1.5rem;
+                margin: 0.5rem 0;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+        }
+
+        /* Advanced Hover Effects */
+        .hover-scale {
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+
+        /* Gradient Overlay Effect */
+        .gradient-overlay {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gradient-overlay::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, 
+                rgba(74, 21, 75, 0.05) 0%,
+                rgba(54, 197, 240, 0.05) 100%);
+            pointer-events: none;
+        }
+
+        /* Slack-style Loading Spinner */
+        .slack-spinner {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 4px solid var(--slack-gray-2);
+            border-top-color: var(--slack-purple);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--slack-gray-1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--slack-gray-2);
+            border-radius: 4px;
+        }
+
+        /* Status Indicators */
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-active {
+            background: var(--slack-green);
+            box-shadow: 0 0 8px rgba(46, 182, 125, 0.3);
+        }
+
+        /* Avatar Styling */
+        .slack-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            background: var(--slack-cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Tag Styles */
+        .slack-tag {
+            background: var(--slack-gray-1);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            margin: 2px;
+        }
+
+        /* Complex Gradient Background */
+        .slack-bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.08;
+            background-image: 
+                linear-gradient(45deg, var(--slack-purple) 25%, transparent 25%),
+                linear-gradient(-45deg, var(--slack-cyan) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, var(--slack-green) 75%),
+                linear-gradient(-45deg, transparent 75%, var(--slack-yellow) 75%);
+            background-size: 100px 100px;
+            background-position: 0 0, 0 50px, 50px -50px, -50px 0px;
+        }
+    </style>
+
+    <!-- Additional Dependencies -->
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FullCalendar Dependencies -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@3.0.1/dist/fullcalendar.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@3.0.1/dist/fullcalendar.min.js"></script>
-    <!-- Bootstrap for modal styling -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
-
-    <h1 class="intro">Event Created Successfully!</h1>
-    <p class="fs-5 text-muted">
-        Now share the link with your invitees to book the event.
-        <strong class="d-block mt-3 fs-5 fw-semibold text-primary">
-            Only your workspace members can book this event.
-            <span class="fw-normal text-secondary">Calendar Plus prevents outside users from booking the event.</span>
-        </strong>
-    </p>
+    <div class="slack-bg-pattern"></div>
     
-    
-    <br>
-    
-    <div class="container">
-        <!-- Event Details Section -->
-        <div class="section">
-            <h3>Event Details</h3>
-            <p><strong>Event Name:</strong> {{ event.title }}</p>
-            <p><strong>Event Duration:</strong> {{ event.duration }} minutes</p>
-            <p><strong>Location:</strong> {{ event.location }}</p>
-            <!-- Edit Button -->
-            <button class="btn btn-primary" data-toggle="modal" data-target="#editEventModal">Edit Event</button>
-        </div>
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <!-- Header Section -->
+        <header class="text-center mb-12">
+            <h1 class="intro">Event Scheduled Successfully! 🎉</h1>
+            <div class="progress-bar"></div>
+        </header>
 
-        <!-- Host and Invitees Section -->
-        <div class="section">
-            <h3>Host & Invitees</h3>
-            <p><strong>Host:</strong> {{ event.user.username }}</p>
-            <p><strong>Event Type:</strong> {{ event.get_event_type_display }}</p>
-        </div>
-    </div>
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Event Details Card -->
+            <div class="slack-card gradient-overlay hover-scale">
+                <h3 class="text-2xl mb-4 font-bold text-slack-purple">
+                    <span class="status-indicator status-active"></span>
+                    Event Details
+                </h3>
+                <div class="space-y-3">
+                    <p class="flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-slack-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                        <strong>Title:</strong> {{ event.title }}
+                    </p>
+                    <p class="flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-slack-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <strong>Duration:</strong> {{ event.duration }} minutes
+                    </p>
+                    <p class="flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-slack-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        </svg>
+                        <strong>Location:</strong> {{ event.location }}
+                    </p>
+                </div>
+                <button class="slack-btn btn-primary mt-6 hover-scale">
+                    Edit Event
+                    <svg class="checkmark" viewBox="0 0 26 26">
+                        <path d="M5 13l5 5L21 7"/>
+                    </svg>
+                </button>
+            </div>
 
-    <div class="container">
-        <!-- Event Link Section -->
-        <div class="section">
-            <h3>Event Link</h3>
-            <p>Click below to copy the event link:</p>
-            <input type="text" id="event_link" value="{{ event_link }}" readonly style="width: 80%; padding: 10px;">
-            <div class="button-container">
-                <button class="copy-btn" onclick="copyLink()">Copy Event Link</button>
+            <!-- Host & Invitees Card -->
+            <div class="slack-card gradient-overlay hover-scale">
+                <h3 class="text-2xl mb-4 font-bold text-slack-purple">
+                    <span class="status-indicator status-active"></span>
+                    Team Details
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="slack-avatar">
+                            {{ event.user.username|first|upper }}
+                        </div>
+                        <div>
+                            <p class="font-semibold">{{ event.user.username }}</p>
+                            <p class="text-sm text-gray-600">Host</p>
+                        </div>
+                    </div>
+                    <div class="border-t pt-4">
+                        <p class="text-sm font-semibold mb-2">Event Type:</p>
+                        <div class="slack-tag">
+                            {{ event.get_event_type_display }}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
+        <!-- Event Link Card -->
+        <div class="slack-card gradient-overlay hover-scale mb-8">
+            <h3 class="text-2xl mb-4 font-bold text-slack-purple">
+                <span class="status-indicator status-active"></span>
+                Shareable Event Link
+            </h3>
+            <div class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
+                <input 
+                    type="text" 
+                    id="event_link" 
+                    value="{{ event_link }}" 
+                    readonly 
+                    class="slack-input flex-grow"
+                >
+                <button 
+                    onclick="copyLink()" 
+                    class="slack-btn btn-secondary hover-scale flex items-center justify-center"
+                >
+                    Copy Link
+                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                    </svg>
+                </button>
+            </div>
+            <p class="text-sm text-gray-600 mt-3">
+                Only visible to workspace members. External guests will need approval.
+            </p>
+        </div>
 
-    
 
     <!-- FullCalendar container -->
    
@@ -371,21 +462,21 @@ h3, p {
 </div>
     <!-- Modal for displaying availability slots -->
     <div class="modal fade" id="availabilityModal" tabindex="-1" role="dialog" aria-labelledby="availabilityModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="availabilityModalLabel">Availability for Selected Date</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body" id="availabilitySlots">
-            <!-- Slots will be dynamically loaded here -->
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="availabilityModalLabel">Availability for Selected Date</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body" id="availabilitySlots">
+              <!-- Slots will be dynamically loaded here -->
+            </div>
           </div>
         </div>
       </div>
-    </div>
-
+  
     <!-- Modal for Editing Event -->
     <div class="modal fade" id="editEventModal" tabindex="-1" role="dialog" aria-labelledby="editEventModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -433,6 +524,10 @@ h3, p {
         </div>
       </div>
     </div>
+
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
+
 
     <script>
         // Function to copy event link to clipboard
@@ -523,6 +618,7 @@ h3, p {
             });
         }
     </script>
+
 
 </body>
 </html>
