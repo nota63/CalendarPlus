@@ -5,155 +5,314 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Event • {{ organization.name }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
-        .fade-in {
-            animation: fadeIn 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
-        @keyframes fadeIn {
-            0% { opacity: 0; transform: translateY(8px); }
-            100% { opacity: 1; transform: translateY(0); }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
         }
-        .slack-input:focus {
-            box-shadow: 0 0 0 1px #4A154B;
+
+        .form-section {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .custom-radio:checked + label {
             border-color: #4A154B;
+            background-color: #F8F3F9;
+            box-shadow: 0 4px 6px -1px rgba(74, 21, 75, 0.1);
+        }
+
+        .custom-checkbox:checked {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+        }
+
+        .slack-focus:focus {
+            box-shadow: 0 0 0 3px rgba(74, 21, 75, 0.2);
+        }
+
+        .duration-option:hover .hover-scale {
+            transform: scale(1.02);
+        }
+
+        .location-card:hover img {
+            transform: scale(1.1);
         }
     </style>
 </head>
-<body class="bg-[#F8F8F8] font-sans">
-    <div class="max-w-3xl mx-auto p-5 mt-8 fade-in">
-        <div class="bg-white rounded-lg shadow-sm border border-[#E8E8E8]">
-            <div class="p-6 border-b border-[#E8E8E8]">
-                <h1 class="text-2xl font-bold text-[#1D1C1D]">Create New Event</h1>
-                <p class="text-[#616061] mt-1">For {{ organization.name }}</p>
+<body class="bg-gradient-to-br from-[#F9F5FA] to-[#F2EDF3] min-h-screen">
+    <div class="max-w-3xl mx-auto px-4 py-8">
+        <!-- Header Section -->
+        <div class="mb-8 text-center form-section">
+            <div class="animate-float inline-block">
+                <svg class="w-16 h-16 text-[#4A154B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+            </div>
+            <h1 class="mt-4 text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#4A154B] to-[#6C1D5E]">
+                Create New Event
+            </h1>
+            <p class="mt-2 text-[#616061] text-lg">For {{ organization.name }}</p>
+        </div>
+
+        <!-- Main Form Container -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden form-section">
+            <!-- Progress Indicator -->
+            <div class="h-1 bg-[#F3F1F3] relative">
+                <div class="h-full bg-[#4A154B] transition-all duration-500 ease-out" style="width: 33%" id="progressBar"></div>
             </div>
 
-            <form method="POST" class="space-y-6 p-6">
+            <form method="POST" class="space-y-8 p-8">
                 {% csrf_token %}
                 
-                <!-- Event Name -->
-                <div>
-                    <label class="block text-sm font-semibold text-[#1D1C1D] mb-2">Event Name</label>
-                    <input type="text" id="event_name" name="event_name" required onkeyup="updatePreview()"
-                           class="w-full px-4 py-2.5 text-[#1D1C1D] border border-[#DDDDDD] rounded-[4px] slack-input focus:ring-0 focus:shadow-none placeholder-[#9E9D9E]">
-                </div>
-
-                <!-- Duration -->
-                <div>
-                    <label class="block text-sm font-semibold text-[#1D1C1D] mb-3">Duration</label>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="flex items-center space-x-3 p-3 border border-[#DDDDDD] rounded-[4px] hover:border-[#B0ADB0]">
-                            <input type="radio" id="duration_15" name="duration" value="15" required 
-                                   class="h-4 w-4 text-[#4A154B] border-[#B0ADB0] focus:ring-[#4A154B]">
-                            <label for="duration_15" class="text-[#1D1C1D]">15 min</label>
-                        </div>
-                        <!-- Repeat similar structure for other durations -->
-                    </div>
-                    <div class="mt-4">
-                        <input type="number" id="custom_duration" name="custom_duration" min="1" 
-                               class="w-full px-4 py-2.5 text-[#1D1C1D] border border-[#DDDDDD] rounded-[4px] slack-input placeholder-[#9E9D9E]"
-                               placeholder="Custom duration (minutes)">
-                    </div>
-                </div>
-
-                <!-- Location -->
-                <div>
-                    <label class="block text-sm font-semibold text-[#1D1C1D] mb-3">Location</label>
-                    <div class="grid grid-cols-2 gap-3">
-                        {% for location in locations %}
-                        <div class="relative">
-                            <input type="radio" id="{{ location.0 }}" name="location" value="{{ location.0 }}" required 
-                                   class="absolute opacity-0 peer">
-                            <label for="{{ location.0 }}" class="block p-4 border border-[#DDDDDD] rounded-[4px] hover:border-[#B0ADB0] peer-checked:border-[#4A154B] peer-checked:bg-[#F8F3F9]">
-                                <div class="flex items-center space-x-3">
-                                    <img src="{{ location.2 }}" alt="{{ location.1 }}" class="w-10 h-10 rounded-full">
-                                    <span class="text-[#1D1C1D]">{{ location.1 }}</span>
-                                </div>
-                            </label>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <!-- Description -->
-                <div>
-                    <label class="block text-sm font-semibold text-[#1D1C1D] mb-2">Description</label>
-                    <textarea id="description" name="description" rows="4"
-                              class="w-full px-4 py-2.5 text-[#1D1C1D] border border-[#DDDDDD] rounded-[4px] slack-input placeholder-[#9E9D9E]"></textarea>
-                </div>
-
-                <!-- Options -->
-                <div class="space-y-4">
+                <!-- Event Name Section -->
+                <div class="form-section space-y-4">
                     <div class="flex items-center space-x-3">
-                        <input type="checkbox" id="is_recurring" name="is_recurring"
-                               class="h-4 w-4 text-[#4A154B] border-[#B0ADB0] rounded-[3px] focus:ring-[#4A154B]">
-                        <label for="is_recurring" class="text-[#1D1C1D]">Recurring event</label>
+                        <div class="w-8 h-8 bg-[#4A154B] rounded-full flex items-center justify-center text-white">1</div>
+                        <h2 class="text-xl font-semibold text-[#1D1C1D]">Event Details</h2>
                     </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-[#1D1C1D] mb-2">Buffer Time (minutes)</label>
-                        <input type="number" id="buffer_time" name="buffer_time" value="0"
-                               class="w-full px-4 py-2.5 text-[#1D1C1D] border border-[#DDDDDD] rounded-[4px] slack-input placeholder-[#9E9D9E]">
+                    
+                    <div class="space-y-4 pl-11">
+                        <div>
+                            <label class="block text-sm font-medium text-[#1D1C1D] mb-2">Event Name</label>
+                            <input type="text" id="event_name" name="event_name" required
+                                   class="w-full px-4 py-3 text-[#1D1C1D] border-2 border-[#E8E8E8] rounded-lg slack-focus 
+                                          transition-all duration-200 ease-out hover:border-[#B0ADB0] 
+                                          placeholder-[#9E9D9E]">
+                        </div>
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-[#4A154B] text-white py-3 rounded-[4px] font-semibold hover:bg-[#3A0E3B] focus:outline-none focus:shadow-[0_0_0_2px_white,0_0_0_4px_#4A154B]">
-                    Create Event
-                </button>
+                <!-- Duration Section -->
+                <div class="form-section space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-[#4A154B] rounded-full flex items-center justify-center text-white">2</div>
+                        <h2 class="text-xl font-semibold text-[#1D1C1D]">Duration</h2>
+                    </div>
+
+                    <div class="space-y-4 pl-11">
+                        <div class="grid grid-cols-2 gap-4">
+                        </div>
+
+                          <!-- Duration -->
+            <div class="flex flex-col">
+                <label for="duration" class="text-gray-700 text-lg font-semibold mb-2">Duration:</label>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                    <div class="flex items-center">
+                        <input type="radio" id="duration_15" name="duration" value="15" required class="h-5 w-5 text-indigo-500 focus:ring-indigo-500">
+                        <label for="duration_15" class="ml-2 text-gray-600 text-lg">15 minutes</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="radio" id="duration_30" name="duration" value="30" class="h-5 w-5 text-indigo-500 focus:ring-indigo-500">
+                        <label for="duration_30" class="ml-2 text-gray-600 text-lg">30 minutes</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="radio" id="duration_45" name="duration" value="45" class="h-5 w-5 text-indigo-500 focus:ring-indigo-500">
+                        <label for="duration_45" class="ml-2 text-gray-600 text-lg">45 minutes</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="radio" id="duration_60" name="duration" value="60" class="h-5 w-5 text-indigo-500 focus:ring-indigo-500">
+                        <label for="duration_60" class="ml-2 text-gray-600 text-lg">60 minutes</label>
+                    </div>
+                </div>
+            </div>
+
+
+
+                        <!-- Custom Duration -->
+                        <div class="relative">
+                            <input type="number" id="custom_duration" name="custom_duration" min="1" 
+                                   class="w-full px-4 py-3 text-[#1D1C1D] border-2 border-[#E8E8E8] rounded-lg 
+                                          slack-focus placeholder-[#9E9D9E] transition-all duration-200 ease-out
+                                          hover:border-[#B0ADB0]">
+                            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[#9E9D9E]">minutes</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location Section -->
+                <div class="form-section space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-[#4A154B] rounded-full flex items-center justify-center text-white">3</div>
+                        <h2 class="text-xl font-semibold text-[#1D1C1D]">Location</h2>
+                    </div>
+
+                    <div class="space-y-4 pl-11">
+                        <div class="grid grid-cols-2 gap-4">
+                            {% for location in locations %}
+                            <div class="location-card relative">
+                                <input type="radio" id="{{ location.0 }}" name="location" value="{{ location.0 }}" 
+                                       class="custom-radio absolute opacity-0 w-0 h-0">
+                                <label for="{{ location.0 }}" 
+                                       class="block p-4 border-2 border-[#E8E8E8] rounded-lg cursor-pointer 
+                                              transition-all duration-200 ease-out hover:border-[#B0ADB0]">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="relative">
+                                            <img src="{{ location.2 }}" alt="{{ location.1 }}" 
+                                                 class="w-12 h-12 rounded-full transition-transform duration-200">
+                                        </div>
+                                        <div>
+                                            <p class="text-[#1D1C1D] font-medium">{{ location.1 }}</p>
+                                            <p class="text-sm text-[#616061] mt-1">{{ location.3 }}</p>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Options -->
+                <div class="form-section space-y-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-[#4A154B] rounded-full flex items-center justify-center text-white">4</div>
+                        <h2 class="text-xl font-semibold text-[#1D1C1D]">Advanced Options</h2>
+                    </div>
+
+                    <div class="space-y-4 pl-11">
+                        <!-- Recurring Event -->
+                        <div class="flex items-center space-x-3 p-4 border-2 border-[#E8E8E8] rounded-lg">
+                            <input type="checkbox" id="is_recurring" name="is_recurring"
+                                   class="custom-checkbox w-5 h-5 border-2 border-[#B0ADB0] rounded-md 
+                                          focus:ring-0 checked:bg-[#4A154B] checked:border-[#4A154B] 
+                                          transition-colors duration-200">
+                            <label for="is_recurring" class="text-[#1D1C1D] font-medium">Recurring Event</label>
+                        </div>
+
+                        <!-- Buffer Time -->
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-[#1D1C1D]">Buffer Time</label>
+                            <div class="relative">
+                                <input type="number" id="buffer_time" name="buffer_time" value="0"
+                                       class="w-full px-4 py-3 text-[#1D1C1D] border-2 border-[#E8E8E8] rounded-lg 
+                                              slack-focus placeholder-[#9E9D9E] transition-all duration-200 
+                                              ease-out hover:border-[#B0ADB0]">
+                                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[#9E9D9E]">minutes</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="form-section pt-6">
+                    <button type="submit" 
+                            class="w-full bg-[#4A154B] text-white py-4 rounded-lg font-semibold 
+                                   transition-all duration-200 ease-out hover:bg-[#3A0E3B] 
+                                   hover:shadow-lg hover:transform hover:scale-[1.02] 
+                                   focus:outline-none focus:ring-4 focus:ring-[#4A154B]/50">
+                        Create Event
+                    </button>
+                </div>
             </form>
         </div>
 
-        <!-- Preview -->
-        <div class="mt-6 bg-white rounded-lg border border-[#E8E8E8] p-5">
-            <h3 class="text-sm font-semibold text-[#616061] mb-4">PREVIEW</h3>
-            <div class="space-y-2">
-                <p class="text-[#1D1C1D]"><span class="text-[#616061]">Event:</span> <span id="event_name_preview" class="font-medium">-</span></p>
-                <p class="text-[#1D1C1D]"><span class="text-[#616061]">Where:</span> <span id="location_preview" class="font-medium">-</span></p>
-                <p class="text-[#1D1C1D]"><span class="text-[#616061]">Duration:</span> <span id="duration_preview" class="font-medium">-</span></p>
+        <!-- Preview Section -->
+        <div class="mt-8 bg-white rounded-2xl shadow-xl overflow-hidden form-section">
+            <div class="p-6 bg-[#F8F3F9] border-b-2 border-[#E8E8E8]">
+                <h3 class="text-lg font-semibold text-[#4A154B]">Live Preview</h3>
+            </div>
+            <div class="p-6 space-y-4" id="livePreview">
+                <div class="preview-item">
+                    <p class="text-sm text-[#616061]">Event Name:</p>
+                    <p class="text-[#1D1C1D] font-medium" id="eventNamePreview">-</p>
+                </div>
+                <div class="preview-item">
+                    <p class="text-sm text-[#616061]">Duration:</p>
+                    <p class="text-[#1D1C1D] font-medium" id="durationPreview">-</p>
+                </div>
+                <div class="preview-item">
+                    <p class="text-sm text-[#616061]">Location:</p>
+                    <p class="text-[#1D1C1D] font-medium" id="locationPreview">-</p>
+                </div>
             </div>
         </div>
     </div>
 
-
     <script>
-        // Function to update the live preview
-        function updatePreview() {
-            var eventName = document.getElementById("event_name").value;
-            document.getElementById("event_name_preview").textContent = eventName;
+        
+        // Live Preview Updates
+        function updateLivePreview() {
+            const eventName = document.getElementById('event_name').value || '-';
+            const duration = document.querySelector('input[name="duration"]:checked')?.value || 
+                            document.getElementById('custom_duration').value || '-';
+            const location = document.querySelector('input[name="location"]:checked')?.nextElementSibling?.querySelector('p').innerText || '-';
+
+            gsap.to("#livePreview .preview-item", {
+                duration: 0.3,
+                opacity: 0,
+                y: 10,
+                stagger: 0.1,
+                onComplete: () => {
+                    document.getElementById('eventNamePreview').textContent = eventName;
+                    document.getElementById('durationPreview').textContent = duration + (duration !== '-' ? ' min' : '');
+                    document.getElementById('locationPreview').textContent = location;
+                    
+                    gsap.to("#livePreview .preview-item", {
+                        duration: 0.3,
+                        opacity: 1,
+                        y: 0,
+                        stagger: 0.1
+                    });
+                }
+            });
         }
 
-        // Function to update location preview
-        function updateLocation(location) {
-            document.getElementById("location_preview").textContent = location;
+        // Event Listeners
+        document.querySelectorAll('input, textarea, select').forEach(el => {
+            el.addEventListener('input', updateLivePreview);
+            el.addEventListener('change', updateLivePreview);
+        });
+
+        // Progress Bar Animation
+        function updateProgress() {
+            const filledSections = document.querySelectorAll('.form-section:not(:empty)').length;
+            const progress = (filledSections / 4) * 100;
+            gsap.to("#progressBar", {
+                duration: 0.5,
+                width: `${progress}%`,
+                ease: "power2.out"
+            });
         }
 
-        // Function to update duration preview
-        document.querySelectorAll('input[name="duration"]').forEach(function (radio) {
-            radio.addEventListener('change', function () {
-                var duration = document.querySelector('input[name="duration"]:checked');
-                document.getElementById("duration_preview").textContent = duration ? duration.value + ' minutes' : 'N/A';
+        // Initial call to set progress
+        updateProgress();
 
-                // When a predefined duration is selected, clear the custom duration input
-                document.getElementById("custom_duration").value = '';
+        // Intersection Observer for form sections
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    gsap.to(entry.target, {
+                        duration: 0.6,
+                        opacity: 1,
+                        y: 0,
+                        ease: "power2.out"
+                    });
+                    updateProgress();
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.form-section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Custom Radio/Checkbox Interactions
+        document.querySelectorAll('.custom-radio, .custom-checkbox').forEach(el => {
+            el.addEventListener('change', () => {
+                const label = el.nextElementSibling;
+                gsap.from(label, {
+                    duration: 0.3,
+                    scale: 0.98,
+                    backgroundColor: '#F8F3F9',
+                    ease: "power2.out"
+                });
             });
         });
-
-        // Function to handle custom duration input
-        document.getElementById("custom_duration").addEventListener('input', function () {
-            var customDuration = document.getElementById("custom_duration").value;
-            if (customDuration) {
-                document.getElementById("duration_preview").textContent = customDuration + ' minutes';
-
-                // When custom duration is entered, uncheck the predefined duration
-                document.querySelectorAll('input[name="duration"]').forEach(function (radio) {
-                    radio.checked = false;
-                });
-            }
-        });
-
-        // Update the preview as user types
-        updatePreview();
     </script>
-
-
-    <!-- Original JavaScript preserved here -->
 </body>
 </html>
