@@ -2667,8 +2667,19 @@ def schedule_alert(request, org_id, channel_id):
 
 # MANAGE SCHEDULED ALERTS
 
-
 def fetch_scheduled_alerts(request, org_id, channel_id):
+
+    organization=get_object_or_404(Organization,id=org_id)
+    channel=get_object_or_404(Channel,id=channel_id)
+
+    if channel.created_by != request.user:
+            return JsonResponse({"success": False, "error": "You are not authorized to perform this action!."}, status=403)
+      
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+
     
     alerts = AlertNotification.objects.filter(
         organization_id=org_id,
@@ -2714,6 +2725,13 @@ def unschedule_alert(request):
             alert_id = data.get('alert_id')  
             
             alert = AlertNotification.objects.get(id=alert_id)
+            if alert.channel.created_by != request.user:
+                return JsonResponse({"success": False, "error": "You are not authorized to perform this action!."}, status=403)
+            
+            user_profile = Profile.objects.filter(user=request.user, organization=alert.organization).first()
+            if not user_profile:
+                  return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
             alert.is_active = False  
             alert.save()
             return JsonResponse({'status': 'success', 'message': 'Alert unscheduled successfully!'})
