@@ -4,203 +4,317 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Organization Members</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
     <style>
-        /* General Styles */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --secondary: #9333EA;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
+
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f4f6f9;
-            color: #333;
-            margin: 0;
-            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: #F8FAFC;
         }
 
-        header {
-            text-align: center;
-            padding: 3rem;
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
-            color: white;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
         }
 
-        header h1 {
-            font-size: 3rem;
-            font-weight: 700;
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
-        header p {
-            font-size: 1.25rem;
-            margin-top: 1rem;
-        }
-
-        section.container {
-            margin: 2rem auto;
-            max-width: 1100px;
-            text-align: center;
-        }
-
-        section.container p {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: #555;
-        }
-
-        table.table {
-            margin-top: 3rem;
-            border-collapse: separate;
-            border-spacing: 0;
-            width: 100%;
-            background-color: #fff;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        table.table th {
-            font-weight: 700;
-            background-color: #2575fc;
-            color: #fff;
-            padding: 1rem;
-            text-transform: uppercase;
-        }
-
-        table.table td {
-            padding: 1.2rem;
-            text-align: center;
-            vertical-align: middle;
-            color: #444;
-        }
-
-        table.table tbody tr {
-            transition: background-color 0.3s ease;
-        }
-
-        table.table tbody tr:hover {
-            background-color: #f9f9f9;
-        }
-
-        .badge-admin {
-            background-color: #ff4d4d;
-            color: white;
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-            border-radius: 20px;
-        }
-
-        .badge-manager {
-            background-color: #ffc107;
-            color: black;
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-            border-radius: 20px;
-        }
-
-        .badge-employee {
-            background-color: #17a2b8;
-            color: white;
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-            border-radius: 20px;
-        }
-
-        .btn-primary {
-            background-color: #2575fc;
-            border-color: #2575fc;
-            color: #fff;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             transition: all 0.3s ease;
         }
 
-        .btn-primary:hover {
-            background-color: #0056d2;
-            border-color: #0056d2;
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
 
-        /* Responsive Styles */
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 2rem;
-            }
-
-            header p {
-                font-size: 1rem;
-            }
-
-            table.table th, table.table td {
-                font-size: 0.9rem;
-                padding: 0.8rem;
-            }
-
-            .btn-primary {
-                font-size: 0.85rem;
-            }
+        .member-row {
+            transition: all 0.3s ease;
         }
 
-        @media (max-width: 480px) {
-            table.table th, table.table td {
-                font-size: 0.8rem;
-                padding: 0.6rem;
-            }
+        .member-row:hover {
+            background: rgba(79, 70, 229, 0.05);
+            transform: translateX(4px);
+        }
 
-            .badge-admin, .badge-manager, .badge-employee {
-                padding: 0.3rem 0.7rem;
-                font-size: 0.8rem;
-            }
+        .badge {
+            @apply px-4 py-1.5 rounded-full text-sm font-medium;
+            transition: all 0.3s ease;
+        }
+
+        .badge:hover {
+            transform: scale(1.05);
+        }
+
+        .badge-admin {
+            @apply bg-red-100 text-red-600;
+        }
+
+        .badge-manager {
+            @apply bg-amber-100 text-amber-600;
+        }
+
+        .badge-employee {
+            @apply bg-blue-100 text-blue-600;
+        }
+
+        .view-btn {
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .view-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+
+        .stats-card {
+            @apply p-6 rounded-2xl;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-input {
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            @apply ring-2 ring-indigo-500 ring-offset-2;
+            transform: translateY(-1px);
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .notification {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 50;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen bg-gray-50">
+    <!-- Header Section -->
+    <header class="gradient-bg text-white py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 opacity-90"></div>
+        <div class="relative max-w-7xl mx-auto">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold mb-4 animate__animated animate__fadeInDown">
+                    Welcome Back, {{request.user}}
+                </h1>
+                <p class="text-xl text-indigo-100 animate__animated animate__fadeInUp">
+                    Manage your workspace members with ease and efficiency
+                </p>
+            </div>
+        </div>
+        <!-- Decorative Elements -->
+        <div class="absolute top-0 left-0 w-32 h-32 bg-white opacity-10 rounded-full -translate-x-16 -translate-y-16"></div>
+        <div class="absolute bottom-0 right-0 w-40 h-40 bg-white opacity-10 rounded-full translate-x-20 translate-y-20"></div>
+    </header>
 
-<header>
-    <h1>Welcome Back, {{request.user}}</h1>
-    <p>Manage, view, and track your workspace members efficiently</p>
-</header>
+    <!-- Stats Section -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="stats-card bg-white">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-indigo-100">
+                        <i class="ri-team-line text-2xl text-indigo-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">Total Members</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ profiles|length }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="stats-card bg-white">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-100">
+                        <i class="ri-building-line text-2xl text-purple-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">Organization</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ organization.name }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="stats-card bg-white">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100">
+                        <i class="ri-calendar-check-line text-2xl text-green-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-500">Active Calendars</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ profiles|length }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<section class="container">
-    <p>
-        Seamlessly manage your workspace members' availability and schedules with Calendar Plus. 
-        Our powerful and user-friendly interface ensures that scheduling meetings is effortless, 
-        while keeping your team aligned.
-    </p>
-</section>
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Search Bar -->
+        <div class="mb-8">
+            <div class="relative">
+                <input type="text" 
+                       id="searchInput" 
+                       class="search-input w-full px-6 py-4 rounded-xl bg-white border-gray-200 focus:outline-none"
+                       placeholder="Search members...">
+                <i class="ri-search-line absolute right-6 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            </div>
+        </div>
 
-<div class="container mt-5">
-    <h1 class="text-center">Members of {{ organization.name }}</h1>
+        <!-- Members Table -->
+        <div class="card rounded-2xl overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="text-left bg-gray-50">
+                            <th class="px-6 py-4 text-sm font-semibold text-gray-600">Member</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-gray-600">Role</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-gray-600">Status</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-gray-600">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for profile in profiles %}
+                        <tr class="member-row border-t border-gray-100">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                                        <span class="text-indigo-600 font-medium">{{ profile.user.username|make_list|first|upper }}</span>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm font-medium text-gray-900">{{ profile.user.username }}</p>
+                                        <p class="text-sm text-gray-500">{{ profile.user.email }}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                {% if profile.is_admin %}
+                                    <span class="badge badge-admin">
+                                        <i class="ri-shield-star-line mr-1"></i> Admin
+                                    </span>
+                                {% elif profile.is_manager %}
+                                    <span class="badge badge-manager">
+                                        <i class="ri-user-star-line mr-1"></i> Manager
+                                    </span>
+                                {% elif profile.is_employee %}
+                                    <span class="badge badge-employee">
+                                        <i class="ri-user-line mr-1"></i> Employee
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-gray-100 text-gray-600">
+                                        <i class="ri-question-line mr-1"></i> Unknown
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-green-600 mr-1.5"></span>
+                                    Active
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <a href="{% url 'user_calendar' user_id=profile.user.id org_id=organization.id %}" 
+                                   class="view-btn inline-flex items-center px-4 py-2 rounded-lg text-white text-sm font-medium">
+                                    <i class="ri-calendar-line mr-2"></i>
+                                    View Calendar
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Full Name</th>
-                <th>Role</th>
-                <th>Calendar</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for profile in profiles %}
-            <tr>
-                <td>{{ profile.user.username }}</td>
-                <td>
-                    {% if profile.is_admin %}
-                        <span class="badge badge-admin">Admin</span>
-                    {% elif profile.is_manager %}
-                        <span class="badge badge-manager">Manager</span>
-                    {% elif profile.is_employee %}
-                        <span class="badge badge-employee">Employee</span>
-                    {% else %}
-                        <span class="badge bg-secondary">Unknown Role</span>
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{% url 'user_calendar' user_id=profile.user.id org_id=organization.id %}" class="btn btn-primary">View Calendar</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+    <!-- Notification -->
+    <div class="notification bg-white rounded-lg shadow-lg p-4" id="notification">
+        <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                <i class="ri-check-line text-green-500"></i>
+            </div>
+            <div>
+                <h4 class="font-medium text-gray-900">Success!</h4>
+                <p class="text-sm text-gray-600">Member status updated successfully.</p>
+            </div>
+        </div>
+    </div>
 
+    <script>
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.member-row');
+            
+            rows.forEach(row => {
+                const name = row.querySelector('.text-gray-900').textContent.toLowerCase();
+                const email = row.querySelector('.text-gray-500').textContent.toLowerCase();
+                
+                if (name.includes(searchTerm) || email.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Notification function
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Add animations to table rows
+        document.querySelectorAll('.member-row').forEach((row, index) => {
+            row.classList.add('animate__animated', 'animate__fadeInUp');
+            row.style.animationDelay = `${index * 0.1}s`;
+        });
+    </script>
 </body>
 </html>
