@@ -2628,7 +2628,7 @@ def schedule_alert(request, org_id, channel_id):
         schedule_value = request.POST.get('schedule_value') 
         schedule_days = None
         scheduled_for = None
-        
+
         if schedule_type == 'after_days':
             try:
                 schedule_days = int(schedule_value)  
@@ -2664,3 +2664,61 @@ def schedule_alert(request, org_id, channel_id):
 
 
 
+
+# MANAGE SCHEDULED ALERTS
+
+
+def fetch_scheduled_alerts(request, org_id, channel_id):
+    
+    alerts = AlertNotification.objects.filter(
+        organization_id=org_id,
+        channel_id=channel_id,
+        scheduled_for__isnull=False, 
+        is_active=True 
+    )
+
+    # Prepare alerts data
+    alerts_data = []
+    for alert in alerts:
+    
+        time_diff = alert.scheduled_for - timezone.now()
+        days_left = time_diff.days
+
+       
+        if days_left > 0:
+            days_message = f"This alert will be sent in {days_left} day{'s' if days_left > 1 else ''}."
+        elif days_left == 0:
+            days_message = "This alert will be sent today."
+        else:
+            days_message = f"This alert was scheduled to be sent {abs(days_left)} day{'s' if abs(days_left) > 1 else ''} ago."
+
+        alerts_data.append({
+            'id': alert.id,
+            'message': alert.message,
+            'scheduled_for': alert.scheduled_for,
+            'schedule_type': alert.get_schedule_type_display(),
+            'schedule_days': alert.schedule_days,
+            'status': 'Active' if alert.is_active else 'Unschedulled',
+            'days_message': days_message, 
+        })
+
+    return JsonResponse({'alerts': alerts_data})
+
+
+# Unschedule Alert
+@csrf_exempt  
+def unschedule_alert(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)  # Get the JSON data from the body
+            alert_id = data.get('alert_id')  # Access the alert_id from the JSON body
+            
+            alert = AlertNotification.objects.get(id=alert_id)
+            alert.is_active = False  # Deactivate the alert
+            alert.save()
+            return JsonResponse({'status': 'success', 'message': 'Alert unscheduled successfully!'})
+        except AlertNotification.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Alert not found.'})
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON data.'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})

@@ -1178,6 +1178,26 @@
     </div>
 </div>
 
+<!-- UnscheduleModal -->
+<div class="modal fade" id="UnscheduleModal" tabindex="-1" aria-labelledby="UnscheduleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="UnscheduleModalLabel">Scheduled Alerts</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- List of scheduled alerts will be loaded here -->
+                <ul id="unscheduleAlertsList" class="list-group">
+                    <li class="list-group-item">Loading scheduled alerts...</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -1377,6 +1397,23 @@ data-bs-target="#userSelectionModal">
         </svg>
         <span class="font-medium text-blue-600/90">Schedule Alert</span>
     </button>
+
+
+    <!-- Button to trigger UnscheduleModal -->
+<button 
+class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200"
+id="unscheduleBtn"
+data-channel-id="{{channel.id}}"
+data-org-id="{{channel.organization.id}}"
+data-bs-toggle="modal"
+data-bs-target="#UnscheduleModal">
+<svg class="w-5 h-5 mr-3 text-blue-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405M19 13V9a7 7 0 10-14 0v4M9 21h6" />
+</svg>
+<span class="font-medium text-blue-600/90">View Scheduled Alerts</span>
+</button>
+
+
 </div>
 
 
@@ -2188,6 +2225,75 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+
+
+
+// HANDLE UNSCHEDULING ALERTS
+// JavaScript to handle fetching scheduled alerts and unscheduling them without jQuery
+document.getElementById('unscheduleBtn').addEventListener('click', function () {
+    const channelId = this.getAttribute('data-channel-id');
+    const orgId = this.getAttribute('data-org-id');
+
+    // Fetch scheduled alerts
+    fetch(`/channels/fetch_scheduled_alerts/${orgId}/${channelId}/`)
+        .then(response => response.json())
+        .then(data => {
+            const alertsList = document.getElementById('unscheduleAlertsList');
+            alertsList.innerHTML = ''; // Clear any previous data
+            data.alerts.forEach(alert => {
+                const alertItem = document.createElement('li');
+                alertItem.classList.add('list-group-item');
+                alertItem.innerHTML = `
+                    <strong>Message:</strong> ${alert.message} <br>
+                    <strong>Scheduled for:</strong> ${alert.scheduled_for} <br>
+                    <strong>Schedule Type:</strong> ${alert.schedule_type} <br>
+                    <strong>Schedule Days:</strong> ${alert.schedule_days} <br>
+                    <strong>Status:</strong> ${alert.status} <br>
+                    <strong>Time Left:</strong> ${alert.days_message} <br>
+                    <button class="btn btn-danger btn-sm unscheduleBtn" data-alert-id="${alert.id}">Unschedule</button>
+                `;
+                alertsList.appendChild(alertItem);
+            });
+
+            // Add event listeners for unschedule buttons
+            const unscheduleBtns = document.querySelectorAll('.unscheduleBtn');
+            unscheduleBtns.forEach(button => {
+                button.addEventListener('click', function () {
+                    const alertId = this.getAttribute('data-alert-id');
+                    unscheduleAlert(alertId);
+                });
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching scheduled alerts:', error);
+        });
+});
+
+// Function to handle unscheduling alert
+function unscheduleAlert(alertId) {
+    fetch(`/channels/unschedule_alert/`, {
+        method: 'POST',
+        body: JSON.stringify({ alert_id: alertId }),
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert('Alert unscheduled successfully!');
+            location.reload();  // Reload to reflect the changes
+        } else {
+            alert('Error unscheduling alert: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error unscheduling alert:', error);
+    });
+}
+
+
 
     </script>
 </body>
