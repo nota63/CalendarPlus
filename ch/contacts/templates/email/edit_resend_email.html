@@ -1,79 +1,184 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit and Resend Email</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary-color: #4A154B;
+            --primary-hover: #611f5d;
+            --success-color: #007a5a;
+            --success-hover: #006c4f;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #F8F9FA;
+        }
+        
+        .compose-area {
+            border: 2px solid #E9EEF2;
+            transition: border-color 0.2s ease;
+        }
+        
+        .compose-area:focus-within {
+            border-color: var(--primary-color);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #4A154B 0%, #9D5BD2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .send-button {
+            background: var(--success-color);
+            transition: all 0.2s ease;
+        }
+        
+        .send-button:hover {
+            background: var(--success-hover);
+            transform: translateY(-1px);
+        }
+    </style>
 </head>
 
-<body class="bg-gray-100">
-
-    <div class="container mx-auto p-8">
+<body class="min-h-screen py-8">
+    <div class="max-w-4xl mx-auto px-4">
         <!-- Header Section -->
-        <div class="text-center mb-8">
-            <h2 class="text-3xl font-semibold text-green-600">Edit and Resend Email</h2>
-            <p class="text-xl text-gray-600 mt-2">Edit the email details and resend to the recipient.</p>
-        </div>
-
-        <!-- Organization Info -->
-        <div class="mb-6 bg-white p-6 shadow-md rounded-lg">
-            <h3 class="text-2xl font-medium text-gray-700">Organization: <span class="text-green-600">{{ form.instance.organization.name }}</span></h3>
+        <div class="bg-white rounded-2xl shadow-sm p-8 mb-4 animate__animated animate__fadeIn">
+            <div class="flex items-center justify-between mb-6">
+                <div class="p-3 bg-white shadow-sm rounded border border-light d-flex flex-column">
+                    <h1 class="text-2xl font-bold text-gray-900">✏️ Edit & Resend Email</h1>
+                    <p class="mt-2 text-gray-600">
+                        <span class="font-medium text-gray-900">Organization:</span>
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">{{ form.instance.organization.name }}</span>
+                    </p>
+                </div>
+            </div>
         </div>
 
         <!-- Original Email Details -->
-        <div class="bg-white p-6 shadow-md rounded-lg mb-6">
-            <p class="font-semibold text-lg text-gray-800 mb-4">Original Email Details:</p>
-            <div class="mb-4">
-                <strong>Sender:</strong> {{ form.instance.sender.username }} ({{ form.instance.sender.email }})
-            </div>
-            <div class="mb-4">
-                <strong>Original Recipient:</strong> {{ form.instance.participant.username }} ({{ form.instance.participant.email }})
-            </div>
-            <div class="mb-4">
-                <strong>Message:</strong>
-                <textarea class="w-full p-4 border rounded-md mt-2" rows="6" readonly>{{ form.instance.message }}</textarea>
-            </div>
-            <div class="mb-4">
-                <strong>Sent At:</strong> {{ form.instance.sent_at|date:"Y-m-d H:i:s" }}
-            </div>
-            <div class="mb-4">
-                <strong>Status:</strong> {{ form.instance.get_status_display }}
+        <div class="bg-white rounded-2xl shadow-sm p-8 mb-4 animate__animated animate__fadeInUp animate__delay-1s">
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-semibold text-gray-900">Original Email Details</h2>
+                    <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">
+                        {{ form.instance.get_status_display }}
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <p class="text-sm text-gray-500">From</p>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                                <span class="text-purple-800 font-medium">{{ form.instance.sender.username|slice:":1" }}</span>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">{{ form.instance.sender.username }}</p>
+                                <p class="text-sm text-gray-500">{{ form.instance.sender.email }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <p class="text-sm text-gray-500">To</p>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                <span class="text-green-800 font-medium">{{ form.instance.participant.username|slice:":1" }}</span>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">{{ form.instance.participant.username }}</p>
+                                <p class="text-sm text-gray-500">{{ form.instance.participant.email }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="text-sm text-gray-500 mb-2">Original Message</p>
+                    <div class="bg-gray-50 rounded-xl p-4">
+                        <p class="text-gray-700 whitespace-pre-wrap">{{ form.instance.message }}</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-2 text-sm text-gray-500">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span>Sent on {{ form.instance.sent_at|date:"F j, Y" }} at {{ form.instance.sent_at|date:"H:i" }}</span>
+                </div>
             </div>
         </div>
 
-        <!-- Form for Editing and Resending Email -->
-        <div class="bg-white p-6 shadow-md rounded-lg">
+        <!-- Edit Form -->
+        <div class="bg-white rounded-2xl shadow-sm p-8 animate__animated animate__fadeInUp animate__delay-2s">
             <form method="POST" class="space-y-6">
                 {% csrf_token %}
-                <!-- Edit Message Field -->
-                <div>
-                    <label for="message" class="block text-lg font-medium text-gray-700">Edit Message:</label>
-                    <textarea id="message" name="message" class="w-full p-4 border rounded-md mt-2" rows="6">{{ form.message.value }}</textarea>
+                
+                <div class="compose-area rounded-xl overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-2 border-b border-gray-200">
+                        <div class="flex items-center space-x-4">
+                            <button type="button" class="text-gray-500 hover:text-gray-700" disabled>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </button>
+                            <button type="button" class="text-gray-500 hover:text-gray-700" disabled>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                </svg>
+                            </button>
+                            <button type="button" class="text-gray-500 hover:text-gray-700" disabled>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <textarea 
+                        id="message" 
+                        name="message" 
+                        rows="8"
+                        class="w-full p-4 text-gray-800 focus:outline-none" 
+                        placeholder="Edit your message here..."
+                    >{{ form.message.value }}</textarea>
                 </div>
 
-                
-
-                <!-- Submit Button -->
-                <div class="text-center">
-                    <button type="submit" class="bg-green-600 text-white p-4 rounded-md text-lg font-semibold hover:bg-green-700 transition duration-300">
-                        Edit and Resend Email
-                    </button>
+                <!-- Action Buttons -->
+                <div class="flex items-center justify-between pt-4">
+                    <a href="{% url 'fetch_emails' org_id=form.instance.organization.id user_id=form.instance.participant.id %}" 
+                       class="inline-flex items-center text-gray-500 hover:text-gray-700 transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                        Back to Emails
+                    </a>
+                    <div class="flex items-center space-x-3">
+                        <button type="submit" class="send-button px-6 py-2.5 rounded-lg text-white font-medium shadow-sm hover:shadow flex items-center space-x-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                            </svg>
+                            <span>Send Updated Email</span>
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
-        <!-- Back Button -->
-     <div class="mt-8 text-center">
-        <a href="{% url 'fetch_emails' org_id=form.instance.organization.id user_id=form.instance.participant.id %}" class="text-blue-600 hover:text-blue-800">
-            ← Back to Email Details
-        </a>
     </div>
-    </div>
-     
 
+    <script>
+        document.addEventListener('keydown', function(e) {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                document.querySelector('form').submit();
+            }
+        });
+    </script>
 </body>
-
 </html>
