@@ -24,7 +24,129 @@
 <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 
 <style>
+#UnscheduleModal .modal-content {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+    transform: scale(0.98);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
 
+#UnscheduleModal .modal-content:hover {
+    transform: scale(1);
+}
+
+#UnscheduleModal .modal-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+    color: white;
+    border-radius: 15px 15px 0 0;
+    padding: 1.2rem;
+}
+
+#UnscheduleModal .modal-title {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    font-size: 1.25rem;
+}
+
+#UnscheduleModal .btn-close {
+    filter: invert(1);
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+#UnscheduleModal .btn-close:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+}
+
+#UnscheduleModal .modal-body {
+    padding: 1.5rem;
+}
+
+#unscheduleAlertsList {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#unscheduleAlertsList .list-group-item {
+    border: none;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1rem 1.25rem;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#unscheduleAlertsList .list-group-item:hover {
+    background-color: white;
+    transform: translateX(5px);
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+}
+
+#unscheduleAlertsList .list-group-item:last-child {
+    border-bottom: none;
+}
+
+#UnscheduleModal .modal-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 1rem 1.5rem;
+}
+
+#UnscheduleModal .btn-secondary {
+    background-color: #f8f9fa;
+    color: #2c3e50;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+#UnscheduleModal .btn-secondary:hover {
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+}
+
+/* Custom scrollbar for alert list */
+#unscheduleAlertsList::-webkit-scrollbar {
+    width: 6px;
+}
+
+#unscheduleAlertsList::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+#unscheduleAlertsList::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+}
+
+/* Alert text styling */
+.alert-message {
+    font-weight: 500;
+    color: #2c3e50;
+    font-size: 0.95rem;
+}
+
+.alert-time {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    margin-left: 1rem;
+}
+
+
+
+
+/* Alert buttons container */
 .alert-buttons-container {
     position: relative;
     display: inline-flex;
@@ -36,19 +158,22 @@
     z-index: 2;
 }
 
-.schedule-alert-btn {
-    position: absolute;
-    left: 100%;
-    top: 0;
+.schedule-alert-btn,
+.unschedule-alert-btn {
+    position: relative;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s, visibility 0.3s;
+    margin-left: 10px; /* Space between the buttons */
 }
 
-.alert-buttons-container:hover .schedule-alert-btn {
+/* Make buttons appear when hovering over the container */
+.alert-buttons-container:hover .schedule-alert-btn,
+.alert-buttons-container:hover .unschedule-alert-btn {
     opacity: 1;
     visibility: visible;
 }
+
 
 
 
@@ -1381,7 +1506,7 @@ data-bs-target="#userSelectionModal">
         <svg class="w-5 h-5 mr-3 text-purple-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M16 11l4-4m0 0l-4-4m4 4H4m16 4l-4 4m0 0l4 4m-4-4H4" />
         </svg>
-        <span class="font-medium text-purple-600/90">Send Alert Notification</span>
+        <span class="font-medium text-purple-600/90">Push Notification Now</span>
     </button>
 
     <!-- Trigger button to open schedule modal -->
@@ -1395,13 +1520,13 @@ data-bs-target="#userSelectionModal">
         <svg class="w-5 h-5 mr-3 text-blue-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405M19 13V9a7 7 0 10-14 0v4M9 21h6" />
         </svg>
-        <span class="font-medium text-blue-600/90">Schedule Alert</span>
+        <span class="font-medium text-blue-600/90">Schedule a Notification</span>
     </button>
 
 
     <!-- Button to trigger UnscheduleModal -->
 <button 
-class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200"
+class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200 unschedule-alert-btn"
 id="unscheduleBtn"
 data-channel-id="{{channel.id}}"
 data-org-id="{{channel.organization.id}}"
@@ -1410,15 +1535,11 @@ data-bs-target="#UnscheduleModal">
 <svg class="w-5 h-5 mr-3 text-blue-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
     <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405M19 13V9a7 7 0 10-14 0v4M9 21h6" />
 </svg>
-<span class="font-medium text-blue-600/90">View Scheduled Alerts</span>
+<span class="font-medium text-blue-600/90">Control Scheduled Notifications</span>
 </button>
-
-
 </div>
 
-
-
-                  {% endif %}
+{% endif %}
 
 
  <!-- Button to trigger notifications modal -->
