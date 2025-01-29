@@ -497,6 +497,15 @@ class Permission(models.Model):
 # ALERT NOTIFICATION MODEL 
 
 class AlertNotification(models.Model):
+
+    SCHEDULE_CHOICES = [
+        ('after_days', 'After X Days'),
+        ('custom_date', 'Custom Date'),
+    ]
+
+
+
+
     organization = models.ForeignKey(Organization, related_name="alert_notifications", on_delete=models.CASCADE)
     channel = models.ForeignKey(Channel, related_name="alert_notifications", on_delete=models.CASCADE)
     created_by = models.ForeignKey(User, related_name="created_alert_notifications", on_delete=models.CASCADE)
@@ -504,6 +513,12 @@ class AlertNotification(models.Model):
     sent_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True) 
     is_read = models.BooleanField(default=False)  
+
+    # Scheduling Fields
+    schedule_type = models.CharField(max_length=20, choices=SCHEDULE_CHOICES, null=True, blank=True)
+    scheduled_for = models.DateTimeField(null=True, blank=True) 
+    schedule_days = models.PositiveIntegerField(null=True, blank=True) 
+
 
     def __str__(self):
         return f"Alert: {self.message[:50]}... for {self.channel.name} in {self.organization.name}"
