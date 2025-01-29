@@ -24,6 +24,37 @@
 <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 
 <style>
+
+.alert-buttons-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.send-alert-btn {
+    position: relative;
+    z-index: 2;
+}
+
+.schedule-alert-btn {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.alert-buttons-container:hover .schedule-alert-btn {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+
+
+
+
 /* Schedule Alert Modal Styling */
 #scheduleAlertModal .modal-dialog {
     max-width: 500px;
@@ -1318,33 +1349,35 @@ data-bs-target="#userSelectionModal">
 
 
 <!-- Button to trigger the modal -->
-<button 
-    class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200"
-    id="sendAlertBtn"
-    data-channel-id="{{channel.id}}"
-    data-org-id="{{channel.organization.id}}"
-    data-bs-toggle="modal"
-    data-bs-target="#alertModal">
-    <svg class="w-5 h-5 mr-3 text-purple-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M16 11l4-4m0 0l-4-4m4 4H4m16 4l-4 4m0 0l4 4m-4-4H4" />
-    </svg>
-    <span class="font-medium text-purple-600/90">Send Alert Notification</span>
-</button>
+<div class="alert-buttons-container">
+    <!-- Button to trigger the modal -->
+    <button 
+        class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200 send-alert-btn"
+        id="sendAlertBtn"
+        data-channel-id="{{channel.id}}"
+        data-org-id="{{channel.organization.id}}"
+        data-bs-toggle="modal"
+        data-bs-target="#alertModal">
+        <svg class="w-5 h-5 mr-3 text-purple-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11l4-4m0 0l-4-4m4 4H4m16 4l-4 4m0 0l4 4m-4-4H4" />
+        </svg>
+        <span class="font-medium text-purple-600/90">Send Alert Notification</span>
+    </button>
 
-
-<!-- Trigger button to open schedule modal -->
-<button 
-    class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200"
-    id="openScheduleModalBtn"
-    data-channel-id="{{channel.id}}"
-    data-org-id="{{channel.organization.id}}"
-    data-bs-toggle="modal"
-    data-bs-target="#scheduleAlertModal">
-    <svg class="w-5 h-5 mr-3 text-blue-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405M19 13V9a7 7 0 10-14 0v4M9 21h6" />
-    </svg>
-    <span class="font-medium text-blue-600/90">Schedule Alert</span>
-</button>
+    <!-- Trigger button to open schedule modal -->
+    <button 
+        class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200 schedule-alert-btn"
+        id="openScheduleModalBtn"
+        data-channel-id="{{channel.id}}"
+        data-org-id="{{channel.organization.id}}"
+        data-bs-toggle="modal"
+        data-bs-target="#scheduleAlertModal">
+        <svg class="w-5 h-5 mr-3 text-blue-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405M19 13V9a7 7 0 10-14 0v4M9 21h6" />
+        </svg>
+        <span class="font-medium text-blue-600/90">Schedule Alert</span>
+    </button>
+</div>
 
 
 
