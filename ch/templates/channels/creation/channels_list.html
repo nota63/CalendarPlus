@@ -24,6 +24,159 @@
 <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 
 <style>
+
+/* Modal Container */
+#ActivityModal .modal-dialog {
+    max-width: 80%; /* Slightly reduce width for a more focused experience */
+    width: 100%;
+    margin: 30px auto; /* Center the modal vertically */
+    border-radius: 15px; /* Modern rounded corners for the modal */
+}
+
+/* Modal Content */
+#ActivityModal .modal-content {
+    border-radius: 12px;
+    background: linear-gradient(145deg, #f8f9fa, #e9ecef); /* Soft gradient for a fresh feel */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1); /* Subtle, clean shadow for the modal */
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+/* Modal Content Hover Effect */
+#ActivityModal .modal-content:hover {
+    transform: scale(1.03); /* Slightly zoom the modal on hover for a dynamic effect */
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15); /* Stronger shadow on hover */
+}
+
+/* Modal Header */
+#ActivityModal .modal-header {
+    background-color: #f3f8fb; /* Soft blue background */
+    border-bottom: 2px solid #e0e6ed; /* Light, subtle border */
+    padding: 24px;
+}
+
+#ActivityModal .modal-header .modal-title {
+    font-size: 1.75rem; /* Larger title for better readability */
+    color: #2d3e50; /* Deep, professional text color */
+    font-weight: 600; /* Bold title for emphasis */
+    letter-spacing: 0.5px; /* Slight spacing for readability */
+}
+
+/* Modal Close Button */
+#ActivityModal .modal-header .btn-close {
+    font-size: 1.5rem; /* Larger close button */
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+
+#ActivityModal .modal-header .btn-close:hover {
+    opacity: 1; /* Full opacity on hover */
+}
+
+/* Modal Body */
+#ActivityModal .modal-body {
+    max-height: 450px; /* Increase max-height for better usability */
+    overflow-y: auto; /* Enable smooth scrolling */
+    padding: 20px;
+    background-color: #fff; /* Clean white background for content */
+}
+
+/* Activity List */
+#activityList {
+    list-style-type: none;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+/* Activity Items */
+#activityList .list-group-item {
+    border-radius: 10px;
+    padding: 16px;
+    background-color: #f7f9fc; /* Fresh, clean background for items */
+    border: 1px solid #d1d8e1; /* Light border for definition */
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); /* Light shadow for items */
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+}
+
+/* Hover Effect for Activity Items */
+#activityList .list-group-item:hover {
+    transform: translateY(-3px); /* Lift effect on hover */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12); /* Darker shadow for interactivity */
+    background-color: #f1f5f9; /* Slight background color change on hover */
+}
+
+/* Text Styling for Activity Items */
+#activityList .list-group-item strong {
+    color: #007bff; /* Blue color for the user name */
+    font-weight: 600;
+}
+
+#activityList .list-group-item em {
+    color: #999; /* Light gray for action type */
+    font-style: normal;
+}
+
+#activityList .list-group-item .text-dark {
+    color: #333; /* Dark text for activity details */
+    font-size: 0.875rem; /* Slightly smaller font for details */
+}
+
+/* Modal Footer */
+#ActivityModal .modal-footer {
+    background-color: #f3f8fb; /* Soft background for the footer */
+    border-top: 2px solid #e0e6ed; /* Light border for separation */
+    padding: 15px;
+}
+
+/* Footer Buttons */
+#ActivityModal .btn {
+    font-weight: 500;
+    padding: 12px 20px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+#ActivityModal .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: #fff;
+}
+
+#ActivityModal .btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+#ActivityModal .btn-danger {
+    background-color: #e74c3c; /* Fresh red for clear activities */
+    border-color: #e74c3c;
+    color: #fff;
+}
+
+#ActivityModal .btn-danger:hover {
+    background-color: #c0392b; /* Darker red on hover */
+    border-color: #c0392b;
+}
+
+/* Smooth Scroll for Activity List */
+#ActivityModal .modal-body::-webkit-scrollbar {
+    width: 8px; /* Thin scrollbar */
+}
+
+#ActivityModal .modal-body::-webkit-scrollbar-thumb {
+    background-color: #c6c6c6; /* Light gray for scrollbar thumb */
+    border-radius: 4px;
+    border: 2px solid #f9f9f9;
+}
+
+#ActivityModal .modal-body::-webkit-scrollbar-thumb:hover {
+    background-color: #8a8a8a; /* Darker gray when hovered */
+}
+
+
+
+
+
 #UnscheduleModal .modal-content {
     border-radius: 15px;
     border: none;
@@ -333,23 +486,22 @@
 
 
 
-
-
-
-
 /* CSS specific to the notification modal */
+/* Modal Container */
 #notificationModal .modal-dialog {
     max-width: 800px; /* Increased width */
     max-height: 90vh; /* Increased height */
     margin: auto;
 }
 
+/* Modal Content */
 #notificationModal .modal-content {
     border-radius: 1rem;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    overflow-y: auto;
+    overflow-y: auto; /* Allow scrolling */
 }
 
+/* Modal Header */
 #notificationModal .modal-header {
     background-color: #6b46c1; /* Purple header */
     color: white;
@@ -361,11 +513,15 @@
     font-weight: bold;
 }
 
+/* Modal Body */
 #notificationModal .modal-body {
     padding: 1.5rem;
     background-color: #f9f9f9; /* Light gray background */
+    max-height: 60vh; /* Restrict max height to ensure scrolling */
+    overflow-y: auto; /* Enable scrolling when content overflows */
 }
 
+/* Notification Item */
 #notificationModal .notification-item {
     border: 1px solid #ddd;
     border-radius: 0.5rem;
@@ -380,6 +536,7 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Recent Tag */
 #notificationModal .notification-item .recent-tag {
     display: inline-block;
     padding: 0.3rem 0.6rem;
@@ -391,6 +548,7 @@
     margin-bottom: 0.5rem;
 }
 
+/* Mark Read Button */
 #notificationModal .mark-read-btn {
     display: inline-block;
     padding: 0.5rem 1rem;
@@ -413,6 +571,21 @@
     background-color: #a0aec0; /* Gray when disabled */
     cursor: not-allowed;
     transform: none;
+}
+
+/* Smooth Scrollbar for Modal Body */
+#notificationModal .modal-body::-webkit-scrollbar {
+    width: 8px; /* Thin scrollbar */
+}
+
+#notificationModal .modal-body::-webkit-scrollbar-thumb {
+    background-color: #c6c6c6; /* Light gray for scrollbar thumb */
+    border-radius: 4px;
+    border: 2px solid #f9f9f9;
+}
+
+#notificationModal .modal-body::-webkit-scrollbar-thumb:hover {
+    background-color: #8a8a8a; /* Darker gray when hovered */
 }
 
 
@@ -454,6 +627,14 @@
             0% { opacity: 0; transform: translateY(-20px); }
             100% { opacity: 1; transform: translateY(0); }
         }
+
+
+
+
+
+
+
+
 
 
 
@@ -1355,6 +1536,27 @@
 </div>
 
 
+<!-- Activity Modal -->
+<div class="modal fade" id="ActivityModal" tabindex="-1" aria-labelledby="ActivityModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ActivityModalLabel">Channel Activities</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Activities list will be dynamically loaded here -->
+                <ul id="activityList" class="list-group">
+                    <!-- Activities will go here -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="clearActivitiesBtn" class="btn btn-danger">Clear All Activities</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <!-- ---------------------------------------------------------------------------------------------------------------- -->
@@ -1568,6 +1770,22 @@ data-bs-target="#UnscheduleModal">
 <span class="font-medium text-blue-600/90">Control Scheduled Notifications</span>
 </button>
 </div>
+
+<!-- Button to trigger Activity Modal -->
+<button 
+    class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200"
+    id="viewActivitiesBtn"
+    data-channel-id="{{channel.id}}"
+    data-org-id="{{channel.organization.id}}"
+    data-bs-toggle="modal"
+    data-bs-target="#ActivityModal">
+    <svg class="w-5 h-5 mr-3 text-green-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405M19 13V9a7 7 0 10-14 0v4M9 21h6" />
+    </svg>
+    <span class="font-medium text-green-600/90">Manage Activities</span>
+</button>
+
+
 
 {% endif %}
 
@@ -2454,6 +2672,84 @@ function unscheduleAlert(alertId) {
         console.error('Error unscheduling alert:', error);
     });
 }
+
+// MANAGE ACTIVITIES 
+
+document.getElementById('viewActivitiesBtn').addEventListener('click', function() {
+    const channelId = this.getAttribute('data-channel-id');
+    const orgId = this.getAttribute('data-org-id');
+
+    // AJAX request to fetch activities for the selected channel
+    fetch(`/channels/manage-activities/${orgId}/${channelId}/`)
+        .then(response => response.json())
+        .then(data => {
+            const activityList = document.getElementById('activityList');
+            activityList.innerHTML = ''; // Clear the list before adding new activities
+
+            data.activities.forEach(activity => {
+                const listItem = document.createElement('li');
+                listItem.classList.add('list-group-item');
+                 // Applying premium style and content
+                 listItem.innerHTML = `
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <strong class="text-primary fs-5">${activity.user}</strong>
+                            <p class="mb-0 text-muted">${activity.action_type}</p>
+                        </div>
+                        <span class="text-secondary fs-6">${activity.timestamp}</span>
+                    </div>
+                    <hr>
+                    <div class="text-dark">
+                        <small>${activity.content || 'No additional details'}</small>
+                    </div>
+                `;
+
+                // Applying hover effect
+                listItem.style.transition = 'transform 0.2s ease, box-shadow 0.2s ease';
+                listItem.addEventListener('mouseenter', function() {
+                    listItem.style.transform = 'scale(1.03)';
+                    listItem.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.1)';
+                });
+
+                listItem.addEventListener('mouseleave', function() {
+                    listItem.style.transform = 'scale(1)';
+                    listItem.style.boxShadow = 'none';
+                });
+
+                // Adding the list item to the list
+                activityList.appendChild(listItem);
+            });
+        })
+        .catch(error => console.error('Error fetching activities:', error));
+});
+
+
+
+document.getElementById('clearActivitiesBtn').addEventListener('click', function() {
+    const channelId = document.getElementById('viewActivitiesBtn').getAttribute('data-channel-id');
+    const orgId = document.getElementById('viewActivitiesBtn').getAttribute('data-org-id');
+
+    // AJAX request to clear activities for the selected channel
+    fetch(`/channels/clear-activities/${orgId}/${channelId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value // CSRF token for POST request
+        },
+        body: JSON.stringify({ channel_id: channelId, org_id: orgId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            document.getElementById('activityList').innerHTML = ''; // Clear activities from modal
+            alert('Activities cleared successfully!');
+        } else {
+            alert('Error clearing activities.');
+        }
+    })
+    .catch(error => console.error('Error clearing activities:', error));
+});
+
 
 
 

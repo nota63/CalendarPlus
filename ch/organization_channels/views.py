@@ -2742,4 +2742,62 @@ def unschedule_alert(request):
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
 
+# MANAGE CHANNEL ACTIVITIES
+
+@login_required
+def fetch_activities(request, org_id, channel_id):
+    organization=get_object_or_404(Organization,id=org_id)
+    channel=get_object_or_404(Channel,id=channel_id)
+
+    if channel.created_by != request.user:
+                return JsonResponse({"success": False, "error": "You are not authorized to perform this action!."}, status=403)
+            
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+                  return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+
+    activities = ActivityChannel.objects.filter(
+        organization_id=org_id, 
+        channel_id=channel_id
+    ).values('user__username', 'action_type', 'content', 'timestamp')
+
+    activities_data = []
+    for activity in activities:
+        activities_data.append({
+            'user': activity['user__username'],
+            'action_type': activity['action_type'],
+            'content': activity['content'],
+            'timestamp': activity['timestamp'],
+            'formatted_timestamp': activity['timestamp'].strftime('%Y-%m-%d %H:%M:%S')
+        })
+
+    return JsonResponse({'activities': activities_data})
+
+
+# Clear activities
+@login_required
+def clear_activities(request, org_id, channel_id):
+    channel=get_object_or_404(Channel,id=channel_id)
+    organization=get_object_or_404(Organization,channel.organization.id)
+
+    if channel.created_by != request.user:
+                return JsonResponse({"success": False, "error": "You are not authorized to perform this action!."}, status=403)
+            
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+                  return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+    if request.method == 'POST':
+     
+        ActivityChannel.objects.filter(
+            organization_id=org_id,
+            channel_id=channel_id
+        ).delete()
+
+        return JsonResponse({'status': 'success', 'message': 'All activities cleared successfully!'})
+
+
+
+
 

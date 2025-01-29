@@ -68,4 +68,6 @@ urlpatterns = [
     path('schedule-alert/<int:org_id>/<int:channel_id>/',schedule_alert, name='schedule_alert'),
     path('fetch_scheduled_alerts/<int:org_id>/<int:channel_id>/',fetch_scheduled_alerts, name='fetch_scheduled_alerts'),
     path('unschedule_alert/',unschedule_alert, name='unschedule_alert'),
+    path('manage-activities/<int:org_id>/<int:channel_id>/',fetch_activities, name='manage_activities'),
+    path('clear-activities/<int:org_id>/<int:channel_id>/',clear_activities, name='clear_activities'),
 ]
