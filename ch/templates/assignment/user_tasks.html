@@ -1,211 +1,428 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assigned Tasks for {{ user.username }}</title>
+    <title>Task Management Hub | {{ user.username }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
+        :root {
+            --primary-color: #4A154B;
+            --secondary-color: #611F69;
+            --accent-color: #E774BB;
+            --background-light: #F8F5F9;
+            --text-dark: #1A051D;
+            --text-light: #FFFFFF;
+            --success-color: #2BAC76;
+            --warning-color: #FFC107;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes cardHover {
+            from { transform: translateY(0); }
+            to { transform: translateY(-5px); }
+        }
+
         body {
-            background-color: #f4f7fc;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #333;
+            background: var(--background-light);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text-dark);
         }
-        .container {
-            background-color: #ffffff;
-            border-radius: 8px;
-            padding: 30px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+        .container-main {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+            animation: fadeIn 0.6s ease-out;
         }
-        h1 {
-            font-size: 2.5rem;
-            color: #333;
-            margin-bottom: 20px;
-        }
-        .section img {
-            width: 100%;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        .section p {
-            color: #555;
-            font-size: 1.1rem;
-        }
-        .badge {
-            font-size: 0.875rem;
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-        }
-        .list-group-item {
-            background-color: #f9f9f9;
-            border: 1px solid #e0e0e0;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            transition: background-color 0.3s ease;
-        }
-        .list-group-item:hover {
-            background-color: #f1f1f1;
-        }
-        .list-group-item h5 {
-            font-size: 1.2rem;
-            color: #333;
-        }
-        .list-group-item p {
-            color: #555;
-        }
-        .btn {
-            padding: 10px 20px;
-            font-size: 1rem;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-        .btn-primary {
-            background-color: #0066cc;
-            border: none;
-        }
-        .btn-primary:hover {
-            background-color: #005bb5;
-        }
-        .btn-success {
-            background-color: #28a745;
-            border: none;
-        }
-        .btn-success:hover {
-            background-color: #218838;
-        }
-        .btn-secondary {
-            background-color: #6c757d;
-            border: none;
-        }
-        .btn-secondary:hover {
-            background-color: #5a6268;
-        }
-        .list-group-item .btn {
-            background-color: #007bff;
-            border: none;
-            padding: 5px 15px;
-        }
-        .list-group-item .btn:hover {
-            background-color: #0056b3;
-        }
-        .section {
-            margin-bottom: 40px;
-        }
-        .filter-btns {
-            margin-bottom: 30px;
+
+        .header-section {
             text-align: center;
+            padding: 3rem 0;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-radius: 15px;
+            margin-bottom: 3rem;
+            color: var(--text-light);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(45deg);
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid white;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-pills-custom .nav-link {
+            font-size: 1.1rem;
+            padding: 1rem 2rem;
+            margin: 0 1rem;
+            border-radius: 30px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+        }
+
+        .nav-pills-custom .nav-link.active {
+            background: var(--accent-color);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 8px 24px rgba(231, 116, 187, 0.3);
+        }
+
+        .nav-pills-custom .nav-link:not(.active):hover {
+            border-color: var(--accent-color);
+            color: var(--secondary-color);
+        }
+
+        .task-card {
+            background: white;
+            border: none;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            cursor: pointer;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .task-card:hover {
+            animation: cardHover 0.3s ease-out forwards;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .task-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem;
+            border-bottom: 2px solid var(--background-light);
+        }
+
+        .task-status {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .task-card-body {
+            padding: 1.5rem;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            color: #6B7280;
+        }
+
+        .progress-bar-custom {
+            height: 8px;
+            border-radius: 4px;
+            background: var(--background-light);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--success-color);
+            transition: width 0.6s ease;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-custom-primary {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .btn-custom-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(74, 21, 75, 0.2);
+            background: var(--secondary-color);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 0;
+            opacity: 0.7;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--accent-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .recent-badge {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #FF9800 100%);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container-main {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+            
+            .nav-pills-custom .nav-link {
+                margin: 0.5rem;
+                width: 100%;
+                text-align: center;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container mt-4">
-      
-        <section class="top-intro text-center my-13">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKJLyunViTG4Y2n2SOSy9eneY9rJC6IYzWbQ&s" alt="Assigned Tasks" class="img-fluid rounded mb-3" style="max-width: 30%; height: auto; max-height: 180px;">
-            <p class="lead text-muted">
-                <strong>
-                    Keep track of the tasks you've assigned to {{ user.username }}, monitor their progress, review activity logs, track time spent, and address any issues they may be facing to ensure smooth task completion.
-                </strong>
-            </p>
+    <div class="container-main">
+        <header class="header-section">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKJLyunViTG4Y2n2SOSy9eneY9rJC6IYzWbQ&s" 
+                 alt="Profile" 
+                 class="profile-avatar">
+            <h1 class="display-4 mb-3 fw-bold">{{ user.username }}'s Task Hub</h1>
+            <p class="lead mb-0">Streamlined task management with precision tracking</p>
+        </header>
+
+        <nav class="nav nav-pills nav-pills-custom justify-content-center mb-5">
+            <a class="nav-link {% if request.GET.category == 'add_day' or not request.GET.category %}active{% endif %}" 
+               href="?category=add_day">My Day Tasks</a>
+            <a class="nav-link {% if request.GET.category == 'completed' %}active{% endif %}" 
+               href="?category=completed">Completed</a>
+            <a class="nav-link {% if request.GET.category == 'not_added' %}active{% endif %}" 
+               href="?category=not_added">Backlog</a>
+        </nav>
+
+        <!-- Add Day Tasks Section -->
+        <section id="add_day_section" style="display: {% if request.GET.category == 'add_day' or not request.GET.category %}block{% else %}none{% endif %}">
+            {% if tasks_added %}
+                <div class="row g-4">
+                    {% for add_day in tasks_added %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="task-card">
+                                <div class="task-card-header">
+                                    <h5 class="mb-0">{{ add_day.task.title }}</h5>
+                                    {% if forloop.first %}
+                                        <span class="recent-badge">
+                                            <i class="bi bi-star-fill"></i>
+                                            Most Recent
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <div class="task-card-body">
+                                    <p class="text-muted">{{ add_day.task.description }}</p>
+                                    <div class="task-meta">
+                                        <div>
+                                            <i class="bi bi-calendar me-1"></i>
+                                            {{ add_day.added_on|date:"M d" }}
+                                        </div>
+                                        <div>
+                                            <i class="bi bi-tag me-1"></i>
+                                            {{ add_day.get_tags_display }}
+                                        </div>
+                                    </div>
+                                    <div class="progress-bar-custom mt-3">
+                                        <div class="progress-fill" style="width: 65%"></div>
+                                    </div>
+                                    <div class="task-actions">
+                                        <a href="{% url 'task_details' org_id=organization.id group_id=group.id task_id=add_day.task.id user_id=user.id %}" 
+                                           class="btn btn-custom-primary">
+                                           <i class="bi bi-speedometer2 me-2"></i>
+                                           Monitor
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <h4>No tasks in {{user.usernames}} day yet</h4>
+                    <p class="text-muted">Ask them to Initiate the tasks they have pending if any</p>
+                </div>
+            {% endif %}
         </section>
-        
-        
 
-        <h1 class="mb-4 text-center">Assigned Tasks for {{ user.username }}</h1>
-
-      
-        <!-- Filter Buttons -->
-        <div class="filter-btns">
-            <a href="?category=add_day" class="btn btn-primary">Add Day Tasks</a>
-            <a href="?category=completed" class="btn btn-success">Completed Tasks</a>
-            <a href="?category=not_added" class="btn btn-secondary">Not in Add Day Tasks</a>
-        </div>
-
-        <div class="row mb-5">
-            <!-- Add Day Tasks -->
-            <div class="col" id="add_day_section" style="display: {% if request.GET.category == 'add_day' or not request.GET.category %}block{% else %}none{% endif %}">
-                <h3>Tasks Added to My Day</h3>
-                {% if tasks_added %}
-                    <div class="list-group">
-                        {% for add_day in tasks_added %}
-                            <div class="list-group-item">
-                                <h5>{{ add_day.task.title }}
-                                    {% if forloop.first %}
-                                        <span class="badge bg-warning">Most Recent</span>
-                                    {% endif %}
-                                </h5>
-                                <p>{{ add_day.task.description }}</p>
-                                <small>Added on: {{ add_day.added_on|date:"M d, Y H:i" }}</small>
-                                <p><strong>Tag:</strong> {{ add_day.get_tags_display }}</p>
-                                <a href="{% url 'task_details' org_id=organization.id group_id=group.id task_id=add_day.task.id user_id=user.id %}">
-                                    <button class="btn btn-primary">Monitor</button>
-                                </a>
+        <!-- Completed Tasks Section -->
+        <section id="completed_section" style="display: {% if request.GET.category == 'completed' %}block{% else %}none{% endif %}">
+            {% if tasks_completed %}
+                <div class="row g-4">
+                    {% for task in tasks_completed %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="task-card">
+                                <div class="task-card-header">
+                                    <h5 class="mb-0">{{ task.title }}</h5>
+                                    <span class="task-status" style="background: rgba(43, 172, 118, 0.1); color: var(--success-color);">
+                                        <i class="bi bi-check-circle-fill me-1"></i>
+                                        Completed
+                                    </span>
+                                </div>
+                                <div class="task-card-body">
+                                    <p class="text-muted">{{ task.description }}</p>
+                                    <div class="task-meta">
+                                        <div>
+                                            <i class="bi bi-check2-circle me-1"></i>
+                                            {{ task.updated_at|date:"M d" }}
+                                        </div>
+                                        <div>
+                                            <i class="bi bi-flag me-1"></i>
+                                            {{ task.get_priority_display }}
+                                        </div>
+                                    </div>
+                                    <div class="task-actions">
+                                        <a href="{% url 'task_details' org_id=organization.id group_id=group.id task_id=task.id user_id=user.id %}" 
+                                           class="btn btn-custom-primary">
+                                           <i class="bi bi-bar-chart me-2"></i>
+                                           Analytics
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <p>No tasks added to My Day yet.</p>
-                {% endif %}
-            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-check2-all"></i>
+                    <h4>{{user.username}} Didnt complete any tasks yet</h4>
+                    <p class="text-muted">Completed tasks will appear here</p>
+                </div>
+            {% endif %}
+        </section>
 
-            <!-- Completed Tasks -->
-            <div class="col" id="completed_section" style="display: {% if request.GET.category == 'completed' %}block{% else %}none{% endif %}">
-                <h3>Completed Tasks</h3>
-                {% if tasks_completed %}
-                    <div class="list-group">
-                        {% for task in tasks_completed %}
-                            <div class="list-group-item">
-                                <h5>{{ task.title }}
-                                    {% if forloop.first %}
-                                        <span class="badge bg-warning">Most Recent</span>
-                                    {% endif %}
-                                </h5>
-                                <p>{{ task.description }}</p>
-                                <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>
-                                <p><strong>Completed on:</strong> {{ task.updated_at|date:"M d, Y H:i" }}</p>
-                                <p><strong>Status:</strong> Completed</p>
-                                <a href="{% url 'task_details' org_id=organization.id group_id=group.id task_id=task.id user_id=user.id %}">
-                                    <button class="btn btn-primary">Monitor</button>
-                                </a>
+        <!-- Not Added Section -->
+        <section id="not_added_section" style="display: {% if request.GET.category == 'not_added' %}block{% else %}none{% endif %}">
+            {% if tasks_without_add_day %}
+                <div class="row g-4">
+                    {% for task in tasks_without_add_day %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="task-card">
+                                <div class="task-card-header">
+                                    <h5 class="mb-0">{{ task.title }}</h5>
+                                    <span class="task-status" style="background: rgba(108, 117, 125, 0.1); color: #6c757d;">
+                                        <i class="bi bi-clock-history me-1"></i>
+                                        Pending
+                                    </span>
+                                </div>
+                                <div class="task-card-body">
+                                    <p class="text-muted">{{ task.description }}</p>
+                                    <div class="task-meta">
+                                        <div>
+                                            <i class="bi bi-hourglass-split me-1"></i>
+                                            {{ task.deadline|date:"M d" }}
+                                        </div>
+                                        <div>
+                                            <i class="bi bi-lightning-charge me-1"></i>
+                                            {{ task.get_priority_display }}
+                                        </div>
+                                    </div>
+                                    <div class="progress-bar-custom mt-3">
+                                        <div class="progress-fill" style="width: 30%"></div>
+                                    </div>
+                                    <div class="task-actions">
+                                        <a href="{% url 'task_details' org_id=organization.id group_id=group.id task_id=task.id user_id=user.id %}" 
+                                           class="btn btn-custom-primary">
+                                           <i class="bi bi-eye me-2"></i>
+                                           Review
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <p>No completed tasks yet.</p>
-                {% endif %}
-            </div>
-
-            <!-- Not Added to My Day Tasks -->
-            <div class="col" id="not_added_section" style="display: {% if request.GET.category == 'not_added' %}block{% else %}none{% endif %}">
-                <h3>Tasks Not Added to My Day</h3>
-                {% if tasks_without_add_day %}
-                    <div class="list-group">
-                        {% for task in tasks_without_add_day %}
-                            <div class="list-group-item">
-                                <h5>{{ task.title }}
-                                    {% if forloop.first %}
-                                        <span class="badge bg-warning">Most Recent</span>
-                                    {% endif %}
-                                </h5>
-                                <p>{{ task.description }}</p>
-                                <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>
-                                <p><strong>Deadline:</strong> {{ task.deadline|date:"M d, Y H:i" }}</p>
-                                <a href="{% url 'task_details' org_id=organization.id group_id=group.id task_id=task.id user_id=user.id %}">
-                                    <button class="btn btn-primary">Monitor</button>
-                                </a>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <p>No tasks assigned that have not been added to My Day.</p>
-                {% endif %}
-            </div>
-        </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-folder2-open"></i>
+                    <h4>Clean backlog!</h4>
+                    <p class="text-muted">All tasks are organized and scheduled</p>
+                </div>
+            {% endif %}
+        </section>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Add smooth section transitions
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetSection = link.getAttribute('href').split('=')[1] || 'add_day';
+                
+                // Fade out current section
+                document.querySelectorAll('section').forEach(section => {
+                    section.style.opacity = '0';
+                    section.style.transform = 'translateY(20px)';
+                    section.style.display = 'none';
+                });
+
+                // Load new content and fade in
+                setTimeout(() => {
+                    window.location.href = link.href;
+                    const activeSection = document.querySelector(`#${targetSection}_section`);
+                    if (activeSection) {
+                        activeSection.style.display = 'block';
+                        setTimeout(() => {
+                            activeSection.style.opacity = '1';
+                            activeSection.style.transform = 'translateY(0)';
+                        }, 50);
+                    }
+                }, 300);
+            });
+        });
+
+        // Add hover effect to cards
+        document.querySelectorAll('.task-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-5px)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
 </body>
 </html>
-
