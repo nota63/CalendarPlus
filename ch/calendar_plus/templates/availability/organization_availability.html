@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Availability | Calendar+</title>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+
     <!-- Design Assets -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -173,6 +176,7 @@
 
 
 /* Modal Background (Blurred Overlay) */
+/* Modal Background (Blurred Overlay) */
 /* Modal Container */
 #edit-availability-modal {
     position: fixed;
@@ -264,8 +268,6 @@
         padding: 1.5rem;
     }
 }
-
-
     </style>
 </head>
 <body>
@@ -633,6 +635,72 @@ $("#edit-availability-form").submit(function (e) {
             });
         });
     });
+
+
+
+// GSAP ANIMATIONS
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const overlay = document.getElementById("overlay"); // Dark background overlay
+    const modals = document.querySelectorAll("[id$='-modal']"); // Select all modals dynamically
+
+    if (!overlay || modals.length === 0) return; // Exit if no modals or overlay exist
+
+    // Open modal function
+    function openModal(modal) {
+        if (!modal) return;
+
+        modal.classList.remove("hidden"); // Make modal visible
+        overlay.classList.remove("hidden");
+
+        // GSAP open animation
+        gsap.fromTo(
+            modal,
+            { opacity: 0, scale: 0.8, y: 50 },
+            { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: "power2.out" }
+        );
+
+        gsap.to(overlay, { opacity: 0.5, duration: 0.3, ease: "power2.out" });
+    }
+
+    // Close modal function
+    function closeModal(modal) {
+        if (!modal) return;
+
+        // GSAP close animation
+        gsap.to(modal, {
+            opacity: 0,
+            scale: 0.8,
+            y: 50,
+            duration: 0.3,
+            ease: "power2.in",
+            onComplete: () => {
+                modal.classList.add("hidden"); // Hide modal after animation
+                overlay.classList.add("hidden");
+            },
+        });
+
+        gsap.to(overlay, { opacity: 0, duration: 0.2, ease: "power2.in" });
+    }
+
+    // Attach click event to open modals
+    document.body.addEventListener("click", function (e) {
+        if (e.target.matches("[data-open-modal]")) {
+            const modalId = e.target.dataset.openModal;
+            const modal = document.getElementById(modalId);
+            openModal(modal);
+        }
+    });
+
+    // Attach click event to close modals
+    document.body.addEventListener("click", function (e) {
+        if (e.target.matches("[data-close-modal]") || e.target.matches("#overlay")) {
+            const openModals = document.querySelectorAll("[id$='-modal']:not(.hidden)");
+            openModals.forEach((modal) => closeModal(modal));
+        }
+    });
+});
 
 </script>
 
