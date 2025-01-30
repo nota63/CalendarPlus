@@ -234,56 +234,62 @@
         </nav>
 
         <!-- Add Day Tasks Section -->
-        <section id="add_day_section" style="display: {% if request.GET.category == 'add_day' or not request.GET.category %}block{% else %}none{% endif %}">
-            {% if tasks_added %}
-                <div class="row g-4">
-                    {% for add_day in tasks_added %}
-                        <div class="col-md-6 col-lg-4">
-                            <div class="task-card">
-                                <div class="task-card-header">
-                                    <h5 class="mb-0">{{ add_day.task.title }}</h5>
-                                    {% if forloop.first %}
-                                        <span class="recent-badge">
-                                            <i class="bi bi-star-fill"></i>
-                                            Most Recent
-                                        </span>
-                                    {% endif %}
+      <!-- Add Day Tasks Section -->
+<section id="add_day_section" style="display: {% if request.GET.category == 'add_day' or not request.GET.category %}block{% else %}none{% endif %}">
+    {% if tasks_added %}
+        <div class="row g-4">
+            {% for add_day in tasks_added %}
+                {% if add_day.task %}  {# Ensure task exists #}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="task-card">
+                            <div class="task-card-header">
+                                <h5 class="mb-0">{{ add_day.task.title }}</h5>
+                                {% if forloop.first %}
+                                    <span class="recent-badge">
+                                        <i class="bi bi-star-fill"></i>
+                                        Most Recent
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <div class="task-card-body">
+                                <p class="text-muted">{{ add_day.task.description }}</p>
+                                <div class="task-meta">
+                                    <div>
+                                        <i class="bi bi-calendar me-1"></i>
+                                        {{ add_day.added_on|date:"M d" }}
+                                    </div>
+                                    <div>
+                                        <i class="bi bi-tag me-1"></i>
+                                        {{ add_day.get_tags_display|default:"No Tags" }}
+                                    </div>
                                 </div>
-                                <div class="task-card-body">
-                                    <p class="text-muted">{{ add_day.task.description }}</p>
-                                    <div class="task-meta">
-                                        <div>
-                                            <i class="bi bi-calendar me-1"></i>
-                                            {{ add_day.added_on|date:"M d" }}
-                                        </div>
-                                        <div>
-                                            <i class="bi bi-tag me-1"></i>
-                                            {{ add_day.get_tags_display }}
-                                        </div>
-                                    </div>
-                                    <div class="progress-bar-custom mt-3">
-                                        <div class="progress-fill" style="width: 65%"></div>
-                                    </div>
-                                    <div class="task-actions">
-                                        <a href="{% url 'task_details' org_id=organization.id group_id=group.id task_id=add_day.task.id user_id=user.id %}" 
-                                           class="btn btn-custom-primary">
-                                           <i class="bi bi-speedometer2 me-2"></i>
-                                           Monitor
-                                        </a>
-                                    </div>
+                                <div class="progress-bar-custom mt-3">
+                                    <div class="progress-fill" style="width: 65%"></div>
+                                </div>
+                                <div class="task-actions">
+                                    <a href="{% url 'task_details' org_id=organization.id group_id=group.id task_id=add_day.task.id user_id=user.id %}" 
+                                       class="btn btn-custom-primary">
+                                       <i class="bi bi-speedometer2 me-2"></i>
+                                       Monitor
+                                    </a>
                                 </div>
                             </div>
                         </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="empty-state">
-                    <i class="bi bi-inbox"></i>
-                    <h4>No tasks in {{user.usernames}} day yet</h4>
-                    <p class="text-muted">Ask them to Initiate the tasks they have pending if any</p>
-                </div>
-            {% endif %}
-        </section>
+                    </div>
+                {% else %}
+                    <p class="text-danger">Task data is missing for one of the entries.</p>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="bi bi-inbox"></i>
+            <h4>No tasks in {{ user.username }}'s day yet</h4>
+            <p class="text-muted">Ask them to initiate the tasks they have pending if any</p>
+        </div>
+    {% endif %}
+</section>
+
 
         <!-- Completed Tasks Section -->
         <section id="completed_section" style="display: {% if request.GET.category == 'completed' %}block{% else %}none{% endif %}">

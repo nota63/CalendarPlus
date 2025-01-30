@@ -1001,6 +1001,8 @@ class AssignedUsersListView(ListView):
 
 
 # Fetch all tasks team leader assignhed to the user]
+
+# Fetch all tasks team leader assigned to the user
 def user_tasks_view(request, org_id, group_id, user_id):
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id, organization=organization)
@@ -1010,35 +1012,38 @@ def user_tasks_view(request, org_id, group_id, user_id):
 
     user = get_object_or_404(User, id=user_id)
 
-    
     if group.team_leader != request.user:
-        return HttpResponseForbidden("You are not authorized to perform this action! please contact to your workspace admin")
-        
+        return HttpResponseForbidden("You are not authorized to perform this action! Please contact your workspace admin.")
 
-    # Fetch all tasks assigned by the team leader to this user in the group
+
     tasks = Task.objects.filter(group=group, created_by=request.user, assigned_to=user, organization=organization)
     
+    
     tasks_in_add_day = AddDay.objects.filter(user=user, task__in=tasks)
+    print("ADD DAY TASKS:", tasks_in_add_day)
 
-   
-    tasks_added = tasks_in_add_day.filter(task__status='completed')  
-    tasks_without_add_day = tasks.exclude(id__in=tasks_in_add_day.values_list('task', flat=True))  
-    tasks_completed = tasks.filter(status='completed') 
+ 
+    tasks_added = tasks_in_add_day
 
-   
+    tasks_without_add_day = tasks.exclude(id__in=tasks_in_add_day.values_list('task', flat=True))
+
+
+    tasks_completed = tasks.filter(status='completed')
+
+
     tasks_added = tasks_added.order_by('-task__updated_at')
     tasks_without_add_day = tasks_without_add_day.order_by('-deadline')
     tasks_completed = tasks_completed.order_by('-updated_at')
 
+   
     return render(request, 'assignment/user_tasks.html', {
         'user': user,
-        'organization':organization,
-        'group':group,
+        'organization': organization,
+        'group': group,
         'tasks_added': tasks_added, 
         'tasks_without_add_day': tasks_without_add_day,  
         'tasks_completed': tasks_completed,  
     })
-
 
 
 
