@@ -1,300 +1,329 @@
-{% extends 'custom.html' %}
-
-{% block content %}
-<br><br><br><br>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Group Users</title>
-    <!-- Bootstrap Icons CDN -->
-   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
-
-   
-
-
-    <!-- Bootstrap 5 CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Fonts for modern typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>Group Management | TeamFlow</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.2.96/css/materialdesignicons.min.css" rel="stylesheet">
+    
+    <!-- Libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 
     <style>
-        /* Custom Styling for Premium Design */
+        :root {
+            --primary: #4A54EC;
+            --primary-hover: #3B46D5;
+            --secondary: #F6F7FB;
+            --text-primary: #2D3748;
+            --text-secondary: #718096;
+            --card-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
+        }
+
         body {
-            background-color: #f4f7fb;
             font-family: 'Inter', sans-serif;
+            background: var(--secondary);
+            color: var(--text-primary);
+            overflow-x: hidden;
         }
-        .container {
-            max-width: 1200px;
-            margin-top: 60px;
+
+        .nav-pill {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            border-radius: 12px;
+            padding: 8px;
+            box-shadow: var(--card-shadow);
+            z-index: 1000;
         }
-        .section-header {
-            text-align: center;
+
+        .header-section {
+            padding: 80px 0 40px;
+            background: linear-gradient(135deg, #f8f9ff 0%, #f1f3fe 100%);
+            border-radius: 0 0 40px 40px;
             margin-bottom: 40px;
-        }
-        .section-header h2 {
-            font-size: 2.5rem;
-            color: #2b3a42;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-        .section-header p {
-            font-size: 1.1rem;
-            color: #6c757d;
-            margin-bottom: 20px;
+            transform: translateY(-20px);
+            opacity: 0;
+            animation: slideDown 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
         }
 
-        .table {
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .table th, .table td {
-            padding: 18px;
-            text-align: center;
-        }
-        .table th {
-            background-color: #f9fafb;
-            color: #495057;
-            border-bottom: 2px solid #e0e0e0;
-        }
-        .table-striped tbody tr:nth-of-type(odd) {
-            background-color: #f9f9f9;
-        }
-        .table-striped tbody tr:hover {
-            background-color: #e7eff4;
+        .member-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--card-shadow);
             cursor: pointer;
-        }
-        .btn {
-            font-size: 1rem;
-            font-weight: 500;
-            padding: 10px 20px;
-            border-radius: 30px;
-            transition: all 0.3s ease;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            border: none;
-        }
-        .btn-primary:hover {
-            background-color: #0069d9;
-            transform: translateY(-2px);
-        }
-        .btn-info {
-            background-color: #17a2b8;
-            border: none;
-        }
-        .btn-info:hover {
-            background-color: #138496;
-            transform: translateY(-2px);
-        }
-        .btn-danger {
-            background-color: #dc3545;
-            border: none;
-        }
-        .btn-danger:hover {
-            background-color: #c82333;
-            transform: translateY(-2px);
-        }
-        .btn-secondary {
-            background-color: #6c757d;
-            border: none;
-        }
-        .btn-secondary:hover {
-            background-color: #5a6268;
-            transform: translateY(-2px);
-        }
-        .btn-manage {
-            width: 100%;
-            font-size: 1.1rem;
-            font-weight: 500;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: cardEnter 0.6s forwards;
         }
 
-        /* Responsive Design for Mobile */
-        @media (max-width: 768px) {
-            .section-header h2 {
-                font-size: 2rem;
-            }
-            .table th, .table td {
-                padding: 12px;
-            }
-            .btn-manage {
-                font-size: 1rem;
-            }
+        .member-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.1);
         }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
-        .premium-text {
-            color: #2c3e50; /* Premium dark color */
-            font-family: 'Roboto', sans-serif;
-            font-weight: 300;
-            
-        }
-        .section-image {
-            max-width: 150px; /* Smallest image size */
-            width: 100%;
-            height: auto;
-            margin-bottom: 20px;
-            border-radius: 8px;
-        }
-
-        .section-header {
-            font-family: 'Roboto', sans-serif;
-            color: #34495e; /* Premium gray color */
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .section-header h2 {
-            font-size: 1.75rem; /* Reduced size for the title */
+        .member-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
             font-weight: 600;
-            color: #2c3e50; /* Darker shade for the heading */
+            font-size: 18px;
         }
-        .section-header p {
-            font-size: 1rem;
-            color: #7f8c8d; /* Lighter gray for the description */
-            font-weight: 400;
+
+        .action-btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
-        .highlight {
-            color: #1abc9c; /* Premium highlight color */
-            font-weight: 500; /* Slightly bolded */
+
+        .primary-action {
+            background: linear-gradient(135deg, var(--primary) 0%, #667EEA 100%);
+            color: white;
+            border: none;
+        }
+
+        .primary-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(74, 84, 236, 0.2);
+            color: white;
+        }
+
+        .secondary-action {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .pill-badge {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(74, 84, 236, 0.1);
+            color: var(--primary);
+        }
+
+        .modal-card {
+            border-radius: 24px;
+            border: none;
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            border-bottom: none;
+            padding: 24px;
+        }
+
+        .modal-body {
+            padding: 0 24px 24px;
+        }
+
+        @keyframes slideDown {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes cardEnter {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stagger-delay:nth-child(1) { animation-delay: 0.1s }
+        .stagger-delay:nth-child(2) { animation-delay: 0.2s }
+        .stagger-delay:nth-child(3) { animation-delay: 0.3s }
+        /* Add more delays as needed */
+
+        @media (max-width: 768px) {
+            .header-section {
+                border-radius: 0 0 24px 24px;
+            }
+            
+            .member-card {
+                margin-bottom: 12px;
+            }
         }
     </style>
 </head>
 <body>
+    <a href="{% url 'user_groups' org_id=organization.id %}" class="nav-pill">
+        <i class="mdi mdi-arrow-left text-primary" style="font-size: 1.5rem"></i>
+    </a>
 
-    <!-- Modals -->
-
-    <!-- Modal for Member Details -->
-<div class="modal fade" id="memberDetailsModal" tabindex="-1" aria-labelledby="memberDetailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="memberDetailsModalLabel">Member Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="header-section">
+        <div class="container">
+            <div class="d-flex align-items-center gap-4 mb-4">
+                <div class="member-avatar">{{ group.name|first|upper }}</div>
+                <div>
+                    <h1 class="mb-1 fw-700">{{ group.name }}</h1>
+                    <p class="text-muted mb-0">Team Leader: {{ group.team_leader.username }}</p>
+                </div>
             </div>
-            <div class="modal-body">
-                <div><strong>Username: </strong><span id="modalUsername"></span></div>
-                <div><strong>Email: </strong><span id="modalEmail"></span></div>
-                <div><strong>Role: </strong><span id="modalRole"></span></div>
-                <div><strong>Joined At: </strong><span id="modalJoinedAt"></span></div>
+            
+            <div class="d-flex gap-3 flex-wrap">
+                <a href="{% url 'invite_members_to_group' org_id=organization.id group_id=group.id %}" 
+                   class="action-btn primary-action">
+                    <i class="mdi mdi-account-plus"></i>
+                    Invite Members
+                </a>
+                <a href="{% url 'create_group_event' org_id=organization.id group_id=group.id %}" 
+                   class="action-btn secondary-action">
+                    <i class="mdi mdi-calendar-plus"></i>
+                    Create Event
+                </a>
             </div>
         </div>
     </div>
-</div>
 
-<!-- -------------------------------------------------------------------------------------------------------- -->
-
-    <section class="text-center my-5">
-        <!-- Small Image with rounded corners -->
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9QzU-w88DKf97dYaJVgvCOWAAw6ODeWEMMw&s" class="section-image" alt="Group Management Image">
-
-        <!-- Text Content -->
-        <p class="h5 premium-text">
-            Manage your group members seamlessly, create group events, and invite members into your group from your workspace.
-        </p>
-    </section>
-    
     <div class="container">
-        <!-- Section Header -->
-        <div class="section-header">
-            <h2>Manage Users in <span class="highlight">{{ group.name }}</span></h2>
-            <p>Group: <span class="highlight">{{ group.name }}</span> | <strong>Team Leader:</strong> {{ group.team_leader.username }}</p>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-600">{{ members|length }} Members</h4>
+            <div class="d-flex gap-2">
+                <button class="btn btn-light"><i class="mdi mdi-magnify"></i></button>
+                <button class="btn btn-light"><i class="mdi mdi-filter-variant"></i></button>
+            </div>
         </div>
-    
 
-        <!-- Members Table -->
-        <h4 class="mb-4 text-center">Group Members</h4>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">Username</th>
-                    <th scope="col">Role</th>
-                    <th scope="col">Joined At</th>
-                    <th scope="col">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for member in members %}
-                    <tr>
-                        <td>{{ member.user.username }}</td>
-                        <td>{{ member.role }}</td>
-                        <td>{{ member.joined_at|date:"d M Y, H:i" }}</td>
-                        <td>
-                            <!-- Dropdown for More Options -->
+        <div class="row g-3">
+            {% for member in members %}
+            <div class="col-12">
+                <div class="member-card stagger-delay">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="member-avatar">{{ member.user.username|first|upper }}</div>
+                            <div>
+                                <h5 class="mb-1">{{ member.user.username }}</h5>
+                                <p class="text-muted mb-0 small">{{ member.user.email }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="pill-badge">{{ member.role }}</span>
                             <div class="dropdown">
-                                <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-three-dots-vertical"></i> <!-- Bootstrap 5 Icon for 3 dots -->
+                                <button class="btn btn-link text-muted" type="button" data-bs-toggle="dropdown">
+                                    <i class="mdi mdi-dots-vertical"></i>
                                 </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <ul class="dropdown-menu dropdown-menu-end">
                                     <li>
-                                        <a class="dropdown-item text-danger" href="{% url 'remove_user_from_group' org_id=member.organization.id group_id=member.group.id user_id=member.id %}">
-                                            Remove From Group
+                                        <a class="dropdown-item text-danger" 
+                                           href="{% url 'remove_user_from_group' org_id=member.organization.id group_id=member.group.id user_id=member.id %}">
+                                            <i class="mdi mdi-trash-can-outline me-2"></i>
+                                            Remove Member
                                         </a>
                                     </li>
                                     <li>
-                                        <!-- View Details Option -->
-                                        <a class="dropdown-item" href="javascript:void(0);" onclick="viewMemberDetails({{ member.organization.id }}, {{ member.group.id }}, {{ member.user.id }})">
+                                        <a class="dropdown-item" 
+                                           href="javascript:void(0);" 
+                                           onclick="showMemberDetails({{ member.organization.id }}, {{ member.group.id }}, {{ member.user.id }})">
+                                            <i class="mdi mdi-information-outline me-2"></i>
                                             View Details
                                         </a>
                                     </li>
                                 </ul>
                             </div>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <!-- Buttons -->
-        <div class="row mt-4">
-            <div class="col-12 col-md-6">
-                <a href="{% url 'invite_members_to_group' org_id=organization.id group_id=group.id %}" class="btn btn-primary btn-manage">Invite Members</a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-12 col-md-6">
-                <a href="{% url 'create_group_event' org_id=organization.id group_id=group.id %}" class="btn btn-info btn-manage">Create Group Event</a>
-            </div>
+            {% endfor %}
         </div>
-
-        <!-- Back Button -->
-        <a href="{% url 'user_groups' org_id=organization.id %}" class="btn btn-secondary btn-lg mt-4">Back to My Groups</a>
     </div>
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <!-- Member Details Modal -->
+    <div class="modal fade" id="memberModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-card modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-600">Member Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex align-items-center gap-4 mb-4">
+                        <div class="member-avatar" id="modalAvatar">J</div>
+                        <div>
+                            <h4 id="modalUsername" class="mb-1">John Doe</h4>
+                            <p class="text-muted mb-0" id="modalRole">Team Member</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="bg-light p-3 rounded-2">
+                                <p class="small text-muted mb-1">Email</p>
+                                <p class="mb-0" id="modalEmail">john@example.com</p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="bg-light p-3 rounded-2">
+                                <p class="small text-muted mb-1">Joined</p>
+                                <p class="mb-0" id="modalJoinedAt">Jan 12, 2023</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <script>
-        function viewMemberDetails(orgId, groupId, userId) {
-    // Perform the AJAX request to get member details
-    $.ajax({
-        url: `/groups/groups/${orgId}/${groupId}/${userId}/group_member_details/`,  // URL to fetch member details
-        method: 'GET',
-        success: function(response) {
-            // Populate the modal with member details
-            $('#modalUsername').text(response.username);
-            $('#modalEmail').text(response.email);
-            $('#modalRole').text(response.role);
-            $('#modalJoinedAt').text(response.joined_at);
-
-            // Show the modal
-            $('#memberDetailsModal').modal('show');
-        },
-        error: function(error) {
-            console.error('Error fetching member details:', error);
-            alert('Could not fetch member details. Please try again later.');
+        function showMemberDetails(orgId, groupId, userId) {
+            $.ajax({
+                url: `/groups/groups/${orgId}/${groupId}/${userId}/group_member_details/`,
+                method: 'GET',
+                success: function(response) {
+                    $('#modalUsername').text(response.username);
+                    $('#modalEmail').text(response.email);
+                    $('#modalRole').text(response.role);
+                    $('#modalJoinedAt').text(response.joined_at);
+                    $('#modalAvatar').text(response.username.charAt(0).toUpperCase());
+                    
+                    const modal = new bootstrap.Modal('#memberModal');
+                    modal.show();
+                },
+                error: function(error) {
+                    console.error('Error:', error);
+                }
+            });
         }
-    });
-}
 
+        // Animate on scroll initialization
+        gsap.utils.toArray('.member-card').forEach((card, i) => {
+            gsap.from(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top center+=100"
+                },
+                y: 50,
+                opacity: 0,
+                duration: 0.6,
+                delay: i * 0.1
+            });
+        });
     </script>
 </body>
 </html>
-
-{% endblock %}
