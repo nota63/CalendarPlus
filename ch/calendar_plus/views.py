@@ -259,23 +259,40 @@ class EditProfileView(LoginRequiredMixin, View):
 
 # organizations
 
-
 class OrganizationListView(LoginRequiredMixin, ListView):
     model = Organization
     template_name = 'calendar/organizations_list.html'
     context_object_name = 'organizations'
 
     def get_queryset(self):
-     
         user_profiles = Profile.objects.filter(user=self.request.user)
         return Organization.objects.filter(profiles__in=user_profiles)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context['user_profiles'] = Profile.objects.filter(user=self.request.user)
+        # Fetch the user profiles for the current user
+        user_profiles = Profile.objects.filter(user=self.request.user)
+
+        # Add member count to the context for each organization
+        organizations_with_member_count = []
+        for organization in context['organizations']:
+            member_count = Profile.objects.filter(organization=organization).count()
+            organizations_with_member_count.append({
+                'organization': organization,
+                'member_count': member_count
+            })
+
+        context['organizations_with_member_count'] = organizations_with_member_count
         return context
-    
+
+
+
+
+
+
+
+
 # org detail
 class OrgDetailView(LoginRequiredMixin, View):
     template_name = 'calendar/org_detail.html'

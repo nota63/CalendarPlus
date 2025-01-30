@@ -1,221 +1,474 @@
-{% extends 'custom.html' %}
-
-{% block content %}
-
-<br>
-<br>
-<br>
-<br>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome Back! {{ request.user }}</title>
-    <!-- Tailwind CSS -->
+    <title>Workspace Dashboard | {{ request.user }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Material Icons -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
-        /* Custom animations */
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20%);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+        @keyframes fadeSlide {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-slide {
+            animation: fadeSlide 0.6s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        .animate-slide-in {
-            animation: slideIn 0.5s ease-out;
+        .hover-3d {
+            transition: transform 0.3s, box-shadow 0.3s;
         }
 
-        .hover-grow {
-            transition: transform 0.3s ease;
+        .hover-3d:hover {
+            transform: translateY(-3px) rotateX(2deg);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
         }
 
-        .hover-grow:hover {
+        .gradient-bar {
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover .gradient-bar {
+            opacity: 1;
+        }
+
+        .member-avatar {
+            transition: transform 0.3s;
+        }
+
+        .member-avatar:hover {
+            transform: translateY(-3px);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border: 2px solid white;
+            right: -2px;
+            bottom: -2px;
+        }
+
+        .workspace-icon {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .workspace-icon:hover {
             transform: scale(1.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        .highlight-section {
-            background: linear-gradient(to right, #6EE7B7, #3B82F6);
-            padding: 16px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, background 0.3s ease;
+        .active-workspace {
+            border-left: 4px solid #3F83F8;
+            background: linear-gradient(90deg, rgba(63, 131, 248, 0.1) 0%, rgba(63, 131, 248, 0) 100%);
         }
 
-        .highlight-section:hover {
-            background: linear-gradient(to right, #3B82F6, #6EE7B7);
-            transform: scale(1.05);
+        .header-shadow {
+            box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.1);
         }
 
-
-    /* Reduce size of text */
-h1 {
-    font-size: 2rem; /* Adjust the size of the heading */
-    font-weight: 600; /* Retain boldness */
-    background: linear-gradient(45deg, lightblue, pink); /* Gradient background */
-    background-clip: text; /* Apply gradient to the text */
-    color: transparent; /* Make text transparent so gradient is visible */
-    letter-spacing: 1px; /* Slight spacing between letters */
-    display: inline-block;
-}
-
-/* Style for the paragraph text */
-p {
-    font-size: 0.875rem; /* Smaller font size for the paragraph */
-    color: #4B5563; /* Dark gray color for the paragraph */
-}
-
-/* Apply animation to each letter */
-h1 span {
-    display: inline-block;
-    opacity: 0;
-    animation: fadeIn 0.8s forwards;
-}
-
-h1 span:nth-child(1) {
-    animation-delay: 0.1s;
-}
-
-h1 span:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-h1 span:nth-child(3) {
-    animation-delay: 0.3s;
-}
-
-h1 span:nth-child(4) {
-    animation-delay: 0.4s;
-}
-
-/* Add more nth-child selectors if needed */
-
-/* Animation for each letter to appear */
-@keyframes fadeIn {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-}
+        .search-bar:focus-within {
+            box-shadow: 0 0 0 2px rgba(63, 131, 248, 0.5);
+        }
     </style>
 </head>
-<body class="bg-gradient-to-b from-gray-100 via-gray-200 to-gray-300 min-h-screen font-sans text-gray-800">
+<body class="bg-gray-50 font-sans antialiased">
+    <!-- Slack-like Sidebar -->
+    <div class="fixed left-0 top-0 h-full w-20 bg-gray-900 flex flex-col items-center py-4 space-y-2 z-50">
+        <!-- Workspace Icon -->
+        <div class="workspace-icon active-workspace mb-4">
+            <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center cursor-pointer">
+                <span class="material-icons-round text-white text-2xl">work_outline</span>
+            </div>
+        </div>
 
-    <!-- Notification Section -->
+        <!-- Additional Workspaces -->
+        <div class="workspace-icon">
+            <div class="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-700">
+                <span class="material-icons-round text-gray-300 text-xl">add</span>
+            </div>
+        </div>
+
+        <div class="workspace-icon">
+            <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center cursor-pointer">
+                <span class="material-icons-round text-white text-xl">group_work</span>
+            </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="border-t border-gray-700 w-8 mx-auto my-2"></div>
+
+        <!-- User Profile -->
+        <div class="workspace-icon mt-auto">
+            <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-700">
+                <img src="https://i.pravatar.cc/40?u={{ request.user }}" class="rounded-full" alt="Profile">
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="ml-20">
+        <!-- Slack-style Header -->
+        <header class="bg-white header-shadow sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+                <!-- Left Section -->
+                <div class="flex items-center space-x-4">
+                    <h1 class="text-lg font-bold text-gray-900 flex items-center">
+                        <span class="material-icons-round text-blue-500 mr-2">rocket</span>
+                        Workspace Pro
+                    </h1>
+                    <div class="h-6 w-px bg-gray-200"></div>
+                    <nav class="flex space-x-4">
+                        <a href="#" class="text-gray-600 hover:text-gray-900 font-medium text-sm">Home</a>
+                        <a href="#" class="text-gray-600 hover:text-gray-900 font-medium text-sm">Activity</a>
+                        <a href="#" class="text-gray-600 hover:text-gray-900 font-medium text-sm">More</a>
+                    </nav>
+                </div>
+
+                <!-- Center Search -->
+                <div class="flex-1 max-w-2xl mx-8">
+                    <div class="search-bar relative flex items-center bg-gray-100 rounded-lg px-4 py-2 transition-all">
+                        <span class="material-icons-round text-gray-400 text-lg">search</span>
+                        <input type="text" 
+                               placeholder="Search messages, files, and people..." 
+                               class="w-full bg-transparent outline-none ml-2 text-sm placeholder-gray-400">
+                    </div>
+                </div>
+
+                <!-- Right Controls -->
+                <div class="flex items-center space-x-4">
+                    <button class="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100">
+                        <span class="material-icons-round">help_outline</span>
+                    </button>
+                    <button class="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100">
+                        <span class="material-icons-round">notifications_none</span>
+                    </button>
+                    <div class="h-8 w-px bg-gray-200"></div>
+                    <button class="flex items-center text-gray-700 hover:text-gray-900">
+                        <img src="https://i.pravatar.cc/32?u={{ request.user }}" class="rounded-full mr-2">
+                        <span class="text-sm font-medium">{{ request.user }}</span>
+                        <span class="material-icons-round text-gray-500 ml-1">expand_more</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+
+
+
+
+
+    <!-- Notification System -->
     {% if messages %}
-    <div class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg">
+    <div class="fixed top-6 right-6 z-50 space-y-3">
         {% for m in messages %}
-        <p class="text-sm font-medium">{{ m }}</p>
+        <div class="animate-fade-slide flex items-center bg-white shadow-xl rounded-xl p-4 w-80 border-l-4 border-blue-500">
+            <span class="material-icons-round text-blue-500 mr-3">notifications_active</span>
+            <p class="text-sm font-medium text-gray-700">{{ m }}</p>
+        </div>
         {% endfor %}
     </div>
     {% endif %}
 
-    <!-- Main Container -->
-    <div class="max-w-7xl mx-auto py-8 px-4 animate-slide-in">
-        <!-- Header -->
-        <header class="text-center mb-10">
-            <h1 class="text-3xl font-semibold text-gray-800">
-                <span>👋</span>
-                <span>Welcome</span>
-                <span>Back,</span>
-                <span>{{ request.user }}</span>!
-            </h1>
-            <p class="mt-2 text-sm text-gray-600">Manage your organizations and stay connected effortlessly.</p>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Header Section -->
+        <header class="mb-16 text-center">
+            <div class="animate-fade-slide">
+                <div class="inline-block bg-gradient-to-br from-blue-100 to-purple-100 p-4 rounded-2xl mb-6">
+                    <span class="material-icons-round text-4xl text-blue-600">rocket_launch</span>
+                </div>
+                <h1 class="text-4xl font-bold text-gray-900 mb-3">
+                    Welcome to Your Digital HQ, 
+                    <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        {{ request.user }}
+                    </span>
+                </h1>
+                <p class="text-gray-500 text-lg max-w-2xl mx-auto">
+                    Collaborate, schedule, and manage your organizations in one unified workspace
+                </p>
+            </div>
         </header>
-        <!-- Organizations Section -->
-<section class="mb-10">
-    <h2 class="text-lg font-medium text-gray-700 mb-4">Your Organizations</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for organization in organizations %}
-        <div class="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition-transform transform hover:scale-105">
-            <div class="flex items-center space-x-3 mb-3">
-                <span class="material-icons-outlined text-blue-500 text-4xl">business</span>
-                <h3 class="text-md font-semibold text-gray-700">{{ organization.name }}</h3>
+
+        <!-- Workspace Grid -->
+        <section class="mb-20">
+            <div class="flex items-center justify-between mb-8 px-2">
+                <h2 class="text-2xl font-semibold text-gray-900">Active Organizations</h2>
+                <div class="flex items-center space-x-4">
+                    <button class="flex items-center text-gray-500 hover:text-gray-700">
+                        <span class="material-icons-round mr-1">sort</span>
+                        Sort
+                    </button>
+                    <button class="flex items-center text-gray-500 hover:text-gray-700">
+                        <span class="material-icons-round mr-1">filter_list</span>
+                        Filter
+                    </button>
+                </div>
             </div>
-            <p class="text-sm text-gray-600 mb-4">{{ organization.description }}</p>
-            <a href="{% url 'org_detail' org_id=organization.id %}" class="text-blue-500 text-sm hover:underline">Work On</a>
+
+
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for org_data in organizations_with_member_count %}
+    <div class="animate-fade-slide relative bg-white rounded-2xl p-6 hover-3d card group">
+        <div class="gradient-bar absolute top-0 left-0 right-0 rounded-t-2xl"></div>
+        
+        <div class="flex items-start mb-4">
+            <div class="bg-blue-100 p-3 rounded-xl mr-4">
+                <span class="material-icons-round text-blue-600 text-2xl">groups</span>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-lg font-semibold text-gray-900">{{ org_data.organization.name }}</h3>
+                <p class="text-sm text-gray-500 mt-1">{{ org_data.organization.description }}</p>
+                
+                <div class="flex items-center mt-4 space-x-2">
+                    <div class="relative member-avatar">
+                        <img src="https://i.pravatar.cc/40?img=1" class="w-8 h-8 rounded-full">
+                        <div class="status-dot bg-green-500 absolute rounded-full"></div>
+                    </div>
+                    <div class="relative member-avatar">
+                        <img src="https://i.pravatar.cc/40?img=2" class="w-8 h-8 rounded-full">
+                        <div class="status-dot bg-yellow-500 absolute rounded-full"></div>
+                    </div>
+
+
+                    <div class="bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-full shadow-inner hover:bg-gray-100 transition-colors duration-200 ease-in-out">
+                        <div class="flex items-center gap-2">
+                            <!-- User group icon (Heroicons) -->
+                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                            <p class="text-sm font-medium text-gray-700">
+                                <span class="text-gray-600">Members:</span> 
+                                {{ org_data.member_count }}
+                            </p>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
         </div>
-        {% empty %}
-        <p class="col-span-full text-center text-gray-500">You are not part of any organizations yet.</p>
-        {% endfor %}
-    </div>
-</section>
-
-
-        <!-- Quick Links -->
-        <section class="flex flex-wrap justify-center gap-4">
-            <!-- Create Organization -->
-            <a href="{% url 'create_organization' %}" class="bg-gradient-to-r from-green-400 to-blue-500 text-white px-4 py-2 rounded-full shadow hover:scale-105 text-sm">
-                <span class="material-icons-outlined text-white align-middle mr-1">add_circle_outline</span>
-                Create Organization
+        
+        <!-- Hidden 'Launch' link that becomes visible on hover -->
+        <div class="absolute inset-0 flex justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+            <a href="{% url 'org_detail' org_id=org_data.organization.id %}" 
+               class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-6 rounded-full shadow-md hover:shadow-lg transform transition-all duration-300 ease-in-out hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                Work On
             </a>
+        </div>
+   
 
-            <!-- View Calendar -->
-            <a href="{% url 'calendar_room' %}" class="bg-gradient-to-r from-purple-400 to-pink-500 text-white px-4 py-2 rounded-full shadow hover:scale-105 text-sm">
-                <span class="material-icons-outlined text-white align-middle mr-1">calendar_today</span>
-                View Calendar
-            </a>
+
+
+
+
+
+                    <div class="border-t border-gray-100 pt-4">
+                        <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center space-x-2">
+                                <span class="material-icons-round text-gray-400 text-base">event</span>
+                                <span class="text-gray-500">Last activity: 2h ago</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="material-icons-round text-green-500 text-base">verified</span>
+                                <span class="text-gray-500">Active</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button class="text-gray-400 hover:text-gray-600">
+                            <span class="material-icons-round">more_vert</span>
+                        </button>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="md:col-span-2 lg:col-span-3 py-16 text-center">
+                    <div class="max-w-md mx-auto">
+                        <div class="mb-6 text-gray-300">
+                            <span class="material-icons-round text-6xl">workspaces</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">No Organizations Found</h3>
+                        <p class="text-gray-500 mb-6">Start collaborating by creating your first organization</p>
+                        <a href="{% url 'create_organization' %}" 
+                           class="inline-flex items-center bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl hover:shadow-lg transition-all">
+                            <span class="material-icons-round mr-2">add</span>
+                            Create Organization
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </section>
 
-        <!-- Create Workspace -->
-        <section class="flex items-center justify-center mt-8 highlight-section">
-            <img src="https://a.slack-edge.com/613463e/marketing/img/homepage/bold-existing-users/create-new-workspace-module/woman-with-laptop-color-background.png" alt="Workspace" class="h-16 rounded-lg mr-4">
-            <a href="{% url 'create_organization' %}" class="bg-blue-500 text-white px-4 py-2 text-sm rounded-full shadow hover:shadow-md">
-                Create New Workspace
-            </a>
+        <!-- Productivity Hub -->
+        <section class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+            <div class="bg-white p-6 rounded-2xl shadow-sm hover-3d">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold">Schedule Meetings</h3>
+                    <span class="material-icons-round text-blue-500">calendar_today</span>
+                </div>
+                <p class="text-sm text-gray-500 mb-4">Book upcoming sessions with team members</p>
+                <a href="{% url 'calendar_room' %}" class="text-blue-500 text-sm flex items-center">
+                    Open Calendar
+                    <span class="material-icons-round ml-1 text-lg">chevron_right</span>
+                </a>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm hover-3d">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold">Team Analytics</h3>
+                    <span class="material-icons-round text-purple-500">analytics</span>
+                </div>
+                <p class="text-sm text-gray-500 mb-4">Track organization productivity metrics</p>
+                <div class="h-2 bg-gray-100 rounded-full mb-3">
+                    <div class="h-2 bg-green-500 rounded-full w-3/4"></div>
+                </div>
+                <span class="text-xs text-gray-500">Weekly goal: 75% completed</span>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm hover-3d">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold">Integrations</h3>
+                    <span class="material-icons-round text-green-500">extension</span>
+                </div>
+                <p class="text-sm text-gray-500 mb-4">Connect with your favorite tools</p>
+                <div class="flex space-x-2">
+                    <img src="https://cdn.worldvectorlogo.com/logos/slack-new-logo.svg" class="w-8 h-8">
+                    <img src="https://cdn.worldvectorlogo.com/logos/google-drive-icon.svg" class="w-8 h-8">
+                    <img src="https://cdn.worldvectorlogo.com/logos/trello-1.svg" class="w-8 h-8">
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm hover-3d">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold">Quick Actions</h3>
+                    <span class="material-icons-round text-pink-500">bolt</span>
+                </div>
+                <div class="space-y-3">
+                    <button class="w-full flex items-center text-gray-600 hover:bg-gray-50 p-2 rounded-lg">
+                        <span class="material-icons-round mr-2">add_task</span>
+                        Create Task
+                    </button>
+                    <button class="w-full flex items-center text-gray-600 hover:bg-gray-50 p-2 rounded-lg">
+                        <span class="material-icons-round mr-2">video_call</span>
+                        Start Meeting
+                    </button>
+                    <button class="w-full flex items-center text-gray-600 hover:bg-gray-50 p-2 rounded-lg">
+                        <span class="material-icons-round mr-2">file_upload</span>
+                        Upload File
+                    </button>
+                </div>
+            </div>
         </section>
 
-        <!-- Account Reminder -->
-        <section class="text-center text-sm text-gray-600 mt-8">
-            <strong>Not Seeing Your Workspace?</strong>
-            <br>
-            <a href="{% url 'login' %}" class="text-blue-500 hover:underline">Try using another account</a>
+        <!-- Workspace Creation -->
+        <section class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 mb-20 text-white overflow-hidden">
+            <div class="relative z-10">
+                <div class="max-w-xl">
+                    <h2 class="text-2xl font-bold mb-3">Ready to Launch a New Workspace?</h2>
+                    <p class="text-blue-100 mb-6">Collaborate with your team in a dedicated digital environment</p>
+                    <a href="{% url 'create_organization' %}" 
+                       class="inline-flex items-center bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-all">
+                        <span class="material-icons-round mr-2">add</span>
+                        Create Workspace
+                    </a>
+                </div>
+            </div>
+            <img src="https://cdn.dribbble.com/users/7531/screenshots/2722450/workspace.png" 
+                 class="absolute right-0 top-1/2 -translate-y-1/2 h-64 opacity-20">
         </section>
 
-        <!-- Download Section -->
-        <section class="mt-12">
-            <div class="bg-white shadow p-4 rounded-md flex items-start gap-4">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXQckyNDdeca1wOe7rkXwhc2boNOmCaC88jQ&s" alt="Calendar+" class="h-14 rounded-lg">
+        <!-- Advanced Features -->
+        <section class="mb-20">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-8">Power Up Your Workflow</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm hover-3d">
+                    <div class="bg-blue-100 w-max p-3 rounded-xl mb-4">
+                        <span class="material-icons-round text-blue-600">auto_awesome</span>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Smart Automation</h3>
+                    <p class="text-gray-500 mb-4">Create custom workflows with no-code automation</p>
+                    <div class="flex items-center text-blue-500">
+                        <span class="text-sm mr-2">Explore Automations</span>
+                        <span class="material-icons-round">arrow_forward</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm hover-3d">
+                    <div class="bg-purple-100 w-max p-3 rounded-xl mb-4">
+                        <span class="material-icons-round text-purple-600">security</span>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Enterprise Security</h3>
+                    <p class="text-gray-500 mb-4">Advanced security controls and permissions</p>
+                    <div class="flex items-center text-blue-500">
+                        <span class="text-sm mr-2">Security Settings</span>
+                        <span class="material-icons-round">arrow_forward</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm hover-3d">
+                    <div class="bg-green-100 w-max p-3 rounded-xl mb-4">
+                        <span class="material-icons-round text-green-600">insights</span>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Advanced Analytics</h3>
+                    <p class="text-gray-500 mb-4">Deep insights into team performance</p>
+                    <div class="flex items-center text-blue-500">
+                        <span class="text-sm mr-2">View Reports</span>
+                        <span class="material-icons-round">arrow_forward</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Global Footer -->
+        <footer class="border-t border-gray-200 pt-12">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
                 <div>
-                    <h3 class="text-sm font-semibold text-gray-800">Calendar+ for Windows</h3>
-                    <p class="text-xs text-gray-600">Launch Calendar+ from your tray and stay updated with desktop notifications.</p>
-                    <a href="#" class="text-blue-500 text-xs hover:underline mt-1 block">Download</a>
+                    <h4 class="text-sm font-semibold text-gray-900 mb-4">Product</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Features</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Integrations</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Security</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-900 mb-4">Resources</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Documentation</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">API Reference</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Status</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-900 mb-4">Company</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">About</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Blog</a></li>
+                        <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Careers</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-gray-900 mb-4">Connect</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-500 hover:text-gray-700">
+                            <span class="material-icons-round">forum</span>
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-gray-700">
+                            <span class="material-icons-round">alternate_email</span>
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-gray-700">
+                            <span class="material-icons-round">rss_feed</span>
+                        </a>
+                    </div>
                 </div>
             </div>
-        </section>
-
-        <!-- Resource Section -->
-        <section class="mt-10">
-            <h2 class="text-lg font-medium text-gray-700 mb-4">Resources</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-white shadow rounded-lg p-4">
-                    <img src="https://a.slack-edge.com/4ebba/marketing/img/homepage/bold-existing-users/promos-new-to-slack/quick-start-guide-slack.png" alt="Guide" class="mb-3 rounded-lg">
-                    <h4 class="text-sm font-semibold text-gray-700">Quick Start Guide</h4>
-                    <a href="#" class="text-blue-500 text-xs hover:underline mt-2 block">Get Started</a>
-                </div>
-                <div class="bg-white shadow rounded-lg p-4">
-                    <img src="https://a.slack-edge.com/4ebba/marketing/img/homepage/bold-existing-users/promos-new-to-slack/find-and-start-convos.png" alt="How-to" class="mb-3 rounded-lg">
-                    <h4 class="text-sm font-semibold text-gray-700">Find & Start Conversations</h4>
-                    <a href="#" class="text-blue-500 text-xs hover:underline mt-2 block">Learn Now</a>
-                </div>
-                <div class="bg-white shadow rounded-lg p-4">
-                    <img src="https://a.slack-edge.com/4ebba/marketing/img/homepage/bold-existing-users/promos-only-social/channels-and-work-illustration.png" alt="Blog" class="mb-3 rounded-lg">
-                    <h4 class="text-sm font-semibold text-gray-700">Organize Work with Channels</h4>
-                    <a href="#" class="text-blue-500 text-xs hover:underline mt-2 block">Read Story</a>
-                </div>
+            <div class="border-t border-gray-200 py-6 text-center">
+                <p class="text-sm text-gray-500">&copy; 2024 Workspace Pro. All rights reserved.</p>
             </div>
-        </section>
-    </div>
+        </footer>
+    </main>
 </body>
 </html>
-{% endblock%}

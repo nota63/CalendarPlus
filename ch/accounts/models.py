@@ -57,6 +57,13 @@ class Profile(models.Model):
 
 
 
+
+
+
+
+
+
+
 # project model 
 class Project(models.Model):
     name = models.CharField(max_length=255)  # Project name
