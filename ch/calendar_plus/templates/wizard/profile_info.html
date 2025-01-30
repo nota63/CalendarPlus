@@ -3,72 +3,256 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Your Organization</title>
-    <!-- Google Fonts and Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- Tailwind CSS CDN -->
+    <title>Create Workspace • CollabSuite</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Animate.css -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet>
+
+
+    <style>
+
+        @keyframes subtleAppear {
+            0% { opacity: 0; transform: translateY(8px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .slack-input {
+            transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .slack-input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        .slack-card {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+        }
+
+        .slack-card:hover {
+            box-shadow: 0 14px 28px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.08);
+        }
+
+        .slack-progress {
+            height: 4px;
+            background: #e2e8f0;
+            overflow: hidden;
+        }
+
+        .slack-progress-bar {
+            background: #6366f1;
+            width: 25%;
+            transition: width 0.3s ease;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            box-shadow: 0 0 0 2px white;
+            bottom: -1px;
+            right: -1px;
+        }
+
+
+        .animated-entry {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+
+
 </head>
-<body class="bg-gray-50 font-montserrat flex flex-col min-h-screen">
-
-    <!-- Header -->
-    {% include 'header.html' %}
-    <br>
-    <br>
-    <br>
-    <br>
-
-    <!-- Main Layout -->
-    <div class="flex flex-1">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-blue-500 text-white flex flex-col p-4">
-            <div class="mb-6">
-                <h2 class="text-2xl font-semibold">Sidebar</h2>
-                <p class="text-sm text-blue-200">Your navigation goes here</p>
+<body class="bg-slate-50">
+    <div class="flex min-h-screen">
+        <!-- Animated Sidebar -->
+        <aside class="w-64 bg-slate-900 p-6 flex flex-col animated-entry">
+            <div class="mb-8">
+                <div class="flex items-center gap-2 text-white">
+                    <svg class="w-7 h-7 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    <span class="font-semibold">CollabSuite</span>
+                </div>
             </div>
-            <ul class="space-y-4">
-                <li><a href="{% url 'organization_list' %}" class="flex items-center gap-2 text-blue-100 hover:text-white"><span class="material-icons">dashboard</span> Workspaces</a></li>
-                <li><a href="#" class="flex items-center gap-2 text-blue-100 hover:text-white"><span class="material-icons">group</span> Team</a></li>
-                <li><a href="#" class="flex items-center gap-2 text-blue-100 hover:text-white"><span class="material-icons">settings</span> Settings</a></li>
-            </ul>
-            <div class="mt-auto">
-                <a href="#" class="flex items-center gap-2 text-blue-100 hover:text-white"><span class="material-icons">logout</span> Logout</a>
-            </div>
+            <nav class="flex-1 space-y-1.5">
+                <a href="{% url 'landing_page' %}" class="flex items-center space-x-3 px-3 py-2.5 rounded-md bg-indigo-50 text-indigo-700">
+                    <span class="material-icons-round text-lg">workspaces</span>
+                    <span class="text-sm">Workspaces</span>
+                </a>
+                <!-- Other nav items -->
+            </nav>
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 p-10">
-            <div class="animate__animated animate__fadeInUp">
-                <section class="steps flex items-center gap-2 mb-4">
-                    <i class="step-icon text-xl text-blue-500"></i>
-                    <strong class="text-gray-700 text-lg">Step 3 of 4</strong>
-                </section>
-
-                <h2 class="flex items-center gap-3 text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-pink-600 text-transparent bg-clip-text mb-6">
-                    <i class="heading-icon text-3xl"></i>
-                    How should we address you?"
-                </h2>
-                
-                <div class="container w-full max-w-lg bg-white shadow-md rounded-lg p-6">
-                    <h3 class="text-gray-600 text-base mb-4">Make it easy for your teammates to identify and connect with you.</h3>
-                    <form method="post" class="space-y-4">
-                        {% csrf_token %}
-                        {{ wizard.management_form }}
-                        {{ wizard.form.as_p }}
-                        <button type="submit" class="w-full flex items-center justify-center bg-blue-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600">
-                            <span class="material-icons mr-2">navigate_next</span> Next
-                        </button>
-                    </form>
-                </div>
+       <!-- Main Content -->
+<!-- Main Content -->
+<main class="flex-1 p-8 overflow-hidden">
+    <!-- Animated Progress Steps -->
+    <div class="max-w-3xl mx-auto mb-12 animated-entry">
+        <div class="flex items-center justify-center gap-4">
+            <!-- Step 1 -->
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center">1</div>
+                <span class="text-sm font-medium text-slate-900">Workspace Setup</span>
             </div>
+
+            <div class="h-0.5 w-16 bg-slate-200"></div>
+
+            <!-- Step 2 -->
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center">2</div>
+                <span class="text-sm text-slate-500">Workspace Purpose</span>
+            </div>
+
+            <div class="h-0.5 w-16 bg-slate-200"></div>
+
+            <!-- Step 3 (Highlighted) -->
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center">3</div>
+                <span class="text-sm font-medium text-indigo-600">Personal Details</span>
+            </div>
+
+            <div class="h-0.5 w-16 bg-slate-200"></div>
+
+            <!-- Step 4 -->
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center">4</div>
+                <span class="text-sm text-slate-500">Current Project</span>
+            </div>
+        </div>
+    </div>
+
+            <!-- Form Container -->
+            <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8 animated-entry">
+                <!-- Animated Header -->
+                <div class="mb-8 text-center space-y-4">
+                    <div class="floating">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4KvP2E2NP-GPAFglHL_66QJvexlKCe8q4GtvwIe4RbXg9zd4NS09uaMlxV7Ts4EVyrLc&usqp=CAU" 
+                             class="w-48 h-48 mx-auto" 
+                             alt="Workspace illustration">
+                    </div>
+                    <h1 class="text-3xl font-bold text-slate-900">Launch Your Workspace</h1>
+                    <p class="text-slate-500 text-sm max-w-md mx-auto">
+                        Create a collaborative space for your team to work efficiently
+                    </p>
+                </div>
+
+                <!-- Animated Form -->
+             <!-- Form Container -->
+            <div class="max-w-xl mx-auto bg-white rounded-lg slack-card p-10">
+                <div class="mb-10 text-center">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#f4ede4] mb-6">
+                        <span class="material-icons-round text-3xl text-[#4a154b]">workspaces</span>
+                    </div>
+                    <h1 class="text-[28px] font-bold text-[#1d1c1d] mb-3 leading-tight">
+                        Share a little about yourself
+                    </h1>
+                    <p class="text-[#616061] text-[15px] leading-relaxed">
+                        this helps your team get to know you better. Feel free to be as detailed as you like!"
+                    </p>
+                </div>
+
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+                    {{ wizard.management_form }}
+            
+                    <div class="space-y-4">
+                        {% for field in wizard.form %}
+                            <div>
+                                <label class="block text-sm font-medium text-[#1d1c1d] mb-2">
+                                    {{ field.label }}
+                                </label>
+                                <div class="relative">
+                                    <input type="text" class="w-full p-3 border border-gray-300 rounded-lg shadow-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-800 placeholder-gray-400 transition-all duration-300" placeholder="{{ field }}">
+
+                                    {% if forloop.first %}
+                                        <span class="absolute right-3 top-3 material-icons-round text-[#616061]">workspace_premium</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <button type="submit" class="w-full flex items-center justify-center gap-2 bg-[#4a154b] text-white py-3 px-6 rounded-md 
+                                              hover:bg-[#5c1b5d] active:bg-[#3a0e3b] transition-colors shadow-sm hover:shadow-md 
+                                              font-medium text-[15px]">
+                        <span class="material-icons-round text-lg">arrow_forward</span>
+                        Continue to Next Step
+                    </button>
+                </form>
+            </div>
+
         </main>
     </div>
 
-    <!-- Footer -->
-    {% include 'footer.html' %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animate all elements with .animated-entry class
+            gsap.from(".animated-entry", {
+                duration: 1,
+                y: 40,
+                opacity: 0,
+                stagger: 0.15,
+                ease: "power4.out",
+                delay: 0.3
+            });
 
+            // Floating animation for illustration
+            gsap.to(".floating", {
+                y: 15,
+                duration: 2,
+                repeat: -1,
+                yoyo: true,
+                ease: "power1.inOut"
+            });
+
+            // Hover effects for workspace type cards
+            document.querySelectorAll('[class*="grid-cols-3"] > div').forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    gsap.to(card, {
+                        y: -5,
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                });
+                card.addEventListener('mouseleave', () => {
+                    gsap.to(card, {
+                        y: 0,
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                });
+            });
+
+            // Input focus animations
+            document.querySelectorAll('input').forEach(input => {
+                input.addEventListener('focus', () => {
+                    gsap.to(input, {
+                        boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.2)',
+                        duration: 0.3
+                    });
+                });
+                input.addEventListener('blur', () => {
+                    gsap.to(input, {
+                        boxShadow: 'none',
+                        duration: 0.3
+                    });
+                });
+            });
+        });
+    </script>
 </body>
 </html>
