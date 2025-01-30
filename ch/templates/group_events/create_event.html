@@ -1,231 +1,363 @@
-{% extends 'custom.html' %}
-
-{% block content %}
-<br><br><br>
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Group Event</title>
-    <!-- Bootstrap 5 CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     
     <style>
-        /* Modern design tweaks */
+        :root {
+            --primary: #1264A3;
+            --secondary: #ECF4FF;
+            --accent: #36B37E;
+            --text-primary: #1D1C1D;
+            --text-secondary: #616061;
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background-color: #F8F9FA;
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+        }
+
+        .event-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
         .event-card {
+            background: white;
             border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            background-color: #f8f9fa;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            padding: 2rem;
+            transition: var(--transition);
         }
 
-        .location-icons img {
-            width: 60px;
-            height: 60px;
-            cursor: pointer;
-            margin: 10px;
-            border-radius: 12px;
-            transition: transform 0.3s ease;
-        }
-
-        .location-icons img:hover {
-            transform: scale(1.1);
-        }
-
-        .location-icons img.selected {
-            border: 3px solid #007bff;
-            padding: 5px;
-            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.5);
-        }
-
-        .btn-custom {
-            background-color: #007bff;
-            color: white;
-            border-radius: 20px;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-custom:hover {
-            background-color: #0056b3;
-        }
-
-        .floating-label input,
-        .floating-label textarea {
-            border-radius: 10px;
-            padding: 12px;
-            border: 1px solid #ddd;
-            font-size: 1rem;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .floating-label label {
-            position: absolute;
-            top: -12px;
-            left: 16px;
-            font-size: 0.9rem;
-            color: #007bff;
-            background-color: #fff;
-            padding: 0 6px;
+        .event-card:hover {
+            box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
         }
 
         .event-header {
-            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #EBEAEB;
+        }
+
+        .event-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .organization-badge {
+            background: var(--secondary);
+            color: var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            margin-left: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-label {
             font-weight: 600;
-            margin-bottom: 20px;
-            color: #333;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
         }
 
-        .input-group .form-label {
+        .form-control {
+            border: 2px solid #EBEAEB;
+            border-radius: var(--border-radius);
+            padding: 0.75rem;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(18, 100, 163, 0.1);
+        }
+
+        .time-picker-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .location-section {
+            margin-top: 2rem;
+        }
+
+        .location-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .location-option {
+            aspect-ratio: 1;
+            border: 2px solid #EBEAEB;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .location-option:hover {
+            border-color: var(--primary);
+            background: var(--secondary);
+        }
+
+        .location-option.selected {
+            border-color: var(--primary);
+            background: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(18, 100, 163, 0.1);
+        }
+
+        .location-option img {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .location-option:hover img {
+            transform: scale(1.1);
+        }
+
+        .location-option span {
+            font-size: 0.75rem;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .btn-create {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 0.75rem 2rem;
             font-weight: 600;
-            color: #333;
+            transition: var(--transition);
+            width: 100%;
+            margin-top: 2rem;
         }
 
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .event-form-container {
-            max-width: 1000px; /* Increased width for better look */
-            margin: 0 auto;
-        }
-
-        .section-header {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #007bff;
+        .btn-create:hover {
+            background: #0A4D8C;
+            transform: translateY(-1px);
         }
 
         .modal-content {
             border-radius: 12px;
+            border: none;
+        }
+
+        .modal-header {
+            border-bottom: none;
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            border-top: none;
+            padding: 1.5rem;
+        }
+
+        .floating-input {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .floating-input input,
+        .floating-input textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #EBEAEB;
+            border-radius: var(--border-radius);
+            background: transparent;
+            transition: var(--transition);
+        }
+
+        .floating-input label {
+            position: absolute;
+            top: 50%;
+            left: 1rem;
+            transform: translateY(-50%);
+            background: white;
+            padding: 0 0.5rem;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            pointer-events: none;
+        }
+
+        .floating-input input:focus + label,
+        .floating-input input:not(:placeholder-shown) + label {
+            top: 0;
+            transform: translateY(-50%) scale(0.85);
+            color: var(--primary);
+        }
+
+        .floating-input input:focus,
+        .floating-input textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(18, 100, 163, 0.1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        @media (max-width: 768px) {
+            .event-container {
+                margin: 1rem auto;
+            }
+
+            .event-card {
+                padding: 1.5rem;
+            }
+
+            .time-picker-group {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container mt-4 event-form-container">
-        <div class="event-card">
-            <h2 class="event-header">Create Event for Group: {{ group.name }}</h2>
-            <p>Organization: {{ organization.name }}</p>
+    <div class="event-container">
+        <div class="event-card animate-in">
+            <div class="event-header">
+                <h1 class="event-title">Create Event</h1>
+                <span class="organization-badge">{{ organization.name }}</span>
+            </div>
 
-            <!-- Event Creation Form -->
-            <form id="eventForm" method="POST" class="mt-4">
+            <form id="eventForm" method="POST">
                 {% csrf_token %}
-                
-                <!-- Event Title -->
-                <div class="input-group">
-                    <label for="title" class="form-label">Event Title</label>
-                    <input type="text" class="form-control" id="title" name="title" placeholder="Enter the event title" required>
+
+                <div class="floating-input">
+                    <input type="text" id="title" name="title" placeholder=" " required>
+                    <label for="title">Event Title</label>
                 </div>
 
-                <!-- Event Date and Time -->
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="input-group">
-                            <label for="date" class="form-label">Event Date</label>
-                            <input type="date" class="form-control" id="date" name="date" required>
-                        </div>
+                <div class="time-picker-group">
+                    <div class="form-group">
+                        <label class="form-label">Event Date</label>
+                        <input type="date" class="form-control" id="date" name="date" required>
                     </div>
-                    <div class="col-md-6">
-                        <div class="input-group">
-                            <label for="start_time" class="form-label">Start Time</label>
-                            <input type="time" class="form-control" id="start_time" name="start_time" required>
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">Start Time</label>
+                        <input type="time" class="form-control" id="start_time" name="start_time" required>
                     </div>
                 </div>
 
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <div class="input-group">
-                            <label for="end_time" class="form-label">End Time</label>
-                            <input type="time" class="form-control" id="end_time" name="end_time" required>
+                <div class="form-group">
+                    <label class="form-label">End Time</label>
+                    <input type="time" class="form-control" id="end_time" name="end_time" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Event Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="4"></textarea>
+                </div>
+
+                <div class="floating-input">
+                    <input type="url" id="meeting_link" name="meeting_link" placeholder=" ">
+                    <label for="meeting_link">Meeting Link (Optional)</label>
+                </div>
+
+                <div class="location-section">
+                    <label class="form-label">Select Location</label>
+                    <div class="location-grid">
+                        <div class="location-option" data-location="Zoom">
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJ8heXta8npoK1xCPaRmMWjSKQI4NATzNb9A&s" alt="Zoom">
+                            <span>Zoom</span>
+                        </div>
+                        <div class="location-option" data-location="Google Meet">
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbLY_Gzjx9AUefb9O74KPoGndPe4TIQGxcxQ&s" alt="Google Meet">
+                            <span>Google Meet</span>
+                        </div>
+                        <div class="location-option" data-location="Organization">
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThIH3m0GXzMQSOK4UX1LOiD6LLya-_i3PzCg&s" alt="Organization">
+                            <span>In Office</span>
+                        </div>
+                        <div class="location-option" data-location="Teams">
+                            <img src="https://download.logo.wine/logo/Microsoft_Teams/Microsoft_Teams-Logo.wine.png" alt="Microsoft Teams">
+                            <span>MS Teams</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Event Description with Floating Label -->
-                <div class="floating-label">
-                    <textarea class="form-control" id="description" name="description" placeholder="Provide a description for the event"></textarea>
-                    <label for="description">Event Description</label>
-                </div>
-                <br>
-
-                <!-- Meeting Link with Floating Label -->
-                <div class="floating-label">
-                    <input type="url" class="form-control" id="meeting_link" name="meeting_link" placeholder="Enter meeting link (Optional)">
-                    <label for="meeting_link">Meeting Link</label>
+                <div class="form-group">
+                    <label class="form-label">Available Slots</label>
+                    <input type="number" class="form-control" id="slots" name="slots" min="1" value="1" required>
                 </div>
 
-                <!-- Location Selection with Icons -->
-                <div class="section-header">Select Event Location</div>
-                <div class="location-icons">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJ8heXta8npoK1xCPaRmMWjSKQI4NATzNb9A&s" alt="Zoom" class="location-icon" id="zoom-icon">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbLY_Gzjx9AUefb9O74KPoGndPe4TIQGxcxQ&s" alt="Google Meet" class="location-icon" id="google-meet-icon">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThIH3m0GXzMQSOK4UX1LOiD6LLya-_i3PzCg&s" alt="Organization" class="location-icon" id="organization-icon">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSscqLov_-ynW_pZB59MILR-xDm4cw902Hc8Q&s" alt="Salesforce" class="location-icon" id="salesforce-icon">
-                    <img src="https://download.logo.wine/logo/Microsoft_Teams/Microsoft_Teams-Logo.wine.png" alt="Micorsoft Teams" class="location-icon" id="micorsoft_teams-icon">
-                    <img src=" https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVtZ6YBJSqORqYNwMw803kx2RCTim5ybFjSw&s" alt="Slack" class="location-icon" id="slack">
-                </div>
-
-                <!-- Hidden Input to Capture the Location -->
-                <input type="hidden" name="location" id="location">
-
-                <!-- Available Slots -->
-                <div class="input-group mt-4">
-                    <label for="slots" class="form-label">Available Slots</label>
-                    <input type="number" class="form-control" id="slots" name="slots" min="1" value="0" required>
-                </div>
-
-                <!-- Submit Button with Modal Trigger -->
-                <button type="button" class="btn btn-custom mt-4" data-bs-toggle="modal" data-bs-target="#confirmationModal">
+                <button type="button" class="btn-create" data-bs-toggle="modal" data-bs-target="#confirmationModal">
                     Create Event
                 </button>
 
-                <!-- Confirmation Modal Inside Form -->
-                <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
+                <div class="modal fade" id="confirmationModal" tabindex="-1" data-bs-backdrop="false">
+
+                    <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="confirmationModalLabel">Confirm Event Creation</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                Are you sure you want to create this event? Please double-check all the details before proceeding.
+                                Are you sure you want to create this event?
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <!-- Submit Button -->
-                                <button type="submit" class="btn btn-custom">Yes, Create Event</button> 
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Create Event</button>
                             </div>
                         </div>
                     </div>
                 </div>
+                
             </form>
         </div>
-
-       
     </div>
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Add event listener for location icon selection
-        const locationIcons = document.querySelectorAll('.location-icon');
-        locationIcons.forEach(icon => {
-            icon.addEventListener('click', function() {
-                locationIcons.forEach(i => i.classList.remove('selected'));  // Remove selected class from all
-                this.classList.add('selected');  // Add selected class to the clicked icon
+        document.addEventListener('DOMContentLoaded', function() {
+            const locationOptions = document.querySelectorAll('.location-option');
+            const locationInput = document.createElement('input');
+            locationInput.type = 'hidden';
+            locationInput.name = 'location';
+            document.getElementById('eventForm').appendChild(locationInput);
 
-                // Set the location input value based on selected icon
-                document.getElementById('location').value = this.alt;
+            locationOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    locationOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    locationInput.value = this.dataset.location;
+                });
             });
         });
     </script>
 </body>
 </html>
-
-{% endblock %}
