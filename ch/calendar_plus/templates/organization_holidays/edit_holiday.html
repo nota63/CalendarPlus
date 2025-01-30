@@ -7,61 +7,127 @@
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
-<body class="bg-gray-100 font-roboto">
-    <div class="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
-        <h2 class="text-2xl font-bold text-gray-800 mb-2">Edit Holiday: {{ holiday.name }}</h2>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 font-inter">
+    <div class="max-w-3xl mx-auto mt-10 p-8 bg-white rounded-xl shadow-xl relative overflow-hidden form-card">
+        <!-- Decorative Elements -->
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-400 to-purple-500"></div>
+        <div class="absolute -top-32 -right-32 w-64 h-64 rounded-full bg-indigo-50 opacity-50"></div>
+
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Edit Holiday: {{ holiday.name }}</h2>
         <h1 class="text-lg font-semibold text-gray-600 mb-6">Organization: {{ organization.name }}</h1>
 
-        <form method="POST" class="space-y-6">
+        <form method="POST" class="space-y-8 divide-y divide-gray-200">
             {% csrf_token %}
 
             <!-- Holiday Name -->
-            <div class="flex flex-col">
-                <label for="id_name" class="text-sm font-semibold text-gray-600 mb-1">Holiday Name</label>
-                <div class="mt-1">{{ form.name }}</div>
+            <div class="space-y-6">
+                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                    <div class="sm:col-span-4">
+                        <label for="id_name" class="block text-sm font-medium text-gray-700">
+                            Holiday Name
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <div class="mt-1">
+                            {{ form.name }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Holiday Description -->
+                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                    <div class="sm:col-span-6">
+                        <label for="id_description" class="block text-sm font-medium text-gray-700">
+                            Holiday Description
+                        </label>
+                        <div class="mt-1">
+                            {{ form.description }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Start Date -->
+                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                    <div class="sm:col-span-3">
+                        <label for="id_start_date" class="block text-sm font-medium text-gray-700">
+                            Start Date
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                            {{ form.start_date }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- End Date -->
+                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                    <div class="sm:col-span-3">
+                        <label for="id_end_date" class="block text-sm font-medium text-gray-700">
+                            End Date
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                            {{ form.end_date }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Message for Invitees -->
+                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                    <div class="sm:col-span-6">
+                        <label for="id_message" class="block text-sm font-medium text-gray-700">
+                            Message For Invitees
+                        </label>
+                        <div class="mt-1">
+                            {{ form.message_for_invitees }}
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Holiday Description -->
-            <div class="flex flex-col">
-                <label for="id_description" class="text-sm font-semibold text-gray-600 mb-1">Holiday Description</label>
-                <div class="mt-1">{{ form.description }}</div>
-            </div>
-
-            <!-- Start Date -->
-            <div class="flex flex-col">
-                <label for="id_start_date" class="text-sm font-semibold text-gray-600 mb-1">Start Date</label>
-                <div class="mt-1">{{ form.start_date }}</div>
-            </div>
-
-            <!-- End Date -->
-            <div class="flex flex-col">
-                <label for="id_end_date" class="text-sm font-semibold text-gray-600 mb-1">End Date</label>
-                <div class="mt-1">{{ form.end_date }}</div>
-            </div>
-
-            <!-- Message for Invitees -->
-            <div class="flex flex-col">
-                <label for="id_message" class="text-sm font-semibold text-gray-600 mb-1">Message For Invitees</label>
-                <div class="mt-1">{{ form.message_for_invitees }}</div>
-            </div>
-
-            <!-- Save Button -->
-            <div class="flex justify-end">
-                <button type="submit" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300">
-                    Save Changes
-                </button>
+            <!-- Form Actions -->
+            <div class="pt-8 flex justify-between items-center">
+                <a href="{% url 'organization_holidays' org_id=organization.id %}" class="inline-flex items-center text-gray-600 hover:text-gray-900 transition-all">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Back to Holiday Details
+                </a>
+                <div class="flex space-x-3">
+                    <button type="button" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Preview Changes
+                    </button>
+                    <button type="submit" class="hover-scale transition-all inline-flex items-center justify-center px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <svg class="w-4 h-4 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Save Changes
+                    </button>
+                </div>
             </div>
         </form>
 
-        <!-- Back Link -->
-        <div class="mt-4">
-            <a href="{% url 'organization_holidays' org_id=organization.id %}" class="text-blue-600 hover:underline">
-                Back to Holiday Details
-            </a>
+        <!-- Notification Toast -->
+        <div class="fixed bottom-4 right-4 animate__animated animate__fadeInUp">
+            <div class="bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>Changes saved successfully!</span>
+            </div>
         </div>
     </div>
 </body>
 </html>
-
