@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,15 +10,187 @@
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
+
+
+
+<style>
+    /* Custom CSS Variables */
+    :root {
+        --primary-color: #4A90E2;
+        --secondary-color: #6A7BFF;
+        --success-color: #2ED573;
+        --error-color: #FF4757;
+        --text-primary: #2D3436;
+        --text-secondary: #636E72;
+        --background-gradient: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    body {
+        background: var(--background-gradient);
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        line-height: 1.6;
+        min-height: 100vh;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2.5rem;
+        border-radius: 16px;
+        box-shadow: var(--shadow-medium);
+        transform: translateY(0);
+        opacity: 0;
+        animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    }
+
+    @keyframes slideUp {
+        0% { transform: translateY(30px); opacity: 0; }
+        100% { transform: translateY(0); opacity: 1; }
+    }
+
+    h2 {
+        font-weight: 700;
+        color: var(--text-primary);
+        font-size: 2.2rem;
+        margin-bottom: 2rem;
+        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .form-switch .form-check-input {
+        width: 3rem;
+        height: 1.5rem;
+        margin-right: 0.75rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+    }
+
+    .alert {
+        border-radius: 8px;
+        padding: 1rem 1.5rem;
+        border: none;
+    }
+
+    .alert-success {
+        background-color: #e3fcef;
+        color: #007a5a;
+    }
+
+    .alert-danger {
+        background-color: #fde8e8;
+        color: #bf0e08;
+    }
+
+    /* Holiday Info Card */
+    .holiday-info {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid #e9ecef;
+    }
+
+    .holiday-info p {
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+        color: var(--text-primary);
+    }
+
+    /* Section Animation */
+    .form-check, .mt-4 {
+        opacity: 0;
+        transform: translateY(10px);
+        animation: fadeInUp 0.4s ease forwards;
+    }
+
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Hover Effects */
+    .form-check:hover, .form-control:hover, .form-select:hover {
+        transform: translateY(-2px);
+        transition: transform 0.2s ease;
+    }
+
+    /* Status Message Animation */
+    .alert {
+        transform: scale(0.95);
+        transition: all 0.3s ease;
+    }
+
+    .alert.show {
+        transform: scale(1);
+    }
+
+    /* Custom Toggle Switch */
+    .form-switch .form-check-input {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .container {
+            margin: 1rem;
+            padding: 1.5rem;
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+        }
+    }
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
 <body class="bg-light">
 <div class="container mt-5 p-4 bg-white shadow rounded">
     <h2 class="text-primary mb-4">Holiday Settings</h2>
     <hr>
-    <p><strong>Holiday:</strong> {{ holiday.name }}</p>
-    <p><strong>Date:</strong> {{ holiday.date }}</p>
+    <!-- Holiday Info Card -->
+    <div class="holiday-info">
+        <p class="mb-1"><strong>📅 Holiday:</strong> {{ holiday.name }}</p>
+        <p class="mb-0"><strong>📌 Date:</strong> {{ holiday.date }}</p>
+    </div>
 
     <!-- Allow Scheduling Toggle -->
-    <div class="form-check form-switch mt-4">
+    <div class="form-check form-switch mt-3">
         <input
             class="form-check-input"
             type="checkbox"
