@@ -1,195 +1,411 @@
-{% include 'header.html' %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Availability</title>
+    <title>Manage Availability | Calendar+</title>
 
-    <!-- Load Tailwind CSS -->
+    <!-- Design Assets -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
-
-
-
-    
-    <!-- Load jQuery -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- Load Moment.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-
-    <!-- Load FullCalendar.js -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.2.0/fullcalendar.min.js"></script>
-
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-       /* Custom Modal Styling */
-#add-time-slot-modal, #edit-availability-modal {
-    display: none;
+        :root {
+            --primary-color: #3F51B5;
+            --secondary-color: #6574CD;
+            --accent-color: #48BB78;
+            --danger-color: #F56565;
+            --background-color: #F8FAFC;
+            --text-primary: #2D3748;
+            --text-secondary: #718096;
+        }
+
+        body {
+            background-color: var(--background-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .calendly-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .availability-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .availability-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+
+        .time-slot {
+            border-left: 4px solid var(--accent-color);
+            background: #F7FAFC;
+            padding: 12px 16px;
+            margin: 8px 0;
+            border-radius: 6px;
+        }
+
+        .fc-toolbar {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem !important;
+        }
+
+        .fc-button-primary {
+            background-color: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+        }
+
+        .modal-glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+
+       
+        .gradient-text {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+        }
+
+        .time-input {
+            border: 1px solid #E2E8F0;
+            padding: 10px 14px;
+            border-radius: 8px;
+            width: 100%;
+            transition: border-color 0.2s ease;
+        }
+
+        .time-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        #calendar {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+
+        .view-switcher {
+            background: #EDF2F7;
+            padding: 6px;
+            border-radius: 10px;
+            display: inline-flex;
+            gap: 8px;
+        }
+
+        .view-switcher button {
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .view-switcher button.active {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .empty-state {
+            background: #F8FAFC;
+            border: 2px dashed #CBD5E0;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-content {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @media (max-width: 768px) {
+            .availability-card {
+                margin: 0 -1rem;
+                border-radius: 0;
+            }
+
+            #calendar {
+                padding: 12px;
+            }
+
+            .fc-toolbar {
+                flex-direction: column;
+                gap: 12px;
+            }
+        }
+
+
+
+
+/* Modal Background (Blurred Overlay) */
+/* Modal Container */
+#edit-availability-modal {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 1000;
-    max-width: 600px;
-    width: 100%;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    padding: 30px;
-    overflow: hidden;
-    transition: transform 0.3s ease-in-out, opacity 0.3s ease;
-}
-
-#add-time-slot-modal.open, #edit-availability-modal.open {
-    display: block;
+    width: 90%;
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 1.75rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+    visibility: visible;
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-#overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
+/* Modal Heading */
+#edit-availability-modal h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #4A154B; /* Slack-inspired purple */
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+/* Input Fields */
+#edit-availability-form input[type="time"] {
     width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    z-index: 999;
-    transition: background-color 0.3s ease;
-}
-
-#overlay.active {
-    display: block;
-    background-color: rgba(0, 0, 0, 0.7);
-}
-
-/* Modal Header */
-#add-time-slot-modal .modal-header, #edit-availability-modal .modal-header {
-    padding: 15px;
-    border-bottom: 1px solid #e0e0e0;
-    background-color: #f5f5f5;
-    border-radius: 10px 10px 0 0;
-}
-
-#add-time-slot-modal .modal-header h5, #edit-availability-modal .modal-header h5 {
-    font-size: 18px;
+    padding: 0.5rem 1rem;
+    border: 2px solid #E8E8E8;
+    border-radius: 8px;
+    font-size: 1rem;
     color: #333;
-    font-weight: bold;
-    margin: 0;
+    transition: border-color 0.3s ease;
 }
 
-/* Modal Body */
-#add-time-slot-modal .modal-body, #edit-availability-modal .modal-body {
-    padding: 20px;
-    font-size: 16px;
-    color: #555;
-    line-height: 1.6;
+/* Input Focus */
+#edit-availability-form input[type="time"]:focus {
+    border-color: #36C5F0;
+    outline: none;
+    box-shadow: 0 0 8px rgba(54, 197, 240, 0.3);
 }
 
-/* Modal Footer */
-#add-time-slot-modal .modal-footer, #edit-availability-modal .modal-footer {
-    padding: 15px;
-    border-top: 1px solid #e0e0e0;
-    background-color: #f9f9f9;
-    text-align: right;
-}
-
-#add-time-slot-modal .modal-footer button, #edit-availability-modal .modal-footer button {
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 5px;
-    border: none;
-    background-color: #007bff;
+/* Save Button */
+#edit-availability-form button[type="submit"] {
+    width: 100%;
+    background-color: #36C5F0;
     color: white;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background 0.3s ease;
+    border: none;
 }
 
-#add-time-slot-modal .modal-footer button:hover, #edit-availability-modal .modal-footer button:hover {
-    background-color: #0056b3;
+/* Save Button Hover */
+#edit-availability-form button[type="submit"]:hover {
+    background-color: #2BAC76;
 }
 
-/* Responsive Design for Modal */
-@media (max-width: 768px) {
-    #add-time-slot-modal, #edit-availability-modal {
-        max-width: 90%;
-        padding: 20px;
-    }
+/* Close Button */
+#edit-availability-modal button.close-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #666;
+    margin-top: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
 
-    #add-time-slot-modal .modal-header h5, #edit-availability-modal .modal-header h5 {
-        font-size: 16px;
-    }
+/* Close Button Hover */
+#edit-availability-modal button.close-btn:hover {
+    color: #4A154B;
+}
 
-    #add-time-slot-modal .modal-body, #edit-availability-modal .modal-body {
-        font-size: 14px;
-    }
-
-    #add-time-slot-modal .modal-footer button, #edit-availability-modal .modal-footer button {
-        font-size: 14px;
-        padding: 8px 15px;
+/* Responsive Design */
+@media (max-width: 480px) {
+    #edit-availability-modal {
+        width: 95%;
+        padding: 1.5rem;
     }
 }
+
 
     </style>
 </head>
-<body class="font-sans bg-gray-100 text-gray-800">
-
-    <h2 class="text-center py-5 text-uppercase" style="font-size: 2rem; font-weight: 600;">
-        Manage Availability for <span class="text-success">{{ organization.name }}</span>
-    </h2>
-
-    <p class="text-center text-muted" style="font-size: 1.125rem; line-height: 1.6;">
-        Your availability will be limited to this workspace. You can modify the availability, and Calendar Plus will prevent users from scheduling outside of your availability.
-    </p>
-    
-    
-
-    <!-- Toggle buttons for list view and calendar view -->
-    <div class="flex justify-center space-x-4 mb-6">
-        <button id="list-view-btn" class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 focus:outline-none">List View</button>
-        <button id="calendar-view-btn" class="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600 focus:outline-none">Calendar View</button>
-    </div>
-
-    <!-- List View (Existing) -->
-    <div id="availability-container" class="space-y-4">
-        {% for day, slots in grouped_availabilities.items %}
-            <div class="bg-white p-4 rounded-lg shadow-md">
-                <div class="flex justify-between items-center">
-                    <span class="font-bold">{{ day }}</span>
-                    <button class="add-time-slot-btn text-green-600 font-semibold" data-day="{{ forloop.counter0 }}" data-org="{{ organization.id }}">+ Add Time Slot</button>
+<body>
+    <!-- Header -->
+    <header class="calendly-header py-8 mb-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <h1 class="text-3xl font-bold">Availability Settings</h1>
+                <div class="flex items-center gap-4">
+                    <button class="bg-white/10 hover:bg-white/20 px-6 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-cog mr-2"></i>Settings
+                    </button>
                 </div>
-                <div class="mt-4 space-y-2">
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4">
+        <!-- Header Section -->
+        <div class="mb-12 text-center">
+            <h2 class="text-4xl font-bold mb-4 gradient-text">
+                Manage Availability for 
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">
+                    {{ organization.name }}
+                </span>
+            </h2>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                Define your available hours for this workspace. Calendar+ will automatically prevent meetings outside these
+                time slots while considering time zones and your working hours.
+            </p>
+        </div>
+
+        <!-- View Switcher -->
+        <div class="view-switcher mb-8">
+            <button id="list-view-btn" class="active text-gray-700">
+                <i class="fas fa-list-ul mr-2"></i>List View
+            </button>
+            <button id="calendar-view-btn" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-calendar-alt mr-2"></i>Calendar View
+            </button>
+        </div>
+
+        <!-- List View -->
+        <div id="availability-container" class="space-y-6">
+            {% for day, slots in grouped_availabilities.items %}
+            <div class="availability-card p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800">{{ day }}</h3>
+                    <button class="add-time-slot-btn flex items-center text-sm text-accent hover:text-accent-dark"
+                        data-day="{{ forloop.counter0 }}" data-org="{{ organization.id }}">
+                        <i class="fas fa-plus-circle mr-2"></i>Add Slot
+                    </button>
+                </div>
+                
+                {% if slots %}
+                <div class="space-y-3">
                     {% for slot in slots %}
-                        <div class="flex justify-between items-center">
-                            <span>{{ slot.start_time }} - {{ slot.end_time }}</span>
-                            <button class="delete-btn text-red-600 font-semibold" data-id="{{ slot.id }}" data-org="{{ organization.id }}">Delete</button>
+                    <div class="time-slot flex items-center justify-between group">
+                        <div class="flex items-center gap-4">
+                            <span class="text-gray-600">🕒</span>
+                            <div>
+                                <span class="font-medium text-gray-800">{{ slot.start_time }}</span>
+                                <span class="mx-2 text-gray-400">-</span>
+                                <span class="font-medium text-gray-800">{{ slot.end_time }}</span>
+                            </div>
                         </div>
+                        <div class="flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button class="edit-btn text-gray-400 hover:text-primary">
+                                <i class="fas fa-pencil-alt"></i>
+                            </button>
+                            <button class="delete-btn text-gray-400 hover:text-danger"
+                                data-id="{{ slot.id }}" data-org="{{ organization.id }}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-clock text-3xl text-gray-400 mb-4"></i>
+                    <p class="text-gray-500">No availability slots added for this day</p>
+                </div>
+                {% endif %}
             </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
+
+        <!-- Calendar View -->
+        <div id="calendar-view" class="hidden">
+            <div id="calendar" class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <!-- FullCalendar instance -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Time Slot Modal -->
+    <div id="overlay" class="fixed inset-0 bg-black/50 z-50 hidden"></div>
+    <div id="add-time-slot-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 modal-glass p-8 rounded-2xl w-full max-w-md hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Add Time Slot</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="add-time-slot-form" class="space-y-6">
+                <input type="hidden" id="selected-day" name="day_of_week">
+                <input type="hidden" id="selected-org" name="org_id" value="{{ organization.id }}">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Start Time</label>
+                    <input type="time" id="start-time" name="start_time" 
+                        class="time-input focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">End Time</label>
+                    <input type="time" id="end-time" name="end_time" 
+                        class="time-input focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+
+                <div class="flex gap-4 justify-end">
+                    <button type="button" onclick="closeModal()" 
+                        class="btn-secondary px-6 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                        class="btn-primary bg-primary hover:bg-primary-dark text-white flex items-center">
+                        <i class="fas fa-check-circle mr-2"></i>Add Slot
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <!-- Calendar View (FullCalendar.js) -->
-    <div class="container mt-5">
-        <h1 class="mb-4" style="text-transform: uppercase; font-weight: bold; font-size: 2rem; background-image: linear-gradient(to right, #f8a5d3, #a2c2e3); -webkit-background-clip: text; color: transparent;">
-        </h1>
-        
-        <div id="calendar" class="container py-5 shadow-lg rounded-3 bg-light border border-0 border-secondary">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-             
-            </div>
-            <!-- FullCalendar will be inserted here -->
-        </div>
-        
-    </div>
+
+
+
     <!-- Modal to Add Time Slot -->
     <div id="overlay" class="hidden"></div>
     <div id="add-time-slot-modal" class="hidden bg-white p-6 rounded-lg shadow-lg">
@@ -233,7 +449,28 @@
 </html>
 
 <script>
-    $(document).ready(function () {
+    // View Toggle
+        const listViewBtn = document.getElementById('list-view-btn');
+        const calendarViewBtn = document.getElementById('calendar-view-btn');
+        const availabilityContainer = document.getElementById('availability-container');
+        const calendarView = document.getElementById('calendar-view');
+
+        listViewBtn.addEventListener('click', () => {
+            availabilityContainer.classList.remove('hidden');
+            calendarView.classList.add('hidden');
+            listViewBtn.classList.add('active');
+            calendarViewBtn.classList.remove('active');
+        });
+
+        calendarViewBtn.addEventListener('click', () => {
+            availabilityContainer.classList.add('hidden');
+            calendarView.classList.remove('hidden');
+            calendarViewBtn.classList.add('active');
+            listViewBtn.classList.remove('active');
+            initCalendar();
+        });
+
+        $(document).ready(function () {
         // Toggle between List View and Calendar View
         $('#list-view-btn').click(function() {
             $('#availability-container').show();  // Show list view
@@ -396,6 +633,7 @@ $("#edit-availability-form").submit(function (e) {
             });
         });
     });
+
 </script>
 
 </body>
