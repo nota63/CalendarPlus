@@ -1,154 +1,443 @@
-{% include 'header.html' %}
-
-
-<br><br><br>
-
-
 <!DOCTYPE html>
-
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Group Creation Wizard</title>
-
+    <title>Group Creation | CollabHub</title>
+    
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- Custom CSS -->
     <style>
+        :root {
+            --primary: #4A54EB;
+            --secondary: #00C9A7;
+            --background: #F8F9FF;
+            --text-primary: #2E384D;
+            --text-secondary: #8798AD;
+        }
+
         body {
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9; /* Pure white background */
-            font-family: 'Poppins', Arial, sans-serif;
-            color: #333; /* Neutral dark text for contrast */
-            overflow-x: hidden;
+            background: var(--background);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
         }
 
-        .container {
-            max-width: 800px; /* Larger size for the card */
-        }
-
-        .card {
-            background-color: #ffffff; /* White card background */
+        .creation-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(18, 34, 84, 0.1);
             border: none;
-            border-radius: 15px;
-            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1); /* Modern soft shadow */
             overflow: hidden;
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .creation-card:hover {
+            transform: translateY(-4px);
         }
 
         .card-header {
-            background: linear-gradient(90deg, #4caf50, #81c784); /* Vibrant green gradient */
-            color: #ffffff; /* White text */
-            text-align: center;
-            padding: 20px;
-            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 2rem;
+            border-bottom: none;
+            position: relative;
+            overflow: hidden;
         }
 
-        .card-header h4 {
-            font-size: 1.8rem;
-            animation: fadeIn 2s ease-in-out;
+        .card-header::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: white;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .card-title {
+            font-weight: 700;
+            color: white;
+            font-size: 1.75rem;
+            text-align: center;
+            letter-spacing: -0.5px;
+            margin: 0;
         }
 
         .card-body {
-            padding: 30px;
-            animation: slideUp 1.5s ease-in-out;
+            padding: 2.5rem;
         }
 
-        button {
-            background: linear-gradient(90deg, #2196f3, #64b5f6); /* Vibrant blue gradient */
-            border: none;
+        .form-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-control {
+            border: 2px solid #E9ECF3;
+            border-radius: 8px;
+            padding: 0.875rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 84, 235, 0.1);
+        }
+
+        .form-floating label {
+            color: var(--text-secondary);
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #E9ECF3;
+            transform: translateY(-50%);
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #E9ECF3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            border-color: var(--primary);
+            background: var(--primary);
             color: white;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 25px;
-            padding: 12px 25px;
-            cursor: pointer;
         }
 
-        button:hover {
-            background: linear-gradient(90deg, #64b5f6, #2196f3); /* Reverse gradient on hover */
-            transform: scale(1.05);
-            transition: 0.3s;
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            padding: 0.875rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
         }
 
-        @keyframes fadeIn {
-            0% {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(74, 84, 235, 0.2);
         }
 
-        @keyframes slideUp {
-            0% {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .feature-badge {
+            background: rgba(74, 84, 235, 0.1);
+            color: var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .floating-illustration {
+            animation: float 4s ease-in-out infinite;
+        }
+
+         /* Add these new styles */
+         .app-header {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--text-primary) !important;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-logo {
+            width: 32px;
+            height: 32px;
+        }
+
+        .nav-link {
+            color: var(--text-secondary) !important;
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary) !important;
+        }
+
+        .nav-link.active {
+            color: var(--primary) !important;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 1rem;
+            right: 1rem;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .notification-icon {
+            position: relative;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .notification-icon:hover {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -6px;
+            right: -8px;
+            background: var(--secondary);
+            color: white;
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .app-footer {
+            background: var(--text-primary);
+            color: white;
+            padding: 2rem 0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-link {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .footer-link:hover {
+            color: white;
+        }
+
+        /* Adjust body padding for fixed header */
+        body {
+            padding-top: 70px;
+            flex-direction: column;
         }
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <div class="card shadow">
-            <div class="card-header">
-                <h4 class="mb-0">Create a New Group</h4>
+
+     <!-- Slack-like Header -->
+     <header class="app-header">
+        <nav class="navbar navbar-expand-lg navbar-light py-2">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <svg class="brand-logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 15C6 16.6569 4.65685 18 3 18C1.34315 18 0 16.6569 0 15C0 13.3431 1.34315 12 3 12C4.65685 12 6 13.3431 6 15Z" fill="#E01E5A"/>
+                        <path d="M14 15C14 16.6569 12.6569 18 11 18C9.34315 18 8 16.6569 8 15C8 13.3431 9.34315 12 11 12C12.6569 12 14 13.3431 14 15Z" fill="#36C5F0"/>
+                        <path d="M6 6C6 7.65685 4.65685 9 3 9C1.34315 9 0 7.65685 0 6C0 4.34315 1.34315 3 3 3C4.65685 3 6 4.34315 6 6Z" fill="#2EB67D"/>
+                        <path d="M14 6C14 7.65685 12.6569 9 11 9C9.34315 9 8 7.65685 8 6C8 4.34315 9.34315 3 11 3C12.6569 3 14 4.34315 14 6Z" fill="#ECB22E"/>
+                    </svg>
+                    CalendarPlus
+                </a>
+                
+                <div class="d-flex align-items-center">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Projects</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Teams</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Messages</a>
+                        </li>
+                    </ul>
+
+                    <div class="user-menu">
+                        <a href="#" class="notification-icon">
+                            <i class="bi bi-bell"></i>
+                            <span class="notification-badge">3</span>
+                        </a>
+                        
+                        <div class="dropdown">
+                            <a class="dropdown-toggle d-flex align-items-center" href="#" role="button" 
+                               id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="https://via.placeholder.com/36" class="user-avatar" alt="User Avatar">
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </nav>
+    </header>
+
+
+
+
+
+
+    <div class="container py-5">
+        <div class="creation-card mx-auto" style="max-width: 740px;">
+            <div class="card-header">
+                <h1 class="card-title">Create New Group</h1>
+            </div>
+            
             <div class="card-body">
+                <!-- Progress Steps -->
+                <div class="progress-steps">
+                    <div class="step active">1</div>
+                    <div class="step">2</div>
+                    <div class="step">3</div>
+                </div>
+
                 {% block content %}
+                <!-- Form content goes here -->
                 {% endblock %}
+
+                <!-- Sample Form Elements -->
+                <form class="needs-validation" novalidate>
+                    <div class="mb-4">
+                        <label for="groupName" class="form-label">Group Name</label>
+                        <input type="text" class="form-control" id="groupName" placeholder="Enter group name" required>
+                        <div class="invalid-feedback">Please provide a group name.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="groupDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="groupDescription" rows="3" placeholder="What's this group about?"></textarea>
+                    </div>
+
+                    <div class="d-grid gap-3">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="me-2">Return</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- GSAP Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+
 
     <!-- Bootstrap Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+    
     <!-- GSAP Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <!-- Custom Animations -->
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Animate the card appearance
-            gsap.fromTo(
-                ".card",
-                { opacity: 0, y: 50, scale: 0.9 },
-                { opacity: 1, y: 0, scale: 1, duration: 1, ease: "power2.out" }
-            );
+        document.addEventListener('DOMContentLoaded', () => {
+            // Card entrance animation
+            gsap.from('.creation-card', {
+                duration: 0.8,
+                y: 40,
+                opacity: 0,
+                ease: 'power3.out'
+            });
 
-            // Button hover effect
-            const buttons = document.querySelectorAll("button");
-            buttons.forEach(button => {
-                button.addEventListener("mouseenter", () => {
-                    gsap.to(button, {
-                        scale: 1.1,
-                        duration: 0.3,
-                        ease: "power2.out",
-                    });
-                });
+            // Step animations
+            gsap.from('.step', {
+                duration: 0.6,
+                scale: 0,
+                stagger: 0.15,
+                ease: 'back.out(1.7)'
+            });
 
-                button.addEventListener("mouseleave", () => {
-                    gsap.to(button, {
-                        scale: 1,
-                        duration: 0.3,
-                        ease: "power2.out",
-                    });
-                });
+            // Form element animations
+            gsap.from('.form-label, .form-control', {
+                duration: 0.6,
+                y: 20,
+                opacity: 0,
+                stagger: 0.1,
+                ease: 'power3.out'
             });
         });
     </script>
 </body>
 </html>
-
-
-{% include 'footer.html' %}
