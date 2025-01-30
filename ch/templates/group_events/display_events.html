@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,593 +5,672 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ group.name }} - Events</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-   
 
     <style>
-      
-
-
-
-
-        .card {
-            transition: transform 0.2s;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
-        }
-        .booked-btn {
-            background-color: #6c757d !important;
-            color: white;
-            cursor: not-allowed;
-        }
-        .alert-success {
-            display: none;
-        }
-        /* Spinner style */
-        .spinner-wrapper {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-        .spinner-wrapper .spinner-border {
-            width: 3rem;
-            height: 3rem;
+        :root {
+            --primary: #4A00E0;
+            --secondary: #8E2DE2;
+            --slate-100: #f8f9fa;
+            --slate-800: #2d3748;
         }
 
-/* 
+        body {
+            background: var(--slate-100);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
 
-/* Modal Styles */
-.modal-content {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-}
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
+        .event-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
+        .event-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        }
 
+        .filter-bar {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
 
+        .status-pill {
+            background: rgba(74, 0, 224, 0.1);
+            color: var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
 
+        .modal-content {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
 
+        .dropdown-menu {
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            padding: 0.5rem;
+        }
+
+        .dropdown-item {
+            border-radius: 6px;
+            margin: 0.25rem 0;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .form-control {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(74, 0, 224, 0.1);
+        }
+
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
-
-    <div class="my-5">
-        <!-- Title with Premium Bold Styling -->
-        <h2 class="text-center mb-4 fw-bold text-uppercase" style="background-image: linear-gradient(to right, #00c6ff, #ff66cc); -webkit-background-clip: text; color: transparent;">
-            {{ group.name }} - Events
-        </h2>
-        
-        <!-- Subtitle with Icon and Premium Text Styling -->
-        <p class="text-muted text-center fs-6 mb-4" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-            <i class="bi bi-building me-2 text-primary"></i>
-            Organized In <strong class="text-dark">{{ organization.name }}</strong>
-        </p>
-        
-        <!-- Event Information Section with Soft Premium Styling -->
-        <div class="container my-5 px-4 py-3 bg-light rounded shadow-sm">
-            <div class="text-center">
-                <p class="fs-5 text-muted mb-3" style="font-family: 'Roboto', sans-serif;">
-                    <i class="bi bi-person-circle me-2 text-primary"></i>
-                    All events organized by your group leader, <strong>{{ group.team_leader.username }}</strong>, will be displayed here.
-                </p>
-                <p class="fs-6 text-muted mb-3" style="font-family: 'Roboto', sans-serif;">
-                    <i class="bi bi-check-circle me-2 text-success"></i>
-                    Participation in all events is mandatory to ensure active collaboration and success.
-                </p>
-                <p class="fs-6 text-secondary mb-0" style="font-family: 'Roboto', sans-serif;">
-                    <i class="bi bi-calendar-plus me-2 text-warning"></i>
-                    Book your spot now and notify your group leader of your attendance!
-                </p>
-            </div>
-        </div>
-        
-      <!-- Leader Status Section with Stylish Text -->
-<div class="container my-4 px-4 py-3 bg-light rounded shadow-sm">
-    <div class="text-center">
-        {% if is_team_leader %}
-            <p class="fs-5 text-success mb-3" style="font-family: 'Roboto', sans-serif;">
-                <i class="bi bi-person-check me-2"></i>
-                You are the team leader of this group. Administrative actions are available for you.
-            </p>
-        {% else %}
-            <p class="fs-5 text-danger mb-3" style="font-family: 'Roboto', sans-serif;">
-                <i class="bi bi-person-x me-2"></i>
-                You are not the team leader.
-            </p>
-        {% endif %}
-    </div>
-</div>
-
-    
-
-        <div class="alert alert-success" id="successMessage">
-            Event booked successfully!
-        </div>
-
-        <!-- Spinner for booking event -->
-        <div class="spinner-wrapper" id="spinnerWrapper">
-            <div class="spinner-border text-primary" role="status"></div>
-            <p>Sending booking request to system...</p>
-        </div>
-
-
-
-        <!-- Modal for Marking Absence -->
-<div class="modal fade" id="absenceModal" tabindex="-1" aria-labelledby="absenceModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="absenceModalLabel">Mark Yourself as Absent</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="absenceForm">
-                    <div class="mb-3">
-                        <label for="reason" class="form-label">Reason for Absence</label>
-                        <select id="reason" class="form-control">
-                            <option value="Personal">Personal</option>
-                            <option value="Availability Issues">Availability Issues</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="customMessage" class="form-label">Custom Message (Optional)</label>
-                        <textarea id="customMessage" class="form-control" rows="3" placeholder="Provide a custom message if needed"></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger" id="submitAbsence">Mark as Absent</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Reminder Modal -->
-<!-- Reminder Modal -->
-<div class="modal fade" id="reminderModal" tabindex="-1" aria-labelledby="reminderModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="reminderModalLabel">Set Event Reminder</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="reminderForm">
-            <!-- Reminder options: 1 day before, 1 hour before, or custom -->
-            <div class="mb-3">
-              <label class="form-label">Reminder Option</label>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="reminder_option" id="reminderOption1Day" value="1_day_before" required>
-                <label class="form-check-label" for="reminderOption1Day">
-                  1 Day Before
-                </label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="reminder_option" id="reminderOption1Hour" value="1_hour_before" required>
-                <label class="form-check-label" for="reminderOption1Hour">
-                  1 Hour Before
-                </label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="reminder_option" id="reminderOptionCustom" value="custom" required>
-                <label class="form-check-label" for="reminderOptionCustom">
-                  Custom
-                </label>
-              </div>
-            </div>
-  
-            <!-- Custom reminder datetime field (hidden initially) -->
-            <div class="mb-3 d-none" id="customTimeContainer">
-              <label for="customTime" class="form-label">Custom Reminder Time</label>
-              <input type="datetime-local" id="customTime" class="form-control">
-            </div>
-  
-            <!-- Optional reason field -->
-            <div class="mb-3">
-              <label for="reason" class="form-label">Reason (Optional)</label>
-              <textarea id="reason" class="form-control" rows="3"></textarea>
-            </div>
-  
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-primary">Set Reminder</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Display Bookings -->
-
-  <!-- Modal to Display Bookings -->
-
-  <!-- Modal for Event Bookings -->
-  <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="bookingModalLabel">Event Bookings</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div id="bookingListContainer">
-                
-                    <p>Loading bookings...</p>
+    <div class="container py-5">
+        <!-- Header Section -->
+        <div class="text-center mb-8">
+            <h1 class="display-5 fw-bold gradient-text mb-3">
+                {{ group.name }} Events
+            </h1>
+            <div class="d-flex align-items-center justify-content-center gap-3">
+                <div class="status-pill">
+                    <i class="bi bi-people-fill me-2"></i>
+                    {{ organization.name }}
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Analytics dashboard -->
-<!-- Modal Structure -->
-<div class="modal fade" id="analyticsModal" tabindex="-1" aria-labelledby="analyticsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="analyticsModalLabel">Event Analytics</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Event Details -->
-          <h6 id="event-title">Event Title: Loading...</h6>
-          <p id="event-description">Description: Loading...</p>
-          <p><strong>Date:</strong> <span id="event-date">Loading...</span></p>
-          <p><strong>Time:</strong> <span id="event-time">Loading...</span></p>
-  
-          <!-- Analytics Overview -->
-          <div class="row">
-            <div class="col-md-6">
-              <p><strong>Total Bookings:</strong> <span id="total-bookings">0</span></p>
-              <p><strong>Confirmed Bookings:</strong> <span id="confirmed-bookings">0</span></p>
-              <p><strong>Pending Bookings:</strong> <span id="pending-bookings">0</span></p>
-              <p><strong>Cancelled Bookings:</strong> <span id="cancelled-bookings">0</span></p>
-            </div>
-            <div class="col-md-6">
-              <p><strong>Total Reminders:</strong> <span id="total-reminders">0</span></p>
-              <p><strong>Reminders Sent:</strong> <span id="reminder-sent">0</span></p>
-              <p><strong>Reminders Pending:</strong> <span id="reminder-pending">0</span></p>
-            </div>
-          </div>
-  
-          <!-- Charts -->
-          <div class="mt-4">
-            <h6>Booking Status Distribution</h6>
-            <canvas id="bookings-chart" width="400" height="200"></canvas>
-          </div>
-          <div class="mt-4">
-            <h6>Absentee Reasons Distribution</h6>
-            <canvas id="absentee-chart" width="400" height="200"></canvas>
-          </div>
-          <div class="mt-4">
-            <h6>Reminder Types</h6>
-            <canvas id="reminder-types-chart" width="400" height="200"></canvas>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- User-Specific Analytics Modal -->
-<div class="modal fade" id="userAnalyticsModal" tabindex="-1" aria-labelledby="userAnalyticsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content rounded-3 shadow-lg">
-            <div class="modal-header border-0">
-                <h5 class="modal-title" id="userAnalyticsModalLabel">My Event Analytics</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <h4 class="text-center mb-4">Your Personalized Analytics</h4>
-
-                <!-- User Event Details -->
-                <div id="userEventDetails" class="mb-4">
-                    <!-- Dynamic content will be loaded here -->
-                </div>
-
-                <!-- User Booking Status Chart -->
-                <div class="chart-container mb-4">
-                    <canvas id="userBookingStatusChart" width="400" height="400"></canvas>
-                </div>
-
-                <!-- User Absentee Reasons Chart -->
-                <div class="chart-container mb-4">
-                    <canvas id="userAbsenteeReasonsChart" width="400" height="400"></canvas>
-                </div>
-
-                <!-- User Reminder Status Chart -->
-                <div class="chart-container mb-4">
-                    <canvas id="userReminderStatusChart" width="400" height="400"></canvas>
+                <div class="status-pill">
+                    <i class="bi bi-person-badge-fill me-2"></i>
+                    Leader: {{ group.team_leader.username }}
                 </div>
             </div>
         </div>
-    </div>
-</div>
+        <br>
 
-  
-<!-- Delete event modal  -->
-<div class="modal fade" id="deleteEventModal" tabindex="-1" aria-labelledby="deleteEventModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteEventModalLabel">Delete Event</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <!-- Team Leader Banner -->
+        <div class="alert border border-primary bg-white mb-6 fade-in">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-star-fill text-primary fs-4"></i>
+                <div>
+                    {% if is_team_leader %}
+                    <h5 class="fw-bold mb-1">Team Leader Dashboard</h5>
+                    <p class="mb-0">You have administrative privileges for all events in this group</p>
+                    {% else %}
+                    <h5 class="fw-bold mb-1">Participant View</h5>
+                    <p class="mb-0">Contact {{ group.team_leader.username }} for event modifications</p>
+                    {% endif %}
+                </div>
             </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete this event? Please enter your password to proceed.</p>
-                <form id="deleteEventForm">
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                    </div>
-                    <button type="submit" class="btn btn-danger">Delete Event</button>
-                </form>
-                <div id="deleteMessage" class="mt-3"></div>
+        </div>
+
+        <!-- Control Bar -->
+
+
+        <!-- Merged Search and Filter Bar -->
+
+        <!-- Merged Search and Filter Bar -->
+<div class="filter-bar mb-6 fade-in">
+    <div class="row g-3">
+        <div class="col-lg-4">
+            <div class="input-group shadow-sm border-0 rounded-3">
+                <span class="input-group-text bg-transparent border-end-0"><i class="bi bi-search"></i></span>
+                <input type="text" id="search-title" class="form-control border-start-0" placeholder="Search events...">
             </div>
+        </div>
+        <div class="col-lg-3">
+            <input type="date" id="filter-date" class="form-control shadow-sm border-0 rounded-3">
+        </div>
+        <div class="col-lg-3">
+            <select id="filter-location" class="form-select shadow-sm border-0 rounded-3">
+                <option value="">All Locations</option>
+                <option value="Zoom">Zoom</option>
+                <option value="Google Meet">Google Meet</option>
+                <option value="Organization">Organization</option>
+                <option value="Salesforce">Salesforce</option>
+                <option value="Microsoft Teams">Microsoft Teams</option>
+                <option value="Skype">Skype</option>
+                <option value="Webex">Webex</option>
+                <option value="Slack">Slack</option>
+            </select>
+        </div>
+        <div class="col-lg-2">
+            <button class="btn btn-primary w-100 shadow-lg px-4 py-2 rounded-3" id="apply-filters">Apply</button>
         </div>
     </div>
 </div>
 
-<!-- Add recurrence info modal  -->
-<div class="modal fade" id="recurrenceModal" tabindex="-1" aria-labelledby="recurrenceModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="recurrenceModalLabel">Add Recurrence Information</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="recurrenceForm">
-            <div class="mb-3">
-              <label for="recurrence_type" class="form-label">Recurrence Type</label>
-              <select class="form-select" id="recurrence_type" name="recurrence_type" required>
-                <option value="none">None</option>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="bi-weekly">Bi-Weekly</option>
-                <option value="monthly">Monthly</option>
-                <option value="yearly">Yearly</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="recurrence_days" class="form-label">Days of the Week (for Weekly/Bi-Weekly Recurrence)</label>
-              <input type="text" class="form-control" id="recurrence_days" name="recurrence_days" placeholder="e.g., Monday, Wednesday">
-            </div>
-            <div class="mb-3">
-              <label for="recurrence_end_date" class="form-label">End Date</label>
-              <input type="date" class="form-control" id="recurrence_end_date" name="recurrence_end_date">
-            </div>
-            <button type="submit" class="btn btn-primary">Save Recurrence</button>
-          </form>
-        </div>
-      </div>
-    </div>
-</div>
-
-<!-- Search and Filter Bar (Visible Always) -->
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div class="form-group me-2">
-        <input type="text" id="search-title" class="form-control shadow-sm border-0 rounded-3" placeholder="Search by title" aria-label="Search by title">
-    </div>
-    
-    <div class="form-group me-2">
-        <input type="date" id="filter-date" class="form-control shadow-sm border-0 rounded-3" aria-label="Filter by date">
-    </div>
-    
-    <div class="form-group me-2">
-        <select id="filter-location" class="form-select shadow-sm border-0 rounded-3" aria-label="Filter by location">
-            <option value="">All Locations</option>
-            <option value="Zoom">Zoom</option>
-            <option value="Google Meet">Google Meet</option>
-            <option value="Organization">Organization</option>
-            <option value="Salesforce">Salesforce</option>
-            <option value="Microsoft Teams">Microsoft Teams</option>
-            <option value="Skype">Skype</option>
-            <option value="Webex">Webex</option>
-            <option value="Slack">Slack</option>
-        </select>
-    </div>
-
-    <button class="btn btn-primary px-4 py-2 rounded-3 shadow-lg" id="apply-filters">Apply Filters</button>
-</div>
-
-
-
-
-<div class="row">
-    {% if events %}
-        {% for event in events %}
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title text-primary">{{ event.title }}</h5>
-                        <p class="card-text">
-                            <strong>Date:</strong> {{ event.date }}<br>
-                            <strong>Time:</strong> {{ event.start_time }} - {{ event.end_time }}<br>
-                            <strong>Location:</strong> {{ event.location }}<br>
-                            <strong>Slots:</strong> {{ event.slots }} Remaining!<br>
-                            {% if event.meeting_link %}
-                                <strong>Launch:</strong> 
-                                <a href="{{ event.meeting_link }}" target="_blank">Join Meeting</a><br>
-                            {% endif %}
-                            <strong>Created At:</strong> {{ event.created_at|date:"M d, Y h:i A" }}
-                        </p>
-
-                        <!-- 3-Dot Menu for Event Actions -->
+        <!-- Events Grid -->
+        <div class="row g-4">
+            {% for event in events %}
+            <div class="col-12 col-md-6 col-xl-4">
+                <div class="event-card p-4 h-100 fade-in">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h3 class="h5 fw-bold mb-1">{{ event.title }}</h3>
+                            <div class="d-flex align-items-center gap-2 text-muted">
+                                <i class="bi bi-calendar-event"></i>
+                                <small>{{ event.date }} | {{ event.start_time }}</small>
+                            </div>
+                        </div>
                         <div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="eventActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-three-dots-vertical"></i> Event Actions
+                            <button class="btn btn-link p-0" data-bs-toggle="dropdown">
+                                <i class="bi bi-three-dots-vertical text-muted"></i>
                             </button>
-                            <ul class="dropdown-menu" aria-labelledby="eventActionsDropdown">
+                            <ul class="dropdown-menu">
                                 {% if event.is_booked_by_user %}
+                                <li>
+                                    <button class="dropdown-item btn btn-secondary" disabled>Event Booked</button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item btn btn-info view-bookings" 
+                                            data-event-id="{{ event.id }}" 
+                                            data-org-id="{{ organization.id }}" 
+                                            data-group-id="{{ group.id }}" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#bookingModal">
+                                        Check Bookings
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item btn btn-primary view-user-analytics"
+                                            data-event-id="{{ event.id }}"
+                                            data-org-id="{{ organization.id }}"
+                                            data-group-id="{{ group.id }}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#userAnalyticsModal">
+                                        <i class="bi bi-person-lines-fill me-2"></i> Dashboard
+                                    </button>
+                                </li>
+
+                                {% if is_team_leader %}
                                     <li>
-                                        <button class="dropdown-item btn btn-secondary" disabled>Event Booked</button>
-                                    </li>
-                                    <li>
-                                        <button class="dropdown-item btn btn-info view-bookings" 
-                                                data-event-id="{{ event.id }}" 
-                                                data-org-id="{{ organization.id }}" 
-                                                data-group-id="{{ group.id }}" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#bookingModal">
-                                            Check Bookings
-                                        </button>
-                                    </li>
-                                    <li>
-                                        <button class="dropdown-item btn btn-primary view-user-analytics"
+                                        <button class="dropdown-item btn btn-info view-analytics"
                                                 data-event-id="{{ event.id }}"
                                                 data-org-id="{{ organization.id }}"
                                                 data-group-id="{{ group.id }}"
                                                 data-bs-toggle="modal"
-                                                data-bs-target="#userAnalyticsModal">
-                                            <i class="bi bi-person-lines-fill me-2"></i> Dashboard
-                                        </button>
-                                    </li>
-
-                                    {% if is_team_leader %}
-                                        <li>
-                                            <button class="dropdown-item btn btn-info view-analytics"
-                                                    data-event-id="{{ event.id }}"
-                                                    data-org-id="{{ organization.id }}"
-                                                    data-group-id="{{ group.id }}"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#analyticsModal">
-                                                View Event Analytics
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button class="dropdown-item btn btn-danger delete-event"
-                                                    data-event-id="{{ event.id }}"
-                                                    data-org-id="{{ organization.id }}"
-                                                    data-group-id="{{ group.id }}"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#deleteEventModal">
-                                                Delete & Cancel
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button class="dropdown-item btn btn-primary add-recurrence" 
-                                                    data-event-id="{{ event.id }}" 
-                                                    data-org-id="{{ organization.id }}" 
-                                                    data-group-id="{{ group.id }}" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#recurrenceModal">
-                                                Add Recurrence Info
-                                            </button>
-                                        </li>
-                                    {% endif %}
-                                {% else %}
-                                    <li>
-                                        <button class="dropdown-item btn btn-success book-event" 
-                                                data-event-id="{{ event.id }}" 
-                                                data-org-id="{{ organization.id }}" 
-                                                data-group-id="{{ group.id }}">
-                                            Book Now
+                                                data-bs-target="#analyticsModal">
+                                            View Event Analytics
                                         </button>
                                     </li>
                                     <li>
-                                        <button class="dropdown-item btn btn-danger mark-absent" 
-                                                data-event-id="{{ event.id }}" 
-                                                data-org-id="{{ organization.id }}" 
-                                                data-group-id="{{ group.id }}" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#absenceModal">
-                                            Mark as Absent
-                                        </button>
-                                    </li>
-                                    <li>
-                                        <button class="dropdown-item btn btn-success remind-me" 
-                                                data-org-id="{{ organization.id }}" 
-                                                data-group-id="{{ group.id }}"
-                                                data-event-id="{{ event.id }}"
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#reminderModal">
-                                            Remind Me
-                                        </button>
-                                    </li>
-                                    <li>
-                                        <button class="dropdown-item btn btn-info view-bookings" 
-                                                data-event-id="{{ event.id }}" 
-                                                data-org-id="{{ organization.id }}" 
-                                                data-group-id="{{ group.id }}" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#bookingModal">
-                                            Check Bookings
-                                        </button>
-                                    </li>
-
-                                    {% if is_team_leader %}
-                                        <li>
-                                            <button class="dropdown-item btn btn-info view-analytics"
-                                                    data-event-id="{{ event.id }}"
-                                                    data-org-id="{{ organization.id }}"
-                                                    data-group-id="{{ group.id }}"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#analyticsModal">
-                                                View Event Analytics
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button class="dropdown-item btn btn-danger delete-event"
-                                                    data-event-id="{{ event.id }}"
-                                                    data-org-id="{{ organization.id }}"
-                                                    data-group-id="{{ group.id }}"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#deleteEventModal">
-                                                Delete & Cancel
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button class="dropdown-item btn btn-primary add-recurrence" 
-                                                    data-event-id="{{ event.id }}" 
-                                                    data-org-id="{{ organization.id }}" 
-                                                    data-group-id="{{ group.id }}" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#recurrenceModal">
-                                                Add Recurrence Info
-                                            </button>
-                                        </li>
-                                    {% endif %}
-                                    <li>
-                                        <button class="dropdown-item btn btn-info view-user-analytics"
+                                        <button class="dropdown-item btn btn-danger delete-event"
                                                 data-event-id="{{ event.id }}"
                                                 data-org-id="{{ organization.id }}"
                                                 data-group-id="{{ group.id }}"
                                                 data-bs-toggle="modal"
-                                                data-bs-target="#userAnalyticsModal">
-                                            <i class="bi bi-person-lines-fill me-2"></i> Dashboard
+                                                data-bs-target="#deleteEventModal">
+                                            Delete & Cancel
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item btn btn-primary add-recurrence" 
+                                                data-event-id="{{ event.id }}" 
+                                                data-org-id="{{ organization.id }}" 
+                                                data-group-id="{{ group.id }}" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#recurrenceModal">
+                                            Add Recurrence Info
                                         </button>
                                     </li>
                                 {% endif %}
+                            {% else %}
+                                <li>
+                                    <button class="dropdown-item btn btn-success book-event" 
+                                            data-event-id="{{ event.id }}" 
+                                            data-org-id="{{ organization.id }}" 
+                                            data-group-id="{{ group.id }}">
+                                        Book Now
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item btn btn-danger mark-absent" 
+                                            data-event-id="{{ event.id }}" 
+                                            data-org-id="{{ organization.id }}" 
+                                            data-group-id="{{ group.id }}" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#absenceModal">
+                                        Mark as Absent
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item btn btn-success remind-me" 
+                                            data-org-id="{{ organization.id }}" 
+                                            data-group-id="{{ group.id }}"
+                                            data-event-id="{{ event.id }}"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#reminderModal">
+                                        Remind Me
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item btn btn-info view-bookings" 
+                                            data-event-id="{{ event.id }}" 
+                                            data-org-id="{{ organization.id }}" 
+                                            data-group-id="{{ group.id }}" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#bookingModal">
+                                        Check Bookings
+                                    </button>
+                                </li>
+
+                                {% if is_team_leader %}
+                                    <li>
+                                        <button class="dropdown-item btn btn-info view-analytics"
+                                                data-event-id="{{ event.id }}"
+                                                data-org-id="{{ organization.id }}"
+                                                data-group-id="{{ group.id }}"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#analyticsModal">
+                                            View Event Analytics
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item btn btn-danger delete-event"
+                                                data-event-id="{{ event.id }}"
+                                                data-org-id="{{ organization.id }}"
+                                                data-group-id="{{ group.id }}"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteEventModal">
+                                            Delete & Cancel
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item btn btn-primary add-recurrence" 
+                                                data-event-id="{{ event.id }}" 
+                                                data-org-id="{{ organization.id }}" 
+                                                data-group-id="{{ group.id }}" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#recurrenceModal">
+                                            Add Recurrence Info
+                                        </button>
+                                    </li>
+                                {% endif %}
+                                <li>
+                                    <button class="dropdown-item btn btn-info view-user-analytics"
+                                            data-event-id="{{ event.id }}"
+                                            data-org-id="{{ organization.id }}"
+                                            data-group-id="{{ group.id }}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#userAnalyticsModal">
+                                        <i class="bi bi-person-lines-fill me-2"></i> Dashboard
+                                    </button>
+                                </li>
+                            {% endif %}
+                        </ul>
+
+
+
+                                <!-- Dropdown items same as before -->
                             </ul>
                         </div>
-
                     </div>
-                    <div class="card-footer bg-white">
+
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-geo-alt"></i>
+                            <span class="text-muted">{{ event.location }}</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-people"></i>
+                            <span class="text-muted">{{ event.slots }} slots remaining</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-end">
+                        {% if event.is_booked_by_user %}
+                        <button class="btn btn-sm btn-success rounded-pill pe-none">
+                            <i class="bi bi-check-circle me-2"></i>Booked
+                        </button>
+                        {% else %}
+                        <button class="btn btn-sm btn-outline-primary rounded-pill book-event">
+                            Reserve Spot
+                        </button>
+                        {% endif %}
                         <small class="text-muted">
-                            Created by: {{ event.created_by.username }}
+                            Created {{ event.created_at|timesince }} ago
                         </small>
                     </div>
                 </div>
             </div>
-        {% endfor %}
-    {% endif %}
-</div>
-
+            {% endfor %}
+        </div>
     </div>
+
+<!-- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+
+
+
+
+        <!-- Modal for Marking Absence -->
+        <div class="modal fade" id="absenceModal" tabindex="-1" aria-labelledby="absenceModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="absenceModalLabel">Mark Yourself as Absent</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="absenceForm">
+                            <div class="mb-3">
+                                <label for="reason" class="form-label">Reason for Absence</label>
+                                <select id="reason" class="form-control">
+                                    <option value="Personal">Personal</option>
+                                    <option value="Availability Issues">Availability Issues</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="customMessage" class="form-label">Custom Message (Optional)</label>
+                                <textarea id="customMessage" class="form-control" rows="3" placeholder="Provide a custom message if needed"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-danger" id="submitAbsence">Mark as Absent</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Reminder Modal -->
+        <!-- Reminder Modal -->
+        <div class="modal fade" id="reminderModal" tabindex="-1" aria-labelledby="reminderModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="reminderModalLabel">Set Event Reminder</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <form id="reminderForm">
+                    <!-- Reminder options: 1 day before, 1 hour before, or custom -->
+                    <div class="mb-3">
+                      <label class="form-label">Reminder Option</label>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="reminder_option" id="reminderOption1Day" value="1_day_before" required>
+                        <label class="form-check-label" for="reminderOption1Day">
+                          1 Day Before
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="reminder_option" id="reminderOption1Hour" value="1_hour_before" required>
+                        <label class="form-check-label" for="reminderOption1Hour">
+                          1 Hour Before
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="reminder_option" id="reminderOptionCustom" value="custom" required>
+                        <label class="form-check-label" for="reminderOptionCustom">
+                          Custom
+                        </label>
+                      </div>
+                    </div>
+          
+                    <!-- Custom reminder datetime field (hidden initially) -->
+                    <div class="mb-3 d-none" id="customTimeContainer">
+                      <label for="customTime" class="form-label">Custom Reminder Time</label>
+                      <input type="datetime-local" id="customTime" class="form-control">
+                    </div>
+          
+                    <!-- Optional reason field -->
+                    <div class="mb-3">
+                      <label for="reason" class="form-label">Reason (Optional)</label>
+                      <textarea id="reason" class="form-control" rows="3"></textarea>
+                    </div>
+          
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="submit" class="btn btn-primary">Set Reminder</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        
+          <!-- Display Bookings -->
+        
+          <!-- Modal to Display Bookings -->
+        
+          <!-- Modal for Event Bookings -->
+          <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="bookingModalLabel">Event Bookings</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="bookingListContainer">
+                        
+                            <p>Loading bookings...</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Analytics dashboard -->
+        <!-- Modal Structure -->
+        <div class="modal fade" id="analyticsModal" tabindex="-1" aria-labelledby="analyticsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="analyticsModalLabel">Event Analytics</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <!-- Event Details -->
+                  <h6 id="event-title">Event Title: Loading...</h6>
+                  <p id="event-description">Description: Loading...</p>
+                  <p><strong>Date:</strong> <span id="event-date">Loading...</span></p>
+                  <p><strong>Time:</strong> <span id="event-time">Loading...</span></p>
+          
+                  <!-- Analytics Overview -->
+                  <div class="row">
+                    <div class="col-md-6">
+                      <p><strong>Total Bookings:</strong> <span id="total-bookings">0</span></p>
+                      <p><strong>Confirmed Bookings:</strong> <span id="confirmed-bookings">0</span></p>
+                      <p><strong>Pending Bookings:</strong> <span id="pending-bookings">0</span></p>
+                      <p><strong>Cancelled Bookings:</strong> <span id="cancelled-bookings">0</span></p>
+                    </div>
+                    <div class="col-md-6">
+                      <p><strong>Total Reminders:</strong> <span id="total-reminders">0</span></p>
+                      <p><strong>Reminders Sent:</strong> <span id="reminder-sent">0</span></p>
+                      <p><strong>Reminders Pending:</strong> <span id="reminder-pending">0</span></p>
+                    </div>
+                  </div>
+          
+                  <!-- Charts -->
+                  <div class="mt-4">
+                    <h6>Booking Status Distribution</h6>
+                    <canvas id="bookings-chart" width="400" height="200"></canvas>
+                  </div>
+                  <div class="mt-4">
+                    <h6>Absentee Reasons Distribution</h6>
+                    <canvas id="absentee-chart" width="400" height="200"></canvas>
+                  </div>
+                  <div class="mt-4">
+                    <h6>Reminder Types</h6>
+                    <canvas id="reminder-types-chart" width="400" height="200"></canvas>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        
+          <!-- User-Specific Analytics Modal -->
+        <div class="modal fade" id="userAnalyticsModal" tabindex="-1" aria-labelledby="userAnalyticsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content rounded-3 shadow-lg">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title" id="userAnalyticsModalLabel">My Event Analytics</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h4 class="text-center mb-4">Your Personalized Analytics</h4>
+        
+                        <!-- User Event Details -->
+                        <div id="userEventDetails" class="mb-4">
+                            <!-- Dynamic content will be loaded here -->
+                        </div>
+        
+                        <!-- User Booking Status Chart -->
+                        <div class="chart-container mb-4">
+                            <canvas id="userBookingStatusChart" width="400" height="400"></canvas>
+                        </div>
+        
+                        <!-- User Absentee Reasons Chart -->
+                        <div class="chart-container mb-4">
+                            <canvas id="userAbsenteeReasonsChart" width="400" height="400"></canvas>
+                        </div>
+        
+                        <!-- User Reminder Status Chart -->
+                        <div class="chart-container mb-4">
+                            <canvas id="userReminderStatusChart" width="400" height="400"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+          
+        <!-- Delete event modal  -->
+        <div class="modal fade" id="deleteEventModal" tabindex="-1" aria-labelledby="deleteEventModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteEventModalLabel">Delete Event</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this event? Please enter your password to proceed.</p>
+                        <form id="deleteEventForm">
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                            </div>
+                            <button type="submit" class="btn btn-danger">Delete Event</button>
+                        </form>
+                        <div id="deleteMessage" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Add recurrence info modal  -->
+        <div class="modal fade" id="recurrenceModal" tabindex="-1" aria-labelledby="recurrenceModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="recurrenceModalLabel">Add Recurrence Information</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <form id="recurrenceForm">
+                    <div class="mb-3">
+                      <label for="recurrence_type" class="form-label">Recurrence Type</label>
+                      <select class="form-select" id="recurrence_type" name="recurrence_type" required>
+                        <option value="none">None</option>
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="bi-weekly">Bi-Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="yearly">Yearly</option>
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label for="recurrence_days" class="form-label">Days of the Week (for Weekly/Bi-Weekly Recurrence)</label>
+                      <input type="text" class="form-control" id="recurrence_days" name="recurrence_days" placeholder="e.g., Monday, Wednesday">
+                    </div>
+                    <div class="mb-3">
+                      <label for="recurrence_end_date" class="form-label">End Date</label>
+                      <input type="date" class="form-control" id="recurrence_end_date" name="recurrence_end_date">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Recurrence</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+        </div>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ----------------------------------------------------------------------------------------------------------- -->
+
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         $(document).on('click', '.book-event', function() {
@@ -1270,4 +1348,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
-
