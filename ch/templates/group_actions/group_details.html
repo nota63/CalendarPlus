@@ -1,382 +1,302 @@
-{% extends 'custom.html' %}
-
-{% block content %}
-<br>
-<br>
-<br>
-<br>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Group Details Dashboard</title>
-
-      <!-- Add Font Awesome CDN -->
-      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <title>Group Analytics Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/scrollreveal"></script>
 </head>
 
 <style>
-/* General container styles */
-.container {
-    margin-top: 30px;
-}
-
-/* Chart card styles */
-.chart-card {
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    padding: 20px;
-    height: 300px;  /* Reduced height */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
-}
-
-/* Add hover effect to chart cards */
-.chart-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-}
-
-/* Title styles */
-.chart-card h3 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 15px;
-    color: #333;
-    font-family: 'Poppins', sans-serif;
-}
-
-/* Adjust chart canvas size */
-canvas {
-    max-width: 100% !important;
-    max-height: 200px !important;
-    margin-top: 10px;
-    height: auto;
-    border-radius: 8px; /* Soft rounded borders for the canvas */
-    transition: transform 0.3s ease-in-out; /* Animation for canvas */
-}
-
-/* Add hover effect to canvas */
-.chart-card:hover canvas {
-    transform: scale(1.05); /* Slight zoom on hover */
-}
-
-/* Grid layout for three charts per row */
-.row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-}
-
-.col-4 {
-    flex: 1 1 calc(33.333% - 20px); /* 3 charts per row with gap */
-    max-width: 33.333%;
-}
-
-/* Responsive layout adjustments for smaller screens */
-@media screen and (max-width: 768px) {
-    .col-4 {
-        flex: 1 1 100%; /* Stack charts vertically on small screens */
-        max-width: 100%;
+    :root {
+        --primary: #6366f1;
+        --secondary: #4f46e5;
+        --accent: #f59e0b;
+        --background: #f8fafc;
     }
-}
 
+    body {
+        font-family: 'Inter', sans-serif;
+        background: var(--background);
+    }
 
+    .dashboard-header {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        padding: 2rem 0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+    }
 
+    .glass-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(12px);
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
+    .glass-card:hover {
+        transform: translateY(-4px);
+    }
 
+    .metric-card {
+        padding: 1.5rem;
+        border-left: 4px solid var(--primary);
+        transition: all 0.3s ease;
+    }
 
-/* General container styles */
-.container {
-    margin-top: 30px;
-    padding: 0 15px; /* Added some padding for responsive design */
-}
+    .metric-card:hover {
+        background: rgba(99, 102, 241, 0.05);
+        transform: translateX(4px);
+    }
 
-/* Group Overview Card */
-.bg-white {
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    padding: 30px;
-}
+    .chart-container {
+        height: 320px;
+        padding: 1.5rem;
+        position: relative;
+    }
 
-/* Heading Style for Group Overview */
-.bg-white h2 {
-    font-size: 2rem;
-    font-weight: 600;
-    color: #333333;
-    margin-bottom: 16px;
-    font-family: 'Poppins', sans-serif;
-}
+    .floating-button {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: var(--primary);
+        padding: 1rem 1.5rem;
+        border-radius: 999px;
+        box-shadow: 0 10px 15px rgba(99, 102, 241, 0.3);
+        transition: all 0.3s ease;
+    }
 
-/* Text Style for Group Overview Information */
-.bg-white p {
-    font-size: 1.1rem;
-    color: #555555;
-    margin-bottom: 10px;
-    font-family: 'Roboto', sans-serif;
-}
+    .floating-button:hover {
+        transform: scale(1.05) rotate(3deg);
+        box-shadow: 0 15px 20px rgba(99, 102, 241, 0.4);
+    }
 
-/* Make Group Name bold, uppercased, and colored */
-.bg-white .font-bold {
-    font-weight: bold;
-    text-transform: uppercase;
-    font-size: 1.2rem;  /* Slightly larger */
-    color: #4C8DFF; /* Blue color for highlighting */
-    margin-bottom: 10px;
-}
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 
-/* Style for Subheading (organization name) */
-.bg-white .text-gray-600 {
-    color: #6C757D; /* Light gray color */
-}
+    .animate-slide-in {
+        animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-/* Add smooth transitions on hover for better UX */
-.bg-white p:hover {
-    color: #333333;
-    cursor: pointer;
-    transition: color 0.3s ease;
-}
-
-/* Icon Styling */
-.fas {
-    font-size: 1.2rem;
-}
-
-/* Text and Icon Spacing */
-.bg-white p {
-    display: flex;
-    align-items: center;
-    margin-bottom: 12px;
-    font-size: 1.1rem;
-    color: #555555;
-    font-family: 'Roboto', sans-serif;
-}
-
-/* Icon Color Customization */
-.bg-white i {
-    margin-right: 10px; /* Spacing between icon and text */
-}
-
-/* Specific Colors for Icons */
-.bg-white .fa-users {
-    color: #4C8DFF; /* Blue for Organization & Group */
-}
-
-.bg-white .fa-users-cog {
-    color: #4C8DFF; /* Blue for Group Name */
-}
-
-.bg-white .fa-calendar-check {
-    color: #F4B400; /* Yellow for Total Bookings */
-}
-
-.bg-white .fa-user-slash {
-    color: #E63946; /* Red for Total Absentees */
-}
-
-.bg-white .fa-paper-plane {
-    color: #4CAF50; /* Green for Sent Reminders */
-}
-
-.bg-white .fa-clock {
-    color: #FF9800; /* Orange for Pending Reminders */
-}
-
-/* Hover Effects for Icons */
-.bg-white p:hover {
-    color: #333333;
-    cursor: pointer;
-    transition: color 0.3s ease;
-}
-
-.bg-white i:hover {
-    transform: scale(1.1); /* Slight zoom effect on icon hover */
-    transition: transform 0.3s ease;
-}
-
-/* Ensure the section is centered on the page */
-/* Group Details Title Styling */
-.group-details-title {
-    background-color: #3b82f6;  /* Blue color */
-    color: white;
-    padding: 1rem;  /* Padding for spacing */
-}
-
-/* Optional: You can adjust the font size or spacing if needed */
-.group-details-title h1 {
-    font-size: 1.75rem;  /* Adjust font size */
-    font-weight: 700;  /* Make the font bold */
-}
-
-
+    .gradient-text {
+        background: linear-gradient(45deg, var(--primary), var(--accent));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
 </style>
 
-
-
-
-<body class="font-sans bg-gray-100 text-gray-800">
-
-  
-
-    <section class="container mt-5 dashboard-section">
-        <div class="row align-items-center justify-content-center">
-            <!-- Content - Left Side -->
-            <div class="col-lg-6">
-                <h3 class="display-5 font-weight-bold mb-4">Dashboard</h3>
-                <h1 class="mb-4">Monitor your group in one place</h1>
-                <p class="lead mb-4">
-                    <ul>
-                        <li>Identify if a user is absent for an event</li>
-                        <li>Track your team's weekly meeting activity</li>
-                        <li>Use quick links to view team and analytics details</li>
-                    </ul>
-                </p>
-    
-                <a href="#" class="btn btn-primary mb-3">Learn More</a>
-    
-                <a href="{% url 'invite_members_to_group' org_id=organization.id group_id=group.id %}">
-                    <button class="btn btn-success" type="submit">Invite a team-mate</button>
-                </a>
-            </div>
-    
-            <!-- Image - Right Side -->
-            <div class="col-lg-6 text-center">
-                <img src="https://assets.calendly.com/assets/frontend/media/admin_dashboard_side-dd237f1cd10014891a81.svg" class="img-fluid rounded" alt="Dashboard Image">
+<body>
+    <header class="dashboard-header">
+        <div class="container mx-auto px-6">
+            <div class="flex items-center justify-between">
+                <h1 class="text-2xl font-bold gradient-text">Group Analytics</h1>
+                <div class="flex items-center space-x-4">
+                    <button class="text-white hover:text-indigo-100 transition-colors">
+                        <i class="fas fa-cog text-lg"></i>
+                    </button>
+                    <button class="text-white hover:text-indigo-100 transition-colors">
+                        <i class="fas fa-bell text-lg"></i>
+                    </button>
+                </div>
             </div>
         </div>
-    </section>
-    
-    
+    </header>
 
-
-
-
-    <!-- Main Content -->
-    <main class="py-8">
-        <div class="container mx-auto">
-            <!-- Group Overview -->
-            <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-                <h2 class="text-3xl font-semibold mb-4">Group Overview</h2>
-                <p class="text-lg"><i class="fas fa-users text-blue-600 mr-2"></i> Organization: <span class="text-gray-600">{{ organization.name }}</span></p>
-                <p class="text-lg font-bold text-xl text-blue-600 uppercase mb-2"><i class="fas fa-users-cog text-blue-600 mr-2"></i>{{ group.name }}</p>
-                <p class="text-lg"><i class="fas fa-users text-green-500 mr-2"></i> Total Members: {{ total_members }}</p>
-                <p class="text-lg"><i class="fas fa-calendar-check text-yellow-500 mr-2"></i> Total Bookings: {{ total_bookings }}</p>
-                <p class="text-lg"><i class="fas fa-user-slash text-red-500 mr-2"></i> Total Absentees: {{ total_absentees }}</p>
-                <p class="text-lg"><i class="fas fa-paper-plane text-green-500 mr-2"></i> Sent Reminders: {{ reminder_sent_count }}</p>
-                <p class="text-lg"><i class="fas fa-clock text-orange-500 mr-2"></i> Pending Reminders: {{ reminder_pending_count }}</p>
-            </div>
-       
-        
-            <div class="container">
-                <!-- Chart Section -->
-                <div class="row">
-                    <!-- Total Members - Pie Chart -->
-                    <div class="col-4">
-                        <div class="chart-card">
-                            <h3>Total Members</h3>
-                            <canvas id="totalMembersChart"></canvas>
+    <main class="container mx-auto px-6 py-8">
+        <!-- Overview Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div class="glass-card animate-slide-in">
+                <div class="metric-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Total Members</p>
+                            <p class="text-3xl font-bold text-gray-800">{{ total_members }}</p>
                         </div>
-                    </div>
-            
-                    <!-- Total Events - Pie Chart -->
-                    <div class="col-4">
-                        <div class="chart-card">
-                            <h3>Total Events</h3>
-                            <canvas id="totalEventsChart"></canvas>
-                        </div>
-                    </div>
-            
-                    <!-- Bookings - Bar Chart -->
-                    <div class="col-4">
-                        <div class="chart-card">
-                            <h3>Bookings</h3>
-                            <canvas id="bookingsChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            
-                <!-- Second row of charts -->
-                <div class="row mt-4">
-                    <!-- Total Absentees - Pie Chart -->
-                    <div class="col-4">
-                        <div class="chart-card">
-                            <h3>Total Absentees</h3>
-                            <canvas id="absenteesChart"></canvas>
-                        </div>
-                    </div>
-            
-                    <!-- Reminder Sent vs Pending - Pie Chart -->
-                    <div class="col-4">
-                        <div class="chart-card">
-                            <h3>Reminder Status</h3>
-                            <canvas id="reminderStatusChart"></canvas>
-                        </div>
-                    </div>
-            
-                    <!-- Organization Info - Pie Chart -->
-                    <div class="col-4">
-                        <div class="chart-card">
-                            <h3>Organization Info</h3>
-                            <canvas id="organizationChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            
-                <!-- Third row of charts -->
-                <div class="row mt-4">
-                    <!-- Events with Bookings - Pie Chart -->
-                    <div class="col-4">
-                        <div class="chart-card">
-                            <h3>Events with Bookings</h3>
-                            <canvas id="eventsBookingsChart"></canvas>
-                        </div>
-                    </div>
-            
-                    <!-- Total Bookings - Pie Chart -->
-                    <div class="col-4">
-                        <div class="chart-card">
-                            <h3>Total Bookings</h3>
-                            <canvas id="totalBookingsChart"></canvas>
-                        </div>
-                    </div>
-            
-                    <!-- Events with Users - Pie Chart -->
-                    <div class="col-4">
-                        <div class="chart-card">
-                            <h3>Events with Users</h3>
-                            <canvas id="eventsUsersChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            
-                <!-- User Participation Over Time (Line Chart) -->
-                <div class="row mt-4">
-                    <div class="col-4">
-                        <div class="chart-card">
-                            <h3>User Participation Over Time</h3>
-                            <canvas id="userParticipationChart"></canvas>
+                        <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-users text-indigo-600 text-xl"></i>
                         </div>
                     </div>
                 </div>
             </div>
-            
 
-        <!-- New chart -->
-       
-        
+            <div class="glass-card animate-slide-in">
+                <div class="metric-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Active Events</p>
+                            <p class="text-3xl font-bold text-gray-800">{{ total_events }}</p>
+                        </div>
+                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-calendar-alt text-purple-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card animate-slide-in">
+                <div class="metric-card">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Participation Rate</p>
+                            <p class="text-3xl font-bold text-gray-800">84%</p>
+                        </div>
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-chart-line text-green-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Column -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Group Summary -->
+                <div class="glass-card p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-semibold text-gray-800">Group Summary</h2>
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm">
+                            {{ organization.name }}
+                        </span>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-users-cog text-blue-600"></i>
+                                </div>
+                                <span class="font-medium">{{ group.name }}</span>
+                            </div>
+                            <span class="text-sm text-gray-500">Active Group</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-4 bg-indigo-50 rounded-lg">
+                                <p class="text-sm text-gray-600 mb-1">Total Bookings</p>
+                                <p class="text-2xl font-bold text-gray-800">{{ total_bookings }}</p>
+                            </div>
+                            <div class="p-4 bg-red-50 rounded-lg">
+                                <p class="text-sm text-gray-600 mb-1">Absent Members</p>
+                                <p class="text-2xl font-bold text-gray-800">{{ total_absentees }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Participation Chart -->
+                <div class="glass-card">
+                    <div class="chart-container">
+                        <h3 class="text-lg font-semibold p-4 border-b">Participation Trends</h3>
+                        <canvas id="userParticipationChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="space-y-6">
+                <!-- Quick Actions -->
+                <div class="glass-card p-6">
+                    <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
+                    <div class="space-y-3">
+                        
+                        <a href="{% url 'create_group_event' org_id=organization.id group_id=group.id%}" class="w-full">
+                            <button class="w-full flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                                <i class="fas fa-plus-circle text-green-600"></i>
+                                <span>Create New Event</span>
+                            </button>
+                        </a>
+                        
+                        <a href="{% url 'invite_members_to_group' org_id=organization.id group_id=group.id %}" 
+                           class="block w-full flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                            <i class="fas fa-user-plus text-blue-600"></i>
+                            <span>Invite Members</span>
+                        </a>
+                        <button class="w-full flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                            <i class="fas fa-file-export text-purple-600"></i>
+                            <span>Export Data</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Performance Metrics -->
+                <div class="glass-card p-6">
+                    <h3 class="text-lg font-semibold mb-4">Performance Snapshot</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check text-green-600"></i>
+                                </div>
+                                <span>Completed Events</span>
+                            </div>
+                            <span class="font-medium">85%</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-clock text-yellow-600"></i>
+                                </div>
+                                <span>Average Response Time</span>
+                            </div>
+                            <span class="font-medium">2.4h</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reminder Status -->
+                <div class="glass-card p-6">
+                    <h3 class="text-lg font-semibold mb-4">Reminder Status</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-paper-plane text-green-600"></i>
+                                </div>
+                                <span>Sent</span>
+                            </div>
+                            <span class="font-medium">{{ reminder_sent_count }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-clock text-orange-600"></i>
+                                </div>
+                                <span>Pending</span>
+                            </div>
+                            <span class="font-medium">{{ reminder_pending_count }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
-    
-    <!-- Chart.js Script -->
-    <script>
+    <a href="{% url 'invite_members_to_group' org_id=organization.id group_id=group.id %}" 
+       class="floating-button text-white hover:text-white animate-slide-in">
+        <i class="fas fa-plus mr-2"></i>Invite Members
+    </a>
+
+<script>
+
         // Total Members Pie Chart
         var ctx1 = document.getElementById('totalMembersChart').getContext('2d');
         var totalMembersChart = new Chart(ctx1, {
@@ -592,11 +512,4 @@ var userParticipationChart = new Chart(ctx2, {
 
 
 
-    </script>
-
-</body>
-</html>
-
-
-{% endblock %}
-
+</script>    

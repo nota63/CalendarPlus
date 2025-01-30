@@ -292,19 +292,19 @@ from django.db.models import Q
 def user_groups(request, org_id):
     organization = get_object_or_404(Organization, id=org_id)
 
-    # Check if the user belongs to the organization
+
     if not organization.profiles.filter(user=request.user).exists():
         return redirect('home')
 
-    # Fetch groups where the user is either a member or a team leader
+ 
     user_groups = Group.objects.filter(
         Q(organization=organization) & (Q(members__user=request.user) | Q(team_leader=request.user))
     ).distinct()
 
-    # Separate team leader groups from user groups
+
     team_leader_groups = user_groups.filter(team_leader=request.user)
 
-    print("Found Team Leader Groups:", team_leader_groups)  # Debugging print
+    print("Found Team Leader Groups:", team_leader_groups) 
 
     return render(request, 'user_groups/user_groups.html', {
         'organization': organization,
