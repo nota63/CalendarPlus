@@ -1,13 +1,15 @@
-{% extends 'custom.html' %}
 
-{% block content %}
-<br>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="csrf-token" content="{% csrf_token %}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- GSAP Import -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -16,166 +18,275 @@
 
 
 <body>
-
-<style>
-/* Modal Specific Styling */
-.custom-modal {
-    display: none; /* Hidden by default */
-    position: fixed;
-    z-index: 1050;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Transparent black background */
-    align-items: center;
-    justify-content: center;
-}
-
-.custom-modal .modal-content {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    width: 80%;
-    max-width: 700px;
-}
-
-.custom-modal .close-btn {
-    color: #aaa;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-}
-
-.custom-modal .close-btn:hover,
-.custom-modal .close-btn:focus {
-    color: black;
-    text-decoration: none;
-}
-
-.custom-modal .table {
-    width: 100%;
-    margin-top: 15px;
-}
-
-.custom-modal .table th,
-.custom-modal .table td {
-    text-align: center;
-}
-
-.custom-modal .table th {
-    background-color: #f8f9fa;
-    border-bottom: 2px solid #dee2e6;
-}
-
-.custom-modal .table tbody tr {
-    background-color: #fdfdfd;
-    border-bottom: 1px solid #dee2e6;
-}
-
-.custom-modal .table tbody tr:hover {
-    background-color: #f1f1f1;
-}
-
-
-
-.manage-members-heading {
-    font-size: 2.5rem; /* Large premium font size */
-    font-weight: bold; /* Bold text for emphasis */
-    color: #2d3748; /* Dark gray for professional look */
-    margin-bottom: 1rem; /* Adds space below the heading */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); /* Subtle shadow for premium effect */
-}
-
-.organization-name {
-    color: #38a169; /* Green color to highlight the organization name */
-    font-style: italic; /* Adds a touch of elegance */
-    text-decoration: underline; /* Optional: Underline for emphasis */
-}
-
-
-
-</style>    
-
-
-<div class="container mt-5">
-    <h2 class="manage-members-heading">
-        Manage Members - <span class="organization-name">{{ organization.name }}</span>
-    </h2>
-
-
-    
-    
-    <!-- Invite Button -->
-   <button type="button" class="btn btn-primary" id="inviteBtn">Invite Member</button>
-   <button id="statusModalBtn" class="btn btn-primary">View Invitations Status</button>
-   <br><br>
-
-   
-
-    
-    <!-- Filter Form -->
-    <form method="get" class="mb-4">
+    <style>
+        /* Slack Color Scheme */
+        :root {
+            --slack-purple: #4A154B;
+            --slack-blue: #36C5F0;
+            --slack-green: #2BAC76;
+            --slack-red: #E01E5A;
+            --slack-yellow: #ECB22E;
+            --slack-gray-1: #F8F8F8;
+            --slack-gray-2: #E8E8E8;
+            --slack-gray-3: #D1D1D1;
+        }
+        
+        body {
+            font-family: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--slack-gray-1);
+        }
+        
+        /* Header Section */
+        .manage-header {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .organization-name {
+            color: var(--slack-purple);
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+        
+        /* Invite Section */
+        .invite-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .invite-card h3 {
+            color: var(--slack-purple);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        /* Search Bar */
+        .search-wrapper {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .search-input {
+            padding-left: 40px;
+            border-radius: 8px;
+            border: 2px solid var(--slack-gray-2);
+            height: 48px;
+        }
+        
+        .search-input:focus {
+            border-color: var(--slack-blue);
+            box-shadow: none;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 14px;
+            color: var(--slack-gray-3);
+        }
+        
+        /* Members Table */
+        .members-table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .members-table thead {
+            background-color: var(--slack-gray-1);
+        }
+        
+        .members-table th {
+            color: var(--slack-purple);
+            font-weight: 700;
+            padding: 1rem;
+            border-bottom: 2px solid var(--slack-gray-2) !important;
+        }
+        
+        .members-table td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+        
+        .members-table tr:hover {
+            background-color: var(--slack-gray-1) !important;
+        }
+        
+        /* Action Dropdown */
+        .dropdown-toggle::after {
+            display: none;
+        }
+        
+        .dropdown-toggle {
+            border: 1px solid var(--slack-gray-2);
+            border-radius: 6px;
+            padding: 0.25rem 0.5rem;
+            color: var(--slack-gray-3);
+        }
+        
+        .dropdown-toggle:hover {
+            background-color: var(--slack-gray-1);
+        }
+        
+        /* Buttons */
+        .btn-slack-primary {
+            background-color: var(--slack-purple);
+            color: white;
+            border-radius: 6px;
+            padding: 0.5rem 1.25rem;
+            font-weight: 600;
+        }
+        
+        .btn-slack-primary:hover {
+            background-color: #3A0C3B;
+            color: white;
+        }
+        
+        /* Status Modal */
+        .modal-header {
+            border-bottom: 1px solid var(--slack-gray-2);
+        }
+        
+        .modal-title {
+            color: var(--slack-purple);
+            font-weight: 700;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+        
+        .status-pending {
+            background-color: #FFEDD5;
+            color: #C05621;
+        }
+        
+        .status-accepted {
+            background-color: #C6F6D5;
+            color: #22543D;
+        }
+        
+        /* Role Badges */
+        .role-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+        
+        .role-admin {
+            background-color: var(--slack-purple);
+            color: white;
+        }
+        
+        .role-member {
+            background-color: var(--slack-gray-2);
+            color: #4A5568;
+        }
+        </style>
+        
+        <div class="container py-4">
+            <div class="manage-header">
+                <h1 class="h3 mb-0">
+                    <span class="organization-name">{{ organization.name }}</span>
+                    <span class="text-muted" style="font-weight: 400;">/ Manage Members</span>
+                </h1>
+            </div>
+        
+            <div class="invite-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="h5 mb-2">Invite to Workspace</h3>
+                        <p class="text-muted mb-0">Add new members via email or shareable link</p>
+                    </div>
+                    <button class="btn btn-slack-primary" id="inviteBtn">
+                        <i class="bi bi-person-plus me-2"></i>Invite People
+                    </button>
+                </div>
+            </div>
+        
+            <div class="members-table">
+                 <!-- Filter Form -->
+     <!-- Filter Form -->
+     <form method="get" class="mb-4">
         <div class="input-group">
             <input type="text" name="q" class="form-control" placeholder="Search by name or email" value="{{ query }}">
             <button class="btn btn-primary" type="submit">Filter</button>
         </div>
     </form>
 
-    <!-- Members Table -->
-    <table class="table table-bordered table-hover">
-        <thead>
-            <tr>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for member in members %}
-            <tr>
-                <td>{{ member.user.username }}</td>
-                <td>{{ member.user.email }}</td>
-                <td>{{ member.role }}</td>
-                <td>
-                    
-                    {% if member.is_admin %}
-                        
-                        <span class="text-muted">Admin</span>
-                    {% else %}
-                        <div class="dropdown">
-                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                &#x2022;&#x2022;&#x2022;
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <li>
-                                    <button class="dropdown-item change-role-btn" data-member-id="{{ member.id }}" data-current-role="{{ member.role }}">
-                                        Change Role
+
+        
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Member</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th style="width: 100px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for member in members %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar me-3">
+                                        <span class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" 
+                                              style="width: 32px; height: 32px;">
+                                            {{ member.user.username|first|upper }}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div class="fw-500">{{ member.user.username }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ member.user.email }}</td>
+                            <td>
+                                <span class="role-badge {% if member.is_admin %}role-admin{% else %}role-member{% endif %}">
+                                    {{ member.role }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if not member.is_admin %}
+                                <div class="dropdown">
+                                    <button class="btn btn-link dropdown-toggle" type="button" 
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-three-dots-vertical"></i>
                                     </button>
-                                </li>
-                                 
-                                <li>
-                                  <button class="dropdown-item remove-member-btn" data-member-id="{{ member.id }}" data-org-id="{{ organization.id }}">
-                                    Remove from Organization
-                                </button>
-                            </li>
-                            </ul>
-                        </div>
-                    {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="4" class="text-center">No members found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <button class="dropdown-item change-role-btn" 
+                                                    data-member-id="{{ member.id }}">
+                                                <i class="bi bi-person-gear me-2"></i>Change Role
+                                            </button>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <button class="dropdown-item text-danger remove-member-btn" 
+                                                    data-member-id="{{ member.id }}">
+                                                <i class="bi bi-person-x me-2"></i>Remove Member
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
 
 <!-- MODALS ---------------------------------------------------------------------------------------------------------------------- -->
@@ -295,67 +406,7 @@
 
 <!-- INVITATION STATUS MODAL -->
 
-<div id="StatusModalOnly" class="custom-modal">
-    <div class="modal-content">
-        <span id="closeModalBtn" class="close-btn">&times;</span>
-        <h5 class="modal-title">Invitation Status</h5>
-        
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">Email</th>
-                    <th scope="col">Role</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Invited By</th>
-                    <th scope="col">Expires At</th>
-                    <th scope="col">Valid</th>
-                </tr>
-            </thead>
-            <tbody id="invitationsTableBody">
-                
-                <tr>
-                    <td colspan="6" class="text-center">Loading...</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-
 <!-- EDIT ORGANIZATION MODAL  -->
-
-
-<div id="organizationModal" class="modal" tabindex="-1" aria-labelledby="organizationModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="organizationModalLabel">Edit Organization</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div id="loadingMessage">Loading...</div>
-
-                <div id="editOrganizationForm" style="display:none;">
-                    <form id="organizationForm">
-                        <div class="mb-3">
-                            <label for="organizationName" class="form-label">Organization Name</label>
-                            <input type="text" class="form-control" id="organizationName" name="name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="organizationDescription" class="form-label">Description</label>
-                            <textarea class="form-control" id="organizationDescription" name="description" rows="3" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
-                    </form>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 
 
 
@@ -524,7 +575,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     });
 
-    // Track invitations
+// Track invitations
     const statusModalBtn = document.getElementById('statusModalBtn');
     const statusModal = document.getElementById('StatusModalOnly');
     const closeModalBtn = document.getElementById('closeModalBtn');
@@ -575,9 +626,82 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+
+// GSAP ANIMATIONS
+
+document.addEventListener("DOMContentLoaded", function () {
+        // Header & Invite Card Animation (Fade In)
+        gsap.from(".manage-header, .invite-card", {
+            opacity: 0,
+            y: -20,
+            duration: 1,
+            ease: "power2.out",
+            stagger: 0.2
+        });
+
+        // Table Rows Animation (Slide-Up)
+        gsap.from(".members-table tbody tr", {
+            opacity: 0,
+            y: 20,
+            duration: 0.8,
+            ease: "power2.out",
+            stagger: 0.1
+        });
+
+        // Button Hover Effect
+        document.querySelectorAll(".btn").forEach((btn) => {
+            btn.addEventListener("mouseenter", () => {
+                gsap.to(btn, { scale: 1.05, duration: 0.2, ease: "power1.out" });
+            });
+            btn.addEventListener("mouseleave", () => {
+                gsap.to(btn, { scale: 1, duration: 0.2, ease: "power1.out" });
+            });
+        });
+
+        // Dropdown Animation
+        document.querySelectorAll(".dropdown-menu").forEach((dropdown) => {
+            dropdown.style.opacity = 0;
+            dropdown.style.transform = "translateY(-10px)";
+        });
+
+        document.querySelectorAll(".dropdown-toggle").forEach((toggle) => {
+            toggle.addEventListener("click", function () {
+                let dropdown = this.nextElementSibling;
+                let isVisible = window.getComputedStyle(dropdown).opacity === "1";
+
+                if (isVisible) {
+                    gsap.to(dropdown, { opacity: 0, y: -10, duration: 0.3, ease: "power1.out" });
+                } else {
+                    gsap.to(dropdown, { opacity: 1, y: 0, duration: 0.3, ease: "power1.out" });
+                }
+            });
+        });
+    });
+
+
 </script>
 
 </body>
 </html>
 
-{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
