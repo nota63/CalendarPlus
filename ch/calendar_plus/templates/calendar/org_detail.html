@@ -1,6 +1,4 @@
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -361,6 +359,10 @@ a {
                 <span class="material-icons">person_add</span>Workspace Channels
             </a>
 
+            <a href="{% url 'user_meetings_calendar' organization.id %}">
+                <span class="material-icons">person_add</span> My Calendar
+            </a>
+
 
         {% else %}
             <h3 class="font-semibold text-lg text-white mb-6">Employee Controls</h3>
@@ -401,6 +403,10 @@ a {
 
             <a href="{% url 'channels_list' organization.id %}">
                 <span class="material-icons">person_add</span>Workspace Channels
+            </a>
+
+            <a href="{% url 'user_meetings_calendar' organization.id %}">
+                <span class="material-icons">person_add</span> My Calendar
             </a>
 
 
@@ -510,3 +516,5 @@ a {
 
 </body>
 </html>
+
+

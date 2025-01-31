@@ -1,96 +1,315 @@
-{% include 'header.html' %}
-<br>
+
+{% extends 'custom.html' %}
+
+{% block content %}
+
+
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendar View</title>
+    <title>Meeting Calendar | Productivity Suite</title>
 
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
-
-
-
-    <!-- Include jQuery -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <!-- Include Moment.js -->
-    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
-    <!-- FullCalendar CSS -->
+    <!-- Design Assets -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@3.2.0/dist/fullcalendar.min.css">
-    <!-- FullCalendar JS -->
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@3.2.0/dist/fullcalendar.min.js"></script>
 
-    <!-- Bootstrap CSS for Modal -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --secondary-gradient: linear-gradient(135deg, #f97316 0%, #f59e0b 100%);
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --slate-100: #f1f5f9;
+        }
+
+        body {
+            background: var(--slate-100);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .hero-section {
+            background: var(--primary-gradient);
+            padding: 4rem 0;
+            clip-path: ellipse(130% 100% at 50% 0%);
+            transition: all 0.3s ease;
+        }
+
+        .hero-image {
+            width: 120px;
+            filter: drop-shadow(0 10px 8px rgba(0,0,0,0.1));
+            transition: transform 0.3s ease;
+        }
+
+        .hero-image:hover {
+            transform: translateY(-5px);
+        }
+
+        .calendar-container {
+            margin-top: -80px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .calendar-card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.1);
+            border: none;
+            overflow: hidden;
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .calendar-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .fc-toolbar {
+            padding: 1.5rem;
+            background: var(--slate-100);
+            border-radius: 1rem 1rem 0 0;
+        }
+
+        .fc-button-primary {
+            background: var(--primary-gradient) !important;
+            border: none !important;
+            border-radius: 0.5rem !important;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease !important;
+        }
+
+        .fc-button-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .fc-event {
+            border-radius: 0.5rem !important;
+            border: none !important;
+            padding: 8px 12px !important;
+            margin: 2px 4px !important;
+            font-size: 0.9rem;
+            background: var(--primary-gradient) !important;
+            transition: all 0.2s ease !important;
+        }
+
+        .fc-event:hover {
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .meeting-modal .modal-content {
+            border-radius: 1.5rem;
+            border: none;
+        }
+
+        .meeting-modal .modal-header {
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 1.5rem 1.5rem 0 0;
+            padding: 1.5rem;
+        }
+
+        .meeting-modal .modal-title {
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .detail-item {
+            padding: 1rem;
+            background: var(--slate-100);
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            transition: transform 0.2s ease;
+        }
+
+        .detail-item:hover {
+            transform: translateX(5px);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .virtual-badge {
+            background: #e0e7ff;
+            color: #4f46e5;
+        }
+
+        .inperson-badge {
+            background: #ffe4e6;
+            color: #f43f5e;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .floating-action {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .floating-btn {
+            background: var(--secondary-gradient);
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .floating-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        .filter-controls {
+            position: absolute;
+            right: 2rem;
+            top: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            background: white;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn.active {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                clip-path: ellipse(180% 100% at 50% 0%);
+                padding: 2rem 0;
+            }
+            
+            .calendar-container {
+                margin-top: -40px;
+            }
+            
+            .filter-controls {
+                position: static;
+                justify-content: center;
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
 
-    <style>
-         /* Custom CSS to style the image */
-    /* Custom CSS to style the image */
-    .small-img {
-        max-width: 100px; /* Adjust image size */
-        height: auto;
-        border-radius: 10px; /* Rounded corners */
-    }
-    </style>
-
-
-    <section class="text-center py-5" style="background-color: #f7f7f7; border-radius: 15px;">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcDyE4sWPgG_z3D8yJrm96EbbnX1xGTO7b8g&s" alt="Meeting Image" class="small-img mb-4">
-        <strong>
-            <p class="lead" style="font-size: 1.0rem; font-weight: 700; background-image: linear-gradient(to right, #ff6b81, #6c94ff); -webkit-background-clip: text; color: transparent;">
-                Stay on top of your meetings with a streamlined calendar and boost your productivity to achieve your goals effortlessly
-            </p>
-        </strong>
-    </section>
-    
-    
-    
-    <div class="container mt-5">
-        <h1 class="mb-4" style="text-transform: uppercase; font-weight: bold; font-size: 2rem; background-image: linear-gradient(to right, #f8a5d3, #a2c2e3); -webkit-background-clip: text; color: transparent;">
-            Your Meetings 
+<section class="hero-section">
+    <div class="container text-center">
+        
+        <h1 class="mt-4 text-white display-5 fw-bold animate__animated animate__fadeIn">
+            Access Your Meetings Smartly,<br>
         </h1>
-        
-        <div id="calendar" class="container py-5 shadow-lg rounded-3 bg-light border border-0 border-secondary">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-             
-            </div>
-            <!-- FullCalendar will be inserted here -->
-        </div>
-        
     </div>
+</section>
+<br>
 
-    <!-- Modal for displaying meeting details -->
-    <div class="modal fade" id="meetingModal" tabindex="-1" aria-labelledby="meetingModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="meetingModalLabel">Meeting Details</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+<div class="container calendar-container">
+    <div class="calendar-card">
+        <div class="filter-controls">
+            <button class="filter-btn active" data-filter="all">All Meetings</button>
+            <button class="filter-btn" data-filter="virtual">Virtual</button>
+            <button class="filter-btn" data-filter="in-person">In-Person</button>
+        </div>
+        <div id="calendar"></div>
+    </div>
+</div>
+
+<div class="floating-action">
+    <button class="floating-btn text-white">
+        <i class="fas fa-plus fa-lg"></i>
+    </button>
+</div>
+
+<div class="modal fade meeting-modal" id="meetingModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Meeting Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-item">
+                    <small class="text-muted d-block mb-1">Title</small>
+                    <h6 id="modal-meeting-title" class="mb-0"></h6>
                 </div>
-                <div class="modal-body">
-                    <h6 id="modal-meeting-title"></h6>
-                    <p><strong>Description:</strong> <span id="modal-meeting-description"></span></p>
-                    <p><strong>Date:</strong> <span id="modal-meeting-date"></span></p>
-                    <p><strong>Time:</strong> <span id="modal-meeting-time"></span></p>
-                    <p><strong>Location:</strong> <span id="modal-meeting-location"></span></p>
-                    <p><strong>Type:</strong> <span id="modal-meeting-type"></span></p>
-                    <p><strong>Link:</strong> <span id="modal-meeting-link"></span></p>
-                    <p><strong>User:</strong> <span id="modal-meeting-user"></span></p> <!-- User -->
-                    <p><strong>Invitee:</strong> <span id="modal-meeting-invitee"></span></p> 
-                    <p><strong>Participants:</strong> <span id="modal-meeting-participants"></span></p>
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="detail-item">
+                            <small class="text-muted d-block mb-1">Date</small>
+                            <span id="modal-meeting-date"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="detail-item">
+                            <small class="text-muted d-block mb-1">Time</small>
+                            <span id="modal-meeting-time"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <small class="text-muted d-block mb-1">Meeting Type</small>
+                    <span id="modal-meeting-type" class="status-badge"></span>
+                </div>
+
+                <div class="detail-item">
+                    <small class="text-muted d-block mb-1">Location</small>
+                    <span id="modal-meeting-location"></span>
+                </div>
+
+                <div class="detail-item">
+                    <small class="text-muted d-block mb-1">Participants</small>
+                    <div id="modal-meeting-participants" class="d-flex flex-wrap gap-2"></div>
                 </div>
             </div>
+            <div class="modal-footer border-0">
+                <input type="hidden" id="hidden-meeting-link">
+                <button type="button" class="btn btn-link text-muted" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="join-meeting-btn">Join Meeting</button>
+
+            </div>
+            
         </div>
     </div>
+</div>
 
-    <script>
-        $(document).ready(function() {
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@3.2.0/dist/fullcalendar.min.js"></script>
+
+<script>
+     $(document).ready(function() {
             $('#calendar').fullCalendar({
                 events: [
                     {% for event in events %}
@@ -131,6 +350,10 @@
                             $('#modal-meeting-invitee').text(data.invitee ? data.invitee : 'N/A');  // Show invitee, or N/A if not available
 
                             $('#modal-meeting-participants').text(data.participants.join(', '));
+
+
+                             // Set hidden input value for the meeting link
+                            $('#hidden-meeting-link').val(data.meeting_link);
     
                             // Show the modal
                             $('#meetingModal').modal('show');
@@ -142,13 +365,21 @@
                 }
             });
         });
-    </script>
-    
-    
 
-    <!-- Bootstrap JS for Modal functionality -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+        $('#join-meeting-btn').on('click', function() {
+    var meetingLink = $('#hidden-meeting-link').val();
+    if (meetingLink) {
+        window.open(meetingLink, '_blank');  // Open in a new tab
+    } else {
+        alert('Meeting link not available');
+    }
+});
+
+
+</script>
 
 </body>
 </html>
 
+{% endblock %}
