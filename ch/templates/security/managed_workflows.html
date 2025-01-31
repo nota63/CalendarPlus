@@ -1,150 +1,415 @@
+{% extends 'custom.html'%}
+
+{% block content %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Managed Workflows - {{ organization.name }}</title>
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
-        /* Custom CSS */
+        :root {
+            --primary-color: #4A154B; /* Slack purple */
+            --secondary-color: #00B289; /* Calendly teal */
+            --accent-color: #F5F5F7;
+            --text-primary: #1A1A1A;
+            --text-secondary: #5E5E5E;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         body {
-            background-color: #f8f9fa;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+            color: var(--text-primary);
         }
+
+        .container-xl {
+            max-width: 1440px;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Hero Section */
         .hero-section {
-            background-color: #ffffff;
-            border: 1px solid #e9ecef;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 30px;
-            text-align: center;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #2D0B2E 100%);
+            border-radius: 24px;
+            padding: 4rem 2rem;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 24px 48px -12px rgba(74, 21, 75, 0.2);
         }
-        .hero-section h1 {
-            font-size: 1.8rem;
-            margin-bottom: 10px;
-            color: #495057;
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(45deg);
         }
-        .hero-section p {
-            font-size: 1rem;
-            color: #6c757d;
+
+        .hero-title {
+            font-weight: 700;
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
         }
-        .hero-section button {
-            background-color: #007bff;
-            color: #fff;
+
+        .hero-subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-button {
+            background: var(--secondary-color);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            margin-top: 15px;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+            z-index: 1;
         }
-        .workflow-section img {
-            max-width: 100%;
-            height: auto;
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -6px rgba(0, 178, 137, 0.3);
         }
-        .workflow-section strong {
-            font-size: 1.2rem;
-            color: #212529;
+
+        /* Workflow Section */
+        .workflow-header {
+            text-align: center;
+            margin: 4rem 0;
         }
+
+        .workflow-icon {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            box-shadow: 0 12px 32px -8px rgba(0,0,0,0.1);
+            margin: 0 auto 2rem;
+        }
+
+        .section-title {
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+        }
+
+        /* Workflow Cards */
         .workflow-card {
-            background-color: #ffffff;
-            border: 1px solid #e9ecef;
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            transition: transform 0.2s ease-in-out;
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: var(--transition);
+            border: 1px solid #EBEBF0;
+            position: relative;
+            overflow: hidden;
         }
-        .workflow-card img {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 15px;
-        }
-        .workflow-card h4 {
-            font-size: 1.2rem;
-            color: #495057;
-        }
-        .workflow-card p {
-            font-size: 0.9rem;
-            color: #6c757d;
-            margin-bottom: 15px;
-        }
-        .workflow-card button {
-            background-color: #28a745;
-            color: #fff;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-        }
+
         .workflow-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
+            box-shadow: 0 24px 48px -12px rgba(0,0,0,0.12);
         }
-        .disable-section {
-            background-color: #f1f1f1;
-            border-left: 4px solid #dc3545;
-            padding: 15px;
-            margin-top: 30px;
-            margin-bottom: 30px;
+
+        .workflow-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--secondary-color);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .workflow-card:hover::after {
+            opacity: 1;
+        }
+
+        .card-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--accent-color);
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-text {
+            color: var(--text-secondary);
             font-size: 1rem;
-            color: #495057;
-            text-align: center;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-button {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            border: none;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-button:hover {
+            background: #3A0F3C;
+            transform: translateY(-2px);
+        }
+
+        /* Template Section */
+        .template-section {
+            background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%);
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            margin: 4rem 0;
+            border: 1px solid #EBEBF0;
+            position: relative;
+        }
+
+        .template-title {
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .template-badge {
+            background: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .animate__animated {
+            --animate-duration: 0.6s;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .section-title {
+                font-size: 1.75rem;
+            }
+            
+            .workflow-card {
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        /* Hover Effects */
+        .hover-scale {
+            transition: var(--transition);
+        }
+
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+
+        /* Loading Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
     </style>
 </head>
-<body>
+<body class="animate__animated animate__fadeIn">
+    <div class="container-xl">
+        <!-- Hero Section -->
+        <section class="hero-section text-center animate__animated animate__fadeInUp">
+            <h1 class="hero-title">Elevate Your Workflows</h1>
+            <p class="hero-subtitle">
+                Unlock enterprise-grade automation and team management features with our Teams plan. 
+                Transform your scheduling experience with advanced controls and analytics.
+            </p>
+            <button class="cta-button hover-scale">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+                Explore Team Features
+            </button>
+        </section>
 
-<div class="container my-5">
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <h1>Managed Workflows - {{ organization.name }}</h1>
-        <p>Upgrade to the Teams plan to access this feature and other advanced scheduling tools.</p>
-        <a href="#"><button type="button">Explore The Teams Plan</button></a>
-    </section>
+        <!-- Workflow Details -->
+        <div class="workflow-header animate-fade-in-up">
+            
+            <h2 class="section-title">Structured Communication Framework</h2>
+            <p class="section-subtitle">
+                Maintain brand consistency across all automated interactions while enabling team members 
+                to focus on high-value engagements.
+            </p>
+            <a href="#" class="text-decoration-none gradient-text fw-semibold">
+                Discover Best Practices →
+            </a>
+        </div>
 
-    <!-- Workflow Details -->
-    <section class="workflow-section text-center mb-5">
-        <img src="https://assets.calendly.com/assets/frontend/media/managed_workflows_icon-da9a03b71ee2d712925b.svg" alt="Workflow Icon" class="mb-4">
-        <strong>Bring consistency to automated communications</strong>
-        <p class="mt-3">
-            Scale your team's reminders, follow-ups, and more around managed events. Assign admin-controlled email and texts to improve the meeting experience.
-        </p>
-        <a href="#" class="text-primary text-decoration-underline">Learn More</a>
-    </section>
+        <!-- Workflow Cards -->
+        <div class="row g-4">
+            <div class="col-lg-4 animate__animated animate__fadeInUp">
+                <div class="workflow-card">
+                    <div class="card-icon">
+                        <img src="https://cdn-icons-png.flaticon.com/512/732/732200.png" alt="Email" class="img-fluid">
+                    </div>
+                    <h3 class="card-title">Smart Email Reminders</h3>
+                    <p class="card-text">
+                        Reduce missed appointments with AI-optimized reminder timing and 
+                        personalized message templates.
+                    </p>
+                    <button class="card-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 5v14M5 12h14"/>
+                        </svg>
+                        Configure Workflow
+                    </button>
+                </div>
+            </div>
 
-    <!-- Disable Section -->
-    <section class="disable-section">
-        <strong>Start With A Workflow Template</strong>
-    </section>
+            <div class="col-lg-4 animate__animated animate__fadeInUp animate__delay-0.2s">
+                <div class="workflow-card">
+                    <div class="card-icon">
+                        <img src="https://cdn-icons-png.flaticon.com/512/893/893257.png" alt="SMS" class="img-fluid">
+                    </div>
+                    <h3 class="card-title">Real-time Cancellation Alerts</h3>
+                    <p class="card-text">
+                        Instant SMS notifications with rescheduling options and 
+                        cancellation reason tracking.
+                    </p>
+                    <button class="card-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 5v14M5 12h14"/>
+                        </svg>
+                        Configure Workflow
+                    </button>
+                </div>
+            </div>
 
-    <!-- Workflow Cards -->
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="workflow-card">
-                <img src="https://th.bing.com/th/id/OIP.zSZlPZ-QOJ_FqYa2BMajCgHaHa?rs=1&pid=ImgDetMain" alt="Email Reminder Icon">
-                <h4>Email Reminder To Invitee</h4>
-                <p>Reduce no-shows by sending automated email reminders to invitees.</p>
-                <button type="button">Add Workflow</button>
+            <div class="col-lg-4 animate__animated animate__fadeInUp animate__delay-0.4s">
+                <div class="workflow-card">
+                    <div class="card-icon">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1047/1047711.png" alt="Thank You" class="img-fluid">
+                    </div>
+                    <h3 class="card-title">Automated Follow-ups</h3>
+                    <p class="card-text">
+                        Post-meeting engagement sequences with satisfaction surveys and 
+                        resource delivery.
+                    </p>
+                    <button class="card-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 5v14M5 12h14"/>
+                        </svg>
+                        Configure Workflow
+                    </button>
+                </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="workflow-card">
-                <img src="https://th.bing.com/th/id/OIP.ERrGF2QtCrYAiHqXQZWRigHaHa?rs=1&pid=ImgDetMain" alt="Text Cancellation Icon">
-                <h4>Text Cancellation Notification To Host</h4>
-                <p>Keep hosts up-to-date with canceled events.</p>
-                <button type="button">Add Workflow</button>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="workflow-card">
-                <img src="https://th.bing.com/th/id/OIP.k-O0AYgtDWs1Z63FjjVbNwAAAA?w=450&h=450&rs=1&pid=ImgDetMain" alt="Thank You Email Icon">
-                <h4>Send Thank You Email</h4>
-                <p>Build relationships with a quick thanks.</p>
-                <button type="button">Add Workflow</button>
-            </div>
-        </div>
+
+        <!-- Template Section -->
+        <section class="template-section text-center animate-fade-in-up">
+            <h2 class="template-title">
+                <span class="gradient-text">Accelerate Your Setup</span>
+                <span class="template-badge">New</span>
+            </h2>
+            <p class="section-subtitle">
+                Choose from our library of pre-built workflow templates designed for common 
+                use cases across industries.
+            </p>
+        </section>
     </div>
-</div>
 
-<!-- Bootstrap 5 JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Add scroll animations
+        const animateElements = document.querySelectorAll('.animate-fade-in-up');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate__fadeInUp');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        animateElements.forEach(element => {
+            observer.observe(element);
+        });
+
+        // Add hover effect to cards
+        document.querySelectorAll('.workflow-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-8px)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
 </body>
 </html>
 
+{% endblock %}
