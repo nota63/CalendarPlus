@@ -1,201 +1,141 @@
   <!--====== PART START ======-->
-    
-
-  {% load static %}
+  <!DOCTYPE html>
+  <html lang="en">
   <head>
-    <meta charset="utf-8">
-    
-    <!--====== Title ======-->
-    <title>Calendar + Landing Page</title>
-    
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <script src="https://cdn.tailwindcss.com"></script>
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+      <title>My Page</title>
+      <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
 
-    {% load static %}
-
-    <!--====== Favicon Icon ======-->
-    <link rel="shortcut icon" href="{% static 'assets/images/favicon.png' %}" type="image/png">
+    <style>
+          @keyframes fadeSlide {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
         
-    <!--====== Animate CSS ======-->
-    <link rel="stylesheet" href="{% static 'assets/css/animate.css' %}">
-        
-    <!--====== lineicons CSS ======-->
-    <link rel="stylesheet" href="{% static 'assets/css/lineicons.css' %}">
-        
-    <!--====== Bootstrap CSS ======-->
-    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
-    
-    <!--====== Default CSS ======-->
-    <link rel="stylesheet" href="{% static 'assets/css/default.css' %}">
-    
-    <!--====== Style CSS ======-->
-    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
-</head>
+        .animate-fade-slide {
+            animation: fadeSlide 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .hover-3d {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .hover-3d:hover {
+            transform: translateY(-3px) rotateX(2deg);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+
+        .gradient-bar {
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover .gradient-bar {
+            opacity: 1;
+        }
+
+        .member-avatar {
+            transition: transform 0.3s;
+        }
+
+        .member-avatar:hover {
+            transform: translateY(-3px);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border: 2px solid white;
+            right: -2px;
+            bottom: -2px;
+        }
+
+        .workspace-icon {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .workspace-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .active-workspace {
+            border-left: 4px solid #3F83F8;
+            background: linear-gradient(90deg, rgba(63, 131, 248, 0.1) 0%, rgba(63, 131, 248, 0) 100%);
+        }
+
+        .header-shadow {
+            box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .search-bar:focus-within {
+            box-shadow: 0 0 0 2px rgba(63, 131, 248, 0.5);
+        }
+    </style>
 
 
-  <footer id="footer" class="footer-area">
-        
-    <div class="footer-shape shape-1"></div>
-    <div class="footer-shape shape-2"></div>
-    <div class="footer-shape shape-3"></div>
-    <div class="footer-shape shape-4"></div>
-    <div class="footer-shape shape-5"></div>
-    <div class="footer-shape shape-6"></div>
-    <div class="footer-shape shape-7"></div>
-    <div class="footer-shape shape-8">
-        <img class="svg" src="{% static 'assets/images/footer-shape.svg' %}" alt="Shape">
-    </div>
-    
-    <div class="footer-widget pt-30 pb-80">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 col-md-6">
-                    <div class="footer-about mt-50 wow fadeIn" data-wow-duration="1.3s" data-wow-delay="0.2s">
-                        <a class="logo" href="#" >
-                            <img src="{% static 'assets/images/logo.png' %}" alt="Logo">
-                        </a>
-                        <p class="text">Calendar+ simplifies scheduling with an intuitive interface for managing meetings and availability effortlessly.</p>
 
-                        <ul class="social">
-                            <li><a href="#"><i class="lni lni-facebook"></i></a></li>
-                            <li><a href="#"><i class="lni lni-twitter"></i></a></li>
-                            <li><a href="#"><i class="lni lni-instagram"></i></a></li>
-                            <li><a href="#"><i class="lni lni-linkedin"></i></a></li>
-                        </ul>
-                    </div> <!-- footer about -->
-                </div> 
-                <div class="col-lg-5 col-md-6">
-                    <div class="footer-link d-flex flex-wrap">
-                        <div class="footer-link-wrapper mt-45 wow fadeIn" data-wow-duration="1.3s" data-wow-delay="0.4s">
-                            <div class="footer-title">
-                                <h4 class="title">Quick Links</h4>
-                            </div>
-                            <ul class="link">
-                                <li><a class="" href="#">Home</a></li>
-                                <li><a class="" href="#">Features</a></li>
-                                <li><a class="" href="#">Testimonial</a></li>
-                                <li><a class="" href="#">Pricing</a></li>
-                                <li><a class="" href="#">Contact</a></li>
-                            </ul>
-                        </div> <!-- footer link wrapper -->
-                        
-                        <div class="footer-link-wrapper mt-45 wow fadeIn" data-wow-duration="1.3s" data-wow-delay="0.6s">
-                            <div class="footer-title">
-                                <h4 class="title">Support</h4>
-                            </div>
-                            <ul class="link">
-                                <li><a class="" href="#">FAQ</a></li>
-                                <li><a class="" href="#">Privacy Policy</a></li>
-                                <li><a class="" href="#">Terms Of Use</a></li>
-                                <li><a class="" href="#">Legal</a></li>
-                                <li><a class="" href="#">Site Map</a></li>
-                            </ul>
-                        </div> <!-- footer link wrapper -->
-                    </div> <!-- footer link -->
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="footer-contact mt-45 wow fadeIn" data-wow-duration="1.3s" data-wow-delay="0.8s">
-                        <div class="footer-title">
-                            <h4 class="title">Quick Link</h4>
-                        </div>
-                        <ul class="contact-list">
-                            <li>
-                                <div class="contact-info d-flex">
-                                    <div class="info-content media-body">
-                                        <p class="text"><i class="lni lni-phone"></i> +809272561823</p>
-                                    </div>
-                                </div> <!-- contact info -->
-                            </li>
-                            <li>
-                                <div class="contact-info d-flex">
-                                    <div class="info-content media-body">
-                                        <p class="text"><a href="#"><i class="lni lni-envelope"></i> info@appland.com</a></p>
-                                    </div>
-                                </div> <!-- contact info -->
-                            </li>
-                            <li>
-                                <div class="contact-info d-flex">
-                                    <div class="info-content media-body">
-                                        <p class="text"><a href="#"><i class="lni lni-world"></i> www.yourweb.com</a></p>
-                                    </div>
-                                </div> <!-- contact info -->
-                            </li>
-                            <li>
-                                <div class="contact-info d-flex">
-                                    <div class="info-content media-body">
-                                        <p class="text"><i class="lni lni-map"></i> 123 Stree New York City , United States Of America.</p>
-                                    </div>
-                                </div> <!-- contact info -->
-                            </li>
-                        </ul> <!-- contact list -->
-                    </div> <!-- footer contact -->
-                </div>
-            </div> <!-- row -->
-        </div> <!-- container -->
-    </div> <!-- footer widget -->
-    
-    <div class="footer-copyright">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="copyright d-sm-flex justify-content-between">
-                        <div class="copyright-text text-center">
-                           
-                        </div> <!-- copyright text -->
-                        
-                        <div class="copyright-privacy text-center">
-                            <a href="#">Report Issues</a>
-                        </div> <!-- copyright privacy -->
-                    </div> <!-- copyright -->
-                </div>
-            </div> <!-- row -->
-        </div> <!-- container -->
-    </div> <!-- footer copyright -->
-</footer>
 
-<!--====== PART ENDS ======-->
 
-<!--====== BACK TOP TOP PART START ======-->
 
-<a href="#" class="back-to-top"><i class="lni lni-chevron-up"></i></a>
-
-<!--====== BACK TOP TOP PART ENDS ======-->
-
-<!--====== PART START ======-->
-
-<!--
-<section class="">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-"></div> 
+   <!-- Global Footer -->
+   <footer class="border-t border-gray-200 pt-12">
+    <div class="grid md:grid-cols-4 gap-8 mb-8">
+        <div>
+            <h4 class="text-sm font-semibold text-gray-900 mb-4">Product</h4>
+            <ul class="space-y-2">
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Features</a></li>
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Integrations</a></li>
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Security</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4 class="text-sm font-semibold text-gray-900 mb-4">Resources</h4>
+            <ul class="space-y-2">
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Documentation</a></li>
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">API Reference</a></li>
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Status</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4 class="text-sm font-semibold text-gray-900 mb-4">Company</h4>
+            <ul class="space-y-2">
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">About</a></li>
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Blog</a></li>
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Careers</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4 class="text-sm font-semibold text-gray-900 mb-4">Connect</h4>
+            <div class="flex space-x-4">
+                <a href="#" class="text-gray-500 hover:text-gray-700">
+                    <span class="material-icons-round">forum</span>
+                </a>
+                <a href="#" class="text-gray-500 hover:text-gray-700">
+                    <span class="material-icons-round">alternate_email</span>
+                </a>
+                <a href="#" class="text-gray-500 hover:text-gray-700">
+                    <span class="material-icons-round">rss_feed</span>
+                </a>
+            </div>
         </div>
     </div>
-</section>
--->
-
-<!--====== PART ENDS ======-->
-
-
+    <div class="border-t border-gray-200 py-6 text-center">
+        <p class="text-sm text-gray-500">&copy; 2024 Workspace Pro. All rights reserved.</p>
+    </div>
+</footer>
 
 
-<!--====== Jquery js ======-->
-<script src="{% static 'assets/js/vendor/jquery-1.12.4.min.js' %}"></script>
-<script src="{% static 'assets/js/vendor/modernizr-3.7.1.min.js' %}"></script>
-
-<!--====== Bootstrap js ======-->
-<script src="{% static 'assets/js/popper.min.js' %}"></script>
-<script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
-
-<!--====== WOW js ======-->
-<script src="{% static 'assets/js/wow.min.js' %}"></script>
-
-<!--====== Scrolling Nav js ======-->
-<script src="{% static 'assets/js/jquery.easing.min.js' %}"></script>
-<script src="{% static 'assets/js/scrolling-nav.js' %}"></script>
-
-<!--====== Main js ======-->
-<script src="{% static 'assets/js/main.js' %}"></script>
-
-</body>
-
-</html>
+    
+   
+  </body>
+  </html>
+  

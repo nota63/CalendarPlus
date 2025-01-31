@@ -1,91 +1,181 @@
 
 {% load static %}
-
-
-<!doctype html>
-<html class="no-js" lang="en">
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    
-    <!--====== Title ======-->
-    <title>Calendar + Landing Page</title>
-    
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    {% load static %}
-
-    <!--====== Favicon Icon ======-->
-    <link rel="shortcut icon" href="{% static 'assets/images/favicon.png' %}" type="image/png">
-        
-    <!--====== Animate CSS ======-->
-    <link rel="stylesheet" href="{% static 'assets/css/animate.css' %}">
-        
-    <!--====== lineicons CSS ======-->
-    <link rel="stylesheet" href="{% static 'assets/css/lineicons.css' %}">
-        
-    <!--====== Bootstrap CSS ======-->
-    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
-    
-    <!--====== Default CSS ======-->
-    <link rel="stylesheet" href="{% static 'assets/css/default.css' %}">
-    
-    <!--====== Style CSS ======-->
-    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar Plus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
+<body class="bg-gray-50 font-sans antialiased">
 
-<body>
-    <!--[if IE]>
-    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
-  <![endif]-->
+
+  <!-- Slack-like Sidebar -->
+  <div class="fixed left-0 top-0 h-full w-20 bg-gray-900 flex flex-col items-center py-4 space-y-2 z-50">
+    <!-- Workspace Icon -->
+    <div class="workspace-icon active-workspace mb-4">
+        <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center cursor-pointer">
+            <span class="material-icons-round text-white text-2xl">work_outline</span>
+        </div>
+    </div>
+
+    <!-- Additional Workspaces -->
+    <div class="workspace-icon">
+        <div class="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-700">
+            <span class="material-icons-round text-gray-300 text-xl">add</span>
+        </div>
+    </div>
+
+    <div class="workspace-icon">
+        <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center cursor-pointer">
+            <span class="material-icons-round text-white text-xl">group_work</span>
+        </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="border-t border-gray-700 w-8 mx-auto my-2"></div>
+
+    <!-- User Profile -->
+    <div class="workspace-icon mt-auto">
+        <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-700">
+            <img src="https://i.pravatar.cc/40?u={{ request.user }}" class="rounded-full" alt="Profile">
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Area -->
+<div class="ml-20">
+    <!-- Slack-style Header -->
+    <header class="bg-white header-shadow sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+            <!-- Left Section -->
+            <div class="flex items-center space-x-4">
+                <h1 class="text-lg font-bold text-gray-900 flex items-center">
+                    <span class="material-icons-round text-blue-500 mr-2">rocket</span>
+                    Workspace Pro
+                </h1>
+                <div class="h-6 w-px bg-gray-200"></div>
+                <nav class="flex space-x-4">
+                    <a href="#" class="text-gray-600 hover:text-gray-900 font-medium text-sm">Home</a>
+                    <a href="#" class="text-gray-600 hover:text-gray-900 font-medium text-sm">Activity</a>
+                    <a href="#" class="text-gray-600 hover:text-gray-900 font-medium text-sm">More</a>
+                </nav>
+            </div>
+
+            <!-- Center Search -->
+            <div class="flex-1 max-w-2xl mx-8">
+                <div class="search-bar relative flex items-center bg-gray-100 rounded-lg px-4 py-2 transition-all">
+                    <span class="material-icons-round text-gray-400 text-lg">search</span>
+                    <input type="text" 
+                           placeholder="Search messages, files, and people..." 
+                           class="w-full bg-transparent outline-none ml-2 text-sm placeholder-gray-400">
+                </div>
+            </div>
+
+            <!-- Right Controls -->
+            <div class="flex items-center space-x-4">
+                <button class="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100">
+                    <span class="material-icons-round">help_outline</span>
+                </button>
+                <button class="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100">
+                    <span class="material-icons-round">notifications_none</span>
+                </button>
+                <div class="h-8 w-px bg-gray-200"></div>
+                <button class="flex items-center text-gray-700 hover:text-gray-900">
+                    <img src="https://i.pravatar.cc/32?u={{ request.user }}" class="rounded-full mr-2">
+                    <span class="text-sm font-medium">{{ request.user }}</span>
+                    <span class="material-icons-round text-gray-500 ml-1">expand_more</span>
+                </button>
+            </div>
+        </div>
+    </header>
+  
+
+    <style>
+        
+   @keyframes fadeSlide {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-slide {
+            animation: fadeSlide 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .hover-3d {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .hover-3d:hover {
+            transform: translateY(-3px) rotateX(2deg);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+
+        .gradient-bar {
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover .gradient-bar {
+            opacity: 1;
+        }
+
+        .member-avatar {
+            transition: transform 0.3s;
+        }
+
+        .member-avatar:hover {
+            transform: translateY(-3px);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border: 2px solid white;
+            right: -2px;
+            bottom: -2px;
+        }
+
+        .workspace-icon {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .workspace-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .active-workspace {
+            border-left: 4px solid #3F83F8;
+            background: linear-gradient(90deg, rgba(63, 131, 248, 0.1) 0%, rgba(63, 131, 248, 0) 100%);
+        }
+
+        .header-shadow {
+            box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .search-bar:focus-within {
+            box-shadow: 0 0 0 2px rgba(63, 131, 248, 0.5);
+        }
+    </style>
+
+
+
+
+
+
+
     
-    <!--====== PRELOADER PART START ======-->
 
-    
-    <!--====== PRELOADER PART ENDS ======-->
-    
-    <!--====== HEADER PART START ======-->
 
-    <header class="header-area">
-        <div class="navbar-area">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <nav class="navbar navbar-expand-lg">
-                            <a class="navbar-brand" href="index.html">
-                                <img src="{% static 'assets/images/logo.png' %}" alt="Logo">
-                            </a>
-                            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                                <span class="toggler-icon"></span>
-                                <span class="toggler-icon"></span>
-                                <span class="toggler-icon"></span>
-                            </button>
 
-                            <div class="collapse navbar-collapse sub-menu-bar" id="navbarSupportedContent">
-                                <ul id="nav" class="navbar-nav ml-auto">
-                                    <li class="nav-item active">
-                                        <a class="page-scroll" href="#home">Home</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="page-scroll" href="#why">Why</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="page-scroll" href="#features">Features</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="page-scroll" href="#screenshots">Screenshots</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="page-scroll" href="#pricing">Pricing</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="page-scroll" href="#download">Download</a>
-                                    </li>
-                                </ul>
-                            </div> <!-- navbar collapse -->
-                        </nav> <!-- navbar -->
-                    </div>
-                </div> <!-- row -->
-            </div> <!-- container -->
-        </div> <!-- navbar area -->
+
+
+
+</body>
+</html>
