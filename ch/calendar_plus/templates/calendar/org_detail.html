@@ -133,6 +133,8 @@ body {
 }
 
 /* Organization Details */
+
+
 .organization-detail {
     display: grid;
     grid-template-columns: 30px 1fr;
@@ -195,6 +197,40 @@ a {
 .bg-purple-slack {
     background-color: #4a154b;
 }
+
+
+/* organization details section  */
+
+
+ /* Slack Color Palette */
+ .bg-slack-purple { background-color: #4A154B; }
+    .text-slack-purple { color: #4A154B; }
+    .bg-slack-purple-bg { background-color: #F4EDF4; }
+    
+    .text-slack-green { color: #2EB67D; }
+    .bg-slack-green-bg { background-color: #E8F6F0; }
+    
+    .text-slack-blue { color: #36C5F0; }
+    .bg-slack-blue-bg { background-color: #E8F6FB; }
+    
+    .text-slack-yellow { color: #ECB22E; }
+    .bg-slack-yellow-bg { background-color: #FCF3E6; }
+    
+    .text-slack-red { color: #E01E5A; }
+    .bg-slack-red-bg { background-color: #FCEFF3; }
+    
+    .text-slack-dark { color: #1D1D1D; }
+    .text-slack-gray { color: #454245; }
+
+    .slack-primary-button {
+        @apply inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-slack-purple hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors;
+    }
+
+    .slack-secondary-button {
+        @apply inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-slack-gray bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors;
+    }
+
+
 </style>
 
 
@@ -386,63 +422,101 @@ a {
         </div>
    
 
-       <!-- Organization Details -->
-<div class="card">
-    <div class="card-header text-blue-600 text-xl font-semibold">Organization: {{ organization.name }}</div>
-    <div class="card-body space-y-6">
-        <!-- Organization Name -->
-        <div class="flex items-center">
-            <span class="material-icons text-blue-500 mr-3">business</span>
-            <p class="text-lg"><strong>Name:</strong> {{ organization.name }}</p>
+
+<!-- Organization Details -->
+
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Card Container -->
+    <div class="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+        <!-- Card Header (Slack-style header) -->
+        <div class="bg-slack-purple px-6 py-4">
+            <div class="flex items-center">
+                <span class="text-2xl text-white mr-3">🏢</span>
+                <h2 class="text-xl font-semibold text-white">
+                    {{ organization.name }} Workspace
+                </h2>
+            </div>
         </div>
 
-        <!-- Organization Description -->
-        <div class="flex items-center">
-            <span class="material-icons text-green-500 mr-3">description</span>
-            <p class="text-lg"><strong>Description:</strong> {{ organization.description }}</p>
+        <!-- Card Body -->
+        <div class="px-6 py-4 space-y-4">
+            <!-- Detail Items with Slack-style colors -->
+            <div class="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                <div class="w-10 h-10 bg-slack-blue-bg rounded-full flex items-center justify-center mr-4">
+                    <span class="material-icons text-slack-blue">business</span>
+                </div>
+                <div>
+                    <p class="text-sm text-slack-gray font-medium mb-1">Organization Name</p>
+                    <p class="text-slack-dark font-medium">{{ organization.name }}</p>
+                </div>
+            </div>
+
+            <div class="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                <div class="w-10 h-10 bg-slack-green-bg rounded-full flex items-center justify-center mr-4">
+                    <span class="material-icons text-slack-green">description</span>
+                </div>
+                <div>
+                    <p class="text-sm text-slack-gray font-medium mb-1">Description</p>
+                    <p class="text-slack-dark font-medium">{{ organization.description }}</p>
+                </div>
+            </div>
+
+            <div class="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                <div class="w-10 h-10 bg-slack-yellow-bg rounded-full flex items-center justify-center mr-4">
+                    <span class="material-icons text-slack-yellow">calendar_today</span>
+                </div>
+                <div>
+                    <p class="text-sm text-slack-gray font-medium mb-1">Created At</p>
+                    <p class="text-slack-dark font-medium">{{ organization.created_at }}</p>
+                </div>
+            </div>
+
+            {% if organization.current_project %}
+            <div class="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                <div class="w-10 h-10 bg-slack-purple-bg rounded-full flex items-center justify-center mr-4">
+                    <span class="material-icons text-slack-purple">work</span>
+                </div>
+                <div>
+                    <p class="text-sm text-slack-gray font-medium mb-1">Current Project</p>
+                    <p class="text-slack-dark font-medium">{{ organization.current_project }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                <div class="w-10 h-10 bg-slack-red-bg rounded-full flex items-center justify-center mr-4">
+                    <span class="material-icons text-slack-red">person</span>
+                </div>
+                <div>
+                    <p class="text-sm text-slack-gray font-medium mb-1">Created By</p>
+                    <p class="text-slack-dark font-medium">{{ organization.created_by }}</p>
+                </div>
+            </div>
         </div>
 
-        <!-- Organization Creation Date -->
-        <div class="flex items-center">
-            <span class="material-icons text-yellow-500 mr-3">calendar_today</span>
-            <p class="text-lg"><strong>Created At:</strong> {{ organization.created_at }}</p>
-        </div>
-
-        <!-- Current Project (if exists) -->
-        {% if organization.current_project %}
-        <div class="flex items-center">
-            <span class="material-icons text-purple-500 mr-3">work</span>
-            <p class="text-lg"><strong>Current Project:</strong> {{ organization.current_project }}</p>
-        </div>
-        {% endif %}
-
-        <!-- Created By -->
-        <div class="flex items-center">
-            <span class="material-icons text-teal-500 mr-3">person</span>
-            <p class="text-lg"><strong>Created By:</strong> {{ organization.created_by }}</p>
+        <!-- Action Buttons (Slack-style buttons) -->
+        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50">
+            <div class="flex justify-between items-center">
+                <a href="{% url 'organization_list' %}" class="slack-secondary-button">
+                    ← All Workspaces
+                </a>
+                <a href="{% url 'meeting_list' organization.id %}" class="slack-primary-button">
+                    View Meetings
+                </a>
+            </div>
         </div>
     </div>
 </div>
 
-        <!-- Action Links -->
-        <div class="action-links">
-            <a href="{% url 'organization_list' %}">Go to your workspaces</a>
-        </div>
-        <br>
 
-        <div class="action-links">
-            <a href="{% url 'meeting_list' organization.id %}">My Meetings</a>
-        </div>
-    </div>
+
+
+
+
 
 
 
     
-    <section>
-        <a href="#">
-            <strong>Calendar Pro Trial</strong>
-        </a>
-    </section>
 
 </body>
 </html>
