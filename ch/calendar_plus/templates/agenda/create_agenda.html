@@ -1,93 +1,162 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Agenda for Meeting</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Create Agenda | MeetingFlow</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     {% load static %}
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+        .shadow-card { box-shadow: 0 8px 32px rgba(0,0,0,0.05); }
+        .tinymce-toolbar { border-radius: 12px 12px 0 0 !important; }
+    </style>
     {% block extrahead %}
         <script src="{% static 'tinymce/tinymce.min.js' %}"></script>
         <script>
             tinymce.init({
-                selector: '#id_agenda_content',  <!-- Ensure you're targeting the specific textarea by its ID -->
+                selector: '#id_agenda_content',
                 plugins: 'link image table lists',
                 toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image',
                 height: 400,
-                images_upload_url: '{% url "image_upload" %}', 
+                skin: 'oxide-dark',
+                content_css: 'dark',
+                images_upload_url: '{% url "image_upload" %}',
+                setup: function(editor) {
+                    editor.on('init', function() {
+                        document.querySelector('.tox-tinymce').classList.add('rounded-xl');
+                    });
+                }
             });
         </script>
     {% endblock %}
 </head>
-<body>
-    <div class="container mx-auto p-4">
-        <h2 class="text-2xl font-semibold mb-4">Create Agenda for Meeting: {{ meeting.meeting_title }}</h2>
-        
-        <section class="details mb-4 text-sm">
-            <div class="flex items-center space-x-2">
-                <svg class="w-4 h-4 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m4-4H8"></path></svg>
-                <strong class="text-gray-700">Meeting Type:</strong> {{meeting.meeting_type}}
+<body class="bg-gray-50 font-['Inter']">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Progress Header -->
+        <div class="mb-8 animate-fade-in">
+            <div class="flex items-center justify-between mb-3">
+                <h1 class="text-2xl font-bold text-gray-900">Create Meeting Agenda</h1>
+                <span class="text-sm text-purple-600 font-medium">Step 1 of 1</span>
             </div>
-            <div class="flex items-center space-x-2 mt-2">
-                <svg class="w-4 h-4 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m4-4H8"></path></svg>
-                <strong class="text-gray-700">Meeting Times:</strong> {{meeting.start_time}} to {{meeting.end_time}}
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-purple-600 h-2 rounded-full w-full"></div>
             </div>
-            <div class="flex items-center space-x-2 mt-2">
-                <svg class="w-4 h-4 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m4-4H8"></path>
-                </svg>
-                <strong class="text-gray-700"></strong> 
-                <a href="{{ meeting.meeting_link }}" class="text-blue-500 hover:underline" target="_blank">Launch & Join</a>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid lg:grid-cols-3 gap-8 animate-fade-in">
+            <!-- Left Column - Meeting Details -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Meeting Card -->
+                <div class="bg-white p-6 rounded-xl shadow-card transition-transform hover:scale-[1.01]">
+                    <div class="flex items-start mb-4">
+                        <div class="bg-purple-100 p-3 rounded-lg">
+                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <h2 class="text-lg font-semibold text-gray-900">{{ meeting.meeting_title }}</h2>
+                            <p class="text-sm text-gray-500">{{ meeting.meeting_type }}</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span class="ml-3 text-sm text-gray-600">{{ meeting.start_time }} - {{ meeting.end_time }}</span>
+                        </div>
+
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                            <a href="{{ meeting.meeting_link }}" class="ml-3 text-sm text-purple-600 hover:text-purple-700 transition-colors">Join meeting room</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Participants Card -->
+                <div class="bg-white p-6 rounded-xl shadow-card">
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Participants</h3>
+                    <div class="space-y-3">
+                        {% for participant in meeting.participants.all %}
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                                <span class="text-purple-600 text-sm font-medium">{{ participant.username|slice:1 }}</span>
+                            </div>
+                            <span class="ml-3 text-gray-700">{{ participant.username }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
-            
-        </section>
-            
-        <section class="mb-4 text-sm">
-            <p class="text-gray-600">
-                <strong>As of now you can only share images from general sources or from a link, don't send images directly from your device!</strong>
-            </p>
-        </section>
-    
-        <section class="mb-4">
-            <h3 class="text-lg font-medium mb-2">The Agenda Will be sent to all following Persons excluding you</h3>
-            
-            <div class="flex items-center space-x-2">
-                <svg class="w-4 h-4 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m4-4H8"></path></svg>
-                <strong class="text-gray-700">User:</strong> {{meeting.user}}
+
+            <!-- Right Column - Agenda Form -->
+            <div class="lg:col-span-2">
+                <form method="post" class="bg-white p-6 rounded-xl shadow-card">
+                    {% csrf_token %}
+                    
+                    <!-- Form Header -->
+                    <div class="mb-6 border-b border-gray-100 pb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Build Your Agenda</h3>
+                        <p class="text-sm text-gray-500 mt-1">Share detailed plans with all participants</p>
+                    </div>
+
+                    <!-- Alert Box -->
+                    <div class="bg-blue-50 p-4 rounded-lg mb-6">
+                        <div class="flex">
+                            <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                            </svg>
+                            <div class="ml-3">
+                                <p class="text-sm text-blue-700">
+                                    Use image URLs from online sources. Direct uploads coming soon!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Fields -->
+                    <div class="space-y-6">
+                        {{ form.as_p }}
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="mt-8 pt-6 border-t border-gray-100 flex justify-end">
+                        <button type="submit" class="inline-flex items-center justify-center px-6 py-2.5 border border-transparent rounded-xl font-medium text-white bg-purple-600 hover:bg-purple-700 transition-all transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 shadow-lg shadow-purple-100">
+                            <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Send Agenda
+                        </button>
+                    </div>
+                </form>
             </div>
-    
-            {% if meeting.participants.all %}
-                <p class="mt-2 text-gray-600">
-                    <span class="font-medium">Participants:</span> 
-                    {% for participant in meeting.participants.all %}
-                        <span class="text-blue-600">{{ participant.username }}</span>{% if not forloop.last %}, {% endif %}
-                    {% endfor %}
-                </p>
-            {% else %}
-                <p class="mt-2 text-gray-600">No participants yet.</p>
-            {% endif %}
-        </section>
+        </div>
     </div>
-    
 
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }} 
-
-            <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-                Send Agenda
-            </button>
-            
-        </form>
-
-      
+    <!-- Animated Background Elements -->
+    <div class="fixed inset-0 -z-10 overflow-hidden opacity-10">
+        <div class="absolute w-96 h-96 bg-purple-100 rounded-full -top-48 -right-48 mix-blend-multiply filter blur-2xl"></div>
+        <div class="absolute w-96 h-96 bg-blue-100 rounded-full -bottom-48 -left-48 mix-blend-multiply filter blur-2xl"></div>
     </div>
 </body>
 </html>
 
-
-
+{%endblock%}
 
 
