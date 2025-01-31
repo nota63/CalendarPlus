@@ -1,174 +1,455 @@
+{% extends 'custom.html'%}
+
+{% block content %}
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Find User to Delete - {{ organization.name }}</title>
+    <title>Data Management - {{ organization.name }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #4F46E5;
+            --secondary-color: #6366F1;
+            --accent-color: #10B981;
+            --danger-color: #EF4444;
+            --background-light: #F8FAFC;
+            --text-primary: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
         body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-light);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        .container {
-            max-width: 1000px; /* Increased width */
-            margin-top: 20px; /* Reduced top margin for better use of page height */
+        .main-container {
+            flex: 1;
+            display: flex;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
         }
 
-        h1, h2, h3 {
+        .nav-sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 1.5rem;
+            position: fixed;
+            height: 100vh;
+        }
+
+        .content-area {
+            flex: 1;
+            margin-left: 280px;
+            padding: 3rem 4rem;
+        }
+
+        .org-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 2.5rem;
+        }
+
+        .org-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
             font-weight: 600;
-            color: #343a40;
         }
 
-        h4 {
-            font-weight: 500;
-            color: #495057;
+        .org-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
         }
 
-        p {
-            color: #6c757d;
-            font-size: 1.1rem;
+        .nav-menu {
+            list-style: none;
+            margin-top: 2rem;
+        }
+
+        .nav-item {
+            margin-bottom: 0.75rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background: var(--background-light);
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-description {
+            color: var(--text-secondary);
             line-height: 1.6;
+            max-width: 800px;
         }
 
-        strong {
-            color: #343a40;
+        .data-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s ease;
         }
 
-        .alert {
-            background-color: #ffdd57;
-            color: #856404;
-            padding: 15px;
-            border-radius: 5px;
-            font-size: 1rem;
+        .data-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .warning-card {
+            background: #FFFBEB;
+            border-color: #FDE68A;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .card-text {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
         }
 
         .form-label {
-            color: #495057;
-            font-weight: 600;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
         }
 
         .form-control {
-            border: 1px solid #ced4da;
-            border-radius: 0.375rem;
-            padding: 10px;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: none;
+        }
+
+        .btn {
+            padding: 0.875rem 1.75rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-danger {
-            background-color: #dc3545;
+            background: var(--danger-color);
             border: none;
-            padding: 12px 20px;
-            font-weight: bold;
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
         }
 
         .btn-danger:hover {
-            background-color: #c82333;
+            background: #DC2626;
+            transform: translateY(-1px);
         }
 
         .btn-primary {
-            background-color: #007bff;
+            background: var(--primary-color);
             border: none;
-            padding: 12px 20px;
-            font-weight: bold;
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
         }
 
         .btn-primary:hover {
-            background-color: #0056b3;
+            background: var(--secondary-color);
+            transform: translateY(-1px);
         }
 
-        .table {
-            margin-top: 30px;
+        .activity-logs {
+            margin-top: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
         }
 
-        .table th, .table td {
-            padding: 12px;
-            text-align: center;
+        .activity-logs.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .table th {
-            background-color: #343a40;
+        .log-table {
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            border-collapse: collapse;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .log-table th,
+        .log-table td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+        }
+
+        .log-table thead {
+            background: var(--primary-color);
             color: white;
         }
 
-        .table-striped tbody tr:nth-of-type(odd) {
-            background-color: #f1f1f1;
+        .log-table th {
+            font-weight: 500;
         }
 
-        .table td {
-            font-size: 0.95rem;
-            color: #495057;
+        .log-table tbody tr {
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s ease;
         }
 
-        .table .btn {
-            padding: 6px 12px;
-            font-size: 0.9rem;
+        .log-table tbody tr:last-child {
+            border-bottom: none;
         }
 
-        .footer {
-            background-color: #343a40;
-            color: white;
-            text-align: center;
-            padding: 20px 0;
-            margin-top: 30px;
+        .log-table tbody tr:hover {
+            background: var(--background-light);
         }
 
-        .footer a {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: 600;
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
         }
 
-        .footer a:hover {
-            text-decoration: underline;
+        .status-success {
+            background: #D1FAE5;
+            color: #059669;
+        }
+
+        .status-warning {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+
+        .status-error {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .spinner {
+            width: 3rem;
+            height: 3rem;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .confirmation-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .confirmation-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: flex-end;
+        }
+
+        @media (max-width: 1200px) {
+            .nav-sidebar {
+                width: 240px;
+                padding: 1.5rem 1rem;
+            }
+
+            .content-area {
+                margin-left: 240px;
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .nav-sidebar {
+                position: static;
+                width: 100%;
+                height: auto;
+                padding: 1.5rem;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .content-area {
+                margin-left: 0;
+                padding: 2rem 1.5rem;
+            }
+
+            .log-table th,
+            .log-table td {
+                padding: 0.75rem 1rem;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="container py-4"> <!-- Reduced padding here -->
-        <!-- Organization and Admin Info -->
-        <h3 class="text-center mb-3">Organization Settings</h3> <!-- Reduced bottom margin -->
-        <h2 class="mb-3">Security</h2>
-        <h3 class="mb-3">Data Deletion</h3> <!-- Reduced bottom margin -->
-        <p>
-            <strong>Delete Information from your organization:</strong>
-            When anyone in your organization schedules an event with an invitee, information about the event and everyone part of it is saved in Calendar Plus. If you need to delete this information for compliance reasons, you can do so without contacting support.
-        </p>
-        <div class="alert">
-            <strong>Warning: Once you delete information, you won't be able to recover it!</strong>
-        </div>
-        <p>
-            Invitee data will be deleted immediately from the date you make the request.
-        </p>
-
-        <p>
-            <strong>Delete information for specific invitees</strong>
-        </p>
-        <p>
-            Enter an invitee’s email to delete all their personally identifiable information from your organization and integrations. During the data deletion process, Calendar Plus removes the deleted invitee from their spot on group events and cancels any pending or upcoming events with them.
-        </p>
-        <p><strong>Organization:</strong> {{ organization.name }}</p>
-        <p><strong>Admin:</strong> {{ request.user.username }}</p>
-
-        <!-- Email Form -->
-        <form method="GET" class="mb-4">
-            <div class="mb-3">
-                <label for="email" class="form-label">Enter User Email to Delete</label>
-                <input type="email" name="email" id="email" class="form-control" placeholder="User's Email" required>
+    <div class="main-container">
+        <!-- Navigation Sidebar -->
+        <nav class="nav-sidebar">
+            <div class="org-header">
+                <div class="org-logo">{{ organization.name|slice:":1" }}</div>
+                <div class="org-name">{{ organization.name }}</div>
             </div>
-            <button type="submit" class="btn btn-danger">Proceed</button>
-        </form>
 
-        <!-- Toggle for Activity Logs -->
-        <button class="btn btn-primary mb-3" onclick="toggleLogs()">Activity Logs</button>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <button class="nav-link active" onclick="toggleLogs()">
+                        <i class="fas fa-user-slash"></i>
+                        Activities
 
-        <!-- Activity Logs Section -->
+                    </button>
+                    
+                </li>
+                <!-- Add more navigation items here -->
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="content-area">
+            <div class="section-header">
+                <h1 class="section-title">Data Deletion</h1>
+                <p class="section-description">
+                    Manage and permanently delete user data from your organization. 
+                    All deletions are irreversible and will remove associated events.
+                </p>
+            </div>
+
+            <!-- Warning Card -->
+            <div class="data-card warning-card">
+                <h3 class="card-title"><i class="fas fa-exclamation-triangle mr-2"></i>Important Notice</h3>
+                <p class="card-text">
+                    Deleted information cannot be recovered. This action will immediately remove all 
+                    personally identifiable information and cancel any upcoming events associated 
+                    with the user.
+                </p>
+            </div>
+
+            <!-- Delete Form -->
+            <div class="data-card">
+                <h3 class="card-title">Delete User Data</h3>
+                <p class="card-text mb-4">
+                    Enter the email address of the user you want to delete. We'll show you a preview 
+                    of affected data before permanent deletion.
+                </p>
+
+                <form method="GET" class="mb-4">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Enter User Email to Delete</label>
+                        <input type="email" name="email" id="email" class="form-control" placeholder="User's Email" required>
+                    </div>
+                    <button type="submit" class="btn btn-danger">Proceed</button>
+                </form>
+
+                 <!-- Toggle for Activity Logs -->
+        
+            </div>
+
+            <!-- Activity Logs -->
+                <!-- Activity Logs Section -->
         <div id="activityLogs" class="d-none">
             <h4 class="mt-4">Activity Logs</h4>
             {% if activity_logs %}
@@ -206,9 +487,21 @@
         </div>
     </div>
 
-    <div class="footer">
-        <strong>Delete your account</strong>
-        <a href="#">You can delete your account in your account settings.</a>
+
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="confirmation-modal">
+        <h3 class="card-title mb-3">Confirm Deletion</h3>
+        <p class="card-text">You're about to permanently delete all data for <strong id="userEmail"></strong>. This action cannot be undone.</p>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="hideConfirmation()">Cancel</button>
+            <button class="btn btn-danger">Delete Permanently</button>
+        </div>
     </div>
 
     <script>
@@ -216,8 +509,10 @@
             const logsSection = document.getElementById('activityLogs');
             logsSection.classList.toggle('d-none');
         }
+
     </script>
 </body>
 
 </html>
 
+{% endblock %}
