@@ -1,124 +1,318 @@
+
 {% extends 'custom.html' %}
 
 {% block content %}
-<br><br>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projects in {{ organization.name }}</title>
+    <title>{{ organization.name }} Projects | TeamFlow</title>
     <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Animate CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
+        :root {
+            --primary-color: #4A3AFF;
+            --secondary-color: #6B59FF;
+            --accent-color: #FF7D59;
+            --dark-color: #1A1A2E;
+            --light-color: #F8F9FF;
+        }
+
         body {
-            background-color: #f8f9fa;
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Inter', sans-serif;
+            background: var(--light-color);
+            color: var(--dark-color);
+            line-height: 1.6;
         }
-        .container {
-            max-width: 1200px;
+
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 6rem 0;
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+            position: relative;
+            overflow: hidden;
         }
-        .header {
-            color: #2d3e50;
-            text-transform: uppercase;
-            font-weight: bold;
-            margin-bottom: 30px;
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(45deg);
+            animation: float 20s infinite;
         }
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(45deg); }
+            50% { transform: translateY(-20px) rotate(45deg); }
+            100% { transform: translateY(0) rotate(45deg); }
         }
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
+
+        .project-card {
+            background: white;
+            border: none;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
         }
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 32px rgba(74,58,255,0.15);
         }
-        .btn-success {
-            background-color: #28a745;
-            border-color: #28a745;
+
+        .project-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
-        .btn-info {
-            background-color: #17a2b8;
-            border-color: #17a2b8;
+
+        .project-card:hover::after {
+            opacity: 1;
         }
-        .table th, .table td {
-            vertical-align: middle;
+
+        .btn-premium {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
-        .table-responsive {
-            margin-top: 30px;
+
+        .btn-premium::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .btn-premium:hover::before {
+            left: 100%;
+        }
+
+        .empty-state {
+            background: white;
+            padding: 4rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+        }
+
+        .empty-state img {
+            max-width: 300px;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .action-buttons .btn {
+            margin-left: 0.5rem;
+            transition: transform 0.2s ease;
+        }
+
+        .action-buttons .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .floating-add-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            box-shadow: 0 8px 24px rgba(74,58,255,0.2);
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .project-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .project-meta .badge {
+            background: rgba(74,58,255,0.1);
+            color: var(--primary-color);
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 4rem 0;
+                clip-path: polygon(0 0, 100% 0, 100% 95%, 0 100%);
+            }
+            
+            .empty-state {
+                padding: 2rem;
+            }
+            
+            .project-card {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-<div class="container mt-5">
-    <!-- Header Section -->
-    <div class="text-center mb-5">
-        <h2 class="display-4 text-primary fw-bold">
-            <span class="text-success">{{ organization.name }}</span> Projects
-        </h2>
-        <p class="lead">
-            Your projects in <strong class="text-success">{{ organization.name }}</strong> will appear here. You can manage them directly.
-        </p>
-    </div>
-    
-    <!-- Projects Section -->
-    {% if projects %}
-        <div class="card p-4">
-            <div class="card-body">
-                <table class="table table-bordered table-striped table-responsive">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Project Name</th>
-                            <th>Description</th>
-                            <th>Created By</th>
-                            <th>Created At</th>
-                            <th colspan="2" class="text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for project in projects %}
-                            <tr>
-                                <td>{{ project.name }}</td>
-                                <td>{{ project.description }}</td>
-                                <td>{{ project.created_by.user.username }}</td>
-                                <td>{{ project.created_at|date:"d M Y, H:i" }}</td>
-                                <td class="text-center">
-                                    <a href="{% url 'assign_manager_to_project' organization_id=project.organization.id project_id=project.id %}" class="btn btn-success btn-sm">
-                                        Assign Manager
-                                    </a>
-                                </td>
-                                <td class="text-center">
-                                    <a href="{% url 'assigned_manager_detail' organization_id=project.organization.id project_id=project.id %}" class="btn btn-info btn-sm">
-                                        View Assigned Manager
-                                    </a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+    <!-- Hero Section -->
+    <section class="hero-section text-white">
+        <div class="container">
+            <div class="row animate__animated animate__fadeInUp">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h1 class="display-4 fw-bold mb-4">Manage Projects in {{ organization.name }}</h1>
+                    <p class="lead mb-4">Collaborate, manage, and track progress with CalendarPlus's intuitive project management system</p>
+                    <a href="{% url 'create_project' org_id=organization.id %}" class="btn-premium">
+                        + New Project
+                    </a>
+                </div>
             </div>
         </div>
-    {% else %}
-        <div class="alert alert-info mt-4">
-            No projects found for this organization. Start by creating a new project.
+    </section>
+
+    <!-- Main Content -->
+    <div class="container py-5">
+        <!-- Projects Grid -->
+        <div class="row animate__animated animate__fadeIn">
+            {% if projects %}
+                {% for project in projects %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="project-card">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h3 class="h5 fw-bold mb-0">{{ project.name }}</h3>
+                            <span class="status-dot bg-success"></span>
+                        </div>
+                        <p class="text-muted mb-3">{{ project.description|truncatechars:80 }}</p>
+                        
+                        <div class="project-meta">
+                            <span class="badge">Created {{ project.created_at|timesince }} ago</span>
+                        </div>
+
+                        <div class="action-buttons mt-3">
+                            <a href="{% url 'assign_manager_to_project' organization_id=project.organization.id project_id=project.id %}" 
+                               class="btn btn-sm btn-premium">
+                                Assign Manager
+                            </a>
+                            <a href="{% url 'assigned_manager_detail' organization_id=project.organization.id project_id=project.id %}" 
+                               class="btn btn-sm btn-premium">
+                                Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="empty-state animate__animated animate__fadeIn">
+                        <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" alt="No projects">
+                        <h3 class="h4 mb-3">No Projects Found</h3>
+                        <p class="text-muted mb-4">Get started by creating your first project. Collaborate with your team and manage tasks efficiently.</p>
+                        <a href="{% url 'create_project' org_id=organization.id %}" class="btn-premium">
+                            Create First Project
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
         </div>
-    {% endif %}
 
-    <!-- Navigation Buttons -->
-    <div class="d-flex justify-content-between mt-4">
-        <a href="{% url 'org_detail' org_id=organization.id %}" class="btn btn-secondary px-4 py-2">Back to Organization Details</a>
-        <a href="{% url 'create_project' org_id=organization.id %}" class="btn btn-primary px-4 py-2">Create New Project</a>
+        <!-- Navigation Footer -->
+        <div class="row mt-5 animate__animated animate__fadeInUp">
+            <div class="col-12 d-flex justify-content-between">
+                <a href="{% url 'org_detail' org_id=organization.id %}" class="btn btn-outline-secondary">
+                    ← Back to Organization
+                </a>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-premium">Export Report</button>
+                    <button class="btn btn-outline-primary">Filter Projects</button>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 
-<!-- Bootstrap 5 JS -->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <!-- Floating Action Button -->
+    <a href="{% url 'create_project' org_id=organization.id %}" class="floating-add-btn btn-premium">
+        +
+    </a>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Add smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Add hover class to project cards
+        document.querySelectorAll('.project-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.classList.add('hover');
+            });
+            card.addEventListener('mouseleave', function() {
+                this.classList.remove('hover');
+            });
+        });
+
+        // Animation trigger on scroll
+        window.addEventListener('scroll', function() {
+            const elements = document.querySelectorAll('.animate-on-scroll');
+            elements.forEach(element => {
+                if (element.getBoundingClientRect().top < window.innerHeight) {
+                    element.classList.add('animate__fadeInUp');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
-
 
 {% endblock %}

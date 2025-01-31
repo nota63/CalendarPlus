@@ -1,5 +1,10 @@
+{%extends 'custom.html'%}
+
+{% block content %}
+<br>
+
 {% load static %}
-    <!DOCTYPE html>
+<!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -12,93 +17,6 @@
 
 
 <body class="bg-gray-50 font-sans antialiased">
-
-  <!-- Slack-like Sidebar -->
-    <div class="fixed left-0 top-0 h-full w-20 bg-gray-900 flex flex-col items-center py-4 space-y-2 z-50">
-        <!-- Workspace Icon -->
-        <div class="workspace-icon active-workspace mb-4">
-            <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center cursor-pointer">
-                <span class="material-icons-round text-white text-2xl">work_outline</span>
-            </div>
-        </div>
-
-        <!-- Additional Workspaces -->
-        <div class="workspace-icon">
-            <div class="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-700">
-                <span class="material-icons-round text-gray-300 text-xl">add</span>
-            </div>
-        </div>
-
-        <div class="workspace-icon">
-            <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center cursor-pointer">
-                <span class="material-icons-round text-white text-xl">group_work</span>
-            </div>
-        </div>
-
-        <!-- Divider -->
-        <div class="border-t border-gray-700 w-8 mx-auto my-2"></div>
-
-        <!-- User Profile -->
-        <div class="workspace-icon mt-auto">
-            <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-700">
-                <img src="https://i.pravatar.cc/40?u={{ request.user }}" class="rounded-full" alt="Profile">
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Content Area -->
-    <div class="ml-20">
-        <!-- Slack-style Header -->
-        <header class="bg-white header-shadow sticky top-0 z-40">
-            <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-                <!-- Left Section -->
-                <div class="flex items-center space-x-4">
-                    <h1 class="text-lg font-bold text-gray-900 flex items-center">
-                        <span class="material-icons-round text-blue-500 mr-2">rocket</span>
-                        Workspace Pro
-                    </h1>
-                    <div class="h-6 w-px bg-gray-200"></div>
-                    <nav class="flex space-x-4">
-                        <a href="#" class="text-gray-600 hover:text-gray-900 font-medium text-sm">Home</a>
-                        <a href="#" class="text-gray-600 hover:text-gray-900 font-medium text-sm">Activity</a>
-                        <a href="#" class="text-gray-600 hover:text-gray-900 font-medium text-sm">More</a>
-                    </nav>
-                </div>
-
-                <!-- Center Search -->
-                <div class="flex-1 max-w-2xl mx-8">
-                    <div class="search-bar relative flex items-center bg-gray-100 rounded-lg px-4 py-2 transition-all">
-                        <span class="material-icons-round text-gray-400 text-lg">search</span>
-                        <input type="text" 
-                               placeholder="Search messages, files, and people..." 
-                               class="w-full bg-transparent outline-none ml-2 text-sm placeholder-gray-400">
-                    </div>
-                </div>
-
-                <!-- Right Controls -->
-                <div class="flex items-center space-x-4">
-                    <button class="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100">
-                        <span class="material-icons-round">help_outline</span>
-                    </button>
-                    <button class="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100">
-                        <span class="material-icons-round">notifications_none</span>
-                    </button>
-                    <div class="h-8 w-px bg-gray-200"></div>
-                    <button class="flex items-center text-gray-700 hover:text-gray-900">
-                        <img src="https://i.pravatar.cc/32?u={{ request.user }}" class="rounded-full mr-2">
-                        <span class="text-sm font-medium">{{ request.user }}</span>
-                        <span class="material-icons-round text-gray-500 ml-1">expand_more</span>
-                    </button>
-                </div>
-            </div>
-        </header>
-        <br>
-
-
-
-
-
-
 
 
 
@@ -707,57 +625,7 @@
 
 
 
-  <!-- Global Footer -->
-  <footer class="border-t border-gray-200 pt-12">
-    <div class="grid md:grid-cols-4 gap-8 mb-8">
-        <div>
-            <h4 class="text-sm font-semibold text-gray-900 mb-4">Product</h4>
-            <ul class="space-y-2">
-                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Features</a></li>
-                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Integrations</a></li>
-                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Security</a></li>
-            </ul>
-        </div>
-        <div>
-            <h4 class="text-sm font-semibold text-gray-900 mb-4">Resources</h4>
-            <ul class="space-y-2">
-                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Documentation</a></li>
-                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">API Reference</a></li>
-                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Status</a></li>
-            </ul>
-        </div>
-        <div>
-            <h4 class="text-sm font-semibold text-gray-900 mb-4">Company</h4>
-            <ul class="space-y-2">
-                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">About</a></li>
-                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Blog</a></li>
-                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Careers</a></li>
-            </ul>
-        </div>
-        <div>
-            <h4 class="text-sm font-semibold text-gray-900 mb-4">Connect</h4>
-            <div class="flex space-x-4">
-                <a href="#" class="text-gray-500 hover:text-gray-700">
-                    <span class="material-icons-round">forum</span>
-                </a>
-                <a href="#" class="text-gray-500 hover:text-gray-700">
-                    <span class="material-icons-round">alternate_email</span>
-                </a>
-                <a href="#" class="text-gray-500 hover:text-gray-700">
-                    <span class="material-icons-round">rss_feed</span>
-                </a>
-            </div>
-        </div>
-    </div>
-    <div class="border-t border-gray-200 py-6 text-center">
-        <p class="text-sm text-gray-500">&copy; 2024 Workspace Pro. All rights reserved.</p>
-    </div>
-</footer>
-
-
-
-
-
-
 </body>
 </html>
+
+{% endblock %}
