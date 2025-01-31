@@ -1,123 +1,631 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Set Meeting Reminder</title>
+    <title>Set Meeting Reminder | ChronoMeet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4A154B;
+            --secondary: #F4EDF4;
+            --accent: #36C5F0;
+            --text: #1A051D;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        body {
+            background: linear-gradient(135deg, #F8F9FA 0%, #E9ECEF 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .main-card {
+            animation: slideIn 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+            overflow: hidden;
+            max-width: 800px;
+            margin: 2rem auto;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #2C0B2E 100%);
+            padding: 1.5rem 2rem;
+            position: relative;
+        }
+
+        .card-header:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(to bottom, rgba(244,237,244,0.2) 0%, transparent 100%);
+        }
+
+        .card-title {
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-title i {
+            font-size: 1.4em;
+            color: var(--accent);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #E3DCE3;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(54, 197, 240, 0.2);
+        }
+
+        .style-picker {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .style-option {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid transparent;
+        }
+
+        .style-option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .style-option.selected {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(54, 197, 240, 0.2);
+        }
+
+        .style-option img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .style-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .checkmark {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--accent);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .selected .checkmark {
+            display: flex;
+        }
+
+        .time-input-group {
+            position: relative;
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .time-input-group input {
+            flex: 1;
+            padding-left: 40px;
+        }
+
+        .time-input-group:before {
+            content: '⏳';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            opacity: 0.6;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border: none;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(74, 21, 75, 0.2);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--secondary);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .style-picker {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .time-input-group {
+                flex-direction: column;
+            }
+        }
+
+
+        /* HEADER /FOOTER STYLES */
+        @keyframes fadeSlide {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-slide {
+            animation: fadeSlide 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .hover-3d {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .hover-3d:hover {
+            transform: translateY(-3px) rotateX(2deg);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+
+        .gradient-bar {
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover .gradient-bar {
+            opacity: 1;
+        }
+
+        .member-avatar {
+            transition: transform 0.3s;
+        }
+
+        .member-avatar:hover {
+            transform: translateY(-3px);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border: 2px solid white;
+            right: -2px;
+            bottom: -2px;
+        }
+
+        .workspace-icon {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .workspace-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .active-workspace {
+            border-left: 4px solid #3F83F8;
+            background: linear-gradient(90deg, rgba(63, 131, 248, 0.1) 0%, rgba(63, 131, 248, 0) 100%);
+        }
+
+        .header-shadow {
+            box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .search-bar:focus-within {
+            box-shadow: 0 0 0 2px rgba(63, 131, 248, 0.5);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </style>
 </head>
-<body>
-    <div class="container mt-5">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">Set Reminder for Meeting: {{ meeting.meeting_title }}</h4>
+<body class="bg-gray-50 font-sans antialiased">
+<!-- HEADER PART STARTS -->
+ 
+  <!-- Slack-like Sidebar -->
+  <div class="fixed left-0 top-0 h-full w-20 bg-gray-900 flex flex-col items-center py-4 space-y-2 z-50">
+    <!-- Workspace Icon -->
+    <div class="workspace-icon active-workspace mb-4">
+        <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center cursor-pointer">
+            <span class="material-icons-round text-white text-2xl">work_outline</span>
+        </div>
+    </div>
+
+    <!-- Additional Workspaces -->
+    <div class="workspace-icon">
+        <div class="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-700">
+            <span class="material-icons-round text-gray-300 text-xl">add</span>
+        </div>
+    </div>
+
+    <div class="workspace-icon">
+        <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center cursor-pointer">
+            <span class="material-icons-round text-white text-xl">group_work</span>
+        </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="border-t border-gray-700 w-8 mx-auto my-2"></div>
+
+    <!-- User Profile -->
+    <div class="workspace-icon mt-auto">
+        <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-700">
+            <img src="https://i.pravatar.cc/40?u={{ request.user }}" class="rounded-full" alt="Profile">
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Area -->
+<div class="ml-20">
+    <!-- Slack-style Header -->
+    <header class="bg-white header-shadow sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+            <!-- Left Section -->
+            <div class="flex items-center space-x-4">
+                <h1 class="text-lg font-bold text-gray-900 flex items-center">
+                    <span class="material-icons-round text-blue-500 mr-2">rocket</span>
+                    Workspace Pro
+                </h1>
+                <div class="h-6 w-px bg-gray-200"></div>
+                <nav class="flex space-x-4">
+                    <a href="#" class="text-gray-600 hover:text-gray-900 font-medium text-sm">Home</a>
+                    <a href="#" class="text-gray-600 hover:text-gray-900 font-medium text-sm">Activity</a>
+                    <a href="#" class="text-gray-600 hover:text-gray-900 font-medium text-sm">More</a>
+                </nav>
             </div>
-            <div class="card-body">
+
+            <!-- Center Search -->
+            <div class="flex-1 max-w-2xl mx-8">
+                <div class="search-bar relative flex items-center bg-gray-100 rounded-lg px-4 py-2 transition-all">
+                    <span class="material-icons-round text-gray-400 text-lg">search</span>
+                    <input type="text" 
+                           placeholder="Search messages, files, and people..." 
+                           class="w-full bg-transparent outline-none ml-2 text-sm placeholder-gray-400">
+                </div>
+            </div>
+
+            <!-- Right Controls -->
+            <div class="flex items-center space-x-4">
+                <button class="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100">
+                    <span class="material-icons-round">help_outline</span>
+                </button>
+                <button class="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100">
+                    <span class="material-icons-round">notifications_none</span>
+                </button>
+                <div class="h-8 w-px bg-gray-200"></div>
+                <button class="flex items-center text-gray-700 hover:text-gray-900">
+                    <img src="https://i.pravatar.cc/32?u={{ request.user }}" class="rounded-full mr-2">
+                    <span class="text-sm font-medium">{{ request.user }}</span>
+                    <span class="material-icons-round text-gray-500 ml-1">expand_more</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    
+
+
+
+
+
+
+
+
+
+
+
+    <div class="container py-5">
+        <div class="main-card">
+            <div class="card-header">
+                <h4 class="card-title">
+                    <i class="fas fa-bell"></i>
+                    Set Reminder: {{ meeting.meeting_title }}
+                </h4>
+            </div>
+            <div class="card-body p-4">
                 <form id="reminderForm" method="post" action="">
                     {% csrf_token %}
-                    <!-- Reminder Type -->
-                    <div class="mb-3">
-                        <label for="reminder_type" class="form-label">Reminder Type:</label>
-                        <select class="form-select" id="reminder_type" name="reminder_type" disabled>
-                            <option value="email" selected>Email (Default)</option>
-                        </select>
-                        <small class="form-text text-muted">Currently, only email reminders are supported.</small>
+                    <div class="mb-4">
+                        <label class="form-label">Reminder Channel</label>
+                        <div class="channel-select d-flex gap-2">
+                            <button type="button" class="btn btn-outline-secondary disabled" style="opacity: 0.7">
+                                <i class="fas fa-envelope me-2"></i>Email
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary disabled" title="Coming soon">
+                                <i class="fas fa-slack me-2"></i>Slack
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary disabled" title="Coming soon">
+                                <i class="fas fa-sms me-2"></i>SMS
+                            </button>
+                        </div>
+                        <small class="text-muted mt-1 d-block">More notification channels coming soon</small>
                     </div>
-    
-                    <!-- Reminder Time -->
-                    <div class="mb-3">
-                        <label for="reminder_time" class="form-label">Reminder Time:</label>
-                        <select class="form-select" id="reminder_time" name="reminder_time">
-                            <option value="">Select Reminder Time</option>
+
+                    <div class="mb-4">
+                        <label class="form-label">When should we remind you?</label>
+                        <select class="form-select mb-3" id="reminder_time" name="reminder_time">
+                            <option value="">Choose predefined time</option>
                             <option value="15">15 minutes before</option>
                             <option value="30">30 minutes before</option>
                             <option value="45">45 minutes before</option>
-                            <option value="0">On Meeting Time</option>
+                            <option value="0">Exactly at meeting time</option>
                         </select>
-                    </div>
-    
-                    <!-- Custom Time -->
-                    <div class="mb-3">
-                        <label class="form-label">Or provide custom time:</label>
-                        <div class="input-group">
-                            <input type="number" class="form-control" name="custom_minutes" placeholder="Minutes">
-                            <input type="number" class="form-control" name="custom_hours" placeholder="Hours">
+                        
+                        <div class="custom-time mt-3">
+                            <label class="form-label">Or set custom time</label>
+                            <div class="time-input-group">
+                                <input type="number" class="form-control" name="custom_hours" placeholder="Hours" min="0">
+                                <input type="number" class="form-control" name="custom_minutes" placeholder="Minutes" min="0" max="59">
+                            </div>
                         </div>
-                        <small class="form-text text-muted">Leave blank if using the predefined reminder times above.</small>
                     </div>
-    
-                    <!-- Remind All Members -->
-                    <div class="form-check mb-3">
-                        <input type="checkbox" class="form-check-input" id="remind_all_members" name="remind_all_members">
-                        <label class="form-check-label" for="remind_all_members">Remind all members (User and Invitee)</label>
-                    </div>
-    
-                    <!-- Reminder Style -->
-                    <div class="mb-3">
-                        <label class="form-label">Select Reminder Style:</label>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <label class="text-center">
-                                <input type="radio" name="reminder_style" value="modern" class="form-check-input">
-                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaCjaF5gkVy47u03woCLOY2blWuJD3Z5bBXg&s" alt="Modern Theme" class="img-thumbnail" style="width: 100px; height: auto;">
-                                <div>Modern</div>
-                            </label>
-                            <label class="text-center">
-                                <input type="radio" name="reminder_style" value="classic" class="form-check-input">
-                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyz3Y1Zri2lI3XmONaBE3Ug4vvp0AQGSZ9Kw&s" alt="Classic Theme" class="img-thumbnail" style="width: 100px; height: auto;">
-                                <div>Classic</div>
-                            </label>
-                            <label class="text-center">
-                                <input type="radio" name="reminder_style" value="minimalist" class="form-check-input">
-                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpcyqqHwhyhrcqkFaQ7bSSDEPv8vPtZhu1kw&s" alt="Minimalist Theme" class="img-thumbnail" style="width: 100px; height: auto;">
-                                <div>Minimalist</div>
-                            </label>
-                            <label class="text-center">
-                                <input type="radio" name="reminder_style" value="dark" class="form-check-input">
-                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLmMC6_5JY2ZGXGE0v-srKub1fVkEVzEIzNg&s" alt="Dark Theme" class="img-thumbnail" style="width: 100px; height: auto;">
-                                <div>Dark</div>
-                            </label>
-                            <label class="text-center">
-                                <input type="radio" name="reminder_style" value="playful" class="form-check-input">
-                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgmVuEaefM9UDajV7hzhfG2AK9w4OVcibVhg&s" alt="Playful Theme" class="img-thumbnail" style="width: 100px; height: auto;">
-                                <div>Playful</div>
+
+                    <div class="mb-4">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="remind_all_members" name="remind_all_members">
+                            <label class="form-check-label" for="remind_all_members">
+                                Notify all participants
+                                <span class="badge bg-primary ms-2">Recommended</span>
                             </label>
                         </div>
                     </div>
-    
-                    <!-- Submit Button -->
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Save Reminder</button>
+
+                    <div class="mb-4">
+                        <label class="form-label">Reminder Style</label>
+                        <div class="style-picker">
+                            <label class="style-option">
+                                <input type="radio" name="reminder_style" value="modern">
+                                <div class="checkmark"><i class="fas fa-check"></i></div>
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdgkgb2OSGBQQjeCP53v1RCfdKVosnVA0UfWTv4XvsZBwebiDhfm0JYqUNkpuG8ozIkVo&usqp=CAU" alt="Modern">
+                                <div class="text-center mt-2 small">Modern</div>
+                            </label>
+                            <label class="style-option">
+                                <input type="radio" name="reminder_style" value="classic">
+                                <div class="checkmark"><i class="fas fa-check"></i></div>
+                                <img src="https://img.freepik.com/premium-vector/abstract-women-splater-colorfull-premium-logo_152830-76.jpg" alt="Classic">
+                                <div class="text-center mt-2 small">Classic</div>
+                            </label>
+                            <label class="style-option">
+                                <input type="radio" name="reminder_style" value="minimalist">
+                                <div class="checkmark"><i class="fas fa-check"></i></div>
+                                <img src="https://img.freepik.com/premium-vector/abstract-logo-template_153291-16.jpg" alt="Minimalist">
+                                <div class="text-center mt-2 small">Minimalist</div>
+                            </label>
+                            <label class="style-option">
+                                <input type="radio" name="reminder_style" value="dark">
+                                <div class="checkmark"><i class="fas fa-check"></i></div>
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQPTFf1LQ-8jK0fsdBAgvkphNrqZ0bH8hc4eFJyqRNtp3GSUi0NEOvTDYurEARZhkZAEMQ&usqp=CAU" alt="Dark">
+                                <div class="text-center mt-2 small">Dark</div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary py-3">
+                            <span class="submit-text">Save Reminder Settings</span>
+                            <span class="loading-spinner" style="display: none">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </span>
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-    
+
+    <div class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Handle form submission
-        document.getElementById('reminderForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const formData = new FormData(this);
+        document.addEventListener('DOMContentLoaded', () => {
+            // Style picker interaction
+            document.querySelectorAll('.style-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('.style-option').forEach(o => o.classList.remove('selected'));
+                    option.classList.add('selected');
+                });
+            });
 
-            fetch(this.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.success);
-                    window.location.href = '/calendar/meetings/{{ organization.id }}/';  // Redirect to meeting list
-                } else {
-                    alert(data.error || 'An error occurred while saving the reminder.');
+            // Form submission handler
+            const form = document.getElementById('reminderForm');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const overlay = document.querySelector('.loading-overlay');
+                const submitText = submitBtn.querySelector('.submit-text');
+                const spinner = submitBtn.querySelector('.loading-spinner');
+
+                submitText.style.display = 'none';
+                spinner.style.display = 'inline-block';
+                overlay.style.display = 'flex';
+
+                try {
+                    const formData = new FormData(form);
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        // Show success animation
+                        submitBtn.innerHTML = '<i class="fas fa-check-circle me-2"></i>Settings Saved!';
+                        setTimeout(() => {
+                            window.location.href = '/calendar/meetings/{{ organization.id }}/';
+                        }, 1500);
+                    } else {
+                        alert(data.error || 'Error saving settings');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                } finally {
+                    spinner.style.display = 'none';
+                    submitText.style.display = 'inline-block';
+                    overlay.style.display = 'none';
                 }
-            })
-            .catch(error => console.error('Error:', error));
+            });
+
+            // Dynamic time input validation
+            const timeInputs = form.querySelectorAll('input[name="custom_hours"], input[name="custom_minutes"]');
+            timeInputs.forEach(input => {
+                input.addEventListener('input', (e) => {
+                    if (e.target.name === 'custom_minutes' && e.target.value > 59) {
+                        e.target.value = 59;
+                    }
+                });
+            });
         });
     </script>
+
+<!-- FOOTER  -->
+
+ <!-- Global Footer -->
+ <footer class="border-t border-gray-200 pt-12">
+    <div class="grid md:grid-cols-4 gap-8 mb-8">
+        <div>
+            <h4 class="text-sm font-semibold text-gray-900 mb-4">Product</h4>
+            <ul class="space-y-2">
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Features</a></li>
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Integrations</a></li>
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Security</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4 class="text-sm font-semibold text-gray-900 mb-4">Resources</h4>
+            <ul class="space-y-2">
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Documentation</a></li>
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">API Reference</a></li>
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Status</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4 class="text-sm font-semibold text-gray-900 mb-4">Company</h4>
+            <ul class="space-y-2">
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">About</a></li>
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Blog</a></li>
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Careers</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4 class="text-sm font-semibold text-gray-900 mb-4">Connect</h4>
+            <div class="flex space-x-4">
+                <a href="#" class="text-gray-500 hover:text-gray-700">
+                    <span class="material-icons-round">forum</span>
+                </a>
+                <a href="#" class="text-gray-500 hover:text-gray-700">
+                    <span class="material-icons-round">alternate_email</span>
+                </a>
+                <a href="#" class="text-gray-500 hover:text-gray-700">
+                    <span class="material-icons-round">rss_feed</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="border-t border-gray-200 py-6 text-center">
+        <p class="text-sm text-gray-500">&copy; 2024 Workspace Pro. All rights reserved.</p>
+    </div>
+</footer>
+
+
 </body>
 </html>
