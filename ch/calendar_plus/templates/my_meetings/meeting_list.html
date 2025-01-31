@@ -1,367 +1,674 @@
+{% load static %}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Meeting Schedule - Modern UI</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    </head>
 
 
+<body class="bg-gray-50 font-sans antialiased">
 
+  <!-- Slack-like Sidebar -->
+    <div class="fixed left-0 top-0 h-full w-20 bg-gray-900 flex flex-col items-center py-4 space-y-2 z-50">
+        <!-- Workspace Icon -->
+        <div class="workspace-icon active-workspace mb-4">
+            <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center cursor-pointer">
+                <span class="material-icons-round text-white text-2xl">work_outline</span>
+            </div>
+        </div>
 
-<div class="container">
-    <h1>Meeting List</h1>
+        <!-- Additional Workspaces -->
+        <div class="workspace-icon">
+            <div class="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-700">
+                <span class="material-icons-round text-gray-300 text-xl">add</span>
+            </div>
+        </div>
 
-    <strong>{{organization.name}}</strong>
+        <div class="workspace-icon">
+            <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center cursor-pointer">
+                <span class="material-icons-round text-white text-xl">group_work</span>
+            </div>
+        </div>
 
-    <div class="tabs">
-        <button id="my-scheduled" class="tab-button active">My Scheduled Meetings</button>
-        <button id="i-scheduled" class="tab-button">I Scheduled Meetings</button>
+        <!-- Divider -->
+        <div class="border-t border-gray-700 w-8 mx-auto my-2"></div>
+
+        <!-- User Profile -->
+        <div class="workspace-icon mt-auto">
+            <div class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-700">
+                <img src="https://i.pravatar.cc/40?u={{ request.user }}" class="rounded-full" alt="Profile">
+            </div>
+        </div>
     </div>
 
-    <!-- My Scheduled Meetings Section -->
-    <div id="my-scheduled-meetings" class="meeting-section active">
-        <h2>My Scheduled Meetings</h2>
-        
-        <div class="meeting-category">
-            <h3><a href="#" class="category-link" data-category="my_scheduled_standup">Standup</a></h3>
-            <div class="meeting-list my_scheduled_standup">
-                {% for meeting in my_scheduled_standup %}
-                    <div class="meeting-item">
-                        <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
-        
-                        <!-- 3 Dots Menu -->
-                        <div class="dots-menu">
-                            <button class="dots-btn">...</button>
-                            <div class="dots-dropdown">
-                                <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
-                                <!-- Remove Me Button -->
-                                <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
-                                <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
+    <!-- Main Content Area -->
+    <div class="ml-20">
+        <!-- Slack-style Header -->
+        <header class="bg-white header-shadow sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+                <!-- Left Section -->
+                <div class="flex items-center space-x-4">
+                    <h1 class="text-lg font-bold text-gray-900 flex items-center">
+                        <span class="material-icons-round text-blue-500 mr-2">rocket</span>
+                        Workspace Pro
+                    </h1>
+                    <div class="h-6 w-px bg-gray-200"></div>
+                    <nav class="flex space-x-4">
+                        <a href="#" class="text-gray-600 hover:text-gray-900 font-medium text-sm">Home</a>
+                        <a href="#" class="text-gray-600 hover:text-gray-900 font-medium text-sm">Activity</a>
+                        <a href="#" class="text-gray-600 hover:text-gray-900 font-medium text-sm">More</a>
+                    </nav>
+                </div>
 
-                                <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>
-                                  
-                            </div>
-                        </div>
+                <!-- Center Search -->
+                <div class="flex-1 max-w-2xl mx-8">
+                    <div class="search-bar relative flex items-center bg-gray-100 rounded-lg px-4 py-2 transition-all">
+                        <span class="material-icons-round text-gray-400 text-lg">search</span>
+                        <input type="text" 
+                               placeholder="Search messages, files, and people..." 
+                               class="w-full bg-transparent outline-none ml-2 text-sm placeholder-gray-400">
                     </div>
-                {% endfor %}
-            </div>
-        </div>
-        
-        
-        <div class="meeting-category">
-            <h3><a href="#" class="category-link" data-category="my_scheduled_task">Task</a></h3>
-            <div class="meeting-list my_scheduled_task">
-                {% for meeting in my_scheduled_task %}
-                    <div class="meeting-item">
-                        <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
-        
-                        <!-- 3 Dots Menu -->
-                        <div class="dots-menu">
-                            <button class="dots-btn">...</button>
-                            <div class="dots-dropdown">
-                                <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
-                               <!-- Remove Me Button -->
-                               <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
-                               <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
-                               <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>
-                               
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-        
-        
-        <div class="meeting-category">
-            <h3><a href="#" class="category-link" data-category="my_scheduled_project">Project Discussion</a></h3>
-            <div class="meeting-list my_scheduled_project">
-                {% for meeting in my_scheduled_project %}
-                    <div class="meeting-item">
-                        <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
-        
-                        <!-- 3 Dots Menu -->
-                        <div class="dots-menu">
-                            <button class="dots-btn">...</button>
-                            <div class="dots-dropdown">
-                                <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
-                                <!-- Remove Me Button -->
-                                <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
-                                <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
-                                <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>
-                                   
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-        
-        
-        <div class="meeting-category">
-            <h3><a href="#" class="category-link" data-category="my_scheduled_other">Other</a></h3>
-            <div class="meeting-list my_scheduled_other">
-                {% for meeting in my_scheduled_other %}
-                    <div class="meeting-item">
-                        <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
-        
-                        <!-- 3 Dots Menu -->
-                        <div class="dots-menu">
-                            <button class="dots-btn">...</button>
-                            <div class="dots-dropdown">
-                                <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
-                              <!-- Remove Me Button -->
-                              <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
-                              <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
-                              <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>
-                               
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-        
-    </div>
+                </div>
 
-    <!-- I Scheduled Meetings Section -->
-    <div id="i-scheduled-meetings" class="meeting-section">
-        <h2>I Scheduled Meetings<div class="meeting-category">
-            <h3><a href="#" class="category-link" data-category="i_scheduled_standup">Standup</a></h3>
-            <div class="meeting-list i_scheduled_standup">
-                {% for meeting in i_scheduled_standup %}
-                    <div class="meeting-item">
-                        <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
-        
-                        <!-- 3 Dots Menu -->
-                        <div class="dots-menu">
-                            <button class="dots-btn">...</button>
-                            <div class="dots-dropdown">
-                                <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
-                               <!-- Remove Me Button -->
-                               <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
-                               <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
-                               <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
+                <!-- Right Controls -->
+                <div class="flex items-center space-x-4">
+                    <button class="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100">
+                        <span class="material-icons-round">help_outline</span>
+                    </button>
+                    <button class="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100">
+                        <span class="material-icons-round">notifications_none</span>
+                    </button>
+                    <div class="h-8 w-px bg-gray-200"></div>
+                    <button class="flex items-center text-gray-700 hover:text-gray-900">
+                        <img src="https://i.pravatar.cc/32?u={{ request.user }}" class="rounded-full mr-2">
+                        <span class="text-sm font-medium">{{ request.user }}</span>
+                        <span class="material-icons-round text-gray-500 ml-1">expand_more</span>
+                    </button>
+                </div>
             </div>
-        </div>
-     
+        </header>
+        <br>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Meeting Container starts -->
+        <div class="container">
+          
         
+            <strong>{{organization.name}}</strong>
         
-        <div class="meeting-category">
-            <h3><a href="#" class="category-link" data-category="i_scheduled_task">Task</a></h3>
-            <div class="meeting-list i_scheduled_task">
-                {% for meeting in i_scheduled_task %}
-                    <div class="meeting-item">
-                        <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
+            <div class="tabs">
+                <button id="my-scheduled" class="tab-button active">My Scheduled Meetings</button>
+                <button id="i-scheduled" class="tab-button">I Scheduled Meetings</button>
+            </div>
         
-                        <!-- 3 Dots Menu -->
-                        <div class="dots-menu">
-                            <button class="dots-btn">...</button>
-                            <div class="dots-dropdown">
-                                <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
-                               <!-- Remove Me Button -->
-                               <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
-                               <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
-                               <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>   
+            <!-- My Scheduled Meetings Section -->
+            <div id="my-scheduled-meetings" class="meeting-section active">
+                <h2>My Scheduled Meetings</h2>
+                
+                <div class="meeting-category">
+                    <h3><a href="#" class="category-link" data-category="my_scheduled_standup">Standup</a></h3>
+                    <div class="meeting-list my_scheduled_standup">
+                        {% for meeting in my_scheduled_standup %}
+                            <div class="meeting-item">
+                                <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
+                
+                                <!-- 3 Dots Menu -->
+                                <div class="dots-menu">
+                                    <button class="dots-btn">...</button>
+                                    <div class="dots-dropdown">
+                                        <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
+                                        <!-- Remove Me Button -->
+                                        <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
+                                        <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
+        
+                                        <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>
+                                          
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        {% endfor %}
                     </div>
-                {% endfor %}
+                </div>
+                
+                
+                <div class="meeting-category">
+                    <h3><a href="#" class="category-link" data-category="my_scheduled_task">Task</a></h3>
+                    <div class="meeting-list my_scheduled_task">
+                        {% for meeting in my_scheduled_task %}
+                            <div class="meeting-item">
+                                <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
+                
+                                <!-- 3 Dots Menu -->
+                                <div class="dots-menu">
+                                    <button class="dots-btn">...</button>
+                                    <div class="dots-dropdown">
+                                        <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
+                                       <!-- Remove Me Button -->
+                                       <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
+                                       <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
+                                       <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>
+                                       
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                
+                <div class="meeting-category">
+                    <h3><a href="#" class="category-link" data-category="my_scheduled_project">Project Discussion</a></h3>
+                    <div class="meeting-list my_scheduled_project">
+                        {% for meeting in my_scheduled_project %}
+                            <div class="meeting-item">
+                                <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
+                
+                                <!-- 3 Dots Menu -->
+                                <div class="dots-menu">
+                                    <button class="dots-btn">...</button>
+                                    <div class="dots-dropdown">
+                                        <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
+                                        <!-- Remove Me Button -->
+                                        <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
+                                        <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
+                                        <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>
+                                           
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                
+                <div class="meeting-category">
+                    <h3><a href="#" class="category-link" data-category="my_scheduled_other">Other</a></h3>
+                    <div class="meeting-list my_scheduled_other">
+                        {% for meeting in my_scheduled_other %}
+                            <div class="meeting-item">
+                                <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
+                
+                                <!-- 3 Dots Menu -->
+                                <div class="dots-menu">
+                                    <button class="dots-btn">...</button>
+                                    <div class="dots-dropdown">
+                                        <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
+                                      <!-- Remove Me Button -->
+                                      <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
+                                      <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
+                                      <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>
+                                       
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+            </div>
+        
+            <!-- I Scheduled Meetings Section -->
+            <div id="i-scheduled-meetings" class="meeting-section">
+                <h2>I Scheduled Meetings<div class="meeting-category">
+                    <h3><a href="#" class="category-link" data-category="i_scheduled_standup">Standup</a></h3>
+                    <div class="meeting-list i_scheduled_standup">
+                        {% for meeting in i_scheduled_standup %}
+                            <div class="meeting-item">
+                                <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
+                
+                                <!-- 3 Dots Menu -->
+                                <div class="dots-menu">
+                                    <button class="dots-btn">...</button>
+                                    <div class="dots-dropdown">
+                                        <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
+                                       <!-- Remove Me Button -->
+                                       <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
+                                       <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
+                                       <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+             
+        
+                
+                
+                <div class="meeting-category">
+                    <h3><a href="#" class="category-link" data-category="i_scheduled_task">Task</a></h3>
+                    <div class="meeting-list i_scheduled_task">
+                        {% for meeting in i_scheduled_task %}
+                            <div class="meeting-item">
+                                <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
+                
+                                <!-- 3 Dots Menu -->
+                                <div class="dots-menu">
+                                    <button class="dots-btn">...</button>
+                                    <div class="dots-dropdown">
+                                        <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
+                                       <!-- Remove Me Button -->
+                                       <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
+                                       <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
+                                       <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>   
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                
+                <div class="meeting-category">
+                    <h3><a href="#" class="category-link" data-category="i_scheduled_project">Project Discussion</a></h3>
+                    <div class="meeting-list i_scheduled_project">
+                        {% for meeting in i_scheduled_project %}
+                            <div class="meeting-item">
+                                <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
+                
+                                <!-- 3 Dots Menu -->
+                                <div class="dots-menu">
+                                    <button class="dots-btn">...</button>
+                                    <div class="dots-dropdown">
+                                        <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
+                                       <!-- Remove Me Button -->
+                                       <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
+                                       <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
+                                       <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>
+                                      
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                
+                <div class="meeting-category">
+                    <h3><a href="#" class="category-link" data-category="i_scheduled_other">Other</a></h3>
+                    <div class="meeting-list i_scheduled_other">
+                        {% for meeting in i_scheduled_other %}
+                            <div class="meeting-item">
+                                <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
+                
+                                <!-- 3 Dots Menu -->
+                                <div class="dots-menu">
+                                    <button class="dots-btn">...</button>
+                                    <div class="dots-dropdown">
+                                        <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
+                                         <!-- Remove Me Link (Popup confirmation) -->
+                                         <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
+                                         <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
+                                         <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
             </div>
         </div>
-        
-        
-        <div class="meeting-category">
-            <h3><a href="#" class="category-link" data-category="i_scheduled_project">Project Discussion</a></h3>
-            <div class="meeting-list i_scheduled_project">
-                {% for meeting in i_scheduled_project %}
-                    <div class="meeting-item">
-                        <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
-        
-                        <!-- 3 Dots Menu -->
-                        <div class="dots-menu">
-                            <button class="dots-btn">...</button>
-                            <div class="dots-dropdown">
-                                <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
-                               <!-- Remove Me Button -->
-                               <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
-                               <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
-                               <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>
-                              
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-        
-        
-        <div class="meeting-category">
-            <h3><a href="#" class="category-link" data-category="i_scheduled_other">Other</a></h3>
-            <div class="meeting-list i_scheduled_other">
-                {% for meeting in i_scheduled_other %}
-                    <div class="meeting-item">
-                        <p>{{ meeting.meeting_title }} - {{ meeting.meeting_date }} at {{ meeting.start_time }}</p>
-        
-                        <!-- 3 Dots Menu -->
-                        <div class="dots-menu">
-                            <button class="dots-btn">...</button>
-                            <div class="dots-dropdown">
-                                <a href="{% url 'meeting_detail_view' org_id=meeting.organization.id meeting_id=meeting.id %}">Meeting Details</a>
-                                 <!-- Remove Me Link (Popup confirmation) -->
-                                 <a href="{% url 'remove_myself' org_id=meeting.organization.id meeting_id=meeting.id %}">Remove Myself</a>
-                                 <a href="{% url 'meeting_reminders' org_id=meeting.organization.id meeting_id=meeting.id %}">Remind Me</a>
-                                 <a href="{% url 'invite_others' org_id=meeting.organization.id meeting_id=meeting.id %}">Invite Others</a>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-        
-    </div>
-</div>
+  
 
 
 <style>
+    :root {
+        --primary: #2F80ED;
+        --secondary: #6F42C1;
+        --background: #F8F9FD;
+        --card-bg: #FFFFFF;
+        --text-primary: #2D3436;
+        --text-secondary: #636E72;
+        --success: #27AE60;
+        --warning: #E2B93B;
+        --error: #EB5757;
+        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
     body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f4;
-}
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: var(--background);
+        margin: 0;
+        padding: 2rem;
+        color: var(--text-primary);
+    }
 
-.container {
-    width: 80%;
-    margin: 20px auto;
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: var(--card-bg);
+        border-radius: 16px;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
 
-h1 {
-    text-align: center;
-    color: #333;
-}
-
-.tabs {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-
-.tab-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: #f0f0f0;
-    border: 1px solid #ddd;
-    border-radius: 5px 5px 0 0;
-    margin-right: 10px;
-    transition: all 0.3s ease;
-}
-
-.tab-button:hover {
-    background-color: #007BFF;
-    color: white;
-}
-
-.tab-button.active {
-    background-color: #007BFF;
-    color: white;
-}
-
-.meeting-section {
-    display: none;
-}
-
-.meeting-section.active {
-    display: block;
-}
-
-.meeting-category {
-    margin-bottom: 30px;
-}
-
-.meeting-category h3 {
-    font-size: 20px;
-    color: #333;
-    margin-bottom: 10px;
-}
-
-.meeting-category p {
-    font-size: 16px;
-    color: #555;
-    margin: 5px 0;
-    transition: all 0.3s ease;
-}
-
-.meeting-category p:hover {
-    color: #007BFF;
-    cursor: pointer;
-    text-decoration: underline;
-}
-.dots-menu {
+    .header-section {
+        padding: 2rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
         position: relative;
-        display: inline-block;
+    }
+
+    .gradient-text {
+        font-weight: 800;
+        font-size: 2.5rem;
+        margin: 0 0 1rem 0;
+        background: linear-gradient(45deg, #fff, #E0F3FF);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .org-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0.75rem 1.25rem;
+        border-radius: 8px;
+        backdrop-filter: blur(10px);
+        font-size: 0.9rem;
+    }
+
+    .tabs-wrapper {
+        position: relative;
+        padding: 1rem 2rem;
+        background: var(--card-bg);
+    }
+
+    .tabs {
+        display: flex;
+        gap: 1rem;
+        position: relative;
+    }
+
+    .tab-button {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        background: none;
+        border-radius: 8px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .tab-button.active {
+        color: var(--primary);
+        background: rgba(47, 128, 237, 0.1);
+    }
+
+    .tab-button:hover {
+        background: rgba(47, 128, 237, 0.05);
+    }
+
+    .tab-indicator {
+        position: absolute;
+        bottom: -1px;
+        height: 2px;
+        background: var(--primary);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .meeting-section {
+        display: none;
+        padding: 2rem;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .meeting-section.active {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .meeting-category {
+        margin-bottom: 2rem;
+    }
+
+    .category-link {
+        color: var(--text-primary);
+        text-decoration: none;
+        font-size: 1.25rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0;
+        border-bottom: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .category-link:hover {
+        color: var(--primary);
+        border-color: var(--primary);
+    }
+
+    .meeting-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .meeting-item {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 1.5rem;
+        position: relative;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .meeting-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .meeting-content {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .meeting-type-indicator {
+        width: 4px;
+        border-radius: 2px;
+        background: var(--primary);
+    }
+
+    .meta-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+
+    .dots-menu {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
     }
 
     .dots-btn {
-        background: transparent;
+        background: none;
         border: none;
-        font-size: 20px;
+        color: var(--text-secondary);
         cursor: pointer;
+        padding: 0.25rem;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .dots-btn:hover {
+        background: rgba(0, 0, 0, 0.05);
+        color: var(--text-primary);
     }
 
     .dots-dropdown {
         display: none;
         position: absolute;
         right: 0;
-        background-color: #f9f9f9;
-        min-width: 160px;
-        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-        z-index: 1;
+        top: 100%;
+        background: var(--card-bg);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        min-width: 200px;
+        padding: 0.5rem;
+        z-index: 10;
+    }
+
+    .dots-menu:hover .dots-dropdown {
+        display: block;
+        animation: slideDown 0.3s ease;
     }
 
     .dots-dropdown a {
-        color: black;
-        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        color: var(--text-primary);
         text-decoration: none;
-        display: block;
+        border-radius: 6px;
+        transition: all 0.2s ease;
     }
 
     .dots-dropdown a:hover {
-        background-color: #ddd;
+        background: rgba(47, 128, 237, 0.1);
+        color: var(--primary);
     }
 
-    /* Show the dropdown when the 3 dots button is clicked */
-    .dots-menu:hover .dots-dropdown {
-        display: block;
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            margin: 0;
+            border-radius: 0;
+        }
+        
+        .meeting-list {
+            grid-template-columns: 1fr;
+        }
+        
+        .tabs {
+            flex-direction: column;
+        }
+        
+        .header-section {
+            padding: 1.5rem;
+        }
+        
+        .gradient-text {
+            font-size: 2rem;
+        }
     }
 
 
-    /* Initially hide the modal */
-#remove-modal {
-    display: none;
-    position: fixed;
-    z-index: 1; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.4); /* Black background with transparency */
-    overflow: auto; /* Enable scroll if needed */
-    padding-top: 60px;
-}
 
-.modal-content {
-    background-color: #fff;
-    margin: 5% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-}
+    @keyframes fadeSlide {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-slide {
+            animation: fadeSlide 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
 
+        .hover-3d {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .hover-3d:hover {
+            transform: translateY(-3px) rotateX(2deg);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+
+        .gradient-bar {
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .card:hover .gradient-bar {
+            opacity: 1;
+        }
+
+        .member-avatar {
+            transition: transform 0.3s;
+        }
+
+        .member-avatar:hover {
+            transform: translateY(-3px);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border: 2px solid white;
+            right: -2px;
+            bottom: -2px;
+        }
+
+        .workspace-icon {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .workspace-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .active-workspace {
+            border-left: 4px solid #3F83F8;
+            background: linear-gradient(90deg, rgba(63, 131, 248, 0.1) 0%, rgba(63, 131, 248, 0) 100%);
+        }
+
+        .header-shadow {
+            box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .search-bar:focus-within {
+            box-shadow: 0 0 0 2px rgba(63, 131, 248, 0.5);
+        }
 </style>
 
 <script>
@@ -395,3 +702,63 @@ h1 {
         });
     });
 </script>
+
+
+
+
+
+
+  <!-- Global Footer -->
+  <footer class="border-t border-gray-200 pt-12">
+    <div class="grid md:grid-cols-4 gap-8 mb-8">
+        <div>
+            <h4 class="text-sm font-semibold text-gray-900 mb-4">Product</h4>
+            <ul class="space-y-2">
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Features</a></li>
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Integrations</a></li>
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Security</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4 class="text-sm font-semibold text-gray-900 mb-4">Resources</h4>
+            <ul class="space-y-2">
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Documentation</a></li>
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">API Reference</a></li>
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Status</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4 class="text-sm font-semibold text-gray-900 mb-4">Company</h4>
+            <ul class="space-y-2">
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">About</a></li>
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Blog</a></li>
+                <li><a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Careers</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4 class="text-sm font-semibold text-gray-900 mb-4">Connect</h4>
+            <div class="flex space-x-4">
+                <a href="#" class="text-gray-500 hover:text-gray-700">
+                    <span class="material-icons-round">forum</span>
+                </a>
+                <a href="#" class="text-gray-500 hover:text-gray-700">
+                    <span class="material-icons-round">alternate_email</span>
+                </a>
+                <a href="#" class="text-gray-500 hover:text-gray-700">
+                    <span class="material-icons-round">rss_feed</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="border-t border-gray-200 py-6 text-center">
+        <p class="text-sm text-gray-500">&copy; 2024 Workspace Pro. All rights reserved.</p>
+    </div>
+</footer>
+
+
+
+
+
+
+</body>
+</html>
