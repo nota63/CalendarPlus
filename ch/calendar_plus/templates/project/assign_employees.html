@@ -1,77 +1,240 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assign Employees to Manager</title>
-    <!-- Google Fonts and Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>Team Management | Assign Employees</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <!-- Custom CSS -->
     <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #f4f7fc;
-            color: #333;
+        :root {
+            --primary-color: #4A90E2;
+            --secondary-color: #2D3436;
+            --accent-color: #00C853;
+            --hover-color: #F5F6FA;
+            --border-color: #EBEBEB;
+            --shadow-light: 0 2px 12px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: #F9FAFC;
+            color: var(--secondary-color);
             display: flex;
-            justify-content: center;
-            align-items: center;
             min-height: 100vh;
         }
-        .container {
-            background-color: #fff;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 800px;
-            animation: fadeIn 1s ease-out;
+
+        /* Side Navigation */
+        .side-nav {
+            width: 280px;
+            background: linear-gradient(135deg, #2D3436 0%, #000000 100%);
+            padding: 2rem 1.5rem;
+            position: fixed;
+            height: 100vh;
+            transform: translateX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        h1 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            color: #007bff;
-            margin-bottom: 1.5rem;
+
+        .logo {
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
-        h3 {
-            font-size: 1.2rem;
-            font-weight: 500;
-            margin-bottom: 1rem;
-            color: #333;
+
+        .nav-menu {
+            list-style: none;
         }
-        p {
-            font-size: 0.9rem;
+
+        .nav-item {
             margin: 0.5rem 0;
         }
-        button,
-        .btn {
-            font-size: 0.9rem;
-            padding: 8px 12px;
-            border: none;
-            border-radius: 5px;
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 3rem;
+            animation: contentEnter 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .page-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            position: relative;
+        }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        /* Assignment Grid */
+        .assignment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .employee-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
             cursor: pointer;
-            text-align: center;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
         }
+
+        .employee-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .employee-card.selected {
+            border-color: var(--primary-color);
+            background: #F8FAFF;
+        }
+
+        .employee-card.selected::after {
+            content: 'check_circle';
+            font-family: 'Material Icons Round';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: var(--primary-color);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-light);
+        }
+
+        .employee-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .employee-name {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .employee-role {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Action Bar */
+        .action-bar {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            background: white;
+            padding: 1.5rem 3rem;
+            box-shadow: var(--shadow-medium);
+            border-radius: 16px 0 0 0;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
         .btn-primary {
-            background-color: #007bff;
-            color: #fff;
+            background: var(--primary-color);
+            color: white;
         }
+
         .btn-primary:hover {
-            background-color: #0056b3;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background: #357ABD;
+            transform: translateY(-2px);
         }
+
         .btn-secondary {
-            background-color: #6c757d;
-            color: #fff;
+            background: transparent;
+            color: var(--secondary-color);
+            border: 1px solid var(--border-color);
         }
+
         .btn-secondary:hover {
-            background-color: #5a6268;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background: var(--hover-color);
         }
-        @keyframes fadeIn {
+
+        /* Animations */
+        @keyframes contentEnter {
             from {
                 opacity: 0;
                 transform: translateY(20px);
@@ -81,43 +244,180 @@
                 transform: translateY(0);
             }
         }
-        label {
-            font-size: 0.9rem;
-            margin: 0.5rem 0;
+
+        @keyframes cardSelect {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
-        input[type="checkbox"] {
-            margin-right: 0.5rem;
+
+        /* Progress Indicator */
+        .progress-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
         }
-        a {
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 1rem;
-            font-size: 0.9rem;
+
+        .progress-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 4px solid var(--primary-color);
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .side-nav {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 2rem;
+            }
+
+            .assignment-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .action-bar {
+                position: static;
+                box-shadow: none;
+                padding: 1.5rem 0;
+                justify-content: flex-end;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Assign Employees to Manager</h1>
+    <!-- Side Navigation -->
+       <!-- Side Navigation -->
+    <nav class="side-nav">
+        <div class="logo">
+            <span class="material-icons-round">group_work</span>
+            Calendar Plus
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <span class="material-icons-round">dashboard</span>
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <span class="material-icons-round">groups</span>
+                    Teams
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <span class="material-icons-round">assignment_ind</span>
+                    Assignments
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Assign Team Members</h1>
+            <div class="header-actions">
+                <button class="btn btn-secondary">
+                    <span class="material-icons-round">help_outline</span>
+                    Need Help?
+                </button>
+            </div>
+        </div>
 
         <form method="post">
             {% csrf_token %}
-            <h3>Select Employees to Assign:</h3>
-            {% for employee in employees %}
-                <div>
-                    <label>
-                        <input type="checkbox" name="employee" value="{{ employee.id }}">
+            <div class="assignment-grid">
+                {% for employee in employees %}
+                <div class="employee-card" onclick="toggleSelection(this)">
+                    <div class="employee-avatar">
+                        {{ employee.user.first_name|first|upper }}{{ employee.user.last_name|first|upper }}
+                    </div>
+                    <h3 class="employee-name">
                         {{ employee.user.get_full_name|default:employee.user.username }}
-                    </label>
+                    </h3>
+                    <p class="employee-role">
+                        {{ employee.position|default:"Team Member" }}
+                    </p>
+                    <input type="checkbox" name="employee" value="{{ employee.id }}" hidden>
                 </div>
-            {% empty %}
-                <p>No employees available to assign.</p>
-            {% endfor %}
-            <button type="submit" class="btn btn-primary">Assign Employees</button>
-        </form>
+                {% empty %}
+                <div class="empty-state">
+                    <span class="material-icons-round">group_off</span>
+                    <p>No team members available</p>
+                </div>
+                {% endfor %}
+            </div>
 
-        <a href="{% url 'assigned_manager_detail' organization.id project.id %}" class="btn btn-secondary">Back to Manager Details</a>
+            <div class="action-bar">
+                <a href="{% url 'assigned_manager_detail' organization.id project.id %}" class="btn btn-secondary">
+                    <span class="material-icons-round">arrow_back</span>
+                    Back
+                </a>
+                <button type="submit" class="btn btn-primary" onclick="showProgress()">
+                    <span class="material-icons-round">assignment_turned_in</span>
+                    Confirm Assignments
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <!-- Progress Overlay -->
+    <div class="progress-overlay">
+        <div class="progress-circle"></div>
     </div>
+
+    <script>
+        function toggleSelection(card) {
+            card.classList.toggle('selected');
+            const checkbox = card.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            card.style.animation = 'cardSelect 0.3s ease';
+        }
+
+        function showProgress() {
+            document.querySelector('.progress-overlay').style.display = 'flex';
+            setTimeout(() => {
+                document.querySelector('.progress-overlay').style.display = 'none';
+            }, 1500);
+        }
+
+        // Dynamic avatar colors
+        const avatars = document.querySelectorAll('.employee-avatar');
+        const colors = ['#4A90E2', '#00C853', '#FF6B6B', '#FFC107', '#9C27B0'];
+        avatars.forEach(avatar => {
+            avatar.style.backgroundColor = 
+                colors[Math.floor(Math.random() * colors.length)];
+        });
+    </script>
 </body>
 </html>
 

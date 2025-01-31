@@ -1,176 +1,462 @@
+{% extends 'custom.html' %}
 
-
+{% block content %}
+<br><br>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Manager Assignment</title>
-    <!-- Google Fonts and Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>Project Manager Assignment | TeamFlow</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
     <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #f4f7fc;
-            color: #333;
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #f8fafc;
+            --success-color: #22c55e;
+            --danger-color: #ef4444;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .container {
-            background-color: #fff;
+            align-items: flex-start;
             padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 800px;
-            animation: fadeIn 1s ease-out;
         }
-        h1 {
-            font-size: 1.8rem;
+
+        .container {
+            background: white;
+            width: 100%;
+            max-width: 960px;
+            border-radius: 16px;
+            box-shadow: 0 12px 24px -6px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #4f46e5 100%);
+            padding: 2rem;
+            color: white;
+            position: relative;
+        }
+
+        .header h1 {
+            font-weight: 700;
+            font-size: 1.75rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-icon {
+            font-size: 2rem;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .content-section {
+            padding: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .content-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
             font-weight: 600;
-            color: #007bff;
+            color: var(--text-primary);
             margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        h3 {
-            font-size: 1.2rem;
+
+        .section-title .material-icons {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+        }
+
+        .manager-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--secondary-color);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            animation: cardEnter 0.4s ease-out;
+        }
+
+        .manager-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .manager-info {
+            flex-grow: 1;
+        }
+
+        .manager-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .manager-assigned {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .project-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .project-detail-card {
+            background: var(--secondary-color);
+            padding: 1.25rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .detail-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .detail-value {
             font-weight: 500;
-            margin-bottom: 1rem;
-            color: #333;
+            color: var(--text-primary);
         }
-        p {
-            font-size: 0.9rem;
-            margin: 0.5rem 0;
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
         }
-        button,
+
         .btn {
-            font-size: 0.9rem;
-            padding: 8px 12px;
-            border: none;
-            border-radius: 5px;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
             cursor: pointer;
-            text-align: center;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid transparent;
         }
+
         .btn-primary {
-            background-color: #007bff;
-            color: #fff;
+            background: var(--primary-color);
+            color: white;
         }
+
         .btn-primary:hover {
-            background-color: #0056b3;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background: #4f46e5;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
         }
+
         .btn-danger {
-            background-color: #dc3545;
-            color: #fff;
+            background: var(--danger-color);
+            color: white;
         }
+
         .btn-danger:hover {
-            background-color: #c82333;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background: #dc2626;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
         }
-        @keyframes fadeIn {
+
+        .employee-list {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .employee-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .employee-card:hover {
+            transform: translateX(4px);
+            border-color: var(--primary-color);
+        }
+
+        .employee-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e0e7ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+
+        .employee-info {
+            flex-grow: 1;
+        }
+
+        .employee-name {
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .employee-assigned {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.875rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-active {
+            background: var(--success-color);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .container {
+                border-radius: 12px;
+            }
+            
+            .header {
+                padding: 1.5rem;
+            }
+            
+            .content-section {
+                padding: 1.5rem;
+            }
+        }
+
+        @keyframes cardEnter {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(10px);
             }
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        hr {
-            border: 0;
-            border-top: 1px solid #ddd;
-            margin: 1.5rem 0;
+
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state .material-icons {
+            font-size: 3rem;
+            color: var(--border-color);
+            margin-bottom: 1rem;
         }
     </style>
 </head>
 <body>
-
-    
-
-
-
     <div class="container">
-        <h1>Project Manager Assignment Details</h1>
-
-        <!-- Manager Details -->
-        <div class="manager-details">
-            <h3>Assigned Manager</h3>
-            {% if manager_assignment %}
-                <p>
-                    <strong>Name:</strong> {{ manager_assignment.manager.user.get_full_name|default:manager_assignment.manager.user.username }}<br>
-                    <strong>Assigned On:</strong> {{ manager_assignment.assigned_at|date:"d M Y, H:i" }}
-                </p>
-
-                <!-- Remove manager from project -->
-                <form method="post">
-                    {% csrf_token %}
-                    <button type="submit" name="remove_manager" class="btn btn-danger">Remove Manager from Project</button>
-                </form>
-            {% else %}
-                <p>No manager assigned to this project yet.</p>
-            {% endif %}
+        <div class="header">
+            <h1>
+                <span class="material-icons header-icon">group_work</span>
+                Project Manager Assignment
+            </h1>
         </div>
 
-        <hr>
+        <!-- Manager Section -->
+        <div class="content-section">
+            <div class="section-title">
+                <span class="material-icons">badge</span>
+                Assigned Manager
+            </div>
+
+            {% if manager_assignment %}
+                <div class="manager-card">
+                    <div class="manager-avatar">
+                        {{ manager_assignment.manager.user.get_full_name|slice:":1"|default:"M" }}
+                    </div>
+                    <div class="manager-info">
+                        <div class="manager-name">
+                            {{ manager_assignment.manager.user.get_full_name|default:manager_assignment.manager.user.username }}
+                        </div>
+                        <div class="manager-assigned">
+                            Assigned {{ manager_assignment.assigned_at|timesince }} ago
+                        </div>
+                    </div>
+                    <form method="post" class="btn-group">
+                        {% csrf_token %}
+                        <button type="submit" name="remove_manager" class="btn btn-danger">
+                            <span class="material-icons">person_remove</span>
+                            Remove Manager
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <span class="material-icons">person_off</span>
+                    <p>No manager assigned to this project</p>
+                </div>
+            {% endif %}
+        </div>
 
         <!-- Project Details -->
-        <div class="project-details">
-            <h3>Project Details</h3>
-            {% if manager_assignment %}
-                <p>
-                    <strong>Project Name:</strong> {{ manager_assignment.project.name }}<br>
-                    <strong>Description:</strong> {{ manager_assignment.project.description|default:"No description available." }}<br>
-                    <strong>Start Date:</strong> {{ manager_assignment.project.start_date|date:"d M Y" }}<br>
-                    <strong>End Date:</strong> {{ manager_assignment.project.end_date|date:"d M Y" }}
-                </p>
-            {% else %}
-                <p>Project details are not available.</p>
-            {% endif %}
+        <div class="content-section">
+            <div class="section-title">
+                <span class="material-icons">assignment</span>
+                Project Overview
+            </div>
+            
+            <div class="project-details-grid">
+                <div class="project-detail-card">
+                    <div class="detail-label">Project Name</div>
+                    <div class="detail-value">{{ manager_assignment.project.name }}</div>
+                </div>
+                <div class="project-detail-card">
+                    <div class="detail-label">Start Date</div>
+                    <div class="detail-value">{{ manager_assignment.project.start_date|date:"M d, Y" }}</div>
+                </div>
+                <div class="project-detail-card">
+                    <div class="detail-label">End Date</div>
+                    <div class="detail-value">{{ manager_assignment.project.end_date|date:"M d, Y" }}</div>
+                </div>
+                <div class="project-detail-card">
+                    <div class="detail-label">Status</div>
+                    <div class="status-indicator">
+                        <span class="status-dot status-active"></span>
+                        Active
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <hr>
-
-        <!-- Assign Employee to Manager -->
-        <div class="assign-employee">
-            <h3>Assign Employees to Manager</h3>
-            <a href="{% url 'assign_employee_to_manager' organization.id project.id manager_assignment.manager.id %}" class="btn btn-primary">
-                Assign Employees
-            </a>
+        <!-- Assign Employees Section -->
+        <div class="content-section">
+            <div class="section-title">
+                <span class="material-icons">person_add</span>
+                Team Management
+            </div>
+            
+            <div class="btn-group">
+                <a href="{% url 'assign_employee_to_manager' organization.id project.id manager_assignment.manager.id %}" 
+                   class="btn btn-primary">
+                    <span class="material-icons">group_add</span>
+                    Assign Employees
+                </a>
+            </div>
         </div>
 
-        <hr>
+        <!-- Assigned Employees -->
+        <div class="content-section">
+            <div class="section-title">
+                <span class="material-icons">groups</span>
+                Managed Team Members
+            </div>
 
-        <!-- Display Employees assigned to Manager -->
-        <div class="assigned-employees">
-            <h3>Employees Assigned to This Manager</h3>
             {% if employee_assignments %}
-                {% for assignment in employee_assignments %}
-                    <p>
-                        <strong>Employee:</strong> {{ assignment.employee.user.get_full_name|default:assignment.employee.user.username }}<br>
-                        <strong>Assigned On:</strong> {{ assignment.assigned_at|date:"d M Y, H:i" }}
-
-                        <!-- Remove Employee Button -->
-                        <form method="post" style="display:inline;">
-                            {% csrf_token %}
-                            <input type="hidden" name="employee_id" value="{{ assignment.id }}">
-                            <button type="submit" name="remove_employee" class="btn btn-danger">Remove Employee from Manager</button>
-                        </form>
-                    </p>
-                {% empty %}
-                    <p>No employees assigned to this manager yet.</p>
-                {% endfor %}
+                <div class="employee-list">
+                    {% for assignment in employee_assignments %}
+                        <div class="employee-card">
+                            <div class="employee-avatar">
+                                {{ assignment.employee.user.get_full_name|slice:":1"|default:"E" }}
+                            </div>
+                            <div class="employee-info">
+                                <div class="employee-name">
+                                    {{ assignment.employee.user.get_full_name|default:assignment.employee.user.username }}
+                                </div>
+                                <div class="employee-assigned">
+                                    Joined {{ assignment.assigned_at|timesince }} ago
+                                </div>
+                            </div>
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="employee_id" value="{{ assignment.id }}">
+                                <button type="submit" name="remove_employee" class="btn btn-danger">
+                                    <span class="material-icons">close</span>
+                                </button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
             {% else %}
-                <p>No employees assigned to this manager yet.</p>
+                <div class="empty-state">
+                    <span class="material-icons">group_off</span>
+                    <p>No employees assigned to this manager</p>
+                </div>
             {% endif %}
         </div>
     </div>
 </body>
 </html>
 
+{% endblock %}
