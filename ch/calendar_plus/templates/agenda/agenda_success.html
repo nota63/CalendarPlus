@@ -1,101 +1,113 @@
+
+{% extends 'custom.html' %}
+
+{% block content %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda Sent Successfully!</title>
+    <title>Agenda Published Successfully | MeetingFlow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
-        @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f9fafc;
-            color: #333;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+        @keyframes confetti {
+            0% { transform: translateY(-100%) rotate(0deg); opacity: 0; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 1; }
+        }
+        
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
         }
 
-        .container {
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            max-width: 600px;
-            width: 100%;
-            text-align: center;
-            animation: fadeIn 1s ease-out;
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
-        h2 {
-            color: #1f2937;
-            font-size: 24px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .success-check {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: dash 2s ease-out forwards;
         }
 
-        .success-icon {
-            color: #10b981;
-            font-size: 30px;
-            margin-right: 10px;
-            animation: popIn 0.5s ease-out;
-        }
-
-        p {
-            margin-bottom: 20px;
-            font-size: 16px;
-        }
-
-        a.btn-primary {
-            display: inline-block;
-            background: #3b82f6;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            text-decoration: none;
-            font-size: 16px;
-            transition: background 0.3s ease;
-        }
-
-        a.btn-primary:hover {
-            background: #2563eb;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes popIn {
-            from {
-                transform: scale(0);
-                opacity: 0;
-            }
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
+        @keyframes dash {
+            to { stroke-dashoffset: 0; }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h2><span class="material-icons success-icon">check_circle</span> Agenda Sent Successfully!</h2>
-        <p>The agenda has been successfully sent to the meeting creator and participants.</p>
-       
+<body class="bg-gray-50 font-['Inter']">
+    <!-- Animated Background Elements -->
+    <div class="fixed inset-0 overflow-hidden -z-10">
+        <div class="absolute w-1 h-1 bg-purple-300 rounded-full animate-confetti" 
+             style="left: 10%; animation-delay: 0.2s"></div>
+        <div class="absolute w-1 h-1 bg-blue-300 rounded-full animate-confetti" 
+             style="left: 30%; animation-delay: 0.5s"></div>
+        <div class="absolute w-1 h-1 bg-green-300 rounded-full animate-confetti" 
+             style="left: 50%; animation-delay: 0.8s"></div>
+    </div>
+
+    <div class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8 bg-white rounded-2xl shadow-xl p-8 sm:p-10 transition-all duration-300 hover:shadow-2xl">
+            <div class="flex flex-col items-center">
+                <!-- Animated Checkmark -->
+                <svg class="w-20 h-20 text-emerald-500 mb-6 animate-float" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" class="stroke-current stroke-2" fill="rgba(16,185,129,0.1)"/>
+                    <path class="success-check stroke-current stroke-2" 
+                          d="M7 13l3 3 7-7" 
+                          stroke-linecap="round"
+                          stroke-linejoin="round"/>
+                </svg>
+
+                <h2 class="text-3xl font-extrabold text-gray-900 text-center mb-2">
+                    Agenda Published!
+                </h2>
+                
+                <p class="text-gray-500 text-center mb-6">
+                    The agenda has been successfully distributed to all participants
+                </p>
+
+                <!-- Participant Avatars -->
+                <div class="flex -space-x-2 mb-8">
+                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                        <span class="text-purple-600 font-medium">JD</span>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                        <span class="text-blue-600 font-medium">AS</span>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                        <span class="text-green-600 font-medium">MP</span>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                        <span class="text-gray-600 font-medium">+3</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="w-full flex flex-col gap-3">
+                    <a href="#" class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-xl font-medium text-white bg-gray-900 hover:bg-gray-800 transition-all transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                        View Meeting Details
+                    </a>
+                    <a href="#" class="text-gray-600 text-sm hover:text-gray-900 mt-4">
+                        Return to Dashboard →
+                    </a>
+                </div>
+            </div>
+
+            <!-- Progress Steps -->
+            <div class="mt-8 pt-6 border-t border-gray-100">
+                <div class="flex items-center justify-between text-sm text-gray-500">
+                    <span>Next Steps:</span>
+                    <span class="text-emerald-600">Automated reminders scheduled</span>
+                </div>
+                <div class="mt-2 w-full bg-gray-200 rounded-full h-1.5">
+                    <div class="bg-emerald-600 h-1.5 rounded-full w-2/3"></div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>
+
+{% endblock %}

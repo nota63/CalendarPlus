@@ -1,35 +1,183 @@
+
+{% extends 'custom.html' %}
+
+{% block content %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Remove Yourself from Meeting</title>
+    <title>Exit Meeting | MeetFlow</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100 font-sans">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    <div class="container mx-auto p-6">
-        <div class="bg-white p-8 rounded-lg shadow-md max-w-lg mx-auto mt-12">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-6">Are you sure you want to remove yourself from the meeting?</h2>
-            
-            <div class="mb-4">
-                <p><span class="font-medium text-gray-700">Meeting Title:</span> <span class="text-gray-900">{{ meeting.meeting_title }}</span></p>
-                <p><span class="font-medium text-gray-700">Meeting Date:</span> <span class="text-gray-900">{{ meeting.meeting_date }} at {{ meeting.start_time }}</span></p>
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .gradient-bg {
+            background: linear-gradient(-45deg, #6366f1, #8b5cf6, #ec4899, #f59e0b);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 1rem;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+        }
+
+        .gradient-text {
+            background: linear-gradient(45deg, #ec4899, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hover-scale {
+            transition: transform 0.2s ease;
+        }
+
+        .hover-scale:hover {
+            transform: translateY(-2px);
+        }
+
+        .icon-circle {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(45deg, #f472b6, #ec4899);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: rgba(236, 72, 153, 0.2);
+            overflow: hidden;
+        }
+
+        .progress-bar::after {
+            content: '';
+            display: block;
+            width: 35%;
+            height: 100%;
+            background: #ec4899;
+            animation: progress 2s ease-in-out infinite;
+        }
+
+        @keyframes progress {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(300%); }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen font-['Inter'] flex items-center justify-center p-4">
+    
+    <!-- Main Card -->
+    <div class="glass-card animate-fade-in w-full max-w-2xl p-8 relative overflow-hidden">
+        <!-- Animated Progress Bar -->
+        <div class="progress-bar absolute top-0 left-0 right-0"></div>
+
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="icon-circle rounded-full mx-auto mb-6">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                Leave Meeting Confirmation
+            </h1>
+            <p class="text-gray-600">Please confirm your action below</p>
+        </div>
+
+        <!-- Meeting Details -->
+        <div class="bg-gray-50 rounded-xl p-6 mb-8 transition-all duration-300 hover:bg-gray-100">
+            <div class="flex items-center mb-4">
+                <svg class="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                </svg>
+                <span class="font-semibold text-gray-900">{{ meeting.meeting_title }}</span>
             </div>
             
-            <form method="post" id="remove-meeting-form">
-                {% csrf_token %}
-                <div class="flex justify-center gap-4">
-                    <button type="submit" class="inline-block bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 transition duration-200">Yes, Remove Me</button>
-                    <button type="button" onclick="window.history.back();" class="inline-block bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400 transition duration-200">No, Keep Me in the Meeting</button>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <span class="text-gray-700">{{ meeting.meeting_date }}</span>
                 </div>
-            </form>
+                
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="text-gray-700">{{ meeting.start_time }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warning Message -->
+        <div class="bg-amber-50 border-l-4 border-amber-400 p-4 mb-8 rounded-lg flex items-start">
+            <svg class="w-5 h-5 text-amber-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <div>
+                <p class="text-sm text-amber-800">
+                    Leaving this meeting will remove all your associated information and you won't be able to rejoin without an invitation.
+                </p>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <form method="post" id="remove-meeting-form">
+            {% csrf_token %}
+            <div class="flex justify-center gap-4">
+                <button type="submit" class="inline-block bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 transition duration-200">Yes, Remove Me</button>
+                <button type="button" onclick="window.history.back();" class="inline-block bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400 transition duration-200">No, Keep Me in the Meeting</button>
+            </div>
+        </form>
+
+
+        <!-- Footer Note -->
+        <p class="text-center text-sm text-gray-500 mt-8">
+            Need help? Contact our <a href="#" class="text-purple-600 hover:underline">support team</a>
+        </p>
+    </div>
+
+    <!-- Success Modal (Hidden by default) -->
+    <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4">
+        <div class="glass-card animate-fade-in max-w-md w-full p-8 text-center">
+            <div class="icon-circle bg-green-500 mx-auto mb-6">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Successfully Removed</h3>
+            <p class="text-gray-600 mb-6">You've been removed from the meeting. A confirmation email has been sent to your inbox.</p>
+            <button onclick="window.location.href='/dashboard'" class="hover-scale bg-purple-600 text-white py-2 px-6 rounded-lg font-medium transition-colors duration-300">
+                Return to Dashboard
+            </button>
         </div>
     </div>
 
     <script>
-        // Handle the button click for confirming removal
-        document.getElementById('remove-meeting-form').addEventListener('submit', function(event) {
+      // Handle the button click for confirming removal
+      document.getElementById('remove-meeting-form').addEventListener('submit', function(event) {
             event.preventDefault(); // Prevent default form submission
 
             const orgId = document.getElementById('org_id').value;
@@ -74,8 +222,10 @@
                 }
             }
             return cookieValue;
-        }
+
     </script>
 
 </body>
 </html>
+
+{% endblock %}
