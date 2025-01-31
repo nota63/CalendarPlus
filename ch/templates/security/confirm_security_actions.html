@@ -1,3 +1,7 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,148 +9,373 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirm Deletion - {{ organization.name }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
+        :root {
+            --slack-purple: #4A154B;
+            --calendly-blue: #00B289;
+            --hover-gray: #F8F8F8;
+            --border-gray: #E8E8E8;
+            --text-dark: #1D1D1D;
+            --text-light: #5E5E5E;
+        }
+
         body {
-            background-color: #f8f9fa;
+            font-family: 'Inter', sans-serif;
+            background-color: #FFFFFF;
+            color: var(--text-dark);
+            line-height: 1.6;
         }
 
-        .container {
-            max-width: 900px;
+        .container-xl {
+            max-width: 1200px;
+            padding: 2rem 1rem;
         }
 
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        .main-card {
+            border: 1px solid var(--border-gray);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .main-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
         }
 
         .card-header {
-            background-color: #007bff;
+            background: var(--slack-purple);
             color: white;
-            text-align: center;
-            border-radius: 15px 15px 0 0;
-            font-size: 24px;
-            padding: 1rem;
+            padding: 1.5rem 2rem;
+            border-radius: 12px 12px 0 0;
+            border-bottom: none;
+        }
+
+        .card-header h1 {
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .card-body {
-            padding: 2rem;
+            padding: 2.5rem 2rem;
         }
 
-        .btn-custom {
-            background-color: #dc3545;
+        .user-info-section {
+            background: var(--hover-gray);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-badge {
+            background: rgba(74, 21, 75, 0.1);
+            color: var(--slack-purple);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .action-list {
+            list-style: none;
+            padding: 0;
+            margin: 1.5rem 0;
+        }
+
+        .action-item {
+            padding: 1rem;
+            border: 1px solid var(--border-gray);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .action-item:hover {
+            border-color: var(--slack-purple);
+            background: rgba(74, 21, 75, 0.03);
+        }
+
+        .action-item.selected {
+            border: 2px solid var(--slack-purple);
+            background: rgba(74, 21, 75, 0.05);
+        }
+
+        .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-gray);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .custom-checkbox.checked {
+            background: var(--slack-purple);
+            border-color: var(--slack-purple);
+        }
+
+        .btn-delete {
+            background: #E12D2D;
             color: white;
-            border-radius: 5px;
-            padding: 10px 20px;
-            font-size: 16px;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .btn-custom:hover {
-            background-color: #c82333;
+        .btn-delete:hover {
+            background: #C12727;
+            transform: translateY(-1px);
         }
 
         .btn-cancel {
-            background-color: #6c757d;
-            color: white;
-            border-radius: 5px;
-            padding: 10px 20px;
-            font-size: 16px;
+            color: var(--text-light);
+            font-weight: 500;
+            transition: all 0.2s ease;
         }
 
         .btn-cancel:hover {
-            background-color: #5a6268;
+            color: var(--text-dark);
+            transform: translateY(-1px);
         }
 
         .guide-section {
-            background-color: #f1f1f1;
-            padding: 1rem;
-            border-radius: 10px;
             margin-top: 3rem;
+            padding: 2rem;
+            background: #F9FAFB;
+            border-radius: 12px;
+            border: 1px solid var(--border-gray);
         }
 
-        .guide-section h3 {
-            font-size: 20px;
-            color: #343a40;
-            margin-bottom: 1rem;
+        .guide-step {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            transition: all 0.2s ease;
         }
 
-        .guide-section p {
-            color: #495057;
+        .guide-step:hover {
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
-        .guide-section ol {
-            padding-left: 20px;
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: var(--slack-purple);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-weight: 700;
         }
 
-        .guide-section li {
-            margin-bottom: 1rem;
+        .alert-slide {
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .card-body {
+                padding: 1.5rem;
+            }
+            
+            .guide-step {
+                flex-direction: column;
+            }
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .floating-hover {
+            transition: transform 0.3s ease;
+        }
+
+        .floating-hover:hover {
+            transform: translateY(-3px);
         }
     </style>
 </head>
 
-<body>
-
-    <div class="container my-5">
-
+<body class="animate__animated animate__fadeIn">
+    <div class="container-xl">
         {% if messages %}
-            {% for m in messages %}
-                <div class="alert alert-info">
-                    <strong>{{ m }}</strong>
-                </div>
-            {% endfor %}
+            <div class="mb-4">
+                {% for m in messages %}
+                    <div class="alert alert-success alert-slide d-flex align-items-center gap-2">
+                        <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                        </svg>
+                        <span>{{ m }}</span>
+                    </div>
+                {% endfor %}
+            </div>
         {% endif %}
 
-        <!-- Main Card -->
-        <div class="card">
-
-            <!-- Heading Section -->
+        <div class="main-card floating-hover">
             <div class="card-header">
-                Confirm Deletion
+                <h1>
+                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    Confirm User Removal
+                </h1>
             </div>
 
             <div class="card-body">
+                <div class="user-info-section">
+                    <div class="d-flex flex-wrap gap-3 mb-3">
+                        <div class="info-badge">
+                            Organization: {{ organization.name }}
+                        </div>
+                        <div class="info-badge">
+                            Admin: {{ request.user.username }}
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="avatar-sm">
+                            <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="h5 mb-0">{{ target_user.email }}</h3>
+                            <small class="text-muted">@{{ target_user.username }}</small>
+                        </div>
+                    </div>
+                </div>
 
-                <!-- Organization Info -->
-                <p class="h5 text-dark">Organization: <span class="font-weight-bold">{{ organization.name }}</span></p>
-                <p class="h5 text-dark">Admin: <span class="font-weight-bold">{{ request.user.username }}</span></p>
-
-                <!-- User Info -->
-                <p class="h5 text-dark">User to be Deleted: <span class="font-weight-bold">{{ target_user.email }}</span></p>
-                <p class="text-muted">Username: <span class="font-weight-bold">{{ target_user.username }}</span></p>
-
-                <!-- Form Section -->
                 <form method="POST" action="{% url 'confirm_security' org_id=organization.id email=email %}">
                     {% csrf_token %}
                     
-                    <!-- Actions Selection -->
-                    <div class="mb-4">
-                        <label for="actions" class="form-label">Select Actions</label>
-                        {{ form.as_p }}
-                    </div>
+                    <h4 class="mb-3">Select Actions</h4>
+                    <ul class="action-list">
+                        {% for field in form %}
+                            <li class="action-item" onclick="toggleCheckbox(this)">
+                                <div class="custom-checkbox">
+                                    <svg class="icon-check" style="display: none;" fill="white" viewBox="0 0 20 20">
+                                        <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h5 class="mb-1">{{ field.label_tag }}</h5>
+                                    <p class="text-muted small mb-0">{{ field.help_text }}</p>
+                                </div>
+                                <div class="flex flex-col space-y-2">
+                                    {% for choice in field %}
+                                        <label class="flex items-center space-x-2 cursor-pointer">
+                                            <input type="radio" name="{{ field.html_name }}" value="{{ choice.data.value }}" 
+                                                class="hidden peer">
+                                            <div class="w-5 h-5 border-2 border-gray-400 rounded-full peer-checked:border-blue-500 peer-checked:bg-blue-500"></div>
+                                            <span class="text-gray-700">{{ choice.choice_label }}</span>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                                
+                                
+                                
+                            </li>
+                        {% endfor %}
+                    </ul>
 
-                    <!-- Submit and Cancel Buttons -->
-                    <div class="d-flex justify-content-between">
-                        <button type="submit" class="btn btn-custom">Perform Action</button>
-                        <a href="{% url 'security' org_id=organization.id %}" class="btn btn-cancel">Cancel</a>
+                    <div class="d-flex justify-content-end gap-3 mt-4">
+                        <a href="{% url 'security' org_id=organization.id %}" class="btn btn-cancel">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-delete">
+                            <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            Confirm Actions
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- Guide Section -->
-        <div class="guide-section mt-5">
-            <h3>How This Feature Works</h3>
-            <p>This feature allows administrators to confirm the deletion of a user from the organization. Below is a detailed guide on how to use this feature:</p>
-            <ol>
-                <li><strong>Review Information:</strong> Carefully review the information displayed about the organization and the user to be deleted. Ensure that the details are correct.</li>
-                <li><strong>Select Actions:</strong> Use the dropdown menu to select the actions you want to perform. These actions may include deleting the user, revoking access, or other security measures.</li>
-                <li><strong>Perform Action:</strong> Once you have selected the appropriate actions, click the "Perform Action" button to proceed. This will submit the form and execute the selected actions.</li>
-                <li><strong>Cancel:</strong> If you decide not to proceed with the deletion, you can click the "Cancel" button to return to the previous page without making any changes.</li>
-                <li><strong>Confirmation:</strong> After performing the action, you will receive a confirmation message indicating the success or failure of the operation. Make sure to read this message carefully.</li>
-            </ol>
-            <p>Please note that deleting a user is a permanent action and cannot be undone. Ensure that you have the necessary permissions and have double-checked all information before proceeding.</p>
+        <div class="guide-section floating-hover">
+            <h3 class="mb-4">Process Overview</h3>
+            <div class="guide-step">
+                <div class="step-number">1</div>
+                <div>
+                    <h5>Review User Details</h5>
+                    <p class="text-muted small mb-0">Verify the user information and associated data before proceeding with any actions.</p>
+                </div>
+            </div>
+            <div class="guide-step">
+                <div class="step-number">2</div>
+                <div>
+                    <h5>Select Security Actions</h5>
+                    <p class="text-muted small mb-0">Choose appropriate security measures from the available options.</p>
+                </div>
+            </div>
+            <div class="guide-step">
+                <div class="step-number">3</div>
+                <div>
+                    <h5>Confirm & Execute</h5>
+                    <p class="text-muted small mb-0">Review your selections and confirm to execute the chosen actions.</p>
+                </div>
+            </div>
         </div>
-
     </div>
 
+    <script>
+        function toggleCheckbox(listItem) {
+            const checkbox = listItem.querySelector('input[type="checkbox"]');
+            const customCheckbox = listItem.querySelector('.custom-checkbox');
+            
+            checkbox.checked = !checkbox.checked;
+            listItem.classList.toggle('selected');
+            customCheckbox.classList.toggle('checked');
+            customCheckbox.querySelector('.icon-check').style.display = checkbox.checked ? 'block' : 'none';
+        }
+
+        // Initialize checkboxes
+        document.querySelectorAll('.action-item').forEach(item => {
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            const customCheckbox = item.querySelector('.custom-checkbox');
+            
+            if(checkbox.checked) {
+                item.classList.add('selected');
+                customCheckbox.classList.add('checked');
+                customCheckbox.querySelector('.icon-check').style.display = 'block';
+            }
+        });
+    </script>
 </body>
 </html>
+
+
+{% endblock %}
