@@ -25,7 +25,11 @@ class Organization(models.Model):
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_organizations')
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_organizations'),
+
+    # New Customizations
+    icon=models.ImageField(upload_to='media/', null=True, blank=True)
+    
  
    
 

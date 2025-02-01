@@ -4,8 +4,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-
-
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 # Create your views here.
 
 @csrf_exempt
@@ -76,6 +76,32 @@ def customize_workspace(request, org_id):
 
 
 
+# Actions
 
 
+# Upload an icon for workspace
 
+@csrf_exempt
+def update_workspace_icon(request, org_id):
+    if request.method == "POST" and request.FILES.get("icon"):
+        organization = get_object_or_404(Organization, id=org_id)
+
+        # Ensure only admins can update the icon
+        if not Profile.objects.filter(user=request.user, organization=organization, is_admin=True).exists():
+            return JsonResponse({"success": False, "error": "You are not authorized to update the workspace icon."}, status=403)
+
+        # Save new icon
+        icon_file = request.FILES["icon"]
+
+        # Optional: Delete the old icon before updating
+        if organization.icon and organization.icon.name:  # Ensure icon exists
+            if default_storage.exists(organization.icon.path):  # Ensure file exists before deleting
+                default_storage.delete(organization.icon.path)
+
+        # Save the new icon (Django recommended way)
+        organization.icon = icon_file  
+        organization.save()
+
+        return JsonResponse({"success": True, "message": "Workspace icon updated successfully!", "icon_url": organization.icon.url})
+
+    return JsonResponse({"success": False, "error": "Invalid request"}, status=400)

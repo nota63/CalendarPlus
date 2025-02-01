@@ -249,13 +249,6 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 # credentials.json
 
-import os
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-GOOGLE_CREDENTIALS_FILE = os.path.join(BASE_DIR,'credentials.json')
-
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-
 
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
@@ -266,19 +259,17 @@ CSRF_COOKIE_SECURE = False
 
 SESSION_COOKIE_AGE = 1209600  
 import os
+import os
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Correct MEDIA settings
 MEDIA_URL = "/media/"
-
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR ,'static']
+MEDIA_ROOT = os.path.join(BASE_DIR, "media") 
 
 SITE_URL = ' http://127.0.0.1:8000/calendar'
 
 
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR ,'media'
 
 
 
