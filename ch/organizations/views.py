@@ -86,22 +86,56 @@ def update_workspace_icon(request, org_id):
     if request.method == "POST" and request.FILES.get("icon"):
         organization = get_object_or_404(Organization, id=org_id)
 
-        # Ensure only admins can update the icon
+      
         if not Profile.objects.filter(user=request.user, organization=organization, is_admin=True).exists():
             return JsonResponse({"success": False, "error": "You are not authorized to update the workspace icon."}, status=403)
 
-        # Save new icon
+      
         icon_file = request.FILES["icon"]
 
-        # Optional: Delete the old icon before updating
-        if organization.icon and organization.icon.name:  # Ensure icon exists
-            if default_storage.exists(organization.icon.path):  # Ensure file exists before deleting
+        
+        if organization.icon and organization.icon.name:  
+            if default_storage.exists(organization.icon.path): 
                 default_storage.delete(organization.icon.path)
 
-        # Save the new icon (Django recommended way)
+        
         organization.icon = icon_file  
         organization.save()
 
         return JsonResponse({"success": True, "message": "Workspace icon updated successfully!", "icon_url": organization.icon.url})
 
     return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
+
+
+
+# Set Workspace Status
+import json
+
+
+
+@csrf_exempt
+def update_organization_status(request, org_id):
+    if request.method == 'POST':
+       
+        organization = get_object_or_404(Organization, id=org_id)
+
+        if not Profile.objects.filter(user=request.user, organization=organization, is_admin=True).exists():
+            return JsonResponse({"success": False, "error": "You are not authorized to update the workspace icon."}, status=403)
+
+        try:
+            data = json.loads(request.body)
+            new_status = data.get('status')
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "error": "Invalid JSON format."}, status=400)
+
+        status_choices = dict(Organization.STATUS_CHOICES)
+        if new_status not in status_choices:
+            return JsonResponse({"success": False, "error": "Invalid status."}, status=400)
+
+       
+        organization.status = new_status
+        organization.save()
+
+        return JsonResponse({"success": True, "message": "Organization status updated successfully!"})
+
+    return JsonResponse({"success": False, "error": "Invalid request method."}, status=400)

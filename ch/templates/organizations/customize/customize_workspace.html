@@ -1,3 +1,6 @@
+{% load static %}
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,13 +8,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
      <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="{% static 'organizations/script.js' %}"></script>
 
    <!-- Google Fonts and Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>My Page</title>
-    <link rel="stylesheet" href="styles.css">
+
 </head>
 <body>
 
@@ -37,6 +41,11 @@
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#updateIconModal">
         Update Workspace Icon
     </button>
+
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#updateStatusModal">
+        Update Organization Status
+    </button>
+    
     
 
 
@@ -70,6 +79,17 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="updateIconModalLabel">Update Workspace Icon</h5>
+                <p>
+                    Workspace icon guidelines
+Your workspace icon is a way for you to visually identify the Django workspace. It’s used in the desktop and mobile apps, as well as on your workspace admin site. It’s most helpful when you’re active on multiple Slack workspaces.
+
+Some tips on choosing a good icon:
+
+Use a solid background colour.
+Use a graphical logo or image rather than text.
+Leave some space around your icon.
+Upload an image that is 132 px square or larger.
+                </p>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -91,6 +111,33 @@
 </div>
 
 
+<!-- UPDATE WORKSPACE STATUS -->
+
+<div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateStatusModalLabel">Update Organization Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="updateStatusForm">
+                    <label for="statusSelect" class="form-label">Select Status</label>
+                    <select class="form-select" id="statusSelect">
+                        <option value="working_remotely">Working Remotely</option>
+                        <option value="in_a_meeting">In A Meeting</option>
+                        <option value="off_sick">Off Sick</option>
+                        <option value="on_holiday">On Holiday</option>
+                    </select>
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-success">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 
@@ -103,50 +150,9 @@
 
 <!-- Bootstrap 5 JS Bundle (includes Popper) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
-
-// Update Workspace Icon
-
-document.addEventListener("DOMContentLoaded", function () {
-    const updateIconForm = document.getElementById("updateIconForm");
-
-    updateIconForm.addEventListener("submit", async function (event) {
-        event.preventDefault();
-
-        const orgId = "{{ organization.id }}"; 
-        const iconInput = document.getElementById("workspaceIcon");
-        const formData = new FormData();
-        formData.append("icon", iconInput.files[0]);
-
-        const response = await fetch(`/organizations/workspace-icon/${orgId}/`, {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": getCSRFToken(),
-            },
-            body: formData,
-        });
-
-        const data = await response.json();
-        if (data.success) {
-            alert("Workspace icon updated successfully!");
-            document.getElementById("currentIcon").src = data.icon_url;
-            iconInput.value = ""; // Reset file input
-        } else {
-            alert(data.error);
-        }
-    });
-
-    function getCSRFToken() {
-        return document.cookie.split("; ").find(row => row.startsWith("csrftoken="))?.split("=")[1];
-    }
-});
-
-
-
-
+    const organizationId = "{{ organization.id }}";
 </script>
-
 
 
 

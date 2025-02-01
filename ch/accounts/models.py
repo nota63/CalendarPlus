@@ -29,8 +29,25 @@ class Organization(models.Model):
 
     # New Customizations
     icon=models.ImageField(upload_to='media/', null=True, blank=True)
-    
- 
+    status = models.CharField(
+        max_length=100,
+        choices=(
+            ('working_remotely', 'Working Remotely'),
+            ('in_a_meeting', 'In A Meeting'),
+            ('off_sick', 'Off Sick'),
+            ('on_holiday', 'On Holiday')
+        ),
+        null=True,
+        blank=True
+    )
+
+    # STATUS_CHOICES directly in the model
+    STATUS_CHOICES = (
+        ('working_remotely', 'Working Remotely'),
+        ('in_a_meeting', 'In A Meeting'),
+        ('off_sick', 'Off Sick'),
+        ('on_holiday', 'On Holiday')
+    )
    
 
     def __str__(self):
