@@ -1,257 +1,423 @@
-{% load static %}
+{% extends 'custom.html' %}
 
+{% block content %}
+
+{% load static %}
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="{% static 'organizations/script.js' %}"></script>
-
-   <!-- Google Fonts and Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>My Page</title>
+    <title>{{organization.name}} Settings</title>
+    <style>
+        :root {
+            --primary-color: #4A154B;
+            --secondary-color: #F4EDE4;
+            --accent-color: #36C5F0;
+            --text-primary: #1A1A1A;
+            --text-secondary: #616061;
+        }
 
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            color: var(--text-primary);
+        }
+
+        .settings-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .settings-sidebar {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .settings-main {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .nav-item {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            color: var(--text-secondary);
+        }
+
+        .nav-item:hover {
+            background: var(--secondary-color);
+            color: var(--primary-color);
+        }
+
+        .nav-item.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .org-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e9ecef;
+            margin-bottom: 2rem;
+        }
+
+        .org-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #2BAC76;
+            margin-right: 8px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .modal-content {
+            border-radius: 16px;
+            border: none;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #301531;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .settings-container {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            
+            .settings-sidebar {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body>
-
-    <style>
-
-
-
-    </style>
-
-
-
-    <header>
-        <h3>{{organization.name}}</h3>
-    </header>
-
-
-<!-- -------------------------------------------------------------------------------------------------------- -->
-
-
-
-<section>
-
-    <strong>
-        Signed in as {{ user.username }}
-        {% if profile.profile_picture %}
-            <br>
-            <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="w-12 h-12 rounded-full" />
-        {% endif %}
-    </strong>
-    
-
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#updateIconModal">
-        Update Workspace Icon
-    </button>
-
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#updateStatusModal">
-        Update Organization Status
-    </button>
-
-    
-     <!-- Button to trigger profile edit modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-    Accounts & Profile
-</button>
-
-<!-- Analytics -->
-<a href="{% url 'workspace_analytics' org_id=organization.id%}">
-    <button type="submit" class="btn btn-primary">
-        Analytics
-    </button>
-</a>
-
-
-    
-
-
-
-
-
-</section>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- -------------------------------------------------------------------------------------------------- -->
-
-<!-- Update workspace icon  -->
-
-<div class="modal fade" id="updateIconModal" tabindex="-1" aria-labelledby="updateIconModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="updateIconModalLabel">Update Workspace Icon</h5>
-                <p>
-                    Workspace icon guidelines
-Your workspace icon is a way for you to visually identify the Django workspace. It’s used in the desktop and mobile apps, as well as on your workspace admin site. It’s most helpful when you’re active on multiple Slack workspaces.
-
-Some tips on choosing a good icon:
-
-Use a solid background colour.
-Use a graphical logo or image rather than text.
-Leave some space around your icon.
-Upload an image that is 132 px square or larger.
-                </p>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="settings-container">
+        <!-- Sidebar Navigation -->
+        <aside class="settings-sidebar">
+            <div class="org-header">
+                {% if organization.icon %}
+                <img src="{{ organization.icon.url }}" alt="{{ organization.name }} Icon" class="org-icon">
+                {% else %}
+                <div class="org-icon bg-primary text-white d-flex align-items-center justify-content-center">
+                    {{ organization.name|first|upper }}
+                </div>
+                {% endif %}
+                <div>
+                    <h3 class="mb-0">{{ organization.name }}</h3>
+                    <small class="text-muted">Workspace</small>
+                </div>
             </div>
-            <div class="modal-body">
-                <form id="updateIconForm">
-                    <div class="mb-3">
-                        <label for="workspaceIcon" class="form-label">Choose an Image</label>
-                        <input type="file" class="form-control" id="workspaceIcon" accept="image/*" required>
+
+            <nav class="nav flex-column">
+                <a href="#" class="nav-item active">
+                    <i class="material-icons-round me-2">settings</i>
+                    Workspace Settings
+                </a>
+                <a href="{% url 'workspace_details' org_id=organization.id %}" class="nav-item">
+                    <i class="material-icons-round me-2">info</i>
+                    About Workspace
+                </a>
+                <a href="{% url 'workspace_analytics' org_id=organization.id %}" class="nav-item">
+                    <i class="material-icons-round me-2">analytics</i>
+                    Analytics
+                </a>
+                <a href="#" class="nav-item" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                    <i class="material-icons-round me-2">person</i>
+                    Account & Profile
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="settings-main">
+            <h4 class="mb-4">Workspace Settings</h4>
+
+            <div class="row g-4">
+                <!-- Workspace Icon Card -->
+                <div class="col-md-6">
+                    <div class="card h-100 p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="material-icons-round me-2 text-primary">image</i>
+                            <h5 class="mb-0">Workspace Icon</h5>
+                        </div>
+                        <p class="text-muted small mb-4">
+                            Recommended size: 512x512px. Formats: PNG, JPG. This appears in your workspace header and notifications.
+                        </p>
+                        <div class="text-center mb-4">
+                            {% if organization.icon %}
+                            <img src="{{ organization.icon.url }}" alt="Workspace Icon" class="img-fluid rounded-3" style="max-width: 120px;">
+                            {% else %}
+                            <div class="bg-secondary text-white rounded-3 d-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                                {{ organization.name|first|upper }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#updateIconModal">
+                            Update Icon
+                        </button>
                     </div>
-                    <button type="submit" class="btn btn-success">Upload</button>
-                </form>
-                <div id="iconPreview" class="mt-3 text-center">
-                    {% if organization.icon %}
-                       <img id="currentIcon" src="{{ organization.icon.url }}" alt="Workspace Icon" class="img-fluid rounded" style="max-width: 100px;">
-                    {% endif %}   
+                </div>
+
+                <!-- Workspace Status Card -->
+                <div class="col-md-6">
+                    <div class="card h-100 p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="material-icons-round me-2 text-primary">visibility</i>
+                            <h5 class="mb-0">Workspace Status</h5>
+                        </div>
+                        <p class="text-muted small mb-4">
+                            Let members know the current status of your workspace. This appears in team directories and notifications.
+                        </p>
+                        <div class="d-flex align-items-center mb-4">
+                            <span class="status-indicator"></span>
+                            <span class="text-success fw-medium">Active</span>
+                        </div>
+                        <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#updateStatusModal">
+                            Update Status
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Advanced Settings Card -->
+                <div class="col-12">
+                    <div class="card p-4">
+                        <h5 class="mb-4"><i class="material-icons-round me-2 text-primary">admin_panel_settings</i>Advanced Settings</h5>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="border-bottom pb-3">
+                                    <h6>Workspace Ownership</h6>
+                                    <p class="text-muted small mb-2">
+                                        Transfer workspace ownership to another member or delete the workspace.
+                                    </p>
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        Transfer Ownership
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="border-bottom pb-3">
+                                    <h6>Account Security</h6>
+                                    <p class="text-muted small mb-2">
+                                        Manage session security and two-factor authentication settings.
+                                    </p>
+                                    <a href="{% url 'logout' %}" class="btn btn-sm btn-outline-primary">
+                                        Sign Out All Sessions
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals (Keep your existing modal HTML, styled with new CSS) -->
+    <!-- Update Icon Modal -->
+    <div class="modal fade" id="updateIconModal" tabindex="-1" aria-labelledby="updateIconModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateIconModalLabel">Update Workspace Icon</h5>
+                    <p>
+                        Workspace icon guidelines
+    Your workspace icon is a way for you to visually identify the Django workspace. It’s used in the desktop and mobile apps, as well as on your workspace admin site. It’s most helpful when you’re active on multiple Slack workspaces.
+    
+    Some tips on choosing a good icon:
+    
+    Use a solid background colour.
+    Use a graphical logo or image rather than text.
+    Leave some space around your icon.
+    Upload an image that is 132 px square or larger.
+                    </p>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="updateIconForm">
+                        <div class="mb-3">
+                            <label for="workspaceIcon" class="form-label">Choose an Image</label>
+                            <input type="file" class="form-control" id="workspaceIcon" accept="image/*" required>
+                        </div>
+                        <button type="submit" class="btn btn-success">Upload</button>
+                    </form>
+                    <div id="iconPreview" class="mt-3 text-center">
+                        {% if organization.icon %}
+                           <img id="currentIcon" src="{{ organization.icon.url }}" alt="Workspace Icon" class="img-fluid rounded" style="max-width: 100px;">
+                        {% endif %}   
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 
-<!-- UPDATE WORKSPACE STATUS -->
 
-<div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="updateStatusModalLabel">Update Organization Status</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="updateStatusForm">
-                    <label for="statusSelect" class="form-label">Select Status</label>
-                    <select class="form-select" id="statusSelect">
-                        <option value="working_remotely">Working Remotely</option>
-                        <option value="in_a_meeting">In A Meeting</option>
-                        <option value="off_sick">Off Sick</option>
-                        <option value="on_holiday">On Holiday</option>
-                    </select>
-                    <div class="mt-3">
-                        <button type="submit" class="btn btn-success">Update</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<!-- Profile Edit Modal -->
-
-<!-- Profile Edit Modal -->
-<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="editProfileForm">
-                    <!-- Full Name -->
-                    <div class="mb-3">
-                        <label for="full_name" class="form-label">Full Name</label>
-                        <input type="text" class="form-control" id="full_name" required>
-                    </div>
-                    <!-- Profile Picture Preview -->
-                    <div class="mb-3">
-                        <label for="profile_picture" class="form-label">Profile Picture</label>
-                        <input type="file" class="form-control" id="profile_picture">
-                        <div id="profile_picture_preview" class="mt-3">
-                            <img id="profile_picture_img" src="" alt="Profile Picture Preview" style="max-width: 100px; max-height: 100px;" />
+    <!-- Update Status Modal -->
+    <div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
+       
+        
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateStatusModalLabel">Update Organization Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="updateStatusForm">
+                        <label for="statusSelect" class="form-label">Select Status</label>
+                        <select class="form-select" id="statusSelect">
+                            <option value="working_remotely">Working Remotely</option>
+                            <option value="in_a_meeting">In A Meeting</option>
+                            <option value="off_sick">Off Sick</option>
+                            <option value="on_holiday">On Holiday</option>
+                        </select>
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-success">Update</button>
                         </div>
-                    </div>
-                    <!-- Email -->
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" required>
-                    </div>
-
-                    <div>
-                        <strong>Time Zone</strong>
-                        <p>
-                            Calendar Plus uses your time zone to send summary and notification emails, for times in your activity feeds and for reminders. Your time zone is currently set to: (UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi.
-                        </p>
-                    </div>
-                    <br>
-                    <div>
-                        <strong>
-                            Sign out of all other sessions
-                        </strong>
-                        <p>
-                            Lost your phone? Left yourself logged in on a public computer? Need a way to sign out from everywhere except your current browser? Then this is for you.
-                            <a href="{% url 'logout' %}">
-                                <button type="submit" class="btn btn-primary">
-                                    Sign out of all other sessions
-                                </button>
-                            </a>
-                        </p>
-                    </div>
-
-                    <div>
-                        <strong>
-                            Deactivate Account!
-                        </strong>
-                        <p>
-                            You’re the primary owner of {{organization.name}}, so you can’t deactivate your account
-                        </p>
-                        <p>
-                            You can <a href="#">Transfer Ownership</a>to another member or <a href="#">
-                                Delete the workspace
-                            </a>
-                        </p>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Profile Edit Modal -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editProfileForm">
+                        <!-- Full Name -->
+                        <div class="mb-3">
+                            <label for="full_name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="full_name" required>
+                        </div>
+                        <!-- Profile Picture Preview -->
+                        <div class="mb-3">
+                            <label for="profile_picture" class="form-label">Profile Picture</label>
+                            <input type="file" class="form-control" id="profile_picture">
+                            <div id="profile_picture_preview" class="mt-3">
+                                <img id="profile_picture_img" src="" alt="Profile Picture Preview" style="max-width: 100px; max-height: 100px;" />
+                            </div>
+                        </div>
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+    
+                        <div>
+                            <strong>Time Zone</strong>
+                            <p>
+                                Calendar Plus uses your time zone to send summary and notification emails, for times in your activity feeds and for reminders. Your time zone is currently set to: (UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi.
+                            </p>
+                        </div>
+                        <br>
+                        <div>
+                            <strong>
+                                Sign out of all other sessions
+                            </strong>
+                            <p>
+                                Lost your phone? Left yourself logged in on a public computer? Need a way to sign out from everywhere except your current browser? Then this is for you.
+                                <a href="{% url 'logout' %}">
+                                    <button type="submit" class="btn btn-primary">
+                                        Sign out of all other sessions
+                                    </button>
+                                </a>
+                            </p>
+                        </div>
+    
+                        <div>
+                            <strong>
+                                Deactivate Account!
+                            </strong>
+                            <p>
+                                You’re the primary owner of {{organization.name}}, so you can’t deactivate your account
+                            </p>
+                            <p>
+                                You can <a href="#">Transfer Ownership</a>to another member or <a href="#">
+                                    Delete the workspace
+                                </a>
+                            </p>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  
 
 
-
-
-
-
-
-<!-- ===================================================================================================== -->
-
-<!-- Bootstrap 5 JS Bundle (includes Popper) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     const organizationId = "{{ organization.id }}";
 
 </script>
 
 
-
-
-
+    
 </body>
 </html>
+
+{% endblock %}

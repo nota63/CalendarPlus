@@ -323,3 +323,62 @@ def organization_analytics(request, org_id):
             'error_message': f"An error occurred: {str(e)}"
         }
         return render(request, 'organizations/analytics/analytics.html', context)
+
+
+
+# Organization Details
+def organization_details(request, org_id):
+    try:
+        # Fetch the organization by ID
+        print(f"Fetching organization with ID: {org_id}")
+        organization = Organization.objects.get(id=org_id)
+        print(f"Organization fetched: {organization.name}")
+
+        # Fetch the admin profile for the organization
+        admin_profile = Profile.objects.get(organization=organization, is_admin=True)
+        print(f"Admin profile found: {admin_profile.full_name}")
+
+        # Check if organization has an icon, else use a default
+        org_icon = organization.icon.url if organization.icon else 'default_icon.png'
+        print(f"Organization icon: {org_icon}")
+
+        # Prepare static data for Retention & Exports section
+        retention_text = {
+            'messages': 'Messages are kept for 1 year. Edit history and messages deleted by people or apps are never saved.',
+            'files': 'Files are kept for 1 year. Files deleted by people or apps are never saved.',
+            'canvases_lists': 'Canvases and lists are kept for 1 year. Canvases and lists deleted by people or apps are never saved.',
+            'export_access': 'Public data can be exported. Workspace owners and admins can export messages and files from public channels.'
+        }
+        print(f"Retention and export information loaded.")
+
+        # Render the template with context data
+        context = {
+            'organization': organization,
+            'admin_profile': admin_profile,
+            'org_icon': org_icon,
+            'retention_text': retention_text,
+        }
+        print("Rendering template with context data.")
+
+        return render(request, 'organizations/details/organization_details.html', context)
+
+    except Organization.DoesNotExist:
+        print(f"Organization with ID {org_id} does not exist.")
+        context = {
+            'error_message': "Organization not found."
+        }
+        return render(request, 'organizations/details/organization_details.html', context)
+
+    except Profile.DoesNotExist:
+        print(f"Admin profile not found for organization with ID {org_id}.")
+        context = {
+            'error_message': "Admin profile not found or the organization does not have an admin."
+        }
+        return render(request, 'organizations/details/organization_details.html', context)
+
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        context = {
+            'error_message': f"An error occurred: {str(e)}"
+        }
+        return render(request, 'organizations/details/organization_details.html', context)

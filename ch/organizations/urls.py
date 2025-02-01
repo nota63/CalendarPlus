@@ -11,6 +11,7 @@ urlpatterns=[
     path('workspace-status/<int:org_id>/',update_organization_status, name='workspace_status'),
     path('modify-profile/<int:org_id>/',edit_profile, name='modify_profile'),
     path('workspace_analytics/<int:org_id>/',organization_analytics, name='workspace_analytics'),
+    path('workspace_details/<int:org_id>/',organization_details, name='workspace_details')
 
 ]
 
