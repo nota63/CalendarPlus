@@ -448,12 +448,10 @@ def delete_email(request, org_id, user_id, email_id):
 
 
 # Email analytics 
-
 def email_analysis_view(request, org_id, user_id, email_id):
-    # Get the organization and email details
-    organization = get_object_or_404(Organization, id=org_id)
-    email = get_object_or_404(EmailOrganization, id=email_id, organization=organization,participant=user_id)
     
+    organization = get_object_or_404(Organization, id=org_id)
+    email = get_object_or_404(EmailOrganization, id=email_id, organization=organization, participant=user_id)
 
 
     emails = EmailOrganization.objects.filter(organization=organization)
@@ -462,9 +460,9 @@ def email_analysis_view(request, org_id, user_id, email_id):
     for e in emails:
         response_time = timezone.now() - e.sent_at
         labels.append(e.sent_at.strftime('%Y-%m-%d %H:%M:%S'))  
-        response_times.append(response_time.days * 24 * 60 + response_time.seconds // 60) 
+        response_times.append(response_time.days * 24 * 60 + response_time.seconds // 60)  # Convert to minutes
 
-    
+   
     status_counts = {
         'Delivered': EmailOrganization.objects.filter(organization=organization, status='Delivered').count(),
         'Pending': EmailOrganization.objects.filter(organization=organization, status='Pending').count(),
@@ -472,17 +470,23 @@ def email_analysis_view(request, org_id, user_id, email_id):
         'Canceled': EmailOrganization.objects.filter(organization=organization, status='Canceled').count(),
     }
 
-    
+
     sent_count = EmailOrganization.objects.filter(sender=email.sender, organization=organization).count()
     received_count = EmailOrganization.objects.filter(participant=email.participant, organization=organization).count()
 
-    email_counts_per_day = EmailOrganization.objects.filter(organization=organization).extra(select={'date_sent': 'date(sent_at)'}).values('date_sent').annotate(count=Count('id'))
+ 
+    email_counts_per_day = EmailOrganization.objects.filter(organization=organization)\
+        .extra(select={'date_sent': 'date(sent_at)'})\
+        .values('date_sent')\
+        .annotate(count=Count('id'))
 
-  
+ 
+    email_counts_per_day = [{'date_sent': str(item['date_sent']), 'count': item['count']} for item in email_counts_per_day]
+
+ 
     top_senders = EmailOrganization.objects.filter(organization=organization).values('sender').annotate(sent_count=Count('sender')).order_by('-sent_count')[:5]
     top_receivers = EmailOrganization.objects.filter(organization=organization).values('participant').annotate(received_count=Count('participant')).order_by('-received_count')[:5]
 
-  
    
     chart_data = {
         'response_times': response_times,
@@ -490,17 +494,18 @@ def email_analysis_view(request, org_id, user_id, email_id):
         'status_counts': status_counts,
         'sent_count': sent_count,
         'received_count': received_count,
-        'email_counts_per_day': list(email_counts_per_day),
+        'email_counts_per_day': email_counts_per_day,
         'top_senders': list(top_senders),
         'top_receivers': list(top_receivers),
-
     }
 
- 
-    serialized_chart_data = json.dumps(chart_data)
+   
+    serialized_chart_data = json.dumps(chart_data, default=str)
 
-    return render(request, 'email/email_analysis.html', {'chart_data': serialized_chart_data,'organization':organization})
-
+    return render(request, 'email/email_analysis.html', {
+        'chart_data': serialized_chart_data,
+        'organization': organization
+    })
 
 
 # Edit and resend Email
