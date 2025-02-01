@@ -17,6 +17,46 @@
 
 <style>
 
+    /* Ensure the buttons appear outside sidebar */
+.popup-container {
+    position: absolute;
+    top: 50px; /* Adjust this based on your sidebar position */
+    left: 220px; /* Adjust this based on sidebar width */
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    display: none; /* Initially hidden */
+    z-index: 9999; /* Ensures it's above sidebar */
+}
+
+/* Make buttons simple and properly clickable */
+.popup-btn {
+    display: block;
+    width: 100%;
+    background: none;
+    border: none;
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    color: #333;
+}
+
+.popup-btn:hover {
+    background: #f1f1f1;
+}
+
+/* Manage Members button styling */
+.manage-btn {
+    text-decoration: none;
+    color: #000;
+    font-size: 14px;
+    padding: 8px;
+    display: inline-block;
+}
+
+
 /* styles.css */
 /* Add this file after Tailwind in your head section */
 
@@ -275,10 +315,12 @@ a {
             </a>
           
 
-            <a href="{% url 'manage_members' organization.id %}">
-                <span class="material-icons">group</span> Manage Workspace Members
-            </a>
-
+           <!-- Manage Workspace Members Button -->
+          <a href="{% url 'manage_members' organization.id %}" 
+              id="manageMembersBtn" class="btn btn-primary">
+              <span class="material-icons">group</span> Manage Workspace Members
+           </a>
+          
             
             <a href="{% url 'invitation_status' organization.id %}">
                 <span class="material-icons">person_add</span> Invitations Status
@@ -526,6 +568,21 @@ a {
 
 
 <!-- --------------------------------------------------------------------------------------------------------------- -->
+<!-- Popup Buttons (Initially Hidden) -->
+<div id="popupButtons" class="popup-container">
+    <button type="button" class="popup-btn" data-bs-toggle="modal" data-bs-target="#editOrgModal">
+        <span class="material-icons">person</span> Organization
+    </button>
+
+    <!-- Future buttons can be added here -->
+    <button type="button" class="popup-btn">
+        <span class="material-icons">settings</span> Settings
+    </button>
+</div>
+
+
+
+<!-- ------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
 <!-- MODALS -->
  <!-- Edit Organization -->
@@ -595,8 +652,38 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+// Handle Organization Section Buttons Pop Up
+document.addEventListener("DOMContentLoaded", function () {
+    const manageMembersBtn = document.getElementById("manageMembersBtn");
+    const popupButtons = document.getElementById("popupButtons");
 
+    // Show popup on hover
+    manageMembersBtn.addEventListener("mouseenter", function () {
+        popupButtons.style.display = "block";
+    });
 
+    // Keep the popup visible when hovered
+    popupButtons.addEventListener("mouseenter", function () {
+        popupButtons.style.display = "block";
+    });
+
+    // Hide popup when mouse leaves both elements
+    manageMembersBtn.addEventListener("mouseleave", function () {
+        setTimeout(() => {
+            if (!popupButtons.matches(":hover")) {
+                popupButtons.style.display = "none";
+            }
+        }, 300); // Delay hiding for a smoother experience
+    });
+
+    popupButtons.addEventListener("mouseleave", function () {
+        setTimeout(() => {
+            if (!manageMembersBtn.matches(":hover")) {
+                popupButtons.style.display = "none";
+            }
+        }, 300);
+    });
+});
 
 </script>
 
