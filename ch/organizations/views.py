@@ -37,19 +37,19 @@ def edit_organization(request, org_id):
 
 @login_required
 def organization_invitations(request, org_id):
-    # Fetch the organization
+ 
     organization = get_object_or_404(Organization, id=org_id)
     
-    # Check if the user is an admin of the organization
+ 
     profile = organization.profiles.filter(user=request.user).first()
     if not profile or not profile.is_admin:
         raise PermissionDenied("You do not have permission to view this organization's invitations.")
     
-    # Fetch invitations for the organization
+   
     invitations = EmailInvitation.objects.filter(organization=organization)
 
 
-    # Preparing the invitations data for frontend
+  
     invitation_data = []
     for invitation in invitations:
         invitation_data.append({
@@ -61,3 +61,21 @@ def organization_invitations(request, org_id):
         })
     
     return JsonResponse({'invitations': invitation_data})
+
+
+# CUSTOMIZE ORGANIZATION AND MANAGE
+
+@login_required
+def customize_workspace(request, org_id):
+    organization = get_object_or_404(Organization, id=org_id)
+    profile = organization.profiles.filter(user=request.user).first()
+    if not profile or not profile.is_admin:
+        raise PermissionDenied("You do not have permission to view this organization's invitations.")
+    
+    return render(request, 'organizations/customize/customize_workspace.html',{'organization':organization})
+
+
+
+
+
+

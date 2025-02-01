@@ -562,14 +562,17 @@ a {
     </button>
 
     <!-- Future buttons can be added here -->
-    <button type="button" class="popup-btn">
-        <span class="material-icons">settings</span> Settings
-    </button>
-
+    
     <!-- Button to trigger the modal -->
    <button type="button" class="popup-btn" data-bs-toggle="modal" data-bs-target="#invitationsModal">
-       View Invitations
+       <span class="material-icons">person</span> Monitor Invitations
    </button>
+
+   <a href="{% url 'customize_workspace' org_id=organization.id%}">
+      <button type="submit" class="popup-btn">
+        <span class="material-icons">settings</span> Customize {{organization.name}}
+      </button>
+   </a>
 </div>
 
 
@@ -716,11 +719,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
-
-
-
-
-
 
 
 
