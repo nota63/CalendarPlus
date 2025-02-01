@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+import re
 # Create your views here.
 
 @csrf_exempt
@@ -72,7 +73,7 @@ def customize_workspace(request, org_id):
     if not profile or not profile.is_admin:
         raise PermissionDenied("You do not have permission to view this organization's invitations.")
     
-    return render(request, 'organizations/customize/customize_workspace.html',{'organization':organization})
+    return render(request, 'organizations/customize/customize_workspace.html',{'organization':organization,'profile':profile})
 
 
 
@@ -111,8 +112,6 @@ def update_workspace_icon(request, org_id):
 # Set Workspace Status
 import json
 
-
-
 @csrf_exempt
 def update_organization_status(request, org_id):
     if request.method == 'POST':
@@ -139,3 +138,53 @@ def update_organization_status(request, org_id):
         return JsonResponse({"success": True, "message": "Organization status updated successfully!"})
 
     return JsonResponse({"success": False, "error": "Invalid request method."}, status=400)
+
+
+
+# Edit Profile
+
+@login_required
+def edit_profile(request, org_id):
+    
+    organization = get_object_or_404(Organization, id=org_id)
+    profile = get_object_or_404(Profile, user=request.user, organization=organization)
+    if not Profile.objects.filter(user=request.user, organization=organization, is_admin=True).exists():
+            return JsonResponse({"success": False, "error": "You are not authorized to update the workspace icon."}, status=403)
+
+    
+    if request.method == "GET":
+        
+        data = {
+            'full_name': profile.full_name,
+            'profile_picture': profile.profile_picture.url if profile.profile_picture else None,
+            'email': request.user.email,
+        }
+        return JsonResponse({'success': True, 'data': data})
+
+    elif request.method == "POST":
+    
+        full_name = request.POST.get('full_name')
+        profile_picture = request.FILES.get('profile_picture')
+        email = request.POST.get('email')
+
+      
+        if email and not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            return JsonResponse({"success": False, "error": "Invalid email format."}, status=400)
+
+        
+        if email:
+            request.user.email = email
+            request.user.save()
+
+        profile.full_name = full_name if full_name else profile.full_name
+        if profile_picture:
+            profile.profile_picture = profile_picture
+        profile.save()
+
+        return JsonResponse({"success": True, "message": "Profile updated successfully!"})
+
+    return JsonResponse({"success": False, "error": "Invalid request method."}, status=400)
+
+
+
+
