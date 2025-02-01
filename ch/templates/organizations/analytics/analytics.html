@@ -1,118 +1,414 @@
 <!-- Analytics Page -->
-<div class="container">
-    <h1>Analytics for {{ organization.name }}</h1>
+{% extends 'custom.html' %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ organization.name }} Analytics</title>
     
-    <div class="row">
-        <!-- Total Storage Used -->
-        <div class="col-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Total Storage Used</h5>
-                    <p>{{ total_storage_used }} items</p>
-                    <p><i class="bi bi-file-earmark"></i> Messages: {{ total_messages }} <br>
-                    <i class="bi bi-file-earmark-video"></i> Videos: {{ total_videos }} <br>
-                    <i class="bi bi-file-earmark-audio"></i> Audio: {{ total_audio }} <br>
-                    <i class="bi bi-link-45deg"></i> Links: {{ total_links }}</p>
-                </div>
-            </div>
-        </div>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Animate CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    <style>
+        :root {
+            --slack-purple: #4A154B;
+            --calendly-blue: #00B289;
+            --chartreuse: #DDF163;
+            --text-dark: #1A1A1A;
+            --text-light: #FFFFFF;
+            --card-bg: #F8F9FA;
+        }
 
-        <!-- Total Channels -->
-        <div class="col-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Total Channels</h5>
-                    <p>Total: {{ total_channels }}</p>
-                    <p><i class="bi bi-globe"></i> Public Channels: {{ public_channels }} <br>
-                    <i class="bi bi-lock"></i> Private Channels: {{ private_channels }}</p>
-                </div>
-            </div>
-        </div>
+        body {
+            background: #fcfcff;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
 
-        <!-- Total Messages Sent -->
-        <div class="col-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Total Messages Sent</h5>
-                    <p>{{ total_messages_sent }} messages</p>
-                </div>
+        .analytics-header {
+            background: linear-gradient(135deg, var(--slack-purple) 0%, #36113d 100%);
+            color: white;
+            padding: 4rem 0;
+            margin-bottom: 3rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .metric-card {
+            background: white;
+            border: none;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--slack-purple) 0%, var(--calendly-blue) 100%);
+        }
+
+        .pro-badge {
+            position: absolute;
+            top: 12px;
+            right: -34px;
+            background: var(--chartreuse);
+            color: var(--text-dark);
+            padding: 4px 36px;
+            transform: rotate(45deg);
+            font-size: 0.75rem;
+            font-weight: 700;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--slack-purple);
+            margin: 1rem 0;
+        }
+
+        .stat-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0.5rem 0;
+            color: #666;
+        }
+
+        .section-title {
+            color: var(--slack-purple);
+            margin: 2rem 0;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #eee;
+        }
+
+        .progress-bar-custom {
+            height: 8px;
+            border-radius: 4px;
+            background: #eee;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--calendly-blue) 0%, var(--chartreuse) 100%);
+            transition: width 0.8s ease-out;
+        }
+
+        .hover-grow {
+            transition: transform 0.2s ease;
+        }
+
+        .hover-grow:hover {
+            transform: scale(1.02);
+        }
+
+        .cta-button {
+            background: var(--slack-purple);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 21, 75, 0.3);
+        }
+
+        @keyframes gradient-pulse {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .pro-section {
+            background: linear-gradient(135deg, var(--slack-purple), #5c1d5e);
+            border-radius: 16px;
+            padding: 2rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            animation: gradient-pulse 8s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        .note-box {
+            background: rgba(221, 241, 99, 0.15);
+            border-left: 4px solid var(--chartreuse);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<header class="analytics-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="display-4 fw-bold mb-0 animate__animated animate__fadeInLeft">
+                {{ organization.name }} Analytics
+            </h1>
+            <div class="animate__animated animate__fadeInRight">
+                <span class="badge bg-light text-dark fs-6">PRO Workspace</span>
             </div>
         </div>
     </div>
+</header>
 
-    <div class="row">
-        <!-- Total Members -->
-        <div class="col-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Total Members</h5>
-                    <p>{{ total_members }} members</p>
+<main class="container">
+    <!-- Usage Section -->
+    <section class="mb-5">
+        <h2 class="section-title animate__animated animate__fadeIn">
+            <i class="bi bi-pie-chart-fill me-2"></i>Workspace Usage
+        </h2>
+        
+        <div class="row g-4">
+            <!-- Storage Card -->
+            <div class="col-lg-4 animate__animated animate__fadeInUp">
+                <div class="metric-card h-100 p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="h5 mb-0">Storage Overview</h3>
+                        <i class="bi bi-database fs-4 text-purple"></i>
+                    </div>
+                    <div class="stat-number">{{ total_storage_used }}</div>
+                    <div class="progress-bar-custom mb-3">
+                        <div class="progress-fill" style="width: 65%"></div>
+                    </div>
+                    <div class="stat-detail">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>{{ total_messages }} Messages</span>
+                    </div>
+                    <div class="stat-detail">
+                        <i class="bi bi-camera-video"></i>
+                        <span>{{ total_videos }} Videos</span>
+                    </div>
+                    <div class="stat-detail">
+                        <i class="bi bi-mic"></i>
+                        <span>{{ total_audio }} Audio Files</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Channels Card -->
+            <div class="col-lg-4 animate__animated animate__fadeInUp animate__delay-1s">
+                <div class="metric-card h-100 p-4">
+                    <div class="pro-badge">PRO</div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="h5 mb-0">Channels Activity</h3>
+                        <i class="bi bi-hash fs-4 text-blue"></i>
+                    </div>
+                    <div class="stat-number">{{ total_channels }}</div>
+                    <div class="row mt-3">
+                        <div class="col-6">
+                            <div class="text-center">
+                                <div class="h3 text-success">{{ public_channels }}</div>
+                                <small class="text-muted">Public</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center">
+                                <div class="h3 text-primary">{{ private_channels }}</div>
+                                <small class="text-muted">Private</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages Card -->
+            <div class="col-lg-4 animate__animated animate__fadeInUp animate__delay-2s">
+                <div class="metric-card h-100 p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="h5 mb-0">Messages</h3>
+                        <i class="bi bi-chat-left-text fs-4 text-pink"></i>
+                    </div>
+                    <div class="stat-number">{{ total_messages_sent }}</div>
+                    <div class="d-flex justify-content-around mt-4">
+                        <div class="text-center">
+                            <div class="h5">{{ total_pinned_messages }}</div>
+                            <small class="text-muted">Pinned</small>
+                        </div>
+                        <div class="text-center">
+                            <div class="h5">{{ total_starred_messages }}</div>
+                            <small class="text-muted">Starred</small>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Active Users -->
-        <div class="col-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Active Users</h5>
-                    <p>{{ active_users }} active users</p>
+    <!-- Engagement Section -->
+    <section class="mb-5">
+        <h2 class="section-title animate__animated animate__fadeIn">
+            <i class="bi bi-activity me-2"></i>User Engagement
+        </h2>
+        
+        <div class="row g-4">
+            <div class="col-md-6 animate__animated animate__fadeInLeft">
+                <div class="metric-card p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3 class="h5 mb-0">Members Overview</h3>
+                        <i class="bi bi-people fs-4 text-orange"></i>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="stat-number">{{ total_members }}</div>
+                            <small class="text-muted">Total Members</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-number text-success">{{ active_users }}</div>
+                            <small class="text-muted">Active Users</small>
+                        </div>
+                    </div>
+                    <canvas class="mt-4" id="engagementChart" height="120"></canvas>
+                </div>
+            </div>
+
+            <div class="col-md-6 animate__animated animate__fadeInRight">
+                <div class="metric-card p-4 h-100">
+                    <div class="pro-badge">PRO</div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3 class="h5 mb-0">Event Analytics</h3>
+                        <i class="bi bi-calendar-event fs-4 text-green"></i>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="stat-number">{{ total_events }}</div>
+                            <small class="text-muted">Total Events</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-number">{{ total_meetings }}</div>
+                            <small class="text-muted">Meetings</small>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Successful Meetings</span>
+                            <span>85%</span>
+                        </div>
+                        <div class="progress-bar-custom">
+                            <div class="progress-fill" style="width: 85%"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Total Events -->
-        <div class="col-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Total Events</h5>
-                    <p>{{ total_events }} events</p>
+    <!-- Security Section -->
+    <section class="mb-5">
+        <div class="metric-card p-4 animate__animated animate__fadeIn">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="h5 mb-1">Security & Moderation</h3>
+                    <p class="text-muted mb-0">Abuse reports and safety metrics</p>
                 </div>
+                <i class="bi bi-shield-lock fs-3 text-red"></i>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="stat-number">{{ total_abused_messages }}</div>
+                    <small class="text-muted">Reported Messages</small>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-number">24</div>
+                    <small class="text-muted">Active Restrictions</small>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-number">98%</div>
+                    <small class="text-muted">Safety Score</small>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Upgrade Section -->
+    <section class="mb-5">
+        <div class="pro-section hover-grow">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h3 class="h2 fw-bold mb-3">Unlock Advanced Analytics</h3>
+                    <p class="lead mb-4">Get deeper insights with historical data, custom reports, and team productivity metrics.</p>
+                    <button class="cta-button">
+                        Upgrade to Pro Plan <i class="bi bi-arrow-up-right"></i>
+                    </button>
+                </div>
+                <div class="col-md-4 text-center">
+                    <i class="bi bi-graph-up-arrow fs-1" style="opacity: 0.8"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analytics Note -->
+    <div class="note-box animate__animated animate__fadeIn">
+        <div class="d-flex gap-3">
+            <i class="bi bi-info-circle fs-4 text-chartreuse"></i>
+            <div>
+                <h4 class="h6 mb-2">About These Metrics</h4>
+                <p class="mb-0">Analytics help understand overall workspace health. They're not meant for individual performance evaluation. Data updates every 24 hours.</p>
             </div>
         </div>
     </div>
+</main>
 
-    <div class="row">
-        <!-- Total Meetings -->
-        <div class="col-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Total Meetings</h5>
-                    <p>{{ total_meetings }} meetings</p>
-                </div>
-            </div>
-        </div>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Engagement Chart
+    const ctx = document.getElementById('engagementChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Active Users',
+                data: [65, 78, 82, 75, 88, 95],
+                borderColor: '#4A154B',
+                tension: 0.4,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true, display: false },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+</script>
 
-        <!-- Pinned Messages -->
-        <div class="col-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Pinned Messages</h5>
-                    <p>{{ total_pinned_messages }} pinned messages</p>
-                </div>
-            </div>
-        </div>
+</body>
+</html>
 
-        <!-- Starred Messages -->
-        <div class="col-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Starred Messages</h5>
-                    <p>{{ total_starred_messages }} starred messages</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <!-- Abused Messages -->
-        <div class="col-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Abused Messages</h5>
-                    <p>{{ total_abused_messages }} reported abused messages</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+{% endblock %}

@@ -194,6 +194,14 @@ def edit_profile(request, org_id):
 
 
 # Analytics Overview
+import os
+
+def get_file_size(file_field):
+    """Returns the size of the file field if it's not empty."""
+    if file_field and hasattr(file_field, 'path'):
+        return os.path.getsize(file_field.path)  # Returns size in bytes
+    return 0
+
 
 def organization_analytics(request, org_id):
     try:
@@ -215,9 +223,29 @@ def organization_analytics(request, org_id):
         print(f"Total links: {total_links.count()}")
 
         # Calculate total storage used
-        total_storage_used = total_messages.count() + total_videos.count() + total_audio.count() + total_links.count()
-        print(f"Total storage used: {total_storage_used}")
-
+        total_storage_used = 0
+        
+        # Get all messages and sum the sizes
+        total_messages = Message.objects.filter(organization=organization)
+        
+        for message in total_messages:
+            total_storage_used += get_file_size(message.content)  # Add content size
+            total_storage_used += get_file_size(message.video)  # Add video size
+            total_storage_used += get_file_size(message.audio)  # Add audio size
+        
+        # Get all links and sum the sizes
+        total_links = Link.objects.filter(organization=organization)
+        for link in total_links:
+            total_storage_used += get_file_size(link.file)  # If Link model has a file field
+            
+        # You can also calculate the size for other fields as needed
+        
+        print(f"Total storage used (in bytes): {total_storage_used}")
+        
+        # Convert to MB for easier reading
+        total_storage_used_mb = total_storage_used / (1024 * 1024)
+        print(f"Total storage used (in MB): {total_storage_used_mb}")
+        
         # 2. Total Channels (Public/Private)
         total_channels = Channel.objects.filter(organization=organization)
         print(f"Total channels: {total_channels.count()}")
