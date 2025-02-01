@@ -295,15 +295,6 @@ a {
 
             <!-- NEW FEATURES -->
 
-            <button type="button" class="font-semibold text-lg text-white mb-6" data-bs-toggle="modal" data-bs-target="#editOrgModal">
-                <span class="material-icons">person</span>Organization
-            </button>
-
-
-
-
-
-            
             <a href="{% url 'organization_availability' organization.id %}">
                 <span class="material-icons">schedule</span> Manage Availability
             </a>
@@ -321,10 +312,6 @@ a {
               <span class="material-icons">group</span> Manage Workspace Members
            </a>
           
-            
-            <a href="{% url 'invitation_status' organization.id %}">
-                <span class="material-icons">person_add</span> Invitations Status
-            </a>
 
             <a href="{% url 'organizations_members' organization.id %}">
                 <span class="material-icons">person_add</span> Calendars
@@ -578,6 +565,11 @@ a {
     <button type="button" class="popup-btn">
         <span class="material-icons">settings</span> Settings
     </button>
+
+    <!-- Button to trigger the modal -->
+   <button type="button" class="popup-btn" data-bs-toggle="modal" data-bs-target="#invitationsModal">
+       View Invitations
+   </button>
 </div>
 
 
@@ -613,6 +605,39 @@ a {
         </div>
     </div>
 </div>
+
+
+<!-- View Invitations -->
+
+<div class="modal fade" id="invitationsModal" tabindex="-1" aria-labelledby="invitationsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="invitationsModalLabel">Email Invitations</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Table to display the invitations -->
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Inviter</th>
+                            <th scope="col">Invitee Email</th>
+                            <th scope="col">Role</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Expires At</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invitationsTableBody">
+                        <!-- Invitations will be loaded here dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 
 
@@ -652,6 +677,72 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+
+
+
+// Fetch Invitations
+document.addEventListener("DOMContentLoaded", function () {
+    const orgId = "{{ organization.id }}";  // Pass organization ID dynamically
+    const invitationsTableBody = document.getElementById("invitationsTableBody");
+
+    // Fetch invitations for the organization when the modal is shown
+    const invitationsModal = document.getElementById("invitationsModal");
+    invitationsModal.addEventListener("show.bs.modal", async function () {
+        const response = await fetch(`/organizations/workspace-invitations/${orgId}/`);  // Update with actual URL
+        const data = await response.json();
+
+        // Clear the previous table data
+        invitationsTableBody.innerHTML = "";
+
+        // Get the current date
+        const now = new Date();
+
+        // Loop through the invitations and add them to the table
+        data.invitations.forEach(invitation => {
+            const expiresAt = new Date(invitation.expires_at);
+            const expirationText = now > expiresAt ? "Expired" : invitation.expires_at;
+
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${invitation.inviter}</td>
+                <td>${invitation.invitee_email}</td>
+                <td>${invitation.role}</td>
+                <td>${invitation.status}</td>
+                <td>${expirationText}</td>
+            `;
+
+            invitationsTableBody.appendChild(row);
+        });
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------
 // Handle Organization Section Buttons Pop Up
 document.addEventListener("DOMContentLoaded", function () {
     const manageMembersBtn = document.getElementById("manageMembersBtn");
