@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Organization Detail</title>
+    <!-- Bootstrap 5 CSS -->
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <!-- Google Fonts and Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -249,9 +252,18 @@ a {
             <a href="{% url 'view_edit_profile' org_id=organization.id %}">
                 <span class="material-icons">person</span> View/Edit Profile
             </a>
-            <a href="{% url 'edit_organization' organization.id %}">
-                <span class="material-icons">edit</span> Edit Organization
-            </a>
+
+            <!-- NEW FEATURES -->
+
+            <button type="button" class="font-semibold text-lg text-white mb-6" data-bs-toggle="modal" data-bs-target="#editOrgModal">
+                <span class="material-icons">person</span>Organization
+            </button>
+
+
+
+
+
+            
             <a href="{% url 'organization_availability' organization.id %}">
                 <span class="material-icons">schedule</span> Manage Availability
             </a>
@@ -409,9 +421,6 @@ a {
                 <span class="material-icons">person_add</span> My Calendar
             </a>
 
-
-
-            
             <div class="info-message">
                 <span class="material-icons">info</span>
                 You are an employee in this organization. No administrative actions are available.
@@ -513,6 +522,85 @@ a {
         </div>
     </div>
 </div>
+
+
+
+<!-- --------------------------------------------------------------------------------------------------------------- -->
+
+<!-- MODALS -->
+ <!-- Edit Organization -->
+
+<div class="modal fade" id="editOrgModal" tabindex="-1" aria-labelledby="editOrgModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editOrgModalLabel">Edit Organization</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editOrgForm">
+                    <div class="mb-3">
+                        <label for="orgName" class="form-label">Organization Name</label>
+                        <input type="text" class="form-control" id="orgName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="orgDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="orgDescription" rows="3"></textarea>
+                    </div>
+                     {% csrf_token %}
+                       <input type="hidden" id="orgId" value="{{ organization.id }}">
+
+                    <button type="submit" class="btn btn-success">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
+<!-- Bootstrap 5 JS Bundle (includes Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const editOrgForm = document.getElementById("editOrgForm");
+
+    editOrgForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const orgId = document.getElementById("orgId").value;
+        const name = document.getElementById("orgName").value;
+        const description = document.getElementById("orgDescription").value;
+
+        const csrfToken = document.querySelector("input[name='csrfmiddlewaretoken']").value;
+
+        const response = await fetch(`/organizations/modify-organization/${orgId}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken,
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: `name=${encodeURIComponent(name)}&description=${encodeURIComponent(description)}`,
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            alert("Organization updated successfully!");
+            location.reload(); // Reload page to reflect changes
+        } else {
+            alert(data.error);
+        }
+    });
+});
+
+
+
+
+</script>
+
+
 
 </body>
 </html>

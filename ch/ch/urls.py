@@ -40,6 +40,7 @@ urlpatterns = [
     path('tasks/',include('group_tasks.urls')),
     path('channels/',include('organization_channels.urls')),
     path('profiles/',include('profiles.urls')),
+    path('organizations/',include('organizations.urls')),
     # ui components
     path('styles/', views.styles, name= 'styles'),
     path('weather/',views.weather, name='weather'),

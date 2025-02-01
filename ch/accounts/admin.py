@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Availability, HolidayOrganization, HolidaySettings, HolidayType, MeetingOrganization, MeetingReminder, Agenda, MeetingNotes, EventOrganization, BookingOrganization
+from .models import Availability, HolidayOrganization, HolidaySettings, HolidayType, MeetingOrganization, MeetingReminder, Agenda, MeetingNotes, EventOrganization, BookingOrganization,Organization,Profile
 
 # Register your models here.
 admin.site.register(Availability)
@@ -12,3 +12,5 @@ admin.site.register(Agenda)
 admin.site.register(MeetingNotes)
 admin.site.register(EventOrganization)
 admin.site.register(BookingOrganization)
+admin.site.register(Organization)
+admin.site.register(Profile)

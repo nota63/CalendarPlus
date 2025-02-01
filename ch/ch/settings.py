@@ -57,6 +57,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 INSTALLED_APPS = [
     'profiles',
+    'organizations',
     'meet',
     'calendar_plus',
     'daphne',
