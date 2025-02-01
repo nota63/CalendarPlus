@@ -1,0 +1,118 @@
+<!-- Analytics Page -->
+<div class="container">
+    <h1>Analytics for {{ organization.name }}</h1>
+    
+    <div class="row">
+        <!-- Total Storage Used -->
+        <div class="col-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Storage Used</h5>
+                    <p>{{ total_storage_used }} items</p>
+                    <p><i class="bi bi-file-earmark"></i> Messages: {{ total_messages }} <br>
+                    <i class="bi bi-file-earmark-video"></i> Videos: {{ total_videos }} <br>
+                    <i class="bi bi-file-earmark-audio"></i> Audio: {{ total_audio }} <br>
+                    <i class="bi bi-link-45deg"></i> Links: {{ total_links }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Channels -->
+        <div class="col-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Channels</h5>
+                    <p>Total: {{ total_channels }}</p>
+                    <p><i class="bi bi-globe"></i> Public Channels: {{ public_channels }} <br>
+                    <i class="bi bi-lock"></i> Private Channels: {{ private_channels }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Messages Sent -->
+        <div class="col-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Messages Sent</h5>
+                    <p>{{ total_messages_sent }} messages</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Total Members -->
+        <div class="col-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Members</h5>
+                    <p>{{ total_members }} members</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Users -->
+        <div class="col-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Active Users</h5>
+                    <p>{{ active_users }} active users</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Events -->
+        <div class="col-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Events</h5>
+                    <p>{{ total_events }} events</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Total Meetings -->
+        <div class="col-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Meetings</h5>
+                    <p>{{ total_meetings }} meetings</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pinned Messages -->
+        <div class="col-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Pinned Messages</h5>
+                    <p>{{ total_pinned_messages }} pinned messages</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Starred Messages -->
+        <div class="col-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Starred Messages</h5>
+                    <p>{{ total_starred_messages }} starred messages</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Abused Messages -->
+        <div class="col-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Abused Messages</h5>
+                    <p>{{ total_abused_messages }} reported abused messages</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

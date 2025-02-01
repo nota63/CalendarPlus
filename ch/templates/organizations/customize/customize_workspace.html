@@ -55,11 +55,18 @@
         Update Organization Status
     </button>
 
-    <!-- Button to trigger profile edit modal -->
+    
      <!-- Button to trigger profile edit modal -->
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
     Accounts & Profile
 </button>
+
+<!-- Analytics -->
+<a href="{% url 'workspace_analytics' org_id=organization.id%}">
+    <button type="submit" class="btn btn-primary">
+        Analytics
+    </button>
+</a>
 
 
     

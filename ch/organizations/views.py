@@ -7,6 +7,11 @@ from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 import re
+from django.db.models import Count
+from organization_channels.models import Message, Link,Channel,ChannelEvents,ActivityChannel
+from accounts.models import MeetingOrganization
+
+
 # Create your views here.
 
 @csrf_exempt
@@ -188,3 +193,105 @@ def edit_profile(request, org_id):
 
 
 
+# Analytics Overview
+
+def organization_analytics(request, org_id):
+    try:
+        # Fetch the organization and check if it exists
+        organization = Organization.objects.get(id=org_id)
+        print(f"Organization {org_id} found: {organization.name}")
+
+        # 1. Total Storage Used (Messages, Videos, Audio, Links)
+        total_messages = Message.objects.filter(organization=organization)
+        print(f"Total messages: {total_messages.count()}")
+
+        total_videos = Message.objects.filter(organization=organization).exclude(video__isnull=True)
+        print(f"Total videos: {total_videos.count()}")
+
+        total_audio = Message.objects.filter(organization=organization).exclude(audio__isnull=True)
+        print(f"Total audio: {total_audio.count()}")
+
+        total_links = Link.objects.filter(organization=organization)
+        print(f"Total links: {total_links.count()}")
+
+        # Calculate total storage used
+        total_storage_used = total_messages.count() + total_videos.count() + total_audio.count() + total_links.count()
+        print(f"Total storage used: {total_storage_used}")
+
+        # 2. Total Channels (Public/Private)
+        total_channels = Channel.objects.filter(organization=organization)
+        print(f"Total channels: {total_channels.count()}")
+
+        public_channels = total_channels.filter(visibility='PUBLIC')
+        print(f"Public channels: {public_channels.count()}")
+
+        private_channels = total_channels.filter(visibility='PRIVATE')
+        print(f"Private channels: {private_channels.count()}")
+
+        # 3. Total Messages Sent in All Channels
+        total_messages_sent = total_messages.count()
+        print(f"Total messages sent: {total_messages_sent}")
+
+        # 4. Total Members (Profiles linked to the organization)
+        total_members = Profile.objects.filter(organization=organization).count()  
+        print(f"Total members: {total_members}")
+
+        # 5. Total Active Users (Users who sent messages or interacted)
+        active_users = total_messages.values('user').distinct().count()
+        print(f"Active users: {active_users}")
+
+        # 6. Total Events
+        total_events = ChannelEvents.objects.filter(organization=organization).count()
+        print(f"Total events: {total_events}")
+
+        # 7. Total Meetings
+        total_meetings = MeetingOrganization.objects.filter(organization=organization).count()
+        print(f"Total meetings: {total_meetings}")
+
+        # 8. Messages Pinned
+        total_pinned_messages = total_messages.filter(is_pinned=True).count()
+        print(f"Total pinned messages: {total_pinned_messages}")
+
+        # 9. Messages Starred
+        total_starred_messages = total_messages.filter(is_starred=True).count()
+        print(f"Total starred messages: {total_starred_messages}")
+
+        # 10. Abused Messages Reported
+        total_abused_messages = ActivityChannel.objects.filter(organization=organization, action_type='WARN').count()
+        print(f"Total abused messages: {total_abused_messages}")
+
+        # Debugging output to check all results
+        print(f"Context data: {locals()}")
+
+        # Render the template with context
+        context = {
+            'organization': organization,
+            'total_storage_used': total_storage_used,
+            'total_channels': total_channels.count(),
+            'public_channels': public_channels.count(),
+            'private_channels': private_channels.count(),
+            'total_messages_sent': total_messages_sent,
+            'total_members': total_members,
+            'active_users': active_users,
+            'total_events': total_events,
+            'total_meetings': total_meetings,
+            'total_pinned_messages': total_pinned_messages,
+            'total_starred_messages': total_starred_messages,
+            'total_abused_messages': total_abused_messages,
+        }
+
+        return render(request, 'organizations/analytics/analytics.html', context)
+
+    except Organization.DoesNotExist:
+        print(f"Organization with ID {org_id} does not exist.")
+        context = {
+            'error_message': "Organization not found."
+        }
+        return render(request, 'organizations/analytics/analytics.html', context)
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        context = {
+            'error_message': f"An error occurred: {str(e)}"
+        }
+        return render(request, 'organizations/analytics/analytics.html', context)
