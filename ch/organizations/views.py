@@ -10,7 +10,7 @@ import re
 from django.db.models import Count
 from organization_channels.models import Message, Link,Channel,ChannelEvents,ActivityChannel
 from accounts.models import MeetingOrganization
-
+from django.contrib.auth import authenticate
 
 # Create your views here.
 
@@ -418,7 +418,40 @@ def fetch_organization_members(request, org_id):
 
 
 
+# HANDLE TRANSFER OWNERSHIP
 
+@login_required
+def transfer_ownership(request, org_id, member_id):
+    if request.method == "POST":
+        
+        current_admin = get_object_or_404(Profile, organization_id=org_id, user=request.user, is_admin=True)
+        organization = get_object_or_404(Organization, id=org_id)
+        profile = get_object_or_404(Profile, user=request.user, organization=organization)
+        if not Profile.objects.filter(user=request.user, organization=organization, is_admin=True).exists():
+            return JsonResponse({"success": False, "error": "You are not authorized to update the workspace icon."}, status=403)
+
+        new_admin = get_object_or_404(Profile, organization_id=org_id, user_id=member_id)
+
+        # Validate password
+        password = request.POST.get("password")
+        if not authenticate(username=request.user.username, password=password):
+            return JsonResponse({"error": "Invalid password"}, status=400)
+
+        if new_admin.user == current_admin.user:
+            return JsonResponse({"error": "You cannot transfer ownership to yourself"}, status=400)
+
+        current_admin.is_admin = False
+        current_admin.is_manager = True  
+        current_admin.save()
+
+        new_admin.is_admin = True
+        new_admin.is_manager = False
+        new_admin.is_employee = False
+        new_admin.save()
+
+        return JsonResponse({"success": "Ownership transferred successfully"})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 
 

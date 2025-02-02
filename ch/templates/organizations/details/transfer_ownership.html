@@ -1,6 +1,17 @@
 {% extends 'custom.html' %}
 
 {% block content %}
+
+
+<!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap 5 JS Bundle (includes Popper.js) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
+
+
 <div class="container mt-4">
     <h2>Transfer Ownership - {{ organization.name }}</h2>
     
@@ -50,8 +61,96 @@
         </tbody>
     </table>
 </div>
+<!-- -------------------------------------------------------------------------------------------------------------------- -->
 
+<!-- Modals -->
+
+<!-- Transfer ownership -->
+
+<!-- Transfer Ownership Modal -->
+<div class="modal fade" id="transferOwnershipModal" tabindex="-1" aria-labelledby="transferOwnershipLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="transferOwnershipLabel">Transfer Ownership</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to transfer ownership? This action cannot be undone.</p>
+                <input type="password" id="adminPassword" class="form-control" placeholder="Enter your password">
+                <input type="hidden" id="selectedUserId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmTransferBtn">Confirm Transfer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ------------------------------------------------------------------------------------------------------------ -->
 <script>
+
+document.addEventListener("DOMContentLoaded", function () {
+    let selectedUserId = null;
+
+    // Open modal and set selected user ID
+    document.querySelectorAll(".transfer-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            selectedUserId = this.getAttribute("data-user-id");
+            document.getElementById("selectedUserId").value = selectedUserId;
+            new bootstrap.Modal(document.getElementById("transferOwnershipModal")).show();
+        });
+    });
+
+    // Handle confirm transfer click
+    document.getElementById("confirmTransferBtn").addEventListener("click", function () {
+        const orgId = "{{ organization.id }}";  // Pass the org_id dynamically
+        const password = document.getElementById("adminPassword").value;
+        const userId = document.getElementById("selectedUserId").value;
+
+        if (!password) {
+            alert("Please enter your password.");
+            return;
+        }
+
+        fetch(`/organizations/transfer-ownership/${orgId}/${userId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": "{{ csrf_token }}"  // Pass CSRF token dynamically
+            },
+            body: new URLSearchParams({ password })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Ownership transferred successfully!");
+                window.location.reload();  // Reload the page after success
+            } else {
+                alert(data.error || "Something went wrong!");
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+});
+
+
+
 
 </script>
 
