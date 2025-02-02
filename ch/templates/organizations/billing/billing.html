@@ -1,0 +1,466 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing - {{ organization.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4A154B;
+            --secondary-color: #611F69;
+            --accent-color: #E8E8E8;
+            --text-primary: #1A1A1A;
+            --text-secondary: #616061;
+            --success-color: #2BAC76;
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            color: var(--text-primary);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .nav-tabs {
+            border-bottom: 2px solid var(--accent-color);
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            border: none;
+            padding: 1rem 0;
+            font-weight: 500;
+            transition: color var(--transition-speed) ease;
+            position: relative;
+        }
+
+        .nav-link.active {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .card-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .card-section:hover {
+            transform: translateY(-2px);
+        }
+
+        .upgrade-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upgrade-card::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .btn-upgrade {
+            background: white;
+            color: var(--primary-color);
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: transform var(--transition-speed) ease;
+        }
+
+        .btn-upgrade:hover {
+            transform: translateY(-2px);
+            background: white;
+            color: var(--secondary-color);
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 0.75rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .feature-list i {
+            color: var(--success-color);
+            font-size: 1.25rem;
+        }
+
+        .member-card {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            transition: background-color var(--transition-speed) ease;
+        }
+
+        .member-card:hover {
+            background-color: var(--accent-color);
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+        }
+
+        .modal-header {
+            background: var(--primary-color);
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .form-control {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 2px solid var(--accent-color);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: none;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            background: var(--success-color);
+            color: white;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-pane {
+            animation: fadeIn 0.3s ease;
+        }
+
+        .no-history {
+            text-align: center;
+            padding: 4rem 0;
+            color: var(--text-secondary);
+        }
+
+        .no-history i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 0 1rem;
+            }
+            
+            .nav-tabs {
+                gap: 0.5rem;
+            }
+            
+            .nav-link {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <h1 class="mb-4 fw-bold">Billing Management</h1>
+        
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs" id="billingTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button">Overview</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button">History</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="contacts-tab" data-bs-toggle="tab" data-bs-target="#contacts" type="button">Contacts</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="payment-methods-tab" data-bs-toggle="tab" data-bs-target="#payment_methods" type="button">Payment Methods</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="member-changes-tab" data-bs-toggle="tab" data-bs-target="#member_changes" type="button">Member Activity</button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content mt-4">
+            <!-- Overview Tab -->
+            <div class="tab-pane fade show active" id="overview">
+                <div class="upgrade-card">
+                    <h3 class="mb-3">Free Plan</h3>
+                    <p class="mb-4">Upgrade to unlock premium features and enhanced capabilities</p>
+                    <button class="btn-upgrade">Upgrade to Pro →</button>
+                </div>
+
+                <div class="card-section">
+                    <h4 class="mb-4">Plan Features</h4>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i>Basic message and file history</li>
+                        <li><i class="fas fa-check-circle"></i>Limited apps and workflows</li>
+                        <li><i class="fas fa-check-circle"></i>Standard collaboration features</li>
+                        <li><i class="fas fa-check-circle"></i>Basic support</li>
+                    </ul>
+                    <div class="mt-4 text-muted">
+                        <small>* Messages and files older than 1 year are automatically archived</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div class="tab-pane fade" id="history">
+                <div class="no-history">
+                    <i class="fas fa-file-invoice"></i>
+                    <h4 class="mt-3">No Billing History Available</h4>
+                    <p class="text-muted mt-2">Your payment records will appear here once you start making transactions</p>
+                </div>
+            </div>
+
+            <!-- Contacts Tab -->
+            <div class="tab-pane fade" id="contacts">
+                <div class="card-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4>Billing Contacts</h4>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPaymentContactModal">
+                            <i class="fas fa-plus me-2"></i>Add Contact
+                        </button>
+                    </div>
+
+
+
+                    <div class="container mt-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <p class="text-muted mb-4">
+                                    Billing emails will be sent to <strong class="text-dark">{{request.user.email}}</strong>
+                                </p>
+                                
+                                <div class="mb-4">
+                                    <p class="text-muted mb-3">
+                                        You may add additional payment contacts to receive copies of all billing-related emails. 
+                                        Payment contacts may be able to see certain workspace details, including the name and 
+                                        email of the primary owner and the person who added them as a payment contact.
+                                    </p>
+                                    
+                                    <div class="slack-note p-3 mb-3 rounded" 
+                                         style="background-color: #f8f8f8; border-left: 4px solid #4A154B;">
+                                        <p class="text-muted mb-0">
+                                            <span class="fw-bold">Note:</span> Only certain Calendar Plus users can make billing and 
+                                            payment changes. For the best experience, consider adding the person who will 
+                                            actively manage billing as a workspace owner so that they can make billing changes 
+                                            as needed. Or, ensure that they know who to contact to make changes.
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="member-card">
+                        <div class="avatar">
+                            {{ user.username|slice:":1"|upper }}
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="mb-0">{{ user.username }} <span class="badge bg-primary ms-2">Primary Owner</span></h6>
+                            <small class="text-muted">{{ billing_email }}</small>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info mt-4">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Payment contacts will receive billing-related communications and may view workspace details.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Methods Tab -->
+            <div class="tab-pane fade" id="payment_methods">
+                <div class="card-section">
+                    <h4 class="mb-4">Payment Methods</h4>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Please add your organization's billing address in settings to enable payment methods.
+                    </div>
+                    <div class="text-center py-5">
+                        <i class="fas fa-credit-card fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No payment methods available</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Member Changes Tab -->
+            <div class="tab-pane fade" id="member_changes">
+                <div class="card-section">
+                    <h4 class="mb-4">Recent Member Activity</h4>
+                    {% for change in member_changes %}
+                    <div class="member-card">
+                        <div class="avatar">
+                            {% if change.profile_picture %}
+                            <img src="{{ change.profile_picture }}" class="avatar-img" alt="{{ change.name }}">
+                            {% else %}
+                            {{ change.name|slice:":1"|upper }}
+                            {% endif %}
+                        </div>
+                        <div class="ms-3 flex-grow-1">
+                            <h6 class="mb-0">{{ change.name }}</h6>
+                            <small class="text-muted">{{ change.email }}</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-muted small">{{ change.date }}</div>
+                            <div class="status-badge">{{ change.status|title }}</div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-users-slash fa-2x text-muted mb-3"></i>
+                        <p class="text-muted">No recent member activity</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Payment Contact Modal -->
+        <div class="modal fade" id="addPaymentContactModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add Payment Contact</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="paymentContactForm">
+                            <div class="mb-3">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" class="form-control" placeholder="contact@example.com" required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" form="paymentContactForm" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Contact
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Form submission handling
+            document.getElementById('paymentContactForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = this.querySelector('input').value;
+                if (email) {
+                    // Simulate API call
+                    setTimeout(() => {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('addPaymentContactModal'));
+                        modal.hide();
+                        showToast('Contact added successfully!');
+                    }, 500);
+                }
+            });
+
+            function showToast(message) {
+                const toast = document.createElement('div');
+                toast.className = 'toast-alert fixed-bottom mb-4 ms-4';
+                toast.innerHTML = `
+                    <div class="alert alert-success d-flex align-items-center">
+                        <i class="fas fa-check-circle me-2"></i>
+                        ${message}
+                    </div>
+                `;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            }
+
+            // Tab activation effects
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function() {
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
+{% endblock %}

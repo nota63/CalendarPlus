@@ -620,3 +620,41 @@ def extend_invitation_expiry(request, org_id, invitation_id):
             return JsonResponse({"error": f"Error: {str(e)}"}, status=500)
 
     return JsonResponse({"error": "Invalid request method."}, status=400)
+
+
+
+# Billing section
+from datetime import datetime
+
+
+@login_required
+def workspace_billing(request, org_id):
+    organization = get_object_or_404(Organization, id=org_id)
+
+    # Check if the user has access to the organization
+    if not Profile.objects.filter(user=request.user, organization=organization).exists():
+        return render(request, 'organizations/no_access.html')
+
+    # Fetch all members for "Member Changes" section
+    members = Profile.objects.filter(organization=organization)
+
+    # Generate dummy activity logs for now (can be replaced with real tracking later)
+    member_changes = [
+        {
+            "name": member.user.username,
+            "email": member.user.email,
+            "profile_picture": member.profile_picture.url if member.profile_picture else None,
+            "date": datetime.now().strftime("%B %Y"),  # Example: "January 2025"
+            "status": "was detected as active"
+        }
+        for member in members
+    ]
+
+    context = {
+        "organization": organization,
+        "billing_email": request.user.email,
+        "members": members,
+        "member_changes": member_changes
+    }
+
+    return render(request, "organizations/billing/billing.html", context)

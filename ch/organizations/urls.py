@@ -18,7 +18,9 @@ urlpatterns=[
     path('workspace_groups/<int:org_id>/',fetch_organization_groups, name='workspace_groups'),
     path('workspace_invitations_admin/<int:org_id>/',view_invitations, name='workspace_invitations_admin'),
     path('organizations/<int:org_id>/invitations/<int:invitation_id>/delete/', delete_invitation, name='delete_invitation'),
-    path('organizations/<int:org_id>/invitations/<int:invitation_id>/extend/',extend_invitation_expiry,name='extend_invitation_expiry')
+    path('organizations/<int:org_id>/invitations/<int:invitation_id>/extend/',extend_invitation_expiry,name='extend_invitation_expiry'),
+    path('workspace_billing/<int:org_id>/',workspace_billing, name='workspace_billing'),
+    
 ]
 
 
