@@ -20,6 +20,7 @@ urlpatterns=[
     path('organizations/<int:org_id>/invitations/<int:invitation_id>/delete/', delete_invitation, name='delete_invitation'),
     path('organizations/<int:org_id>/invitations/<int:invitation_id>/extend/',extend_invitation_expiry,name='extend_invitation_expiry'),
     path('workspace_billing/<int:org_id>/',workspace_billing, name='workspace_billing'),
+    path('workflows/<int:org_id>/',workflow_template, name='workflows'),
     
 ]
 

@@ -765,8 +765,8 @@ a {
                     <span class="material-icons text-slack-red">person</span>
                 </div>
                 <div>
-                    <p class="text-sm text-slack-gray font-medium mb-1">Created By</p>
-                    <p class="text-slack-dark font-medium">{{ organization.created_by }}</p>
+                    <p class="text-sm text-slack-gray font-medium mb-1">Owner & Administrator</p>
+                    <p class="text-slack-dark font-medium">{{ organization.created_by.get_full_name }}</p>
                 </div>
             </div>
         </div>
@@ -823,6 +823,21 @@ a {
             Customize {{organization.name}}
         </button>
     </a>
+
+
+    <a href="{% url 'workflows' org_id=organization.id%}" 
+    class="text-decoration-none">
+     <button type="submit" 
+             class="popup-btn btn w-100 text-start d-flex align-items-center gap-3 px-3 py-2"
+             style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                    color: #1d1c1d;
+                    font-size: 15px;
+                    transition: background-color 0.2s ease;
+                    border-radius: 4px;">
+         <span class="material-icons" style="font-size: 18px; color: #616061;">settings</span>
+         Workflows & Templates
+     </button>
+ </a>
 </div>
 
 

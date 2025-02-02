@@ -316,6 +316,7 @@ class OrgDetailView(LoginRequiredMixin, View):
             'is_admin': is_admin,
             'is_manager': is_manager,
             'is_employee': is_employee,
+          
         }
         return render(request, self.template_name, context)
     

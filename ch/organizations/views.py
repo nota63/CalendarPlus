@@ -658,3 +658,11 @@ def workspace_billing(request, org_id):
     }
 
     return render(request, "organizations/billing/billing.html", context)
+
+
+
+# Workflow and templates
+
+def workflow_template(request, org_id):
+    organization=get_object_or_404(Organization, id=org_id)
+    return render(request, 'organizations/billing/workflows.html',{'organization':organization})
