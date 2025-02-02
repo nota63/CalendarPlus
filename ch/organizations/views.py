@@ -207,6 +207,10 @@ def organization_analytics(request, org_id):
     try:
         # Fetch the organization and check if it exists
         organization = Organization.objects.get(id=org_id)
+        profile = get_object_or_404(Profile, user=request.user, organization=organization)
+        if not Profile.objects.filter(user=request.user, organization=organization, is_admin=True).exists():
+            return JsonResponse({"success": False, "error": "You are not authorized to update the workspace icon."}, status=403)
+
         print(f"Organization {org_id} found: {organization.name}")
 
         # 1. Total Storage Used (Messages, Videos, Audio, Links)
@@ -332,6 +336,10 @@ def organization_details(request, org_id):
         # Fetch the organization by ID
         print(f"Fetching organization with ID: {org_id}")
         organization = Organization.objects.get(id=org_id)
+        profile = get_object_or_404(Profile, user=request.user, organization=organization)
+        if not Profile.objects.filter(user=request.user, organization=organization, is_admin=True).exists():
+            return JsonResponse({"success": False, "error": "You are not authorized to update the workspace icon."}, status=403)
+
         print(f"Organization fetched: {organization.name}")
 
         # Fetch the admin profile for the organization
@@ -382,3 +390,39 @@ def organization_details(request, org_id):
             'error_message': f"An error occurred: {str(e)}"
         }
         return render(request, 'organizations/details/organization_details.html', context)
+
+
+# Transfer ownership
+
+@login_required
+def fetch_organization_members(request, org_id):
+   
+    organization = get_object_or_404(Organization, id=org_id)
+
+    profile = get_object_or_404(Profile, user=request.user, organization=organization)
+    if not Profile.objects.filter(user=request.user, organization=organization, is_admin=True).exists():
+            return JsonResponse({"success": False, "error": "You are not authorized to update the workspace icon."}, status=403)
+
+
+    
+    current_admin = get_object_or_404(Profile, user=request.user, organization=organization, is_admin=True)
+
+    members = Profile.objects.filter(organization=organization).select_related('user')
+
+    context = {
+        'organization': organization,
+        'members': members
+    }
+
+    return render(request, 'organizations/details/transfer_ownership.html', context)
+
+
+
+
+
+
+
+
+
+
+

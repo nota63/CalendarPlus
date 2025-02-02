@@ -140,6 +140,30 @@
                 display: none;
             }
         }
+
+
+        .fs-13 { font-size: 13px; }
+    .modal-content { border: none; box-shadow: 0 0 12px rgba(0,0,0,0.15); }
+    .btn:hover { background-color: #4a154b; color: white; }
+    .file-upload-area:hover { border-color: #611f69; background-color: rgba(97,31,105,0.05); }
+
+    .fs-13 { font-size: 13px; }
+    .modal-content { border: none; box-shadow: 0 0 12px rgba(0,0,0,0.15); }
+    .btn:hover { background-color: #4a154b !important; color: white !important; }
+    .status-pill:hover { border-color: #611f69 !important; color: #611f69 !important; }
+    .form-select:focus { border-color: #611f69; box-shadow: 0 0 0 2px rgba(97,31,105,0.2); }
+    .status-pill.active { background-color: #611f69 !important; color: white !important; border-color: #611f69 !important; }
+
+    .slack-input:focus {
+        border-color: #611f69;
+        box-shadow: 0 0 0 2px rgba(97,31,105,0.2);
+    }
+    .btn-avatar-edit:hover {
+        background-color: #f8f8f8 !important;
+    }
+    .fs-13 { font-size: 13px; }
+    .modal-content { border: none; box-shadow: 0 0 12px rgba(0,0,0,0.15); }
+    .btn:hover { background-color: #4a154b !important; color: white !important; }
     </style>
 </head>
 <body>
@@ -241,9 +265,13 @@
                                     <p class="text-muted small mb-2">
                                         Transfer workspace ownership to another member or delete the workspace.
                                     </p>
-                                    <button class="btn btn-sm btn-outline-danger">
-                                        Transfer Ownership
-                                    </button>
+
+                                    <a href="{% url 'workspace_members' org_id=organization.id%}">
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            Transfer Ownership
+                                        </button>
+                                    </a>
+                    
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -264,148 +292,243 @@
         </main>
     </div>
 
-    <!-- Modals (Keep your existing modal HTML, styled with new CSS) -->
+<!-- Modals (Keep your existing modal HTML, styled with new CSS)--------------------- -->
     <!-- Update Icon Modal -->
     <div class="modal fade" id="updateIconModal" tabindex="-1" aria-labelledby="updateIconModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="updateIconModalLabel">Update Workspace Icon</h5>
-                    <p>
-                        Workspace icon guidelines
-    Your workspace icon is a way for you to visually identify the Django workspace. It’s used in the desktop and mobile apps, as well as on your workspace admin site. It’s most helpful when you’re active on multiple Slack workspaces.
-    
-    Some tips on choosing a good icon:
-    
-    Use a solid background colour.
-    Use a graphical logo or image rather than text.
-    Leave some space around your icon.
-    Upload an image that is 132 px square or larger.
-                    </p>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 8px;">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fs-5 fw-bold" id="updateIconModalLabel">Update Workspace Icon</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <form id="updateIconForm">
-                        <div class="mb-3">
-                            <label for="workspaceIcon" class="form-label">Choose an Image</label>
-                            <input type="file" class="form-control" id="workspaceIcon" accept="image/*" required>
+                <div class="modal-body pt-0">
+                    <div class="slack-guidelines mb-4 p-3" style="background-color: #f8f8f8; border-radius: 8px;">
+                        <p class="text-muted fs-13 mb-2 fw-semibold">Workspace icon guidelines</p>
+                        <ul class="list-unstyled fs-13 text-muted mb-0">
+                            <li class="mb-2 d-flex align-items-start">
+                                <i class="fas fa-check-circle me-2 mt-1" style="color: #611f69; font-size: 14px;"></i>
+                                Use a solid background color with good contrast
+                            </li>
+                            <li class="mb-2 d-flex align-items-start">
+                                <i class="fas fa-check-circle me-2 mt-1" style="color: #611f69; font-size: 14px;"></i>
+                                Prefer graphical logos over text-based designs
+                            </li>
+                            <li class="mb-2 d-flex align-items-start">
+                                <i class="fas fa-check-circle me-2 mt-1" style="color: #611f69; font-size: 14px;"></i>
+                                Maintain clear spacing around the edges
+                            </li>
+                            <li class="d-flex align-items-start">
+                                <i class="fas fa-check-circle me-2 mt-1" style="color: #611f69; font-size: 14px;"></i>
+                                Upload image (132px square minimum, PNG/JPG)
+                            </li>
+                        </ul>
+                    </div>
+    
+                    <form id="updateIconForm" class="mb-4">
+                        <div class="file-upload-area text-center p-4" 
+                             style="border: 2px dashed #ddd; border-radius: 8px; cursor: pointer;"
+                             onclick="document.getElementById('workspaceIcon').click()">
+                            <i class="fas fa-cloud-upload-alt fa-2x mb-3" style="color: #611f69;"></i>
+                            <p class="mb-0 fw-semibold" style="color: #611f69;">Choose an image file</p>
+                            <p class="text-muted fs-13 mt-1">or drag and drop here</p>
+                            <input type="file" class="form-control d-none" id="workspaceIcon" accept="image/*" required>
                         </div>
-                        <button type="submit" class="btn btn-success">Upload</button>
+                        <button type="submit" class="btn w-100 mt-3" 
+                                style="background-color: #611f69; color: white; border-radius: 4px; font-weight: 500;">
+                            Upload Icon
+                        </button>
                     </form>
-                    <div id="iconPreview" class="mt-3 text-center">
-                        {% if organization.icon %}
-                           <img id="currentIcon" src="{{ organization.icon.url }}" alt="Workspace Icon" class="img-fluid rounded" style="max-width: 100px;">
-                        {% endif %}   
+    
+                    <div class="current-icon-section text-center">
+                        <p class="text-muted fs-13 mb-2 fw-semibold">Current Icon Preview</p>
+                        <div class="d-inline-block p-2" style="background-color: #f8f8f8; border-radius: 12px;">
+                            {% if organization.icon %}
+                            <img id="currentIcon" src="{{ organization.icon.url }}" alt="Workspace Icon" 
+                                 class="img-fluid rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                            {% else %}
+                            <div class="d-flex align-items-center justify-content-center rounded-circle" 
+                                 style="width: 80px; height: 80px; background-color: #ddd;">
+                                <i class="fas fa-building fs-4" style="color: #666;"></i>
+                            </div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-
-
     <!-- Update Status Modal -->
     <div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
-       
-        
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="updateStatusModalLabel">Update Organization Status</h5>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 8px;">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fs-5 fw-bold" id="updateStatusModalLabel">Update {{ organization.name }} Status</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body pt-0">
+                    <div class="slack-guidelines mb-4">
+                        <p class="text-muted fs-13 mb-3">
+                            <i class="fas fa-info-circle me-2" style="color: #611f69;"></i>
+                            Anyone can write their own status description. Customize these suggestions for your workspace.
+                        </p>
+                    </div>
+    
                     <form id="updateStatusForm">
-                        <label for="statusSelect" class="form-label">Select Status</label>
-                        <select class="form-select" id="statusSelect">
-                            <option value="working_remotely">Working Remotely</option>
-                            <option value="in_a_meeting">In A Meeting</option>
-                            <option value="off_sick">Off Sick</option>
-                            <option value="on_holiday">On Holiday</option>
-                        </select>
-                        <div class="mt-3">
-                            <button type="submit" class="btn btn-success">Update</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Profile Edit Modal -->
-    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editProfileForm">
-                        <!-- Full Name -->
-                        <div class="mb-3">
-                            <label for="full_name" class="form-label">Full Name</label>
-                            <input type="text" class="form-control" id="full_name" required>
-                        </div>
-                        <!-- Profile Picture Preview -->
-                        <div class="mb-3">
-                            <label for="profile_picture" class="form-label">Profile Picture</label>
-                            <input type="file" class="form-control" id="profile_picture">
-                            <div id="profile_picture_preview" class="mt-3">
-                                <img id="profile_picture_img" src="" alt="Profile Picture Preview" style="max-width: 100px; max-height: 100px;" />
+                        <div class="mb-4">
+                            <label for="statusSelect" class="form-label fw-semibold fs-13 mb-2">Select Status</label>
+                            <div class="dropdown-wrapper position-relative">
+                                <select class="form-select ps-3" id="statusSelect" 
+                                        style="height: 40px; border-radius: 6px; border-color: #ddd;"
+                                        aria-label="Status selection">
+                                    <option value="working_remotely">🏠 Working Remotely</option>
+                                    <option value="in_a_meeting">📅 In A Meeting</option>
+                                    <option value="off_sick">🤒 Off Sick</option>
+                                    <option value="on_holiday">🌴 On Holiday</option>
+                                </select>
+                                <i class="fas fa-chevron-down position-absolute" 
+                                   style="right: 15px; top: 50%; transform: translateY(-50%); color: #616061;"></i>
                             </div>
                         </div>
+    
+                        <div class="suggested-statuses mb-4">
+                            <p class="text-muted fs-13 fw-semibold mb-2">Suggested Statuses</p>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button type="button" class="status-pill btn btn-outline-secondary rounded-pill px-3 py-1 fs-13"
+                                        data-value="working_remotely">
+                                    🏠 Working Remotely
+                                </button>
+                                <button type="button" class="status-pill btn btn-outline-secondary rounded-pill px-3 py-1 fs-13"
+                                        data-value="in_a_meeting">
+                                    📅 In a Meeting
+                                </button>
+                                <button type="button" class="status-pill btn btn-outline-secondary rounded-pill px-3 py-1 fs-13"
+                                        data-value="off_sick">
+                                    🤒 Out Sick
+                                </button>
+                                <button type="button" class="status-pill btn btn-outline-secondary rounded-pill px-3 py-1 fs-13"
+                                        data-value="on_holiday">
+                                    🌴 On Vacation
+                                </button>
+                            </div>
+                        </div>
+    
+                        <button type="submit" class="btn w-100 mt-2"
+                                style="background-color: #611f69; color: white; border-radius: 4px; font-weight: 500; padding: 10px;">
+                            Update Status
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <!-- Profile Edit Modal -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 8px;">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fs-5 fw-bold" id="editProfileModalLabel">Edit Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pt-0">
+                    <form id="editProfileForm">
+                        <!-- Profile Picture -->
+                        <div class="mb-4 text-center">
+                            <div class="avatar-upload position-relative d-inline-block">
+                                <div class="avatar-preview rounded-circle overflow-hidden" 
+                                     style="width: 100px; height: 100px; border: 2px solid #ddd;">
+                                    <img id="profile_picture_img" src="" alt="Profile Preview" 
+                                         class="img-fluid h-100 w-100 object-fit-cover">
+                                </div>
+                                <label for="profile_picture" class="btn-avatar-edit position-absolute bottom-0 end-0 bg-white rounded-circle p-2 shadow-sm"
+                                       style="width: 32px; height: 32px;">
+                                    <i class="fas fa-camera" style="font-size: 14px; color: #616061;"></i>
+                                </label>
+                                <input type="file" class="d-none" id="profile_picture" accept="image/*">
+                            </div>
+                        </div>
+    
+                        <!-- Full Name -->
+                        <div class="mb-4">
+                            <label for="full_name" class="form-label fw-semibold fs-13 mb-2">Full Name</label>
+                            <input type="text" class="form-control slack-input" id="full_name" required
+                                   style="border-radius: 6px; padding: 8px 12px;">
+                        </div>
+    
                         <!-- Email -->
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" required>
+                        <div class="mb-4">
+                            <label for="email" class="form-label fw-semibold fs-13 mb-2">Email</label>
+                            <input type="email" class="form-control slack-input" id="email" required
+                                   style="border-radius: 6px; padding: 8px 12px;">
                         </div>
     
-                        <div>
-                            <strong>Time Zone</strong>
-                            <p>
-                                Calendar Plus uses your time zone to send summary and notification emails, for times in your activity feeds and for reminders. Your time zone is currently set to: (UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi.
-                            </p>
-                        </div>
-                        <br>
-                        <div>
-                            <strong>
-                                Sign out of all other sessions
-                            </strong>
-                            <p>
-                                Lost your phone? Left yourself logged in on a public computer? Need a way to sign out from everywhere except your current browser? Then this is for you.
-                                <a href="{% url 'logout' %}">
-                                    <button type="submit" class="btn btn-primary">
-                                        Sign out of all other sessions
-                                    </button>
-                                </a>
-                            </p>
+                        <!-- Time Zone -->
+                        <div class="mb-4 p-3" style="background-color: #f8f8f8; border-radius: 8px;">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-clock me-2 mt-1" style="color: #616061; font-size: 14px;"></i>
+                                <div>
+                                    <p class="fw-semibold fs-13 mb-1">Time Zone</p>
+                                    <p class="text-muted fs-13 mb-0">
+                                        (UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi<br>
+                                        <span class="text-muted">Used for notifications and scheduling</span>
+                                    </p>
+                                </div>
+                            </div>
                         </div>
     
-                        <div>
-                            <strong>
-                                Deactivate Account!
-                            </strong>
-                            <p>
-                                You’re the primary owner of {{organization.name}}, so you can’t deactivate your account
-                            </p>
-                            <p>
-                                You can <a href="#">Transfer Ownership</a>to another member or <a href="#">
-                                    Delete the workspace
-                                </a>
-                            </p>
+                        <!-- Session Management -->
+                        <div class="mb-4 p-3" style="background-color: #f8f8f8; border-radius: 8px;">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-sign-out-alt me-2 mt-1" style="color: #616061; font-size: 14px;"></i>
+                                <div>
+                                    <p class="fw-semibold fs-13 mb-2">Sign out of all other sessions</p>
+                                    <p class="text-muted fs-13 mb-3">
+                                        Lost your phone? Left yourself logged in on a public computer? 
+                                        Secure your account by signing out everywhere except this browser.
+                                    </p>
+                                    <a href="{% url 'logout' %}" class="btn btn-sm w-100" 
+                                       style="background-color: #611f69; color: white; border-radius: 4px;">
+                                        Sign Out Everywhere Else
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
+    
+                        <!-- Account Management -->
+                        <div class="p-3" style="background-color: #fdf2f2; border-radius: 8px;">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-exclamation-triangle me-2 mt-1" style="color: #c23628; font-size: 14px;"></i>
+                                <div>
+                                    <p class="fw-semibold fs-13 mb-1 text-danger">Account Management</p>
+                                    <p class="text-muted fs-13 mb-2">
+                                        As primary owner of {{organization.name}}, you can't deactivate your account.
+                                    </p>
+                                    <div class="d-flex gap-2 fs-13">
+                                        <a href="#" class="text-decoration-none fw-semibold" style="color: #611f69;">
+                                            Transfer Ownership
+                                        </a>
+                                        <span class="text-muted">|</span>
+                                        <a href="#" class="text-decoration-none fw-semibold" style="color: #611f69;">
+                                            Delete Workspace
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+    
+                        <!-- Save Button -->
+                        <button type="submit" class="btn w-100 mt-4" 
+                                style="background-color: #611f69; color: white; border-radius: 4px; padding: 10px;">
+                            Save Changes
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
     
-    
-    
-    </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   
 

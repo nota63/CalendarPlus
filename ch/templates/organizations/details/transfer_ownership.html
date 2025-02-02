@@ -1,0 +1,58 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Transfer Ownership - {{ organization.name }}</h2>
+    
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Profile Picture</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for member in members %}
+            <tr>
+                <td>
+                    {% if member.profile_picture %}
+                        <img src="{{ member.profile_picture.url }}" alt="Profile" width="40" height="40" class="rounded-circle">
+                    {% else %}
+                        <img src="/static/default_profile.png" alt="Default Profile" width="40" height="40" class="rounded-circle">
+                    {% endif %}
+                </td>
+                <td>{{ member.user.username }}</td>
+                <td>{{ member.user.email }}</td>
+                <td>
+                    {% if member.is_admin %}
+                        <span class="badge bg-danger">Admin</span>
+                    {% elif member.is_manager %}
+                        <span class="badge bg-warning">Manager</span>
+                    {% else %}
+                        <span class="badge bg-primary">Employee</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if not member.is_admin %}
+                        <button class="btn btn-sm btn-outline-danger transfer-btn"
+                                data-user-id="{{ member.user.id }}">
+                            Transfer Ownership
+                        </button>
+                    {% else %}
+                        <span class="text-muted">Current Owner</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+
+</script>
+
+{% endblock %}

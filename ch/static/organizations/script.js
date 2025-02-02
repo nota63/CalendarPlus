@@ -144,3 +144,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+// WORKSPACE STATUS BUTTONS FEATURES
+document.querySelectorAll('.status-pill').forEach(button => {
+    button.addEventListener('click', function() {
+        document.querySelectorAll('.status-pill').forEach(btn => btn.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById('statusSelect').value = this.dataset.value;
+    });
+});
