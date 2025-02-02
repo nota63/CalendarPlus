@@ -298,6 +298,26 @@
                                     </a>
                                 </div>
                             </div>
+
+
+
+                            <h5 class="mb-4"><i class="material-icons-round me-2 text-primary">admin_panel_settings</i>Invitations</h5>
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="border-bottom pb-3">
+                                        <h6>Invitations</h6>
+                                        <p class="text-muted small mb-2">
+                                          Track your invitations and keep an eye to whom your manager invited to join {{organization.name}}
+                                        </p>
+    
+                                        <a href="{% url 'workspace_invitations_admin' org_id=organization.id%}">
+                                            <button class="btn btn-sm btn-outline-danger">
+                                                {{organization.name}} Invitations
+                                            </button>
+                                        </a>
+                        
+                                    </div>
+                                </div>
                         </div>
                     </div>
                 </div>

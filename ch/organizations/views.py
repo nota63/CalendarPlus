@@ -519,4 +519,68 @@ def fetch_organization_groups(request, org_id):
 
 
 
+# VIEW INVITATIONS
+from django.utils import timezone
+
+
+@login_required
+def view_invitations(request, org_id):
+  
+    organization = get_object_or_404(Organization, id=org_id)
+    profile = get_object_or_404(Profile, user=request.user, organization=organization)
+    if not Profile.objects.filter(user=request.user, organization=organization, is_admin=True).exists():
+        return JsonResponse({"success": False, "error": "You are not authorized to view the groups."}, status=403)
+
+    
+   
+    if not Profile.objects.filter(user=request.user, organization=organization).exists():
+        return JsonResponse({"error": "You are not a member of this organization"}, status=403)
+
+ 
+    invitations = EmailInvitation.objects.filter(organization=organization)
+
+    
+    accepted_invitations = invitations.filter(status='accepted')
+    rejected_invitations = invitations.filter(status='rejected')
+    pending_invitations = invitations.filter(status='pending')
+    expired_invitations = invitations.filter(expires_at__lt=timezone.now(), status='pending')
+
+ 
+    search_email = request.GET.get('search_email', '')
+    if search_email:
+        invitations = invitations.filter(invitee_email__icontains=search_email)
+    else:
+        invitations = invitations.all()
+
+    context = {
+        'organization': organization,
+        'accepted_invitations': accepted_invitations,
+        'rejected_invitations': rejected_invitations,
+        'pending_invitations': pending_invitations,
+        'expired_invitations': expired_invitations,
+        'search_email': search_email
+    }
+
+    return render(request, 'organizations/invitations/view_invitations.html', context)
+
+
+# PREVENT INVITATIONS
+
+@login_required
+def delete_invitation(request, org_id, invitation_id):
+    if request.method == "POST":
+        organization = get_object_or_404(Organization, id=org_id)
+        
+        # Ensure the user is an admin
+        if not Profile.objects.filter(user=request.user, organization=organization, is_admin=True).exists():
+            return JsonResponse({"success": False, "error": "You are not authorized to delete invitations."}, status=403)
+
+        invitation = get_object_or_404(EmailInvitation, id=invitation_id, organization=organization)
+        invitation.delete()
+        
+        return JsonResponse({"success": True, "message": "Invitation deleted successfully!"})
+    
+    return JsonResponse({"success": False, "error": "Invalid request."}, status=400)
+
+
 
