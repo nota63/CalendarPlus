@@ -1,174 +1,248 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Profile</title>
-    <!-- Google Fonts and Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>Edit Profile • Workspace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Animation for profile updates */
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
+        :root {
+            --primary: #3B82F6;
+            --primary-hover: #2563EB;
+            --secondary: #64748B;
+            --success: #10B981;
         }
 
-        @keyframes fadeIn {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
+        @keyframes slideDown {
+            0% { transform: translateY(-20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
         }
 
-        /* Navbar Styling */
-        .navbar {
-            background-color: #1E3A8A; /* Dark blue background */
-            color: white;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .navbar a {
-            transition: color 0.3s ease;
-        }
-        .navbar a:hover {
-            color: #93C5FD; /* Lighter blue on hover */
+        @keyframes wave {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0); }
         }
 
-        /* Adjust Content Container */
-        .content-container {
-            padding: 2rem 1rem;
-            display: flex;
-            justify-content: space-between;
-            gap: 2rem;
+        .animate-wave {
+            animation: wave 2s ease-in-out infinite;
         }
 
-        .main-content {
-            flex: 1;
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        .smooth-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .sidebar {
-            width: 250px;
-            background-color: #F9FAFB;
-            border-radius: 8px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
-            padding: 1rem;
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        /* Responsive Layout */
-        @media (max-width: 768px) {
-            .content-container {
-                flex-direction: column;
-            }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+
+        .success-popup {
+            animation: slideDown 0.5s ease-out;
+        }
+
+        .profile-ring {
+            box-shadow: 0 0 0 3px white, 0 0 0 6px #3B82F6;
         }
     </style>
 </head>
-<body class="font-sans bg-gray-50 text-gray-900">
+<body class="font-['Inter'] bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
 
-    <!-- Full Width Navbar -->
-    <div class="navbar w-full fixed top-0 left-0 z-50 p-4 flex justify-between items-center shadow-lg">
-        <div class="flex items-center gap-4">
-            <img src="https://via.placeholder.com/40" alt="Logo" class="rounded-full">
-            <span class="text-lg font-semibold">Workspace</span>
-        </div>
-        <nav class="flex gap-6">
-            <a href="{% url 'project_views_others' organization_id=organization.id %}" class="hover:text-blue-200 transition-colors">My Projects</a>
-            <a href="{% url 'view_edit_profile' org_id=organization.id %}" class="hover:text-blue-200 transition-colors">Edit Profile</a>
-            <a href="{% url 'organization_availability' organization.id %}" class="hover:text-blue-200 transition-colors">Manage Availability</a>
-            <a href="{% url 'organization_holidays' organization.id %}" class="hover:text-blue-200 transition-colors">Holidays</a>
-        </nav>
-    </div>
+      
 
-    <!-- Main Content Container with Top Margin for Navbar -->
-    <div class="content-container mt-16">
-        <!-- Left Sidebar Section (optional, here as an example) -->
-        <div class="sidebar hidden lg:block p-4">
-            <h3 class="font-semibold text-lg mb-4">Shortcuts</h3>
-            <a href="{% url 'project_views_others' organization_id=organization.id %}" class="text-blue-600">My Projects</a><br>
-            <a href="{% url 'view_edit_profile' org_id=organization.id %}" class="text-blue-600">Edit Profile</a><br>
-            <a href="{% url 'organization_availability' organization.id %}" class="text-blue-600">Manage Availability</a><br>
-            <a href="{% url 'organization_holidays' organization.id %}" class="text-blue-600">Holidays</a><br>
-        </div>
-
-        <!-- Right Main Content Section -->
-        <div class="main-content w-full lg:w-2/3">
-            <h1 class="text-3xl font-semibold text-blue-600 mb-4">Update Profile</h1>
-            <h3 class="text-lg text-gray-600 mb-6">Your profile will be updated only for {{organization.name}}</h3>
-
-            <!-- Profile Edit Form -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 fade-in">
-                <!-- Profile Preview Section -->
-                <div class="profile-preview text-center p-6 bg-white rounded-lg shadow-lg">
-                    <img src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}/static/images/default-profile.png{% endif %}" alt="Profile Picture" class="w-32 h-32 mx-auto rounded-full border-4 border-blue-600 object-cover mb-4">
-                    <h3 class="text-2xl font-semibold text-blue-600">{{ profile.full_name|default:"Full Name" }}</h3>
-                    <p class="text-lg mt-2 text-gray-500">
-                        <strong>Role:</strong> 
-                        {% if profile.is_admin %} Admin
-                        {% elif profile.is_manager %} Manager
-                        {% else %} Employee {% endif %}
-                    </p>
-                </div>
-
-                <!-- Edit Profile Form Section -->
-                <div class="edit-profile bg-white p-6 rounded-lg shadow-lg">
-                    <h2 class="text-3xl font-semibold text-blue-600 flex items-center gap-2 mb-6">
-                        <span class="material-icons">edit</span> Edit Profile
-                    </h2>
-                    <form method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        
-                        <!-- Full Name Input -->
-                        <div class="mb-4">
-                            <label for="full_name" class="block text-sm font-medium text-gray-700">
-                                <span class="material-icons inline-block text-blue-600">person</span> Full Name
-                            </label>
-                            <input type="text" id="full_name" name="full_name" value="{{ profile.full_name }}" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow">
-                        </div>
-
-                        <!-- Profile Picture Input -->
-                        <div class="mb-4">
-                            <label for="profile_picture" class="block text-sm font-medium text-gray-700">
-                                <span class="material-icons inline-block text-blue-600">camera_alt</span> Profile Picture
-                            </label>
-                            <input type="file" id="profile_picture" name="profile_picture" class="mt-1 block w-full text-sm text-gray-700 border border-gray-300 rounded-md file:border-0 file:bg-blue-100 file:text-blue-700 file:px-4 file:py-2 file:rounded-md transition-shadow">
-                        </div>
-
-                        <!-- Admin Checkbox (Hide if applicable) -->
-                        {% if not hide_checkbox %}
-                        <div class="mb-4 flex items-center">
-                            <input type="checkbox" id="is_admin" name="is_admin" {% if profile.is_admin %}checked{% endif %} class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 transition-transform">
-                            <label for="is_admin" class="ml-2 text-sm text-gray-700">Admin</label>
-                        </div>
-                        {% endif %}
-                        
-                        <!-- Update Button -->
-                        <button type="submit" class="w-full py-2 px-4 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center gap-2 transition-all">
-                            <span class="material-icons">save</span> Update Profile
-                        </button>
-                    </form>
-
-                    <!-- Success/Info Messages -->
-                    {% if messages %}
-                    <div class="mt-6 text-sm text-green-600">
-                        {% for message in messages %}
-                            <p>{{ message }}</p>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                </div>
+    <!-- Main Content -->
+    <main class="pt-24 pb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-3xl mx-auto">
+            <!-- Header Section -->
+            <div class="mb-8 text-center">
+                <h1 class="text-4xl font-bold text-gray-900 mb-3 animate-wave">
+                    <span class="material-icons-round text-5xl mr-3 align-middle">👋</span>
+                    Edit Your Profile
+                </h1>
+                <p class="text-gray-600">Customize how you appear in {{organization.name}} workspace</p>
             </div>
 
-            <!-- Global Profile Link -->
-            <section class="mt-8 text-center">
-                <a href="{% url 'profile_info' %}" class="text-blue-600 font-semibold hover:underline">
-                    <strong>See Global Profile</strong>
-                </a>
-            </section>
-        </div>
-    </div>
+            <!-- Profile Card -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 card-hover">
+                <!-- Preview Section -->
+                <div class="text-center mb-10">
+                    <div class="relative inline-block group">
+                        <img id="profile-preview" 
+                             src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}/static/images/default-profile.png{% endif %}" 
+                             class="h-32 w-32 rounded-full object-cover mx-auto profile-ring cursor-pointer">
+                        <div class="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 smooth-transition flex items-center justify-center">
+                            <span class="text-white text-sm font-medium">Change Photo</span>
+                        </div>
+                    </div>
+                    <h2 class="text-2xl font-bold mt-4">{{ profile.full_name|default:"Your Name" }}</h2>
+                    <div class="mt-2">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-600 text-sm">
+                            {% if profile.is_admin %} Admin
+                            {% elif profile.is_manager %} Manager
+                            {% else %} Team Member {% endif %}
+                        </span>
+                    </div>
+                </div>
 
+                <!-- Edit Form -->
+                <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- Full Name Input -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Full Name
+                        </label>
+                        <div class="relative">
+                            <span class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                                badge
+                            </span>
+                            <input type="text" 
+                                   id="full_name" 
+                                   name="full_name" 
+                                   value="{{ profile.full_name }}"
+                                   class="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 input-focus smooth-transition">
+                        </div>
+                    </div>
+
+                    <!-- Profile Picture Upload -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Profile Photo
+                        </label>
+                        <div class="relative">
+                            <input type="file" 
+                                   id="profile_picture" 
+                                   name="profile_picture"
+                                   class="absolute opacity-0 w-full h-full cursor-pointer"
+                                   onchange="document.getElementById('profile-preview').src = URL.createObjectURL(event.target.files[0])">
+                            <div class="flex items-center justify-between px-4 py-3 border border-gray-300 rounded-lg hover:border-blue-500 smooth-transition">
+                                <div class="flex items-center space-x-3">
+                                    <span class="material-icons-round text-blue-600">cloud_upload</span>
+                                    <span class="text-gray-600" id="file-name">
+                                        {% if profile.profile_picture %}
+                                            {{ profile.profile_picture.name }}
+                                        {% else %}
+                                            No file chosen
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <button type="button" class="text-blue-600 hover:text-blue-700 smooth-transition">
+                                    Choose File
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Toggle -->
+                    {% if not hide_checkbox %}
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div>
+                            <h4 class="font-medium text-gray-900">Workspace Admin</h4>
+                            <p class="text-sm text-gray-600">Grant full administrative privileges</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" 
+                                   id="is_admin" 
+                                   name="is_admin" 
+                                   {% if profile.is_admin %}checked{% endif %}
+                                   class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-blue-600 smooth-transition"></div>
+                            <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm peer-checked:translate-x-5 smooth-transition"></div>
+                        </label>
+                    </div>
+                    {% endif %}
+
+                    <!-- Form Actions -->
+                    <div class="pt-8 border-t border-gray-200">
+                        <button type="submit" 
+                                class="w-full flex items-center justify-center px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg smooth-transition hover:scale-[1.02]">
+                            <span class="material-icons-round mr-2">save</span>
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Success Messages -->
+                {% if messages %}
+                <div class="mt-6 success-popup">
+                    {% for message in messages %}
+                    <div class="flex items-center p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <span class="material-icons-round text-green-600 mr-3">check_circle</span>
+                        <span class="text-green-700">{{ message }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Additional Settings -->
+            <div class="grid md:grid-cols-2 gap-6 mt-8">
+                <!-- Security Card -->
+                <div class="bg-white p-6 rounded-xl shadow card-hover">
+                    <div class="flex items-center mb-4">
+                        <span class="material-icons-round text-blue-600 mr-2">security</span>
+                        <h3 class="font-medium">Security</h3>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">Manage password and security settings</p>
+                    <button class="w-full text-sm text-blue-600 hover:text-blue-700 flex items-center justify-between p-3 hover:bg-blue-50 rounded-lg smooth-transition">
+                        Update Password
+                        <span class="material-icons-round text-xl">chevron_right</span>
+                    </button>
+                </div>
+
+                <!-- Linked Accounts -->
+                <div class="bg-white p-6 rounded-xl shadow card-hover">
+                    <div class="flex items-center mb-4">
+                        <span class="material-icons-round text-blue-600 mr-2">link</span>
+                        <h3 class="font-medium">Linked Accounts</h3>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <img src="https://via.placeholder.com/24x24" class="h-6 w-6">
+                                <span class="text-sm">Google Workspace</span>
+                            </div>
+                            <span class="text-green-600 text-sm flex items-center">
+                                Connected
+                                <span class="material-icons-round ml-1 text-base">check_circle</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Dynamic File Name Update
+        document.getElementById('profile_picture').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : 'No file chosen';
+            document.getElementById('file-name').textContent = fileName;
+        });
+
+        // Submit Button Loading State
+        document.querySelector('form').addEventListener('submit', function() {
+            const button = this.querySelector('button[type="submit"]');
+            button.innerHTML = `<span class="material-icons-round animate-spin">autorenew</span> Saving...`;
+            button.disabled = true;
+        });
+    </script>
 </body>
 </html>
 
-{% include 'footer.html' %}
+{% endblock %}
