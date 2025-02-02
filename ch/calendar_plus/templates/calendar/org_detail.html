@@ -473,6 +473,27 @@ a {
 #editOrgModal .btn-success:hover {
     background-color: #239E6B;
 }
+
+
+.org-logo-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%; /* Ensures a perfect circle */
+    overflow: hidden; /* Ensures no content spills outside */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #fff; /* Optional border */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Adds a premium look */
+}
+
+.org-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures the image fills the circle without distortion */
+}
+
+
 </style>
 
 
@@ -484,8 +505,11 @@ a {
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <img src="https://via.placeholder.com/40" alt="Logo">
-            <span>Workspace</span>
+            {% if organization.icon %}
+            <div class="org-logo-wrapper">
+                <img src="{{ organization.icon.url }}" alt="Logo" class="org-logo">
+            </div>
+        {% endif %}
         </div>
 
         {% if is_admin %}
