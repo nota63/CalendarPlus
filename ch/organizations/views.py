@@ -497,8 +497,25 @@ def delete_workspace(request, org_id):
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
 
+# USER GROUPS
 
 
+@login_required
+def fetch_organization_groups(request, org_id):
+    organization = get_object_or_404(Organization, id=org_id)
+
+    profile = get_object_or_404(Profile, user=request.user, organization=organization)
+    if not Profile.objects.filter(user=request.user, organization=organization, is_admin=True).exists():
+        return JsonResponse({"success": False, "error": "You are not authorized to view the groups."}, status=403)
+
+    groups = organization.groups.all()[:4]  
+
+    context = {
+        'organization': organization,
+        'groups': groups
+    }
+
+    return render(request, 'organizations/groups/view_groups.html', context)
 
 
 
