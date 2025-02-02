@@ -2,8 +2,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.mail import send_mail
 from django.conf import settings
-from accounts.models import Profile
-
+from accounts.models import Profile,Organization
+from django.db.models.signals import post_delete
 
 
 @receiver(post_save, sender=Profile)
@@ -54,3 +54,30 @@ def send_ownership_transfer_email(sender, instance, created, **kwargs):
 
        
         send_mail(members_subject, members_message, from_email, member_emails)
+
+
+
+# NOTIFY ALL WORKSPACE MEMBERS ABOUT WORKSPACE DELETION
+
+@receiver(post_delete, sender=Organization)
+def send_workspace_deletion_email(sender, instance, **kwargs):
+    organization = instance 
+    members = Profile.objects.filter(organization=organization)
+
+   
+    subject = f"Important: Workspace {organization.name} Deleted"
+    message = f"""
+    Hello,
+
+    We regret to inform you that the workspace "{organization.name}" has been deleted. 
+    Please note that this action cannot be undone.
+
+    If you have any questions, feel free to reach out to the support team.
+
+    Best Regards,
+    The CalendarPlus Team
+    """
+    from_email = settings.DEFAULT_FROM_EMAIL
+
+    for member in members:
+        send_mail(subject, message, from_email, [member.user.email])
