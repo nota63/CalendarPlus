@@ -454,6 +454,45 @@ def transfer_ownership(request, org_id, member_id):
     return JsonResponse({"error": "Invalid request"}, status=400)
 
 
+# DELETE THE WORKSPACE
+
+@login_required
+def delete_workspace(request, org_id):
+    if request.method == "POST":
+       
+        organization = get_object_or_404(Organization, id=org_id)
+        profile = get_object_or_404(Profile, user=request.user, organization=organization)
+        if not Profile.objects.filter(user=request.user, organization=organization, is_admin=True).exists():
+            return JsonResponse({"success": False, "error": "You are not authorized to update the workspace icon."}, status=403)
+
+        current_admin = get_object_or_404(Profile, organization=organization, user=request.user, is_admin=True)
+
+       
+        password = request.POST.get("password")
+        if not password:
+            return JsonResponse({"error": "Password is required"}, status=400)
+        
+        user = authenticate(username=request.user.username, password=password)
+        if not user:
+            return JsonResponse({"error": "Invalid password"}, status=400)
+        
+       
+        if current_admin.user != request.user:
+            return JsonResponse({"error": "You are not authorized to delete this workspace"}, status=403)
+
+        try:
+          
+            organization.delete()
+            return JsonResponse({"success": "Workspace deleted successfully"})
+        
+        except Exception as e:
+            
+            return JsonResponse({"error": f"An error occurred: {str(e)}"}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=400)
+
+
+
 
 
 

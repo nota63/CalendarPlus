@@ -8,12 +8,29 @@
 <!-- Bootstrap 5 JS Bundle (includes Popper.js) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+<style>
+#loadingSpinner {
+    display: none;
+    text-align: center;
+}
 
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+
+</style>
 
 
 
 <div class="container mt-4">
     <h2>Transfer Ownership - {{ organization.name }}</h2>
+
+    <button type="button" class="btn btn-danger delete-btn" data-org-id="{{ organization.id }}">
+        Delete Workspace
+    </button>
+    
     
     <table class="table table-bordered mt-3">
         <thead>
@@ -87,11 +104,45 @@
         </div>
     </div>
 </div>
+<!-- Loading spinner -->
+ <!-- Add this spinner and text container somewhere in your HTML, hidden by default -->
+<div id="loadingSpinner" style="display: none; text-align: center;">
+    <div class="spinner-border" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+    <p>Operation in progress...</p>
+</div>
 
 
-
-
-
+<!-- Modal for Delete Workspace -->
+ <!-- Modal for Delete Workspace -->
+<div class="modal fade" id="deleteWorkspaceModal" tabindex="-1" aria-labelledby="deleteWorkspaceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteWorkspaceModalLabel">Delete Workspace</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this workspace? This action cannot be undone.</p>
+                <div class="mb-3">
+                    <label for="adminPasswordDeleteModal" class="form-label">Enter your password to confirm:</label>
+                    <input type="password" class="form-control" id="adminPasswordDeleteModal" placeholder="Password" required>
+                </div>
+                <div id="loadingSpinner" style="display: none; text-align: center;">
+                    <div class="spinner-border" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <p>Deleting workspace...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete Workspace</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -104,7 +155,6 @@
 
 <!-- ------------------------------------------------------------------------------------------------------------ -->
 <script>
-
 document.addEventListener("DOMContentLoaded", function () {
     let selectedUserId = null;
 
@@ -128,6 +178,14 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
+        // Show loading spinner and message
+        document.getElementById("loadingSpinner").style.display = "block";
+
+        // Hide the modal while waiting for the request to complete
+        const modal = bootstrap.Modal.getInstance(document.getElementById("transferOwnershipModal"));
+        modal.hide();
+
+        // Make the request to transfer ownership
         fetch(`/organizations/transfer-ownership/${orgId}/${userId}/`, {
             method: "POST",
             headers: {
@@ -138,6 +196,9 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => response.json())
         .then(data => {
+            // Hide the loading spinner
+            document.getElementById("loadingSpinner").style.display = "none";
+
             if (data.success) {
                 alert("Ownership transferred successfully!");
                 window.location.reload();  // Reload the page after success
@@ -145,12 +206,66 @@ document.addEventListener("DOMContentLoaded", function () {
                 alert(data.error || "Something went wrong!");
             }
         })
-        .catch(error => console.error("Error:", error));
+        .catch(error => {
+            // Hide the loading spinner on error
+            document.getElementById("loadingSpinner").style.display = "none";
+            console.error("Error:", error);
+            alert("An error occurred, please try again.");
+        });
     });
 });
 
 
+// DELETE WORKSPACE
+document.addEventListener("DOMContentLoaded", function () {
+    let selectedOrgId = null;
 
+    // Open modal to set organization ID
+    document.querySelectorAll(".delete-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            selectedOrgId = this.getAttribute("data-org-id");
+            console.log("Selected Org ID:", selectedOrgId); // Debugging: check if org ID is being set correctly
+            new bootstrap.Modal(document.getElementById("deleteWorkspaceModal")).show();
+        });
+    });
+
+    // Handle confirm delete button click
+    document.getElementById("confirmDeleteBtn").addEventListener("click", function () {
+        const password = document.getElementById("adminPasswordDeleteModal").value; // Updated to new ID
+        console.log("Entered Password:", password);  // Debugging: check if password is captured correctly
+
+        if (!password) {
+            alert("Please enter your password.");
+            return;
+        }
+
+        // Show loading spinner
+        document.getElementById("loadingSpinner").style.display = "block";
+
+        fetch(`/organizations/delete-workspace/${selectedOrgId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": "{{ csrf_token }}"  // Pass CSRF token dynamically
+            },
+            body: new URLSearchParams({ password })
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("loadingSpinner").style.display = "none"; // Hide spinner
+            if (data.success) {
+                alert("Workspace deleted successfully!");
+                window.location.reload();  // Reload the page after success
+            } else {
+                alert(data.error || "Something went wrong!");
+            }
+        })
+        .catch(error => {
+            document.getElementById("loadingSpinner").style.display = "none"; // Hide spinner in case of error
+            console.error("Error:", error);
+        });
+    });
+});
 
 </script>
 
