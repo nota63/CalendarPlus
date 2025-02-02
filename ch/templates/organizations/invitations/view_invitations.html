@@ -149,6 +149,182 @@
                 padding: 20px;
             }
         }
+
+        /* Slack modal */
+
+        .slack-modal .modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.1), 0 12px 24px rgba(0,0,0,.3);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.slack-modal .modal-header {
+    border-bottom: 1px solid #ddd;
+    padding: 24px 28px 16px;
+    position: relative;
+}
+
+.slack-modal .modal-title {
+    font-weight: 900;
+    font-size: 22px;
+    color: #1d1c1d;
+    margin-bottom: 8px;
+}
+
+.slack-modal .modal-header strong {
+    display: block;
+    font-weight: 400;
+    font-size: 15px;
+    color: #616061;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.slack-modal .modal-header a {
+    color: #1264a3;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.slack-modal .modal-header a:hover {
+    text-decoration: underline;
+}
+
+.slack-modal .btn-close {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+.slack-modal .btn-close:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+}
+
+.slack-modal .modal-body {
+    padding: 20px 28px 28px;
+}
+
+.slack-modal .form-label {
+    font-weight: 700;
+    font-size: 15px;
+    color: #1d1c1d;
+    margin-bottom: 8px;
+}
+
+.slack-modal .form-control {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 15px;
+    transition: all 0.2s ease;
+}
+
+.slack-modal .form-control:focus {
+    border-color: #4A154B;
+    box-shadow: 0 0 0 3px rgba(74,21,75,0.15);
+}
+
+/* Custom Radio Buttons */
+.role-radio-group {
+    display: flex;
+    gap: 24px;
+    margin: 16px 0 24px;
+}
+
+.role-radio-item {
+    position: relative;
+}
+
+.role-radio-item input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.role-radio-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.role-radio-label:before {
+    content: "";
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.role-radio-item input:checked + .role-radio-label {
+    border-color: #4A154B;
+    background-color: rgba(74,21,75,0.05);
+}
+
+.role-radio-item input:checked + .role-radio-label:before {
+    border-color: #4A154B;
+    background: radial-gradient(#4A154B 0%, #4A154B 40%, transparent 50%);
+}
+
+/* Submit Button */
+.slack-modal .btn-primary {
+    background: #4A154B;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 24px;
+    font-weight: 700;
+    font-size: 15px;
+    transition: all 0.2s ease;
+}
+
+.slack-modal .btn-primary:hover {
+    background: #2D0F2E;
+    transform: translateY(-1px);
+}
+
+.slack-modal .btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Loading Spinner */
+#loadingSpinner {
+    width: 20px;
+    height: 20px;
+    border-width: 2px;
+    margin-left: 12px;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+@keyframes spinner-border {
+    to { transform: rotate(360deg) }
+}
+
+.spinner-border {
+    animation: spinner-border .75s linear infinite;
+}
+
+/* Responsive Design */
+@media (max-width: 576px) {
+    .slack-modal .modal-content {
+        margin: 16px;
+    }
+    
+    .role-radio-group {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
     </style>
 </head>
 
@@ -174,8 +350,6 @@
             <button class="btn btn-primary" id="inviteBtn" style="background: var(--calendly-blue); border: none;">
                 <i class="fas fa-plus me-2"></i> New Invite
             </button>
-
-          
         </div>
 
         <!-- Search -->
@@ -403,7 +577,7 @@
 
 <!-- Date Extend Modal -->
 
-<div class="modal fade" id="extendExpiryModal" tabindex="-1" aria-labelledby="extendExpiryLabel" aria-hidden="true">
+<div class="modal fade slack-modal" id="extendExpiryModal" tabindex="-1" aria-labelledby="extendExpiryLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -427,49 +601,55 @@
 
 
 <!-- Invitation Modal  -->
-
-<div class="modal fade" id="inviteModal" tabindex="-1" aria-labelledby="inviteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade slack-modal" id="inviteModal" tabindex="-1" aria-labelledby="inviteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="inviteModalLabel">Invite Members into {{organization.name}}</h5>
+                <h5 class="modal-title" id="inviteModalLabel">Invite to {{organization.name}}</h5>
+                <strong>
+                    Invite others to join your workspace. You can also allow members to sign up using your company’s email domain <a href="#">
+                        Set up your Email domain
+                    </a>
+                </strong>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="inviteForm">
-                    <div class="mb-3">
+                    <div class="mb-4">
                         <label for="email" class="form-label">Email Address</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
+                        <input type="email" class="form-control" id="email" name="email" required 
+                               placeholder="name@company.com">
                     </div>
 
-                   
-                    <div class="mb-3">
+                    <div class="mb-4">
                         <label class="form-label">Role</label>
-                        
-                   
-                     
-    
-        <div>
-            <input type="radio" id="role_manager" name="role" value="manager" required>
-            <label for="role_manager">Manager</label>
-        </div>
-        <div>
-            <input type="radio" id="role_employee" name="role" value="employee" required>
-            <label for="role_employee">Employee</label>
-        </div>
-    <br>
-                    <button type="submit" class="btn btn-primary">Send Invitation</button>
-                    <br>
-                          
-                   <div class="spinner-border text-primary" id="loadingSpinner" style="display: none;" role="status">
-                       <span class="visually-hidden">Loading...</span>
+                        <div class="role-radio-group">
+                            <div class="role-radio-item">
+                                <input type="radio" id="role_manager" name="role" value="manager" required>
+                                <label class="role-radio-label" for="role_manager">
+                                    <span>Manager</span>
+                                </label>
+                            </div>
+                            <div class="role-radio-item">
+                                <input type="radio" id="role_employee" name="role" value="employee" required>
+                                <label class="role-radio-label" for="role_employee">
+                                    <span>Employee</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        Send Invitation
+                        <div class="spinner-border text-light" id="loadingSpinner" role="status" style="display: none;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </button>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
 
 
 
