@@ -132,7 +132,7 @@ class ManagedWorkflows(View):
         user = self.request.user
         try:
             # Fetch the organization, ensuring the user is the creator
-            organization = Organization.objects.get(id=org_id, created_by=user)
+            organization = Organization.objects.get(id=org_id)
         except Organization.DoesNotExist:
             raise Http404("Organization not found or you do not have permission to view this organization.")
         
