@@ -586,6 +586,7 @@ def delete_invitation(request, org_id, invitation_id):
 
 
 # EXTEND INVITATION EXPIRY
+
 @login_required
 def extend_invitation_expiry(request, org_id, invitation_id):
     """Allow admin to extend invitation expiry date."""

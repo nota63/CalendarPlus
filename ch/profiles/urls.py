@@ -8,5 +8,5 @@ urlpatterns = [
     path('remove_member/<int:org_id>/<int:member_id>/', remove_member, name='remove_member'),
     path('send_invitation/<org_id>/',send_email_invitation, name='send_invitation'),
     path('invitations/status/<int:org_id>/', fetch_invitations_status, name='fetch_invitations_status'),
-   
+    
 ]
