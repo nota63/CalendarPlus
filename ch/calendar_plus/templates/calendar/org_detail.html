@@ -399,6 +399,80 @@ a {
     color: #d1453b;
     font-style: italic;
 }
+
+
+#editOrgModal .modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 0 0 1px rgba(29,28,29,.13), 0 18px 48px 0 rgba(0,0,0,.35);
+    font-family: 'Helvetica Neue', sans-serif;
+}
+
+#editOrgModal .modal-header {
+    border-bottom: 1px solid #E8E8E8;
+    padding: 20px 24px 16px;
+}
+
+#editOrgModal .modal-title {
+    font-weight: 800;
+    color: #1D1C1D;
+    font-size: 18px;
+}
+
+#editOrgModal .btn-close {
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23626262'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+    opacity: 1;
+    margin: 0;
+    padding: 10px;
+}
+
+#editOrgModal .btn-close:hover {
+    opacity: 0.8;
+}
+
+#editOrgModal .modal-body {
+    padding: 16px 24px 24px;
+}
+
+#editOrgModal .form-label {
+    font-weight: 700;
+    color: #1D1C1D;
+    margin-bottom: 8px;
+    font-size: 15px;
+}
+
+#editOrgModal .form-control {
+    border: 1px solid #DDD;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 15px;
+    color: #1D1C1D;
+    margin-bottom: 16px;
+}
+
+#editOrgModal .form-control:focus {
+    border-color: #1D9BD1;
+    box-shadow: 0 0 0 1px #1D9BD1, 0 0 0 5px rgba(29,155,209,.3);
+}
+
+#editOrgModal textarea.form-control {
+    min-height: 100px;
+}
+
+#editOrgModal .btn-success {
+    background-color: #2BAC76;
+    color: #FFF;
+    font-weight: 700;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 15px;
+    transition: background-color 0.2s;
+}
+
+#editOrgModal .btn-success:hover {
+    background-color: #239E6B;
+}
 </style>
 
 
@@ -733,9 +807,8 @@ a {
 
 <!-- MODALS -->
  <!-- Edit Organization -->
-
-<div class="modal fade" id="editOrgModal" tabindex="-1" aria-labelledby="editOrgModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+ <div class="modal fade" id="editOrgModal" tabindex="-1" aria-labelledby="editOrgModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editOrgModalLabel">Edit Organization</h5>
@@ -751,10 +824,12 @@ a {
                         <label for="orgDescription" class="form-label">Description</label>
                         <textarea class="form-control" id="orgDescription" rows="3"></textarea>
                     </div>
-                     {% csrf_token %}
-                       <input type="hidden" id="orgId" value="{{ organization.id }}">
-
-                    <button type="submit" class="btn btn-success">Save Changes</button>
+                    {% csrf_token %}
+                    <input type="hidden" id="orgId" value="{{ organization.id }}">
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-link me-2" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Save Changes</button>
+                    </div>
                 </form>
             </div>
         </div>
