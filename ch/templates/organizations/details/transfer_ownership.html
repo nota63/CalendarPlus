@@ -23,14 +23,21 @@
 </style>
 
 
-
 <div class="container mt-4">
     <h2>Transfer Ownership - {{ organization.name }}</h2>
 
     <button type="button" class="btn btn-danger delete-btn" data-org-id="{{ organization.id }}">
-        Delete Workspace
+        Delete {{organization.name}}
     </button>
+    <br>
     
+    <!-- Search Form -->
+    <form method="GET" action="{% url 'workspace_members' org_id=organization.id %}" class="mb-3">
+        <div class="input-group">
+            <input type="text" class="form-control" name="email" placeholder="Search by email" value="{{ email_search }}">
+            <button type="submit" class="btn btn-outline-secondary">Search</button>
+        </div>
+    </form>
     
     <table class="table table-bordered mt-3">
         <thead>
@@ -78,6 +85,7 @@
         </tbody>
     </table>
 </div>
+
 <!-- -------------------------------------------------------------------------------------------------------------------- -->
 
 <!-- Modals -->

@@ -394,24 +394,29 @@ def organization_details(request, org_id):
 
 # Transfer ownership
 
+
 @login_required
 def fetch_organization_members(request, org_id):
-   
     organization = get_object_or_404(Organization, id=org_id)
 
     profile = get_object_or_404(Profile, user=request.user, organization=organization)
     if not Profile.objects.filter(user=request.user, organization=organization, is_admin=True).exists():
-            return JsonResponse({"success": False, "error": "You are not authorized to update the workspace icon."}, status=403)
+        return JsonResponse({"success": False, "error": "You are not authorized to update the workspace icon."}, status=403)
 
-
-    
     current_admin = get_object_or_404(Profile, user=request.user, organization=organization, is_admin=True)
 
-    members = Profile.objects.filter(organization=organization).select_related('user')
+    # Get search query from GET parameters
+    email_search = request.GET.get('email', '').strip()
+
+    if email_search:
+        members = Profile.objects.filter(organization=organization, user__email__icontains=email_search).select_related('user')
+    else:
+        members = Profile.objects.filter(organization=organization).select_related('user')
 
     context = {
         'organization': organization,
-        'members': members
+        'members': members,
+        'email_search': email_search  
     }
 
     return render(request, 'organizations/details/transfer_ownership.html', context)
