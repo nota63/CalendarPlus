@@ -3,16 +3,17 @@ from django.dispatch import receiver
 from django.core.mail import send_mail
 from django.conf import settings
 from accounts.models import Profile
+
+
+
 @receiver(post_save, sender=Profile)
-
-
 def send_ownership_transfer_email(sender, instance, created, **kwargs):
     if not created and instance.is_admin:  
         organization = instance.organization
         new_admin = instance.user
         old_admin = Profile.objects.get(organization=organization, is_admin=True, user__is_active=True)
 
-    
+       
         subject = f"Ownership Transfer in {organization.name}"
         message = f"""
         Hello {new_admin.first_name},  # Using first_name for a personalized greeting
@@ -24,7 +25,7 @@ def send_ownership_transfer_email(sender, instance, created, **kwargs):
         - Total Channels: {organization.channels.count()}
         - Total Users: {organization.profiles.count()}
 
-        The previous admin, {old_admin.user.username} {old_admin.user.last_name}, has successfully transferred the ownership to you.
+        The previous admin, {old_admin.user.first_name} {old_admin.user.last_name}, has successfully transferred the ownership to you.
 
         If you have any questions, feel free to reach out to us.
 
@@ -33,5 +34,23 @@ def send_ownership_transfer_email(sender, instance, created, **kwargs):
         """
         from_email = settings.DEFAULT_FROM_EMAIL
 
+      
+        send_mail(subject, message, from_email, [new_admin.email])
+
+       
+        members_subject = f"New Admin in {organization.name}"
+        members_message = f"""
+        Hello,
+
+        This is to inform you that {new_admin.first_name} {new_admin.last_name} is the new Admin of the organization "{organization.name}".
         
-        send_mail(subject, message, from_email, [new_admin.email])  
+        If you have any questions, feel free to reach out to the new admin.
+
+        Best Regards,
+        The CalendarPlus Team
+        """
+
+        member_emails = Profile.objects.filter(organization=organization).exclude(user=new_admin).values_list('user__email', flat=True)
+
+       
+        send_mail(members_subject, members_message, from_email, member_emails)
