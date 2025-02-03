@@ -430,32 +430,81 @@ class OrganizationListView(LoginRequiredMixin, ListView):
 
 
 # org detail
+
+# PREVENT HIDDEN WORKSPACE ACCESS AND DISPLAY DETAILS 
+
 class OrgDetailView(LoginRequiredMixin, View):
     template_name = 'calendar/org_detail.html'
 
     def get(self, request, org_id):
-        # Get the organization
+        
         organization = get_object_or_404(Organization, id=org_id)
+        print(f"Accessing organization: {organization.name} (ID: {organization.id})")
+
+        now = timezone.now()
+        print(f"Current time: {now}")
 
         
+        hide_entry = OrganizationHide.objects.filter(
+            to_organization=organization,
+            hidden_from__lte=now,
+            hidden_until__gte=now
+        ).first()
+
+        
+        if hide_entry:
+            print(f"Organization is hidden: {organization.name} (ID: {organization.id})")
+            print(f"Hidden from: {hide_entry.hidden_from}, Hidden until: {hide_entry.hidden_until}")
+            print(f"Hide on Sundays and Holidays: {hide_entry.hide_on_sundays_and_holidays}")
+
+            
+            if hide_entry.hide_on_sundays_and_holidays:
+                if now.weekday() == 6:  
+                    print("Today is Sunday, organization is hidden on Sundays.")
+                    return self.redirect_to_hidden()
+
+                
+                if self.is_holiday(now):
+                    print(f"Today is a holiday, organization is hidden.")
+                    return self.redirect_to_hidden()
+
+            
+            print(f"Organization is within hidden time period.")
+            return self.redirect_to_hidden()
+
+    
+        print(f"Organization is not hidden. Proceeding with user profile checks.")
         user_profiles = Profile.objects.filter(organization=organization, user=request.user)
 
-     
         is_admin = user_profiles.filter(is_admin=True).exists()
         is_manager = user_profiles.filter(is_manager=True).exists()
         is_employee = user_profiles.filter(is_employee=True).exists()
 
-        
         context = {
             'organization': organization,
             'user_profiles': user_profiles,
             'is_admin': is_admin,
             'is_manager': is_manager,
             'is_employee': is_employee,
-          
         }
+
         return render(request, self.template_name, context)
+
+    def redirect_to_hidden(self):
+        """Force the user to a different page when the organization is hidden."""
+        print("Redirecting to the organization list page because the organization is hidden.")
+        
+        return HttpResponseForbidden(f'Workspace is on holiday or hidden! contact your workspace admin for more details!')  # Modify the URL name if needed
+
+    def is_holiday(self, current_date):
+        """Check if the current date is a holiday (you can add your own holiday list)."""
+        
+        holidays = [
+            datetime.date(current_date.year, 1, 1),  
+        ]
+        return current_date.date() in holidays
     
+
 
 # Edit Organization
 class OrganizationEditView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
