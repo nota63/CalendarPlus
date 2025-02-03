@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class DmConfig(AppConfig):
+class DirectMessageConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'dm'
+    name = 'direct_message'

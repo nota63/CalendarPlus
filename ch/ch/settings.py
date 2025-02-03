@@ -56,7 +56,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Application definition
 
 INSTALLED_APPS = [
-    'dm',
+    'direct_message',
     'profiles',
     'organizations',
     'meet',

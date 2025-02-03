@@ -41,7 +41,7 @@ urlpatterns = [
     path('channels/',include('organization_channels.urls')),
     path('profiles/',include('profiles.urls')),
     path('organizations/',include('organizations.urls')),
-    path('direct_message/',include('dm.urls')),
+    path('direct_message/',include('direct_message.urls')),
     # ui components
     path('styles/', views.styles, name= 'styles'),
     path('weather/',views.weather, name='weather'),

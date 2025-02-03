@@ -1,0 +1,101 @@
+<!-- chat_room.html -->
+<!-- chat_room.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
+    <style>
+        /* Basic styling for the chat room */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .message {
+            margin-bottom: 10px;
+        }
+        .message .sender {
+            font-weight: bold;
+        }
+        .message .content {
+            margin-left: 10px;
+        }
+        .input-box {
+            display: flex;
+            padding: 10px;
+            background-color: #f1f1f1;
+        }
+        .input-box input {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+        }
+        .input-box button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Chat with {{ other_user.username }}</h1>
+
+<div class="messages" id="messages">
+    {% for message in messages %}
+        <div class="message">
+            <span class="sender">{{ message.sender.username }}:</span>
+            <span class="content">{{ message.content }}</span>
+        </div>
+    {% endfor %}
+</div>
+
+<div class="input-box">
+    <input type="text" id="message-input" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+    // JavaScript to handle WebSocket and send messages
+    const conversationId = "{{ conversation.id }}";
+    const messageInput = document.getElementById("message-input");
+    const messagesContainer = document.getElementById("messages");
+
+    const socket = new WebSocket(
+        'ws://' + window.location.host + '/ws/chat/' + conversationId + '/'
+    );
+
+    socket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message');
+        messageElement.innerHTML = `<span class="sender">${data.sender}:</span> <span class="content">${data.message}</span>`;
+        messagesContainer.appendChild(messageElement);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    };
+
+    function sendMessage() {
+        const message = messageInput.value;
+        if (message.trim() !== "") {
+            socket.send(JSON.stringify({
+                'message': message
+            }));
+            messageInput.value = "";
+        }
+    }
+</script>
+
+</body>
+</html>

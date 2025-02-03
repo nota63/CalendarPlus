@@ -840,7 +840,7 @@ a {
  </a>
 
 
- <a href="{% url 'direct_message' org_id=organization.id%}" 
+ <a href="{% url 'direct_messages' organization_id=organization.id %}" 
  class="text-decoration-none">
   <button type="submit" 
           class="popup-btn btn w-100 text-start d-flex align-items-center gap-3 px-3 py-2"
@@ -850,9 +850,10 @@ a {
                  transition: background-color 0.2s ease;
                  border-radius: 4px;">
       <span class="material-icons" style="font-size: 18px; color: #616061;">settings</span>
-      Direct Message
+      Direct Messages
   </button>
 </a>
+
 </div>
 
 

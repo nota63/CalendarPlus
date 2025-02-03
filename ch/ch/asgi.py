@@ -15,6 +15,7 @@ from django.urls import path
 import chat.routing
 import calendar_plus.routing
 import organization_channels.routing
+import direct_message.routing
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ch.settings')
 
@@ -27,7 +28,10 @@ django_asgi_app = get_asgi_application()
 application = ProtocolTypeRouter({
     'http': django_asgi_app,
     'websocket':AuthMiddlewareStack(URLRouter(
-        chat.routing.ws_urlpatterns + calendar_plus.routing.websocket_urlpatterns + organization_channels.routing.websocket_urlpatterns
+        chat.routing.ws_urlpatterns + 
+        calendar_plus.routing.websocket_urlpatterns +
+          organization_channels.routing.websocket_urlpatterns+
+          direct_message.routing.websocket_urlpatterns
     ))
 })
 
