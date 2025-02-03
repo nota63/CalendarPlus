@@ -1,0 +1,52 @@
+{% extends "custom.html" %}
+
+{% block content %}
+  <h2>Hide Organization - {{ organization.name }}</h2>
+
+  <section>
+      {% if messages %}
+        {% for m in messages %}
+          <strong>{{m}}</strong>
+        {% endfor %}
+      {% endif %}     
+  </section>
+
+  <!-- Admin Guidelines Section -->
+  <div class="alert alert-info">
+    <strong>Guidelines:</strong>
+    <ul>
+      <li>Use this feature to temporarily hide the organization from staff members.</li>
+      <li>The organization will be hidden from the specified <strong>Hide From</strong> date until the <strong>Hide Until</strong> date.</li>
+      <li>Staff members in this organization will not be able to view it during this period.</li>
+      <li>Only admins can perform this action.</li>
+    </ul>
+  </div>
+
+  <!-- Form to hide the organization -->
+  <form method="POST">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="hidden_from" class="form-label">Hide From</label>
+      <input type="datetime-local" class="form-control" id="hidden_from" name="hidden_from" required>
+    </div>
+    <div class="mb-3">
+      <label for="hidden_until" class="form-label">Hide Until</label>
+      <input type="datetime-local" class="form-control" id="hidden_until" name="hidden_until" required>
+    </div>
+    
+    <!-- Toggle for Email Notification -->
+    <div class="mb-3 form-check">
+      <input type="checkbox" class="form-check-input" id="notify_members" name="notify_members">
+      <label class="form-check-label" for="notify_members">Notify staff members about the hidden status</label>
+    </div>
+    
+    <button type="submit" class="btn btn-danger">Hide Organization</button>
+  </form>
+
+  <!-- Effect on Staff -->
+  <div class="alert alert-warning mt-4">
+    <strong>Effect on Staff:</strong>
+    <p>Once the organization is hidden, all staff members associated with this organization will not be able to access it until the <strong>Hide Until</strong> date. Make sure you communicate with your team about this change.</p>
+  </div>
+
+  {% endblock %}

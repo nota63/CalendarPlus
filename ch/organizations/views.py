@@ -13,7 +13,10 @@ from accounts.models import MeetingOrganization
 from django.contrib.auth import authenticate
 from django.utils.timezone import now, make_aware
 from django.utils.dateparse import parse_datetime
-
+from .models import OrganizationHide
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib import messages
 # Create your views here.
 
 @csrf_exempt
@@ -671,6 +674,53 @@ def workflow_template(request, org_id):
 
 
 # Hide Organization
+@login_required
+def hide_organization(request, org_id):
+    organization = get_object_or_404(Organization, id=org_id)
+
+    profile = Profile.objects.filter(user=request.user, organization=organization, is_admin=True).first()
+    if not profile:
+        return JsonResponse({"error": "You do not have permission to extend invitations."}, status=403)
 
 
+    if request.method == "POST":
+        hidden_from = request.POST.get('hidden_from')
+        hidden_until = request.POST.get('hidden_until')
+        
+     
+        notify_members = True  
 
+        if hidden_from and hidden_until:
+            
+            hide_info = OrganizationHide.objects.create(
+                from_organization=organization,
+                to_organization=organization,
+                hidden_from=hidden_from,
+                hidden_until=hidden_until,
+                hider=request.user  
+            )
+
+            
+            staff_profiles = Profile.objects.filter(organization=organization, is_employee=True,is_manager=True)
+
+            for profile in staff_profiles:
+                profile.hidden_organization = True  
+                profile.save()
+
+            
+            staff_emails = [profile.user.email for profile in staff_profiles]
+
+            send_mail(
+                'Organization Hidden Notification',
+                f'Hello,\n\nThe organization "{organization.name}" has been temporarily hidden from view. It will remain hidden from {hidden_from} to {hidden_until}.',
+                settings.DEFAULT_FROM_EMAIL,
+                staff_emails,
+                fail_silently=False,
+            )
+
+            messages.success(request,f'{organization.name} hidden successfully')
+            return redirect('hide_workspace',org_id=organization.id)
+
+            
+
+    return render(request, 'organizations/details/hide_organization.html', {'organization': organization})

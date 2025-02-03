@@ -144,6 +144,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+
+// HIDE ORGANIZATION 
+
 // WORKSPACE STATUS BUTTONS FEATURES
 document.querySelectorAll('.status-pill').forEach(button => {
     button.addEventListener('click', function() {
@@ -152,3 +155,6 @@ document.querySelectorAll('.status-pill').forEach(button => {
         document.getElementById('statusSelect').value = this.dataset.value;
     });
 });
+
+
+

@@ -11,7 +11,7 @@ from django.utils import timezone
 class OrganizationHide(models.Model):
     from_organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE, related_name="hidden_by"
-    )  # The organization setting the hide  
+    )  
     to_organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE, related_name="hidden_from"
     )  # The organization being hidden  
@@ -22,6 +22,7 @@ class OrganizationHide(models.Model):
     hidden_until = models.DateTimeField()  # End date  
     created_at = models.DateTimeField(auto_now_add=True)  
     updated_at = models.DateTimeField(auto_now=True)  
+    notify_members=models.BooleanField(default=False, null=True, blank=True)
 
     def is_active(self):
         """Check if the hide is currently active"""
