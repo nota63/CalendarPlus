@@ -1,8 +1,19 @@
 from django.contrib.auth.models import User
-from .models import HolidayOrganization, Profile
+from .models import HolidayOrganization, Profile,Organization
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
+from organization_channels.models import Channel
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.conf import settings
+from django.utils.html import strip_tags
+
+
+
+
+
+
 
 # Predefined list of government holidays (adjust according to your country)
 GOVERNMENT_HOLIDAYS = [
@@ -53,4 +64,45 @@ def create_predefined_holidays(sender, instance, created, **kwargs):
 
 
 
+# Create a social channel by default for every organization
+@receiver(post_save, sender=Organization)
+def create_social_channel_and_send_email(sender, instance, created, **kwargs):
+    if created:  # Only run when a new organization is created
+        try:
+            # ✅ Get the admin profile
+            admin_profile = Profile.objects.get(organization=instance, is_admin=True)
+            admin_user = admin_profile.user  # Get the admin user
+
+            # ✅ Create "Social" Channel
+            Channel.objects.create(
+                organization=instance,
+                created_by=admin_user,
+                name="Social",
+                type="BLANK",
+                visibility="PUBLIC",
+            )
+
+            # ✅ Send Email to Admin
+            subject = "🎉 Your Organization Has Been Created!"
+            context = {
+                "admin_name": admin_user.get_full_name(),
+                "admin_email": admin_user.email,
+                "org_name": instance.name,
+                "created_at": instance.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            }
+            html_message = render_to_string("channels/creation/org_created.html", context)
+            plain_message = strip_tags(html_message)  # Convert HTML to plain text
+            send_mail(
+                subject,
+                plain_message,
+                settings.DEFAULT_FROM_EMAIL,
+                [admin_user.email],
+                html_message=html_message,
+            )
+        except Profile.DoesNotExist:
+            # Handle the case where no admin profile is found
+            print(f"Error: Admin profile not found for organization: {instance.name}")
+        except Exception as e:
+            # General error handling
+            print(f"Error creating channel or sending email: {e}")
 
