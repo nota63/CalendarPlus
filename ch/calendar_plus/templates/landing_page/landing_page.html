@@ -3,30 +3,310 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Landing Page</title>
+    <title>Calendar Plus | Modern Scheduling Platform</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --accent-color: #ec4899;
+            --dark-color: #1e293b;
+            --light-color: #f8fafc;
+        }
+
+        * {
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--light-color);
+            overflow-x: hidden;
+        }
+
+        .hero-section {
+            position: relative;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 120px 0 160px;
+            clip-path: ellipse(150% 100% at 50% 0%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .gradient-text {
+            background: linear-gradient(45deg, #fff, #e0e7ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .btn-cta {
+            background: linear-gradient(45deg, var(--accent-color), #f472b6);
+            border: none;
+            padding: 16px 40px;
+            border-radius: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(236, 72, 153, 0.3);
+        }
+
+        .decorative-blob {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: linear-gradient(45deg, rgba(236, 72, 153, 0.15), rgba(99, 102, 241, 0.15));
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            filter: blur(80px);
+            z-index: 1;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .nav-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--light-color) !important;
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .section-heading {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 60px;
+        }
+
+        .section-heading::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--accent-color);
+        }
+
+        .hover-shadow {
+            transition: box-shadow 0.3s ease;
+        }
+
+        .hover-shadow:hover {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        }
+
+        .text-gradient {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
 </head>
 
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="nav-brand" href="#">CalendarPlus</a>
+        </div>
+    </nav>
 
-<body class="bg-light">
-    <div class="container mt-5">
-        <div class="card shadow-lg border-0">
-            <div class="card-body text-center">
-                <h1 class="display-4">Welcome to the Organization Manager</h1>
-                <p class="lead mt-3">Manage your organizations seamlessly.</p>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="decorative-blob" style="top: -200px; left: -200px;"></div>
+        <div class="decorative-blob" style="bottom: -200px; right: -200px;"></div>
+        
+        <div class="container">
+            <div class="hero-content text-center text-white" data-aos="fade-up">
+                <h1 class="display-3 fw-bold mb-4 gradient-text">
+                    Transform Your Team's Scheduling
+                </h1>
+                <p class="lead fs-24 mb-5 opacity-75" data-aos="fade-up" data-aos-delay="100">
+                    Intelligent calendar management for modern teams
+                </p>
+
                 {% if user.is_authenticated %}
-                    <p class="mt-4">You are not a member of any organization yet.</p>
-                    <a href="{% url 'create_organization' %}" class="btn btn-primary btn-lg">
-                        <i class="bi bi-building"></i> Create an Organization
-                    </a>
-
-                  
+                <div data-aos="zoom-in" data-aos-delay="200">
+                    <div class="d-inline-block p-4 feature-card">
+                        <p class="mb-4">Ready to organize your workflow?</p>
+                        <a href="{% url 'create_organization' %}" class="btn btn-cta text-white">
+                            Create Organization <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
                 {% else %}
-                    <p class="mt-4">Please <a href="{% url 'login' %}" class="text-primary">log in</a> to continue.</p>
+                <div data-aos="zoom-in" data-aos-delay="200">
+                    <a href="{% url 'login' %}" class="btn btn-cta text-white me-3">
+                        Get Started <i class="fas fa-rocket ms-2"></i>
+                    </a>
+                    <a href="#features" class="btn btn-outline-light btn-lg">
+                        Learn More
+                    </a>
+                </div>
                 {% endif %}
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-100" id="features">
+        <div class="container">
+            <h2 class="text-center section-heading mb-5" data-aos="fade-up">
+                <span class="text-gradient">Why CalendarPlus?</span>
+            </h2>
+
+            <div class="row g-5">
+                <!-- Feature 1 -->
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="p-4 feature-card hover-shadow">
+                        <div class="feature-icon">
+                            <i class="fas fa-brain text-white fs-4"></i>
+                        </div>
+                        <h4 class="text-white mb-3">AI-Powered Scheduling</h4>
+                        <p class="text-muted">Smart algorithms optimize your team's calendar for maximum productivity</p>
+                    </div>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="p-4 feature-card hover-shadow">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt text-white fs-4"></i>
+                        </div>
+                        <h4 class="text-white mb-3">Enterprise Security</h4>
+                        <p class="text-muted">Military-grade encryption and compliance with industry standards</p>
+                    </div>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="p-4 feature-card hover-shadow">
+                        <div class="feature-icon">
+                            <i class="fas fa-bolt text-white fs-4"></i>
+                        </div>
+                        <h4 class="text-white mb-3">Lightning Fast</h4>
+                        <p class="text-muted">Instant updates and real-time collaboration across all devices</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-100 bg-white">
+        <div class="container">
+            <div class="row g-4 text-center" data-aos="fade-up">
+                <div class="col-md-3">
+                    <h3 class="text-gradient fw-bold display-4">98%</h3>
+                    <p class="text-muted">Customer Satisfaction</p>
+                </div>
+                <div class="col-md-3">
+                    <h3 class="text-gradient fw-bold display-4">1M+</h3>
+                    <p class="text-muted">Daily Meetings</p>
+                </div>
+                <div class="col-md-3">
+                    <h3 class="text-gradient fw-bold display-4">150+</h3>
+                    <p class="text-muted">Integrations</p>
+                </div>
+                <div class="col-md-3">
+                    <h3 class="text-gradient fw-bold display-4">24/7</h3>
+                    <p class="text-muted">Support</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <h5>CalendarPlus</h5>
+                    <p class="text-muted">Reimagining team scheduling for the modern workplace</p>
+                </div>
+                <div class="col-md-2">
+                    <h6>Product</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-muted">Features</a></li>
+                        <li><a href="#" class="text-muted">Security</a></li>
+                        <li><a href="#" class="text-muted">Pricing</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2">
+                    <h6>Company</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-muted">About</a></li>
+                        <li><a href="#" class="text-muted">Blog</a></li>
+                        <li><a href="#" class="text-muted">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6>Stay Updated</h6>
+                    <div class="input-group mb-3">
+                        <input type="email" class="form-control" placeholder="Enter your email">
+                        <button class="btn btn-primary">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 1000,
+            once: true,
+            easing: 'ease-in-out'
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
 </body>
 </html>

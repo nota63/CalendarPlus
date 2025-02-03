@@ -169,9 +169,7 @@ class ActivityChannel(models.Model):
     content = models.TextField(null=True, blank=True) 
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"{self.user.username} performed {self.get_action_type_display()} in {self.channel.name}"
-
+    
     class Meta:
         ordering = ['-timestamp'] 
 

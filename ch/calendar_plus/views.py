@@ -173,6 +173,8 @@ class CreateOrganizationWizardView(SessionWizardView):
                 created_by=self.request.user,
             )
 
+            print('Organization created:',organization)
+
          
             if not hasattr(self.request.user, 'profile'):
                 profile = Profile.objects.create(

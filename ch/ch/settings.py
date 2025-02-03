@@ -56,6 +56,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Application definition
 
 INSTALLED_APPS = [
+    'dm',
     'profiles',
     'organizations',
     'meet',
@@ -281,6 +282,15 @@ STATICFILES_DIRS = [
     BASE_DIR ,"static",
 ]
 
+
+
+STATIC_URL = '/static/'  
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'), ]
+
+# If using collectstatic for production
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  
 
 
 # lOGGING

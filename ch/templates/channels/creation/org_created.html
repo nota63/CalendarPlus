@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to {{ org_name }} | Organization Setup</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom CSS Variables */
+        :root {
+            --primary-color: #4A154B;
+            --secondary-color: #00A884;
+            --accent-color: #ECB22E;
+            --text-dark: #1A1A1A;
+            --text-light: #FFFFFF;
+            --bg-light: #F8F8F8;
+            --transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header Section */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), #2A094B);
+            color: var(--text-light);
+            padding: 4rem 2rem;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-icon {
+            animation: bounce 2s infinite;
+        }
+
+        /* Section Styling */
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.05);
+            transform: translateY(0);
+            transition: var(--transition);
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Grid Layout */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--secondary-color);
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            background: #F9F4FF;
+            transform: translateX(10px);
+        }
+
+        /* Channel Types Grid */
+        .channel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .channel-card {
+            padding: 1.5rem;
+            background: var(--bg-light);
+            border-radius: 10px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .channel-card i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        /* Event Timeline */
+        .timeline {
+            border-left: 3px solid var(--secondary-color);
+            padding-left: 2rem;
+            margin-left: 1rem;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            background: var(--bg-light);
+            border-radius: 8px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2.5rem;
+            top: 1.5rem;
+            width: 15px;
+            height: 15px;
+            background: var(--secondary-color);
+            border-radius: 50%;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 3rem 0;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #ddd;
+            z-index: 0;
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+            transition: var(--transition);
+        }
+
+        .step.active {
+            border-color: var(--secondary-color);
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #381338;
+            transform: scale(1.05);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header {
+                padding: 2rem 1rem;
+                border-radius: 0 0 20px 20px;
+            }
+
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Advanced Hover Effects */
+        .hover-zoom {
+            transition: var(--transition);
+        }
+
+        .hover-zoom:hover {
+            transform: scale(1.02);
+        }
+
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            cursor: help;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-dark);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>
+                <i class="fas fa-rocket header-icon"></i>
+                Welcome to <span class="gradient-text">{{ org_name }}</span>
+            </h1>
+            <p>Your workspace is ready! Let's build something amazing together 🚀</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Organization Details Section -->
+        <section class="section hover-zoom">
+            <h2 class="section-title"><i class="fas fa-building"></i> Organization Details</h2>
+            <div class="grid-container">
+                <div class="feature-card">
+                    <h3><i class="fas fa-user-shield"></i> Admin Details</h3>
+                    <p>{{ admin_name }}<br>{{ admin_email }}</p>
+                </div>
+                <div class="feature-card">
+                    <h3><i class="fas fa-calendar-alt"></i> Created At</h3>
+                    <p>{{ created_at }}</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Getting Started Section -->
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-play-circle"></i> Getting Started</h2>
+            <div class="progress-steps">
+                <div class="step active">1</div>
+                <div class="step">2</div>
+                <div class="step">3</div>
+                <div class="step">4</div>
+            </div>
+
+            <div class="grid-container">
+                <div class="feature-card">
+                    <h3><i class="fas fa-users"></i> Invite Team Members</h3>
+                    <p>Start by inviting your team members to collaborate</p>
+                    <button class="btn btn-primary">Invite People</button>
+                </div>
+                <div class="feature-card">
+                    <h3><i class="fas fa-comments"></i> Create Channels</h3>
+                    <p>Organize discussions with dedicated channels</p>
+                    <button class="btn btn-primary">Create Channel</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Channel Management Section -->
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-hashtag"></i> Channel Types</h2>
+            <div class="channel-grid">
+                <div class="channel-card">
+                    <i class="fas fa-project-diagram"></i>
+                    <h4>Project Starter Kit</h4>
+                    <p>Kickoff new projects with structured templates</p>
+                </div>
+                <!-- Repeat for other channel types -->
+            </div>
+        </section>
+
+        <!-- Event Management Section -->
+        <section class="section">
+            <h2 class="section-title"><i class="fas fa-calendar-check"></i> Event Scheduling</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h4>Team Onboarding Session</h4>
+                    <p>Schedule your first team onboarding event</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Add simple animations on scroll
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('.section');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if(entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            sections.forEach(section => {
+                section.style.opacity = 0;
+                section.style.transform = 'translateY(20px)';
+                section.style.transition = 'all 0.6s ease-out';
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
