@@ -1,5 +1,3 @@
-<!-- chat_room.html -->
-<!-- chat_room.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Room</title>
     <style>
-        /* Basic styling for the chat room */
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -47,6 +44,9 @@
             border: none;
             cursor: pointer;
         }
+        .input-box button:disabled {
+            background-color: #ccc;
+        }
     </style>
 </head>
 <body>
@@ -64,14 +64,14 @@
 
 <div class="input-box">
     <input type="text" id="message-input" placeholder="Type a message...">
-    <button onclick="sendMessage()">Send</button>
+    <button onclick="sendMessage()" id="send-button">Send</button>
 </div>
 
 <script>
-    // JavaScript to handle WebSocket and send messages
     const conversationId = "{{ conversation.id }}";
     const messageInput = document.getElementById("message-input");
     const messagesContainer = document.getElementById("messages");
+    const sendButton = document.getElementById("send-button");
 
     const socket = new WebSocket(
         'ws://' + window.location.host + '/ws/chat/' + conversationId + '/'
@@ -79,22 +79,36 @@
 
     socket.onmessage = function(e) {
         const data = JSON.parse(e.data);
+        
+        // Display the new message
         const messageElement = document.createElement('div');
         messageElement.classList.add('message');
         messageElement.innerHTML = `<span class="sender">${data.sender}:</span> <span class="content">${data.message}</span>`;
         messagesContainer.appendChild(messageElement);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+        // Re-enable the send button
+        sendButton.disabled = false;
     };
 
     function sendMessage() {
         const message = messageInput.value;
         if (message.trim() !== "") {
-            socket.send(JSON.stringify({
-                'message': message
-            }));
-            messageInput.value = "";
+            sendButton.disabled = true;  // Disable button while sending
+            socket.send(JSON.stringify({ 'message': message }));
+            messageInput.value = "";  // Clear input
         }
     }
+
+    // Enable the send button when WebSocket connection opens
+    socket.onopen = function() {
+        sendButton.disabled = false;
+    };
+
+    // If WebSocket closes, re-enable button (for reconnection)
+    socket.onclose = function() {
+        sendButton.disabled = false;
+    };
 </script>
 
 </body>

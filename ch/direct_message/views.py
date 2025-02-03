@@ -57,8 +57,8 @@ def start_chat(request, org_id, user_id):
 
     # Redirect to the conversation page (chat room)
     return redirect('chat_room', conversation_id=conversation.id)
-# views.py
 
+# views.py
 @login_required
 def chat_room(request, conversation_id):
     # Fetch the conversation based on conversation_id
@@ -71,7 +71,7 @@ def chat_room(request, conversation_id):
     # Get the other user in the conversation
     other_user = conversation.get_other_user(request.user)
 
-    # Fetch messages for the conversation
+    # Fetch all messages for the conversation ordered by timestamp
     messages = Message.objects.filter(conversation=conversation).order_by('timestamp')
 
     # Render the chat room template
