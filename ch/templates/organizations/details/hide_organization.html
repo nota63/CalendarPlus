@@ -1,59 +1,401 @@
-{% extends "custom.html" %}
+{% extends 'custom.html' %}
 
 {% block content %}
-  <h2>Hide Organization - {{ organization.name }}</h2>
 
-  <section>
-      {% if messages %}
-        {% for m in messages %}
-          <strong>{{m}}</strong>
-        {% endfor %}
-     {% endif %}     
-  </section>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hide Organization - {{ organization.name }} | Admin Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4A154B;
+            --secondary: #611F69;
+            --accent: #E01E5A;
+            --background: #F8F9FC;
+            --text: #1A1D24;
+            --border: #E3E8EE;
+        }
 
-  <!-- Admin Guidelines Section -->
-  <div class="alert alert-info">
-    <strong>Guidelines:</strong>
-    <ul>
-      <li>Use this feature to temporarily hide the organization from staff members.</li>
-      <li>The organization will be hidden from the specified <strong>Hide From</strong> date until the <strong>Hide Until</strong> date.</li>
-      <li>Staff members in this organization will not be able to view it during this period.</li>
-      <li>Only admins can perform this action.</li>
-    </ul>
-  </div>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-  <!-- Form to hide the organization -->
-  <form method="POST">
-    {% csrf_token %}
-    <div class="mb-3">
-      <label for="hidden_from" class="form-label">Hide From</label>
-      <input type="datetime-local" class="form-control" id="hidden_from" name="hidden_from" required>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .header h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .alert {
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .alert:hover {
+            transform: translateY(-2px);
+        }
+
+        .alert-info {
+            background: #F0F4FF;
+            border: 1px solid #C2D6FF;
+            color: #2A4E96;
+        }
+
+        .alert-warning {
+            background: #FFF4E6;
+            border: 1px solid #FFD8B2;
+            color: #663C00;
+        }
+
+        .alert strong {
+            display: block;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .alert ul {
+            padding-left: 1.5rem;
+        }
+
+        .alert ul li {
+            margin-bottom: 0.75rem;
+            position: relative;
+        }
+
+        .alert ul li:before {
+            content: '•';
+            color: currentColor;
+            position: absolute;
+            left: -1.2rem;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .form-group {
+            margin-bottom: 1.8rem;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74,21,75,0.1);
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-check-input {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.75rem;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .form-check-label {
+            font-size: 0.95rem;
+            color: var(--text);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-danger {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #C41C4D;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(224,30,90,0.2);
+        }
+
+        .icon {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .messages {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 400px;
+        }
+
+        .message {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            animation: slideIn 0.4s ease-out;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .message strong {
+            display: flex;
+            align-items: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+            margin-right: 0.75rem;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .date-input-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-highlight {
+            border-left: 4px solid var(--primary);
+            padding-left: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature-highlight p {
+            font-size: 0.95rem;
+            color: #666;
+            line-height: 1.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Messages -->
+        <section class="messages">
+            {% if messages %}
+                {% for m in messages %}
+                    <div class="message alert-info">
+                        <strong><i class="fas fa-info-circle icon"></i>{{ m }}</strong>
+                    </div>
+                {% endfor %}
+            {% endif %}     
+        </section>
+
+        <!-- Header -->
+        <header class="header">
+            <h2>Hide Organization - {{ organization.name }}</h2>
+            <div class="feature-highlight">
+                <p>Temporarily restrict organization visibility while maintaining administrative control.</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Guidelines Card -->
+            <div class="alert alert-info">
+                <strong><i class="fas fa-info-circle icon"></i>Administration Guidelines</strong>
+                <ul>
+                    <li>Use this feature to temporarily hide the organization from staff members.</li>
+                    <li>The organization will be hidden from the specified <strong>Hide From</strong> date until the <strong>Hide Until</strong> date.</li>
+                    <li>Staff members in this organization will not be able to view it during this period.</li>
+                    <li>Only admins can perform this action.</li>
+                </ul>
+            </div>
+
+            <!-- Form Card -->
+            <div class="form-card">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <!-- Date Inputs -->
+                    <div class="date-input-group">
+                        <div class="form-group">
+                            <label class="form-label" for="hidden_from"><i class="fas fa-calendar-minus icon"></i>Hide From</label>
+                            <input type="datetime-local" class="form-control" id="hidden_from" name="hidden_from" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="hidden_until"><i class="fas fa-calendar-check icon"></i>Hide Until</label>
+                            <input type="datetime-local" class="form-control" id="hidden_until" name="hidden_until" required>
+                        </div>
+                    </div>
+
+                    <!-- Toggles -->
+                    <div class="form-group">
+                        <div class="form-check">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="notify_members" name="notify_members">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <label class="form-check-label" for="notify_members">
+                                Notify staff members via email
+                                <span class="hint-text">(Custom notification message will be sent)</span>
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="hide_on_sundays_and_holidays" name="hide_on_sundays_and_holidays">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <label class="form-check-label" for="hide_on_sundays_and_holidays">
+                                Auto-hide on Sundays & holidays
+                                <span class="hint-text">(Based on regional calendar)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-eye-slash icon"></i>
+                        Confirm Hide Organization
+                    </button>
+                </form>
+            </div>
+
+            <!-- Impact Section -->
+            <div class="alert alert-warning">
+                <strong><i class="fas fa-exclamation-triangle icon"></i>Staff Impact Analysis</strong>
+                <p class="mt-2">This action will immediately restrict access for all 245 staff members. Any active sessions will be terminated within 5 minutes. Critical admin functions will remain accessible.</p>
+            </div>
+        </main>
     </div>
-    <div class="mb-3">
-      <label for="hidden_until" class="form-label">Hide Until</label>
-      <input type="datetime-local" class="form-control" id="hidden_until" name="hidden_until" required>
-    </div>
-    
-    <!-- Toggle for Email Notification -->
-    <div class="mb-3 form-check">
-      <input type="checkbox" class="form-check-input" id="notify_members" name="notify_members">
-      <label class="form-check-label" for="notify_members">Notify staff members about the hidden status</label>
-    </div>
 
-    <!-- Add a toggle for "Hide on Sundays and Holidays" -->
-  <div class="mb-3 form-check">
-    <input type="checkbox" class="form-check-input" id="hide_on_sundays_and_holidays" name="hide_on_sundays_and_holidays">
-    <label class="form-check-label" for="hide_on_sundays_and_holidays">Hide organization on Sundays and holidays</label>
-  </div>
-  
-    
-    <button type="submit" class="btn btn-danger">Hide Organization</button>
-  </form>
+    <script>
+        // Add smooth transitions for form elements
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.style.transform = 'translateX(5px)';
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.style.transform = 'translateX(0)';
+            });
+        });
 
-  <!-- Effect on Staff -->
-  <div class="alert alert-warning mt-4">
-    <strong>Effect on Staff:</strong>
-    <p>Once the organization is hidden, all staff members associated with this organization will not be able to access it until the <strong>Hide Until</strong> date. Make sure you communicate with your team about this change.</p>
-  </div>
+        // Auto-close messages after 5 seconds
+        setTimeout(() => {
+            document.querySelectorAll('.message').forEach(msg => {
+                msg.style.transform = 'translateX(150%)';
+                setTimeout(() => msg.remove(), 300);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>
 
 {% endblock %}
