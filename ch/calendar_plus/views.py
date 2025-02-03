@@ -134,6 +134,15 @@ class LandingPageView(LoginRequiredMixin, TemplateView):
         
             return JsonResponse({'exception':str(e)}, status = 400)
 
+
+
+
+
+
+
+
+
+
 # create organization
 
 TEMP_FILE_STORAGE = FileSystemStorage(location=os.path.join("media", "temp"))
@@ -152,6 +161,73 @@ TEMPLATES = {
     "current_project": "wizard/current_project.html",
 }
 
+# class CreateOrganizationWizardView(SessionWizardView):
+#     form_list = FORMS
+#     file_storage = TEMP_FILE_STORAGE
+
+#     def get_template_names(self):
+#         """Select the template based on the current step."""
+#         return [TEMPLATES[self.steps.current]]
+
+#     def done(self, form_list, **kwargs):
+#         """Handle the form submission at the end."""
+   
+#         data = {key: form.cleaned_data for key, form in zip(self.get_form_list(), form_list)}
+
+#         try:
+     
+#             organization = Organization.objects.create(
+#                 name=data["org_name"]["name"],
+#                 description=data["org_desc"]["description"],
+#                 created_by=self.request.user,
+#             )
+
+#             print('Organization created:',organization)
+
+         
+#             if not hasattr(self.request.user, 'profile'):
+#                 profile = Profile.objects.create(
+#                     user=self.request.user,
+#                     organization=organization,
+#                     full_name=data["profile_info"]["full_name"],
+#                     profile_picture=data["profile_info"].get("profile_picture"),
+#                     is_admin=True,
+#                 )
+#             else:
+#                 profile = self.request.user.profile
+#                 profile.organization = organization
+#                 profile.full_name = data["profile_info"]["full_name"]
+#                 profile.profile_picture = data["profile_info"].get("profile_picture")
+#                 profile.save()
+
+       
+#             project_name = data["current_project"].get("current_project")
+#             if not project_name:
+#                 messages.error(self.request, "Project name is missing.")
+#                 return redirect("create_organization")
+
+      
+#             project = Project.objects.create(
+#                 name=project_name,
+#                 description="null",
+#                 organization=organization,
+#                 created_by=profile,  
+#             )
+
+    
+#             messages.success(self.request, "Organization and Project created successfully!")
+
+#             return redirect("org_detail", org_id=organization.id)
+
+#         except Exception as e:
+       
+#             messages.error(self.request, f"Error creating organization or project: {e}")
+#             return redirect("create_organization")
+        
+# Define logger directly in the view
+
+logger = logging.getLogger(__name__)  # Using the module's name for the logger
+
 class CreateOrganizationWizardView(SessionWizardView):
     form_list = FORMS
     file_storage = TEMP_FILE_STORAGE
@@ -162,20 +238,21 @@ class CreateOrganizationWizardView(SessionWizardView):
 
     def done(self, form_list, **kwargs):
         """Handle the form submission at the end."""
-   
         data = {key: form.cleaned_data for key, form in zip(self.get_form_list(), form_list)}
-
+        
         try:
-     
+            # Log the incoming data for debugging purposes
+            logger.debug(f"Received form data: {data}")
+
+            # Create the organization
             organization = Organization.objects.create(
                 name=data["org_name"]["name"],
                 description=data["org_desc"]["description"],
-                created_by=self.request.user,
+               
             )
+            logger.info(f"Organization created successfully: {organization.name} (ID: {organization.id})")
 
-            print('Organization created:',organization)
-
-         
+            # Create or update the profile
             if not hasattr(self.request.user, 'profile'):
                 profile = Profile.objects.create(
                     user=self.request.user,
@@ -184,37 +261,62 @@ class CreateOrganizationWizardView(SessionWizardView):
                     profile_picture=data["profile_info"].get("profile_picture"),
                     is_admin=True,
                 )
+                logger.info(f"Profile created for user {self.request.user.username} as admin")
             else:
                 profile = self.request.user.profile
                 profile.organization = organization
                 profile.full_name = data["profile_info"]["full_name"]
                 profile.profile_picture = data["profile_info"].get("profile_picture")
                 profile.save()
+                logger.info(f"Profile updated for user {self.request.user.username}")
 
-       
+            # Handle project creation
             project_name = data["current_project"].get("current_project")
             if not project_name:
                 messages.error(self.request, "Project name is missing.")
+                logger.error("Project name missing in form data")
                 return redirect("create_organization")
 
-      
             project = Project.objects.create(
                 name=project_name,
                 description="null",
                 organization=organization,
                 created_by=profile,  
             )
+            logger.info(f"Project created successfully: {project.name} (ID: {project.id})")
 
-    
+            # Success message
             messages.success(self.request, "Organization and Project created successfully!")
+            logger.info(f"Organization and Project creation successful. Redirecting to org_detail view.")
 
             return redirect("org_detail", org_id=organization.id)
 
-        except Exception as e:
-       
-            messages.error(self.request, f"Error creating organization or project: {e}")
+        except ValidationError as e:
+            # Catch validation errors
+            messages.error(self.request, f"Validation error: {e}")
+            logger.error(f"Validation error: {e}")
             return redirect("create_organization")
         
+        except Exception as e:
+            # Log the full error and traceback
+            messages.error(self.request, f"Error creating organization or project: {e}")
+            logger.exception(f"Error occurred during organization or project creation: {e}")
+            return redirect("create_organization")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # edit profile 

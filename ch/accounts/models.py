@@ -107,6 +107,8 @@ class Project(models.Model):
     def __str__(self):
         return self.name
 
+
+
 # Model to assign managers to projects
 class ProjectManagerAssignment(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE,related_name='projects_assignments')

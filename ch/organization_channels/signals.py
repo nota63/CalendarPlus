@@ -132,35 +132,35 @@ def send_unban_email(sender, instance, created, **kwargs):
 
 # Create a social channel by default for every organization
 
-@receiver(post_save, sender=Organization)
-def create_social_channel_and_send_email(sender, instance, created, **kwargs):
-    if created:  # Only run when a new organization is created
-        admin_profile = Profile.objects.get(organization=instance, role="admin")
-        admin_user = admin_profile.user  # Get the admin user
+# @receiver(post_save, sender=Organization)
+# def create_social_channel_and_send_email(sender, instance, created, **kwargs):
+#     if created:  # Only run when a new organization is created
+#         admin_profile = Profile.objects.get(organization=instance, role="admin")
+#         admin_user = admin_profile.user  # Get the admin user
 
-        # ✅ Create "Social" Channel
-        Channel.objects.create(
-            organization=instance,
-            created_by=admin_user,
-            name="Social",
-            type="BLANK",
-            visibility="PUBLIC",
-        )
+#         # ✅ Create "Social" Channel
+#         Channel.objects.create(
+#             organization=instance,
+#             created_by=admin_user,
+#             name="Social",
+#             type="BLANK",
+#             visibility="PUBLIC",
+#         )
 
-        # ✅ Send Email to Admin
-        subject = "🎉 Your Organization Has Been Created!"
-        context = {
-            "admin_name": admin_user.get_full_name(),
-            "admin_email": admin_user.email,
-            "org_name": instance.name,
-            "created_at": instance.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-        }
-        html_message = render_to_string("emails/org_created.html", context)
-        plain_message = strip_tags(html_message)  # Convert HTML to plain text
-        send_mail(
-            subject,
-            plain_message,
-            settings.DEFAULT_FROM_EMAIL,
-            [admin_user.email],
-            html_message=html_message,
-        )
+#         # ✅ Send Email to Admin
+#         subject = "🎉 Your Organization Has Been Created!"
+#         context = {
+#             "admin_name": admin_user.get_full_name(),
+#             "admin_email": admin_user.email,
+#             "org_name": instance.name,
+#             "created_at": instance.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+#         }
+#         html_message = render_to_string("emails/org_created.html", context)
+#         plain_message = strip_tags(html_message)  # Convert HTML to plain text
+#         send_mail(
+#             subject,
+#             plain_message,
+#             settings.DEFAULT_FROM_EMAIL,
+#             [admin_user.email],
+#             html_message=html_message,
+#         )
