@@ -14,15 +14,17 @@ class OrganizationHide(models.Model):
     )  
     to_organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE, related_name="hidden_from"
-    )  # The organization being hidden  
+    )  
     hider = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="hidden_organizations"
-    )  # The admin who hid the organization  
-    hidden_from = models.DateTimeField()  # Start date  
-    hidden_until = models.DateTimeField()  # End date  
+    )   
+    hidden_from = models.DateTimeField()  
+    hidden_until = models.DateTimeField()  
     created_at = models.DateTimeField(auto_now_add=True)  
     updated_at = models.DateTimeField(auto_now=True)  
     notify_members=models.BooleanField(default=False, null=True, blank=True)
+    hide_on_sundays_and_holidays = models.BooleanField(default=False,null=True, blank=True)  
+
 
     def is_active(self):
         """Check if the hide is currently active"""

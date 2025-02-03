@@ -8,7 +8,7 @@
         {% for m in messages %}
           <strong>{{m}}</strong>
         {% endfor %}
-      {% endif %}     
+     {% endif %}     
   </section>
 
   <!-- Admin Guidelines Section -->
@@ -39,6 +39,13 @@
       <input type="checkbox" class="form-check-input" id="notify_members" name="notify_members">
       <label class="form-check-label" for="notify_members">Notify staff members about the hidden status</label>
     </div>
+
+    <!-- Add a toggle for "Hide on Sundays and Holidays" -->
+  <div class="mb-3 form-check">
+    <input type="checkbox" class="form-check-input" id="hide_on_sundays_and_holidays" name="hide_on_sundays_and_holidays">
+    <label class="form-check-label" for="hide_on_sundays_and_holidays">Hide organization on Sundays and holidays</label>
+  </div>
+  
     
     <button type="submit" class="btn btn-danger">Hide Organization</button>
   </form>
@@ -49,4 +56,4 @@
     <p>Once the organization is hidden, all staff members associated with this organization will not be able to access it until the <strong>Hide Until</strong> date. Make sure you communicate with your team about this change.</p>
   </div>
 
-  {% endblock %}
+{% endblock %}

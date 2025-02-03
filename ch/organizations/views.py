@@ -17,6 +17,8 @@ from .models import OrganizationHide
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
+from datetime import timedelta
+import holidays
 # Create your views here.
 
 @csrf_exempt
@@ -673,41 +675,36 @@ def workflow_template(request, org_id):
 
 
 
+
 # Hide Organization
+
 @login_required
 def hide_organization(request, org_id):
     organization = get_object_or_404(Organization, id=org_id)
-
-    profile = Profile.objects.filter(user=request.user, organization=organization, is_admin=True).first()
-    if not profile:
-        return JsonResponse({"error": "You do not have permission to extend invitations."}, status=403)
-
 
     if request.method == "POST":
         hidden_from = request.POST.get('hidden_from')
         hidden_until = request.POST.get('hidden_until')
         
-     
-        notify_members = True  
+      
+        hide_on_sundays_and_holidays = request.POST.get('hide_on_sundays_and_holidays') == 'on'
 
         if hidden_from and hidden_until:
-            
+           
             hide_info = OrganizationHide.objects.create(
                 from_organization=organization,
                 to_organization=organization,
                 hidden_from=hidden_from,
                 hidden_until=hidden_until,
-                hider=request.user  
+                hider=request.user,  
+                hide_on_sundays_and_holidays=hide_on_sundays_and_holidays 
             )
 
             
-            staff_profiles = Profile.objects.filter(organization=organization, is_employee=True,is_manager=True)
+            staff_profiles = Profile.objects.filter(organization=organization, is_employee=True, is_manager=True)
 
-            for profile in staff_profiles:
-                profile.hidden_organization = True  
-                profile.save()
-
-            
+           
+          
             staff_emails = [profile.user.email for profile in staff_profiles]
 
             send_mail(
@@ -718,9 +715,21 @@ def hide_organization(request, org_id):
                 fail_silently=False,
             )
 
-            messages.success(request,f'{organization.name} hidden successfully')
-            return redirect('hide_workspace',org_id=organization.id)
-
             
+            if hide_on_sundays_and_holidays:
+               
+                hidden_from_datetime = datetime.strptime(hidden_from, '%Y-%m-%dT%H:%M')  
+                hidden_until_datetime = datetime.strptime(hidden_until, '%Y-%m-%dT%H:%M')  
+                
+                
+                if hidden_from_datetime.weekday() == 6 or hidden_from_datetime in holidays.CountryHoliday('US'):
+                    hidden_from_datetime += timedelta(days=1)  
+                
+              
+                hide_info.hidden_from = hidden_from_datetime
+                hide_info.hidden_until = hidden_until_datetime
+                hide_info.save()
+
+            messages.success(request,f'{organization.name} hidden successfully')
 
     return render(request, 'organizations/details/hide_organization.html', {'organization': organization})
