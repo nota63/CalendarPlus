@@ -362,23 +362,59 @@ class EditProfileView(LoginRequiredMixin, View):
 # ADD MEMBERS 
 
 # organizations
+from organizations.models import OrganizationHide
+import calendar
 
+
+# DISPLAY AND CONFIGURE HIDDEN WORKSPACES
 class OrganizationListView(LoginRequiredMixin, ListView):
     model = Organization
     template_name = 'calendar/organizations_list.html'
     context_object_name = 'organizations'
 
     def get_queryset(self):
+        
         user_profiles = Profile.objects.filter(user=self.request.user)
-        return Organization.objects.filter(profiles__in=user_profiles)
+        
+        
+        organizations = Organization.objects.filter(profiles__in=user_profiles)
+
+        now = timezone.now()
+
+       
+        hidden_organizations = OrganizationHide.objects.filter(
+            Q(hidden_from__lte=now, hidden_until__gte=now) | 
+            Q(hide_on_sundays_and_holidays=True)
+        ).values_list('to_organization', flat=True)
+
+        
+        today = timezone.now().date()
+        is_sunday = today.weekday() == calendar.SUNDAY
+
+        
+        holidays = [
+            datetime(today.year, 12, 25),  
+            datetime(today.year, 1, 1),    
+            
+        ]
+        is_holiday = today in [holiday.date() for holiday in holidays]
+
+    
+        if is_sunday or is_holiday:
+            organizations = organizations.exclude(id__in=hidden_organizations)
+
+    
+        organizations = organizations.exclude(id__in=hidden_organizations)
+
+        return organizations
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Fetch the user profiles for the current user
+
         user_profiles = Profile.objects.filter(user=self.request.user)
 
-        # Add member count to the context for each organization
+
         organizations_with_member_count = []
         for organization in context['organizations']:
             member_count = Profile.objects.filter(organization=organization).count()
@@ -389,10 +425,6 @@ class OrganizationListView(LoginRequiredMixin, ListView):
 
         context['organizations_with_member_count'] = organizations_with_member_count
         return context
-
-
-
-
 
 
 
