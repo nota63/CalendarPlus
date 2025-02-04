@@ -624,3 +624,68 @@ def add_event_attachment(request, event_id):
 
     return JsonResponse({"success": False, "message": "Invalid request method."})
 
+
+
+# HANDLE DUPLICATION OF EVENT
+
+@login_required
+def duplicate_event(request, event_id):
+    try:
+        # Fetch user's Google Auth credentials
+        google_auth = GoogleAuth.objects.get(user=request.user)
+
+        # Create OAuth2 credentials
+        credentials = Credentials(
+            token=google_auth.access_token,
+            refresh_token=google_auth.refresh_token,
+            token_uri="https://oauth2.googleapis.com/token",
+            client_id=settings.GOOGLE_CLIENT_ID,
+            client_secret=settings.GOOGLE_CLIENT_SECRET,
+            scopes=[
+                "https://www.googleapis.com/auth/calendar.events",
+                "https://www.googleapis.com/auth/drive.file"
+            ]
+        )
+
+        # Refresh token if expired
+        if credentials and credentials.expired and credentials.refresh_token:
+            credentials.refresh(Request())
+
+        # Initialize Google Calendar service
+        service = build('calendar', 'v3', credentials=credentials)
+
+        # Fetch the original event details
+        original_event = service.events().get(calendarId='primary', eventId=event_id).execute()
+
+        # Extract details for duplication
+        duplicated_event = {
+            "summary": original_event.get("summary", "Duplicated Event"),
+            "location": original_event.get("location", ""),
+            "description": original_event.get("description", ""),
+            "start": original_event["start"],  # Start date & time
+            "end": original_event["end"],  # End date & time
+            "attendees": original_event.get("attendees", []),  # Guests
+            "reminders": original_event.get("reminders", {}),
+            "conferenceData": original_event.get("conferenceData", {}),  # Meeting link
+            "attachments": original_event.get("attachments", []),  # Attachments
+        }
+
+        # ✅ Create the new duplicated event
+        new_event = service.events().insert(
+            calendarId="primary",
+            body=duplicated_event,
+            conferenceDataVersion=1,  # Required for Google Meet links
+            supportsAttachments=True
+        ).execute()
+
+        return JsonResponse({
+            "success": True,
+            "message": "Event duplicated successfully!",
+            "new_event_id": new_event["id"],
+            "event_link": new_event["htmlLink"]
+        })
+
+    except GoogleAuth.DoesNotExist:
+        return JsonResponse({"success": False, "message": "Google credentials not found. Please authenticate."})
+    except Exception as e:
+        return JsonResponse({"success": False, "message": str(e)})

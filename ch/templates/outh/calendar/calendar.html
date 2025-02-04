@@ -391,6 +391,9 @@
                    <button id="exportPDFBtn" class="btn btn-primary" data-event-id="">Export as PDF</button>
                    <button id="deleteEventBtn" class="btn btn-primary" data-event-id="">Delete</button>
                    <button id="attachmentsEventBtn" class="btn btn-primary" data-event-id="">Add attachments</button>
+                   <button id="duplicateEventBtn" class="btn btn-primary" data-event-id="">Duplicate</button>
+
+
 
 
                 </div>
@@ -433,6 +436,7 @@
             $('#exportPDFBtn').data('event-id', calEvent.id);
             $('#deleteEventBtn').data('event-id', calEvent.id); // Set the event ID on delete button
             $('#attachmentsEventBtn').data('event-id', calEvent.id);
+            $('#duplicateEventBtn').data('event-id', calEvent.id);
 
             // Fetch event details using AJAX
             $.ajax({
@@ -634,6 +638,35 @@ $('#attachmentsEventBtn').click(function() {
             });
         });
     });
+
+// HANDLE DUPLICATION OF EVENT
+
+    $('#duplicateEventBtn').click(function () {
+    const eventId = $(this).data('event-id');
+
+    if (!eventId) {
+        alert('Event ID is missing!');
+        return;
+    }
+
+    $.ajax({
+        url: '/oauth/google_duplicate_event/' + eventId + '/',
+        method: 'POST',
+        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+        success: function (response) {
+            if (response.success) {
+                alert('✅ Event duplicated successfully! Open it here: ' + response.event_link);
+                console.log(response.new_event_id);
+            } else {
+                alert('❌ Error: ' + response.message);
+            }
+        },
+        error: function (xhr) {
+            alert('❌ Error: ' + xhr.responseText);
+        }
+    });
+});
+
 
 
     </script>
