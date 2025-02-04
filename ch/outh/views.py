@@ -9,6 +9,33 @@ from django.http import JsonResponse
 from .models import GoogleAuth
 from django.contrib.auth.decorators import login_required
 import json
+import csv
+from io import BytesIO
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django.conf import settings
+from googleapiclient.discovery import build
+from google.oauth2.credentials import Credentials
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.http import JsonResponse
+from google_auth_oauthlib.flow import Flow
+from google.auth.transport.requests import Request
+from google.auth.exceptions import GoogleAuthError
+from .models import GoogleAuth  # Assuming you have a GoogleAuth model
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
+from datetime import datetime, timedelta
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
+from datetime import datetime
+from google.auth.transport.requests import Request
 
 
 # Initiation template
@@ -16,16 +43,6 @@ import json
 def google(request):
 
     return render(request,'outh/login/initiate.html')
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -53,15 +70,6 @@ def google_calendar_connect(request):
     return redirect(authorization_url)
 
 # -----------------------------------------------------------------------------------
-from django.contrib.auth.decorators import login_required
-from django.conf import settings
-from django.http import JsonResponse
-from google_auth_oauthlib.flow import Flow
-from google.auth.transport.requests import Request
-from google.auth.exceptions import GoogleAuthError
-from .models import GoogleAuth  # Assuming you have a GoogleAuth model
-from google_auth_oauthlib.flow import InstalledAppFlow
-
 
 
 
@@ -132,16 +140,6 @@ def google_calendar_callback(request):
 
 
 # Calendar Connected successfully
-from googleapiclient.discovery import build
-from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build
-from datetime import datetime, timedelta
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build
-from datetime import datetime
-from google.auth.transport.requests import Request
 
 @login_required
 def get_google_events(request):
@@ -385,3 +383,144 @@ def create_google_event(request):
             return JsonResponse({"error": str(e)}, status=400)
 
     return JsonResponse({"error": "Invalid request method"}, status=400)
+
+
+
+
+
+# GENERATE AND EXPORT EVENT REPORTS
+def gett_google_event_details(event_id, credentials):
+    service = build('calendar', 'v3', credentials=credentials)
+    event = service.events().get(calendarId='primary', eventId=event_id).execute()
+
+    event_details = {
+        "id": event.get("id"),
+        "title": event.get("summary", "No Title"),
+        "description": event.get("description", "No Description"),
+        "start": event["start"].get("dateTime", event["start"].get("date")),
+        "end": event["end"].get("dateTime", event["end"].get("date")),
+        "location": event.get("location", "No Location"),
+        "organizer": event.get("organizer", {}).get("email", "No Organizer"),
+        "meeting_link": event.get("hangoutLink", "No Meeting Link"),
+        "guests": [
+            attendee["email"] for attendee in event.get("attendees", []) if "email" in attendee
+        ],
+        "reminders": event.get("reminders", {}).get("overrides", []),
+        "attachments": [
+            {
+                "fileId": attachment.get("fileId"),
+                "title": attachment.get("title"),
+                "mimeType": attachment.get("mimeType"),
+                "fileUrl": attachment.get("fileUrl"),
+            }
+            for attachment in event.get("attachments", [])
+        ]
+    }
+
+    return event_details
+
+def generate_event_report(request, event_id):
+    try:
+        # Fetch GoogleAuth instance for the authenticated user
+        google_auth = GoogleAuth.objects.get(user=request.user)
+
+        # Debugging: Ensure google_auth contains the expected values
+        print(f"Access Token: {google_auth.access_token}")
+        print(f"Refresh Token: {google_auth.refresh_token}")
+
+        # Check if refresh_token is available
+        if not google_auth.refresh_token:
+            return HttpResponse("Refresh token is missing. Please re-authenticate.", status=400)
+
+        # Create Credentials object using the stored access and refresh tokens
+        credentials = Credentials(
+            token=google_auth.access_token,
+            refresh_token=google_auth.refresh_token,
+            token_uri="https://oauth2.googleapis.com/token",
+            client_id=settings.GOOGLE_CLIENT_ID,  # Assuming client_id is stored in your settings
+            client_secret=settings.GOOGLE_CLIENT_SECRET  # Assuming client_secret is stored in your settings
+        )
+
+        # Debugging: Ensure credentials are being created correctly
+        print(f"Credentials: {credentials}")
+
+        # Refresh the token if expired
+        if credentials and credentials.expired and credentials.refresh_token:
+            try:
+                credentials.refresh(Request())
+            except Exception as e:
+                return HttpResponse(f"Failed to refresh token: {str(e)}", status=500)
+
+        # Fetch the event details from Google Calendar API
+        event_details = gett_google_event_details(event_id, credentials)
+
+        # Check if the user requested CSV or PDF export
+        export_type = request.GET.get('export', 'csv')  # Default to CSV if no export type provided
+        
+        if export_type == 'csv':
+            return generate_csv_report(event_details)
+        elif export_type == 'pdf':
+            return generate_pdf_report(event_details)
+        else:
+            return HttpResponse("Invalid export type.", status=400)
+
+    except GoogleAuth.DoesNotExist:
+        return HttpResponse("Google credentials not found. Please authenticate.", status=400)
+
+def generate_csv_report(event_details):
+    # Create a CSV response
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="event_{event_details["id"]}_report.csv"'
+    writer = csv.writer(response)
+
+    # Write header
+    writer.writerow(['Event Title', 'Event Description', 'Event Start Date', 'Event End Date', 'Location', 'Organizer', 'Guest Email'])
+
+    # Write event data
+    writer.writerow([
+        event_details['title'],
+        event_details['description'],
+        event_details['start'],
+        event_details['end'],
+        event_details['location'],
+        event_details['organizer'],
+        ', '.join(event_details['guests'])  # List of guest emails
+    ])
+
+    return response
+
+def generate_pdf_report(event_details):
+    # Create a PDF response
+    buffer = BytesIO()
+    p = canvas.Canvas(buffer, pagesize=letter)
+
+    # Title
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(72, 750, f"Google Calendar Event Report for {event_details['title']}")
+
+    # Event details
+    p.setFont("Helvetica", 12)
+    p.drawString(72, 725, f"Event Description: {event_details['description']}")
+    p.drawString(72, 705, f"Start Date: {event_details['start']}")
+    p.drawString(72, 685, f"End Date: {event_details['end']}")
+    p.drawString(72, 665, f"Location: {event_details['location']}")
+    p.drawString(72, 645, f"Organizer: {event_details['organizer']}")
+
+    # Attendees list
+    p.drawString(72, 625, f"Attendees:")
+
+    y_position = 605
+    for guest in event_details['guests']:
+        p.drawString(72, y_position, f"- {guest}")
+        y_position -= 20
+
+    # Finalize the PDF
+    p.showPage()
+    p.save()
+
+    # Return the PDF as response
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="event_{event_details["id"]}_report.pdf"'
+
+    return response

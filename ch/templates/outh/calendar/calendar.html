@@ -110,124 +110,155 @@
                     <p><strong>Guests:</strong> <span id="eventGuestsDetail"></span></p>
                     <p><strong>Meeting Link:</strong> <span id="eventMeetingLinkDetail"></span></p>
                     <p><strong>Attachments:</strong> <span id="eventAttachmentsDetail"></span></p>
+                    <p><strong>Reminders:</strong> <span id="eventRemindersDetail"></span></p>
+
+                    <!-- Export buttons in your modal or page -->
+                   <button id="exportCSVBtn" class="btn btn-primary" data-event-id="">Export as CSV</button>
+                   <button id="exportPDFBtn" class="btn btn-primary" data-event-id="">Export as PDF</button>
+                   <button id="deleteEventBtn" class="btn btn-primary" data-event-id="">Delete</button>
+
                 </div>
+                <!-- Button for CSV Export -->
             </div>
         </div>
     </div>
 
     <script>
        
-        $(document).ready(function() {
-            $('#calendar').fullCalendar({
-                events: '/oauth/calendar/google_events/',
-                selectable: true,
-                select: function(start) {
-                    // Automatically set the selected date as the start date
-                    $('#eventStartDateInput').val(moment(start).format('YYYY-MM-DD'));
-                    $('#eventStartTimeInput').val(moment(start).format('HH:mm'));
-                    $('#eventEndDateInput').val(moment(start).add(1, 'hour').format('YYYY-MM-DD')); // Default end date is 1 hour after start
-                    $('#eventEndTimeInput').val(moment(start).add(1, 'hour').format('HH:mm')); // Default end time is 1 hour after start
-                    $('#createEventModal').modal('show');
-                },
-                eventClick: function(calEvent) {
-                    // Fetch event details using AJAX
-                    $.ajax({
-                        url: '/oauth/google_event_details/' + calEvent.id + '/',
-                        method: 'GET',
-                        success: function(data) {
-                            // Populate modal with event details
-                            $('#eventTitleDetail').text(data.title);
-                            $('#eventStartDetail').text(moment(data.start).format('YYYY-MM-DD HH:mm'));
-                            $('#eventEndDetail').text(moment(data.end).format('YYYY-MM-DD HH:mm'));
-                            $('#eventLocationDetail').text(data.location);
-                            $('#eventDescriptionDetail').text(data.description);
-                            $('#eventOrganizerDetail').text(data.organizer);
-                            $('#eventGuestsDetail').text(data.guests.join(', '));
+       $(document).ready(function() {
+    // Initialize FullCalendar
+    $('#calendar').fullCalendar({
+        events: '/oauth/calendar/google_events/', // Fetch Google Calendar events
+        selectable: true, // Allow selecting date ranges
+        select: function(start) {
+            // Automatically set the selected date as the start date
+            $('#eventStartDateInput').val(moment(start).format('YYYY-MM-DD'));
+            $('#eventStartTimeInput').val(moment(start).format('HH:mm'));
+            $('#eventEndDateInput').val(moment(start).add(1, 'hour').format('YYYY-MM-DD')); // Default end date is 1 hour after start
+            $('#eventEndTimeInput').val(moment(start).add(1, 'hour').format('HH:mm')); // Default end time is 1 hour after start
+            $('#createEventModal').modal('show');
+        },
+        eventClick: function(calEvent) {
+            // Set the event ID on export buttons dynamically
+            $('#exportCSVBtn').data('event-id', calEvent.id);
+            $('#exportPDFBtn').data('event-id', calEvent.id);
 
-                            // Display the meeting link as "Join Meeting" if available
-                            if (data.meeting_link && data.meeting_link !== "No Meeting Link") {
-                                $('#eventMeetingLinkDetail').html(`<a href="${data.meeting_link}" target="_blank">Join Meeting</a>`);
-                            } else {
-                                $('#eventMeetingLinkDetail').text(data.meeting_link);
-                            }
+            // Fetch event details using AJAX
+            $.ajax({
+                url: '/oauth/google_event_details/' + calEvent.id + '/',
+                method: 'GET',
+                success: function(data) {
+                    // Populate modal with event details
+                    $('#eventTitleDetail').text(data.title);
+                    $('#eventStartDetail').text(moment(data.start).format('YYYY-MM-DD HH:mm'));
+                    $('#eventEndDetail').text(moment(data.end).format('YYYY-MM-DD HH:mm'));
+                    $('#eventLocationDetail').text(data.location);
+                    $('#eventDescriptionDetail').text(data.description);
+                    $('#eventOrganizerDetail').text(data.organizer);
+                    $('#eventGuestsDetail').text(data.guests.join(', '));
 
-                            // Display attachments
-                            let attachmentsHtml = '';
-                            data.attachments.forEach(function(attachment) {
-                                attachmentsHtml += `<br><a href="${attachment.fileUrl}" target="_blank">${attachment.title}</a>`;
-                            });
-                            $('#eventAttachmentsDetail').html(attachmentsHtml || "No Attachments");
+                    // Display the meeting link as "Join Meeting" if available
+                    if (data.meeting_link && data.meeting_link !== "No Meeting Link") {
+                        $('#eventMeetingLinkDetail').html(`<a href="${data.meeting_link}" target="_blank">Join Meeting</a>`);
+                    } else {
+                        $('#eventMeetingLinkDetail').text(data.meeting_link);
+                    }
 
-                            // Show the modal
-                            $('#viewEventModal').modal('show');
-                        },
-                        error: function() {
-                            alert('Error fetching event details');
-                        }
+                    // Display attachments
+                    let attachmentsHtml = '';
+                    data.attachments.forEach(function(attachment) {
+                        attachmentsHtml += `<br><a href="${attachment.fileUrl}" target="_blank">${attachment.title}</a>`;
                     });
+                    $('#eventAttachmentsDetail').html(attachmentsHtml || "No Attachments");
+
+                    // Display reminders
+                    let remindersHtml = '';
+                    data.reminders.forEach(function(reminder) {
+                        remindersHtml += `<br><strong>Reminder:</strong> ${reminder.method} - ${reminder.minutes} minutes before`;
+                    });
+                    $('#eventRemindersDetail').html(remindersHtml || "No Reminders");
+
+                    // Show the modal
+                    $('#viewEventModal').modal('show');
+                },
+                error: function() {
+                    alert('Error fetching event details');
                 }
             });
+        }
+    });
 
+    // Handle Google Event Creation Form
+    $('#createEventForm').submit(function (e) {
+        e.preventDefault();
 
-           
+        // Get values from the form
+        let title = $('#eventTitleInput').val();
+        let startDate = $('#eventStartDateInput').val();
+        let startTime = $('#eventStartTimeInput').val();
+        let endDate = $('#eventEndDateInput').val();
+        let endTime = $('#eventEndTimeInput').val();
+        let location = $('#eventLocationInput').val();
+        let description = $('#eventDescriptionInput').val();
+        let guests = $('#eventGuestsInput').val().split(',').map(email => email.trim());
+        let generateMeetingLink = $('#generateMeetingLinkToggle').is(':checked');
+        let notifyGuests = $('#notifyGuestsToggle').is(':checked');
 
+        // Ensure start and end date-time are correctly formatted
+        let startDateTime = `${startDate}T${startTime}:00`;
+        let endDateTime = `${endDate}T${endTime}:00`;
 
-            // Create Google Event (Form submission)
-             // Create Google Event
-             $('#createEventForm').submit(function (e) {
-                e.preventDefault();
+        let eventData = {
+            title: title,
+            start: startDateTime,
+            end: endDateTime,
+            location: location,
+            description: description,
+            guests: guests.filter(email => email !== ""), // Remove empty emails
+            meeting_link: generateMeetingLink,
+            notify_guests: notifyGuests
+        };
 
-                // Get values from the form
-                let title = $('#eventTitleInput').val();
-                let startDate = $('#eventStartDateInput').val();
-                let startTime = $('#eventStartTimeInput').val();
-                let endDate = $('#eventEndDateInput').val();
-                let endTime = $('#eventEndTimeInput').val();
-                let location = $('#eventLocationInput').val();
-                let description = $('#eventDescriptionInput').val();
-                let guests = $('#eventGuestsInput').val().split(',').map(email => email.trim());
-                let generateMeetingLink = $('#generateMeetingLinkToggle').is(':checked');
-                let notifyGuests = $('#notifyGuestsToggle').is(':checked');
+        // Debugging Log
+        console.log("📌 Sending Event Data:", eventData);
 
-                // Ensure start and end date-time are correctly formatted
-                let startDateTime = `${startDate}T${startTime}:00`;
-                let endDateTime = `${endDate}T${endTime}:00`;
+        $.ajax({
+            url: '/oauth/google_create_event/',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(eventData),
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            success: function (response) {
+                alert('✅ Event Created Successfully!');
+                $('#createEventModal').modal('hide');
 
-                let eventData = {
-                    title: title,
-                    start: startDateTime,
-                    end: endDateTime,
-                    location: location,
-                    description: description,
-                    guests: guests.filter(email => email !== ""), // Remove empty emails
-                    meeting_link: generateMeetingLink,
-                    notify_guests: notifyGuests
-                };
-
-                // Debugging Log
-                console.log("📌 Sending Event Data:", eventData);
-
-                $.ajax({
-                    url: '/oauth/google_create_event/',
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(eventData),
-                    headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-                    success: function (response) {
-                        alert('✅ Event Created Successfully!');
-                        $('#createEventModal').modal('hide');
-
-                        // Refresh calendar events (if using FullCalendar)
-                        if ($('#calendar').length) {
-                            $('#calendar').fullCalendar('refetchEvents');
-                        }
-                    },
-                    error: function (xhr) {
-                        alert('❌ Error Creating Event: ' + xhr.responseText);
-                    }
-                });
-            });
+                // Refresh calendar events (if using FullCalendar)
+                if ($('#calendar').length) {
+                    $('#calendar').fullCalendar('refetchEvents');
+                }
+            },
+            error: function (xhr) {
+                alert('❌ Error Creating Event: ' + xhr.responseText);
+            }
         });
+    });
+
+    // Handle Export as CSV
+    $('#exportCSVBtn').click(function() {
+        const eventId = $(this).data('event-id');
+        console.log("Exporting CSV for Event ID:", eventId); // Debugging
+        window.location.href = '/oauth/generate_event_report/' + eventId + '?export=csv';
+    });
+
+    // Handle Export as PDF
+    $('#exportPDFBtn').click(function() {
+        const eventId = $(this).data('event-id');
+        console.log("Exporting PDF for Event ID:", eventId); // Debugging
+        window.location.href = '/oauth/generate_event_report/' + eventId + '?export=pdf';
+    });
+});
+
+        
 
     </script>
 
