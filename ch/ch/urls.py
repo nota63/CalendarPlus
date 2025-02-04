@@ -42,6 +42,7 @@ urlpatterns = [
     path('profiles/',include('profiles.urls')),
     path('organizations/',include('organizations.urls')),
     path('direct_message/',include('direct_message.urls')),
+    path('oauth/',include('outh.urls')),
     # ui components
     path('styles/', views.styles, name= 'styles'),
     path('weather/',views.weather, name='weather'),

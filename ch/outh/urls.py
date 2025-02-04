@@ -1,0 +1,13 @@
+from django.urls import path
+from .views import google_calendar_connect, google,google_calendar_callback
+from .views import * 
+
+
+urlpatterns = [
+    path('google/',google, name='google'),
+    path("google-connect/", google_calendar_connect, name="google_connect"),
+    path("callback/", google_calendar_callback, name="google_callback"),
+
+    path("calendar/", google_calendar_view, name="google_calendar_view"),
+    path('calendar/google_events/', get_google_events, name='google_events'),
+]

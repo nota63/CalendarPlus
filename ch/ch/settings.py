@@ -56,6 +56,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Application definition
 
 INSTALLED_APPS = [
+    'outh',
     'direct_message',
     'profiles',
     'organizations',
@@ -250,13 +251,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 # credentials.json
 
-
-
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-
-SESSION_COOKIE_SECURE = False  
-CSRF_COOKIE_SECURE = False  
-
 
 SESSION_COOKIE_AGE = 1209600  
 import os
@@ -293,4 +288,14 @@ STATICFILES_DIRS = [
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  
 
 
-# lOGGING
+# GOOGLE CALENDAR  CREDENTIALS
+
+
+GOOGLE_CLIENT_ID = "854433356192-d81dha5vahp50pj5f8g5c9fqesd7flti.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET = "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"
+GOOGLE_REDIRECT_URI = "http://localhost:8000/oauth/callback/"
+
+
+
+
+
