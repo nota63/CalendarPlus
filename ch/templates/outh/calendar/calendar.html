@@ -44,6 +44,7 @@
                 </div>
                 <div class="modal-body">
                     <form id="createEventForm">
+                        {% csrf_token %}
                         <div class="mb-3">
                             <label for="eventTitleInput" class="form-label">Event Title</label>
                             <input type="text" class="form-control" id="eventTitleInput" required>
@@ -91,28 +92,74 @@
         </div>
     </div>
 
+    <!-- Bootstrap Modal for Viewing Event Details -->
+    <div class="modal fade" id="viewEventModal" tabindex="-1" aria-labelledby="viewEventModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewEventModalLabel">Event Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Title:</strong> <span id="eventTitleDetail"></span></p>
+                    <p><strong>Start:</strong> <span id="eventStartDetail"></span></p>
+                    <p><strong>End:</strong> <span id="eventEndDetail"></span></p>
+                    <p><strong>Location:</strong> <span id="eventLocationDetail"></span></p>
+                    <p><strong>Description:</strong> <span id="eventDescriptionDetail"></span></p>
+                    <p><strong>Organizer:</strong> <span id="eventOrganizerDetail"></span></p>
+                    <p><strong>Guests:</strong> <span id="eventGuestsDetail"></span></p>
+                    <p><strong>Meeting Link:</strong> <span id="eventMeetingLinkDetail"></span></p>
+                    <p><strong>Attachments:</strong> <span id="eventAttachmentsDetail"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+       
         $(document).ready(function() {
             $('#calendar').fullCalendar({
                 events: '/oauth/calendar/google_events/',
                 selectable: true,
                 select: function(start) {
-                    // Set the start date to the selected date
+                    // Automatically set the selected date as the start date
                     $('#eventStartDateInput').val(moment(start).format('YYYY-MM-DD'));
-                    // Set the start time to the selected time (set to noon by default)
-                    $('#eventStartTimeInput').val('12:00');
-                    // Set the end date to the selected date (same as start date by default)
-                    $('#eventEndDateInput').val(moment(start).format('YYYY-MM-DD'));
-                    // Set the end time to 1 hour after the start time (default)
-                    $('#eventEndTimeInput').val('13:00');
+                    $('#eventStartTimeInput').val(moment(start).format('HH:mm'));
+                    $('#eventEndDateInput').val(moment(start).add(1, 'hour').format('YYYY-MM-DD')); // Default end date is 1 hour after start
+                    $('#eventEndTimeInput').val(moment(start).add(1, 'hour').format('HH:mm')); // Default end time is 1 hour after start
                     $('#createEventModal').modal('show');
                 },
                 eventClick: function(calEvent) {
+                    // Fetch event details using AJAX
                     $.ajax({
                         url: '/oauth/google_event_details/' + calEvent.id + '/',
                         method: 'GET',
                         success: function(data) {
-                            alert('Event Details:\n' + JSON.stringify(data, null, 2));
+                            // Populate modal with event details
+                            $('#eventTitleDetail').text(data.title);
+                            $('#eventStartDetail').text(moment(data.start).format('YYYY-MM-DD HH:mm'));
+                            $('#eventEndDetail').text(moment(data.end).format('YYYY-MM-DD HH:mm'));
+                            $('#eventLocationDetail').text(data.location);
+                            $('#eventDescriptionDetail').text(data.description);
+                            $('#eventOrganizerDetail').text(data.organizer);
+                            $('#eventGuestsDetail').text(data.guests.join(', '));
+
+                            // Display the meeting link as "Join Meeting" if available
+                            if (data.meeting_link && data.meeting_link !== "No Meeting Link") {
+                                $('#eventMeetingLinkDetail').html(`<a href="${data.meeting_link}" target="_blank">Join Meeting</a>`);
+                            } else {
+                                $('#eventMeetingLinkDetail').text(data.meeting_link);
+                            }
+
+                            // Display attachments
+                            let attachmentsHtml = '';
+                            data.attachments.forEach(function(attachment) {
+                                attachmentsHtml += `<br><a href="${attachment.fileUrl}" target="_blank">${attachment.title}</a>`;
+                            });
+                            $('#eventAttachmentsDetail').html(attachmentsHtml || "No Attachments");
+
+                            // Show the modal
+                            $('#viewEventModal').modal('show');
                         },
                         error: function() {
                             alert('Error fetching event details');
@@ -121,8 +168,13 @@
                 }
             });
 
-            // Create Google Event
-            $('#createEventForm').submit(function (e) {
+
+           
+
+
+            // Create Google Event (Form submission)
+             // Create Google Event
+             $('#createEventForm').submit(function (e) {
                 e.preventDefault();
 
                 // Get values from the form
@@ -176,6 +228,8 @@
                 });
             });
         });
+
     </script>
+
 </body>
 </html>
