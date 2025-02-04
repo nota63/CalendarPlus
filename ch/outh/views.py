@@ -223,17 +223,16 @@ def google_calendar_view(request):
 
 # Fetch Event details
 
-
 @login_required
 def get_google_event_details(request, event_id):
-    """Fetch details of a specific Google Calendar event."""
+    """Fetch complete details of a specific Google Calendar event."""
     try:
         user = request.user
         creds_data = GoogleAuth.objects.filter(user=user).first()
-        
+
         if not creds_data:
             return JsonResponse({'error': 'Google credentials not found'}, status=400)
-        
+
         creds = Credentials(
             token=creds_data.access_token,
             refresh_token=creds_data.refresh_token,
@@ -242,17 +241,18 @@ def get_google_event_details(request, event_id):
             client_secret=settings.GOOGLE_CLIENT_SECRET,
             scopes=creds_data.scopes,
         )
-        
+
         # Refresh token if expired
         if creds.expired and creds.refresh_token:
             creds.refresh(Request())
             creds_data.access_token = creds.token
             creds_data.save()
-        
+
         # Build Google Calendar API service
         service = build("calendar", "v3", credentials=creds)
         event = service.events().get(calendarId="primary", eventId=event_id).execute()
-        
+
+        # Extract event details
         event_details = {
             "id": event.get("id"),
             "title": event.get("summary", "No Title"),
@@ -260,10 +260,24 @@ def get_google_event_details(request, event_id):
             "start": event["start"].get("dateTime", event["start"].get("date")),
             "end": event["end"].get("dateTime", event["end"].get("date")),
             "location": event.get("location", "No Location"),
-            'organizer':event.get('organizer'),
+            "organizer": event.get("organizer", {}).get("email", "No Organizer"),
+            "meeting_link": event.get("hangoutLink", "No Meeting Link"),
+            "guests": [
+                attendee["email"] for attendee in event.get("attendees", []) if "email" in attendee
+            ],
+            "reminders": event.get("reminders", {}).get("overrides", []),
+            "attachments": [
+                {
+                    "fileId": attachment.get("fileId"),
+                    "title": attachment.get("title"),
+                    "mimeType": attachment.get("mimeType"),
+                    "fileUrl": attachment.get("fileUrl"),
+                }
+                for attachment in event.get("attachments", [])
+            ]
         }
-        
+
         return JsonResponse(event_details)
-    
+
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
