@@ -14,5 +14,7 @@ urlpatterns = [
     path('google_create_event/',create_google_event, name='google_create_event'),
     path('generate_event_report/<str:event_id>/',generate_event_report, name='generate_event_report'),
     path('google_delete_event/<str:event_id>/',delete_event, name='delete_event'),
+    path('google_add_attachment/<str:event_id>/',add_event_attachment, name='google_add_attachment'),
+
 
 ]

@@ -62,7 +62,7 @@ def google_calendar_connect(request):
             }
         },
         scopes=["https://www.googleapis.com/auth/calendar.readonly","https://www.googleapis.com/auth/calendar.events",
-                 "https://www.googleapis.com/auth/calendar"],
+                 "https://www.googleapis.com/auth/calendar","https://www.googleapis.com/auth/drive.file"],
     )
     flow.redirect_uri = settings.GOOGLE_REDIRECT_URI
     authorization_url, _ = flow.authorization_url(prompt="consent")
@@ -94,7 +94,7 @@ def google_calendar_callback(request):
                 }
             },
             scopes=["https://www.googleapis.com/auth/calendar.readonly","https://www.googleapis.com/auth/calendar",
-             "https://www.googleapis.com/auth/calendar.events"],
+             "https://www.googleapis.com/auth/calendar.events","https://www.googleapis.com/auth/drive.file"],
         )
         flow.redirect_uri = settings.GOOGLE_REDIRECT_URI
 
@@ -561,3 +561,62 @@ def delete_event(request, event_id):
         return JsonResponse({"success": False, "message": "Google credentials not found. Please authenticate."})
     except Exception as e:
         return JsonResponse({"success": False, "message": str(e)})
+
+
+# ATTACH ATTACHMENTS
+from googleapiclient.http import MediaIoBaseUpload
+import io
+
+@login_required
+def add_event_attachment(request, event_id):
+    if request.method == "POST":
+        try:
+            google_auth = GoogleAuth.objects.get(user=request.user)
+
+            credentials = Credentials(
+                token=google_auth.access_token,
+                refresh_token=google_auth.refresh_token,
+                token_uri="https://oauth2.googleapis.com/token",
+                client_id=settings.GOOGLE_CLIENT_ID,
+                client_secret=settings.GOOGLE_CLIENT_SECRET
+            )
+
+            if credentials and credentials.expired and credentials.refresh_token:
+                credentials.refresh(Request())
+
+            service = build('calendar', 'v3', credentials=credentials)
+
+            # Get the uploaded file
+            file = request.FILES.get('attachment')
+            if not file:
+                return JsonResponse({"success": False, "message": "No file uploaded!"})
+
+            # Upload the file to Google Drive
+            drive_service = build('drive', 'v3', credentials=credentials)
+            file_metadata = {'name': file.name}
+            
+            # Convert the file to a stream for upload
+            file_stream = io.BytesIO(file.read())
+            media = MediaIoBaseUpload(file_stream, mimetype=file.content_type, resumable=True)
+
+            uploaded_file = drive_service.files().create(body=file_metadata, media_body=media, fields='id, webViewLink').execute()
+
+            # Attach the file to the event
+            event = service.events().get(calendarId='primary', eventId=event_id).execute()
+            event.setdefault('attachments', []).append({
+                "fileId": uploaded_file['id'],
+                "title": file.name,
+                "fileUrl": uploaded_file['webViewLink'],
+                "mimeType": file.content_type
+            })
+
+            updated_event = service.events().update(calendarId='primary', eventId=event_id, body=event).execute()
+
+            return JsonResponse({"success": True, "message": "Attachment added successfully!", "attachment": uploaded_file['webViewLink']})
+
+        except GoogleAuth.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Google credentials not found. Please authenticate."})
+        except Exception as e:
+            return JsonResponse({"success": False, "message": str(e)})
+
+    return JsonResponse({"success": False, "message": "Invalid request method."})

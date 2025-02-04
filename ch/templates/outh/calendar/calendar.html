@@ -390,6 +390,8 @@
                    <button id="exportCSVBtn" class="btn btn-primary" data-event-id="">Export as CSV</button>
                    <button id="exportPDFBtn" class="btn btn-primary" data-event-id="">Export as PDF</button>
                    <button id="deleteEventBtn" class="btn btn-primary" data-event-id="">Delete</button>
+                   <button id="attachmentsEventBtn" class="btn btn-primary" data-event-id="">Add attachments</button>
+
 
                 </div>
                 <!-- Button for CSV Export -->
@@ -430,6 +432,7 @@
             $('#exportCSVBtn').data('event-id', calEvent.id);
             $('#exportPDFBtn').data('event-id', calEvent.id);
             $('#deleteEventBtn').data('event-id', calEvent.id); // Set the event ID on delete button
+            $('#attachmentsEventBtn').data('event-id', calEvent.id);
 
             // Fetch event details using AJAX
             $.ajax({
@@ -585,7 +588,53 @@ $('#deleteEventBtn').click(function() {
     });
 });
 
-        
+// HANDLE ATTACHING ATTACHMENTS 
+
+// Handle Attachment Upload
+$('#attachmentsEventBtn').click(function() {
+        const eventId = $(this).data('event-id');
+
+        if (!eventId) {
+            alert('Event ID is missing, cannot add attachment.');
+            return;
+        }
+
+        // Create file input dynamically
+        let fileInput = $('<input type="file" accept="*/*">');
+        fileInput.trigger('click');
+
+        fileInput.change(function(event) {
+            let file = event.target.files[0];
+            if (!file) {
+                alert('No file selected.');
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append('attachment', file);
+
+            $.ajax({
+                url: '/oauth/google_add_attachment/' + eventId + '/',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                success: function(response) {
+                    if (response.success) {
+                        alert('✅ Attachment added successfully!');
+                        $('#viewEventModal').modal('hide');
+                    } else {
+                        alert('❌ Error: ' + response.message);
+                    }
+                },
+                error: function(xhr) {
+                    alert('❌ Error adding attachment: ' + xhr.responseText);
+                }
+            });
+        });
+    });
+
 
     </script>
 
