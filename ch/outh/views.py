@@ -218,3 +218,52 @@ def get_google_events(request):
 def google_calendar_view(request):
     """Render the calendar page"""
     return render(request, "outh/calendar/calendar.html")
+
+
+
+# Fetch Event details
+
+
+@login_required
+def get_google_event_details(request, event_id):
+    """Fetch details of a specific Google Calendar event."""
+    try:
+        user = request.user
+        creds_data = GoogleAuth.objects.filter(user=user).first()
+        
+        if not creds_data:
+            return JsonResponse({'error': 'Google credentials not found'}, status=400)
+        
+        creds = Credentials(
+            token=creds_data.access_token,
+            refresh_token=creds_data.refresh_token,
+            token_uri="https://oauth2.googleapis.com/token",
+            client_id=settings.GOOGLE_CLIENT_ID,
+            client_secret=settings.GOOGLE_CLIENT_SECRET,
+            scopes=creds_data.scopes,
+        )
+        
+        # Refresh token if expired
+        if creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+            creds_data.access_token = creds.token
+            creds_data.save()
+        
+        # Build Google Calendar API service
+        service = build("calendar", "v3", credentials=creds)
+        event = service.events().get(calendarId="primary", eventId=event_id).execute()
+        
+        event_details = {
+            "id": event.get("id"),
+            "title": event.get("summary", "No Title"),
+            "description": event.get("description", "No Description"),
+            "start": event["start"].get("dateTime", event["start"].get("date")),
+            "end": event["end"].get("dateTime", event["end"].get("date")),
+            "location": event.get("location", "No Location"),
+            'organizer':event.get('organizer'),
+        }
+        
+        return JsonResponse(event_details)
+    
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)

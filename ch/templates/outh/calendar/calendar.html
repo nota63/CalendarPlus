@@ -46,11 +46,13 @@
 
                     // Fetch event details via AJAX
                     $.ajax({
-                        url: '/oauth/calendar/google_event_details/' + eventId + '/',
+                        url: '/oauth/google_event_details/' + eventId + '/',
                         method: 'GET',
                         success: function(data) {
                             // Populate event details
-                            alert('Event: ' + data.title + '\nDate: ' + data.date + '\nLocation: ' + data.location);
+                            alert('Event: ' + data.title + '\nDate: ' + data.date + '\nLocation: ' + data.location + '\nStart'
+                                +data.start + '\nEnd' + data.end + '\nDescription' + data.description + '\nOrganizer' + data.organizer
+                             );
                         },
                         error: function() {
                             alert('Error fetching event details');

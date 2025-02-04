@@ -10,4 +10,5 @@ urlpatterns = [
 
     path("calendar/", google_calendar_view, name="google_calendar_view"),
     path('calendar/google_events/', get_google_events, name='google_events'),
+    path('google_event_details/<str:event_id>/', get_google_event_details, name='google_event_details'),
 ]
