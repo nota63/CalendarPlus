@@ -36,7 +36,8 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from datetime import datetime
 from google.auth.transport.requests import Request
-
+from googleapiclient.http import MediaIoBaseUpload
+import io
 
 # Initiation template
 
@@ -564,8 +565,8 @@ def delete_event(request, event_id):
 
 
 # ATTACH ATTACHMENTS
-from googleapiclient.http import MediaIoBaseUpload
-import io
+
+
 
 @login_required
 def add_event_attachment(request, event_id):
@@ -578,7 +579,9 @@ def add_event_attachment(request, event_id):
                 refresh_token=google_auth.refresh_token,
                 token_uri="https://oauth2.googleapis.com/token",
                 client_id=settings.GOOGLE_CLIENT_ID,
-                client_secret=settings.GOOGLE_CLIENT_SECRET
+                client_secret=settings.GOOGLE_CLIENT_SECRET,
+                scopes=["https://www.googleapis.com/auth/calendar.events", 
+                        "https://www.googleapis.com/auth/drive.file"]  # ✅ FIXED SCOPES
             )
 
             if credentials and credentials.expired and credentials.refresh_token:
@@ -620,3 +623,4 @@ def add_event_attachment(request, event_id):
             return JsonResponse({"success": False, "message": str(e)})
 
     return JsonResponse({"success": False, "message": "Invalid request method."})
+
