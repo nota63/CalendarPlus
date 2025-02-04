@@ -3,35 +3,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Calendar Events</title>
+    <title>SyncSphere | Smart Calendar</title>
 
-    <!-- Bootstrap 5 & FullCalendar CSS -->
+
+      <!-- Bootstrap 5 & FullCalendar CSS -->
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@3.2.0/dist/fullcalendar.min.css">
+  
+      <!-- jQuery, Bootstrap JS, Moment.js, and FullCalendar -->
+      <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/fullcalendar@3.2.0/dist/fullcalendar.min.js"></script>
+  
+  
+
+    <!-- Design Assets -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@3.2.0/dist/fullcalendar.min.css">
-
-    <!-- jQuery, Bootstrap JS, Moment.js, and FullCalendar -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@3.2.0/dist/fullcalendar.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
+        :root {
+            --primary-color: #4A3AFF;
+            --secondary-color: #6C63FF;
+            --accent-color: #FF6B6B;
+            --background-light: #F8F9FF;
+            --text-primary: #2E2E48;
+            --text-secondary: #6B6B8C;
         }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background-light);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .main-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 280px;
+            background: white;
+            padding: 24px;
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .brand-logo {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 24px;
+            margin-bottom: 48px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 8px 0;
+            transition: all 0.2s ease;
+            color: var(--text-secondary);
+        }
+
+        .nav-item:hover {
+            background: var(--background-light);
+            color: var(--primary-color);
+            transform: translateX(4px);
+        }
+
+        /* Main Content Area */
+        .content-area {
+            flex: 1;
+            padding: 40px;
+            background: var(--background-light);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .header-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Calendar Customization */
         #calendar {
-            max-width: 900px;
-            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+        }
+
+        .fc-toolbar {
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 24px !important;
+        }
+
+        .fc-button-primary {
+            background: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+            border-radius: 8px !important;
+            padding: 8px 16px !important;
+            transition: all 0.2s ease !important;
+        }
+
+        .fc-button-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(74, 58, 255, 0.2);
+        }
+
+        .fc-event {
+            border-radius: 6px !important;
+            border: none !important;
+            padding: 8px 12px !important;
+            background: var(--secondary-color) !important;
+            margin: 4px 0 !important;
+            transition: all 0.2s ease !important;
+        }
+
+        .fc-event:hover {
+            transform: translateX(2px);
+            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.2);
+        }
+
+        /* Modern Modal Design */
+        .modal-content {
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            border-bottom: none;
+            padding: 24px;
+        }
+
+        .modal-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 0 24px 24px;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 12px 16px;
+            border: 1px solid #e0e0ff;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 58, 255, 0.1);
+        }
+
+        /* Animated Elements */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animated-entry {
+            animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hover-scale {
+            transition: transform 0.2s ease;
+        }
+
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+
+        /* Utility Classes */
+        .gradient-text {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .badge-notification {
+            background: var(--accent-color);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Event Details Modal */
+        #eventMeetingLinkDetail a {
+            color: var(--primary-color);
+            text-decoration: none;
+            position: relative;
+        }
+
+        #eventMeetingLinkDetail a:after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: width 0.2s ease;
+        }
+
+        #eventMeetingLinkDetail a:hover:after {
+            width: 100%;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-wrapper {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 16px;
+                box-shadow: none;
+            }
+
+            .content-area {
+                padding: 24px;
+            }
+
+            #calendar {
+                padding: 16px;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="main-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar animated-entry">
+            <div class="brand-logo">
+                <i class="fas fa-calendar-alt"></i>
+                SyncSphere
+            </div>
+            
+            <nav class="nav flex-column">
+                <a href="#" class="nav-item active">
+                    <i class="fas fa-calendar-days me-2"></i>
+                    My Calendar
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-clock me-2"></i>
+                    Schedule
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-users me-2"></i>
+                    Team
+                    <span class="badge-notification ms-2">3</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-cog me-2"></i>
+                    Settings
+                </a>
+            </nav>
+        </aside>
 
-    <h2 class="text-center">Google Calendar Events</h2>
-    <div id="calendar"></div>
+        <!-- Main Content -->
+        <main class="content-area">
+            <!-- Header -->
+            <div class="header animated-entry">
+                <div>
+                    <h1 class="header-title">Welcome Back, <span class="gradient-text">{{request.user}}</span></h1>
+                    <p class="text-muted">Your schedule as per Google Calendar</p>
+                </div>
+                <div class="d-flex gap-3">
+                    <button class="btn btn-primary hover-scale" data-bs-toggle="modal" data-bs-target="#createEventModal">
+                        <i class="fas fa-plus me-2"></i>
+                        New Event
+                    </button>
+                    <div class="avatar">
+                        <img src="https://via.placeholder.com/40" alt="Profile" class="rounded-circle" width="40">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar Container -->
+            <div id="calendar" class="animated-entry hover-scale"></div>
+
+
 
     <!-- Bootstrap Modal for Creating New Event -->
     <!-- Bootstrap Modal for Creating Google Calendar Event -->
@@ -122,6 +396,20 @@
             </div>
         </div>
     </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <script>
        $(document).ready(function() {
@@ -296,8 +584,6 @@ $('#deleteEventBtn').click(function() {
         }
     });
 });
-
-
 
         
 
