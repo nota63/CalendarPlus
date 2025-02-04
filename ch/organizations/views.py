@@ -19,6 +19,9 @@ from django.conf import settings
 from django.contrib import messages
 from datetime import timedelta
 import holidays
+from django.db import transaction
+from django.utils.decorators import method_decorator
+from django.views import View
 # Create your views here.
 
 @csrf_exempt
@@ -733,3 +736,173 @@ def hide_organization(request, org_id):
             messages.success(request,f'{organization.name} hidden successfully')
 
     return render(request, 'organizations/details/hide_organization.html', {'organization': organization})
+
+
+
+# Handle workspace duplication
+from accounts.models import ProjectEmployeeAssignment, Project, ProjectManagerAssignment
+from groups.models import Group, GroupMember
+import logging
+
+
+logger = logging.getLogger(__name__)
+
+@method_decorator(login_required, name='dispatch')
+class DuplicateWorkspaceView(View):
+    def post(self, request, org_id):
+        """Handles workspace duplication based on admin's selected options."""
+        admin_profile = Profile.objects.filter(user=request.user, organization_id=org_id, is_admin=True).first()
+        if not admin_profile:
+            return JsonResponse({'error': 'Only admins can duplicate workspaces'}, status=403)
+
+        organization = get_object_or_404(Organization, id=org_id)
+        options = request.POST.getlist('options')  # List of things to duplicate
+
+        # If "everything" is selected, duplicate all entities
+        if 'everything' in options:
+            options = ['workspace_with_members', 'projects', 'meetings', 'channels', 'groups']
+
+        try:
+            with transaction.atomic():
+                # Create a new workspace
+                new_org = Organization.objects.create(
+                    name=f"{organization.name} (Copy)",
+                    description=organization.description,
+                    icon=organization.icon,
+                    status=organization.status
+                )
+                
+                logger.info(f"Duplicated organization: {new_org}")
+
+                # Ensure the creator becomes an admin in the new organization
+                admin_profile_new = Profile.objects.create(
+                    user=request.user,
+                    organization=new_org,
+                    is_admin=True,
+                    is_manager=False,
+                    is_employee=False,
+                    full_name=request.user.get_full_name()
+                )
+
+                # Dictionary to track old users → new profiles
+                user_mapping = {request.user: admin_profile_new}
+
+              
+                if 'workspace_with_members' in options:
+                    members = Profile.objects.filter(organization=organization).exclude(user=request.user)
+                    for member in members:
+                        new_member = Profile.objects.create(
+                            user=member.user,
+                            organization=new_org,
+                            is_admin=member.is_admin,
+                            is_manager=member.is_manager,
+                            is_employee=member.is_employee,
+                            profile_picture=member.profile_picture,
+                            full_name=member.full_name
+                        )
+                        user_mapping[member.user] = new_member  
+                    logger.info("Duplicated members successfully.")
+
+                # Duplicate projects
+                if 'projects' in options:
+                    old_projects = Project.objects.filter(organization=organization)
+                    for project in old_projects:
+                        creator_profile = user_mapping.get(project.created_by.user, admin_profile_new)
+                        new_project = Project.objects.create(
+                            name=project.name,
+                            description=project.description,
+                            start_date=project.start_date,
+                            end_date=project.end_date,
+                            organization=new_org,
+                            created_by=creator_profile
+                        )
+
+                        # Duplicate project managers
+                        old_managers = ProjectManagerAssignment.objects.filter(project=project)
+                        for manager in old_managers:
+                            if manager.manager.user in user_mapping:
+                                ProjectManagerAssignment.objects.create(
+                                    project=new_project,
+                                    manager=user_mapping[manager.manager.user]
+                                )
+
+                        # Duplicate employee assignments
+                        old_employees = ProjectEmployeeAssignment.objects.filter(project=project)
+                        for employee in old_employees:
+                            if employee.employee.user in user_mapping and employee.manager.user in user_mapping:
+                                ProjectEmployeeAssignment.objects.create(
+                                    project=new_project,
+                                    employee=user_mapping[employee.employee.user],
+                                    manager=user_mapping[employee.manager.user]
+                                )
+                    logger.info("Duplicated projects successfully.")
+
+                # Duplicate meetings
+                if 'meetings' in options:
+                    meetings = MeetingOrganization.objects.filter(organization=organization)
+                    for meeting in meetings:
+                        new_meeting = MeetingOrganization.objects.create(
+                            organization=new_org,
+                            user=user_mapping.get(meeting.user, admin_profile_new),
+                            invitee=user_mapping.get(meeting.invitee, admin_profile_new),
+                            meeting_title=meeting.meeting_title,
+                            meeting_description=meeting.meeting_description,
+                            meeting_date=meeting.meeting_date,
+                            start_time=meeting.start_time,
+                            end_time=meeting.end_time,
+                            meeting_link=meeting.meeting_link,
+                            meeting_location=meeting.meeting_location,
+                            meeting_type=meeting.meeting_type,
+                            status=meeting.status,
+                            is_notification_sent=meeting.is_notification_sent
+                        )
+                        new_meeting.participants.set([
+                            user_mapping.get(participant, admin_profile_new) for participant in meeting.participants.all()
+                        ])
+                    logger.info("Duplicated meetings successfully.")
+
+                # Duplicate channels
+                if 'channels' in options:
+                    channels = Channel.objects.filter(organization=organization)
+                    for channel in channels:
+                        new_channel = Channel.objects.create(
+                            organization=new_org,
+                            created_by=request.user,
+                            name=channel.name,
+                            type=channel.type,
+                            visibility=channel.visibility
+                        )
+                        new_channel.allowed_members.set([
+                            user_mapping.get(member, admin_profile_new) for member in channel.allowed_members.all()
+                        ])
+                    logger.info("Duplicated channels successfully.")
+
+                # Duplicate groups
+                if 'groups' in options:
+                  groups = Group.objects.filter(organization=organization)
+                  for group in groups:
+                    new_group = Group.objects.create(
+                     organization=new_org,
+                     name=group.name,
+                     description=group.description,
+                     team_leader=user_mapping.get(group.team_leader, request.user).user,  
+                     created_by=user_mapping.get(group.created_by, request.user).user  
+             )
+                group_members = GroupMember.objects.filter(group=group)
+                for member in group_members:
+                 if member.user in user_mapping:
+                   GroupMember.objects.create(
+                    group=new_group,
+                    organization=new_org,
+                    user=user_mapping[member.user].user,  
+                    role=member.role
+                )
+                logger.info("Duplicated groups successfully.")
+
+
+
+                return JsonResponse({'message': 'Workspace duplicated successfully!', 'new_org_id': new_org.id}, status=200)
+
+        except Exception as e:
+            logger.error(f"Error duplicating workspace: {e}")
+            return JsonResponse({'error': 'Failed to duplicate workspace'}, status=500)

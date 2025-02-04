@@ -9,6 +9,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+
     <script src="{% static 'organizations/script.js' %}"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -335,8 +337,9 @@
                                             </a>
                                         </div>
                                     </div>
-                                   
-                                      
+
+                                    <button onclick="openDuplicateModal()" class="btn btn-primary">Duplicate Workspace</button>
+
                                       
                                 </div>
                         </div>
@@ -586,35 +589,28 @@
         </div>
     </div>
 
-<!--Hide Organization Modal  -->
-<div class="modal fade" id="hideOrgModal" tabindex="-1" aria-labelledby="hideOrgModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="hideOrgModalLabel">Hide Organization</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="hideOrgForm">
-            <div class="mb-3">
-              <label for="hidden_from" class="form-label">Hide From</label>
-              <input type="datetime-local" class="form-control" id="hidden_from" required>
-            </div>
-            <div class="mb-3">
-              <label for="hidden_until" class="form-label">Hide Until</label>
-              <input type="datetime-local" class="form-control" id="hidden_until" required>
-            </div>
-            <input type="hidden" id="org_id"> <!-- Hidden field for organization ID -->
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-danger" id="submitHideOrg">Submit</button>
-        </div>
-      </div>
+
+<!-- Dupl;icate Workspace  -->
+<div id="duplicateWorkspaceModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span onclick="closeDuplicateModal()" class="close">&times;</span>
+        <h2>Duplicate Workspace</h2>
+        
+        <form id="duplicateForm">
+            <label><input type="radio" name="option" value="only_workspace"> Only Workspace</label><br>
+            <label><input type="radio" name="option" value="workspace_with_members"> Workspace with Members</label><br>
+            <label><input type="radio" name="option" value="projects"> Projects</label><br>
+            <label><input type="radio" name="option" value="meetings"> Meetings</label><br>
+            <label><input type="radio" name="option" value="channels"> Channels</label><br>
+            <label><input type="radio" name="option" value="groups"> Groups</label><br>
+            <label><input type="radio" name="option" value="everything"> Everything</label><br>
+
+            <button type="submit" id="confirmDuplicate" class="btn btn-success">Confirm</button>
+        </form>
     </div>
-  </div>
-  
+</div>
+
+<div id="organization-id" data-org-id="{{ organization.id }}"></div>
 
     
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -623,6 +619,84 @@
 
 <script>
     const organizationId = "{{ organization.id }}";
+
+    
+// HANDLE DUPLICATION OF WORKSPACE
+function openDuplicateModal() {
+    const modal = document.getElementById("duplicateWorkspaceModal");
+    modal.style.display = "block";
+}
+
+function closeDuplicateModal() {
+    const modal = document.getElementById("duplicateWorkspaceModal");
+    modal.style.display = "none";
+}
+
+// Close modal if user clicks outside the modal content
+window.addEventListener("click", function (event) {
+    const modal = document.getElementById("duplicateWorkspaceModal");
+    if (event.target === modal) {
+        closeDuplicateModal();
+    }
+});
+
+// Handle form submission
+document.getElementById("duplicateForm").addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    let orgId = getOrgIdFromPage();
+    if (!orgId) {
+        alert("Organization ID is missing.");
+        return;
+    }
+
+    const selectedOption = document.querySelector('input[name="option"]:checked');
+    if (!selectedOption) {
+        alert("Please select an option.");
+        return;
+    }
+
+    const requestData = new FormData();
+    requestData.append("options", selectedOption.value);
+
+    fetch(`/organizations/duplicate-workspace/${organizationId}/`, {
+        method: "POST",
+        body: requestData,
+        headers: {
+            "X-CSRFToken": getCSRFToken(),
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert("Workspace duplicated successfully!");
+            closeDuplicateModal();
+        } else {
+            alert("Error: " + data.error);
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Something went wrong.");
+    });
+});
+
+// Function to get org_id dynamically
+function getOrgIdFromPage() {
+    const orgElement = document.getElementById("organization-id");
+    return orgElement ? orgElement.dataset.orgId : null;
+}
+
+// Function to get CSRF token
+function getCSRFToken() {
+    return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+}
+
+
+
+
+
+
 
 </script>
 

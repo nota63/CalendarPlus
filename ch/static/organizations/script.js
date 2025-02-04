@@ -145,7 +145,14 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-// HIDE ORGANIZATION 
+
+
+
+
+
+
+
+
 
 // WORKSPACE STATUS BUTTONS FEATURES
 document.querySelectorAll('.status-pill').forEach(button => {
