@@ -33,59 +33,81 @@
     <h2 class="text-center">Google Calendar Events</h2>
     <div id="calendar"></div>
 
-    <!-- Bootstrap Modal for Event Details -->
-    <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="eventTitle">Event Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p><strong>Date:</strong> <span id="eventDate"></span></p>
-                    <p><strong>Time:</strong> <span id="eventTime"></span></p>
-                    <p><strong>Location:</strong> <span id="eventLocation"></span></p>
-                    <p><strong>Description:</strong> <span id="eventDescription"></span></p>
-                    <p><strong>Organizer:</strong> <span id="eventOrganizer"></span></p>
-                    <p><strong>Guests:</strong> <span id="eventGuests"></span></p>
-                    <p><strong>Meeting Link:</strong> <a href="#" id="eventMeetingLink" target="_blank">Join Meeting</a></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
+    <!-- Bootstrap Modal for Creating New Event -->
+    <!-- Bootstrap Modal for Creating Google Calendar Event -->
+<div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createEventModalLabel">Create Google Calendar Event</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createEventForm">
+                    <div class="mb-3">
+                        <label for="eventTitleInput" class="form-label">Event Title</label>
+                        <input type="text" class="form-control" id="eventTitleInput" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="eventStartDateInput" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="eventStartDateInput" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="eventStartTimeInput" class="form-label">Start Time</label>
+                        <input type="time" class="form-control" id="eventStartTimeInput" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="eventEndDateInput" class="form-label">End Date</label>
+                        <input type="date" class="form-control" id="eventEndDateInput" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="eventEndTimeInput" class="form-label">End Time</label>
+                        <input type="time" class="form-control" id="eventEndTimeInput" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="eventLocationInput" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="eventLocationInput">
+                    </div>
+                    <div class="mb-3">
+                        <label for="eventDescriptionInput" class="form-label">Description</label>
+                        <textarea class="form-control" id="eventDescriptionInput"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="eventGuestsInput" class="form-label">Guests (Emails, comma-separated)</label>
+                        <input type="text" class="form-control" id="eventGuestsInput">
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="generateMeetingLinkToggle">
+                        <label class="form-check-label" for="generateMeetingLinkToggle">Generate Google Meet Link</label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="notifyGuestsToggle">
+                        <label class="form-check-label" for="notifyGuestsToggle">Notify Guests</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Event</button>
+                </form>
             </div>
         </div>
     </div>
+</div>
+
+
 
     <script>
         $(document).ready(function() {
             $('#calendar').fullCalendar({
-                events: '/oauth/calendar/google_events/',  // Fetch Google Calendar events from Django API
-                
-                eventRender: function(event, element) {
-                    element.find('.fc-title').text(event.title);
+                events: '/oauth/calendar/google_events/',
+                selectable: true,
+                select: function(start) {
+                    $('#eventDateInput').val(moment(start).format('YYYY-MM-DD'));
+                    $('#createEventModal').modal('show');
                 },
-
-                eventClick: function(calEvent, jsEvent, view) {
-                    var eventId = calEvent.id;  // Google Event ID
-
-                    // Fetch event details via AJAX
+                eventClick: function(calEvent) {
                     $.ajax({
-                        url: '/oauth/google_event_details/' + eventId + '/',
+                        url: '/oauth/google_event_details/' + calEvent.id + '/',
                         method: 'GET',
                         success: function(data) {
-                            // Populate modal fields
-                            $('#eventTitle').text(data.title);
-                            $('#eventDate').text(moment(data.start).format('MMMM D, YYYY'));
-                            $('#eventTime').text(moment(data.start).format('h:mm A') + " - " + moment(data.end).format('h:mm A'));
-                            $('#eventLocation').text(data.location || 'No Location');
-                            $('#eventDescription').text(data.description || 'No Description');
-                            $('#eventOrganizer').text(data.organizer || 'Unknown');
-                            $('#eventGuests').text(data.guests ? data.guests.join(', ') : 'No Guests');
-                            $('#eventMeetingLink').attr('href', data.meeting_link || '#');
-
-                            // Show the modal
-                            $('#eventModal').modal('show');
+                            alert('Event Details:\n' + JSON.stringify(data, null, 2));
                         },
                         error: function() {
                             alert('Error fetching event details');
@@ -93,8 +115,64 @@
                     });
                 }
             });
-        });
-    </script>
 
+
+// Create Google EVent             
+    $('#createEventForm').submit(function (e) {
+        e.preventDefault();
+
+        // Get values from the form
+        let title = $('#eventTitleInput').val();
+        let startDate = $('#eventStartDateInput').val();
+        let startTime = $('#eventStartTimeInput').val();
+        let endDate = $('#eventEndDateInput').val();
+        let endTime = $('#eventEndTimeInput').val();
+        let location = $('#eventLocationInput').val();
+        let description = $('#eventDescriptionInput').val();
+        let guests = $('#eventGuestsInput').val().split(',').map(email => email.trim());
+        let generateMeetingLink = $('#generateMeetingLinkToggle').is(':checked');
+        let notifyGuests = $('#notifyGuestsToggle').is(':checked');
+
+        // Ensure start and end date-time are correctly formatted
+        let startDateTime = `${startDate}T${startTime}:00`;
+        let endDateTime = `${endDate}T${endTime}:00`;
+
+        let eventData = {
+            title: title,
+            start: startDateTime,
+            end: endDateTime,
+            location: location,
+            description: description,
+            guests: guests.filter(email => email !== ""), // Remove empty emails
+            meeting_link: generateMeetingLink,
+            notify_guests: notifyGuests
+        };
+
+        // Debugging Log
+        console.log("📌 Sending Event Data:", eventData);
+
+        $.ajax({
+            url: '/oauth/google_create_event/',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(eventData),
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            success: function (response) {
+                alert('✅ Event Created Successfully!');
+                $('#createEventModal').modal('hide');
+
+                // Refresh calendar events (if using FullCalendar)
+                if ($('#calendar').length) {
+                    $('#calendar').fullCalendar('refetchEvents');
+                }
+            },
+            error: function (xhr) {
+                alert('❌ Error Creating Event: ' + xhr.responseText);
+            }
+        });
+    });
+});
+
+    </script>
 </body>
 </html>

@@ -8,7 +8,7 @@ import os
 from django.http import JsonResponse
 from .models import GoogleAuth
 from django.contrib.auth.decorators import login_required
-
+import json
 
 
 # Initiation template
@@ -44,14 +44,15 @@ def google_calendar_connect(request):
                 "token_uri": "https://oauth2.googleapis.com/token",
             }
         },
-        scopes=["https://www.googleapis.com/auth/calendar.readonly"],
+        scopes=["https://www.googleapis.com/auth/calendar.readonly","https://www.googleapis.com/auth/calendar.events",
+                 "https://www.googleapis.com/auth/calendar"],
     )
     flow.redirect_uri = settings.GOOGLE_REDIRECT_URI
     authorization_url, _ = flow.authorization_url(prompt="consent")
 
     return redirect(authorization_url)
 
-
+# -----------------------------------------------------------------------------------
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.http import JsonResponse
@@ -59,6 +60,9 @@ from google_auth_oauthlib.flow import Flow
 from google.auth.transport.requests import Request
 from google.auth.exceptions import GoogleAuthError
 from .models import GoogleAuth  # Assuming you have a GoogleAuth model
+from google_auth_oauthlib.flow import InstalledAppFlow
+
+
 
 
 def google_calendar_callback(request):
@@ -81,7 +85,8 @@ def google_calendar_callback(request):
                     "token_uri": "https://oauth2.googleapis.com/token",
                 }
             },
-            scopes=["https://www.googleapis.com/auth/calendar.readonly"],
+            scopes=["https://www.googleapis.com/auth/calendar.readonly","https://www.googleapis.com/auth/calendar",
+             "https://www.googleapis.com/auth/calendar.events"],
         )
         flow.redirect_uri = settings.GOOGLE_REDIRECT_URI
 
@@ -122,6 +127,7 @@ def google_calendar_callback(request):
     except Exception as e:
         print("\n❌ [ERROR] Unexpected Error:", str(e))
         return JsonResponse({"error": str(e)}, status=400)
+
 
 
 
@@ -281,3 +287,101 @@ def get_google_event_details(request, event_id):
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
+
+
+
+# Create Google Calendar Event 
+from datetime import datetime
+
+@login_required
+@login_required
+def create_google_event(request):
+    """Create a Google Calendar event when a user clicks on a date."""
+    if request.method == "POST":
+        try:
+            print("🔍 Received request:", request.body)  # DEBUGGING
+
+            data = json.loads(request.body)  # Convert JSON to Python Dict
+            print("✅ Parsed JSON Data:", data)  # DEBUGGING
+
+            user = request.user
+            creds_data = GoogleAuth.objects.filter(user=user).first()
+
+            if not creds_data:
+                print("❌ Google credentials not found for user:", user)
+                return JsonResponse({'error': 'Google credentials not found'}, status=400)
+
+            creds = Credentials(
+                token=creds_data.access_token,
+                refresh_token=creds_data.refresh_token,
+                token_uri="https://oauth2.googleapis.com/token",
+                client_id=settings.GOOGLE_CLIENT_ID,
+                client_secret=settings.GOOGLE_CLIENT_SECRET,
+                scopes=creds_data.scopes,
+            )
+
+            if creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+                creds_data.access_token = creds.token
+                creds_data.save()
+
+            title = data.get("title", "Untitled Event")
+            description = data.get("description", "")
+            location = data.get("location", "")
+            start_time = data.get("start")
+            end_time = data.get("end")
+            guests_emails = data.get("guests", [])
+            generate_meeting = data.get("meeting_link", False)
+            notify_guests = data.get("notify_guests", False)
+
+            if not start_time or not end_time:
+                print("❌ Missing Start or End Time")
+                return JsonResponse({"error": "Start and end time are required"}, status=400)
+
+            start_dt = datetime.fromisoformat(start_time)
+            end_dt = datetime.fromisoformat(end_time)
+
+            print("✅ Event Details:", title, start_dt, end_dt)
+
+            # Send event data to Google Calendar
+            service = build("calendar", "v3", credentials=creds)
+            event_data = {
+                "summary": title,
+                "description": description,
+                "location": location,
+                "start": {"dateTime": start_dt.isoformat(), "timeZone": "UTC"},
+                "end": {"dateTime": end_dt.isoformat(), "timeZone": "UTC"},
+                "attendees": [{"email": email} for email in guests_emails],
+                "reminders": {"useDefault": False, "overrides": [{"method": "email", "minutes": 10}]} if notify_guests else {},
+            }
+
+            if generate_meeting:
+                event_data["conferenceData"] = {
+                    "createRequest": {
+                        "requestId": "meet-" + datetime.now().strftime("%Y%m%d%H%M%S"),
+                        "conferenceSolutionKey": {"type": "hangoutsMeet"},
+                    }
+                }
+
+            event = service.events().insert(
+                calendarId="primary",
+                body=event_data,
+                conferenceDataVersion=1 if generate_meeting else 0
+            ).execute()
+
+            print("✅ Google Event Created:", event.get("id"))
+
+            return JsonResponse({
+                "message": "Event created successfully",
+                "event_id": event.get("id"),
+                "meeting_link": event.get("hangoutLink", "No Meeting Link"),
+            })
+
+        except json.JSONDecodeError:
+            print("❌ JSON Decode Error")
+            return JsonResponse({"error": "Invalid JSON format"}, status=400)
+        except Exception as e:
+            print("❌ Exception Occurred:", str(e))
+            return JsonResponse({"error": str(e)}, status=400)
+
+    return JsonResponse({"error": "Invalid request method"}, status=400)
