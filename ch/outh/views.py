@@ -524,3 +524,40 @@ def generate_pdf_report(event_details):
     response['Content-Disposition'] = f'attachment; filename="event_{event_details["id"]}_report.pdf"'
 
     return response
+
+
+
+# DELETE EVENT
+
+# View to handle event deletion from Google Calendar
+@login_required
+def delete_event(request, event_id):
+    try:
+        # Fetch GoogleAuth instance for the authenticated user
+        google_auth = GoogleAuth.objects.get(user=request.user)
+
+        # Create Credentials object using the stored access and refresh tokens
+        credentials = Credentials(
+            token=google_auth.access_token,
+            refresh_token=google_auth.refresh_token,
+            token_uri="https://oauth2.googleapis.com/token",
+            client_id=settings.GOOGLE_CLIENT_ID,
+            client_secret=settings.GOOGLE_CLIENT_SECRET,
+        )
+
+        # Refresh the token if expired
+        if credentials and credentials.expired and credentials.refresh_token:
+            credentials.refresh(Request())
+
+        # Create service to interact with the Google Calendar API
+        service = build('calendar', 'v3', credentials=credentials)
+
+        # Delete the event from Google Calendar
+        service.events().delete(calendarId='primary', eventId=event_id).execute()
+
+        return JsonResponse({"success": True, "message": "Event deleted successfully!"})
+
+    except GoogleAuth.DoesNotExist:
+        return JsonResponse({"success": False, "message": "Google credentials not found. Please authenticate."})
+    except Exception as e:
+        return JsonResponse({"success": False, "message": str(e)})
