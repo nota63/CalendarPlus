@@ -166,6 +166,182 @@
     .fs-13 { font-size: 13px; }
     .modal-content { border: none; box-shadow: 0 0 12px rgba(0,0,0,0.15); }
     .btn:hover { background-color: #4a154b !important; color: white !important; }
+
+
+
+    /* Modal Overlay */
+
+    /* Modal Styling */
+#duplicateWorkspaceModal.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-content {
+    background-color: #ffffff;
+    margin: 5% auto;
+    padding: 28px 32px;
+    border-radius: 12px;
+    width: 600px;
+    position: relative;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Typography */
+.modal-content h2 {
+    color: #1d1c1d;
+    font-family: 'Slack-Lato', 'Lato', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.modal-content strong {
+    color: #1d1c1d;
+    font-size: 16px;
+    display: block;
+    margin-bottom: 12px;
+}
+
+.modal-content p {
+    color: #616061;
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 12px 0;
+}
+
+/* Radio Button Grid */
+#duplicateForm {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin: 20px 0;
+}
+
+#duplicateForm label {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    background: #f8f8f8;
+}
+
+#duplicateForm label:hover {
+    border-color: #1264a3;
+    background: #f0f6fc;
+}
+
+#duplicateForm input[type="radio"] {
+    opacity: 0;
+    position: absolute;
+}
+
+#duplicateForm input[type="radio"]:checked + span::before {
+    content: "✓";
+    color: #1264a3;
+    position: absolute;
+    left: -28px;
+    font-size: 16px;
+}
+
+#duplicateForm label span {
+    margin-left: 32px;
+    color: #1d1c1d;
+    font-weight: 500;
+    font-size: 15px;
+}
+
+/* Button Styling */
+#confirmDuplicate {
+    grid-column: span 2;
+    background: #2bac76;
+    color: white;
+    border: none;
+    padding: 16px 24px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    margin-top: 16px;
+}
+
+#confirmDuplicate:hover {
+    background: #238f63;
+}
+
+/* Close Button */
+.close {
+    color: #616061;
+    float: right;
+    font-size: 28px;
+    font-weight: 300;
+    transition: color 0.2s ease;
+}
+
+.close:hover,
+.close:focus {
+    color: #1d1c1d;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Helper Text */
+.helper-text {
+    color: #868686;
+    font-size: 13px;
+    margin-top: 4px;
+    display: block;
+}
+
+/* Warning Message */
+.warning-message {
+    color: #e01e5a;
+    font-size: 13px;
+    margin-top: 8px;
+    font-weight: 500;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+    .modal-content {
+        width: 90%;
+        margin: 10% auto;
+    }
+    
+    #duplicateForm {
+        grid-template-columns: 1fr;
+    }
+    
+    #confirmDuplicate {
+        grid-column: span 1;
+    }
+}
+
+   
     </style>
 </head>
 <body>
@@ -591,24 +767,68 @@
 
 
 <!-- Dupl;icate Workspace  -->
+
 <div id="duplicateWorkspaceModal" class="modal" style="display: none;">
     <div class="modal-content">
         <span onclick="closeDuplicateModal()" class="close">&times;</span>
         <h2>Duplicate Workspace</h2>
         
-        <form id="duplicateForm">
-            <label><input type="radio" name="option" value="only_workspace"> Only Workspace</label><br>
-            <label><input type="radio" name="option" value="workspace_with_members"> Workspace with Members</label><br>
-            <label><input type="radio" name="option" value="projects"> Projects</label><br>
-            <label><input type="radio" name="option" value="meetings"> Meetings</label><br>
-            <label><input type="radio" name="option" value="channels"> Channels</label><br>
-            <label><input type="radio" name="option" value="groups"> Groups</label><br>
-            <label><input type="radio" name="option" value="everything"> Everything</label><br>
+        <div class="header-section">
+            <strong>Workspace would be {{organization.name}} Copy</strong>
+            <p class="helper-text">Team members will have access to all selected components in the new workspace</p>
+        </div>
 
-            <button type="submit" id="confirmDuplicate" class="btn btn-success">Confirm</button>
+        <form id="duplicateForm">
+            <label>
+                <input type="radio" name="option" value="only_workspace">
+                <span>Only Workspace</span>
+                <span class="helper-text">Basic settings and structure</span>
+            </label>
+            
+            <label>
+                <input type="radio" name="option" value="workspace_with_members">
+                <span>Workspace with Members</span>
+                <span class="helper-text">Include all team members</span>
+            </label>
+            
+            <label>
+                <input type="radio" name="option" value="projects">
+                <span>Projects</span>
+                <span class="helper-text">All current projects and tasks</span>
+            </label>
+            
+            <label>
+                <input type="radio" name="option" value="meetings">
+                <span>Meetings</span>
+                <span class="helper-text">Scheduled meetings and notes</span>
+            </label>
+            
+            <label>
+                <input type="radio" name="option" value="channels">
+                <span>Channels</span>
+                <span class="helper-text">All public channels</span>
+            </label>
+            
+            <label>
+                <input type="radio" name="option" value="groups">
+                <span>Groups</span>
+                <span class="helper-text">Private groups and permissions</span>
+            </label>
+            
+            <label style="grid-column: span 2">
+                <input type="radio" name="option" value="everything">
+                <span>Everything</span>
+                <span class="helper-text warning-message">This will duplicate all workspace components</span>
+            </label>
+
+            <button type="submit" id="confirmDuplicate" class="btn btn-success">
+                Create Duplicate Workspace
+            </button>
         </form>
     </div>
 </div>
+
+
 
 <div id="organization-id" data-org-id="{{ organization.id }}"></div>
 

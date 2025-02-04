@@ -878,27 +878,30 @@ class DuplicateWorkspaceView(View):
                     logger.info("Duplicated channels successfully.")
 
                 # Duplicate groups
+                # Duplicate groups
                 if 'groups' in options:
-                  groups = Group.objects.filter(organization=organization)
-                  for group in groups:
-                    new_group = Group.objects.create(
-                     organization=new_org,
-                     name=group.name,
-                     description=group.description,
-                     team_leader=user_mapping.get(group.team_leader, request.user).user,  
-                     created_by=user_mapping.get(group.created_by, request.user).user  
-             )
-                group_members = GroupMember.objects.filter(group=group)
-                for member in group_members:
-                 if member.user in user_mapping:
-                   GroupMember.objects.create(
-                    group=new_group,
-                    organization=new_org,
-                    user=user_mapping[member.user].user,  
-                    role=member.role
-                )
-                logger.info("Duplicated groups successfully.")
-
+                    groups = Group.objects.filter(organization=organization)
+                    for group in groups:
+                        new_group = Group.objects.create(
+                           organization=new_org,
+                           name=group.name,
+                           description=group.description,
+                           team_leader=user_mapping.get(group.team_leader, request.user).user,  
+                          created_by=user_mapping.get(group.created_by, request.user).user  
+                     )
+        
+        # Duplicate group members (inside the loop)
+                    group_members = GroupMember.objects.filter(group=group)
+                    for member in group_members:
+                        if member.user in user_mapping:
+                            GroupMember.objects.create(
+                            group=new_group,
+                             organization=new_org,
+                            user=user_mapping[member.user].user,  
+                            role=member.role
+                        )
+        
+                        logger.info("Duplicated groups successfully.")
 
 
                 return JsonResponse({'message': 'Workspace duplicated successfully!', 'new_org_id': new_org.id}, status=200)
