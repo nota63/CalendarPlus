@@ -313,7 +313,137 @@ p:hover strong {
     transform: scale(1.1); /* Slight zoom effect on hover */
 }
 
+/* Slack-inspired Modal Styling */
+#customReminderModal .modal-content {
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 0 24px rgba(0, 0, 0, 0.15);
+    font-family: 'Helvetica Neue', sans-serif;
+}
 
+#customReminderModal .modal-header {
+    background: #f8f8f8;
+    border-bottom: 1px solid #e8e8e8;
+    padding: 16px 24px;
+    border-radius: 8px 8px 0 0;
+}
+
+#customReminderModal .modal-title {
+    color: #1d1c1d;
+    font-weight: 900;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#customReminderModal .modal-title .bi {
+    font-size: 20px;
+    color: #4a154b;
+}
+
+#customReminderModal .modal-body {
+    padding: 24px;
+    color: #1d1c1d;
+}
+
+#customReminderModal .form-label {
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #1d1c1d;
+}
+
+#customReminderModal .form-label .bi {
+    color: #ecb22e;
+    font-size: 18px;
+}
+
+#customReminderModal .input-group {
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+#customReminderModal .input-group .btn {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 8px 16px;
+    transition: all 0.2s ease;
+}
+
+#customReminderModal .input-group .btn:hover {
+    background: #f6f6f6;
+    border-color: #ccc;
+}
+
+#customReminderModal #reminderTime {
+    border: 1px solid #ddd;
+    border-left: none;
+    border-right: none;
+    font-weight: 500;
+    padding: 8px;
+    text-align: center;
+    color: #1d1c1d;
+}
+
+#customReminderModal #reminderTime:focus {
+    box-shadow: none;
+    border-color: #4a154b;
+}
+
+#customReminderModal small.text-muted {
+    color: #616061 !important;
+    font-size: 13px;
+    line-height: 1.4;
+    display: block;
+}
+
+#customReminderModal .modal-footer {
+    border-top: 1px solid #e8e8e8;
+    padding: 16px 24px;
+    gap: 8px;
+}
+
+#customReminderModal .btn-secondary {
+    background: transparent;
+    border: 1px solid #ddd;
+    color: #1d1c1d;
+    font-weight: 500;
+    border-radius: 4px;
+    padding: 8px 16px;
+    transition: all 0.2s ease;
+}
+
+#customReminderModal .btn-secondary:hover {
+    background: #f6f6f6;
+    border-color: #ccc;
+}
+
+#customReminderModal #saveReminderBtn {
+    background: #4a154b;
+    border: none;
+    color: white;
+    font-weight: 700;
+    border-radius: 4px;
+    padding: 8px 20px;
+    transition: all 0.2s ease;
+}
+
+#customReminderModal #saveReminderBtn:hover {
+    background: #3d1041;
+}
+
+#customReminderModal .btn-close {
+    font-size: 14px;
+    margin: 0;
+    padding: 8px;
+}
+
+#customReminderModal .bi {
+    vertical-align: middle;
+}
 
     </style>
 </head>
