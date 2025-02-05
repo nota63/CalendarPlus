@@ -18,6 +18,7 @@ urlpatterns = [
     path('google_duplicate_event/<str:event_id>/',duplicate_event, name='google_duplicate_event'),
     path('edit_google_event/<str:event_id>/',edit_google_event, name='edit_event'),
     path('update_event_response/<str:event_id>/',update_event_response, name='update_event_response'),
+    path('get_event_invite_link/<str:event_id>/',get_event_invite_link, name='get_event_invite_link'),
 
 
 ]

@@ -963,4 +963,52 @@ def update_event_response(request, event_id):
         return JsonResponse({"success": False, "message": f"Unexpected error: {str(e)}"}, status=500)
     
 
-    
+
+# GENERATE INVITE LINK
+@login_required
+def get_event_invite_link(request, event_id):
+    """Generate a Google Calendar invite link for an event."""
+    try:
+        user = request.user
+        creds_data = GoogleAuth.objects.filter(user=user).first()
+
+        if not creds_data:
+            return JsonResponse({'error': 'Google credentials not found'}, status=400)
+
+        creds = Credentials(
+            token=creds_data.access_token,
+            refresh_token=creds_data.refresh_token,
+            token_uri="https://oauth2.googleapis.com/token",
+            client_id=settings.GOOGLE_CLIENT_ID,
+            client_secret=settings.GOOGLE_CLIENT_SECRET,
+            scopes=creds_data.scopes,
+        )
+
+        # Refresh token if expired
+        if creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+            creds_data.access_token = creds.token
+            creds_data.save()
+
+        # Build Google Calendar API service
+        service = build("calendar", "v3", credentials=creds)
+        event = service.events().get(calendarId="primary", eventId=event_id).execute()
+
+        # Get event details
+        event_title = event.get("summary", "No Title")
+        event_description = event.get("description", "No Description")
+        event_start = event["start"].get("dateTime", event["start"].get("date"))
+        event_end = event["end"].get("dateTime", event["end"].get("date"))
+        event_location = event.get("location", "")
+
+        # ✅ Generate Google Calendar Invite Link
+        invite_link = f"https://calendar.google.com/calendar/render?action=TEMPLATE"
+        invite_link += f"&text={event_title}"
+        invite_link += f"&details={event_description}"
+        invite_link += f"&location={event_location}"
+        invite_link += f"&dates={event_start.replace('-', '').replace(':', '').replace('+', 'Z')}/{event_end.replace('-', '').replace(':', '').replace('+', 'Z')}"
+
+        return JsonResponse({'success': True, 'event_link': invite_link})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
