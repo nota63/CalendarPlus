@@ -1231,3 +1231,51 @@ def change_event_owner(request, event_id):
 
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
+
+
+# HANDLE CUSTOM REMINDERS
+
+@csrf_exempt
+@login_required
+def save_custom_reminder(request, event_id, reminder_time):
+    if request.method == "POST":
+        try:
+            # Retrieve user's GoogleAuth credentials from the database
+            google_auth = GoogleAuth.objects.filter(user=request.user).first()
+            if not google_auth:
+                return JsonResponse({"success": False, "error": "Google authentication not found."}, status=400)
+
+            # Construct credentials object
+            creds = Credentials(
+                token=google_auth.access_token,
+                refresh_token=google_auth.refresh_token,
+                token_uri="https://oauth2.googleapis.com/token",
+                client_id=settings.GOOGLE_CLIENT_ID,
+                client_secret=settings.GOOGLE_CLIENT_SECRET,
+                scopes=google_auth.scopes
+            )
+
+            # Connect to Google Calendar API
+            service = build("calendar", "v3", credentials=creds)
+
+            # Fetch the existing event from Google Calendar
+            event = service.events().get(calendarId="primary", eventId=event_id).execute()
+
+            # Update reminder settings
+            event["reminders"] = {
+                "useDefault": False,
+                "overrides": [
+                    {"method": "popup", "minutes": int(reminder_time)},  # Custom popup reminder
+                    {"method": "email", "minutes": int(reminder_time)}   # Email notification
+                ]
+            }
+
+            # Update the event in Google Calendar
+            updated_event = service.events().update(calendarId="primary", eventId=event_id, body=event).execute()
+
+            return JsonResponse({"success": True, "message": "Reminder updated successfully!"})
+
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=400)
+
+    return JsonResponse({"success": False, "message": "Invalid request"}, status=400)

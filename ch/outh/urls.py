@@ -22,6 +22,7 @@ urlpatterns = [
     path('generate_event_invite_link_for_book/<str:event_id>/',generate_google_booking_link, name='generate_event_invite_link_for_book'),
     path('publish_google_event/<str:event_id>/',publish_event, name='publish_event'),
     path('change_event_owner/<str:event_id>/',change_event_owner, name='change_event_owner'),
+    path('save_custom_reminder/<str:event_id>/<str:reminder_time>/',save_custom_reminder, name='save_custom_reminder'),
 
 
 ]

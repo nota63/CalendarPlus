@@ -576,6 +576,46 @@ p:hover strong {
 </div>
 
 
+<!-- MANAGE CUSTOM REMINDER -->
+
+<!-- Custom Reminder Modal -->
+<div class="modal fade" id="customReminderModal" tabindex="-1" aria-labelledby="customReminderLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="customReminderLabel">
+                    <i class="bi bi-clock-history text-primary"></i> Set Custom Reminder
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label for="reminderTime" class="form-label">
+                    <i class="bi bi-bell text-warning"></i> Reminder Time (Minutes Before Event)
+                </label>
+                <div class="input-group">
+                    <button class="btn btn-outline-secondary" type="button" id="decreaseReminder">
+                        <i class="bi bi-dash"></i>
+                    </button>
+                    <input type="number" class="form-control text-center" id="reminderTime" value="10" min="1">
+                    <button class="btn btn-outline-secondary" type="button" id="increaseReminder">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                </div>
+                <small class="text-muted">Set how many minutes before the event you want to be reminded.</small>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveReminderBtn">
+                    <i class="bi bi-save"></i> Save Reminder
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
 
 
 
@@ -643,7 +683,7 @@ p:hover strong {
                              <i class="bi bi-trash"></i> Delete
                             </a>
                          </li>
-      <!-- Add Attachments Button -->
+      <!--      Add Attachments Button -->
                        <li>
                            <a class="dropdown-item" href="#" id="attachmentsEventBtn" data-event-id="">
                            <i class="bi bi-paperclip"></i> Add attachments
@@ -689,6 +729,12 @@ p:hover strong {
                              <li>
                                 <a class="dropdown-item" href="#" id="changeOwnerEventBtn" data-event-id="">
                                     <i class="bi bi-globe"></i> Change Owner
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item" href="#" id="reminderEventBtn" data-event-id="">
+                                    <i class="bi bi-globe"></i> Custom Reminder by Google
                                 </a>
                             </li>
                           </ul>
@@ -741,6 +787,7 @@ p:hover strong {
             $('#inviteViaLinkEventBtn').data('event-id', calEvent.id);
             $('#publishEventBtn').data('event-id', calEvent.id);
             $('#changeOwnerEventBtn').data('event-id', calEvent.id);
+            $('#reminderEventBtn').data('event-id', calEvent.id);
 
 
 
@@ -1358,6 +1405,89 @@ $(document).ready(function () {
         });
     });
 });
+
+
+
+
+// HANDLE CUSTOM REMINDER
+// HANDLE CUSTOM REMINDER
+
+document.addEventListener("DOMContentLoaded", function () {
+    let reminderInput = document.getElementById("reminderTime");
+    let decreaseBtn = document.getElementById("decreaseReminder");
+    let increaseBtn = document.getElementById("increaseReminder");
+    let saveReminderBtn = document.getElementById("saveReminderBtn");
+    let reminderEventBtn = document.getElementById("reminderEventBtn");
+
+    let eventID = null; // Will be set when modal opens
+
+    // Open modal and set event ID
+    reminderEventBtn.addEventListener("click", function () {
+        eventID = $(this).data('event-id'); // Get event ID
+        reminderInput.value = 10; // Default reminder time
+        let modal = new bootstrap.Modal(document.getElementById("customReminderModal"));
+        modal.show();
+    });
+
+    // Increase reminder time
+    increaseBtn.addEventListener("click", function () {
+        let value = parseInt(reminderInput.value);
+        reminderInput.value = value + 1;
+    });
+
+    // Decrease reminder time (min 1 minute)
+    decreaseBtn.addEventListener("click", function () {
+        let value = parseInt(reminderInput.value);
+        if (value > 1) {
+            reminderInput.value = value - 1;
+        }
+    });
+
+    // Save reminder via AJAX (Event ID in URL)
+    saveReminderBtn.addEventListener("click", function () {
+        let reminderTime = reminderInput.value;
+
+        if (!eventID) {
+            alert("Error: Event ID not found.");
+            return;
+        }
+
+        fetch(`/oauth/save_custom_reminder/${eventID}/${reminderTime}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCSRFToken(), // Get CSRF token dynamically
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Reminder set successfully!");
+                let modal = bootstrap.Modal.getInstance(document.getElementById("customReminderModal"));
+                modal.hide();
+            } else {
+                alert("Failed to save reminder.");
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+
+    // Function to get CSRF Token from Django
+    function getCSRFToken() {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            let cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                let cookie = cookies[i].trim();
+                if (cookie.startsWith("csrftoken=")) {
+                    cookieValue = cookie.substring("csrftoken=".length, cookie.length);
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+
 
 </script>
 
