@@ -456,6 +456,32 @@
 </div>
 
 
+<!-- PUBLISH THE EVENT -->
+ <!-- Modal to Display the Generated Link and Embed Code -->
+<div class="modal fade" id="publishEventModal" tabindex="-1" aria-labelledby="publishEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="publishEventModalLabel">Publish Event</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label for="calendarUrl">Google Calendar Link:</label>
+                <input type="text" class="form-control" id="calendarUrl" readonly>
+                
+                <hr>
+                
+                <label for="embedCode">Embed Code (HTML):</label>
+                <textarea class="form-control" id="embedCode" rows="4" readonly></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="confirmPublishBtn" class="btn btn-primary">Generate</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 
@@ -489,6 +515,7 @@
                    <button id="actionEventBtn" class="btn btn-primary" data-event-id="">Going</button>
                    <button id="inviteEventBtn" class="btn btn-primary" data-event-id="">Generate collaboration Link</button>
                    <button id="inviteViaLinkEventBtn" class="btn btn-primary" data-event-id="">Invite via link</button>
+                   <button id="publishEventBtn" class="btn btn-primary" data-event-id="">Publish event</button>
                 </div>
                 <!-- Button for CSV Export -->
             </div>
@@ -534,6 +561,9 @@
             $('#actionEventBtn').data('event-id', calEvent.id);
             $('#inviteEventBtn').data('event-id', calEvent.id);
             $('#inviteViaLinkEventBtn').data('event-id', calEvent.id);
+            $('#publishEventBtn').data('event-id', calEvent.id);
+
+
 
 
 
@@ -1043,7 +1073,65 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+// PUBLISH THE EVENT
 
+
+document.addEventListener("DOMContentLoaded", function () {
+    const publishEventBtn = document.getElementById("publishEventBtn");
+    const publishEventModal = new bootstrap.Modal(document.getElementById("publishEventModal"));
+    const calendarUrlInput = document.getElementById("calendarUrl");
+    const embedCodeInput = document.getElementById("embedCode");
+    const eventIdInput = document.getElementById("eventIdInput");
+
+    // Open modal when Publish Event button is clicked
+    publishEventBtn.addEventListener("click", function () {
+        const eventId = $(this).data('event-id');
+        if (!eventId) {
+            console.error("❌ Event ID not found!");
+            return;
+        }
+        eventIdInput.value = eventId;
+        publishEventModal.show();
+    });
+
+    // Handle the Publish Event logic when confirm button is clicked
+    document.getElementById("confirmPublishBtn").addEventListener("click", function () {
+        const eventId = eventIdInput.value;
+
+        if (!eventId) {
+            alert("Please select an event!");
+            return;
+        }
+
+        // Send request to backend to generate event link and embed code
+        fetch(`/oauth/publish_google_event/${eventId}/`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.calendar_url && data.embed_code) {
+                    // Display the generated Google Calendar URL and embed code in the modal
+                    calendarUrlInput.value = data.calendar_url;
+                    embedCodeInput.value = data.embed_code;
+                    publishEventModal.show();
+                } else {
+                    alert("Error generating the link: " + data.error);
+                }
+            })
+            .catch((err) => console.error("❌ Error:", err));
+    });
+
+    // Function to get CSRF token
+    function getCSRFToken() {
+        const cookies = document.cookie.split("; ");
+        for (const cookie of cookies) {
+            const [name, value] = cookie.split("=");
+            if (name === "csrftoken") return value;
+        }
+        return "";
+    }
+});
 
 
 </script>

@@ -19,7 +19,8 @@ urlpatterns = [
     path('edit_google_event/<str:event_id>/',edit_google_event, name='edit_event'),
     path('update_event_response/<str:event_id>/',update_event_response, name='update_event_response'),
     path('get_event_invite_link/<str:event_id>/',get_event_invite_link, name='get_event_invite_link'),
-    path('generate_event_invite_link_for_book/<str:event_id>/',generate_google_booking_link, name='generate_event_invite_link_for_book')
+    path('generate_event_invite_link_for_book/<str:event_id>/',generate_google_booking_link, name='generate_event_invite_link_for_book'),
+    path('publish_google_event/<str:event_id>/',publish_event, name='publish_event'),
 
 
 ]

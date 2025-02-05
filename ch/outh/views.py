@@ -423,6 +423,8 @@ def gett_google_event_details(event_id, credentials):
 
     return event_details
 
+
+# generate event report
 def generate_event_report(request, event_id):
     try:
         # Fetch GoogleAuth instance for the authenticated user
@@ -1080,6 +1082,73 @@ def generate_google_booking_link(request, event_id):
         invite_link = f"{base_url}?{urllib.parse.urlencode(query_params)}"
 
         return JsonResponse({'success': True, 'event_link': invite_link})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
+    
+
+
+# PUBLISH THE EVENT
+@login_required
+def publish_event(request, event_id):
+    """Generate the Google Calendar event links and HTML code to publish the event."""
+    try:
+        # Fetch user credentials
+        user = request.user
+        creds_data = GoogleAuth.objects.filter(user=user).first()
+
+        if not creds_data:
+            return JsonResponse({'error': 'Google credentials not found'}, status=400)
+
+        creds = Credentials(
+            token=creds_data.access_token,
+            refresh_token=creds_data.refresh_token,
+            token_uri="https://oauth2.googleapis.com/token",
+            client_id=settings.GOOGLE_CLIENT_ID,
+            client_secret=settings.GOOGLE_CLIENT_SECRET,
+            scopes=creds_data.scopes,
+        )
+
+        if creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+            creds_data.access_token = creds.token
+            creds_data.save()
+
+        # Build the Google Calendar service
+        service = build("calendar", "v3", credentials=creds)
+        event = service.events().get(calendarId="primary", eventId=event_id).execute()
+
+        # Extract event details
+        start_time = event["start"].get("dateTime", event["start"].get("date"))
+        end_time = event["end"].get("dateTime", event["end"].get("date"))
+        title = event.get("summary", "No Title")
+        description = event.get("description", "")
+        location = event.get("location", "")
+        meeting_link = event.get("hangoutLink", "")
+        
+        # Get organizer email
+        organizer_email = event.get("organizer", {}).get("email", "No Organizer Email")
+
+        # Get guest emails
+        guests = event.get("attendees", [])
+        guest_emails = [attendee.get("email") for attendee in guests if "email" in attendee]
+
+        # Format the start and end times properly for Google Calendar URL
+        start_time = start_time.replace(":", "").replace("-", "").replace("T", "")  # Clean up the time
+        end_time = end_time.replace(":", "").replace("-", "").replace("T", "")  # Clean up the time
+
+        # Generate the Google Calendar event link (for adding to calendar)
+        calendar_url = f"https://calendar.google.com/calendar/event?action=TEMPLATE&text={title}&details={description}&location={location}&dates={start_time}/{end_time}&sf=true&output=xml"
+
+        # Generate the HTML code for embedding the Google Calendar button
+        tmeid = event.get("id")
+        embed_code = f'<a target="_blank" href="https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid={tmeid}&tmsrc={organizer_email}"><img border="0" src="https://www.google.com/calendar/images/ext/gc_button1_en-GB.gif"></a>'
+
+        # Return response with generated link and embed code
+        return JsonResponse({
+            "calendar_url": calendar_url,
+            "embed_code": embed_code,
+        })
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
