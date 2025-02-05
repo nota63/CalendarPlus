@@ -432,6 +432,29 @@
     </div>
 </div>
 
+<!-- EVENT ACTIONS  -->
+<!-- Event Response Modal -->
+<div class="modal fade" id="eventResponseModal" tabindex="-1" aria-labelledby="eventResponseModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventResponseModalLabel">Are you attending?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <input type="hidden" id="eventIdInput">
+                <button class="btn btn-success response-option" data-response="yes">Yes</button>
+                <button class="btn btn-warning response-option" data-response="maybe">Maybe</button>
+                <button class="btn btn-danger response-option" data-response="no">No</button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmResponseBtn" class="btn btn-primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 
@@ -463,6 +486,7 @@
                    <button id="attachmentsEventBtn" class="btn btn-primary" data-event-id="">Add attachments</button>
                    <button id="duplicateEventBtn" class="btn btn-primary" data-event-id="">Duplicate</button>
                    <button id="editEventBtn" class="btn btn-primary" data-event-id="">Edit</button>
+                   <button id="actionEventBtn" class="btn btn-primary" data-event-id="">Going</button>
                 </div>
                 <!-- Button for CSV Export -->
             </div>
@@ -505,6 +529,8 @@
             $('#attachmentsEventBtn').data('event-id', calEvent.id);
             $('#duplicateEventBtn').data('event-id', calEvent.id);
             $('#editEventBtn').data('event-id', calEvent.id);
+            $('#actionEventBtn').data('event-id', calEvent.id);
+
 
 
             // Fetch event details using AJAX
@@ -826,7 +852,74 @@ $(document).ready(function() {
 });
 
 
-    </script>
+
+// HANDLE EVENT ACTIONS
+
+document.addEventListener("DOMContentLoaded", function () {
+    const actionEventBtn = document.getElementById("actionEventBtn");
+    const eventResponseModal = new bootstrap.Modal(document.getElementById("eventResponseModal"));
+    const eventIdInput = document.getElementById("eventIdInput");
+    const confirmResponseBtn = document.getElementById("confirmResponseBtn");
+    let selectedResponse = null;
+
+    // ✅ Open modal when button is clicked
+    actionEventBtn.addEventListener("click", function () {
+        const eventId = $(this).data('event-id'); // Capture Event ID
+        if (!eventId) {
+            console.error("❌ Event ID not found!");
+            return;
+        }
+        eventIdInput.value = eventId; // Store event ID in hidden input
+        eventResponseModal.show(); // Show Bootstrap Modal
+    });
+
+    // ✅ Handle selection of response
+    document.querySelectorAll(".response-option").forEach((btn) => {
+        btn.addEventListener("click", function () {
+            selectedResponse = this.getAttribute("data-response");
+            document.querySelectorAll(".response-option").forEach((el) => el.classList.remove("active"));
+            this.classList.add("active");
+        });
+    });
+
+    // ✅ Handle confirm response button
+    confirmResponseBtn.addEventListener("click", function () {
+        const eventId = eventIdInput.value;
+        if (!eventId || !selectedResponse) {
+            alert("Please select a response!");
+            return;
+        }
+
+        // Send data to backend
+        fetch(`/oauth/update_event_response/${eventId}/`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
+            body: JSON.stringify({ response: selectedResponse }),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.success) {
+                    alert("Response updated successfully!");
+                    eventResponseModal.hide(); // Close modal
+                } else {
+                    alert("Error: " + data.message);
+                }
+            })
+            .catch((err) => console.error("❌ Error updating response:", err));
+    });
+
+    // ✅ Function to get CSRF token from cookies
+    function getCSRFToken() {
+        const cookies = document.cookie.split("; ");
+        for (const cookie of cookies) {
+            const [name, value] = cookie.split("=");
+            if (name === "csrftoken") return value;
+        }
+        return "";
+    }
+});
+
+</script>
 
 </body>
 </html>
