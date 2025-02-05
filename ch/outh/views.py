@@ -689,3 +689,144 @@ def duplicate_event(request, event_id):
         return JsonResponse({"success": False, "message": "Google credentials not found. Please authenticate."})
     except Exception as e:
         return JsonResponse({"success": False, "message": str(e)})
+    
+
+# EDIT THE EVENT
+from django.views.decorators.csrf import csrf_exempt
+import logging
+from googleapiclient.errors import HttpError
+logger = logging.getLogger(__name__)  # 🔥 Logging for debugging
+@csrf_exempt
+@login_required
+def edit_google_event(request, event_id):
+    """Handles both GET (fetch event details) and POST (update event) requests."""
+
+    try:
+        logger.info(f"🔹 Processing Google Event Edit for event_id: {event_id}")
+
+        # ✅ Fetch user credentials
+        try:
+            google_auth = GoogleAuth.objects.get(user=request.user)
+        except GoogleAuth.DoesNotExist:
+            logger.error("❌ GoogleAuth credentials not found!")
+            return JsonResponse({"success": False, "message": "Google authentication not found!"}, status=401)
+
+        # ✅ Load credentials
+        credentials = Credentials(
+            token=google_auth.access_token,
+            refresh_token=google_auth.refresh_token,
+            token_uri="https://oauth2.googleapis.com/token",
+            client_id=settings.GOOGLE_CLIENT_ID,
+            client_secret=settings.GOOGLE_CLIENT_SECRET,
+            scopes=google_auth.scopes
+        )
+
+        # 🔄 **Refresh token if expired**
+        if not credentials.valid or credentials.expired:
+            if credentials.refresh_token:
+                try:
+                    logger.info("🔄 Refreshing Google OAuth token...")
+                    credentials.refresh(Request())
+
+                    # ✅ **Save new access token**
+                    google_auth.access_token = credentials.token
+                    google_auth.save()
+                    logger.info("✅ Token refreshed successfully!")
+                except Exception as e:
+                    logger.error(f"❌ Token refresh failed: {e}")
+                    return JsonResponse({"success": False, "message": f"Failed to refresh token: {str(e)}"}, status=401)
+            else:
+                logger.error("❌ No refresh token available!")
+                return JsonResponse({"success": False, "message": "No refresh token available. Please re-authenticate."}, status=401)
+
+        # 🔥 **Initialize Google Calendar API**
+        service = build("calendar", "v3", credentials=credentials)
+
+        # ✅ **Handle GET request - Fetch event details**
+        if request.method == "GET":
+            try:
+                logger.info(f"📡 Fetching event details for {event_id}")
+                event = service.events().get(calendarId="primary", eventId=event_id).execute()
+                return JsonResponse({"success": True, "event": event})
+            except HttpError as e:
+                logger.error(f"❌ Google API Error while fetching event: {e}")
+                return JsonResponse({"success": False, "message": "Error fetching event from Google Calendar."}, status=400)
+            except Exception as e:
+                logger.error(f"❌ Unexpected error fetching event: {e}")
+                return JsonResponse({"success": False, "message": f"Unexpected error: {str(e)}"}, status=400)
+
+        # ✅ **Handle POST request - Update event**
+        elif request.method == "POST":
+            try:
+                # ✅ **Parse JSON request body**
+                data = json.loads(request.body.decode("utf-8"))
+                logger.info(f"📥 Received update request: {data}")
+
+                # 🔎 **Ensure all required fields are present**
+                required_fields = ["title", "start", "end"]
+                for field in required_fields:
+                    if field not in data or not data[field].strip():
+                        logger.error(f"❌ Missing required field: {field}")
+                        return JsonResponse({"success": False, "message": f"Missing required field: {field}"}, status=400)
+
+                # ✅ **Ensure datetime format is correct (ISO 8601)**
+                start_time = data["start"].strip()
+                end_time = data["end"].strip()
+                if "T" not in start_time or "T" not in end_time:
+                    logger.error("❌ Invalid datetime format. Must be ISO 8601.")
+                    return JsonResponse({"success": False, "message": "Invalid datetime format. Must be ISO 8601."}, status=400)
+
+                # ✅ **Process guests data**
+                guests = data.get("guests", [])
+                # Handle both comma-separated strings and list inputs
+                if isinstance(guests, str):
+                    guests = [email.strip() for email in guests.split(',') if email.strip()]
+                elif not isinstance(guests, list):
+                    guests = []
+
+                # ✅ **Process reminders safely**
+                reminder_minutes = 10  # default value
+                try:
+                    reminder_minutes = int(data.get("reminders", 10))
+                except ValueError:
+                    logger.warning("⚠️ Invalid reminder value, using default 10 minutes")
+
+                # ✅ **Prepare event data**
+                event_data = {
+                    "summary": data["title"].strip(),
+                    "description": data.get("description", "").strip(),
+                    "start": {"dateTime": start_time, "timeZone": "UTC"},
+                    "end": {"dateTime": end_time, "timeZone": "UTC"},
+                    "location": data.get("location", "").strip(),
+                    "attendees": [{"email": email} for email in guests if email],
+                    "reminders": {
+                        "useDefault": False,
+                        "overrides": [{"method": "email", "minutes": reminder_minutes}]
+                    },
+                }
+
+                logger.info(f"📡 Sending event update request to Google: {event_data}")
+
+                # 🔥 **Update the event in Google Calendar**
+                updated_event = service.events().update(
+                    calendarId="primary", eventId=event_id, body=event_data
+                ).execute()
+
+                logger.info("✅ Event updated successfully!")
+                return JsonResponse({"success": True, "message": "Event updated successfully!", "event": updated_event})
+
+            except json.JSONDecodeError:
+                logger.error("❌ Invalid JSON data received")
+                return JsonResponse({"success": False, "message": "Invalid JSON data"}, status=400)
+            except HttpError as e:
+                logger.error(f"❌ Google API Error while updating event: {e}")
+                return JsonResponse({"success": False, "message": "Error updating event in Google Calendar."}, status=400)
+            except Exception as e:
+                logger.error(f"❌ Unexpected error updating event: {e}")
+                return JsonResponse({"success": False, "message": f"Unexpected error: {str(e)}"}, status=400)
+
+    except Exception as e:
+        logger.critical(f"🔥 Unexpected critical error: {e}", exc_info=True)
+        return JsonResponse({"success": False, "message": f"Unexpected error: {str(e)}"}, status=500)
+    
+    

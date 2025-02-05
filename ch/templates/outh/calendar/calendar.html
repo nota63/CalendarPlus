@@ -366,6 +366,76 @@
         </div>
     </div>
 
+<!-- Modal for edit the event -->
+
+<!-- Edit Event Modal -->
+<div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="editEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editEventModalLabel">Edit Event</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editEventForm">
+                    <input type="hidden" id="editEventId">
+                    
+                    <div class="mb-3">
+                        <label for="editEventTitle" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="editEventTitle" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editEventDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="editEventDescription"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editEventStart" class="form-label">Start Date & Time</label>
+                        <input type="datetime-local" class="form-control" id="editEventStart" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editEventEnd" class="form-label">End Date & Time</label>
+                        <input type="datetime-local" class="form-control" id="editEventEnd" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editEventLocation" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="editEventLocation">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editEventGuests" class="form-label">Guests (comma-separated emails)</label>
+                        <input type="text" class="form-control" id="editEventGuests">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editEventReminders" class="form-label">Reminders (minutes before event)</label>
+                        <input type="number" class="form-control" id="editEventReminders" min="1">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editEventAttachment" class="form-label">Attachments</label>
+                        <input type="file" class="form-control" id="editEventAttachment">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editEventMeetingLink" class="form-label">Meeting Link</label>
+                        <input type="url" class="form-control" id="editEventMeetingLink">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
     <!-- Bootstrap Modal for Viewing Event Details -->
     <div class="modal fade" id="viewEventModal" tabindex="-1" aria-labelledby="viewEventModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -392,10 +462,7 @@
                    <button id="deleteEventBtn" class="btn btn-primary" data-event-id="">Delete</button>
                    <button id="attachmentsEventBtn" class="btn btn-primary" data-event-id="">Add attachments</button>
                    <button id="duplicateEventBtn" class="btn btn-primary" data-event-id="">Duplicate</button>
-
-
-
-
+                   <button id="editEventBtn" class="btn btn-primary" data-event-id="">Edit</button>
                 </div>
                 <!-- Button for CSV Export -->
             </div>
@@ -437,6 +504,8 @@
             $('#deleteEventBtn').data('event-id', calEvent.id); // Set the event ID on delete button
             $('#attachmentsEventBtn').data('event-id', calEvent.id);
             $('#duplicateEventBtn').data('event-id', calEvent.id);
+            $('#editEventBtn').data('event-id', calEvent.id);
+
 
             // Fetch event details using AJAX
             $.ajax({
@@ -667,6 +736,94 @@ $('#attachmentsEventBtn').click(function() {
     });
 });
 
+
+
+
+// EDIT THE EVENT
+$(document).ready(function() {
+    // Open Edit Event Modal & Fetch Data
+    $('#editEventBtn').click(function() {
+        const eventId = $(this).data('event-id');
+
+        if (!eventId) {
+            alert('Event ID is missing!');
+            return;
+        }
+
+        $.ajax({
+            url: `/oauth/edit_google_event/${eventId}/`,  // Fetch event details
+            method: 'GET',
+            success: function(response) {
+                if (response.success) {
+                    const event = response.event;
+
+                    $('#editEventId').val(event.id);
+                    $('#editEventTitle').val(event.summary || '');
+                    $('#editEventDescription').val(event.description || '');
+                    $('#editEventStart').val(event.start_date?.dateTime?.replace('Z', '') || '');
+                    $('#editEventEnd').val(event.end_date?.dateTime?.replace('Z', '') || '');
+                    $('#editEventLocation').val(event.location || '');
+                    
+                    // Set Guests as a comma-separated string
+                    $('#editEventGuests').val(event.attendees ? event.attendees.map(a => a.email).join(', ') : '');
+
+                    // Set reminders (fallback to 10 minutes if empty)
+                    $('#editEventReminders').val(event.reminders?.overrides?.[0]?.minutes || '10');
+
+                    $('#editEventModal').modal('show');
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            },
+            error: function(xhr) {
+                console.error('Error fetching event:', xhr);
+                alert('Error fetching event details. Please try again.');
+            }
+        });
+    });
+
+    // Submit Edited Event Data
+    $('#editEventForm').submit(function(e) {
+        e.preventDefault();
+        const eventId = $('#editEventId').val();
+
+        if (!eventId) {
+            alert('Invalid event ID!');
+            return;
+        }
+
+        let eventData = {
+            title: $('#editEventTitle').val().trim(),
+            description: $('#editEventDescription').val().trim(),
+            start: $('#editEventStart').val(),
+            end: $('#editEventEnd').val(),
+            location: $('#editEventLocation').val().trim(),
+            guests: $('#editEventGuests').val().trim().split(',').map(email => email.trim()),  // Convert to array
+            reminders: $('#editEventReminders').val().trim() || '10'  // Default to 10 minutes
+        };
+
+        $.ajax({
+            url: `/oauth/edit_google_event/${eventId}/`,
+            method: 'POST',
+            data: JSON.stringify(eventData),
+            contentType: 'application/json',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            success: function(response) {
+                if (response.success) {
+                    alert('Event updated successfully!');
+                    $('#editEventModal').modal('hide');
+                    $('#calendar').fullCalendar('refetchEvents');  // Refresh calendar
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            },
+            error: function(xhr) {
+                console.error('Error updating event:', xhr);
+                alert('Error updating event. Please check your details and try again.');
+            }
+        });
+    });
+});
 
 
     </script>
