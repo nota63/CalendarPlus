@@ -23,6 +23,9 @@ urlpatterns = [
     path('publish_google_event/<str:event_id>/',publish_event, name='publish_event'),
     path('change_event_owner/<str:event_id>/',change_event_owner, name='change_event_owner'),
     path('save_custom_reminder/<str:event_id>/<str:reminder_time>/',save_custom_reminder, name='save_custom_reminder'),
+    path('get_guest_permissions/<str:event_id>/',get_guest_permissions, name='get_guest_permissions'),
+    path('update_guest_permissions/<str:event_id>/<str:modify_event>/<str:see_guest_list>/<str:invite_others>/', 
+         update_guest_permissions, name='update_guest_permissions'),
 
 
 ]

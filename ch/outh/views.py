@@ -1279,3 +1279,71 @@ def save_custom_reminder(request, event_id, reminder_time):
             return JsonResponse({"success": False, "error": str(e)}, status=400)
 
     return JsonResponse({"success": False, "message": "Invalid request"}, status=400)
+
+
+# MANAGE GUEST PERMISSIONS
+
+# Fetch Guest Permissions
+@login_required
+def get_guest_permissions(request, event_id):
+    try:
+        google_auth = GoogleAuth.objects.filter(user=request.user).first()
+        if not google_auth:
+            return JsonResponse({"success": False, "error": "Google authentication not found."}, status=400)
+
+        creds = Credentials(
+            token=google_auth.access_token,
+            refresh_token=google_auth.refresh_token,
+            token_uri="https://oauth2.googleapis.com/token",
+            client_id=settings.GOOGLE_CLIENT_ID,
+            client_secret=settings.GOOGLE_CLIENT_SECRET,
+            scopes=google_auth.scopes
+        )
+
+        service = build("calendar", "v3", credentials=creds)
+        event = service.events().get(calendarId="primary", eventId=event_id).execute()
+
+        return JsonResponse({
+            "success": True,
+            "modify_event": event.get("guestsCanModify", False),
+            "see_guest_list": event.get("guestsCanSeeOtherGuests", False),
+            "invite_others": event.get("guestsCanInviteOthers", False),
+        })
+
+    except Exception as e:
+        return JsonResponse({"success": False, "error": str(e)}, status=400)
+
+
+# Update Guest Permissions
+@csrf_exempt
+@login_required
+def update_guest_permissions(request, event_id, modify_event, see_guest_list, invite_others):
+    try:
+        google_auth = GoogleAuth.objects.filter(user=request.user).first()
+        if not google_auth:
+            return JsonResponse({"success": False, "error": "Google authentication not found."}, status=400)
+
+        creds = Credentials(
+            token=google_auth.access_token,
+            refresh_token=google_auth.refresh_token,
+            token_uri="https://oauth2.googleapis.com/token",
+            client_id=settings.GOOGLE_CLIENT_ID,
+            client_secret=settings.GOOGLE_CLIENT_SECRET,
+            scopes=google_auth.scopes
+        )
+
+        service = build("calendar", "v3", credentials=creds)
+        event = service.events().get(calendarId="primary", eventId=event_id).execute()
+
+        # Update guest permissions
+        event["guestsCanModify"] = modify_event.lower() == "true"
+        event["guestsCanSeeOtherGuests"] = see_guest_list.lower() == "true"
+        event["guestsCanInviteOthers"] = invite_others.lower() == "true"
+
+        service.events().update(calendarId="primary", eventId=event_id, body=event).execute()
+
+        return JsonResponse({"success": True, "message": "Guest permissions updated successfully!"})
+
+    except Exception as e:
+        return JsonResponse({"success": False, "error": str(e)}, status=400)
+
