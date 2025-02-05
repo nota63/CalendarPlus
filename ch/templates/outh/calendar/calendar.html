@@ -743,6 +743,44 @@ p:hover strong {
     </div>
 </div>
 
+<!-- HANDLE GUEST PERMISSIONS MODAL -->
+
+<!-- Guest Permissions Modal -->
+<div class="modal fade" id="guestPermissionsModal" tabindex="-1" aria-labelledby="guestPermissionsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="guestPermissionsModalLabel">Manage Guest Permissions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="eventID">
+                
+                <!-- Guest Permission Toggles -->
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="modifyEvent">
+                    <label class="form-check-label" for="modifyEvent">Modify Event</label>
+                </div>
+
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="seeGuestList">
+                    <label class="form-check-label" for="seeGuestList">See Guest List</label>
+                </div>
+
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="inviteOthers">
+                    <label class="form-check-label" for="inviteOthers">Invite Others</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="saveGuestPermissionsBtn" class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 
 
@@ -865,6 +903,12 @@ p:hover strong {
                             <li>
                                 <a class="dropdown-item" href="#" id="reminderEventBtn" data-event-id="">
                                     <i class="bi bi-globe"></i> Custom Reminder by Google
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item" href="#" id="guestPermissionsEventBtn" data-event-id="">
+                                    <i class="bi bi-globe"></i> Guest permissions
                                 </a>
                             </li>
                           </ul>
@@ -1617,6 +1661,89 @@ document.addEventListener("DOMContentLoaded", function () {
         return cookieValue;
     }
 });
+
+// HANDLE GUEST PERMISSIONS 
+
+document.addEventListener("DOMContentLoaded", function () {
+    let guestPermissionsBtn = document.getElementById("guestPermissionsEventBtn");
+    let saveGuestPermissionsBtn = document.getElementById("saveGuestPermissionsBtn");
+
+    let eventID = null;
+
+    // Open Modal & Fetch Existing Permissions
+    guestPermissionsBtn.addEventListener("click", function () {
+        eventID = this.getAttribute("data-event-id");
+        if (!eventID) {
+            alert("Error: Event ID not found.");
+            return;
+        }
+
+        fetch(`/oauth/get_guest_permissions/${eventID}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById("modifyEvent").checked = data.modify_event;
+                    document.getElementById("seeGuestList").checked = data.see_guest_list;
+                    document.getElementById("inviteOthers").checked = data.invite_others;
+                } else {
+                    alert("Failed to fetch guest permissions.");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+
+        let modal = new bootstrap.Modal(document.getElementById("guestPermissionsModal"));
+        modal.show();
+    });
+
+    // Save Updated Guest Permissions
+    saveGuestPermissionsBtn.addEventListener("click", function () {
+        let modifyEvent = document.getElementById("modifyEvent").checked;
+        let seeGuestList = document.getElementById("seeGuestList").checked;
+        let inviteOthers = document.getElementById("inviteOthers").checked;
+
+        if (!eventID) {
+            alert("Error: Event ID not found.");
+            return;
+        }
+
+        fetch(`/oauth/update_guest_permissions/${eventID}/${modifyEvent}/${seeGuestList}/${inviteOthers}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken(),
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Guest permissions updated successfully!");
+                let modal = bootstrap.Modal.getInstance(document.getElementById("guestPermissionsModal"));
+                modal.hide();
+            } else {
+                alert("Failed to update guest permissions.");
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+
+    // Function to get CSRF Token from Django
+    function getCSRFToken() {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            let cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                let cookie = cookies[i].trim();
+                if (cookie.startsWith("csrftoken=")) {
+                    cookieValue = cookie.substring("csrftoken=".length, cookie.length);
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+
+
 
 
 </script>

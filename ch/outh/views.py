@@ -1265,8 +1265,8 @@ def save_custom_reminder(request, event_id, reminder_time):
             event["reminders"] = {
                 "useDefault": False,
                 "overrides": [
-                    {"method": "popup", "minutes": int(reminder_time)},  # Custom popup reminder
-                    {"method": "email", "minutes": int(reminder_time)}   # Email notification
+                    {"method": "popup", "minutes": int(reminder_time)},  
+                    {"method": "email", "minutes": int(reminder_time)}   
                 ]
             }
 
