@@ -506,16 +506,75 @@
                     <p><strong>Reminders:</strong> <span id="eventRemindersDetail"></span></p>
 
                     <!-- Export buttons in your modal or page -->
-                   <button id="exportCSVBtn" class="btn btn-primary" data-event-id="">Export as CSV</button>
-                   <button id="exportPDFBtn" class="btn btn-primary" data-event-id="">Export as PDF</button>
-                   <button id="deleteEventBtn" class="btn btn-primary" data-event-id="">Delete</button>
-                   <button id="attachmentsEventBtn" class="btn btn-primary" data-event-id="">Add attachments</button>
-                   <button id="duplicateEventBtn" class="btn btn-primary" data-event-id="">Duplicate</button>
-                   <button id="editEventBtn" class="btn btn-primary" data-event-id="">Edit</button>
-                   <button id="actionEventBtn" class="btn btn-primary" data-event-id="">Going</button>
-                   <button id="inviteEventBtn" class="btn btn-primary" data-event-id="">Generate collaboration Link</button>
-                   <button id="inviteViaLinkEventBtn" class="btn btn-primary" data-event-id="">Invite via link</button>
-                   <button id="publishEventBtn" class="btn btn-primary" data-event-id="">Publish event</button>
+                     <!-- Three dot menu button -->
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="threeDotMenuBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                           <i class="bi bi-three-dots-vertical"></i> <!-- Icon for the 3-dot menu -->
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="threeDotMenuBtn">
+                        <!-- Export CSV Button -->
+                         <li>
+                              <a class="dropdown-item" href="#" id="exportCSVBtn" data-event-id="">
+                               <i class="bi bi-file-earmark-spreadsheet"></i> Export as CSV
+                                 </a>
+                           </li>
+                          <!-- Export PDF Button -->
+                        <li>
+                            <a class="dropdown-item" href="#" id="exportPDFBtn" data-event-id="">
+                            <i class="bi bi-file-earmark-pdf"></i> Export as PDF
+                             </a>
+                         </li>
+                       <!-- Delete Event Button -->
+                         <li>
+                            <a class="dropdown-item" href="#" id="deleteEventBtn" data-event-id="">
+                             <i class="bi bi-trash"></i> Delete
+                            </a>
+                         </li>
+      <!-- Add Attachments Button -->
+                       <li>
+                           <a class="dropdown-item" href="#" id="attachmentsEventBtn" data-event-id="">
+                           <i class="bi bi-paperclip"></i> Add attachments
+                            </a>
+                         </li>
+                        <!-- Duplicate Event Button -->
+                       <li>
+                            <a class="dropdown-item" href="#" id="duplicateEventBtn" data-event-id="">
+                           <i class="bi bi-files"></i> Duplicate
+                           </a>
+                        </li>
+                      <!-- Edit Event Button -->
+                        <li>
+                            <a class="dropdown-item" href="#" id="editEventBtn" data-event-id="">
+                            <i class="bi bi-pencil-square"></i> Edit
+                           </a>
+                        </li>
+                        <!-- Going Button -->
+                        <li>
+                              <a class="dropdown-item" href="#" id="actionEventBtn" data-event-id="">
+                             <i class="bi bi-check-circle"></i> Going
+                                </a>
+                        </li>
+                     <!-- Generate Collaboration Link Button -->
+                         <li>
+                              <a class="dropdown-item" href="#" id="inviteEventBtn" data-event-id="">
+                              <i class="bi bi-link"></i> Generate collaboration Link
+                               </a>
+                           </li>
+      <!-- Invite via Link Button -->
+                           <li>
+                               <a class="dropdown-item" href="#" id="inviteViaLinkEventBtn" data-event-id="">
+                               <i class="bi bi-person-plus"></i> Invite via link
+                               </a>
+                            </li>
+      <!-- Publish Event Button -->
+                            <li>
+                              <a class="dropdown-item" href="#" id="publishEventBtn" data-event-id="">
+                              <i class="bi bi-globe"></i> Publish event
+                              </a>
+                             </li>
+                          </ul>
+                      </div>
+  
                 </div>
                 <!-- Button for CSV Export -->
             </div>
