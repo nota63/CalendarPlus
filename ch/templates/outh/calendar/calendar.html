@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <title>SyncSphere | Smart Calendar</title>
 
 
@@ -251,6 +252,69 @@
                 padding: 16px;
             }
         }
+
+
+/* NEW STYELES */
+
+.google-meet-logo {
+    height: 20px;  /* Adjust the size */
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+.meeting-link {
+    text-decoration: none;
+    font-weight: bold;
+    color: #1a73e8;  /* Google Blue */
+}
+
+/* Style for icons */
+p strong i {
+    font-size: 1.2rem;  /* Slightly larger icons */
+    margin-right: 8px;  /* Space between icon and text */
+    vertical-align: middle;  /* Align with text */
+}
+
+/* Adjust icon colors for a vibrant feel */
+.text-primary { color: #4285F4 !important; } /* Google Blue */
+.text-success { color: #34A853 !important; } /* Google Green */
+.text-danger { color: #EA4335 !important; } /* Google Red */
+.text-warning { color: #FBBC05 !important; } /* Google Yellow */
+.text-info { color: #17A2B8 !important; } /* Light Blue */
+.text-secondary { color: #6c757d !important; } /* Subtle Grey */
+
+/* Add hover effect for a modern touch */
+p strong {
+    font-weight: 600; /* Slightly bolder for emphasis */
+    transition: all 0.2s ease-in-out;
+}
+
+p:hover strong {
+    color: #333; /* Darker shade on hover */
+}
+
+/* Meeting Link Styling */
+.meeting-link {
+    text-decoration: none;
+    font-weight: bold;
+    color: #1a73e8;  /* Google Meet Blue */
+    display: inline-flex;
+    align-items: center;
+    gap: 8px; /* Space between logo and text */
+}
+
+.google-meet-logo {
+    height: 20px; /* Resize for clean look */
+    vertical-align: middle;
+    transition: transform 0.2s ease-in-out;
+}
+
+.meeting-link:hover .google-meet-logo {
+    transform: scale(1.1); /* Slight zoom effect on hover */
+}
+
+
+
     </style>
 </head>
 <body>
@@ -526,16 +590,33 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p><strong>Title:</strong> <span id="eventTitleDetail"></span></p>
-                    <p><strong>Start:</strong> <span id="eventStartDetail"></span></p>
-                    <p><strong>End:</strong> <span id="eventEndDetail"></span></p>
-                    <p><strong>Location:</strong> <span id="eventLocationDetail"></span></p>
-                    <p><strong>Description:</strong> <span id="eventDescriptionDetail"></span></p>
-                    <p><strong>Organizer:</strong> <span id="eventOrganizerDetail"></span></p>
-                    <p><strong>Guests:</strong> <span id="eventGuestsDetail"></span></p>
-                    <p><strong>Meeting Link:</strong> <span id="eventMeetingLinkDetail"></span></p>
-                    <p><strong>Attachments:</strong> <span id="eventAttachmentsDetail"></span></p>
-                    <p><strong>Reminders:</strong> <span id="eventRemindersDetail"></span></p>
+
+                    <p><strong><i class="fa-solid fa-heading text-primary"></i> Title:</strong> <span id="eventTitleDetail"></span></p>
+
+                     <p><strong><i class="fa-solid fa-calendar-day text-success"></i> Start:</strong> <span id="eventStartDetail"></span></p>
+
+                     <p><strong><i class="fa-solid fa-calendar-check text-danger"></i> End:</strong> <span id="eventEndDetail"></span></p>
+
+                     <p><strong><i class="fa-solid fa-location-dot text-warning"></i> Location:</strong> <span id="eventLocationDetail"></span></p>
+
+                     <p><strong><i class="fa-solid fa-align-left text-info"></i> Description:</strong> <span id="eventDescriptionDetail"></span></p>
+
+                     <p><strong><i class="fa-solid fa-user-tie text-secondary"></i> Organizer:</strong> <span id="eventOrganizerDetail"></span></p>
+
+                      <p><strong><i class="fa-solid fa-users text-success"></i> Guests:</strong> <span id="eventGuestsDetail"></span></p>
+
+                      <p>
+                         <strong><i class="fa-solid fa-video text-danger"></i> Hangout on Meet:</strong> 
+                           <a id="eventMeetingLinkDetail" href="#" target="_blank" class="meeting-link">
+                             <img src="https://www.gstatic.com/meet/google_meet_horizontal_wordmark_clr.svg" 
+                            alt="Google Meet" class="google-meet-logo">
+                         Join Meeting
+                         </a>
+                     </p>
+
+                      <p><strong><i class="fa-solid fa-paperclip text-primary"></i> Attachments:</strong> <span id="eventAttachmentsDetail"></span></p>
+
+                      <p><strong><i class="fa-solid fa-bell text-warning"></i> Reminders:</strong> <span id="eventRemindersDetail"></span></p>
 
                     <!-- Export buttons in your modal or page -->
                      <!-- Three dot menu button -->
