@@ -776,11 +776,11 @@ p:hover strong {
                       <p><strong><i class="fa-solid fa-users text-success"></i> Guests:</strong> <span id="eventGuestsDetail"></span></p>
 
                       <p>
-                         <strong><i class="fa-solid fa-video text-danger"></i> Hangout on Meet:</strong> 
+                         <strong><i class="fa-solid fa-video text-danger"></i> Hangout:</strong> 
                            <a id="eventMeetingLinkDetail" href="#" target="_blank" class="meeting-link">
                              <img src="https://www.gstatic.com/meet/google_meet_horizontal_wordmark_clr.svg" 
                             alt="Google Meet" class="google-meet-logo">
-                         Join Meeting
+                         Join With Google Meet
                          </a>
                      </p>
 
@@ -944,7 +944,7 @@ p:hover strong {
 
                     // Display the meeting link as "Join Meeting" if available
                     if (data.meeting_link && data.meeting_link !== "No Meeting Link") {
-                        $('#eventMeetingLinkDetail').html(`<a href="${data.meeting_link}" target="_blank">Join Meeting</a>`);
+                        $('#eventMeetingLinkDetail').html(`<a href="${data.meeting_link}" target="_blank">Join With Google Meet</a>`);
                     } else {
                         $('#eventMeetingLinkDetail').text(data.meeting_link);
                     }
