@@ -1012,3 +1012,74 @@ def get_event_invite_link(request, event_id):
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
+    
+
+
+# Invite Link 
+import urllib.parse
+
+@login_required
+def generate_google_booking_link(request, event_id):
+    """Generate a Google Calendar invite link with full event details for booking."""
+    try:
+        user = request.user
+        creds_data = GoogleAuth.objects.filter(user=user).first()
+
+        if not creds_data:
+            return JsonResponse({'error': 'Google credentials not found'}, status=400)
+
+        creds = Credentials(
+            token=creds_data.access_token,
+            refresh_token=creds_data.refresh_token,
+            token_uri="https://oauth2.googleapis.com/token",
+            client_id=settings.GOOGLE_CLIENT_ID,
+            client_secret=settings.GOOGLE_CLIENT_SECRET,
+            scopes=creds_data.scopes,
+        )
+
+        # Refresh token if expired
+        if creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+            creds_data.access_token = creds.token
+            creds_data.save()
+
+        # Build Google Calendar API service
+        service = build("calendar", "v3", credentials=creds)
+        event = service.events().get(calendarId="primary", eventId=event_id).execute()
+
+        # Extract event details
+        title = event.get("summary", "No Title")
+        start_time = event["start"].get("dateTime", event["start"].get("date"))
+        end_time = event["end"].get("dateTime", event["end"].get("date"))
+        location = event.get("location", "")
+        description = event.get("description", "")
+        organizer = event["organizer"].get("email", "")
+        attendees = [a["email"] for a in event.get("attendees", [])]
+        reminders = event.get("reminders", {}).get("overrides", [])
+
+        # Generate Google Calendar booking link in the correct format
+        base_url = "https://calendar.google.com/calendar/r/eventedit"
+        
+        # Convert dateTime into proper format: YYYYMMDDTHHmmSSZ
+        start_time_formatted = start_time.replace(":", "").replace("-", "").replace("+", "Z")
+        end_time_formatted = end_time.replace(":", "").replace("-", "").replace("+", "Z")
+
+        # Create the query parameters for the event
+        query_params = {
+            "text": title,
+            "dates": f"{start_time_formatted}/{end_time_formatted}",
+            "details": description,
+            "location": location,
+            "add": ",".join(attendees),
+            "trp": "false",
+            "sprop": "https://calendar.google.com/calendar/",
+            "sprop=name":"Google Calendar",
+        }
+
+        # Encode parameters
+        invite_link = f"{base_url}?{urllib.parse.urlencode(query_params)}"
+
+        return JsonResponse({'success': True, 'event_link': invite_link})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)

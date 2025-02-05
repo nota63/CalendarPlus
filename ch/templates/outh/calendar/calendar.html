@@ -487,7 +487,8 @@
                    <button id="duplicateEventBtn" class="btn btn-primary" data-event-id="">Duplicate</button>
                    <button id="editEventBtn" class="btn btn-primary" data-event-id="">Edit</button>
                    <button id="actionEventBtn" class="btn btn-primary" data-event-id="">Going</button>
-                   <button id="inviteEventBtn" class="btn btn-primary" data-event-id="">Invite via link</button>
+                   <button id="inviteEventBtn" class="btn btn-primary" data-event-id="">Generate collaboration Link</button>
+                   <button id="inviteViaLinkEventBtn" class="btn btn-primary" data-event-id="">Invite via link</button>
                 </div>
                 <!-- Button for CSV Export -->
             </div>
@@ -532,6 +533,8 @@
             $('#editEventBtn').data('event-id', calEvent.id);
             $('#actionEventBtn').data('event-id', calEvent.id);
             $('#inviteEventBtn').data('event-id', calEvent.id);
+            $('#inviteViaLinkEventBtn').data('event-id', calEvent.id);
+
 
 
 
@@ -986,6 +989,58 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+
+// INVITE VIA LINK TO BOOK THE EVENT 
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const inviteEventBtn = document.getElementById("inviteViaLinkEventBtn");
+
+    if (inviteEventBtn) {
+        inviteEventBtn.addEventListener("click", function () {
+            const eventId = $(this).data('event-id'); // Capture Event ID
+            if (!eventId) {
+                alert("Event ID not found!");
+                return;
+            }
+
+            // Show loading text
+            inviteEventBtn.innerHTML = "Generating link...";
+            inviteEventBtn.disabled = true;
+
+            // Fetch event invite link
+            fetch(`/oauth/generate_event_invite_link_for_book/${eventId}/`, {
+                method: "GET",
+                headers: { "X-CSRFToken": getCSRFToken() },
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.success) {
+                        navigator.clipboard.writeText(data.event_link).then(() => {
+                            alert("✅ Invite link copied to clipboard!");
+                        });
+                    } else {
+                        alert("❌ Error: " + data.error);
+                    }
+                })
+                .catch((err) => console.error("❌ Error generating invite link:", err))
+                .finally(() => {
+                    inviteEventBtn.innerHTML = "Invite via link";
+                    inviteEventBtn.disabled = false;
+                });
+        });
+    }
+
+    // Function to get CSRF token
+    function getCSRFToken() {
+        const cookies = document.cookie.split("; ");
+        for (const cookie of cookies) {
+            const [name, value] = cookie.split("=");
+            if (name === "csrftoken") return value;
+        }
+        return "";
+    }
+});
 
 
 
