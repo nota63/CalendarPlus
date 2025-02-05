@@ -483,9 +483,41 @@
 </div>
 
 
+<!-- MODAL TO CHANGE THE OWNER OF THE EVENT -->
+<!-- Change Owner Modal -->
+<div class="modal fade" id="changeOwnerEventModal" tabindex="-1" aria-labelledby="changeOwnerEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changeOwnerEventModalLabel">Change Event Owner</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="newOwnerEmail">New Owner Email</label>
+                        <input type="email" class="form-control" id="newOwnerEmail" placeholder="Enter new owner's email">
+                    </div>
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmChangeOwner" class="btn btn-primary">Change Owner</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
-    <!-- Bootstrap Modal for Viewing Event Details -->
+
+
+
+
+
+<!-- Bootstrap Modal for Viewing Event Details -->
     <div class="modal fade" id="viewEventModal" tabindex="-1" aria-labelledby="viewEventModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -568,10 +600,16 @@
                             </li>
       <!-- Publish Event Button -->
                             <li>
-                              <a class="dropdown-item" href="#" id="publishEventBtn" data-event-id="">
-                              <i class="bi bi-globe"></i> Publish event
-                              </a>
+                                <a class="dropdown-item" href="#" id="publishEventBtn" data-event-id="">
+                                  <i class="bi bi-globe"></i> Publish event
+                                </a>
                              </li>
+
+                             <li>
+                                <a class="dropdown-item" href="#" id="changeOwnerEventBtn" data-event-id="">
+                                    <i class="bi bi-globe"></i> Change Owner
+                                </a>
+                            </li>
                           </ul>
                       </div>
   
@@ -621,6 +659,9 @@
             $('#inviteEventBtn').data('event-id', calEvent.id);
             $('#inviteViaLinkEventBtn').data('event-id', calEvent.id);
             $('#publishEventBtn').data('event-id', calEvent.id);
+            $('#changeOwnerEventBtn').data('event-id', calEvent.id);
+
+
 
 
 
@@ -1192,6 +1233,50 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+// CHANGE THE OWNER
+$(document).ready(function () {
+    $("#changeOwnerEventBtn").click(function () {
+        let eventId = $(this).data("event-id");
+        $("#changeOwnerEventModal").data("event-id", eventId).modal("show");
+    });
+
+    $("#confirmChangeOwner").click(function () {
+        let eventId = $("#changeOwnerEventModal").data("event-id");
+        let newOwnerEmail = $("#newOwnerEmail").val();
+
+        if (!newOwnerEmail) {
+            alert("Please enter the new owner's email!");
+            return;
+        }
+
+        $.ajax({
+            url: `/oauth/change_event_owner/${eventId}/`,
+            type: "POST",
+            data: {
+                new_owner_email: newOwnerEmail,
+                csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+            },
+            success: function (response) {
+                alert(response.message);
+
+                // Display event details after updating
+                let eventInfo = `
+                    <p><strong>Event Title:</strong> ${response.event_details.title}</p>
+                    <p><strong>Organizer:</strong> ${response.event_details.organizer}</p>
+                    <p><strong>Meeting Link:</strong> <a href="${response.event_details.meeting_link}" target="_blank">Join Meeting</a></p>
+                    <p><strong>Guests:</strong> ${response.event_details.guests.join(", ")}</p>
+                `;
+
+                $("#eventDetails").html(eventInfo);
+                $("#changeOwnerEventModal").modal("hide");
+            },
+            error: function (xhr) {
+                let errorMsg = xhr.responseJSON?.error || "An error occurred!";
+                alert("Error: " + errorMsg);
+            },
+        });
+    });
+});
 
 </script>
 

@@ -1152,3 +1152,82 @@ def publish_event(request, event_id):
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
+
+
+# CHANGE EVENT OWNER
+@login_required
+def change_event_owner(request, event_id):
+    """Transfer event ownership by adding a new owner as a guest and providing event details."""
+    if request.method == "POST":
+        new_owner_email = request.POST.get("new_owner_email")
+
+        if not new_owner_email:
+            return JsonResponse({"error": "New owner email is required"}, status=400)
+
+        try:
+            # Fetch user's Google credentials
+            user = request.user
+            creds_data = GoogleAuth.objects.filter(user=user).first()
+
+            if not creds_data:
+                return JsonResponse({'error': 'Google credentials not found'}, status=400)
+
+            creds = Credentials(
+                token=creds_data.access_token,
+                refresh_token=creds_data.refresh_token,
+                token_uri="https://oauth2.googleapis.com/token",
+                client_id=settings.GOOGLE_CLIENT_ID,
+                client_secret=settings.GOOGLE_CLIENT_SECRET,
+                scopes=creds_data.scopes,
+            )
+
+            if creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+                creds_data.access_token = creds.token
+                creds_data.save()
+
+            # Build Google Calendar service
+            service = build("calendar", "v3", credentials=creds)
+
+            # Get event details
+            event = service.events().get(calendarId="primary", eventId=event_id).execute()
+
+            # Check if the current user is the organizer
+            current_organizer = event.get("organizer", {}).get("email")
+            if current_organizer != request.user.email:
+                return JsonResponse({"error": "Only the current organizer can change ownership"}, status=403)
+
+            # Add the new owner as a guest
+            attendees = event.get("attendees", [])
+            if not any(att["email"] == new_owner_email for att in attendees):
+                attendees.append({"email": new_owner_email})
+
+            event["attendees"] = attendees
+
+            # Update the event with the new attendee
+            updated_event = service.events().update(
+                calendarId="primary", eventId=event_id, body=event, sendUpdates="all"
+            ).execute()
+
+            # Provide updated event details
+            event_details = {
+                "id": updated_event.get("id"),
+                "title": updated_event.get("summary", "No Title"),
+                "description": updated_event.get("description", "No Description"),
+                "start": updated_event["start"].get("dateTime", updated_event["start"].get("date")),
+                "end": updated_event["end"].get("dateTime", updated_event["end"].get("date")),
+                "location": updated_event.get("location", "No Location"),
+                "organizer": updated_event.get("organizer", {}).get("email", "No Organizer"),
+                "meeting_link": updated_event.get("hangoutLink", "No Meeting Link"),
+                "guests": [
+                    attendee["email"] for attendee in updated_event.get("attendees", []) if "email" in attendee
+                ],
+            }
+
+            return JsonResponse({
+                "message": "New owner added as a guest. They need to accept the invite to become the owner.",
+                "event_details": event_details
+            })
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
