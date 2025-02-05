@@ -854,12 +854,14 @@ $(document).ready(function() {
 
 
 // HANDLE EVENT ACTIONS
+// HANDLE EVENT ACTIONS
 
 document.addEventListener("DOMContentLoaded", function () {
     const actionEventBtn = document.getElementById("actionEventBtn");
     const eventResponseModal = new bootstrap.Modal(document.getElementById("eventResponseModal"));
     const eventIdInput = document.getElementById("eventIdInput");
     const confirmResponseBtn = document.getElementById("confirmResponseBtn");
+    const loadingSpinner = document.getElementById("loadingSpinner"); // Spinner Element
     let selectedResponse = null;
 
     // ✅ Open modal when button is clicked
@@ -890,6 +892,10 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
+        // Show loading spinner
+        confirmResponseBtn.disabled = true;
+        confirmResponseBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating response and sending to Google...`;
+
         // Send data to backend
         fetch(`/oauth/update_event_response/${eventId}/`, {
             method: "POST",
@@ -905,7 +911,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     alert("Error: " + data.message);
                 }
             })
-            .catch((err) => console.error("❌ Error updating response:", err));
+            .catch((err) => console.error("❌ Error updating response:", err))
+            .finally(() => {
+                // Hide loading spinner
+                confirmResponseBtn.disabled = false;
+                confirmResponseBtn.innerHTML = "Confirm Response";
+            });
     });
 
     // ✅ Function to get CSRF token from cookies
