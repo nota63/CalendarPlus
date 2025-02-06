@@ -451,31 +451,59 @@ p:hover strong {
 
 
     <!-- Spinner -->
-<!-- Spinner Modal -->
+     <!-- Spinner Modal -->
 <div id="loadingSpinner" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); color: white; text-align: center; padding-top: 20%; z-index: 9999;">
     <div>
+        <!-- Google Logo -->
+        <div class="google-logo-wrapper" style="position: relative; display: inline-block;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a0/Google_2015_logo.svg" alt="Google Logo" class="google-logo" style="width: 50px; height: 50px; position: absolute; top: 0; left: 0;">
+        </div>
+
+        <!-- Spinner -->
         <div class="spinner-border text-light" role="status">
             <span class="sr-only">Loading...</span>
         </div>
+
         <p>Fetching events from Google...</p>
     </div>
 </div>
 
+<style>
+    /* Spinning Google Logo Animation */
+    .google-logo-wrapper {
+        animation: spinLogo 3s infinite linear;
+    }
+
+    @keyframes spinLogo {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+
+
 <!-- Modern Spinner (hidden by default) -->
 <div id="spinner" style="
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 50px;
-    height: 50px;
-    border: 5px solid #f3f3f3;
-    border-top: 5px solid #3498db;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    z-index: 9999;
-    display: none;
+position: fixed;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+width: 40px;
+height: 40px;
+border: 3px solid rgba(226, 228, 232, 0.25);
+border-top: 3px solid #36C5F0;
+border-radius: 50%;
+animation: spin 1s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;
+z-index: 9999;
+display: none;
 "></div>
+
+<style>
+@keyframes spin {
+0% { transform: translate(-50%, -50%) rotate(0deg); }
+100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+</style>
 
 
 
