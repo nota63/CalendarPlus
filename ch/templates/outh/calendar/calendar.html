@@ -1805,8 +1805,6 @@ $(document).ready(function () {
 
 
 // HANDLE CUSTOM REMINDER
-// HANDLE CUSTOM REMINDER
-
 document.addEventListener("DOMContentLoaded", function () {
     let reminderInput = document.getElementById("reminderTime");
     let decreaseBtn = document.getElementById("decreaseReminder");
@@ -1847,6 +1845,11 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
+        // Show spinner and disable the button
+        $('#spinner').show();
+        saveReminderBtn.textContent = "Saving..."; // Change button text
+        saveReminderBtn.disabled = true;
+
         fetch(`/oauth/save_custom_reminder/${eventID}/${reminderTime}/`, {
             method: "POST",
             headers: {
@@ -1863,7 +1866,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 alert("Failed to save reminder.");
             }
         })
-        .catch(error => console.error("Error:", error));
+        .catch(error => console.error("Error:", error))
+        .finally(() => {
+            // Hide spinner and reset button state
+            $('#spinner').hide();
+            saveReminderBtn.textContent = "Save Reminder"; // Reset button text
+            saveReminderBtn.disabled = false;
+        });
     });
 
     // Function to get CSRF Token from Django
@@ -1882,7 +1891,6 @@ document.addEventListener("DOMContentLoaded", function () {
         return cookieValue;
     }
 });
-
 
 
 // HANDLE GUEST PERMISSIONS 
