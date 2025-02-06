@@ -935,11 +935,28 @@ p:hover strong {
 
 
     <script>
-       $(document).ready(function() {
+      $(document).ready(function() {
     // Initialize FullCalendar
     $('#calendar').fullCalendar({
         events: '/oauth/calendar/google_events/', // Fetch Google Calendar events
         selectable: true, // Allow selecting date ranges
+        header: {
+            left: 'prev,next today', // Controls the left side buttons (previous, next, today)
+            center: 'title', // Title in the center
+            right: 'month,agendaWeek,agendaDay' // View options (Month, Week, Day)
+        },
+        defaultView: 'month', // Default view when the calendar loads (Month view)
+        views: {
+            month: { // Month view settings
+                titleFormat: 'MMMM YYYY', // Display full month and year
+            },
+            agendaWeek: { // Week view settings
+                titleFormat: 'MMMM D YYYY', // Display full month, day, and year
+            },
+            agendaDay: { // Day view settings
+                titleFormat: 'MMMM D YYYY', // Display full month, day, and year
+            }
+        },
         select: function(start) {
             // Automatically set the selected date as the start date
             $('#eventStartDateInput').val(moment(start).format('YYYY-MM-DD'));
@@ -1007,6 +1024,8 @@ p:hover strong {
             });
         }
     });
+
+
 
     // Handle Google Event Creation Form
     $('#createEventForm').submit(function (e) {
