@@ -1894,7 +1894,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // HANDLE GUEST PERMISSIONS 
-
 document.addEventListener("DOMContentLoaded", function () {
     let guestPermissionsBtn = document.getElementById("guestPermissionsEventBtn");
     let saveGuestPermissionsBtn = document.getElementById("saveGuestPermissionsBtn");
@@ -1909,6 +1908,10 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
+        // Show spinner and disable the button
+        $('#spinner').show();
+        guestPermissionsBtn.disabled = true;
+
         fetch(`/oauth/get_guest_permissions/${eventID}/`)
             .then(response => response.json())
             .then(data => {
@@ -1920,7 +1923,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     alert("Failed to fetch guest permissions.");
                 }
             })
-            .catch(error => console.error("Error:", error));
+            .catch(error => console.error("Error:", error))
+            .finally(() => {
+                $('#spinner').hide(); // Hide spinner
+                guestPermissionsBtn.disabled = false; // Re-enable the button
+            });
 
         let modal = new bootstrap.Modal(document.getElementById("guestPermissionsModal"));
         modal.show();
@@ -1936,6 +1943,11 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("Error: Event ID not found.");
             return;
         }
+
+        // Show spinner and disable the button
+        $('#spinner').show();
+        saveGuestPermissionsBtn.disabled = true;
+        saveGuestPermissionsBtn.textContent = "Saving...";
 
         fetch(`/oauth/update_guest_permissions/${eventID}/${modifyEvent}/${seeGuestList}/${inviteOthers}/`, {
             method: "POST",
@@ -1954,7 +1966,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 alert("Failed to update guest permissions.");
             }
         })
-        .catch(error => console.error("Error:", error));
+        .catch(error => console.error("Error:", error))
+        .finally(() => {
+            // Hide spinner and reset button state
+            $('#spinner').hide();
+            saveGuestPermissionsBtn.disabled = false;
+            saveGuestPermissionsBtn.textContent = "Save Permissions";
+        });
     });
 
     // Function to get CSRF Token from Django
@@ -1973,7 +1991,6 @@ document.addEventListener("DOMContentLoaded", function () {
         return cookieValue;
     }
 });
-
 
 
 
