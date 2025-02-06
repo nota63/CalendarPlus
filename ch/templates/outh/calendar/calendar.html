@@ -1206,52 +1206,70 @@ $('#deleteEventBtn').click(function() {
     });
 });
 
+
 // HANDLE ATTACHING ATTACHMENTS 
+// HANDLE ATTACHING ATTACHMENTS
 
 // Handle Attachment Upload
 $('#attachmentsEventBtn').click(function() {
-        const eventId = $(this).data('event-id');
+    const eventId = $(this).data('event-id');
 
-        if (!eventId) {
-            alert('Event ID is missing, cannot add attachment.');
+    if (!eventId) {
+        alert('Event ID is missing, cannot add attachment.');
+        return;
+    }
+
+    // Create file input dynamically
+    let fileInput = $('<input type="file" accept="*/*">');
+    fileInput.trigger('click');
+
+    fileInput.change(function(event) {
+        let file = event.target.files[0];
+        if (!file) {
+            alert('No file selected.');
             return;
         }
 
-        // Create file input dynamically
-        let fileInput = $('<input type="file" accept="*/*">');
-        fileInput.trigger('click');
+        // Create and display loading spinner
+        let spinnerHtml = `
+            <div id="loadingSpinner" class="text-center">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p>Uploading attachment, please wait...</p>
+            </div>
+        `;
+        $('#viewEventModal .modal-body').append(spinnerHtml); // Add spinner to modal body
 
-        fileInput.change(function(event) {
-            let file = event.target.files[0];
-            if (!file) {
-                alert('No file selected.');
-                return;
-            }
+        let formData = new FormData();
+        formData.append('attachment', file);
 
-            let formData = new FormData();
-            formData.append('attachment', file);
-
-            $.ajax({
-                url: '/oauth/google_add_attachment/' + eventId + '/',
-                method: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-                success: function(response) {
-                    if (response.success) {
-                        alert('✅ Attachment added successfully!');
-                        $('#viewEventModal').modal('hide');
-                    } else {
-                        alert('❌ Error: ' + response.message);
-                    }
-                },
-                error: function(xhr) {
-                    alert('❌ Error adding attachment: ' + xhr.responseText);
+        $.ajax({
+            url: '/oauth/google_add_attachment/' + eventId + '/',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+            success: function(response) {
+                $('#loadingSpinner').remove(); // Remove spinner after request completes
+                if (response.success) {
+                    alert('✅ Attachment added successfully!');
+                    $('#viewEventModal').modal('hide');
+                } else {
+                    alert('❌ Error: ' + response.message);
                 }
-            });
+            },
+            error: function(xhr) {
+                $('#loadingSpinner').remove(); // Remove spinner if error occurs
+                alert('❌ Error adding attachment: ' + xhr.responseText);
+            }
         });
     });
+});
+
+
+
 
 // HANDLE DUPLICATION OF EVENT
 
@@ -1369,6 +1387,10 @@ $(document).ready(function() {
         });
     });
 });
+
+
+
+
 
 
 
