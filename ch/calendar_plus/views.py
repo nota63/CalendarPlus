@@ -432,6 +432,8 @@ class OrganizationListView(LoginRequiredMixin, ListView):
 # org detail
 
 # PREVENT HIDDEN WORKSPACE ACCESS AND DISPLAY DETAILS 
+from outh.models import GoogleAuth
+
 
 class OrgDetailView(LoginRequiredMixin, View):
     template_name = 'calendar/org_detail.html'
@@ -440,6 +442,14 @@ class OrgDetailView(LoginRequiredMixin, View):
         
         organization = get_object_or_404(Organization, id=org_id)
         print(f"Accessing organization: {organization.name} (ID: {organization.id})")
+
+        check_access=get_object_or_404(Profile,organization=organization,user=request.user)
+        if not check_access:
+            return HttpResponseForbidden("You are Not Authorized to access this page!")
+        
+        connected_apps=GoogleAuth.objects.filter(user=request.user)
+        
+
 
         now = timezone.now()
         print(f"Current time: {now}")
@@ -486,6 +496,7 @@ class OrgDetailView(LoginRequiredMixin, View):
             'is_admin': is_admin,
             'is_manager': is_manager,
             'is_employee': is_employee,
+            'connected_apps':connected_apps
         }
 
         return render(request, self.template_name, context)
@@ -504,6 +515,7 @@ class OrgDetailView(LoginRequiredMixin, View):
         ]
         return current_date.date() in holidays
     
+
 
 
 # Edit Organization

@@ -584,6 +584,16 @@ a {
                 <span class="material-icons">person_add</span>Workspace Channels
             </a>
 
+            {% if connected_apps %}
+               <a href="{% url 'google_calendar_view' %}">
+                  <span class="material-icons">calendar_month</span>Plug-inned Calendar
+               </a>
+            {% else %}
+               <a href="{% url 'google_calendar_view' %}">
+                  <span class="material-icons">event</span>Connect Apps
+               </a>
+            {% endif %}   
+
 
 
 
