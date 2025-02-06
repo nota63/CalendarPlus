@@ -1545,8 +1545,8 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-// HANDLE INVITE LINK GENERATION
 
+// HANDLE INVITE LINK GENERATION
 document.addEventListener("DOMContentLoaded", function () {
     const inviteEventBtn = document.getElementById("inviteEventBtn");
 
@@ -1558,7 +1558,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            // Show loading text
+            // Show spinner when processing
+            $('#spinner').show();
+
+            // Show loading text on the button
             inviteEventBtn.innerHTML = "Generating link...";
             inviteEventBtn.disabled = true;
 
@@ -1579,6 +1582,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 })
                 .catch((err) => console.error("❌ Error generating invite link:", err))
                 .finally(() => {
+                    // Hide spinner after process is complete
+                    $('#spinner').hide();
+
+                    // Reset button text and enable it
                     inviteEventBtn.innerHTML = "Invite via link";
                     inviteEventBtn.disabled = false;
                 });
@@ -1595,6 +1602,8 @@ document.addEventListener("DOMContentLoaded", function () {
         return "";
     }
 });
+
+
 
 
 // INVITE VIA LINK TO BOOK THE EVENT 
