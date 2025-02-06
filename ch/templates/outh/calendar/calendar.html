@@ -732,31 +732,514 @@ display: none;
             <div id="calendar" class="animated-entry hover-scale"></div>
        
    {% else %}
-   <div class="integration-section">
-    <div class="integration-header">
-        Hey {{request.user}}, seamlessly connect your favorite apps and take control of your events and meetings effortlessly. 
-        Stay organized, sync schedules in real-time, and manage everything in one place with ease! 🚀
-    </div>
+
+
+   <section class="starting-section">
+    <!-- Animated Background Elements -->
+    <div class="decorative-circle circle-1"></div>
+    <div class="decorative-circle circle-2"></div>
     
-    <div class="calendar-grid">
-        <!-- Google Calendar (Clickable) -->
-        <a href="{% url 'google_connect' %}" class="calendar-card clickable">
-            <img src="https://th.bing.com/th/id/OIP.IlSC4VLx4_vTAOTMPjKjRAHaHa?rs=1&pid=ImgDetMain" alt="google-calendar">
-        </a>
-
-        <!-- Microsoft Outlook (Disabled) -->
-        <div class="calendar-card disabled-calendar">
-            <span class="pro-badge">Pro</span>
-            <img src="https://th.bing.com/th/id/OIP.MQ5Z4i6lVAGtoC00u6cmUQHaHa?rs=1&pid=ImgDetMain" alt="microsoft-outlook">
+    <div class="container">
+        <!-- Header Section -->
+        <div class="hero-header animate-fade-in">
+            <div class="header-content">
+                <h1 class="gradient-heading">
+                    Unified Calendar Experience
+                    <span class="underline-animation"></span>
+                </h1>
+                <p class="subheading">
+                    Seamlessly integrate your favorite apps and transform how you manage time.
+                    <span class="typing-animation"></span>
+                </p>
+            </div>
+            
         </div>
 
-        <!-- Zoho Calendar (Disabled) -->
-        <div class="calendar-card disabled-calendar">
-            <span class="pro-badge">Pro</span>
-            <img src="https://cdn.dribbble.com/users/3529564/screenshots/10027130/01_4x.jpg" alt="zoho-calendar">
+        <!-- Feature Highlights -->
+        <div class="feature-grid animate-slide-up">
+            <div class="feature-card">
+                <div class="feature-icon pulse">
+                    <i class="fas fa-sync-alt"></i>
+                </div>
+                <h3>Real-time Sync</h3>
+                <p>Instant updates across all connected platforms</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon pulse">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Enterprise Security</h3>
+                <p>Bank-grade encryption for your data</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon pulse">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3>Smart Scheduling</h3>
+                <p>AI-powered time optimization</p>
+            </div>
+        </div>
+
+        <!-- Integration Section -->
+        <div class="integration-section animate-slide-up">
+            <div class="integration-header">
+                <h2>Connect Your Ecosystem</h2>
+                <p class="integration-subheader">
+                    Hey {{request.user}}, unify your workflow with deep integrations
+                    <span class="hover-sparkle">✨</span>
+                </p>
+            </div>
+
+            <div class="calendar-grid">
+                <!-- Google Calendar -->
+                <a href="{% url 'google_connect' %}" class="integration-card google-card hover-transform">
+                    <div class="card-content">
+                        <div class="card-logo">
+                            <img src="https://th.bing.com/th/id/OIP.IlSC4VLx4_vTAOTMPjKjRAHaHa?rs=1&pid=ImgDetMain" 
+                                 alt="Google Calendar"
+                                 class="logo-scale">
+                        </div>
+                        <div class="card-details">
+                            <h3>Google Calendar</h3>
+                            <p>Connect with 1-click OAuth</p>
+                            <span class="status-badge connected">Popular</span>
+                        </div>
+                        <div class="card-action">
+                            <i class="fas fa-chevron-right arrow-bounce"></i>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Microsoft Outlook -->
+                <div class="integration-card outlook-card disabled-card hover-transform">
+                    <div class="pro-overlay">
+                        <span class="pro-badge gradient-badge">PRO FEATURE</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-logo">
+                            <img src="https://cdn-icons-png.flaticon.com/512/732/732228.png" 
+                                 alt="Microsoft Outlook"
+                                 class="logo-scale">
+                        </div>
+                        <div class="card-details">
+                            <h3>Microsoft Outlook</h3>
+                            <p>Enterprise-grade integration</p>
+                            <span class="status-badge coming-soon">Coming Soon</span>
+                        </div>
+                        <div class="card-action">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Zoho Calendar -->
+                <div class="integration-card zoho-card disabled-card hover-transform">
+                    <div class="pro-overlay">
+                        <span class="pro-badge gradient-badge">PRO FEATURE</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-logo">
+                            <img src="https://cdn.worldvectorlogo.com/logos/zoho-1.svg" 
+                                 alt="Zoho Calendar"
+                                 class="logo-scale">
+                        </div>
+                        <div class="card-details">
+                            <h3>Zoho Calendar</h3>
+                            <p>Advanced team scheduling</p>
+                            <span class="status-badge coming-soon">Q4 2024</span>
+                        </div>
+                        <div class="card-action">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sync Notification -->
+        <div class="sync-notification animate-fade-in">
+            <div class="notification-icon">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            <p>
+                <strong>Real-time Sync:</strong> All changes propagate instantly across connected platforms.
+                <span class="sync-status">
+                    <i class="fas fa-circle sync-pulse"></i>
+                    Connection Active
+                </span>
+            </p>
         </div>
     </div>
-</div>
+
+    <!-- Floating Action Button -->
+    <button class="fab-button hover-grow">
+        <i class="fas fa-plus"></i>
+    </button>
+</section>
+
+<style>
+/* CSS Variables */
+:root {
+    --primary-color: #4A00E0;
+    --secondary-color: #8E2DE2;
+    --accent-color: #00C9FF;
+    --text-primary: #2D3748;
+    --text-secondary: #718096;
+    --slate-100: #f8fafc;
+    --slate-200: #e2e8f0;
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --gradient-main: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+/* Base Styles */
+.starting-section {
+    position: relative;
+    min-height: 100vh;
+    background: var(--slate-100);
+    overflow: hidden;
+    padding: 4rem 2rem;
+}
+
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    position: relative;
+}
+
+/* Decorative Elements */
+.decorative-circle {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.15;
+    z-index: 0;
+}
+
+.circle-1 {
+    width: 400px;
+    height: 400px;
+    background: var(--primary-color);
+    top: -100px;
+    left: -200px;
+}
+
+.circle-2 {
+    width: 300px;
+    height: 300px;
+    background: var(--accent-color);
+    bottom: -150px;
+    right: -100px;
+}
+
+/* Typography */
+.gradient-heading {
+    font-size: 3.5rem;
+    background: var(--gradient-main);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.underline-animation {
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 150px;
+    height: 4px;
+    background: var(--gradient-main);
+    border-radius: 2px;
+    animation: underlineSlide 2.5s ease-in-out infinite;
+}
+
+.subheading {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    line-height: 1.6;
+}
+
+/* Animations */
+@keyframes underlineSlide {
+    0%, 100% { transform: translateX(0) scaleX(0.5); }
+    50% { transform: translateX(100%) scaleX(1.2); }
+}
+
+.hover-float {
+    transition: transform 0.3s ease;
+}
+
+.hover-float:hover {
+    transform: translateY(-5px);
+}
+
+.hover-transform {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-transform:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Integration Cards */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.integration-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--slate-200);
+}
+
+.google-card { border-left: 4px solid #4285F4; }
+.outlook-card { border-left: 4px solid #0072C6; }
+.zoho-card { border-left: 4px solid #F1592A; }
+
+.card-content {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.card-logo {
+    width: 60px;
+    height: 60px;
+    background: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-lg);
+}
+
+.card-logo img {
+    width: 70%;
+    height: 70%;
+    object-fit: contain;
+}
+
+.card-details h3 {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.card-details p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Pro Overlay */
+.pro-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(2px);
+}
+
+.gradient-badge {
+    background: var(--gradient-main);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/* Sync Notification */
+.sync-notification {
+    margin-top: 3rem;
+    padding: 1.5rem;
+    background: rgba(74, 224, 224, 0.05);
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: 1px solid rgba(74, 224, 224, 0.1);
+}
+
+.sync-pulse {
+    color: #48BB78;
+    animation: pulse 1.5s infinite;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .gradient-heading {
+        font-size: 2.5rem;
+    }
+
+    .hero-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .underline-animation {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
+/* Advanced Interactions */
+.disabled-card {
+    position: relative;
+    cursor: not-allowed;
+}
+
+.disabled-card::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 1;
+}
+
+.arrow-bounce {
+    animation: bounceX 1.5s infinite;
+}
+
+@keyframes bounceX {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(5px); }
+}
+
+/* FAB Button */
+.fab-button {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--gradient-main);
+    color: white;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* Loading Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-slide-up {
+    animation: slideUp 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes slideUp {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Micro-interactions */
+.hover-grow {
+    transition: transform 0.3s ease;
+}
+
+.hover-grow:hover {
+    transform: scale(1.05);
+}
+
+.logo-scale {
+    transition: transform 0.3s ease;
+}
+
+.integration-card:hover .logo-scale {
+    transform: scale(1.1);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+.connected {
+    background: rgba(72, 187, 120, 0.1);
+    color: #48BB78;
+}
+
+.coming-soon {
+    background: rgba(246, 173, 85, 0.1);
+    color: #F6AD55;
+}
+
+/* Accessibility */
+button:focus, a:focus {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+</style>
+
+<script>
+// Add interactive animations
+document.querySelectorAll('.integration-card').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
+    });
+});
+
+// Animate elements on scroll
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('animate');
+        }
+    });
+});
+
+document.querySelectorAll('.animate-slide-up, .animate-fade-in').forEach(el => {
+    observer.observe(el);
+});
+</script>
    {% endif %}   
 
 
