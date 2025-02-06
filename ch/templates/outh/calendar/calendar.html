@@ -1273,7 +1273,8 @@ $('#attachmentsEventBtn').click(function() {
 
 // HANDLE DUPLICATION OF EVENT
 
-    $('#duplicateEventBtn').click(function () {
+  // HANDLE DUPLICATION OF EVENT
+$('#duplicateEventBtn').click(function () {
     const eventId = $(this).data('event-id');
 
     if (!eventId) {
@@ -1281,11 +1282,35 @@ $('#attachmentsEventBtn').click(function() {
         return;
     }
 
+    // Create a modern, rounded spinner dynamically if not already in DOM
+    if ($('#spinner').length === 0) {
+        $('body').append(`
+            <div id="spinner" style="
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 50px;
+                height: 50px;
+                border: 5px solid #f3f3f3;
+                border-top: 5px solid #3498db;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                z-index: 9999;
+            "></div>
+        `);
+    }
+
+    // Show spinner
+    $('#spinner').show();
+
     $.ajax({
         url: '/oauth/google_duplicate_event/' + eventId + '/',
         method: 'POST',
         headers: { 'X-CSRFToken': '{{ csrf_token }}' },
         success: function (response) {
+            // Hide spinner after request completes
+            $('#spinner').hide();
             if (response.success) {
                 alert('✅ Event duplicated successfully! Open it here: ' + response.event_link);
                 console.log(response.new_event_id);
@@ -1294,10 +1319,28 @@ $('#attachmentsEventBtn').click(function() {
             }
         },
         error: function (xhr) {
+            // Hide spinner after request completes
+            $('#spinner').hide();
             alert('❌ Error: ' + xhr.responseText);
         }
     });
 });
+
+// CSS for spinning animation
+$('<style>')
+    .prop('type', 'text/css')
+    .html(`
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    `)
+    .appendTo('head');
+
+
+
+
+
 
 
 
