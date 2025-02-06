@@ -937,19 +937,19 @@ p:hover strong {
                              <i class="bi bi-check-circle"></i> Going
                                 </a>
                         </li>
-                     <!-- Generate Collaboration Link Button -->
+                        <!-- Generate Collaboration Link Button -->
                          <li>
                               <a class="dropdown-item" href="#" id="inviteEventBtn" data-event-id="">
                               <i class="bi bi-link"></i> Generate collaboration Link
                                </a>
                            </li>
-      <!-- Invite via Link Button -->
+                         <!-- Invite via Link Button -->
                            <li>
                                <a class="dropdown-item" href="#" id="inviteViaLinkEventBtn" data-event-id="">
                                <i class="bi bi-person-plus"></i> Invite via link
                                </a>
                             </li>
-      <!-- Publish Event Button -->
+                         <!-- Publish Event Button -->
                             <li>
                                 <a class="dropdown-item" href="#" id="publishEventBtn" data-event-id="">
                                   <i class="bi bi-globe"></i> Publish event
@@ -1606,8 +1606,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-// INVITE VIA LINK TO BOOK THE EVENT 
 
+// INVITE VIA LINK TO BOOK THE EVENT 
 
 document.addEventListener("DOMContentLoaded", function () {
     const inviteEventBtn = document.getElementById("inviteViaLinkEventBtn");
@@ -1620,7 +1620,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            // Show loading text
+            // Show spinner when processing
+            $('#spinner').show();
+
+            // Show loading text on the button
             inviteEventBtn.innerHTML = "Generating link...";
             inviteEventBtn.disabled = true;
 
@@ -1641,6 +1644,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 })
                 .catch((err) => console.error("❌ Error generating invite link:", err))
                 .finally(() => {
+                    // Hide spinner after process is complete
+                    $('#spinner').hide();
+
+                    // Reset button text and enable it
                     inviteEventBtn.innerHTML = "Invite via link";
                     inviteEventBtn.disabled = false;
                 });
