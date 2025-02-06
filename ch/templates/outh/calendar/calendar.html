@@ -31,7 +31,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        :root {
+    
+    :root {
             --primary-color: #4A3AFF;
             --secondary-color: #6C63FF;
             --accent-color: #FF6B6B;
@@ -105,47 +106,225 @@
             color: var(--text-primary);
         }
 
-        /* Calendar Customization */
-        #calendar {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
-        }
 
-        .fc-toolbar {
-            font-family: 'Inter', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 24px !important;
-        }
 
-        .fc-button-primary {
-            background: var(--primary-color) !important;
-            border-color: var(--primary-color) !important;
-            border-radius: 8px !important;
-            padding: 8px 16px !important;
-            transition: all 0.2s ease !important;
-        }
 
-        .fc-button-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(74, 58, 255, 0.2);
-        }
 
-        .fc-event {
-            border-radius: 6px !important;
-            border: none !important;
-            padding: 8px 12px !important;
-            background: var(--secondary-color) !important;
-            margin: 4px 0 !important;
-            transition: all 0.2s ease !important;
-        }
 
-        .fc-event:hover {
-            transform: translateX(2px);
-            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.2);
-        }
+/* Calendar Customization */
+/* Compact Calendar - Calendly Inspired */
+/* Premium Calendar Container */
+/* Premium Calendar Design System */
+:root {
+  --primary-blue: #006BFF;
+  --slack-purple: #4A154B;
+  --calendly-emerald: #00BFA5;
+  --hover-state: rgba(0, 0, 0, 0.03);
+  --border-color: #EBEEF5;
+}
+
+/* Container Styling */
+#calendar {
+  background: #FFFFFF;
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.08);
+  max-width: 860px;
+  margin: 2rem auto;
+  border: 1px solid var(--border-color);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Toolbar - Premium Header */
+.fc-toolbar {
+  padding: 0 8px 24px;
+  margin-bottom: 0 !important;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.fc-toolbar-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1A1D24;
+  letter-spacing: -0.2px;
+  padding: 8px 0;
+}
+
+/* Premium Buttons */
+.fc-button {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 10px 24px !important;
+  font-weight: 600 !important;
+  text-transform: capitalize !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05) !important;
+}
+
+.fc-button-primary {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, #005AD6 100%) !important;
+  color: white !important;
+}
+
+.fc-button-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 107, 255, 0.2) !important;
+}
+
+.fc-button-active {
+  background: linear-gradient(135deg, #004EB3 0%, #003D8F 100%) !important;
+}
+
+/* Day Headers - Slack-inspired */
+.fc-col-header-cell {
+  background: linear-gradient(160deg, #F8FAFF 0%, #FFFFFF 100%);
+  border: none !important;
+  padding: 12px 0;
+}
+
+.fc-day-header {
+  color: #4A4A6A;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 14px 0;
+}
+
+/* Day Cells - Premium Styling */
+.fc-daygrid-day {
+  border: none !important;
+  padding: 14px !important;
+  transition: background 0.15s ease;
+  border-radius: 10px !important;
+  margin: 4px;
+}
+
+.fc-daygrid-day:hover {
+  background: var(--hover-state) !important;
+}
+
+.fc-daygrid-day-number {
+  color: #1A1D24;
+  font-weight: 600;
+  padding: 8px 12px !important;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+/* Today Highlight - Calendly-style */
+.fc-day-today {
+  background: transparent !important;
+}
+
+.fc-day-today .fc-daygrid-day-number {
+  background: var(--primary-blue);
+  color: white !important;
+  box-shadow: 0 2px 6px rgba(0, 107, 255, 0.15);
+}
+
+/* Events - Premium Presentation */
+.fc-event {
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 8px 14px !important;
+  background: linear-gradient(135deg, var(--calendly-emerald) 0%, #009E7F 100%) !important;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 2px 6px rgba(26, 182, 157, 0.1);
+  transition: all 0.2s ease;
+  border-left: 4px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.fc-event:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(26, 182, 157, 0.2);
+}
+
+/* Time Slots - Premium Details */
+.fc-timegrid-slots td {
+  border-color: var(--border-color) !important;
+}
+
+.fc-timegrid-axis {
+  color: #6B7280;
+  font-size: 12px;
+}
+
+/* Popover Styling */
+.fc-popover {
+  border-radius: 12px !important;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.fc-popover-header {
+  background: #F9FAFB !important;
+  font-weight: 600 !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+/* Scrollbar Styling */
+.fc-scroller::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.fc-scroller::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+/* Time Grid - Premium Details */
+.fc-timegrid-event-harness-inset .fc-timegrid-event {
+  border-radius: 8px;
+  margin-right: 8px !important;
+}
+
+/* Modal Styling */
+.fc .fc-more-popover {
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.fc-more-popover .fc-popover-body {
+  padding: 12px !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  #calendar {
+    padding: 20px;
+    margin: 1rem;
+    border-radius: 14px;
+  }
+  
+  .fc-toolbar {
+    flex-direction: column;
+    gap: 16px;
+    padding-bottom: 20px;
+  }
+  
+  .fc-toolbar-title {
+    font-size: 18px;
+  }
+  
+  .fc-button {
+    padding: 8px 16px !important;
+    font-size: 13px !important;
+  }
+}
+
+/* Frosted Glass Overlay Effect */
+.fc-highlight {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(4px);
+  border-radius: 12px;
+}
+
+
+
+
 
         /* Modern Modal Design */
         .modal-content {
@@ -448,6 +627,8 @@ p:hover strong {
 #customReminderModal .bi {
     vertical-align: middle;
 }
+
+
 
 
 

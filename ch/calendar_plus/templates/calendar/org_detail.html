@@ -647,6 +647,16 @@ a {
                 <span class="material-icons">person_add</span> My Calendar
             </a>
 
+            {% if connected_apps %}
+               <a href="{% url 'google_calendar_view' %}">
+                  <span class="material-icons">calendar_month</span>Plug-inned Calendar
+               </a>
+            {% else %}
+               <a href="{% url 'google_calendar_view' %}">
+                  <span class="material-icons">event</span>Connect Apps
+               </a>
+            {% endif %}   
+
 
         {% else %}
             <h3 class="font-semibold text-lg text-white mb-6">Employee Controls</h3>
@@ -692,6 +702,16 @@ a {
             <a href="{% url 'user_meetings_calendar' organization.id %}">
                 <span class="material-icons">person_add</span> My Calendar
             </a>
+
+            {% if connected_apps %}
+               <a href="{% url 'google_calendar_view' %}">
+                  <span class="material-icons">calendar_month</span>Plug-inned Calendar
+               </a>
+            {% else %}
+               <a href="{% url 'google_calendar_view' %}">
+                  <span class="material-icons">event</span>Connect Apps
+               </a>
+            {% endif %}   
 
             <div class="info-message">
                 <span class="material-icons">info</span>
