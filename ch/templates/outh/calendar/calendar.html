@@ -1,3 +1,7 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -504,6 +508,90 @@ p:hover strong {
     letter-spacing: 0.01em;
 }
 
+
+
+/* Integration section */
+
+/* Integration Section */
+.integration-section {
+    max-width: 800px;
+    margin: 40px auto;
+    text-align: center;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Header Styling */
+.integration-header {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+/* Calendar Grid */
+.calendar-grid {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+/* Calendar Card */
+.calendar-card {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    background: #f8f9fb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-card img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+}
+
+/* Google Calendar Clickable */
+.clickable {
+    background: #fff;
+    cursor: pointer;
+}
+
+.clickable:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Disabled Calendars */
+.disabled-calendar {
+    background: #f0f2f5;
+    cursor: not-allowed;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Pro Badge */
+.pro-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #ff9800;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+}
+
     </style>
 </head>
 <body>
@@ -618,7 +706,7 @@ display: none;
             <div class="header animated-entry">
                 <div>
                     <h1 class="header-title">Welcome Back, <span class="gradient-text">{{request.user}}</span></h1>
-                    <p class="text-muted">Your schedule as per Google Calendar</p>
+                    <p class="text-muted">Manage Your Google Calendar Events Instantly</p>
                 </div>
 
                 <div class="calendar-status">
@@ -644,9 +732,31 @@ display: none;
             <div id="calendar" class="animated-entry hover-scale"></div>
        
    {% else %}
-      <strong>
-          Connect your google calendar
-      </strong> 
+   <div class="integration-section">
+    <div class="integration-header">
+        Hey {{request.user}}, seamlessly connect your favorite apps and take control of your events and meetings effortlessly. 
+        Stay organized, sync schedules in real-time, and manage everything in one place with ease! 🚀
+    </div>
+    
+    <div class="calendar-grid">
+        <!-- Google Calendar (Clickable) -->
+        <a href="{% url 'google_connect' %}" class="calendar-card clickable">
+            <img src="https://th.bing.com/th/id/OIP.IlSC4VLx4_vTAOTMPjKjRAHaHa?rs=1&pid=ImgDetMain" alt="google-calendar">
+        </a>
+
+        <!-- Microsoft Outlook (Disabled) -->
+        <div class="calendar-card disabled-calendar">
+            <span class="pro-badge">Pro</span>
+            <img src="https://th.bing.com/th/id/OIP.MQ5Z4i6lVAGtoC00u6cmUQHaHa?rs=1&pid=ImgDetMain" alt="microsoft-outlook">
+        </div>
+
+        <!-- Zoho Calendar (Disabled) -->
+        <div class="calendar-card disabled-calendar">
+            <span class="pro-badge">Pro</span>
+            <img src="https://cdn.dribbble.com/users/3529564/screenshots/10027130/01_4x.jpg" alt="zoho-calendar">
+        </div>
+    </div>
+</div>
    {% endif %}   
 
 
@@ -2099,3 +2209,5 @@ document.addEventListener("DOMContentLoaded", function () {
 
 </body>
 </html>
+
+{% endblock %}
