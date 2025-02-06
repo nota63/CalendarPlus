@@ -451,23 +451,7 @@ p:hover strong {
 
 
     <!-- Spinner -->
-     <!-- Spinner Modal -->
-<div id="loadingSpinner" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); color: white; text-align: center; padding-top: 20%; z-index: 9999;">
-    <div>
-        <!-- Google Logo -->
-        <div class="google-logo-wrapper" style="position: relative; display: inline-block;">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a0/Google_2015_logo.svg" alt="Google Logo" class="google-logo" style="width: 50px; height: 50px; position: absolute; top: 0; left: 0;">
-        </div>
-
-        <!-- Spinner -->
-        <div class="spinner-border text-light" role="status">
-            <span class="sr-only">Loading...</span>
-        </div>
-
-        <p>Fetching events from Google...</p>
-    </div>
-</div>
-
+   
 <style>
     /* Spinning Google Logo Animation */
     .google-logo-wrapper {
@@ -535,9 +519,9 @@ display: none;
     </div>
 
 
+  
 
-
-
+  {% if google_auth %}
     <div class="main-wrapper">
         <!-- Sidebar -->
         <aside class="sidebar animated-entry">
@@ -567,6 +551,8 @@ display: none;
             </nav>
         </aside>
 
+
+
         <!-- Main Content -->
         <main class="content-area">
             <!-- Header -->
@@ -588,6 +574,9 @@ display: none;
 
             <!-- Calendar Container -->
             <div id="calendar" class="animated-entry hover-scale"></div>
+       
+   {% endif %} 
+
 
 
 
@@ -1033,18 +1022,18 @@ display: none;
     $('#calendar').fullCalendar({
         events: function(start, end, timezone, callback) {
             // Show the loading spinner before fetching events
-            $('#loadingSpinner').show();
+            $('#spinner').show();
 
             $.ajax({
                 url: '/oauth/calendar/google_events/', // Fetch Google Calendar events
                 method: 'GET',
                 success: function(data) {
                     callback(data); // Pass events data to the calendar
-                    $('#loadingSpinner').hide(); // Hide the loading spinner after events are loaded
+                    $('#spinner').hide(); // Hide the loading spinner after events are loaded
                 },
                 error: function() {
                     alert('Error fetching events');
-                    $('#loadingSpinner').hide(); // Hide spinner on error
+                    $('#spinner').hide(); // Hide spinner on error
                 }
             });
         },
@@ -1089,8 +1078,11 @@ display: none;
             $('#changeOwnerEventBtn').data('event-id', calEvent.id);
             $('#reminderEventBtn').data('event-id', calEvent.id);
             $('#guestPermissionsEventBtn').data('event-id', calEvent.id);
+
+
             // Fetch event details using AJAX
-            $.ajax({
+        // Fetch event details using AJAX
+        $.ajax({
                 url: '/oauth/google_event_details/' + calEvent.id + '/',
                 method: 'GET',
                 success: function(data) {
@@ -1133,6 +1125,15 @@ display: none;
             });
         }
     });
+
+
+
+
+
+
+
+
+
 
 
 

@@ -225,7 +225,10 @@ def get_google_events(request):
 
 def google_calendar_view(request):
     """Render the calendar page"""
-    return render(request, "outh/calendar/calendar.html")
+    google_auth=GoogleAuth.objects.filter(user=request.user)
+    return render(request, "outh/calendar/calendar.html",{'google_auth':google_auth})
+
+
 
 
 
