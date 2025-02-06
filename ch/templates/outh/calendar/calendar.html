@@ -1668,7 +1668,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // PUBLISH THE EVENT
 
-
 document.addEventListener("DOMContentLoaded", function () {
     const publishEventBtn = document.getElementById("publishEventBtn");
     const publishEventModal = new bootstrap.Modal(document.getElementById("publishEventModal"));
@@ -1696,6 +1695,14 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
+        // Show spinner when processing
+        $('#spinner').show();
+
+        // Disable confirm button and show loading text
+        const confirmPublishBtn = document.getElementById("confirmPublishBtn");
+        confirmPublishBtn.innerHTML = "Publishing...";
+        confirmPublishBtn.disabled = true;
+
         // Send request to backend to generate event link and embed code
         fetch(`/oauth/publish_google_event/${eventId}/`, {
             method: "GET",
@@ -1712,7 +1719,15 @@ document.addEventListener("DOMContentLoaded", function () {
                     alert("Error generating the link: " + data.error);
                 }
             })
-            .catch((err) => console.error("❌ Error:", err));
+            .catch((err) => console.error("❌ Error:", err))
+            .finally(() => {
+                // Hide spinner after process is complete
+                $('#spinner').hide();
+
+                // Reset button text and enable it
+                confirmPublishBtn.innerHTML = "Confirm";
+                confirmPublishBtn.disabled = false;
+            });
     });
 
     // Function to get CSRF token
@@ -1725,6 +1740,11 @@ document.addEventListener("DOMContentLoaded", function () {
         return "";
     }
 });
+
+
+
+
+
 
 // CHANGE THE OWNER
 $(document).ready(function () {
