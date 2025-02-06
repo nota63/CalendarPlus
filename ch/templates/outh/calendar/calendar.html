@@ -1762,6 +1762,13 @@ $(document).ready(function () {
             return;
         }
 
+        // Show spinner while processing
+        $('#spinner').show();
+
+        // Disable the button and update the text
+        const confirmChangeOwnerBtn = $("#confirmChangeOwner");
+        confirmChangeOwnerBtn.text("Changing owner...").prop("disabled", true);
+
         $.ajax({
             url: `/oauth/change_event_owner/${eventId}/`,
             type: "POST",
@@ -1772,7 +1779,7 @@ $(document).ready(function () {
             success: function (response) {
                 alert(response.message);
 
-                // Display event details after updating
+                // Display updated event details
                 let eventInfo = `
                     <p><strong>Event Title:</strong> ${response.event_details.title}</p>
                     <p><strong>Organizer:</strong> ${response.event_details.organizer}</p>
@@ -1787,11 +1794,14 @@ $(document).ready(function () {
                 let errorMsg = xhr.responseJSON?.error || "An error occurred!";
                 alert("Error: " + errorMsg);
             },
+            complete: function () {
+                // Hide spinner and reset the button
+                $('#spinner').hide();
+                confirmChangeOwnerBtn.text("Confirm Change").prop("disabled", false);
+            },
         });
     });
 });
-
-
 
 
 // HANDLE CUSTOM REMINDER
