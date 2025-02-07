@@ -1,6 +1,30 @@
-
 <div class="container mt-4">
-    <h2 class="text-center">🚀 Organization Pulse</h2>
+    <h2 class="text-center">🚀 Pulse</h2>
+    <p class="text-center">
+        See who's online and what they're working on
+    </p>
+
+    <!-- Today's Date Section -->
+    <section class="text-center">
+        <h4>📅 Today's Date: <span id="today-date"></span></h4>
+    </section>
+
+    <!-- Search Bar -->
+    <div class="mt-3 mb-4 text-center">
+        <input type="text" id="search-user" class="form-control w-50 mx-auto" placeholder="🔍 Search users...">
+    </div>
+
+    <!-- People Online Section -->
+    <div class="card shadow p-3 mb-4">
+        <h5 class="text-center fw-bold">🟢 People Online</h5>
+        <div class="row text-center">
+            {% for hour in time_slots %}
+                <div class="col-2 p-1">
+                    <span class="badge bg-primary">{{ hour }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 
     {% if error %}
         <div class="alert alert-warning text-center">
@@ -11,7 +35,7 @@
             <div class="col-md-8 offset-md-2">
                 <ul class="list-group">
                     {% for user, activities in activity_data.items %}
-                        <li class="list-group-item">
+                        <li class="list-group-item user-item">
                             <h5 class="text-primary">👤 {{ user }}</h5>
                             {% if activities %}
                                 <ul>
@@ -34,3 +58,24 @@
         </div>
     {% endif %}
 </div>
+
+<!-- JavaScript to Set Today's Date & Handle Search -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Set Today's Date
+        let today = new Date();
+        let formattedDate = today.toLocaleDateString('en-US', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+        document.getElementById("today-date").innerText = formattedDate;
+
+        // Search User Filter
+        document.getElementById("search-user").addEventListener("keyup", function () {
+            let searchValue = this.value.toLowerCase();
+            document.querySelectorAll(".user-item").forEach(function (userItem) {
+                let userName = userItem.querySelector("h5").innerText.toLowerCase();
+                userItem.style.display = userName.includes(searchValue) ? "block" : "none";
+            });
+        });
+    });
+</script>
