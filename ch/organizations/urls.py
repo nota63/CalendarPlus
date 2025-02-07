@@ -23,7 +23,8 @@ urlpatterns=[
     path('workflows/<int:org_id>/',workflow_template, name='workflows'),
     path('hide_workspace/<int:org_id>/',hide_organization,name='hide_workspace'),
     path('duplicate-workspace/<int:org_id>/',DuplicateWorkspaceView.as_view(), name='duplicate_workspace'),
-    path('pulse/<int:org_id>/',organization_pulse_view, name='pulse')
+    path('pulse/<int:org_id>/',organization_pulse_view, name='pulse'),
+    path('pulse_settings/<int:org_id>/',pulse_settings, name='pulse_settings')
     
 ]
 

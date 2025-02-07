@@ -927,6 +927,7 @@ class DuplicateWorkspaceView(View):
 
 
 # PULSE FEATURES
+
 from accounts.models import EventOrganization
 from django.contrib.auth.models import User
 def get_last_two_activities(org_id):
@@ -938,7 +939,7 @@ def get_last_two_activities(org_id):
     for user in users:
         activities = []
 
-        # Fetch latest activities with unique field names
+       
         activities += list(
             Message.objects.filter(user=user).values(activity=F("content"), activity_time=F("timestamp"))
         ) + list(
@@ -957,13 +958,13 @@ def get_last_two_activities(org_id):
             GroupEventBooking.objects.filter(user=user).values(activity=F("group_event"), activity_time=F("created_at"))
         )
 
-        # Ensure no null values in activity_time
+      
         activities = [act for act in activities if act.get("activity_time")]
 
-        # Sort activities by activity_time in descending order & get last two
+       
         activities = sorted(activities, key=lambda x: x["activity_time"], reverse=True)[:2]
 
-        activity_data[user.username] = activities  # Store last two activities per user
+        activity_data[user.username] = activities  
 
     return activity_data
 
@@ -972,11 +973,11 @@ def organization_pulse_view(request, org_id):
     """View to render the pulse page showing member activities."""
     organization=get_object_or_404(Organization, id=org_id)
     
-    # Ensure the organization has members
+  
     if not Profile.objects.filter(organization=organization).exists():
         return render(request, "pulse.html", {"error": "No members found in this organization."})
 
-        # Time slots for "People Online" section
+      
     time_slots = [
         "12 AM", "1 AM", "2 AM", "3 AM", "4 AM", "5 AM", "6 AM", "7 AM",
         "8 AM", "9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM", "3 PM",
@@ -988,3 +989,32 @@ def organization_pulse_view(request, org_id):
     return render(request, "organizations/pulse/pulse.html", {"activity_data": activity_data,'organization':organization,'profile':Profile,'time_slots':time_slots})
 
 
+
+# PULSE SETTINGS 
+def pulse_settings(request, org_id):
+    organization=get_object_or_404(Organization, id=org_id)
+    development = [
+        {"title": "Custom Fields", "description": "Enhance your workspace by adding custom fields..."},
+        {"title": "Dependency Warning", "description": "Get alerts when task dependencies are not met..."},
+        {"title": "Email", "description": "Enable email notifications for important updates..."},
+        {"title": "Incomplete Warning", "description": "Receive warnings for incomplete tasks..."},
+        {"title": "Remap Subtask Due Dates", "description": "Automatically adjust subtask due dates..."},
+        {"title": "Reschedule Dependencies", "description": "Adjust dependent task deadlines..."},
+    ]
+
+    work_in_progress = [
+        {"title": "Work in Progress Limits", "description": "Set limits on active tasks to prevent overload..."}
+    ]
+
+    space = [
+        {"title": "Show Status Progress", "description": "Track the real-time progress of tasks..."},
+        {"title": "Tags", "description": "Categorize and organize tasks effectively..."},
+        {"title": "Time Estimates", "description": "Set estimated time for tasks and projects..."}
+    ]
+
+    return render(request, "organizations/pulse/pulse_settings.html", {
+        "development": development,
+        "work_in_progress": work_in_progress,
+        "space": space,
+        'organization':organization,
+    })
