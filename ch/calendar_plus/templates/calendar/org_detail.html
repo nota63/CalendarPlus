@@ -793,26 +793,61 @@ a {
             </div>
         </div>
 
-        <!-- SECOND CONTAINER -->
+        <!-- SECOND CONTAINER (RECENT MEETINGS)-->
         <div class="max-w-3xl flex-grow-1 mx-2 px-4 sm:px-6 lg:px-8 py-4" style="max-width: 48%;">
             <div class="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
                 <div class="bg-slack-purple px-6 py-4">
                     <div class="flex items-center">
+                      {% if recent_meetings %}  
                         <span class="text-2xl text-white mr-3">🏢</span>
-                        <h2 class="text-xl font-semibold text-white">Recent Projects</h2>
+                        <h2 class="text-xl font-semibold text-white">Upcoming Meetings</h2>
+                      {% else %}
+                         <h2 class="text-xl font-semibold text-white">Recent Meetings Will be appear here</h2>
+                      {% endif %}   
                     </div>
                 </div>
-                <div class="px-6 py-4 space-y-4">
-                    <div class="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors">
+
+                {% for meeting in recent_meetings %}
+
+                   <div class="px-6 py-4 space-y-4">
+                      <div class="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors">
                         <div class="w-10 h-10 bg-slack-blue-bg rounded-full flex items-center justify-center mr-4">
                             <span class="material-icons text-slack-blue">business</span>
                         </div>
+
                         <div>
-                            <p class="text-sm text-slack-gray font-medium mb-1">Project</p>
-                            <p class="text-slack-dark font-medium">{{ project.name }}</p>
+                            {% if meeting.meeting_title %}
+                               <p class="text-sm text-slack-gray font-medium mb-1">Meeting</p>
+                               <p class="text-slack-dark font-medium">{{ meeting.meeting_title }}</p>
+                            {% endif %}   
                         </div>
+                        <br><br><br>
+
+                        <div>
+                            {% if meeting.meeting_date%}
+                               <p class="text-sm text-slack-gray font-medium mb-1">Due</p>
+                               <p class="text-slack-dark font-medium">{{ meeting.meeting_date }}</p>
+                               <p class="text-slack-dark font-medium">{{ meeting.start_time }} | {{meeting.end_time}}</p>
+  
+                            {% endif %}   
+                        </div>
+
+                        <!-- 3-dot menu container -->
+                      <div class="dropdown">
+                          <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v"></i> <!-- FontAwesome 3 dots -->
+                     </button>
+    
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                        <li><a class="dropdown-item" href="{% url 'meeting_detail_view' org_id=organization.id meeting_id=meeting.id  %}">Join & Details</a></li>
+                         <li><a class="dropdown-item" href="{% url 'collaborate' org_id=organization.id meeting_id=meeting.id %}">Collaborate</a></li>
+                         <li><a class="dropdown-item" href="{% url 'remove_myself' org_id=organization.id meeting_id=meeting.id %}">Exit</a></li>
+                       </ul>
+                    </div>
                     </div>
                 </div>
+                {% endfor %}
+
             </div>
         </div>
     </div>
