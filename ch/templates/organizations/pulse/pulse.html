@@ -1,81 +1,432 @@
-<div class="container mt-4">
-    <h2 class="text-center">🚀 Pulse</h2>
-    <p class="text-center">
-        See who's online and what they're working on
-    </p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulse - Team Activity Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2F80ED;
+            --secondary: #9B51E0;
+            --success: #27AE60;
+            --warning: #F2C94C;
+            --background: #F8F9FD;
+            --card-bg: #FFFFFF;
+            --text-primary: #2D3436;
+            --text-secondary: #636E72;
+            --border: #EBECF0;
+        }
 
-    <!-- Today's Date Section -->
-    <section class="text-center">
-        <h4>📅 Today's Date: <span id="today-date"></span></h4>
-    </section>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
 
-    <!-- Search Bar -->
-    <div class="mt-3 mb-4 text-center">
-        <input type="text" id="search-user" class="form-control w-50 mx-auto" placeholder="🔍 Search users...">
-    </div>
+        body {
+            background: var(--background);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
 
-    <!-- People Online Section -->
-    <div class="card shadow p-3 mb-4">
-        <h5 class="text-center fw-bold">🟢 People Online</h5>
-        <div class="row text-center">
-            {% for hour in time_slots %}
-                <div class="col-2 p-1">
-                    <span class="badge bg-primary">{{ hour }}</span>
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        /* Header Styles */
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.5rem;
+            color: var(--text-primary);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .dashboard-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 400;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Date Card */
+        .date-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 2rem auto;
+            width: fit-content;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease;
+        }
+
+        .date-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .date-card h3 {
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 1.2rem;
+        }
+
+        .date-card span {
+            color: var(--primary);
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        /* Search Bar */
+        .search-container {
+            position: relative;
+            max-width: 600px;
+            margin: 2rem auto;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.1);
+        }
+
+        /* Online Status Section */
+        .online-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+
+
+
+        .timeline-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .time-slot {
+            height: 40px;
+            background: #E3F2FD;
+            border-radius: 8px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .time-slot:hover {
+            transform: scale(1.05);
+            background: var(--primary);
+        }
+
+
+
+        
+
+
+
+
+        /* User Activity Cards */
+        .user-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .user-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        }
+
+        .user-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+            border-radius: 4px 0 0 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .user-card:hover::before {
+            opacity: 1;
+        }
+
+        .user-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 1rem;
+            position: relative;
+        }
+
+        .online-status {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--success);
+            border: 2px solid var(--card-bg);
+        }
+
+        .activity-list {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-time {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            min-width: 80px;
+            margin-right: 1rem;
+        }
+
+        .activity-content {
+            flex-grow: 1;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem auto;
+            }
+
+            .dashboard-header h1 {
+                font-size: 2rem;
+            }
+
+            .user-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading State */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+            min-height: 20px;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Error State */
+        .error-card {
+            background: #FFF3F3;
+            border: 1px solid #FFD1D1;
+            color: #FF4D4D;
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        /* Status Indicators */
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .status-online { background: var(--success); }
+        .status-offline { background: var(--text-secondary); }
+        .status-away { background: var(--warning); }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="dashboard-header">
+            <h1>Team Pulse</h1>
+            <p>Real-time visibility into team availability and current focus</p>
+        </header>
+
+        <div class="date-card">
+            <h3>📅 Today is <span id="today-date"></span></h3>
+        </div>
+
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Search team members...">
+        </div>
+
+        <section class="online-section">
+            <h3>🕒 Team Activity Timeline</h3>
+            <div class="timeline-grid">
+                {% for hour in time_slots %}
+                <div class="time-slot" data-hour="{{ hour }}"></div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <div class="user-grid">
+            {% for user, activities in activity_data.items %}
+            <div class="user-card">
+                <div class="user-header">
+                    <div class="user-avatar">
+                        {{ user|first|upper }}
+                        <div class="online-status"></div>
+                    </div>
+                    <div>
+                        <h4>{{ user }}</h4>
+                        <small class="text-secondary">{{organization.name}}</small>
+                    </div>
                 </div>
+                
+                <ul class="activity-list">
+                    {% for activity in activities|slice:":3" %}
+                    <li class="activity-item">
+                        <span class="activity-time">
+                            {{ activity.created_at|date:"H:i" }}
+                        </span>
+                        <span class="activity-content">
+                            {{ activity.activity|default:"Working on tasks" }}
+                        </span>
+                    </li>
+                    {% empty %}
+                    <li class="activity-item">
+                        <span class="activity-content text-secondary">
+                            No recent activity
+                        </span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
             {% endfor %}
         </div>
     </div>
 
-    {% if error %}
-        <div class="alert alert-warning text-center">
-            {{ error }}
-        </div>
-    {% else %}
-        <div class="row">
-            <div class="col-md-8 offset-md-2">
-                <ul class="list-group">
-                    {% for user, activities in activity_data.items %}
-                        <li class="list-group-item user-item">
-                            <h5 class="text-primary">👤 {{ user }}</h5>
-                            {% if activities %}
-                                <ul>
-                                    {% for activity in activities %}
-                                        <li>
-                                            <span class="badge bg-success">
-                                                {{ activity.created_at|date:"M d, Y H:i" }}
-                                            </span> 
-                                            - {{ activity.activity|default:"No Activity Title" }}
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            {% else %}
-                                <p class="text-muted">No recent activities.</p>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
-    {% endif %}
-</div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Set dynamic date
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-US', options);
 
-<!-- JavaScript to Set Today's Date & Handle Search -->
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Set Today's Date
-        let today = new Date();
-        let formattedDate = today.toLocaleDateString('en-US', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-        });
-        document.getElementById("today-date").innerText = formattedDate;
+            // Search functionality
+            const searchInput = document.querySelector('.search-input');
+            searchInput.addEventListener('input', debounce(function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                document.querySelectorAll('.user-card').forEach(card => {
+                    const username = card.querySelector('h4').textContent.toLowerCase();
+                    card.style.display = username.includes(searchTerm) ? 'block' : 'none';
+                });
+            }, 300));
 
-        // Search User Filter
-        document.getElementById("search-user").addEventListener("keyup", function () {
-            let searchValue = this.value.toLowerCase();
-            document.querySelectorAll(".user-item").forEach(function (userItem) {
-                let userName = userItem.querySelector("h5").innerText.toLowerCase();
-                userItem.style.display = userName.includes(searchValue) ? "block" : "none";
+            // Time slot interactions
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                slot.addEventListener('mouseover', function() {
+                    const hour = this.dataset.hour;
+                    this.setAttribute('title', `${hour}:00 - Active`);
+                });
             });
+
+            // Debounce function
+            function debounce(func, wait) {
+                let timeout;
+                return function(...args) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(this, args), wait);
+                };
+            }
         });
-    });
-</script>
+    </script>
+</body>
+</html>
