@@ -7,6 +7,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- FontAwesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
     <title>Pulse - Team Activity Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -339,10 +345,12 @@
 </head>
 <body>
 
-    <a href="{% url 'pulse_settings' org_id=organization.id %}">
-        Pulse settings 
-    </a>
-
+    <div class="d-flex justify-content-start p-3">
+        <a href="{% url 'pulse_settings' org_id=organization.id %}" class="text-dark">
+            <i class="fas fa-cog fa-lg"></i> Pulse Settings
+        </a>
+    </div>
+    
 
     <div class="container">
         <header class="dashboard-header">
