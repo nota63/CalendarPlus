@@ -64,7 +64,7 @@ from django.http import HttpResponseRedirect
 from .forms import ProjectForm, AssignEmployeeForm, AssignManagerForm
 from accounts.models import ProjectEmployeeAssignment,ProjectManagerAssignment
 from django.shortcuts import render, get_object_or_404, redirect
-from accounts.models import Organization, Project, Profile, ProjectManagerAssignment, MeetingReminder
+from accounts.models import (Organization, Project, Profile, ProjectManagerAssignment, MeetingReminder)
 from .forms import AssignManagerForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
@@ -448,6 +448,12 @@ class OrgDetailView(LoginRequiredMixin, View):
             return HttpResponseForbidden("You are Not Authorized to access this page!")
         
         connected_apps=GoogleAuth.objects.filter(user=request.user)
+        # Recent projects 
+
+        project=Project.objects.filter(organization=organization).order_by('created_at').first()
+
+
+
         
 
 
@@ -496,7 +502,8 @@ class OrgDetailView(LoginRequiredMixin, View):
             'is_admin': is_admin,
             'is_manager': is_manager,
             'is_employee': is_employee,
-            'connected_apps':connected_apps
+            'connected_apps':connected_apps,
+            'project':project
         }
 
         return render(request, self.template_name, context)
