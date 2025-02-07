@@ -1018,3 +1018,5 @@ def pulse_settings(request, org_id):
         "space": space,
         'organization':organization,
     })
+
+
