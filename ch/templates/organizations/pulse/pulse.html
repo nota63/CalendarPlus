@@ -1,0 +1,36 @@
+
+<div class="container mt-4">
+    <h2 class="text-center">🚀 Organization Pulse</h2>
+
+    {% if error %}
+        <div class="alert alert-warning text-center">
+            {{ error }}
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <ul class="list-group">
+                    {% for user, activities in activity_data.items %}
+                        <li class="list-group-item">
+                            <h5 class="text-primary">👤 {{ user }}</h5>
+                            {% if activities %}
+                                <ul>
+                                    {% for activity in activities %}
+                                        <li>
+                                            <span class="badge bg-success">
+                                                {{ activity.created_at|date:"M d, Y H:i" }}
+                                            </span> 
+                                            - {{ activity.activity|default:"No Activity Title" }}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="text-muted">No recent activities.</p>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+</div>

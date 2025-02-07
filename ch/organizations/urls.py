@@ -22,7 +22,8 @@ urlpatterns=[
     path('workspace_billing/<int:org_id>/',workspace_billing, name='workspace_billing'),
     path('workflows/<int:org_id>/',workflow_template, name='workflows'),
     path('hide_workspace/<int:org_id>/',hide_organization,name='hide_workspace'),
-    path('duplicate-workspace/<int:org_id>/',DuplicateWorkspaceView.as_view(), name='duplicate_workspace')
+    path('duplicate-workspace/<int:org_id>/',DuplicateWorkspaceView.as_view(), name='duplicate_workspace'),
+    path('pulse/<int:org_id>/',organization_pulse_view, name='pulse')
     
 ]
 

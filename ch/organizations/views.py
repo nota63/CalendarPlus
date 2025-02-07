@@ -22,6 +22,20 @@ import holidays
 from django.db import transaction
 from django.utils.decorators import method_decorator
 from django.views import View
+from accounts.models import Organization,Profile
+from django.utils.timezone import now
+from django.db.models import Q,F,When
+from groups.models import Group,GroupMember,GroupInvitation,GroupEvent,GroupEventBooking
+from group_tasks.models import Task, AddDay
+
+
+
+
+
+
+
+
+
 # Create your views here.
 
 @csrf_exempt
@@ -909,3 +923,59 @@ class DuplicateWorkspaceView(View):
         except Exception as e:
             logger.error(f"Error duplicating workspace: {e}")
             return JsonResponse({'error': 'Failed to duplicate workspace'}, status=500)
+        
+
+
+# PULSE FEATURES
+from accounts.models import EventOrganization
+from django.contrib.auth.models import User
+def get_last_two_activities(org_id):
+    """Fetch last two activities of all unique members in an organization."""
+    
+    users = User.objects.filter(profiles__organization=org_id).distinct()
+    activity_data = {}
+
+    for user in users:
+        activities = []
+
+        # Fetch latest activities with unique field names
+        activities += list(
+            Message.objects.filter(user=user).values(activity=F("content"), activity_time=F("timestamp"))
+        ) + list(
+            GroupEvent.objects.filter(created_by=user).values(activity=F("title"), activity_time=F("created_at"))
+        ) + list(
+            MeetingOrganization.objects.filter(user=user).values(activity=F("meeting_title"), activity_time=F("created_at"))
+        ) + list(
+            EventOrganization.objects.filter(user=user).values(activity=F("title"), activity_time=F("created_at"))
+        ) + list(
+            Task.objects.filter(assigned_to=user).values(activity=F("title"), activity_time=F("created_at"))
+        ) + list(
+            Group.objects.filter(created_by=user).values(activity=F("name"), activity_time=F("created_at"))
+        ) + list(
+            Channel.objects.filter(created_by=user).values(activity=F("name"), activity_time=F("created_at"))
+        ) + list(
+            GroupEventBooking.objects.filter(user=user).values(activity=F("group_event"), activity_time=F("created_at"))
+        )
+
+        # Ensure no null values in activity_time
+        activities = [act for act in activities if act.get("activity_time")]
+
+        # Sort activities by activity_time in descending order & get last two
+        activities = sorted(activities, key=lambda x: x["activity_time"], reverse=True)[:2]
+
+        activity_data[user.username] = activities  # Store last two activities per user
+
+    return activity_data
+
+
+def organization_pulse_view(request, org_id):
+    """View to render the pulse page showing member activities."""
+    organization=get_object_or_404(Organization, id=org_id)
+    
+    # Ensure the organization has members
+    if not Profile.objects.filter(organization=organization).exists():
+        return render(request, "pulse.html", {"error": "No members found in this organization."})
+
+    activity_data = get_last_two_activities(org_id)
+    
+    return render(request, "organizations/pulse/pulse.html", {"activity_data": activity_data})
