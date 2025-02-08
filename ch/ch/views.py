@@ -53,7 +53,7 @@ def update_email(request):
             request.user.email = email
             request.user.save()
             messages.success(request, "Email updated successfully! 🎉")
-            return redirect("/")  # Redirect to home or last visited page
+            return redirect("landing_page")  
         messages.error(request, "Please enter a valid email.")
     
     return render(request, "middlewares/update_email.html")
