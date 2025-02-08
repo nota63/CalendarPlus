@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 
 from pathlib import Path
+import dj_database_url
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -125,6 +126,7 @@ ASGI_APPLICATION = 'ch.asgi.application'
 
 # WSGI_APPLICATION = 'ch.wsgi.application'
 
+
 # Database
 DATABASES = {
     'default': {
@@ -136,6 +138,23 @@ DATABASES = {
         'PASSWORD': 'skl12qw@#',  
     }
 }
+
+# RENDER EXTERNAL DATABASE URL 
+
+
+DATABASES["default"] = dj_database_url.parse("postgresql://calendar_p_lus_database_user:bPydl91jveJL1UvAyqC1tKpXBXJDl2BU@dpg-cujobeogph6c73bjh4h0-a.oregon-postgres.render.com/calendar_p_lus_database")
+
+# postgresql://calendar_p_lus_database_user:bPydl91jveJL1UvAyqC1tKpXBXJDl2BU@dpg-cujobeogph6c73bjh4h0-a.oregon-postgres.render.com/calendar_p_lus_database
+
+
+
+
+
+
+
+
+
+
 
 
 CHANNEL_LAYERS = {
