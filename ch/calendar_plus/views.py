@@ -434,6 +434,7 @@ class OrganizationListView(LoginRequiredMixin, ListView):
 # PREVENT HIDDEN WORKSPACE ACCESS AND DISPLAY DETAILS 
 from outh.models import GoogleAuth
 from django.db import models
+from accounts.models import EventOrganization
 
 class OrgDetailView(LoginRequiredMixin, View):
     template_name = 'calendar/org_detail.html'
@@ -458,6 +459,17 @@ class OrgDetailView(LoginRequiredMixin, View):
          ).filter(
             models.Q(user=request.user) | models.Q(invitee=request.user)
         ).order_by('-meeting_date', '-start_time')[:3]
+
+        # Fetch recent events
+        recent_events = EventOrganization.objects.filter(organization=organization).filter(
+          Q(user=request.user)
+        ).annotate(
+        booking_count=Count('bookings')
+           ).order_by('-created_at')[:2]
+
+        
+
+
 
 
 
@@ -512,7 +524,8 @@ class OrgDetailView(LoginRequiredMixin, View):
             'is_employee': is_employee,
             'connected_apps':connected_apps,
             'project':project,
-            'recent_meetings':recent_meetings
+            'recent_meetings':recent_meetings,
+            'recent_events':recent_events,
         }
 
         return render(request, self.template_name, context)
