@@ -30,12 +30,8 @@ urlpatterns=[
 
     path('events/<int:org_id>/<int:event_id>/delete/', DeleteEventView.as_view(), name='delete-event'),
 
-
-
-
     # Booking Event
 
-    
     # Event Booking
     path('event/<slug:event_slug>/', views.EventBookingView.as_view(), name='event_booking'),
 
@@ -47,7 +43,7 @@ urlpatterns=[
    path('confirm_event/<int:user_id>/<int:org_id>/<str:date>/<slug:event_slug>/', ConfirmEventView.as_view(), name='confirm_event'),
    path('schedule_event_action/<int:user_id>/<int:org_id>/<str:date>/<slug:event_slug>/', ScheduleEventActionView.as_view(), name='schedule_event_action'),
 
-   #    display user bookings
+    #display user bookings
     path('bookings/<int:org_id>/', UserOrganizationBookingsView.as_view(), name='user_organization_bookings'),
 
     path('booking/<int:org_id>/<int:booking_id>/', BookingDetailView.as_view(), name='booking_detail'),
