@@ -544,7 +544,7 @@ a {
                  class="flex items-center space-x-2 text-gray-800 transition duration-300 hover:text-blue-500">
                  <span class="material-icons text-blue-500">person</span>
                  <span class="font-medium text-[14px]" style="font-family: 'Inter', sans-serif;">
-                    View/Edit Profile
+                    Manage Profile
                 </span>
                 
               </a>
@@ -1247,59 +1247,47 @@ My Calendar
 
 <!-- --------------------------------------------------------------------------------------------------------------- -->
 <!-- Popup Buttons (Initially Hidden) -->
+<!-- Popup Buttons (Initially Hidden) -->
 <div id="popupButtons" class="popup-container shadow-sm rounded-3 p-2" 
      style="background: white; border: 1px solid #e8e8e8; min-width: 240px;">
-    <!-- Edit Organization Button -->
-    <button type="button" class="popup-btn" data-bs-toggle="modal" data-bs-target="#editOrgModal">
-        <span class="material-icons">person</span> Short set-up
+
+    <!-- Short Set-up Button -->
+    <button type="button" class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2" 
+            data-bs-toggle="modal" data-bs-target="#editOrgModal"
+            style="font-family: 'Inter', sans-serif; font-size: 15px; 
+                   color: #1d1c1d; transition: background 0.2s ease; border-radius: 4px;">
+        <span class="material-icons" style="font-size: 18px; color: #007bff;">tune</span> 
+        Short Set-up
     </button>
 
     <!-- Monitor Invitations Button -->
-    <button type="button" class="popup-btn btn w-100 text-start d-flex align-items-center gap-3 px-3 py-2 mb-1"
-            style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-                   color: #1d1c1d;
-                   font-size: 15px;
-                   transition: background-color 0.2s ease;
-                   border-radius: 4px;"
-            data-bs-toggle="modal" 
-            data-bs-target="#invitationsModal">
-        <span class="material-icons" style="font-size: 18px; color: #616061;">people_alt</span>
+    <button type="button" class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2 mb-1"
+            data-bs-toggle="modal" data-bs-target="#invitationsModal"
+            style="font-family: 'Inter', sans-serif; font-size: 15px; 
+                   color: #1d1c1d; transition: background 0.2s ease; border-radius: 4px;">
+        <span class="material-icons" style="font-size: 18px; color: #007bff;">person_add</span> 
         Monitor Invitations
     </button>
 
     <!-- Customize Workspace Link -->
-    <a href="{% url 'customize_workspace' org_id=organization.id%}" 
-       class="text-decoration-none">
-        <button type="submit" 
-                class="popup-btn btn w-100 text-start d-flex align-items-center gap-3 px-3 py-2"
-                style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-                       color: #1d1c1d;
-                       font-size: 15px;
-                       transition: background-color 0.2s ease;
-                       border-radius: 4px;">
-            <span class="material-icons" style="font-size: 18px; color: #616061;">settings</span>
-            Customize {{organization.name}}
+    <a href="{% url 'customize_workspace' org_id=organization.id%}" class="text-decoration-none">
+        <button type="submit" class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2"
+                style="font-family: 'Inter', sans-serif; font-size: 15px; 
+                       color: #1d1c1d; transition: background 0.2s ease; border-radius: 4px;">
+            <span class="material-icons" style="font-size: 18px; color: #007bff;">build</span> 
+            Customize {{ organization.name }}
         </button>
     </a>
 
-
-    <a href="{% url 'workflows' org_id=organization.id%}" 
-    class="text-decoration-none">
-     <button type="submit" 
-             class="popup-btn btn w-100 text-start d-flex align-items-center gap-3 px-3 py-2"
-             style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-                    color: #1d1c1d;
-                    font-size: 15px;
-                    transition: background-color 0.2s ease;
-                    border-radius: 4px;">
-         <span class="material-icons" style="font-size: 18px; color: #616061;">settings</span>
-         Workflows & Templates
-     </button>
- </a>
-
-
-</a>
-
+    <!-- Workflows & Templates Button -->
+    <a href="{% url 'workflows' org_id=organization.id%}" class="text-decoration-none">
+        <button type="submit" class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2"
+                style="font-family: 'Inter', sans-serif; font-size: 15px; 
+                       color: #1d1c1d; transition: background 0.2s ease; border-radius: 4px;">
+            <span class="material-icons" style="font-size: 18px; color: #007bff;">dashboard_customize</span> 
+            Workflows & Templates
+        </button>
+    </a>
 </div>
 
 
