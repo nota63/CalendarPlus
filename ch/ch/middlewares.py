@@ -2,16 +2,16 @@
 from django.shortcuts import redirect
 from django.urls import reverse
 
+
 class CheckEmailMiddleware:
-    """Middleware to check if user has an email. If not, force update."""
+    """Middleware to check if a logged-in user has an email. If not, force update."""
     
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.user.is_authenticated and not request.user.email:
-            if request.path != reverse('update_email'):
+        if request.user.is_authenticated:  # ✅ Only check for logged-in users
+            if not request.user.email and request.path not in [reverse('update_email'), reverse('logout')]:
                 return redirect(reverse('update_email'))
+                
         return self.get_response(request)
-
-
