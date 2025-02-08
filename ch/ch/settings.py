@@ -36,13 +36,13 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 
 
-SECRET_KEY =os.environ.get('django-insecure-2_5v35*4-ylcnkadmjcbghfoa3^fhq8%kun$ywajnp7jd3_s2j')
+SECRET_KEY ='django-insecure-2_5v35*4-ylcnkadmjcbghfoa3^fhq8%kun$ywajnp7jd3_s2j'
 
 
 
-DEBUG = False  # Set to False in production
+DEBUG = True 
 
-ALLOWED_HOSTS = ["https://calendarplus-dsu6.onrender.com", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = []
 
 import os 
 
@@ -102,6 +102,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'meet.middlewares.AdminOnlyMiddleware',
+    'ch.middlewares.CheckEmailMiddleware',
 
 ]
 
@@ -144,9 +145,9 @@ DATABASES = {
 
 
 
-DATABASES["default"] = dj_database_url.parse("postgresql://calendar_p_lus_database_user:bPydl91jveJL1UvAyqC1tKpXBXJDl2BU@dpg-cujobeogph6c73bjh4h0-a.oregon-postgres.render.com/calendar_p_lus_database")
+# DATABASES["default"] = dj_database_url.parse("postgresql://calendar_p_lus_database_user:bPydl91jveJL1UvAyqC1tKpXBXJDl2BU@dpg-cujobeogph6c73bjh4h0-a.oregon-postgres.render.com/calendar_p_lus_database")
 
-# postgresql://calendar_p_lus_database_user:bPydl91jveJL1UvAyqC1tKpXBXJDl2BU@dpg-cujobeogph6c73bjh4h0-a.oregon-postgres.render.com/calendar_p_lus_database
+# # postgresql://calendar_p_lus_database_user:bPydl91jveJL1UvAyqC1tKpXBXJDl2BU@dpg-cujobeogph6c73bjh4h0-a.oregon-postgres.render.com/calendar_p_lus_database
 
 
 

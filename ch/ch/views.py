@@ -1,6 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
-
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 
 # homepage
 def home(request):
@@ -40,3 +42,18 @@ def image_slider_2(request):
     return render(request, 'ui/image_slider2.html')
 
 
+
+# Check email middleware
+
+@login_required
+def update_email(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        if email:
+            request.user.email = email
+            request.user.save()
+            messages.success(request, "Email updated successfully! 🎉")
+            return redirect("/")  # Redirect to home or last visited page
+        messages.error(request, "Please enter a valid email.")
+    
+    return render(request, "middlewares/update_email.html")
