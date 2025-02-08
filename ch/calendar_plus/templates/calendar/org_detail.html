@@ -815,23 +815,27 @@ a {
                             <span class="material-icons text-slack-blue">business</span>
                         </div>
 
-                        <div>
+                        <div class="p-2 bg-white shadow-sm rounded-md border border-gray-200">
                             {% if meeting.meeting_title %}
-                               <p class="text-sm text-slack-gray font-medium mb-1">Meeting</p>
-                               <p class="text-slack-dark font-medium">{{ meeting.meeting_title }}</p>
-                            {% endif %}   
+                                <div class="mb-2">
+                                    <p class="text-xs text-gray-500 font-medium uppercase">Meeting</p>
+                                    <p class="text-sm text-gray-900 font-semibold truncate">{{ meeting.meeting_title }}</p>
+                                </div>
+                            {% endif %}
+                        
+                            {% if meeting.meeting_date %}
+                                <div class="flex items-center justify-between text-xs text-gray-700">
+                                    <div>
+                                        <p class="text-gray-500 font-medium uppercase">Due</p>
+                                        <p class="text-sm font-medium text-gray-900">{{ meeting.meeting_date }}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm font-medium text-gray-900">{{ meeting.start_time }} - {{ meeting.end_time }}</p>
+                                    </div>
+                                </div>
+                            {% endif %}
                         </div>
-                        <br><br><br>
-
-                        <div>
-                            {% if meeting.meeting_date%}
-                               <p class="text-sm text-slack-gray font-medium mb-1">Due</p>
-                               <p class="text-slack-dark font-medium">{{ meeting.meeting_date }}</p>
-                               <p class="text-slack-dark font-medium">{{ meeting.start_time }} | {{meeting.end_time}}</p>
-  
-                            {% endif %}   
-                        </div>
-
+                        
                         <!-- 3-dot menu container -->
                       <div class="dropdown">
                           <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
