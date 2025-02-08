@@ -18,122 +18,109 @@
 <style>
 
 /* Ensure the buttons appear outside sidebar */
-.popup-container {
-    position: absolute;
-    top: 50px; /* Adjust this based on your sidebar position */
-    left: 220px; /* Adjust this based on sidebar width */
-    background: white;
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-    display: none; /* Initially hidden */
-    z-index: 9999; /* Ensures it's above sidebar */
-}
-
-/* Make buttons simple and properly clickable */
-.popup-btn {
-    display: block;
-    width: 100%;
-    background: none;
-    border: none;
-    text-align: left;
-    padding: 8px 12px;
-    font-size: 14px;
-    cursor: pointer;
-    color: #333;
-}
-
-.popup-btn:hover {
-    background: #f1f1f1;
-}
-
-/* Manage Members button styling */
-.manage-btn {
-    text-decoration: none;
-    color: #000;
-    font-size: 14px;
-    padding: 8px;
-    display: inline-block;
-}
-
-
-/* styles.css */
-/* Add this file after Tailwind in your head section */
-
-/* Base Layout */
-body {
-    display: flex;
-    min-height: 100vh;
-    background-color: #f8f9fb;
-}
-
+/* --- Fixed Sidebar Layout --- */
 .sidebar {
-    width: 260px;
-    background-color: #1a1d21;
-    color: #ffffff;
+    width: 250px;
+    background: linear-gradient(to bottom, #e3f2fd, #bbdefb); /* Light Blue */
+    color: #1a1d21;
     padding: 20px;
     position: fixed;
+    top: 0;
+    left: 0;
     height: 100vh;
     overflow-y: auto;
+    transition: all 0.3s ease-in-out;
+    border-right: 1px solid #d6e3f3;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.08);
+    z-index: 1000; /* Keeps sidebar on top */
 }
 
+/* --- Adjusting Main Content to Avoid Overlapping --- */
 .main-content {
-    flex: 1;
-    margin-left: 260px;
+    margin-left: 260px; /* Matches sidebar width */
     padding: 30px;
+    transition: margin-left 0.3s ease-in-out;
 }
 
-/* Sidebar Styling */
-.sidebar-header {
-    display: flex;
-    align-items: center;
-    padding: 12px 0;
-    margin-bottom: 24px;
-    border-bottom: 1px solid #2d2f32;
-}
-
-.sidebar-header img {
-    border-radius: 4px;
-    margin-right: 12px;
-}
-
-.sidebar-header span {
-    font-weight: 700;
-    color: #e2e2e2;
-    font-size: 18px;
-}
-
+/* --- Sidebar Items Styling --- */
 .sidebar a {
     display: flex;
     align-items: center;
-    padding: 10px 14px;
+    padding: 12px;
     margin: 6px 0;
-    border-radius: 4px;
-    color: #d1d2d3;
+    border-radius: 6px;
+    color: #1a1d21;
     text-decoration: none;
-    transition: all 0.2s ease;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
 }
 
 .sidebar a:hover {
-    background-color: #2d2f32;
+    background: #90caf9;
     color: #ffffff;
+    box-shadow: 2px 3px 8px rgba(0, 0, 0, 0.1);
 }
 
-.sidebar a span.material-icons {
-    font-size: 20px;
-    margin-right: 12px;
-    color: #747f8d;
+/* --- Fix Inner Buttons Overlapping --- */
+.sidebar .inner-buttons {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
 }
 
-.sidebar h3 {
-    color: #b9bbbe;
-    font-size: 13px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin: 24px 0 16px;
-    padding-left: 14px;
+.sidebar .inner-buttons button {
+    padding: 10px;
+    border: none;
+    background: none;
+    color: #1565c0;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
 }
+
+.sidebar .inner-buttons button:hover {
+    background: #bbdefb;
+    border-radius: 4px;
+}
+
+/* --- Make Sidebar Responsive --- */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 80px;
+    }
+    
+    .main-content {
+        margin-left: 90px;
+    }
+
+    .sidebar a span {
+        display: none;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* Main Content */
 .profile-header {
