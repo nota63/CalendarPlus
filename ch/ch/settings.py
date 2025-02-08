@@ -40,10 +40,10 @@ SECRET_KEY =os.environ.get('django-insecure-2_5v35*4-ylcnkadmjcbghfoa3^fhq8%kun$
 
 
 
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-DEBUG = True
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
-ALLOWED_HOSTS = []
 
 import os 
 
