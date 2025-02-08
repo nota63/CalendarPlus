@@ -50,13 +50,6 @@
 }
 
 /* Manage Members button styling */
-.manage-btn {
-    text-decoration: none;
-    color: #000;
-    font-size: 14px;
-    padding: 8px;
-    display: inline-block;
-}
 
 
 
@@ -544,84 +537,144 @@ a {
 
         {% if is_admin %}
             <h3 class="font-semibold text-lg text-white mb-6">Admin Controls</h3>
-            <a href="{% url 'view_edit_profile' org_id=organization.id %}">
-                <span class="material-icons">person</span> View/Edit Profile
-            </a>
+
+            <a href="{% url 'view_edit_profile' org_id=organization.id %}"
+                 class="flex items-center space-x-2 text-gray-800 transition duration-300 hover:text-blue-500">
+                 <span class="material-icons text-blue-500">person</span>
+                  <span class="font-medium">View/Edit Profile</span>
+              </a>
+
 
             <!-- NEW FEATURES -->
 
-            <a href="{% url 'organization_availability' organization.id %}">
-                <span class="material-icons">schedule</span> Manage Availability
+            <a href="{% url 'organization_availability' organization.id %}" 
+              class="flex items-center gap-2 text-gray-700 hover:text-indigo-600 
+              font-medium px-3 py-2 rounded-lg transition duration-300">
+              <span class="material-icons text-indigo-500 transition duration-300">schedule</span> 
+              Manage Availability
+           </a>
+
+
+
+           <a href="{% url 'organization_holidays' organization.id %}" 
+             class="flex items-center gap-2 text-gray-700 hover:text-red-600 
+                  font-medium px-3 py-2 rounded-lg transition duration-300">
+              <span class="material-icons text-blue-500 transition duration-300">event</span> 
+              Organization Holidays
             </a>
-            <a href="{% url 'organization_holidays' organization.id %}">
-                <span class="material-icons">event</span> Organization Holidays
+
+        
+            <a href="{% url 'project_list' organization.id %}" 
+                 class="flex items-center gap-2 text-gray-700 hover:text-blue-600 
+                font-medium px-3 py-2 rounded-lg transition duration-300">
+                <span class="material-icons text-blue-500 transition duration-300">assignment</span> 
+               My Projects
             </a>
-            <a href="{% url 'project_list' organization.id %}">
-                <span class="material-icons">assignment</span> My Projects
-            </a>
-          
+
 
            <!-- Manage Workspace Members Button -->
            <a href="{% url 'manage_members' organization.id %}" 
-           id="manageMembersBtn" 
-           class="btn slack-btn d-inline-flex align-items-center gap-2"
-           style="background-color: #4A154B; border: none; border-radius: 4px; padding: 8px 16px;">
-            <span class="material-icons" style="font-size: 18px; color: white;">group</span>
-            <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-                          font-size: 15px; 
-                          font-weight: 500; 
-                          color: white;">
-                Manage {{ organization.name }} Members
-            </span>
-        </a>
+   id="manageMembersBtn" 
+   class="flex items-center gap-2 px-3 py-1.5 bg-blue-700 hover:bg-blue-800 
+          text-white font-medium rounded-md transition duration-300 shadow-sm">
+    <span class="material-icons text-white text-[16px]">group</span>
+    <span class="text-[14px]">
+        Manage {{ organization.name }} Members
+    </span>
+</a>
+
+
           
 
-            <a href="{% url 'organizations_members' organization.id %}">
-                <span class="material-icons">person_add</span> Calendars
-            </a>
+        <a href="{% url 'organizations_members' organization.id %}" 
+               class="flex items-center gap-2 text-gray-700 hover:text-green-600 
+               font-medium px-3 py-2 rounded-lg transition duration-300">
+               <span class="material-icons text-green-500 transition duration-300">calendar_today</span> 
+               Calendars
+        </a>
+     
+     
             <!-- new features  -->
-            <a href="{% url 'user_meetings_calendar' organization.id %}">
-                <span class="material-icons">person_add</span> My Calendar
-            </a>
+            <a href="{% url 'user_meetings_calendar' organization.id %}" 
+                class="flex items-center gap-2 text-gray-700 hover:text-indigo-600 
+               font-medium px-3 py-2 rounded-lg transition duration-300">
+               <span class="material-icons text-indigo-500 transition duration-300">event</span> 
+               My Calendar
+             </a>
 
-            <a href="{% url 'user-events' organization.id %}">
-                <span class="material-icons">edit</span>Events & Bookings
-            </a>
 
-            <a href="{% url 'security' organization.id %}">
-                <span class="material-icons">person_add</span>Security
-            </a>
+             <a href="{% url 'user-events' organization.id %}" 
+             class="flex items-center gap-2 text-gray-700 hover:text-indigo-600 
+                    font-medium px-3 py-2 rounded-lg transition duration-300">
+              <span class="material-icons text-indigo-500 transition duration-300">event_note</span> 
+              Events & Bookings
+          </a>
+          
+          <a href="{% url 'security' organization.id %}" 
+            class="flex items-center gap-2 text-gray-700 hover:text-red-600 
+                 font-medium px-3 py-2 rounded-lg transition duration-300">
+             <span class="material-icons text-red-500 transition duration-300">lock</span> 
+             Security
+         </a>
+       
 
-            <a href="{% url 'managed_workflows' organization.id %}">
-                <span class="material-icons">person_add</span>Managed Workflows
-            </a>
+         <a href="{% url 'managed_workflows' organization.id %}" 
+         class="flex items-center gap-2 text-gray-700 hover:text-indigo-600 
+                font-medium px-3 py-2 rounded-lg transition duration-300">
+          <span class="material-icons text-indigo-500 transition duration-300">sync_alt</span> 
+          Managed Workflows
+        </a>
+      
 
-            <a href="{% url 'contacts_list' organization.id %}">
-                <span class="material-icons">edit</span>Contacts
-            </a>
+        <a href="{% url 'contacts_list' organization.id %}" 
+          class="flex items-center gap-2 text-gray-700 hover:text-green-600 
+               font-medium px-3 py-2 rounded-lg transition duration-300">
+           <span class="material-icons text-green-500 transition duration-300">contacts</span> 
+           Contacts
+       </a>
+     
 
            
 
-            <a href="{% url 'display_groups' organization.id %}">
-                <span class="material-icons">person_add</span>Organization Groups
-            </a>
+       <a href="{% url 'display_groups' organization.id %}" 
+          class="flex items-center gap-2 text-gray-700 hover:text-purple-600 
+              font-medium px-3 py-2 rounded-lg transition duration-300">
+           <span class="material-icons text-purple-500 transition duration-300">groups</span> 
+           Organization Groups
+       </a>
+    
 
-            <a href="{% url 'create_channel' organization.id %}">
-                <span class="material-icons">person_add</span>Channels
-            </a>
+       <a href="{% url 'create_channel' organization.id %}" 
+         class="flex items-center gap-2 text-gray-700 hover:text-blue-600 
+              font-medium px-3 py-2 rounded-lg transition duration-300">
+         <span class="material-icons text-blue-500 transition duration-300">forum</span> 
+         Channels
+      </a>
+    
 
-            <a href="{% url 'channels_list' organization.id %}">
-                <span class="material-icons">person_add</span>Workspace Channels
-            </a>
-
+      <a href="{% url 'channels_list' organization.id %}" 
+      class="flex items-center gap-2 text-gray-700 hover:text-blue-600 
+             font-medium px-3 py-2 rounded-lg transition duration-300">
+       <span class="material-icons text-blue-500 transition duration-300">group_work</span> 
+       Workspace Channels
+    </a>
+   
             {% if connected_apps %}
-               <a href="{% url 'google_calendar_view' %}">
-                  <span class="material-icons">calendar_month</span>Plug-inned Calendar
-               </a>
+            <a href="{% url 'google_calendar_view' %}" 
+                class="flex items-center gap-2 text-gray-700 hover:text-blue-600 
+                   font-medium px-3 py-2 rounded-lg transition duration-300">
+               <span class="material-icons text-blue-500 transition duration-300">calendar_month</span> 
+                Google Calendar
+            </a>
+         
             {% else %}
-               <a href="{% url 'google_calendar_view' %}">
-                  <span class="material-icons">event</span>Connect Apps
-               </a>
+              <a href="{% url 'google_calendar_view' %}" 
+                class="flex items-center gap-2 text-gray-700 hover:text-purple-600 
+                   font-medium px-3 py-2 rounded-lg transition duration-300">
+                <span class="material-icons text-purple-500 transition duration-300">sync</span> 
+               Connect Apps
+              </a>
+         
             {% endif %}   
 
 
