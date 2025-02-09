@@ -15,6 +15,8 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 
 <style>
@@ -1830,6 +1832,11 @@ My Calendar
         Create Meeting via NLP
     </button>
 
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#OverviewMeetingModal">
+        📊 Overview
+    </button>
+    
+
 </div>
 
 
@@ -1960,6 +1967,35 @@ My Calendar
         </div>
     </div>
 </div>
+
+
+<!-- MEETING ANALYTICS AND OVERVIEW -->
+<!-- Meeting Analytics Modal -->
+<div class="modal fade" id="OverviewMeetingModal" tabindex="-1" aria-labelledby="analyticsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">📊 Meeting Overview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Summary Stats -->
+                <div class="text-center mb-3">
+                    <h4>Total Meetings: <span id="totalMeetings">0</span></h4>
+                    <h6>✅ Completed: <span id="completedMeetings">0</span> | ❌ Canceled: <span id="canceledMeetings">0</span> | 📅 Upcoming: <span id="upcomingMeetings">0</span></h6>
+                    <h6>⏳ Avg Duration: <span id="avgDuration">0</span> mins | 👥 Avg Attendees: <span id="avgAttendees">0</span></h6>
+                </div>
+
+                <!-- Charts -->
+                <canvas id="meetingTypeChart" class="mb-3"></canvas>
+                <canvas id="meetingModeChart" class="mb-3"></canvas>
+                <canvas id="peakHoursChart" class="mb-3"></canvas>
+                <canvas id="topHostsChart" class="mb-3"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 
@@ -2178,6 +2214,94 @@ function getCSRFToken() {
     });
 
     return cookieValue;
+}
+
+
+
+// MEETING ANALYTICS 
+
+document.addEventListener("DOMContentLoaded", function () {
+    let analyticsModal = document.getElementById("OverviewMeetingModal");
+    analyticsModal.addEventListener("show.bs.modal", function () {
+        fetch("/organizations/meeting_analytics/{{organization.id}}/")  // Replace with org_id dynamically
+            .then(response => response.json())
+            .then(data => {
+                // Update Summary Stats
+                document.getElementById("totalMeetings").textContent = data.total_meetings;
+                document.getElementById("completedMeetings").textContent = data.completed_meetings;
+                document.getElementById("canceledMeetings").textContent = data.canceled_meetings;
+                document.getElementById("upcomingMeetings").textContent = data.upcoming_meetings;
+                document.getElementById("avgDuration").textContent = data.avg_duration;
+                document.getElementById("avgAttendees").textContent = data.avg_attendees;
+
+                // Render Charts
+                renderMeetingTypeChart(data.meeting_types);
+                renderMeetingModeChart(data.meeting_modes);
+                renderPeakHoursChart(data.peak_hours);
+                renderTopHostsChart(data.top_hosts);
+            })
+            .catch(error => console.error("Error fetching analytics:", error));
+    });
+});
+
+// Meeting Type Chart
+function renderMeetingTypeChart(data) {
+    let ctx = document.getElementById("meetingTypeChart").getContext("2d");
+    let labels = data.map(item => item.meeting_type);
+    let counts = data.map(item => item.count);
+
+    new Chart(ctx, {
+        type: "pie",
+        data: {
+            labels: labels,
+            datasets: [{ data: counts, backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4CAF50"] }],
+        },
+    });
+}
+
+// Meeting Mode Chart
+function renderMeetingModeChart(data) {
+    let ctx = document.getElementById("meetingModeChart").getContext("2d");
+    let labels = data.map(item => item.meeting_location);
+    let counts = data.map(item => item.count);
+
+    new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets: [{ label: "Meeting Modes", data: counts, backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4CAF50"] }],
+        },
+    });
+}
+
+// Peak Meeting Hours Chart
+function renderPeakHoursChart(data) {
+    let ctx = document.getElementById("peakHoursChart").getContext("2d");
+    let labels = data.map(item => item.start_time);
+    let counts = data.map(item => item.count);
+
+    new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [{ label: "Peak Hours", data: counts, borderColor: "#36A2EB", fill: false }],
+        },
+    });
+}
+
+// Top Hosts Chart
+function renderTopHostsChart(data) {
+    let ctx = document.getElementById("topHostsChart").getContext("2d");
+    let labels = data.map(item => item.host__full_name);
+    let counts = data.map(item => item.count);
+
+    new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets: [{ label: "Top Hosts", data: counts, backgroundColor: "#FF6384" }],
+        },
+    });
 }
 
 

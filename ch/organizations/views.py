@@ -7,7 +7,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 import re
-from django.db.models import Count
+from django.db.models import Count, Avg, Sum, F, ExpressionWrapper, DurationField
 from organization_channels.models import Message, Link,Channel,ChannelEvents,ActivityChannel
 from django.contrib.auth import authenticate
 from django.utils.timezone import now, make_aware
@@ -1283,3 +1283,55 @@ def send_meeting_email(meeting):
         html_message=html_message,
         fail_silently=False,
     )
+
+
+
+# MEETING ANALYTICS 
+
+
+def meeting_analytics(request, org_id):
+    today = datetime.today().date()
+
+    # Total Meetings
+    total_meetings = MeetingOrganization.objects.filter(organization_id=org_id).count()
+    completed_meetings = MeetingOrganization.objects.filter(organization_id=org_id, status="completed").count()
+    canceled_meetings = MeetingOrganization.objects.filter(organization_id=org_id, status="canceled").count()
+    upcoming_meetings = MeetingOrganization.objects.filter(organization_id=org_id, meeting_date__gte=today).count()
+
+    # Meeting Types & Modes
+    meeting_types = MeetingOrganization.objects.filter(organization_id=org_id).values("meeting_type").annotate(count=Count("id"))
+    meeting_modes = MeetingOrganization.objects.filter(organization_id=org_id).values("meeting_location").annotate(count=Count("id"))
+
+
+    peak_hours = MeetingOrganization.objects.filter(organization_id=org_id).values("start_time").annotate(count=Count("id")).order_by("-count")[:5]
+
+  
+    avg_duration = MeetingOrganization.objects.filter(organization_id=org_id).annotate(
+        duration=ExpressionWrapper(F("end_time") - F("start_time"), output_field=DurationField())
+    ).aggregate(avg_duration=Avg("duration"))["avg_duration"]
+    avg_duration = avg_duration.total_seconds() / 3600 if avg_duration else 0  # Convert to hours
+
+ 
+    top_hosts = (
+      MeetingOrganization.objects.filter(organization_id=org_id)
+      .annotate(invitee_username=F("invitee__username"))
+      .values("invitee_username")
+      .annotate(count=Count("id"))
+    .order_by("-count")[:5]
+   )
+  
+    avg_attendees = MeetingOrganization.objects.filter(organization_id=org_id).annotate(num_attendees=Count("participants")).aggregate(avg_attendees=Avg("num_attendees"))["avg_attendees"] or 0
+
+    data = {
+        "total_meetings": total_meetings,
+        "completed_meetings": completed_meetings,
+        "canceled_meetings": canceled_meetings,
+        "upcoming_meetings": upcoming_meetings,
+        "meeting_types": list(meeting_types),
+        "meeting_modes": list(meeting_modes),
+        "peak_hours": list(peak_hours),
+        "avg_duration": round(avg_duration, 2),
+        "top_hosts": list(top_hosts),
+        "avg_attendees": round(avg_attendees, 2),
+    }
+    return JsonResponse(data)

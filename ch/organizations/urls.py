@@ -27,7 +27,8 @@ urlpatterns=[
     path('pulse_settings/<int:org_id>/',pulse_settings, name='pulse_settings'),
     path("organization/<int:org_id>/members/", handle_suspend_action, name="handle_suspend_action"),
     path("organization/<int:org_id>/suspend/<int:user_id>/<str:action>/", handle_suspend_action, name="handle_suspend_action"),
-    path('create_meeting_from_nlp/<int:org_id>/',create_meeting_from_nlp, name='create_meeting_from_nlp')
+    path('create_meeting_from_nlp/<int:org_id>/',create_meeting_from_nlp, name='create_meeting_from_nlp'),
+    path('meeting_analytics/<int:org_id>/',meeting_analytics, name='meeting_analytics')
     
 ]
 
