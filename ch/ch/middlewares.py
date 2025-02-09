@@ -31,3 +31,20 @@ class FirstTimeGuideMiddleware:
             return redirect("guide_page")  
 
         return self.get_response(request)
+
+
+
+# guide when user first time visit to org_detail page
+class OrgGuideMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if request.path.startswith("/calendar/org_detail/") and not request.session.get("seen_guide_org"):
+            # Extract org_id from the URL
+            org_id = request.path.split("/")[-2]  # Assuming /org_detail/{org_id}/
+            request.session["org_id"] = org_id  # Store in session
+
+            return redirect(reverse("org_guide"))  # Redirect to guide
+
+        return self.get_response(request)

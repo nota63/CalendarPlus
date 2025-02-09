@@ -50,6 +50,7 @@ urlpatterns = [
     # middlewares
     path('update-email/',views.update_email, name='update_email'),
     path('guide/', views.GuideView.as_view(), name='guide_page'),
+    path('org_guide/',views.OrgGuideView.as_view(), name='org_guide')
 
   
 

@@ -105,6 +105,7 @@ MIDDLEWARE = [
     'meet.middlewares.AdminOnlyMiddleware',
     'ch.middlewares.CheckEmailMiddleware',
     'ch.middlewares.FirstTimeGuideMiddleware',
+    'ch.middlewares.OrgGuideMiddleware',
 
 ]
 
