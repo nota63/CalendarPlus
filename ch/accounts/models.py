@@ -293,24 +293,24 @@ class MeetingOrganization(models.Model):
     user = models.ForeignKey(User, related_name="user_meetingss", on_delete=models.CASCADE, null=True, blank=True)  # The user whose calendar is being viewed
     invitee = models.ForeignKey(User, related_name="created_meetingss", on_delete=models.CASCADE,null=True, blank=True)  # The invitee (the person creating the meeting)
     
-    meeting_title = models.CharField(max_length=255)
+    meeting_title = models.CharField(max_length=255,null=True, blank=True)
     meeting_description = models.TextField(blank=True, null=True)
     
     # Scheduling fields
-    meeting_date = models.DateField()
-    start_time = models.TimeField()
-    end_time = models.TimeField()
+    meeting_date = models.DateField(null=True, blank=True)
+    start_time = models.TimeField(null=True, blank=True)
+    end_time = models.TimeField(null=True, blank=True)
 
     # New fields
     meeting_link = models.URLField(blank=True, null=True) 
-    meeting_location = models.CharField(max_length=255, choices=[('zoom', 'Zoom'), ('google_meet', 'Google Meet'), ('zoho', 'Zoho'), ('in_person', 'In-person')], default='in_person')
-    meeting_type = models.CharField(max_length=255, choices=[('standup', 'Standup'), ('task', 'Task'), ('project_discussion', 'Project Discussion'), ('other', 'Other')], default='other')
+    meeting_location = models.CharField(max_length=255, choices=[('zoom', 'Zoom'), ('google_meet', 'Google Meet'), ('zoho', 'Zoho'), ('in_person', 'In-person')], default='in_person',null=True, blank=True)
+    meeting_type = models.CharField(max_length=255, choices=[('standup', 'Standup'), ('task', 'Task'), ('project_discussion', 'Project Discussion'), ('other', 'Other')], default='other', null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
 
-    status = models.CharField(max_length=50, choices=[('scheduled', 'Scheduled'), ('completed', 'Completed'), ('canceled', 'Canceled')], default='scheduled')
+    status = models.CharField(max_length=50, choices=[('scheduled', 'Scheduled'), ('completed', 'Completed'), ('canceled', 'Canceled')], default='scheduled',null=True, blank=True)
     is_notification_sent = models.BooleanField(default=False) 
 
     participants= models.ManyToManyField(User, related_name='participants_meetings', null=True, blank=True)
@@ -319,7 +319,9 @@ class MeetingOrganization(models.Model):
         return f"Meeting: {self.meeting_title} on {self.meeting_date} from {self.start_time} to {self.end_time}"
 
     class Meta:
-        unique_together = ('organization', 'meeting_date', 'start_time', 'user')  # Ensures no double-booking for the same user
+        unique_together = ('organization', 'meeting_date', 'start_time', 'user')  
+
+
 
 
 # Meeting Reminder

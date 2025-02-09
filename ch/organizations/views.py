@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from accounts.models import(Organization, Profile, EmailInvitation, Suspend)
+from accounts.models import(Organization, Profile, EmailInvitation, Suspend,MeetingOrganization)
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
@@ -9,7 +9,6 @@ from django.core.files.base import ContentFile
 import re
 from django.db.models import Count
 from organization_channels.models import Message, Link,Channel,ChannelEvents,ActivityChannel
-from accounts.models import MeetingOrganization
 from django.contrib.auth import authenticate
 from django.utils.timezone import now, make_aware
 from django.utils.dateparse import parse_datetime
@@ -1077,3 +1076,107 @@ def handle_suspend_action(request, org_id, user_id=None, action=None):
         return JsonResponse({"status": "error", "message": "Invalid action."}, status=400)
 
     return JsonResponse({"status": "error", "message": "Invalid request."}, status=400)
+
+
+# MEETING CREATION VIA NLP (NATURAL LANGUAGE PROCESSING)
+import dateparser  
+
+
+@csrf_exempt
+def create_meeting_from_nlp(request, org_id):
+    """
+    Handles meeting creation from natural language input.
+    Example Input: "Schedule a meeting with John tomorrow at 3 PM"
+    """
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request method"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        user_id = data.get("user_id")  # The user scheduling the meeting
+        input_text = data.get("input_text")  # Natural language meeting details
+
+        if not user_id or not input_text:
+            return JsonResponse({"error": "Missing required fields"}, status=400)
+
+        # Validate Organization
+        organization = get_object_or_404(Organization, id=org_id)
+
+        # Validate User (Requester)
+        user = get_object_or_404(User, id=user_id)
+        user_profile = Profile.objects.filter(user=user, organization=organization).first()
+        if not user_profile:
+            return JsonResponse({"error": "You are not part of this organization"}, status=403)
+
+        # Extract meeting details using NLP
+        parsed_date = dateparser.parse(input_text)
+        if not parsed_date:
+            return JsonResponse({"error": "Could not understand date/time"}, status=400)
+
+        meeting_date = parsed_date.date()
+        start_time = parsed_date.time()
+        end_time = None  
+
+        # Extract Invitee and check if they belong to the same organization
+        invitee_username = extract_invitee_from_text(input_text)
+        invitee = None
+        if invitee_username:
+            invitee = User.objects.filter(username=invitee_username).first()
+            invitee_profile = Profile.objects.filter(user=invitee, organization=organization).first()
+
+            if not invitee or not invitee_profile:
+                return JsonResponse({"error": f"{invitee_username} is not in this organization"}, status=400)
+
+        # Check for scheduling conflicts
+        if invitee:
+            conflict = MeetingOrganization.objects.filter(
+                organization=organization,
+                meeting_date=meeting_date,
+                start_time=start_time,
+                participants=invitee
+            ).exists()
+
+            if conflict:
+                return JsonResponse({"error": f"{invitee_username} is already booked at this time"}, status=400)
+
+        # Create Meeting
+        meeting = MeetingOrganization.objects.create(
+            organization=organization,
+            user=user,
+            invitee=invitee,
+            meeting_title=f"Meeting with {invitee_username}" if invitee else "New Meeting",
+            meeting_date=meeting_date,
+            start_time=start_time,
+            end_time=end_time,
+            status="scheduled",
+        )
+        if invitee:
+            meeting.participants.add(invitee)  
+
+        return JsonResponse({
+            "message": "Meeting created successfully",
+            "meeting_id": meeting.id,
+            "meeting_date": meeting_date.strftime("%Y-%m-%d"),
+            "start_time": start_time.strftime("%H:%M:%S"),
+            "invitee": invitee_username if invitee else None
+        })
+
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON data"}, status=400)
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+# 📌 Helper Function to Extract Invitee Name
+def extract_invitee_from_text(text):
+    """
+    Extracts the invitee name from the given text.
+    Example: "Schedule a meeting with John tomorrow at 3 PM" → returns "John"
+    """
+    words = text.lower().split()
+    if "with" in words:
+        index = words.index("with") + 1
+        if index < len(words):
+            return words[index].capitalize()  
+    return None

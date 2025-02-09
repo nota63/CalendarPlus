@@ -10,7 +10,7 @@ class CheckEmailMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.user.is_authenticated:  # ✅ Only check for logged-in users
+        if request.user.is_authenticated: 
             if not request.user.email and request.path not in [reverse('update_email'), reverse('logout')]:
                 return redirect(reverse('update_email'))
                 
@@ -40,7 +40,7 @@ class OrgGuideMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.path.startswith("/calendar/org_detail/") and not request.session.get("seen_guide_org"):
+        if request.path.startswith("/calendar/org_detail/") and not request.session.get("seen_guide"):
             # Extract org_id from the URL
             org_id = request.path.split("/")[-2]  
             request.session["org_id"] = org_id 

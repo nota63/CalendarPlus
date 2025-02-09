@@ -82,11 +82,11 @@ class OrgGuideView(View):
         return render(request, self.template_name)
 
     def post(self, request):
-        request.session["seen_guide_org"] = True  # Mark guide as seen
+        request.session["seen_guide"] = True  # Mark guide as seen
         org_id = request.session.get("org_id")  # Retrieve stored org_id
 
         if org_id:
             del request.session["org_id"]  # Remove it from session after use
-            return redirect("org_detail", org_id=org_id)  # Redirect to org_detail/<org_id>/
+            return redirect("org_detail", org_id=org_id)  
 
         return redirect("organization_list")  # Fallback if org_id is missing

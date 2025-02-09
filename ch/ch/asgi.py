@@ -16,7 +16,7 @@ import chat.routing
 import calendar_plus.routing
 import organization_channels.routing
 import direct_message.routing
-
+import solo_communication.routing
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ch.settings')
 
 
@@ -31,7 +31,8 @@ application = ProtocolTypeRouter({
         chat.routing.ws_urlpatterns + 
         calendar_plus.routing.websocket_urlpatterns +
           organization_channels.routing.websocket_urlpatterns+
-          direct_message.routing.websocket_urlpatterns
+          direct_message.routing.websocket_urlpatterns+
+          solo_communication.routing.websocket_urlpatterns
     ))
 })
 
