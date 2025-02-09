@@ -904,7 +904,7 @@ class DuplicateWorkspaceView(View):
                           created_by=user_mapping.get(group.created_by, request.user).user  
                      )
         
-        # Duplicate group members (inside the loop)
+                   # Duplicate group members (inside the loop)
                     group_members = GroupMember.objects.filter(group=group)
                     for member in group_members:
                         if member.user in user_mapping:
@@ -1024,10 +1024,16 @@ def pulse_settings(request, org_id):
 
 
 # FETCH MEMBERS FIRST 
+@login_required
 def handle_suspend_action(request, org_id, user_id=None, action=None):
     organization = get_object_or_404(Organization, id=org_id)
 
-    # 🔥 Fetching all members along with their suspend status
+    admin_profile = Profile.objects.filter(user=request.user, organization_id=org_id, is_admin=True).first()
+    if not admin_profile:
+        return JsonResponse({'error': 'Only admins can perform this action!'}, status=403)
+
+
+   
     if request.method == "GET":
         members = Profile.objects.filter(organization=organization).select_related("user")
         suspended_users = Suspend.objects.filter(organization=organization, is_suspended=True).values_list("user_id", flat=True)
@@ -1037,7 +1043,7 @@ def handle_suspend_action(request, org_id, user_id=None, action=None):
                 "id": member.user.id,
                 "name": member.user.username,
                 "role": "Admin" if member.is_admin else "Manager" if member.is_manager else "Employee",
-                "is_suspended": member.user.id in suspended_users  # Checking suspension status
+                "is_suspended": member.user.id in suspended_users  
             }
             for member in members
         ]
@@ -1047,7 +1053,7 @@ def handle_suspend_action(request, org_id, user_id=None, action=None):
     # 🔥 Handling Ban/Unban Actions
     if request.method == "POST" and user_id and action:
         user = get_object_or_404(User, id=user_id)
-        admin = request.user  # Admin performing the action
+        admin = request.user  
 
         if action == "ban":
             reason = request.POST.get("reason", "No reason provided")
