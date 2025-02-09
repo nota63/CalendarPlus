@@ -1953,8 +1953,8 @@ My Calendar
         Create Meeting via NLP
     </button>
 
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#OverviewMeetingModal">
-        📊 Overview
+    <button class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2 " data-bs-toggle="modal" data-bs-target="#OverviewMeetingModal">
+         Overview
     </button>
     
 
@@ -2099,6 +2099,14 @@ My Calendar
                 <h5 class="modal-title">📊 Meeting Overview</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
+           <p style="font-family: 'Inter', sans-serif; font-size: 16px; color: #6c757d; font-weight: 500; line-height: 1.6;">
+            Gain insights into your meeting interactions within  
+           <strong style="color: #22c55e;">{{ organization.name }}</strong>.  
+            Track your productivity and performance with this detailed overview.
+          </p>
+
+            
             <div class="modal-body">
                 <!-- Summary Stats -->
                 <div class="summary-stats">

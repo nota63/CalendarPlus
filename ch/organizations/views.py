@@ -29,6 +29,9 @@ from group_tasks.models import Task, AddDay
 from django.template.loader import render_to_string
 import dateparser  
 from django.utils.html import strip_tags
+from accounts.models import ProjectEmployeeAssignment, Project, ProjectManagerAssignment
+from groups.models import Group, GroupMember
+import logging
 
 
 
@@ -753,9 +756,6 @@ def hide_organization(request, org_id):
 
 
 # Handle workspace duplication
-from accounts.models import ProjectEmployeeAssignment, Project, ProjectManagerAssignment
-from groups.models import Group, GroupMember
-import logging
 
 
 logger = logging.getLogger(__name__)
@@ -929,10 +929,16 @@ class DuplicateWorkspaceView(View):
 
 from accounts.models import EventOrganization
 from django.contrib.auth.models import User
+
 def get_last_two_activities(org_id):
     """Fetch last two activities of all unique members in an organization."""
     
     users = User.objects.filter(profiles__organization=org_id).distinct()
+    organization = get_object_or_404(Organization, id=org_id)
+    
+
+
+
     activity_data = {}
 
     for user in users:
@@ -972,6 +978,12 @@ def organization_pulse_view(request, org_id):
     """View to render the pulse page showing member activities."""
     organization=get_object_or_404(Organization, id=org_id)
     
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+
+    
   
     if not Profile.objects.filter(organization=organization).exists():
         return render(request, "pulse.html", {"error": "No members found in this organization."})
@@ -992,6 +1004,12 @@ def organization_pulse_view(request, org_id):
 # PULSE SETTINGS 
 def pulse_settings(request, org_id):
     organization=get_object_or_404(Organization, id=org_id)
+    
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+
     development = [
         {"title": "Custom Fields", "description": "Enhance your workspace by adding custom fields..."},
         {"title": "Dependency Warning", "description": "Get alerts when task dependencies are not met..."},
@@ -1099,6 +1117,13 @@ def create_meeting_from_nlp(request, org_id):
 
         # Validate Organization
         organization = get_object_or_404(Organization, id=org_id)
+
+        
+        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+        if not user_profile:
+           return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+
 
         # Validate User (Requester)
         user = request.user
@@ -1291,6 +1316,13 @@ def send_meeting_email(meeting):
 
 def meeting_analytics(request, org_id):
     today = datetime.today().date()
+    organization = get_object_or_404(Organization, id=org_id)
+    
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+
 
     # Total Meetings
     total_meetings = MeetingOrganization.objects.filter(organization_id=org_id).count()
