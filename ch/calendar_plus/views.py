@@ -466,15 +466,16 @@ class OrgDetailView(LoginRequiredMixin, View):
         ).annotate(
         booking_count=Count('bookings')
            ).order_by('-created_at')[:2]
+        
+        # Fetch members 
 
+        members = Profile.objects.filter(organization=organization)
         
 
 
-
-
-
-
         
+
+    
 
 
         now = timezone.now()
@@ -526,6 +527,7 @@ class OrgDetailView(LoginRequiredMixin, View):
             'project':project,
             'recent_meetings':recent_meetings,
             'recent_events':recent_events,
+            'members':members,
         }
 
         return render(request, self.template_name, context)

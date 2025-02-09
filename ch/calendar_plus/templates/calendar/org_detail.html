@@ -1249,6 +1249,71 @@ My Calendar
     </div>
 </div>
 
+<!-- Workspace members -->
+<!-- SECOND CONTAINER (ORGANIZATION MEMBERS)-->
+<div class="max-w-3xl flex-grow-1 mx-2 px-4 sm:px-6 lg:px-8 py-4" style="max-width: 48%;">
+    <div class="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+        <div class="bg-slack-purple px-6 py-4">
+            <div class="flex items-center">
+                {% if members %}
+                    <span class="text-2xl text-white mr-3">👥</span>
+                    <h2 class="text-xl font-semibold text-white">Organization Members</h2>
+                {% else %}
+                    <h2 class="text-xl font-semibold text-white">Members will appear here</h2>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Scrollable List -->
+        <div class="px-6 py-2 space-y-3 overflow-y-auto" style="max-height: 400px;">
+            {% for member in members %}
+                <div class="flex items-center p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                    <!-- Profile Picture or Default Icon -->
+                    <div class="w-8 h-8 bg-slack-blue-bg rounded-full flex items-center justify-center mr-3">
+                        {% if member.profile_picture %}
+                            <img src="{{ member.profile_picture.url }}" alt="Profile Picture" class="w-8 h-8 rounded-full">
+                        {% else %}
+                            <span class="material-icons text-slack-blue text-sm">person</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Member Details (Truncated Name with Tooltip) -->
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-gray-900 truncate" title="{{ member.full_name }}">
+                            {{ member.full_name }}
+                        </p>
+                        <p class="text-xs text-gray-500">
+                            {% if member.is_admin %}
+                                <span class="text-red-600">Admin</span>
+                            {% elif member.is_manager %}
+                                <span class="text-yellow-600">Manager</span>
+                            {% else %}
+                                <span class="text-green-600">Employee</span>
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <!-- 3-dot menu container -->
+                    <div class="dropdown">
+                        <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v"></i> <!-- FontAwesome 3 dots -->
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#">View Profile</a></li>
+                            <li><a class="dropdown-item text-danger" href="#">Remove</a></li>
+                        </ul>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+
+       
+
+
 
 
 
@@ -1322,8 +1387,17 @@ My Calendar
             </div>
         </div>
         {% endfor %}
-
     </div>
+
+<!-- workspace members  -->
+
+
+
+
+
+     
+
+   
 </div>
 </div>
 </div>
