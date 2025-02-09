@@ -58,6 +58,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Application definition
 
 INSTALLED_APPS = [
+    'alert',
     'outh',
     'direct_message',
     'profiles',

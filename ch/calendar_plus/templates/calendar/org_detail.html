@@ -1489,6 +1489,78 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+
+// DRAG AND DROP CONTAINERS
+document.addEventListener("DOMContentLoaded", function () {
+    let draggedElement = null;
+    let originalPosition = {};
+
+    document.querySelectorAll(".max-w-3xl").forEach(container => {
+        container.style.position = "relative"; // Ensure it can be moved
+        container.style.cursor = "grab"; // Show grab cursor
+
+        container.addEventListener("mousedown", function (e) {
+            draggedElement = this;
+            originalPosition = { left: this.offsetLeft, top: this.offsetTop };
+            let shiftX = e.clientX - draggedElement.getBoundingClientRect().left;
+            let shiftY = e.clientY - draggedElement.getBoundingClientRect().top;
+
+            function moveAt(pageX, pageY) {
+                draggedElement.style.position = "absolute";
+                draggedElement.style.zIndex = 1000; // Bring to front
+                draggedElement.style.left = pageX - shiftX + "px";
+                draggedElement.style.top = pageY - shiftY + "px";
+            }
+
+            function onMouseMove(event) {
+                moveAt(event.pageX, event.pageY);
+            }
+
+            document.addEventListener("mousemove", onMouseMove);
+
+            container.addEventListener("mouseup", function () {
+                document.removeEventListener("mousemove", onMouseMove);
+                draggedElement.style.cursor = "grab";
+
+                // Show undo message
+                showUndoMessage(draggedElement, originalPosition);
+                draggedElement = null;
+            }, { once: true });
+        });
+
+        container.ondragstart = function () {
+            return false; // Prevents browser drag behavior
+        };
+    });
+
+    function showUndoMessage(element, originalPos) {
+        let undoMessage = document.createElement("div");
+        undoMessage.textContent = "Layout changed - Undo";
+        undoMessage.style.position = "fixed";
+        undoMessage.style.bottom = "20px";
+        undoMessage.style.right = "20px";
+        undoMessage.style.backgroundColor = "#333";
+        undoMessage.style.color = "#fff";
+        undoMessage.style.padding = "10px 20px";
+        undoMessage.style.borderRadius = "5px";
+        undoMessage.style.cursor = "pointer";
+        undoMessage.style.zIndex = "2000";
+        document.body.appendChild(undoMessage);
+
+        undoMessage.addEventListener("click", function () {
+            element.style.left = originalPos.left + "px";
+            element.style.top = originalPos.top + "px";
+            document.body.removeChild(undoMessage);
+        });
+
+        setTimeout(() => {
+            if (undoMessage.parentElement) {
+                document.body.removeChild(undoMessage);
+            }
+        }, 5000); // Auto-hide after 5 seconds
+    }
+});
+
 </script>
 
 
