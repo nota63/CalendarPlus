@@ -1335,3 +1335,5 @@ def meeting_analytics(request, org_id):
         "avg_attendees": round(avg_attendees, 2),
     }
     return JsonResponse(data)
+
+

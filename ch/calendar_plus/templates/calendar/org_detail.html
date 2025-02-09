@@ -20,6 +20,127 @@
 </head>
 
 <style>
+/* Modal Overrides */
+#OverviewMeetingModal .modal-content {
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    border: none;
+}
+
+#OverviewMeetingModal .modal-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1.5rem;
+}
+
+#OverviewMeetingModal .modal-title {
+    font-weight: 700;
+    color: #2d3436;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#OverviewMeetingModal .modal-body {
+    padding: 1.5rem;
+    background: #fff;
+}
+
+/* Summary Stats */
+.summary-stats {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #f1f3f5;
+}
+
+.summary-stats h4 {
+    color: #2d3436;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.summary-stats h6 {
+    color: #6c757d;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.75rem;
+    background: rgba(108,117,125,0.08);
+    border-radius: 6px;
+}
+
+/* Chart Containers */
+.chart-container {
+    position: relative;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #f1f3f5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.chart-container canvas {
+    max-height: 400px;
+    min-height: 250px;
+}
+
+/* Chart Titles */
+.chart-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Custom Chart.js Styles */
+.chartjs-tooltip {
+    background: rgba(45,52,54,0.95) !important;
+    border-radius: 4px !important;
+    padding: 0.5rem 1rem !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+}
+
+.chartjs-tooltip-key {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    margin-right: 0.5rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .summary-stats h6 {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .chart-container {
+        padding: 1rem;
+    }
+}
+
+
+
+
 /* Custom Modal Styling */
 #meetingModal .modal-dialog {
     max-width: 600px;
@@ -1970,7 +2091,7 @@ My Calendar
 
 
 <!-- MEETING ANALYTICS AND OVERVIEW -->
-<!-- Meeting Analytics Modal -->
+<!-- Updated Modal Structure -->
 <div class="modal fade" id="OverviewMeetingModal" tabindex="-1" aria-labelledby="analyticsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -1980,24 +2101,60 @@ My Calendar
             </div>
             <div class="modal-body">
                 <!-- Summary Stats -->
-                <div class="text-center mb-3">
-                    <h4>Total Meetings: <span id="totalMeetings">0</span></h4>
-                    <h6>✅ Completed: <span id="completedMeetings">0</span> | ❌ Canceled: <span id="canceledMeetings">0</span> | 📅 Upcoming: <span id="upcomingMeetings">0</span></h6>
-                    <h6>⏳ Avg Duration: <span id="avgDuration">0</span> mins | 👥 Avg Attendees: <span id="avgAttendees">0</span></h6>
+                <div class="summary-stats">
+                    <h4>Meeting Statistics</h4>
+                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                        <div class="stat-item">
+                            <span>Total:</span>
+                            <strong id="totalMeetings">0</strong>
+                        </div>
+                        <div class="stat-item">
+                            <span>✅ Completed:</span>
+                            <strong id="completedMeetings">0</strong>
+                        </div>
+                        <div class="stat-item">
+                            <span>❌ Canceled:</span>
+                            <strong id="canceledMeetings">0</strong>
+                        </div>
+                        <div class="stat-item">
+                            <span>📅 Upcoming:</span>
+                            <strong id="upcomingMeetings">0</strong>
+                        </div>
+                        <div class="stat-item">
+                            <span>⏳ Avg Duration:</span>
+                            <strong id="avgDuration">0</strong>m
+                        </div>
+                        <div class="stat-item">
+                            <span>👥 Avg Attendees:</span>
+                            <strong id="avgAttendees">0</strong>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Charts -->
-                <canvas id="meetingTypeChart" class="mb-3"></canvas>
-                <canvas id="meetingModeChart" class="mb-3"></canvas>
-                <canvas id="peakHoursChart" class="mb-3"></canvas>
-                <canvas id="topHostsChart" class="mb-3"></canvas>
+                <div class="chart-container">
+                    <div class="chart-title">Meeting Types Distribution</div>
+                    <canvas id="meetingTypeChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Meeting Modes</div>
+                    <canvas id="meetingModeChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Peak Meeting Hours</div>
+                    <canvas id="peakHoursChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Top Hosts</div>
+                    <canvas id="topHostsChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-
-
 
 
 
@@ -2218,12 +2375,46 @@ function getCSRFToken() {
 
 
 
+
+
 // MEETING ANALYTICS 
 
 document.addEventListener("DOMContentLoaded", function () {
-    let analyticsModal = document.getElementById("OverviewMeetingModal");
+    const chartDefaults = {
+        maintainAspectRatio: false,
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: {
+                    color: '#6c757d',
+                    font: { size: 13 }
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(45,52,54,0.95)',
+                titleFont: { size: 14 },
+                bodyFont: { size: 13 },
+                padding: 12,
+                displayColors: true
+            }
+        },
+        scales: {
+            x: {
+                grid: { color: 'rgba(0,0,0,0.05)' },
+                ticks: { color: '#6c757d' }
+            },
+            y: {
+                grid: { color: 'rgba(0,0,0,0.05)' },
+                ticks: { color: '#6c757d' }
+            }
+        }
+    };
+
+    const analyticsModal = document.getElementById("OverviewMeetingModal");
+    
     analyticsModal.addEventListener("show.bs.modal", function () {
-        fetch("/organizations/meeting_analytics/{{organization.id}}/")  // Replace with org_id dynamically
+        fetch(`/organizations/meeting_analytics/{{organization.id}}/`)
             .then(response => response.json())
             .then(data => {
                 // Update Summary Stats
@@ -2240,70 +2431,149 @@ document.addEventListener("DOMContentLoaded", function () {
                 renderPeakHoursChart(data.peak_hours);
                 renderTopHostsChart(data.top_hosts);
             })
-            .catch(error => console.error("Error fetching analytics:", error));
+            .catch(error => {
+                console.error("Error fetching analytics:", error);
+                // Add error handling UI here
+            });
     });
+
+    // Meeting Type Chart (Doughnut)
+    function renderMeetingTypeChart(data) {
+        const ctx = document.getElementById("meetingTypeChart").getContext('2d');
+        new Chart(ctx, {
+            ...chartDefaults,
+            type: 'doughnut',
+            data: {
+                labels: data.map(item => item.meeting_type),
+                datasets: [{
+                    data: data.map(item => item.count),
+                    backgroundColor: [
+                        'rgba(99, 102, 241, 0.8)',
+                        'rgba(14, 165, 233, 0.8)',
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(16, 185, 129, 0.8)'
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                ...chartDefaults.options,
+                cutout: '70%',
+                plugins: {
+                    ...chartDefaults.plugins,
+                    legend: { position: 'right' }
+                }
+            }
+        });
+    }
+
+    // Meeting Mode Chart (Horizontal Bar)
+    function renderMeetingModeChart(data) {
+        const ctx = document.getElementById("meetingModeChart").getContext('2d');
+        new Chart(ctx, {
+            ...chartDefaults,
+            type: 'bar',
+            data: {
+                labels: data.map(item => item.meeting_location),
+                datasets: [{
+                    label: 'Meeting Modes',
+                    data: data.map(item => item.count),
+                    backgroundColor: createGradient(ctx, ['#6366f1', '#3b82f6']),
+                    borderRadius: 6,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                ...chartDefaults.options,
+                indexAxis: 'y',
+                plugins: {
+                    ...chartDefaults.plugins,
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+
+    // Peak Hours Chart (Line with Gradient)
+    function renderPeakHoursChart(data) {
+        const ctx = document.getElementById("peakHoursChart").getContext('2d');
+        new Chart(ctx, {
+            ...chartDefaults,
+            type: 'line',
+            data: {
+                labels: data.map(item => item.start_time),
+                datasets: [{
+                    label: 'Peak Hours',
+                    data: data.map(item => item.count),
+                    borderColor: '#3b82f6',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: {
+                        target: 'origin',
+                        above: createGradient(ctx, ['#3b82f620', '#3b82f601'], 'vertical')
+                    },
+                    pointBackgroundColor: '#fff',
+                    pointBorderWidth: 2
+                }]
+            }
+        });
+    }
+
+    // Top Hosts Chart (Bar with Gradient)
+    function renderTopHostsChart(data) {
+    const ctx = document.getElementById("topHostsChart").getContext("2d");
+
+    new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: data.map(item => item.invitee_username), // Corrected label source
+            datasets: [{
+                label: "Meetings Hosted",
+                data: data.map(item => item.count), // Matches backend count
+                backgroundColor: createGradient(ctx, ["#6366f1", "#8b5cf6"]), // Gradient function
+                borderRadius: 6,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            return `Meetings: ${tooltipItem.raw}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { display: false }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+}
+
+    // Gradient Helper Function
+    function createGradient(ctx, colors, direction = 'horizontal') {
+        const gradient = direction === 'horizontal' 
+            ? ctx.createLinearGradient(0, 0, ctx.canvas.width, 0)
+            : ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
+
+        colors.forEach((color, index) => {
+            gradient.addColorStop(index / (colors.length - 1), color);
+        });
+        return gradient;
+    }
 });
-
-// Meeting Type Chart
-function renderMeetingTypeChart(data) {
-    let ctx = document.getElementById("meetingTypeChart").getContext("2d");
-    let labels = data.map(item => item.meeting_type);
-    let counts = data.map(item => item.count);
-
-    new Chart(ctx, {
-        type: "pie",
-        data: {
-            labels: labels,
-            datasets: [{ data: counts, backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4CAF50"] }],
-        },
-    });
-}
-
-// Meeting Mode Chart
-function renderMeetingModeChart(data) {
-    let ctx = document.getElementById("meetingModeChart").getContext("2d");
-    let labels = data.map(item => item.meeting_location);
-    let counts = data.map(item => item.count);
-
-    new Chart(ctx, {
-        type: "bar",
-        data: {
-            labels: labels,
-            datasets: [{ label: "Meeting Modes", data: counts, backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4CAF50"] }],
-        },
-    });
-}
-
-// Peak Meeting Hours Chart
-function renderPeakHoursChart(data) {
-    let ctx = document.getElementById("peakHoursChart").getContext("2d");
-    let labels = data.map(item => item.start_time);
-    let counts = data.map(item => item.count);
-
-    new Chart(ctx, {
-        type: "line",
-        data: {
-            labels: labels,
-            datasets: [{ label: "Peak Hours", data: counts, borderColor: "#36A2EB", fill: false }],
-        },
-    });
-}
-
-// Top Hosts Chart
-function renderTopHostsChart(data) {
-    let ctx = document.getElementById("topHostsChart").getContext("2d");
-    let labels = data.map(item => item.host__full_name);
-    let counts = data.map(item => item.count);
-
-    new Chart(ctx, {
-        type: "bar",
-        data: {
-            labels: labels,
-            datasets: [{ label: "Top Hosts", data: counts, backgroundColor: "#FF6384" }],
-        },
-    });
-}
-
 
 
 
