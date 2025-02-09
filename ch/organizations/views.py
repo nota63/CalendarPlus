@@ -1112,9 +1112,8 @@ def create_meeting_from_nlp(request, org_id):
 
         meeting_date = meeting_datetime.date()
         start_time = meeting_datetime.time()
-        end_time = (datetime.combine(meeting_date, start_time) + timedelta(hours=1)).time()  # Default 1-hour duration
+        end_time = (datetime.combine(meeting_date, start_time) + timedelta(hours=1)).time()  
 
-        # Extract Invitee and validate organization
         # Extract Invitee and check if they belong to the same organization
         invitee_username = extract_invitee_from_text(input_text)
 

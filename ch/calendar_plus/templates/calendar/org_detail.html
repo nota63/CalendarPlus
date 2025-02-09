@@ -18,6 +18,157 @@
 </head>
 
 <style>
+/* Custom Modal Styling */
+#meetingModal .modal-dialog {
+    max-width: 600px;
+    margin: 1.75rem auto;
+}
+
+#meetingModal .modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    background: #f8f9fa;
+}
+
+/* Header Styling */
+#meetingModal .modal-header {
+    border-bottom: 1px solid #e3e8ee;
+    padding: 1.5rem;
+    background: #fff;
+    border-radius: 12px 12px 0 0;
+}
+
+#meetingModal .modal-title {
+    font-weight: 600;
+    color: #1a1a1a;
+    font-size: 1.25rem;
+}
+
+#meetingModal .btn-close {
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+#meetingModal .btn-close:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+}
+
+/* Body Styling */
+#meetingModal .modal-body {
+    padding: 1.5rem;
+    background: #fff;
+}
+
+#meetingModal .guide-text {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+#meetingModal ul {
+    background: #f3f4f6;
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    margin: 0.5rem 0;
+}
+
+#meetingModal ul li {
+    color: #4b5563;
+    font-size: 0.9rem;
+    padding: 0.25rem 0;
+    list-style-type: none;
+    position: relative;
+    padding-left: 1.25rem;
+}
+
+#meetingModal ul li:before {
+    content: "•";
+    color: #3b82f6;
+    position: absolute;
+    left: 0;
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+/* Input Styling */
+#meetingModal label {
+    color: #374151;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    display: block;
+    font-size: 0.95rem;
+}
+
+#nlpInput {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background: #fff;
+}
+
+#nlpInput:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: none;
+}
+
+/* Error Message Styling */
+#errorMessage {
+    font-size: 0.875rem;
+    padding: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #dc2626 !important;
+}
+
+#errorMessage:before {
+    content: "⚠️";
+    font-size: 0.875rem;
+}
+
+/* Footer Styling */
+#meetingModal .modal-footer {
+    border-top: 1px solid #e3e8ee;
+    padding: 1.25rem 1.5rem;
+    background: #f8f9fa;
+    border-radius: 0 0 12px 12px;
+}
+
+#meetingModal .btn {
+    padding: 0.625rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+#meetingModal .btn-primary {
+    background: #3b82f6;
+    border-color: #3b82f6;
+}
+
+#meetingModal .btn-primary:hover {
+    background: #2563eb;
+    border-color: #2563eb;
+    transform: translateY(-1px);
+}
+
+#meetingModal .btn-secondary {
+    background: #fff;
+    border-color: #e5e7eb;
+    color: #374151;
+}
+
+#meetingModal .btn-secondary:hover {
+    background: #f3f4f6;
+    border-color: #e5e7eb;
+}
+
 
 #suspendUsersModal {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, sans-serif;
@@ -1751,6 +1902,8 @@ My Calendar
                 <ul>
                     <li>Meeting with John tomorrow at 3 PM</li>
                     <li>Schedule a meeting with Sarah next Monday at 10 AM</li>
+                    <li>Natural Language processing meetings will be having 1 hour of duration</li>
+                    <li>We will check the available slot | Workspace availability before scheduling</li>
                 </ul>
 
                 <!-- Input Field -->
