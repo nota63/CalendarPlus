@@ -77,14 +77,6 @@ class Profile(models.Model):
      super().save(*args, **kwargs)
 
 
-
-
-
-
-
-
-
-
 # project model 
 class Project(models.Model):
     name = models.CharField(max_length=255)  # Project name
@@ -600,7 +592,36 @@ class BookingOrganization(models.Model):
         self.save()
 
 
-    
+# BAN USERS FROM WORKSPACE
+
+class Suspend(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="suspended_organizations")
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="suspended_users")
+    suspended_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="suspended_users_admin")
+    reason = models.TextField(null=True, blank=True)
+    suspended_at = models.DateTimeField(auto_now_add=True)
+    is_suspended = models.BooleanField(default=True)  # Helps in reactivating users
+
+    class Meta:
+        unique_together = ('user', 'organization')  # Prevent duplicate suspensions
+
+    def __str__(self):
+        return f"{self.user.username} suspended from {self.organization.name}"
+
+    def ban(self, admin, reason=""):
+        """Suspend a user from the organization."""
+        self.suspended_by = admin
+        self.reason = reason
+        self.is_suspended = True
+        self.suspended_at = timezone.now()
+        self.save()
+
+    def unban(self):
+        """Lift the suspension for a user."""
+        self.is_suspended = False
+        self.save()
+
+
 
 
 

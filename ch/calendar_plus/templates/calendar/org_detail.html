@@ -1481,6 +1481,16 @@ My Calendar
             Workflows & Templates
         </button>
     </a>
+    <!-- Monitor suspensions -->
+
+    <button type="button" class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2 mb-1"
+    data-bs-toggle="modal" data-bs-target="#suspendUsersModal"
+    style="font-family: 'Inter', sans-serif; font-size: 15px; 
+           color: #1d1c1d; transition: background 0.2s ease; border-radius: 4px;">
+    <span class="material-icons" style="font-size: 18px; color: #dc3545;">person_remove</span> 
+    Monitor Suspensions
+</button>
+
 </div>
 
 
@@ -1548,6 +1558,26 @@ My Calendar
         </div>
     </div>
 </div>
+
+
+<!-- HANDLE AND MANAGE SUSPENSIONS -->
+<div class="modal fade" id="suspendUsersModal" tabindex="-1" aria-labelledby="suspendUsersLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="suspendUsersLabel">Manage Suspensions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="userListContainer">
+                    <p>Loading users...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 
 
@@ -1628,6 +1658,75 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+
+// MONITOR SUSPENSIONS
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("suspendUsersModal");
+    const userListContainer = document.getElementById("userListContainer");
+    const orgId = "{{organization.id}}"; // Change this dynamically as per your org setup
+
+    modal.addEventListener("show.bs.modal", function () {
+        fetch(`/organizations/organization/${orgId}/members/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    userListContainer.innerHTML = "";
+                    data.members.forEach(member => {
+                        const userRow = document.createElement("div");
+                        userRow.classList.add("d-flex", "justify-content-between", "align-items-center", "p-2", "border-bottom");
+
+                        userRow.innerHTML = `
+                            <div>
+                                <strong>${member.name}</strong> <span class="text-muted">(${member.role})</span>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input suspend-toggle" type="checkbox" 
+                                       data-user-id="${member.id}" ${member.is_suspended ? "checked" : ""}>
+                            </div>
+                        `;
+
+                        userListContainer.appendChild(userRow);
+                    });
+
+                    // Attach event listeners to all toggle buttons
+                    document.querySelectorAll(".suspend-toggle").forEach(toggle => {
+                        toggle.addEventListener("change", function () {
+                            const userId = this.getAttribute("data-user-id");
+                            const action = this.checked ? "ban" : "unban";
+
+                            fetch(`/organizations/organization/${orgId}/suspend/${userId}/${action}/`, {
+                                method: "POST",
+                                headers: { "X-CSRFToken": getCSRFToken() },
+                            })
+                                .then(response => response.json())
+                                .then(response => {
+                                    alert(response.message);
+                                })
+                                .catch(error => console.error("Error:", error));
+                        });
+                    });
+                } else {
+                    userListContainer.innerHTML = "<p class='text-danger'>Failed to load users.</p>";
+                }
+            })
+            .catch(error => {
+                userListContainer.innerHTML = "<p class='text-danger'>Error fetching users.</p>";
+            });
+    });
+
+    // Function to get CSRF Token from cookies
+    function getCSRFToken() {
+        let cookieValue = null;
+        let cookies = document.cookie.split(';');
+        cookies.forEach(cookie => {
+            let trimmedCookie = cookie.trim();
+            if (trimmedCookie.startsWith("csrftoken=")) {
+                cookieValue = trimmedCookie.substring("csrftoken=".length, trimmedCookie.length);
+            }
+        });
+        return cookieValue;
+    }
+});
 
 
 

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import JsonResponse
-from accounts.models import Profile, Organization,  EmailInvitation
+from accounts.models import(Profile, Organization,  EmailInvitation, Suspend)
 from meet.models import MeetInvitation
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin

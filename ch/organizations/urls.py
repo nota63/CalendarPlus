@@ -24,7 +24,12 @@ urlpatterns=[
     path('hide_workspace/<int:org_id>/',hide_organization,name='hide_workspace'),
     path('duplicate-workspace/<int:org_id>/',DuplicateWorkspaceView.as_view(), name='duplicate_workspace'),
     path('pulse/<int:org_id>/',organization_pulse_view, name='pulse'),
-    path('pulse_settings/<int:org_id>/',pulse_settings, name='pulse_settings')
+    path('pulse_settings/<int:org_id>/',pulse_settings, name='pulse_settings'),
+     # Fetch all members and check suspension status
+    path("organization/<int:org_id>/members/", handle_suspend_action, name="handle_suspend_action"),
+    
+    # Handle ban/unban actions
+    path("organization/<int:org_id>/suspend/<int:user_id>/<str:action>/", handle_suspend_action, name="handle_suspend_action"),
     
 ]
 

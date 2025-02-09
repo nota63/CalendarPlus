@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from accounts.models import(Organization, Profile, EmailInvitation)
+from accounts.models import(Organization, Profile, EmailInvitation, Suspend)
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
@@ -1020,3 +1020,54 @@ def pulse_settings(request, org_id):
     })
 
 
+# SUSPEND THE USER FROM WORKSPACE
+
+
+# FETCH MEMBERS FIRST 
+def handle_suspend_action(request, org_id, user_id=None, action=None):
+    organization = get_object_or_404(Organization, id=org_id)
+
+    # 🔥 Fetching all members along with their suspend status
+    if request.method == "GET":
+        members = Profile.objects.filter(organization=organization).select_related("user")
+        suspended_users = Suspend.objects.filter(organization=organization, is_suspended=True).values_list("user_id", flat=True)
+
+        members_data = [
+            {
+                "id": member.user.id,
+                "name": member.user.username,
+                "role": "Admin" if member.is_admin else "Manager" if member.is_manager else "Employee",
+                "is_suspended": member.user.id in suspended_users  # Checking suspension status
+            }
+            for member in members
+        ]
+
+        return JsonResponse({"status": "success", "members": members_data})
+
+    # 🔥 Handling Ban/Unban Actions
+    if request.method == "POST" and user_id and action:
+        user = get_object_or_404(User, id=user_id)
+        admin = request.user  # Admin performing the action
+
+        if action == "ban":
+            reason = request.POST.get("reason", "No reason provided")
+            suspend_obj, created = Suspend.objects.get_or_create(
+                user=user,
+                organization=organization,
+                defaults={"suspended_by": admin, "reason": reason, "suspended_at": timezone.now(), "is_suspended": True}
+            )
+
+            if not created:
+                suspend_obj.ban(admin, reason)
+
+            return JsonResponse({"status": "success", "message": f"{user.username} has been suspended."})
+
+        elif action == "unban":
+            suspend_obj = Suspend.objects.filter(user=user, organization=organization, is_suspended=True).first()
+            if suspend_obj:
+                suspend_obj.unban()
+                return JsonResponse({"status": "success", "message": f"{user.username} has been unsuspended."})
+
+        return JsonResponse({"status": "error", "message": "Invalid action."}, status=400)
+
+    return JsonResponse({"status": "error", "message": "Invalid request."}, status=400)
