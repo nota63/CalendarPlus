@@ -373,6 +373,8 @@ class OrganizationListView(LoginRequiredMixin, ListView):
     context_object_name = 'organizations'
 
     def get_queryset(self):
+
+      
         
         user_profiles = Profile.objects.filter(user=self.request.user)
         
@@ -413,14 +415,15 @@ class OrganizationListView(LoginRequiredMixin, ListView):
 
 
         user_profiles = Profile.objects.filter(user=self.request.user)
-
-
+     
+        
         organizations_with_member_count = []
         for organization in context['organizations']:
             member_count = Profile.objects.filter(organization=organization).count()
             organizations_with_member_count.append({
                 'organization': organization,
-                'member_count': member_count
+                'member_count': member_count,
+            
             })
 
         context['organizations_with_member_count'] = organizations_with_member_count
@@ -470,7 +473,7 @@ class OrgDetailView(LoginRequiredMixin, View):
         # Fetch members 
 
         members = Profile.objects.filter(organization=organization)
-        
+
         # restrict suspended members
         is_suspended = Suspend.objects.filter(user=request.user, organization_id=organization, is_suspended=True).exists()
 
