@@ -948,7 +948,7 @@ a {
             <a href="{% url 'meeting_list' org_id=organization.id %}"
             id="meetingBtn" 
             class="flex items-center space-x-2 text-gray-800 transition duration-300 hover:text-blue-500">
-            <span class="material-icons text-blue-500">person</span>
+            <span class="material-icons text-blue-500">psychology</span>
             <span class="font-medium text-[14px]" style="font-family: 'Inter', sans-serif;">
                Meetings & NLP
            </span>
@@ -1138,6 +1138,16 @@ a {
         {% elif is_manager %}
             <h3 class="font-semibold text-lg text-white mb-6">Manager Controls</h3>
 
+             <!-- NLp meeting creation button  -->
+             <a href="{% url 'meeting_list' org_id=organization.id %}"
+             id="meetingBtn" 
+             class="flex items-center space-x-2 text-gray-800 transition duration-300 hover:text-blue-500">
+             <span class="material-icons text-blue-500">psychology</span>
+             <span class="font-medium text-[14px]" style="font-family: 'Inter', sans-serif;">
+                Meetings & NLP
+            </span>
+          </a>
+
             <a href="{% url 'view_edit_profile' org_id=organization.id %}"
                class="flex items-center space-x-2 text-gray-800 transition duration-300 hover:text-blue-500">
                <span class="material-icons text-blue-500">person</span>
@@ -1280,6 +1290,16 @@ My Calendar
 
         {% else %}
             <h3 class="font-semibold text-lg text-white mb-6">Employee Controls</h3>
+
+             <!-- NLp meeting creation button  -->
+             <a href="{% url 'meeting_list' org_id=organization.id %}"
+             id="meetingBtn" 
+             class="flex items-center space-x-2 text-gray-800 transition duration-300 hover:text-blue-500">
+             <span class="material-icons text-blue-500">psychology</span>
+             <span class="font-medium text-[14px]" style="font-family: 'Inter', sans-serif;">
+                Meetings & NLP
+            </span>
+          </a>
 
 
             <a href="{% url 'project_views_others' organization.id %}" 
