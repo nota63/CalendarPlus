@@ -320,7 +320,9 @@ GOOGLE_CLIENT_ID = "854433356192-d81dha5vahp50pj5f8g5c9fqesd7flti.apps.googleuse
 GOOGLE_CLIENT_SECRET = "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"
 GOOGLE_REDIRECT_URI = "http://localhost:8000/oauth/callback/"
 
+#  Session Expiry & Auto Logout (Prevent Stolen Sessions)
 
-
+SESSION_COOKIE_AGE = 1800 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  
 
 
