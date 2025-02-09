@@ -793,6 +793,13 @@ a {
         {% if is_admin %}
             <h3 class="font-semibold text-lg text-white mb-6">Admin Controls</h3>
 
+            <!-- NLp meeting creation button  -->
+             <!-- Button to Open Modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#meetingModal">
+    Create Meeting via NLP
+</button>
+
+
             <a href="{% url 'view_edit_profile' org_id=organization.id %}"
                  class="flex items-center space-x-2 text-gray-800 transition duration-300 hover:text-blue-500">
                  <span class="material-icons text-blue-500">person</span>
@@ -1729,6 +1736,40 @@ My Calendar
 </div>
 
 
+<!-- CREATE MEETING VIA NLP -->
+<!-- Bootstrap 5 Modal -->
+<div class="modal fade" id="meetingModal" tabindex="-1" aria-labelledby="meetingModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="meetingModalLabel">Create Meeting via Natural Language</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Guide -->
+                <p>💡 Example inputs:</p>
+                <ul>
+                    <li>Meeting with John tomorrow at 3 PM</li>
+                    <li>Schedule a meeting with Sarah next Monday at 10 AM</li>
+                </ul>
+
+                <!-- Input Field -->
+                <label for="nlpInput">Enter Meeting Details:</label>
+                <input type="text" id="nlpInput" class="form-control" placeholder="Type here..." />
+
+                <!-- Error Message -->
+                <div id="errorMessage" class="text-danger mt-2" style="display: none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="createMeetingBtn">Create Meeting</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 
 
 
@@ -1879,6 +1920,59 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+// CREATE MEETINGS VIA NLP
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("createMeetingBtn").addEventListener("click", function () {
+        let inputText = document.getElementById("nlpInput").value.trim();
+        let orgId = "{{organization.id}}";  // Replace dynamically in your template
+
+        if (!inputText) {
+            document.getElementById("errorMessage").textContent = "Please enter a meeting description!";
+            document.getElementById("errorMessage").style.display = "block";
+            return;
+        }
+
+        fetch(`/organizations/create_meeting_from_nlp/${orgId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken(),  
+            },
+            body: JSON.stringify({ input_text: inputText }),  // No user_id needed!
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById("errorMessage").textContent = data.error;
+                document.getElementById("errorMessage").style.display = "block";
+            } else {
+                alert("✅ Meeting Scheduled Successfully!");
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            document.getElementById("errorMessage").textContent = "Something went wrong!";
+            document.getElementById("errorMessage").style.display = "block";
+        });
+    });
+});
+
+// Function to Get CSRF Token
+function getCSRFToken() {
+    let cookieValue = null;
+    let cookies = document.cookie.split(";");
+
+    cookies.forEach(cookie => {
+        let [name, value] = cookie.trim().split("=");
+        if (name === "csrftoken") {
+            cookieValue = decodeURIComponent(value);
+        }
+    });
+
+    return cookieValue;
+}
 
 
 

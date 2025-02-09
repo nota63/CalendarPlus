@@ -1080,8 +1080,6 @@ def handle_suspend_action(request, org_id, user_id=None, action=None):
 
 # MEETING CREATION VIA NLP (NATURAL LANGUAGE PROCESSING)
 import dateparser  
-
-
 @csrf_exempt
 def create_meeting_from_nlp(request, org_id):
     """
@@ -1093,39 +1091,44 @@ def create_meeting_from_nlp(request, org_id):
 
     try:
         data = json.loads(request.body)
-        user_id = data.get("user_id")  # The user scheduling the meeting
-        input_text = data.get("input_text")  # Natural language meeting details
+        input_text = data.get("input_text")
 
-        if not user_id or not input_text:
+        if not input_text:
             return JsonResponse({"error": "Missing required fields"}, status=400)
 
         # Validate Organization
         organization = get_object_or_404(Organization, id=org_id)
 
         # Validate User (Requester)
-        user = get_object_or_404(User, id=user_id)
+        user = request.user
         user_profile = Profile.objects.filter(user=user, organization=organization).first()
         if not user_profile:
             return JsonResponse({"error": "You are not part of this organization"}, status=403)
 
-        # Extract meeting details using NLP
-        parsed_date = dateparser.parse(input_text)
-        if not parsed_date:
-            return JsonResponse({"error": "Could not understand date/time"}, status=400)
+        # 🔥 Custom NLP Date Extraction
+        meeting_datetime = extract_datetime_from_text(input_text)
+        if not meeting_datetime:
+            return JsonResponse({"error": "Could not understand date/time. Please use a format like 'tomorrow at 3 PM'."}, status=400)
 
-        meeting_date = parsed_date.date()
-        start_time = parsed_date.time()
-        end_time = None  
+        meeting_date = meeting_datetime.date()
+        start_time = meeting_datetime.time()
+        end_time = (datetime.combine(meeting_date, start_time) + timedelta(hours=1)).time()  # Default 1-hour duration
 
+        # Extract Invitee and validate organization
         # Extract Invitee and check if they belong to the same organization
         invitee_username = extract_invitee_from_text(input_text)
-        invitee = None
-        if invitee_username:
-            invitee = User.objects.filter(username=invitee_username).first()
-            invitee_profile = Profile.objects.filter(user=invitee, organization=organization).first()
 
-            if not invitee or not invitee_profile:
+        if invitee_username:
+           invitee_username = invitee_username.lower()  # Convert to lowercase for case-insensitive matching
+           invitee = User.objects.filter(username__iexact=invitee_username).first()  # Case-insensitive lookup
+
+           if invitee:
+             invitee_profile = Profile.objects.filter(user=invitee, organization=organization).exists()
+             if not invitee_profile:
                 return JsonResponse({"error": f"{invitee_username} is not in this organization"}, status=400)
+        else:
+            return JsonResponse({"error": f"User {invitee_username} not found"}, status=400)
+
 
         # Check for scheduling conflicts
         if invitee:
@@ -1151,13 +1154,14 @@ def create_meeting_from_nlp(request, org_id):
             status="scheduled",
         )
         if invitee:
-            meeting.participants.add(invitee)  
+            meeting.participants.add(invitee)
 
         return JsonResponse({
             "message": "Meeting created successfully",
             "meeting_id": meeting.id,
             "meeting_date": meeting_date.strftime("%Y-%m-%d"),
             "start_time": start_time.strftime("%H:%M:%S"),
+            "end_time": end_time.strftime("%H:%M:%S"),
             "invitee": invitee_username if invitee else None
         })
 
@@ -1166,6 +1170,53 @@ def create_meeting_from_nlp(request, org_id):
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+
+# 📌 Helper Function: NLP Date Parsing
+def extract_datetime_from_text(text):
+    """
+    Extracts datetime from text like:
+    - "tomorrow at 3 PM"
+    - "next Monday at 10 AM"
+    """
+    text = text.lower()
+    now = datetime.now()
+
+    # 🔥 Handle "tomorrow" manually
+    if "tomorrow" in text:
+        base_date = now + timedelta(days=1)
+    elif "next" in text:
+        match = re.search(r"next (\w+)", text)
+        if match:
+            weekday_str = match.group(1)
+            weekdays = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+            if weekday_str in weekdays:
+                target_weekday = weekdays.index(weekday_str)
+                days_ahead = (target_weekday - now.weekday() + 7) % 7 or 7
+                base_date = now + timedelta(days=days_ahead)
+            else:
+                return None
+        else:
+            return None
+    else:
+        base_date = now  # Assume today if no relative date
+
+    # 🔥 Extract time
+    time_match = re.search(r"(\d{1,2})(:\d{2})?\s?(am|pm)?", text)
+    if time_match:
+        hour = int(time_match.group(1))
+        minute = int(time_match.group(2)[1:]) if time_match.group(2) else 0
+        period = time_match.group(3)
+
+        # Convert to 24-hour format
+        if period == "pm" and hour < 12:
+            hour += 12
+        elif period == "am" and hour == 12:
+            hour = 0
+    else:
+        return None  # No valid time found
+
+    return datetime.combine(base_date.date(), datetime.min.time()).replace(hour=hour, minute=minute)
 
 
 # 📌 Helper Function to Extract Invitee Name
