@@ -2,7 +2,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.mail import send_mail
 from django.conf import settings
-from accounts.models import Profile,Organization
+from accounts.models import Profile,Organization,Suspend
 from django.db.models.signals import post_delete
 
 
@@ -81,3 +81,32 @@ def send_workspace_deletion_email(sender, instance, **kwargs):
 
     for member in members:
         send_mail(subject, message, from_email, [member.user.email])
+
+
+
+# NOTIFY SUSPENDED USERS
+
+
+@receiver(post_save, sender=Suspend)
+def send_suspension_email(sender, instance, created, **kwargs):
+    if instance.is_suspended: 
+        user = instance.user
+        organization = instance.organization
+        subject = f"Suspended from {organization.name}"
+        message = (
+            f"Dear {user.username},\n\n"
+            f"You have been suspended from the organization **{organization.name}**.\n"
+            f"You will no longer have access to this workspace until an admin restores your access.\n\n"
+            f"Reason: {instance.reason}\n\n"
+            f"If you believe this was a mistake, please contact your organization admin.\n\n"
+            f"Best regards,\n"
+            f"Calendar Plus Team"
+        )
+
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,  
+            [user.email],
+            fail_silently=False,
+        )
