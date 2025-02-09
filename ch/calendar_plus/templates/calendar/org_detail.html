@@ -1257,7 +1257,7 @@ My Calendar
             <div class="flex items-center">
                 {% if members %}
                     <span class="text-2xl text-white mr-3">👥</span>
-                    <h2 class="text-xl font-semibold text-white">Organization Members</h2>
+                    <h2 class="text-xl font-semibold text-white">Quick Schedule</h2>
                 {% else %}
                     <h2 class="text-xl font-semibold text-white">Members will appear here</h2>
                 {% endif %}
@@ -1280,7 +1280,7 @@ My Calendar
                     <!-- Member Details (Truncated Name with Tooltip) -->
                     <div class="flex-1">
                         <p class="text-sm font-medium text-gray-900 truncate" title="{{ member.full_name }}">
-                            {{ member.full_name }}
+                            {{ member.user.username }}
                         </p>
                         <p class="text-xs text-gray-500">
                             {% if member.is_admin %}
@@ -1299,8 +1299,8 @@ My Calendar
                             <i class="fas fa-ellipsis-v"></i> <!-- FontAwesome 3 dots -->
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#">View Profile</a></li>
-                            <li><a class="dropdown-item text-danger" href="#">Remove</a></li>
+                            <li><a class="dropdown-item" href="{% url 'user_calendar' user_id=member.user.id org_id=organization.id%}">Schedule</a></li>
+                           
                         </ul>
                     </div>
                 </div>
