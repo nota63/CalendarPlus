@@ -945,10 +945,19 @@ a {
             <h3 class="font-semibold text-lg text-white mb-6">Admin Controls</h3>
 
             <!-- NLp meeting creation button  -->
-             <!-- Button to Open Modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#meetingModal">
-    Create Meeting via NLP
-</button>
+            <a href="{% url 'meeting_list' org_id=organization.id %}"
+            id="meetingBtn" 
+            class="flex items-center space-x-2 text-gray-800 transition duration-300 hover:text-blue-500">
+            <span class="material-icons text-blue-500">person</span>
+            <span class="font-medium text-[14px]" style="font-family: 'Inter', sans-serif;">
+               Meetings & NLP
+           </span>
+         </a>
+
+
+
+            
+
 
 
             <a href="{% url 'view_edit_profile' org_id=organization.id %}"
@@ -1792,6 +1801,17 @@ My Calendar
 </div>
 
 
+<!-- meetings and nlp pop-up btns -->
+
+<div id="meetsButtons" class="popup-container shadow-sm rounded-3 p-2" 
+     style="background: white; border: 1px solid #e8e8e8; min-width: 240px;">
+
+     <button type="button" class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2" data-bs-toggle="modal" data-bs-target="#meetingModal">
+        Create Meeting via NLP
+    </button>
+
+</div>
+
 
 <!-- ------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
@@ -2143,8 +2163,6 @@ function getCSRFToken() {
 
 
 
-
-
 // -----------------------------------------------------------------------------------------------------------------------------------------------------
 // Handle Organization Section Buttons Pop Up
 document.addEventListener("DOMContentLoaded", function () {
@@ -2178,6 +2196,44 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 300);
     });
 });
+
+
+// Meeting NLP Pop Ups
+document.addEventListener("DOMContentLoaded", function () {
+    const manageMembersBtn = document.getElementById("meetingBtn");
+    const popupButtons = document.getElementById("meetsButtons");
+
+    // Show popup on hover
+    manageMembersBtn.addEventListener("mouseenter", function () {
+        popupButtons.style.display = "block";
+    });
+
+    // Keep the popup visible when hovered
+    popupButtons.addEventListener("mouseenter", function () {
+        popupButtons.style.display = "block";
+    });
+
+    // Hide popup when mouse leaves both elements
+    manageMembersBtn.addEventListener("mouseleave", function () {
+        setTimeout(() => {
+            if (!popupButtons.matches(":hover")) {
+                popupButtons.style.display = "none";
+            }
+        }, 300); // Delay hiding for a smoother experience
+    });
+
+    popupButtons.addEventListener("mouseleave", function () {
+        setTimeout(() => {
+            if (!manageMembersBtn.matches(":hover")) {
+                popupButtons.style.display = "none";
+            }
+        }, 300);
+    });
+});
+
+
+
+
 
 
 // DRAG AND DROP CONTAINERS
