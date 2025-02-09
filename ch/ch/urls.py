@@ -49,6 +49,8 @@ urlpatterns = [
     path('ckeditor/', include('ckeditor_uploader.urls')),
     # middlewares
     path('update-email/',views.update_email, name='update_email'),
+    path('guide/', views.GuideView.as_view(), name='guide_page'),
+
   
 
   

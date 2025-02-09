@@ -15,3 +15,19 @@ class CheckEmailMiddleware:
                 return redirect(reverse('update_email'))
                 
         return self.get_response(request)
+
+
+
+# FIRST TIME GUIDE MIDDLEWARE
+
+from django.shortcuts import redirect
+
+class FirstTimeGuideMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if request.path == "/calendar/organizations/" and not request.session.get("seen_guide"):
+            return redirect("guide_page")  
+
+        return self.get_response(request)

@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.views import View
 
 # homepage
 def home(request):
@@ -57,3 +58,16 @@ def update_email(request):
         messages.error(request, "Please enter a valid email.")
     
     return render(request, "middlewares/update_email.html")
+
+
+# first time guide 
+class GuideView(View):
+    template_name = "middlewares/guide.html"
+
+    def get(self, request):
+        return render(request, self.template_name)
+
+    def post(self, request):
+        
+        request.session["seen_guide"] = True
+        return redirect("organization_list") 

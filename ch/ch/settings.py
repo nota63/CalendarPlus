@@ -104,6 +104,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'meet.middlewares.AdminOnlyMiddleware',
     'ch.middlewares.CheckEmailMiddleware',
+    'ch.middlewares.FirstTimeGuideMiddleware',
 
 ]
 

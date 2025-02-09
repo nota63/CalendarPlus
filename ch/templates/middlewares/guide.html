@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Calendar Plus</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background-color: #f8f9fa;
+        }
+        .guide-container {
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: auto;
+        }
+        h1 { color: #5b21b6; }
+        p { color: #333; }
+        .btn {
+            padding: 10px 20px;
+            background-color: #5b21b6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .btn:hover {
+            background-color: #4a148c;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="guide-container">
+        <h1>Welcome to Calendar Plus! 🎉</h1>
+        <p>Here, you can manage organizations, create groups, and collaborate with ease.</p>
+        <p>✅ Create and manage workspaces.</p>
+        <p>✅ Organize projects & channels.</p>
+        <p>✅ Schedule meetings & events.</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn">Finish</button>
+        </form>
+    </div>
+
+</body>
+</html>
