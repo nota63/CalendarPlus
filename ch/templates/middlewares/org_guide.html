@@ -3,51 +3,274 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Getting Started with Calendar Plus</title>
+    <title>Welcome to Calendar Plus</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        /* General Styles */
+       /* General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    display: flex;
+    height: 100vh;
+    background-color: #f4f5f7;
+}
+
+/* Sidebar Navigation */
+.sidebar {
+    width: 280px;
+    background: linear-gradient(135deg, #5b21b6, #4a148c);
+    padding: 25px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+.sidebar h2 {
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sidebar ul {
+    list-style: none;
+}
+
+.sidebar ul li {
+    padding: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease-in-out;
+}
+
+.sidebar ul li:hover,
+.sidebar ul li.active {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateX(5px);
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+}
+
+.section {
+    margin-bottom: 50px;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.5s ease-in-out;
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.section.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Headings & Text */
+h1 {
+    font-size: 30px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #4a148c;
+    margin-bottom: 15px;
+}
+
+p {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+/* Modern List */
+.modern-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.modern-list li {
+    padding: 10px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(91, 33, 182, 0.05);
+    border-left: 4px solid #5b21b6;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease-in-out;
+}
+
+.modern-list li:hover {
+    background: rgba(91, 33, 182, 0.1);
+    transform: translateX(5px);
+}
+
+.modern-list li i {
+    color: #5b21b6;
+    font-size: 18px;
+}
+
+/* Gradient Divider */
+.gradient-bar {
+    height: 4px;
+    width: 100%;
+    background: linear-gradient(90deg, #5b21b6, #4a148c);
+    border-radius: 2px;
+}
+
+/* Finish Button */
+.finish-btn {
+    display: block;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, #5b21b6, #4a148c);
+    color: white;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    width: 220px;
+    margin: auto;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 10px rgba(91, 33, 182, 0.2);
+}
+
+.finish-btn:hover {
+    background: linear-gradient(135deg, #4a148c, #5b21b6);
+    transform: scale(1.05);
+}
+
+    </style>
 </head>
 <body>
 
-    <h1>Before You Start Your Workspace Journey on Calendar Plus</h1>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <h2>🚀 Workspace Guide</h2>
+        <ul>
+            <li class="nav-link active" data-target="intro"><i class="fas fa-home"></i> Introduction</li>
+            <li class="nav-link" data-target="team"><i class="fas fa-user-plus"></i> Invite Your Team</li>
+            <li class="nav-link" data-target="channels"><i class="fas fa-comments"></i> Chat Channels</li>
+            <li class="nav-link" data-target="groups"><i class="fas fa-users"></i> Manage Groups</li>
+            <li class="nav-link" data-target="events"><i class="fas fa-calendar"></i> Events & Meetings</li>
+            <li class="nav-link" data-target="tasks"><i class="fas fa-tasks"></i> Task Management</li>
+            <li class="nav-link" data-target="monitoring"><i class="fas fa-chart-line"></i> Task Monitoring</li>
+            <li class="nav-link" data-target="finish"><i class="fas fa-check-circle"></i> Get Started</li>
+        </ul>
+    </div>
 
-    <p>Welcome to Calendar Plus! 🚀 Before diving into all the powerful features, we recommend setting up your workspace efficiently. The first step is to **invite your team members** to your Calendar Plus workspace. Collaboration starts with a strong team!</p>
+    <!-- Main Content -->
+    <div class="main-content">
 
-    <h2>1️⃣ Invite Your Team</h2>
-    <p>Teams work best when everyone is connected. In Calendar Plus, you can **invite your team members** by sending them an invitation link or adding them via email. Once they join, you can assign roles such as Admin, Manager, or Employee.</p>
-    
-    <h2>2️⃣ Start Working with Chat Channels</h2>
-    <p>Every workspace in Calendar Plus comes with a **default voice channel** to facilitate quick discussions. You can create **public and private channels** for team discussions, project collaborations, and topic-based conversations.</p>
+        <!-- Introduction -->
+        <section id="intro" class="section active">
+            <h1>Initiate the workspace 🎉</h1>
+            <p>Start your workspace journey by setting up your organization, inviting team members, and managing work seamlessly.</p>
+        </section>
 
-    <h2>3️⃣ Manage Members Efficiently</h2>
-    <p>Keep track of your organization's members with **role-based permissions**. Admins can add or remove members, change roles, and monitor activity to ensure seamless collaboration.</p>
+        <!-- Invite Team -->
+        <section id="team" class="section">
+            <h1>👥 Invite Your Team</h1>
+            <p>Collaboration starts with a team. Send invites, assign roles, and set permissions for your members.</p>
+        </section>
 
-    <h2>4️⃣ Organize Work with Groups</h2>
-    <p>Groups in Calendar Plus help you structure your team effectively. Create **task-based groups, project teams, or department-specific groups** to streamline communication and collaboration.</p>
+        <!-- Chat Channels -->
+        <section id="channels" class="section">
+            <h1>💬 Chat Channels</h1>
+            <p>Each workspace has a default voice channel. Create private or public channels for better collaboration.</p>
+        </section>
 
-    <h2>5️⃣ Schedule and Track Events</h2>
-    <p>With Calendar Plus, you can **schedule team meetings, set reminders, and track upcoming events**. Events can be linked to specific projects, groups, or channels to ensure visibility for the right team members.</p>
+        <!-- Manage Groups -->
+        <section id="groups" class="section">
+            <h1>👨‍👩‍👦 Manage Groups</h1>
+            <p>Create project-based or department-specific groups to keep work structured.</p>
+        </section>
 
-    <h2>6️⃣ Task Management Made Simple</h2>
-    <p>Assign, track, and complete tasks efficiently. Calendar Plus lets you create tasks, set deadlines, and monitor progress using task tracking features.</p>
+        <!-- Events & Meetings -->
+        <section id="events" class="section">
+            <h1>📅 Events & Meetings</h1>
+            <p>Schedule events, set reminders, and track all upcoming meetings from a single dashboard.</p>
+        </section>
 
-    <h2>7️⃣ Monitor Work Progress</h2>
-    <p>Stay updated on your team's productivity with real-time insights. Calendar Plus provides **activity tracking, project timelines, and task completion reports** to help you stay on top of your team's progress.</p>
+        <!-- Task Management -->
+        <section id="tasks" class="section">
+            <h1>✅ Task Management</h1>
+            <p>Assign, track, and complete tasks efficiently with deadlines and progress tracking.</p>
+        </section>
 
-    <h2>8️⃣ Stay Connected with Availability Tracking</h2>
-    <p>Know when your teammates are available with **real-time availability tracking**. Easily schedule meetings based on when your team members are free.</p>
+        <!-- Task Monitoring -->
+        <section id="monitoring" class="section">
+            <h1>📊 Task Monitoring</h1>
+            <p>Get real-time insights on team activity and ensure work is completed on time.</p>
+        </section>
 
-    <h2>9️⃣ Plan Group Events with Ease</h2>
-    <p>Organizing a team event? Calendar Plus lets you **create group events, manage RSVPs, and send event notifications** so that everyone stays informed.</p>
+        <!-- Finish -->
+        <section id="finish" class="section">
+            <h1>🎉 Get Started Now!</h1>
+            <p>You’re all set to use Calendar Plus. Start collaborating with your team today!</p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="finish-btn">Finish</button>
+            </form>
+        </section>
 
-    <h2>🔟 More Features to Explore</h2>
-    <p>Calendar Plus is built to make collaboration smooth and efficient. Explore additional features like **workspace customization, notifications, and integrations with external tools** to enhance your workflow.</p>
+    </div>
 
-    <h2>🎉 Get Started Now!</h2>
-    <p>Now that you know how to set up your workspace, **go ahead and invite your team** to start collaborating efficiently on Calendar Plus!</p>
+    <script>
+        // Sidebar Navigation Click Event
+        document.querySelectorAll('.nav-link').forEach(item => {
+            item.addEventListener('click', function () {
+                document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+                this.classList.add('active');
 
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit">Finish</button>
-    </form>
+                document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+                document.getElementById(this.getAttribute('data-target')).classList.add('active');
+            });
+        });
+
+        // Fade-in Effect on Scroll
+        const sections = document.querySelectorAll('.section');
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.3 });
+
+        sections.forEach(section => observer.observe(section));
+
+    </script>
 
 </body>
 </html>
