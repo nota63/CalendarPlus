@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Meeting Invitation</title>
+</head>
+<body>
+    <h2>You've Been Invited to a Meeting</h2>
+    <p>Hello {{ invitee.username }},</p>
+    
+    <p><strong>{{ creator.username }}</strong> has scheduled a meeting with you in the organization <strong>{{ organization.name }}</strong>.</p>
+    
+    <p><strong>Meeting Details:</strong></p>
+    <ul>
+        <li>📌 <strong>Title:</strong> {{ meeting_title }}</li>
+        <li>📅 <strong>Date:</strong> {{ meeting_date }}</li>
+        <li>⏰ <strong>Time:</strong> {{ start_time }} - {{ end_time }}</li>
+    </ul>
+    
+    <p style="color: blue;"><strong>{{ mention_nlp }}</strong></p>
+    
+    <p>See you there!</p>
+    <p>Best Regards,</p>
+    <p><strong>Calendar Plus Team</strong></p>
+</body>
+</html>

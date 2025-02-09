@@ -26,8 +26,7 @@ from django.utils.timezone import now
 from django.db.models import Q,F,When
 from groups.models import Group,GroupMember,GroupInvitation,GroupEvent,GroupEventBooking
 from group_tasks.models import Task, AddDay
-
-
+from django.template.loader import render_to_string
 
 
 
@@ -1080,6 +1079,8 @@ def handle_suspend_action(request, org_id, user_id=None, action=None):
 
 # MEETING CREATION VIA NLP (NATURAL LANGUAGE PROCESSING)
 import dateparser  
+from django.utils.html import strip_tags
+
 @csrf_exempt
 def create_meeting_from_nlp(request, org_id):
     """
@@ -1152,8 +1153,10 @@ def create_meeting_from_nlp(request, org_id):
             end_time=end_time,
             status="scheduled",
         )
+        send_meeting_email(meeting)
         if invitee:
             meeting.participants.add(invitee)
+
 
         return JsonResponse({
             "message": "Meeting created successfully",
@@ -1230,3 +1233,33 @@ def extract_invitee_from_text(text):
         if index < len(words):
             return words[index].capitalize()  
     return None
+
+
+# send the email to notify 
+def send_meeting_email(meeting):
+    """ Sends an email notification to the invitee about the scheduled meeting. """
+
+    subject = f"New Meeting Scheduled with {meeting.user.username}"
+    
+    # Render email template (for HTML email)
+    html_message = render_to_string("emails/meeting_invite.html", {
+        "invitee": meeting.invitee,
+        "creator": meeting.user,
+        "organization": meeting.organization,
+        "meeting_title": meeting.meeting_title,
+        "meeting_date": meeting.meeting_date,
+        "start_time": meeting.start_time,
+        "end_time": meeting.end_time,
+        "mention_nlp": "This meeting was scheduled using NLP.",
+    })
+    
+    plain_message = strip_tags(html_message) 
+    
+    send_mail(
+        subject,
+        plain_message,
+        settings.DEFAULT_FROM_EMAIL,
+        [meeting.invitee.email],  
+        html_message=html_message,
+        fail_silently=False,
+    )
