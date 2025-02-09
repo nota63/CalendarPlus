@@ -42,9 +42,9 @@ class OrgGuideMiddleware:
     def __call__(self, request):
         if request.path.startswith("/calendar/org_detail/") and not request.session.get("seen_guide_org"):
             # Extract org_id from the URL
-            org_id = request.path.split("/")[-2]  # Assuming /org_detail/{org_id}/
-            request.session["org_id"] = org_id  # Store in session
+            org_id = request.path.split("/")[-2]  
+            request.session["org_id"] = org_id 
 
-            return redirect(reverse("org_guide"))  # Redirect to guide
+            return redirect(reverse("org_guide"))  
 
         return self.get_response(request)

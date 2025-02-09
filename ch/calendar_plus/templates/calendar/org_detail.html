@@ -18,6 +18,118 @@
 </head>
 
 <style>
+/* General Card Container Styling */
+.bg-white {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+}
+
+/* Card Hover Effect */
+.bg-white:hover {
+    box-shadow: 0px 12px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+}
+
+/* Header Styling */
+.bg-slack-purple {
+    background: linear-gradient(135deg, #5b21b6, #4a148c);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.bg-slack-purple h2 {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* Project Information Styling */
+.px-6.py-4 {
+    padding: 20px;
+}
+
+/* Individual Project Item */
+.flex.items-center.p-3 {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-radius: 10px;
+    background: rgba(91, 33, 182, 0.05);
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+.flex.items-center.p-3:hover {
+    background: rgba(91, 33, 182, 0.1);
+    transform: translateX(4px);
+}
+
+/* Project Icons */
+.w-10.h-10 {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Color Styling for Icons */
+.bg-slack-blue-bg {
+    background: rgba(33, 150, 243, 0.1);
+}
+
+.text-slack-blue {
+    color: #2196f3;
+}
+
+.bg-slack-green-bg {
+    background: rgba(76, 175, 80, 0.1);
+}
+
+.text-slack-green {
+    color: #4caf50;
+}
+
+.bg-slack-yellow-bg {
+    background: rgba(255, 193, 7, 0.1);
+}
+
+.text-slack-yellow {
+    color: #ffc107;
+}
+
+/* Project Details */
+.text-slack-dark {
+    font-weight: 600;
+    color: #333;
+}
+
+/* Light Gray Text */
+.text-slack-gray {
+    font-size: 14px;
+    color: #777;
+}
+
+/* Last Update Styling */
+.text-slack-dark:last-child {
+    font-size: 14px;
+    color: #666;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .max-w-3xl {
+        max-width: 100% !important;
+    }
+}
 
 
 /* Ensure the buttons appear outside sidebar */
