@@ -471,6 +471,11 @@ class OrgDetailView(LoginRequiredMixin, View):
 
         members = Profile.objects.filter(organization=organization)
         
+        # restrict suspended members
+        is_suspended = Suspend.objects.filter(user=request.user, organization_id=organization, is_suspended=True).exists()
+
+        if is_suspended:
+           return JsonResponse({"status": "error", "message": "Access denied. You are suspended!"}, status=403)
 
 
         
