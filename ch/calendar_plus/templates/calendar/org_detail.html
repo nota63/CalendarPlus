@@ -19,6 +19,7 @@
 
 <style>
 
+
 /* Ensure the buttons appear outside sidebar */
 
 /* Ensure the buttons appear outside sidebar */
@@ -1491,9 +1492,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // DRAG AND DROP CONTAINERS
+
 document.addEventListener("DOMContentLoaded", function () {
     let draggedElement = null;
     let originalPosition = {};
+    let isDragging = false;
 
     document.querySelectorAll(".max-w-3xl").forEach(container => {
         container.style.position = "relative"; // Ensure it can be moved
@@ -1505,9 +1508,13 @@ document.addEventListener("DOMContentLoaded", function () {
             let shiftX = e.clientX - draggedElement.getBoundingClientRect().left;
             let shiftY = e.clientY - draggedElement.getBoundingClientRect().top;
 
+            draggedElement.style.transition = "none"; // Remove transition while dragging
+            draggedElement.style.cursor = "grabbing";
+            isDragging = true;
+
             function moveAt(pageX, pageY) {
                 draggedElement.style.position = "absolute";
-                draggedElement.style.zIndex = 1000; // Bring to front
+                draggedElement.style.zIndex = "1000"; // Bring to front
                 draggedElement.style.left = pageX - shiftX + "px";
                 draggedElement.style.top = pageY - shiftY + "px";
             }
@@ -1518,48 +1525,78 @@ document.addEventListener("DOMContentLoaded", function () {
 
             document.addEventListener("mousemove", onMouseMove);
 
-            container.addEventListener("mouseup", function () {
-                document.removeEventListener("mousemove", onMouseMove);
-                draggedElement.style.cursor = "grab";
-
-                // Show undo message
-                showUndoMessage(draggedElement, originalPosition);
-                draggedElement = null;
+            document.addEventListener("mouseup", function () {
+                if (isDragging) {
+                    document.removeEventListener("mousemove", onMouseMove);
+                    draggedElement.style.cursor = "grab";
+                    draggedElement.style.transition = "all 0.3s ease-in-out"; // Smooth transition after release
+                    showUndoMessage(draggedElement, originalPosition);
+                    isDragging = false;
+                }
             }, { once: true });
         });
 
         container.ondragstart = function () {
-            return false; // Prevents browser drag behavior
+            return false; // Prevents browser default drag behavior
         };
     });
 
     function showUndoMessage(element, originalPos) {
         let undoMessage = document.createElement("div");
-        undoMessage.textContent = "Layout changed - Undo";
-        undoMessage.style.position = "fixed";
-        undoMessage.style.bottom = "20px";
-        undoMessage.style.right = "20px";
-        undoMessage.style.backgroundColor = "#333";
-        undoMessage.style.color = "#fff";
-        undoMessage.style.padding = "10px 20px";
-        undoMessage.style.borderRadius = "5px";
-        undoMessage.style.cursor = "pointer";
-        undoMessage.style.zIndex = "2000";
-        document.body.appendChild(undoMessage);
+        undoMessage.innerHTML = "⏪ Layout changed - <strong>Undo</strong>";
 
+        // Apply styles directly via JS
+        Object.assign(undoMessage.style, {
+            position: "fixed",
+            bottom: "20px",
+            right: "20px",
+            background: "linear-gradient(135deg, #6a11cb, #2575fc)", 
+            color: "#fff",
+            padding: "12px 20px",
+            fontSize: "14px",
+            fontWeight: "600",
+            borderRadius: "8px",
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
+            cursor: "pointer",
+            transition: "all 0.3s ease-in-out",
+            zIndex: "2000",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px"
+        });
+
+        // Hover effect
+        undoMessage.addEventListener("mouseenter", () => {
+            undoMessage.style.transform = "translateY(-2px)";
+            undoMessage.style.boxShadow = "0px 6px 15px rgba(0, 0, 0, 0.3)";
+            undoMessage.style.opacity = "0.9";
+        });
+
+        undoMessage.addEventListener("mouseleave", () => {
+            undoMessage.style.transform = "translateY(0)";
+            undoMessage.style.boxShadow = "0px 4px 10px rgba(0, 0, 0, 0.2)";
+            undoMessage.style.opacity = "1";
+        });
+
+        // Click to undo position
         undoMessage.addEventListener("click", function () {
             element.style.left = originalPos.left + "px";
             element.style.top = originalPos.top + "px";
             document.body.removeChild(undoMessage);
         });
 
+        // Append to body
+        document.body.appendChild(undoMessage);
+
+        // Auto-hide after 5 seconds
         setTimeout(() => {
             if (undoMessage.parentElement) {
                 document.body.removeChild(undoMessage);
             }
-        }, 5000); // Auto-hide after 5 seconds
+        }, 5000);
     }
 });
+
 
 </script>
 
