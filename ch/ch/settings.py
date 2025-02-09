@@ -58,6 +58,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Application definition
 
 INSTALLED_APPS = [
+    'axes',
     'alert',
     'outh',
     'direct_message',
@@ -106,6 +107,7 @@ MIDDLEWARE = [
     'ch.middlewares.CheckEmailMiddleware',
     'ch.middlewares.FirstTimeGuideMiddleware',
     'ch.middlewares.OrgGuideMiddleware',
+    'axes.middleware.AxesMiddleware',
 
 ]
 
@@ -151,15 +153,6 @@ DATABASES = {
 # DATABASES["default"] = dj_database_url.parse("postgresql://calendar_p_lus_database_user:bPydl91jveJL1UvAyqC1tKpXBXJDl2BU@dpg-cujobeogph6c73bjh4h0-a.oregon-postgres.render.com/calendar_p_lus_database")
 
 # # postgresql://calendar_p_lus_database_user:bPydl91jveJL1UvAyqC1tKpXBXJDl2BU@dpg-cujobeogph6c73bjh4h0-a.oregon-postgres.render.com/calendar_p_lus_database
-
-
-
-
-
-
-
-
-
 
 
 
@@ -320,9 +313,15 @@ GOOGLE_CLIENT_ID = "854433356192-d81dha5vahp50pj5f8g5c9fqesd7flti.apps.googleuse
 GOOGLE_CLIENT_SECRET = "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"
 GOOGLE_REDIRECT_URI = "http://localhost:8000/oauth/callback/"
 
+
+# SECURITY FEATURES 
+
 #  Session Expiry & Auto Logout (Prevent Stolen Sessions)
 
 SESSION_COOKIE_AGE = 1800 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  
 
+#  Brute Force Attack Protection (Limit Login Attempts)
 
+AXES_FAILURE_LIMIT = 2  
+AXES_COOLOFF_TIME = 30  
