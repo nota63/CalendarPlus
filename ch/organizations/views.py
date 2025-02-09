@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from accounts.models import(Organization, Profile, EmailInvitation, Suspend,MeetingOrganization)
+from accounts.models import(Organization, Profile, EmailInvitation, Suspend,MeetingOrganization,Availability)
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
@@ -27,7 +27,8 @@ from django.db.models import Q,F,When
 from groups.models import Group,GroupMember,GroupInvitation,GroupEvent,GroupEventBooking
 from group_tasks.models import Task, AddDay
 from django.template.loader import render_to_string
-
+import dateparser  
+from django.utils.html import strip_tags
 
 
 
@@ -1078,8 +1079,7 @@ def handle_suspend_action(request, org_id, user_id=None, action=None):
 
 
 # MEETING CREATION VIA NLP (NATURAL LANGUAGE PROCESSING)
-import dateparser  
-from django.utils.html import strip_tags
+
 
 @csrf_exempt
 def create_meeting_from_nlp(request, org_id):
@@ -1119,8 +1119,8 @@ def create_meeting_from_nlp(request, org_id):
         invitee_username = extract_invitee_from_text(input_text)
 
         if invitee_username:
-           invitee_username = invitee_username.lower()  # Convert to lowercase for case-insensitive matching
-           invitee = User.objects.filter(username__iexact=invitee_username).first()  # Case-insensitive lookup
+           invitee_username = invitee_username.lower()  
+           invitee = User.objects.filter(username__iexact=invitee_username).first()  
 
            if invitee:
              invitee_profile = Profile.objects.filter(user=invitee, organization=organization).exists()
@@ -1141,6 +1141,26 @@ def create_meeting_from_nlp(request, org_id):
 
             if conflict:
                 return JsonResponse({"error": f"{invitee_username} is already booked at this time"}, status=400)
+            
+            # Convert meeting date to weekday index (0 = Monday, 6 = Sunday)
+            meeting_weekday = meeting_date.weekday()
+
+            # Check if invitee has availability for the meeting time
+            availability_slot = Availability.objects.filter(
+               user=invitee,
+               organization=organization,
+                day_of_week=meeting_weekday,
+                start_time__lte=start_time, 
+                end_time__gte=end_time,  
+               is_booked=False  
+              ).first()
+
+            if not availability_slot:
+               return JsonResponse({"error": "Invitee is not available at this time!"}, status=400)
+
+            # Mark slot as booked
+            availability_slot.is_booked = True
+            availability_slot.save() 
 
         # Create Meeting
         meeting = MeetingOrganization.objects.create(
