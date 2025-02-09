@@ -1241,7 +1241,7 @@ def send_meeting_email(meeting):
 
     subject = f"New Meeting Scheduled with {meeting.user.username}"
     
-    # Render email template (for HTML email)
+   
     html_message = render_to_string("emails/meeting_invite.html", {
         "invitee": meeting.invitee,
         "creator": meeting.user,

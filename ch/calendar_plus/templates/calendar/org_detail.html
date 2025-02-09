@@ -2113,18 +2113,26 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-// CREATE MEETINGS VIA NLP
 
+
+// CREATE MEETINGS VIA NLP
+// CREATE MEETINGS VIA NLP
 document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("createMeetingBtn").addEventListener("click", function () {
         let inputText = document.getElementById("nlpInput").value.trim();
         let orgId = "{{organization.id}}";  // Replace dynamically in your template
+        let createBtn = document.getElementById("createMeetingBtn"); 
+        let errorMessage = document.getElementById("errorMessage");
 
         if (!inputText) {
-            document.getElementById("errorMessage").textContent = "Please enter a meeting description!";
-            document.getElementById("errorMessage").style.display = "block";
+            errorMessage.textContent = "Please enter a meeting description!";
+            errorMessage.style.display = "block";
             return;
         }
+
+        // Show Spinner in Button
+        createBtn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Scheduling...`;
+        createBtn.disabled = true;  // Disable button during request
 
         fetch(`/organizations/create_meeting_from_nlp/${orgId}/`, {
             method: "POST",
@@ -2137,8 +2145,8 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(response => response.json())
         .then(data => {
             if (data.error) {
-                document.getElementById("errorMessage").textContent = data.error;
-                document.getElementById("errorMessage").style.display = "block";
+                errorMessage.textContent = data.error;
+                errorMessage.style.display = "block";
             } else {
                 alert("✅ Meeting Scheduled Successfully!");
                 location.reload();
@@ -2146,8 +2154,13 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .catch(error => {
             console.error("Error:", error);
-            document.getElementById("errorMessage").textContent = "Something went wrong!";
-            document.getElementById("errorMessage").style.display = "block";
+            errorMessage.textContent = "Something went wrong!";
+            errorMessage.style.display = "block";
+        })
+        .finally(() => {
+            // Restore Button Text
+            createBtn.innerHTML = `Create Meeting via NLP`;
+            createBtn.disabled = false;  // Re-enable button after request
         });
     });
 });
