@@ -1,54 +1,546 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to Calendar Plus</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Base Styles */
+        :root {
+            --primary: #4A3AFF;
+            --secondary: #00C1D4;
+            --tertiary: #FF6B6B;
+            --background: #F8FAFF;
+            --text: #2D3436;
+            --card-bg: #FFFFFF;
+            --shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 50px;
-            background-color: #f8f9fa;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
         }
+
         .guide-container {
-            max-width: 600px;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin: auto;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
         }
-        h1 { color: #5b21b6; }
-        p { color: #333; }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Header Styles */
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -1.5px;
+        }
+
+        /* Section Styles */
+        .section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow);
+            transform: translateY(0);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+
+        .section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section h2 i {
+            font-size: 1.4rem;
+            color: var(--secondary);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            padding: 25px;
+            border-radius: 12px;
+            background: linear-gradient(145deg, #ffffff, #f8f9ff);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            background: linear-gradient(145deg, #f8f9ff, #ffffff);
+            transform: translateX(8px);
+        }
+
+        .feature-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Button Styles */
         .btn {
-            padding: 10px 20px;
-            background-color: #5b21b6;
-            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
             border: none;
             cursor: pointer;
-            border-radius: 5px;
-            margin-top: 20px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            position: relative;
+            overflow: hidden;
         }
-        .btn:hover {
-            background-color: #4a148c;
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn:hover::after {
+            opacity: 1;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Interactive Elements */
+        .highlight {
+            position: relative;
+            display: inline-block;
+        }
+
+        .highlight::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--tertiary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .highlight:hover::after {
+            transform: scaleX(1);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .guide-container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .section {
+                padding: 25px;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Special Elements */
+        .gradient-bar {
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            margin: 30px 0;
+            border-radius: 2px;
+            animation: gradientShift 6s ease infinite;
+        }
+
+        .floating-emoji {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--card-bg);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .floating-emoji:hover {
+            transform: scale(1.1) rotate(15deg);
+        }
+
+        /* Progress Indicator */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: var(--secondary);
+            z-index: 999;
+            transition: width 0.3s ease;
+        }
+
+        /* Enhanced List Styles */
+        .modern-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .modern-list li {
+            padding: 12px 0;
+            padding-left: 35px;
+            position: relative;
+        }
+
+        .modern-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            top: 12px;
+            color: var(--secondary);
+            font-weight: bold;
+            width: 25px;
+            height: 25px;
+            background: rgba(0,193,212,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Interactive Form */
+        form {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        /* Responsive Animations */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="scroll-progress" id="progress"></div>
+    <div class="floating-emoji">🎉</div>
 
     <div class="guide-container">
-        <h1>Welcome to Calendar Plus! 🎉</h1>
-        <p>Here, you can manage organizations, create groups, and collaborate with ease.</p>
-        <p>✅ Create and manage workspaces.</p>
-        <p>✅ Organize projects & channels.</p>
-        <p>✅ Schedule meetings & events.</p>
+        <header class="header">
+            <h1>Welcome to Calendar Plus</h1>
+            <p class="subtitle">Your all-in-one workspace for seamless collaboration and productivity</p>
+            <div class="gradient-bar"></div>
+        </header>
+
+        <section class="section">
+            <h2><i class="fas fa-rocket"></i>Why Calendar Plus?</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3><i class="fas fa-users"></i>Team Collaboration</h3>
+                    <p>Real-time communication and task management for distributed teams</p>
+                </div>
+                <div class="feature-card">
+                    <h3><i class="fas fa-calendar-alt"></i>Smart Scheduling</h3>
+                    <p>AI-powered meeting coordination and calendar synchronization</p>
+                </div>
+                <div class="feature-card">
+                    <h3><i class="fas fa-chart-line"></i>Advanced Analytics</h3>
+                    <p>Track team productivity and project progress in real-time</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2><i class="fas fa-building"></i>Organizations</h2>
+            <ul class="modern-list">
+                <li>Create multiple workspaces with custom permissions</li>
+                <li>Role-based access control and security settings</li>
+                <li>Cross-organization resource sharing</li>
+            </ul>
+            <div class="gradient-bar" style="margin: 25px 0"></div>
+            <div class="feature-grid" style="margin-top: 30px">
+                <div class="feature-card">
+                    <h3><i class="fas fa-comments"></i>Channels</h3>
+                    <p>Public, private, and shared communication spaces</p>
+                </div>
+                <div class="feature-card">
+                    <h3><i class="fas fa-tasks"></i>Projects</h3>
+                    <p>End-to-end project management with Gantt charts</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Additional Sections with Similar Structure -->
+
+        <section class="section">
+            <h2><i class="fas fa-users"></i> Groups</h2>
+            <ul class="modern-list">
+                <li>Organize members into teams for better collaboration</li>
+                <li>Role-based permissions for each group</li>
+                <li>Separate group-specific discussions and projects</li>
+            </ul>
+            <div class="gradient-bar" style="margin: 25px 0"></div>
+            <div class="feature-grid" style="margin-top: 30px">
+                <div class="feature-card">
+                    <h3><i class="fas fa-user-shield"></i> Group Permissions</h3>
+                    <p>Manage access levels and roles within groups</p>
+                </div>
+                <div class="feature-card">
+                    <h3><i class="fas fa-users-cog"></i> Team Collaboration</h3>
+                    <p>Encourage teamwork with structured discussions</p>
+                </div>
+            </div>
+        </section>
         
-        <form method="post">
-            {% csrf_token %}
-            <button type="submit" class="btn">Finish</button>
-        </form>
+        <section class="section">
+            <h2><i class="fas fa-calendar-alt"></i> Events & Meetings</h2>
+            <ul class="modern-list">
+                <li>Schedule one-time or recurring meetings</li>
+                <li>Sync with Google Calendar for seamless planning</li>
+                <li>Generate and share video call links (Google Meet, Zoom, etc.)</li>
+            </ul>
+            <div class="gradient-bar" style="margin: 25px 0"></div>
+            <div class="feature-grid" style="margin-top: 30px">
+                <div class="feature-card">
+                    <h3><i class="fas fa-bell"></i> Notifications</h3>
+                    <p>Automated reminders for upcoming meetings</p>
+                </div>
+                <div class="feature-card">
+                    <h3><i class="fas fa-check-circle"></i> Attendance Tracking</h3>
+                    <p>Monitor meeting participation and responses</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2><i class="fas fa-tasks"></i> Task Management</h2>
+            <ul class="modern-list">
+                <li>Assign tasks to individuals or teams</li>
+                <li>Track progress with task statuses and due dates</li>
+                <li>Monitor workload distribution across projects</li>
+            </ul>
+            <div class="gradient-bar" style="margin: 25px 0"></div>
+            <div class="feature-grid" style="margin-top: 30px">
+                <div class="feature-card">
+                    <h3><i class="fas fa-chart-line"></i> Task Monitoring</h3>
+                    <p>Get real-time insights into task progress</p>
+                </div>
+                <div class="feature-card">
+                    <h3><i class="fas fa-user-clock"></i> Time Tracking</h3>
+                    <p>Measure time spent on tasks for better efficiency</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2><i class="fas fa-user-clock"></i> Availability & Scheduling</h2>
+            <ul class="modern-list">
+                <li>Mark availability for meetings and events</li>
+                <li>View team members’ schedules in real-time</li>
+                <li>Automatically find the best meeting slots</li>
+            </ul>
+            <div class="gradient-bar" style="margin: 25px 0"></div>
+            <div class="feature-grid" style="margin-top: 30px">
+                <div class="feature-card">
+                    <h3><i class="fas fa-sync-alt"></i> Google Calendar Sync</h3>
+                    <p>Keep your schedule updated across all devices</p>
+                </div>
+                <div class="feature-card">
+                    <h3><i class="fas fa-calendar-check"></i> Auto Scheduling</h3>
+                    <p>AI-powered scheduling for optimized workflows</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2><i class="fas fa-users"></i> Group Events</h2>
+            <ul class="modern-list">
+                <li>Plan team-building activities and workshops</li>
+                <li>Organize knowledge-sharing sessions</li>
+                <li>Track RSVPs and participation</li>
+            </ul>
+            <div class="gradient-bar" style="margin: 25px 0"></div>
+            <div class="feature-grid" style="margin-top: 30px">
+                <div class="feature-card">
+                    <h3><i class="fas fa-calendar-plus"></i> Event Creation</h3>
+                    <p>Customizable group event planning</p>
+                </div>
+                <div class="feature-card">
+                    <h3><i class="fas fa-user-check"></i> Participation Tracking</h3>
+                    <p>Monitor attendee engagement in events</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2><i class="fas fa-link"></i> Google Calendar Integration</h2>
+            <ul class="modern-list">
+                <li>Sync Calendar Plus with your Google Calendar</li>
+                <li>Receive real-time updates on events and tasks</li>
+                <li>Automate meeting invites and scheduling</li>
+            </ul>
+            <div class="gradient-bar" style="margin: 25px 0"></div>
+            <div class="feature-grid" style="margin-top: 30px">
+                <div class="feature-card">
+                    <h3><i class="fas fa-calendar-alt"></i> Event Synchronization</h3>
+                    <p>Keep track of all events across platforms</p>
+                </div>
+                <div class="feature-card">
+                    <h3><i class="fas fa-clock"></i> Time Zone Adjustments</h3>
+                    <p>Automatic time zone conversion for global teams</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2><i class="fas fa-tools"></i> Advanced Features</h2>
+            <ul class="modern-list">
+                <li>Custom permissions for different roles</li>
+                <li>File sharing and document collaboration</li>
+                <li>Automated reminders and task tracking</li>
+            </ul>
+            <div class="gradient-bar" style="margin: 25px 0"></div>
+            <div class="feature-grid" style="margin-top: 30px">
+                <div class="feature-card">
+                    <h3><i class="fas fa-shield-alt"></i> Security & Access</h3>
+                    <p>Multi-layer security with role-based access</p>
+                </div>
+                <div class="feature-card">
+                    <h3><i class="fas fa-chart-pie"></i> Analytics & Reporting</h3>
+                    <p>Data-driven insights for better decision-making</p>
+                </div>
+            </div>
+        </section>
+
+
+
+
+
+
+
+
+        <section class="section">
+            <h2><i class="fas fa-calendar-check"></i>Get Started</h2>
+            <p>Ready to transform your team's productivity?</p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn">
+                    <i class="fas fa-play"></i>
+                    Launch Workspace
+                </button>
+            </form>
+        </section>
     </div>
 
+    <script>
+        // Scroll Progress Indicator
+        window.onscroll = () => {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            document.getElementById('progress').style.width = (winScroll / height) * 100 + "%";
+        };
+
+        // Intersection Observer for Scroll Animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.section').forEach((el) => observer.observe(el));
+
+        // Ripple Effect for Button
+        document.querySelector('.btn').addEventListener('click', function(e) {
+            let ripple = document.createElement('div');
+            ripple.style.position = 'absolute';
+            ripple.style.width = '20px';
+            ripple.style.height = '20px';
+            ripple.style.background = 'rgba(255,255,255,0.4)';
+            ripple.style.borderRadius = '50%';
+            ripple.style.transform = 'translate(-50%, -50%)';
+            ripple.style.pointerEvents = 'none';
+            ripple.style.left = e.offsetX + 'px';
+            ripple.style.top = e.offsetY + 'px';
+            this.appendChild(ripple);
+            
+            setTimeout(() => ripple.remove(), 500);
+        });
+    </script>
 </body>
 </html>
+
+{% endblock %}
