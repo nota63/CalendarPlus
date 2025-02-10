@@ -39,8 +39,9 @@ class OrganizationHide(models.Model):
 # Schedule meetings
 
 class RecurringMeeting(models.Model):
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="recurring_meetings")
-    meeting = models.ForeignKey(MeetingOrganization, on_delete=models.CASCADE, related_name="recurrences")
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="recurring_meetings",null=True, blank=True)
+  
+    type=models.CharField(max_length=100, choices=(('Recurring Meeting','recurring_meeting'),('Urgent','urgent')),default='Urgent',null=True, blank=True)
     
    
     RECURRING_CHOICES = [
@@ -51,7 +52,7 @@ class RecurringMeeting(models.Model):
         ("custom", "Custom"),
     ]
     
-    recurrence_type = models.CharField(max_length=10, choices=RECURRING_CHOICES, default="weekly")
+    recurrence_type = models.CharField(max_length=10, choices=RECURRING_CHOICES, default="weekly",null=True, blank=True)
     custom_days = models.JSONField(blank=True, null=True, help_text="Store custom recurrence days as a list [1,3,5] for Mon,Wed,Fri")
 
     start_date = models.DateField()
@@ -67,15 +68,15 @@ class RecurringMeeting(models.Model):
 
 
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="created_recurring_meetings")
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="recurring_meetings_set")
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="recurring_meetings_set")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.meeting.meeting_title} ({self.get_recurrence_type_display()})"
+        return f" Meeting Created by {self.created_by} - {self.creator}"
 
     class Meta:
-        unique_together = ("meeting", "recurrence_type", "start_date")
+        unique_together = ("recurrence_type", "start_date")
 
-
+     

@@ -1753,7 +1753,13 @@ My Calendar
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="{% url 'user_calendar' user_id=member.user.id org_id=organization.id%}">Schedule</a></li>
-                           
+                            <li>
+                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#ScheduleMeetsModal"
+                                   data-org-id="{{ organization.id }}" data-user-id="{{ member.user.id }}">
+                                    Future Schedule
+                                </a>
+                            </li>
+                            
                         </ul>
                     </div>
                 </div>
@@ -1772,9 +1778,6 @@ My Calendar
 
 
 <!-- Upcoming Events  -->
-<!-- Upcoming Events  -->
-<!-- Upcoming Events  -->
-
 <!-- SECOND CONTAINER (UPCOMING EVENTS)-->
 <div class="max-w-3xl flex-grow-1 mx-2 px-4 sm:px-6 lg:px-8 py-4" style="max-width: 48%;">
     <div class="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
@@ -2163,6 +2166,105 @@ My Calendar
         </div>
     </div>
 </div>
+
+
+
+<!-- SCHEDULE RECURRING MEETING -->
+
+<div class="modal fade" id="ScheduleMeetsModal" tabindex="-1" aria-labelledby="ScheduleMeetsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ScheduleMeetsModalLabel">Schedule a Recurring Meeting</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="scheduleMeetingForm">
+                    <input type="hidden" id="org_id" name="org_id">
+                    <input type="hidden" id="user_id" name="user_id">
+
+                    <div class="mb-3">
+                        <label for="recurrence_type" class="form-label">Recurrence Type</label>
+                        <select class="form-select" id="recurrence_type" name="recurrence_type">
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="yearly">Yearly</option>
+                            <option value="custom">Custom Days</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="start_date" class="form-label">Start Date</label>
+                        <input type="datetime-local" class="form-control" id="start_date" name="start_date" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="end_date" class="form-label">End Date (Optional)</label>
+                        <input type="datetime-local" class="form-control" id="end_date" name="end_date">
+                    </div>
+
+                    <div id="customDaysContainer" class="mb-3" style="display: none;">
+                        <label class="form-label">Select Custom Days</label>
+                        <div class="d-flex flex-wrap">
+                            <div class="form-check me-3">
+                                <input class="form-check-input" type="checkbox" value="monday" id="monday">
+                                <label class="form-check-label" for="monday">Monday</label>
+                            </div>
+                            <div class="form-check me-3">
+                                <input class="form-check-input" type="checkbox" value="tuesday" id="tuesday">
+                                <label class="form-check-label" for="tuesday">Tuesday</label>
+                            </div>
+                            <div class="form-check me-3">
+                                <input class="form-check-input" type="checkbox" value="wednesday" id="wednesday">
+                                <label class="form-check-label" for="wednesday">Wednesday</label>
+                            </div>
+                            <div class="form-check me-3">
+                                <input class="form-check-input" type="checkbox" value="thursday" id="thursday">
+                                <label class="form-check-label" for="thursday">Thursday</label>
+                            </div>
+                            <div class="form-check me-3">
+                                <input class="form-check-input" type="checkbox" value="friday" id="friday">
+                                <label class="form-check-label" for="friday">Friday</label>
+                            </div>
+                            <div class="form-check me-3">
+                                <input class="form-check-input" type="checkbox" value="saturday" id="saturday">
+                                <label class="form-check-label" for="saturday">Saturday</label>
+                            </div>
+                            <div class="form-check me-3">
+                                <input class="form-check-input" type="checkbox" value="sunday" id="sunday">
+                                <label class="form-check-label" for="sunday">Sunday</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="remind_before" class="form-label">Remind Before (Minutes)</label>
+                        <input type="number" class="form-control" id="remind_before" name="remind_before" value="15" min="1">
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="send_email_reminder" checked>
+                        <label class="form-check-label" for="send_email_reminder">Send Email Reminder</label>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="send_push_notification" checked>
+                        <label class="form-check-label" for="send_push_notification">Send Push Notification</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Schedule Meeting</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
 
 
 
@@ -2584,6 +2686,68 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+// HANDLE RECURRING MEETINGS
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Capture data-org-id and data-user-id when opening modal
+    const scheduleModal = document.getElementById("ScheduleMeetsModal");
+    scheduleModal.addEventListener("show.bs.modal", function (event) {
+        let button = event.relatedTarget;
+        let orgId = button.getAttribute("data-org-id");
+        let userId = button.getAttribute("data-user-id");
+
+        document.getElementById("org_id").value = orgId;
+        document.getElementById("user_id").value = userId;
+    });
+
+    // Show/hide custom days input
+    document.getElementById("recurrence_type").addEventListener("change", function () {
+        let customDaysContainer = document.getElementById("customDaysContainer");
+        customDaysContainer.style.display = this.value === "custom" ? "block" : "none";
+    });
+
+    // Handle form submission via AJAX
+    document.getElementById("scheduleMeetingForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        let formData = {
+            org_id: document.getElementById("org_id").value,
+            user_id: document.getElementById("user_id").value,
+            recurrence_type: document.getElementById("recurrence_type").value,
+            start_date: document.getElementById("start_date").value,
+            end_date: document.getElementById("end_date").value || null,
+            custom_days: Array.from(document.querySelectorAll("#customDaysContainer input:checked")).map(el => el.value),
+            remind_before: document.getElementById("remind_before").value,
+            send_email_reminder: document.getElementById("send_email_reminder").checked,
+            send_push_notification: document.getElementById("send_push_notification").checked
+        };
+
+        fetch(`/organizations/create_recurring_meetings/${formData.org_id}/${formData.user_id}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken()
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert("Error: " + data.error);
+            } else {
+                alert("Meeting Scheduled Successfully!");
+                let modalInstance = bootstrap.Modal.getInstance(scheduleModal);
+                modalInstance.hide();
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+
+    // Get CSRF Token (if needed)
+    function getCSRFToken() {
+        return document.querySelector("[name=csrfmiddlewaretoken]")?.value;
+    }
+});
 
 
 

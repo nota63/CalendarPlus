@@ -28,7 +28,8 @@ urlpatterns=[
     path("organization/<int:org_id>/members/", handle_suspend_action, name="handle_suspend_action"),
     path("organization/<int:org_id>/suspend/<int:user_id>/<str:action>/", handle_suspend_action, name="handle_suspend_action"),
     path('create_meeting_from_nlp/<int:org_id>/',create_meeting_from_nlp, name='create_meeting_from_nlp'),
-    path('meeting_analytics/<int:org_id>/',meeting_analytics, name='meeting_analytics')
+    path('meeting_analytics/<int:org_id>/',meeting_analytics, name='meeting_analytics'),
+    path('create_recurring_meetings/<int:org_id>/<int:user_id>/',create_recurring_meeting, name='create_recurring_meetings')
     
 ]
 

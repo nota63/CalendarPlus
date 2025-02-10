@@ -32,7 +32,7 @@ from django.utils.html import strip_tags
 from accounts.models import ProjectEmployeeAssignment, Project, ProjectManagerAssignment
 from groups.models import Group, GroupMember
 import logging
-
+from .models import RecurringMeeting
 
 
 
@@ -1369,3 +1369,66 @@ def meeting_analytics(request, org_id):
     return JsonResponse(data)
 
 
+# Handle recurring Meetings
+
+@csrf_exempt  # Remove if CSRF is handled in frontend
+def create_recurring_meeting(request, org_id, user_id):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            created_by = request.user  
+
+            # Validate Organization and User
+            organization = get_object_or_404(Organization, id=org_id)
+            scheduled_user = get_object_or_404(User, id=user_id)  # User to whom the meeting is scheduled
+
+            # Extract required fields
+            recurrence_type = data.get("recurrence_type")
+            start_date = data.get("start_date")
+            end_date = data.get("end_date", None)
+            custom_days = data.get("custom_days", [])
+            remind_before = data.get("remind_before", 15)
+            send_email_reminder = data.get("send_email_reminder", True)
+            send_push_notification = data.get("send_push_notification", True)
+            exclude_dates = data.get("exclude_dates", [])
+
+            # Validate recurrence type
+            valid_recurrence_types = ["daily", "weekly", "monthly", "yearly", "custom"]
+            if recurrence_type not in valid_recurrence_types:
+                return JsonResponse({"error": "Invalid recurrence type"}, status=400)
+
+            # Handle custom days validation
+            if recurrence_type == "custom" and not isinstance(custom_days, list):
+                return JsonResponse({"error": "Custom days must be a list"}, status=400)
+
+            # Convert start_date and end_date to correct format
+            try:
+                start_date = datetime.fromisoformat(start_date).date()  # Convert to YYYY-MM-DD
+                if end_date:
+                    end_date = datetime.fromisoformat(end_date).date()
+            except ValueError:
+                return JsonResponse({"error": "Invalid date format. Use YYYY-MM-DD."}, status=400)
+
+            # Create recurring meeting
+            recurring_meeting = RecurringMeeting.objects.create(
+                organization=organization,
+                created_by=created_by,
+                creator=scheduled_user,  # Assign the scheduled user
+                recurrence_type=recurrence_type,
+                start_date=start_date,
+                end_date=end_date,
+                custom_days=custom_days if recurrence_type == "custom" else None,
+                remind_before=remind_before,
+                send_email_reminder=send_email_reminder,
+                send_push_notification=send_push_notification,
+                exclude_dates=exclude_dates,
+            )
+
+            return JsonResponse({"message": "Recurring meeting scheduled successfully!", "meeting_id": recurring_meeting.id}, status=201)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON data"}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
