@@ -2429,6 +2429,29 @@ My Calendar
     </div>
 </div>
 
+<!-- CALENDAR MEETING DETAILS -->
+
+<div class="modal fade" id="meetingDetailsModal" tabindex="-1" aria-labelledby="meetingDetailsLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="meetingTitle"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Date:</strong> <span id="meetingDate"></span></p>
+                <p><strong>Time:</strong> <span id="meetingTime"></span></p>
+                <p><strong>Location:</strong> <span id="meetingLocation"></span></p>
+                <p><strong>User:(For created)</strong> <span id="meetingUser"></span></p>
+                <p><strong>Invitee (creator):</strong> <span id="meetingInvitee"></span></p>
+                <p><strong>Status:</strong> <span id="meetingStatus"></span></p>
+                <p><strong>Description:</strong></p>
+                <p id="meetingDescription"></p>
+                <div id="meetingJoinButton" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -3011,57 +3034,90 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Meetings calendar
 document.addEventListener('DOMContentLoaded', function () {
-            let calendar;
+    let calendar;
 
-            // Open Modal & Initialize Calendar on Button Click
-            $('#openCalendarBtn').on('click', function () {
-                $('#calendarModal').modal('show'); // Show modal
+    // Open Modal & Initialize Calendar on Button Click
+    $('#openCalendarBtn').on('click', function () {
+        $('#calendarModal').modal('show'); // Show modal
 
-                if (!calendar) { // Initialize only once
-                    setTimeout(() => {
-                        loadCalendar();
-                    }, 500);
-                }
-            });
+        if (!calendar) { // Initialize only once
+            setTimeout(() => {
+                loadCalendar();
+            }, 500);
+        }
+    });
 
-            function loadCalendar() {
-                let calendarEl = document.getElementById('calendar');
-                let orgId = "{{organization.id}}"; // Replace with dynamic organization ID
-                let eventsUrl = `/organizations/meetings-calendar-view/${orgId}/`; // Django view URL
+    function loadCalendar() {
+        let calendarEl = document.getElementById('calendar');
+        let orgId = "{{organization.id}}"; // Replace with dynamic organization ID
+        let eventsUrl = `/organizations/meetings-calendar-view/${orgId}/`; // Django view URL
 
-                calendar = new FullCalendar.Calendar(calendarEl, {
-                    initialView: 'dayGridMonth',
-                    headerToolbar: {
-                        left: 'prev,next today',
-                        center: 'title',
-                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                    },
-                    events: function (fetchInfo, successCallback, failureCallback) {
-                        $.ajax({
-                            url: eventsUrl,
-                            type: "GET",
-                            dataType: "json",
-                            success: function (response) {
-                                let events = response.meetings.map(meeting => ({
-                                    id: meeting.id,
-                                    title: meeting.title,
-                                    start: meeting.start,
-                                    end: meeting.end,
-                                    url: meeting.meeting_link || null,
-                                    color: meeting.status === "completed" ? "green" : meeting.status === "canceled" ? "red" : "#007bff"
-                                }));
-                                successCallback(events);
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            eventClick: function (info) {
+                showMeetingDetails(info.event);
+            },
+            events: function (fetchInfo, successCallback, failureCallback) {
+                $.ajax({
+                    url: eventsUrl,
+                    type: "GET",
+                    dataType: "json",
+                    success: function (response) {
+                        let events = response.meetings.map(meeting => ({
+                            id: meeting.id,
+                            title: meeting.title,
+                            start: meeting.start,
+                            end: meeting.end,
+                    
+                            extendedProps: {
+                                description: meeting.description,
+                                location: meeting.location,
+                                meeting_link: meeting.meeting_link,
+                                status: meeting.status,
+                                user: meeting.user,
+                                invitee:meeting.invitee,
+                                
                             },
-                            error: function () {
-                                failureCallback();
-                            }
-                        });
+                            color: meeting.status === "completed" ? "green" : 
+                                   meeting.status === "canceled" ? "red" : "#007bff"
+                        }));
+                        successCallback(events);
+                    },
+                    error: function () {
+                        failureCallback();
                     }
                 });
-
-                calendar.render();
             }
         });
+
+        calendar.render();
+    }
+
+    function showMeetingDetails(event) {
+        $('#meetingTitle').text(event.title);
+        $('#meetingUser').text(event.extendedProps.user || "Unknown"); // FIXED
+        $('#meetingInvitee').text(event.extendedProps.invitee || "Unknown"); // FIXED
+        $('#meetingInvitee').text(event.invitee);
+        $('#meetingDate').text(event.start.toLocaleDateString());
+        $('#meetingTime').text(`${event.start.toLocaleTimeString()} - ${event.end ? event.end.toLocaleTimeString() : 'N/A'}`);
+        $('#meetingLocation').text(event.extendedProps.location || "N/A");
+        $('#meetingDescription').text(event.extendedProps.description || "No description available");
+        $('#meetingStatus').text(event.extendedProps.status || "N/A");
+
+        if (event.extendedProps.meeting_link) {
+            $('#meetingJoinButton').html(`<a href="${event.extendedProps.meeting_link}" target="_blank" class="btn btn-primary">Join Meeting</a>`);
+        } else {
+            $('#meetingJoinButton').html(`<span class="text-muted">No meeting link available</span>`);
+        }
+
+        $('#meetingDetailsModal').modal('show'); // Open the details modal
+    }
+});
 
 
 

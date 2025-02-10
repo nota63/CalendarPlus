@@ -1525,7 +1525,10 @@ def get_meetings(request, org_id):
                 "meeting_link": meeting.meeting_link if meeting.meeting_link else "",
                 "meeting_type": meeting.meeting_type,
                 "meeting_location": meeting.meeting_location,
+                "user":meeting.user.username,
+                'invitee':meeting.invitee.username
             })
+        print("MEETINGS DATA:",meetings_data)    
 
         return JsonResponse({"meetings": meetings_data}, safe=False)
 
