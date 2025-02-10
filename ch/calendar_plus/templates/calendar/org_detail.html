@@ -284,10 +284,7 @@
     box-shadow: 0 4px 12px rgba(74, 58, 255, 0.25);
 }
 
-/* Three-Dot Menu Styling */
-.dropdown-toggle::after {
-    display: none;
-}
+
 
 #meetingOptionsDropdown {
     position: absolute;
@@ -2166,10 +2163,16 @@ My Calendar
                         </div>
                         
                         <!-- 3-dot menu container -->
-                      <div class="dropdown">
-                          <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-ellipsis-v"></i> <!-- FontAwesome 3 dots -->
-                     </button>
+                        
+                        <div class="dropdown">
+                           <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                          <i class="fas fa-ellipsis-v"></i> <!-- FontAwesome 3 dots -->
+                        </button>
+
+
+
+
+                        
     
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
                         <li><a class="dropdown-item" href="{% url 'meeting_detail_view' org_id=organization.id meeting_id=meeting.id  %}">Join & Details</a></li>
