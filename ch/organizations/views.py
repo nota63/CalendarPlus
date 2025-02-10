@@ -1371,7 +1371,7 @@ def meeting_analytics(request, org_id):
 
 # Handle recurring Meetings
 
-@csrf_exempt  # Remove if CSRF is handled in frontend
+@csrf_exempt 
 def create_recurring_meeting(request, org_id, user_id):
     if request.method == "POST":
         try:
@@ -1380,7 +1380,14 @@ def create_recurring_meeting(request, org_id, user_id):
 
             # Validate Organization and User
             organization = get_object_or_404(Organization, id=org_id)
-            scheduled_user = get_object_or_404(User, id=user_id)  # User to whom the meeting is scheduled
+            
+            user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+            if not user_profile:
+                return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+
+
+            scheduled_user = get_object_or_404(User, id=user_id)  
 
             # Extract required fields
             recurrence_type = data.get("recurrence_type")
@@ -1397,13 +1404,13 @@ def create_recurring_meeting(request, org_id, user_id):
             if recurrence_type not in valid_recurrence_types:
                 return JsonResponse({"error": "Invalid recurrence type"}, status=400)
 
-            # Handle custom days validation
+            
             if recurrence_type == "custom" and not isinstance(custom_days, list):
                 return JsonResponse({"error": "Custom days must be a list"}, status=400)
 
             # Convert start_date and end_date to correct format
             try:
-                start_date = datetime.fromisoformat(start_date).date()  # Convert to YYYY-MM-DD
+                start_date = datetime.fromisoformat(start_date).date() 
                 if end_date:
                     end_date = datetime.fromisoformat(end_date).date()
             except ValueError:
@@ -1413,7 +1420,7 @@ def create_recurring_meeting(request, org_id, user_id):
             recurring_meeting = RecurringMeeting.objects.create(
                 organization=organization,
                 created_by=created_by,
-                creator=scheduled_user,  # Assign the scheduled user
+                creator=scheduled_user,  
                 recurrence_type=recurrence_type,
                 start_date=start_date,
                 end_date=end_date,
