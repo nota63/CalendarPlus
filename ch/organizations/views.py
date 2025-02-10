@@ -1450,6 +1450,13 @@ def fetch_recurring_meetings(request, org_id):
     """
     if not request.user.is_authenticated:
         return JsonResponse({"error": "Unauthorized"}, status=401)
+    
+    organization = get_object_or_404(Organization, id=org_id)
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+
 
     meetings = RecurringMeeting.objects.filter(organization_id=org_id, created_by=request.user)
 
@@ -1477,6 +1484,13 @@ def delete_recurring_meeting(request, org_id, meeting_id):
     """
     if not request.user.is_authenticated:
         return JsonResponse({"error": "Unauthorized"}, status=401)
+    
+     
+    organization = get_object_or_404(Organization, id=org_id)
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
 
     meeting = get_object_or_404(RecurringMeeting, id=meeting_id, organization_id=org_id, created_by=request.user)
     meeting.delete()
