@@ -32,7 +32,8 @@ urlpatterns=[
     path('create_recurring_meetings/<int:org_id>/<int:user_id>/',create_recurring_meeting, name='create_recurring_meetings'),
     path("recurring-meetings/<int:org_id>/", fetch_recurring_meetings, name="fetch_recurring_meetings"),
     path("delete-recurring-meetings/<int:org_id>/<int:meeting_id>/", delete_recurring_meeting, name="delete_recurring_meetings"),
-    path('meetings-calendar-view/<int:org_id>/',get_meetings, name='meetings_calendar_view')
+    path('meetings-calendar-view/<int:org_id>/',get_meetings, name='meetings_calendar_view'),
+    path('meeting-reminder-ajax/<int:org_id>/<int:meeting_id>/',set_meeting_reminder,name='meeting_reminder_ajax')
     
 ]
 

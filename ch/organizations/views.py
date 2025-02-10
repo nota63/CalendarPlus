@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from accounts.models import(Organization, Profile, EmailInvitation, Suspend,MeetingOrganization,Availability)
+from accounts.models import(Organization, Profile, EmailInvitation, Suspend,MeetingOrganization,Availability,MeetingReminder)
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
@@ -1536,3 +1536,53 @@ def get_meetings(request, org_id):
         return JsonResponse({"error": str(e)}, status=500)
 
 
+
+# MANAGE MEETING REMINDER
+
+@csrf_exempt
+def set_meeting_reminder(request, org_id, meeting_id):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            reminder_time = data.get("reminder_time", 15)  # Default: 15 minutes
+            custom_minutes = data.get("custom_minutes")
+            custom_hours = data.get("custom_hours")
+            reminder_type = data.get("reminder_type", "email")
+            reminder_style = data.get("reminder_style", "minimalist")
+            remind_all_members = data.get("remind_all_members", False)
+
+            organization = get_object_or_404(Organization, id=org_id)
+            meeting = get_object_or_404(MeetingOrganization, id=meeting_id, organization=organization)
+            user = request.user  # The user setting the reminder
+
+            # Calculate Reminder Time
+            if reminder_time in [0, 15, 30, 45]:  
+                reminder_offset = timedelta(minutes=reminder_time)
+            else:  
+                reminder_offset = timedelta(minutes=custom_minutes or 0, hours=custom_hours or 0)
+
+            meeting_datetime = datetime.combine(meeting.meeting_date, meeting.start_time)
+            reminder_datetime = meeting_datetime - reminder_offset
+
+            # Create Reminder
+            reminder, created = MeetingReminder.objects.update_or_create(
+                organization=organization,
+                meeting=meeting,
+                user=user,
+                defaults={
+                    "reminder_type": reminder_type,
+                    "reminder_time": reminder_time,
+                    "custom_minutes": custom_minutes,
+                    "custom_hours": custom_hours,
+                    "reminder_datetime": reminder_datetime,
+                    "remind_all_members": remind_all_members,
+                    "reminder_style": reminder_style,
+                }
+            )
+
+            return JsonResponse({"message": "Reminder set successfully!", "reminder_id": reminder.id}, status=201)
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
