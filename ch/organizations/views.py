@@ -1098,7 +1098,6 @@ def handle_suspend_action(request, org_id, user_id=None, action=None):
 
 # MEETING CREATION VIA NLP (NATURAL LANGUAGE PROCESSING)
 
-
 @csrf_exempt
 def create_meeting_from_nlp(request, org_id):
     """
@@ -1111,6 +1110,8 @@ def create_meeting_from_nlp(request, org_id):
     try:
         data = json.loads(request.body)
         input_text = data.get("input_text")
+
+        print("INPUT TEXT :",input_text)
 
         if not input_text:
             return JsonResponse({"error": "Missing required fields"}, status=400)
@@ -1168,24 +1169,28 @@ def create_meeting_from_nlp(request, org_id):
                 return JsonResponse({"error": f"{invitee_username} is already booked at this time"}, status=400)
             
             # Convert meeting date to weekday index (0 = Monday, 6 = Sunday)
-            meeting_weekday = meeting_date.weekday()
+         
+            # ✅ Convert meeting date to weekday index (0 = Monday, 6 = Sunday)
+#             meeting_weekday = meeting_date.weekday()
 
-            # Check if invitee has availability for the meeting time
-            availability_slot = Availability.objects.filter(
-               user=invitee,
-               organization=organization,
-                day_of_week=meeting_weekday,
-                start_time__lte=start_time, 
-                end_time__gte=end_time,  
-               is_booked=False  
-              ).first()
+# # ✅ Check if an exact unbooked slot exists for the invitee
+#             selected_slot = Availability.objects.filter(
+#                user=invitee,
+#                     organization=organization,
+#                day_of_week=meeting_weekday,
+#                 start_time=start_time,  # Must match start time exactly
+#                 end_time=end_time,  # Must match end time exactly
+#                   is_booked=False  # Only check available slots
+#               ).first()  # Pick the first match
 
-            if not availability_slot:
-               return JsonResponse({"error": "Invitee is not available at this time!"}, status=400)
+#             if not selected_slot:
+#                return JsonResponse({"error": "Invitee is not available at this time!"}, status=400)
 
-            # Mark slot as booked
-            availability_slot.is_booked = True
-            availability_slot.save() 
+# # ✅ Mark this slot as booked
+#             selected_slot.is_booked = True
+#             selected_slot.save()
+
+         
 
         # Create Meeting
         meeting = MeetingOrganization.objects.create(
@@ -1217,6 +1222,7 @@ def create_meeting_from_nlp(request, org_id):
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+    
 
 
 # 📌 Helper Function: NLP Date Parsing
@@ -1308,6 +1314,10 @@ def send_meeting_email(meeting):
         html_message=html_message,
         fail_silently=False,
     )
+
+
+
+
 
 
 
@@ -1601,3 +1611,5 @@ def set_meeting_reminder(request, org_id, meeting_id):
             return JsonResponse({"error": str(e)}, status=400)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
+
+

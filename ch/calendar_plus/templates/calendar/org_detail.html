@@ -20,6 +20,9 @@
 
 
     <title>Organization Detail</title>
+    <input type="hidden" id="organizationId" value="{{ organization.id }}">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
     <!-- Bootstrap 5 CSS -->
    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -2581,7 +2584,7 @@ My Calendar
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="createMeetingBtn">Create Meeting</button>
+                <button type="button" class="btn btn-primary" id="createMeetingBtnn">Create Meeting</button>
             </div>
         </div>
     </div>
@@ -3183,13 +3186,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // CREATE MEETINGS VIA NLP
+
+
 // CREATE MEETINGS VIA NLP
 document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("createMeetingBtn").addEventListener("click", function () {
+    document.getElementById("createMeetingBtnn").addEventListener("click", function () {
         let inputText = document.getElementById("nlpInput").value.trim();
         let orgId = "{{organization.id}}";  // Replace dynamically in your template
-        let createBtn = document.getElementById("createMeetingBtn"); 
+        let createBtn = document.getElementById("createMeetingBtnn"); 
         let errorMessage = document.getElementById("errorMessage");
+        console.log(inputText);
 
         if (!inputText) {
             errorMessage.textContent = "Please enter a meeting description!";
@@ -3246,8 +3252,6 @@ function getCSRFToken() {
 
     return cookieValue;
 }
-
-
 
 
 
@@ -3514,7 +3518,13 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+
+
+
+
 // MANAGE RECURRING MEETINGS
+
+
 
 document.addEventListener("DOMContentLoaded", function () {
     const modal = document.getElementById("ManageRecurringModal");
@@ -3595,6 +3605,7 @@ document.addEventListener("DOMContentLoaded", function () {
             ?.split("=")[1];
     }
 });
+
 
 
 // Meetings calendar
@@ -3733,10 +3744,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
-
-
-
-
 
 
 
@@ -3919,6 +3926,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 5000);
     }
 });
+
+// nlp
+
 
 
 </script>
