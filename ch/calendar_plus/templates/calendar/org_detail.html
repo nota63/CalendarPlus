@@ -35,8 +35,299 @@
 </head>
 
 <style>
+  /* Modal Container */
+  #MeetsReminderModal .modal-dialog {
+        max-width: 500px;
+        margin: 1rem auto;
+    }
+    
+    #MeetsReminderModal .modal-content {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    /* Header */
+    #MeetsReminderModal .modal-header {
+        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        color: white;
+        padding: 1.5rem;
+        border-bottom: none;
+    }
+    
+    #MeetsReminderModal .modal-title {
+        font-weight: 600;
+        font-size: 1.4rem;
+        font-family: 'Inter', system-ui;
+        letter-spacing: -0.02em;
+    }
+    
+    #MeetsReminderModal .btn-close {
+        filter: invert(1);
+        opacity: 0.8;
+        transition: all 0.2s ease;
+    }
+    
+    #MeetsReminderModal .btn-close:hover {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+    
+    /* Body */
+    #MeetsReminderModal .modal-body {
+        padding: 2rem;
+        background: #f8fafc;
+    }
+    
+    /* Form Elements */
+    #setReminderForm .form-label {
+        font-weight: 500;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    #setReminderForm .form-select,
+    #setReminderForm .form-control {
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+    }
+    
+    #setReminderForm .form-select:focus,
+    #setReminderForm .form-control:focus {
+        border-color: #a855f7;
+        box-shadow: 0 0 0 3px rgba(168,85,247,0.1);
+    }
+    
+    #setReminderForm .form-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+        background-position: right 1rem center;
+        background-size: 16px;
+    }
+    
+    /* Custom Time Fields */
+    #customTimeFields {
+        background: #ffffff;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    #customTimeFields .form-control {
+        background: #f8fafc;
+    }
+    
+    /* Checkbox */
+    #setReminderForm .form-check-input {
+        width: 1.1em;
+        height: 1.1em;
+        margin-top: 0.15em;
+        border: 2px solid #cbd5e1;
+    }
+    
+    #setReminderForm .form-check-input:checked {
+        background-color: #6366f1;
+        border-color: #6366f1;
+    }
+    
+    /* Submit Button */
+    #setReminderForm .btn-success {
+        width: 100%;
+        padding: 0.9rem;
+        background: #6366f1;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        transition: all 0.2s ease;
+        margin-top: 1rem;
+    }
+    
+    #setReminderForm .btn-success:hover {
+        background: #4f46e5;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(99,102,241,0.2);
+    }
+    
+    /* Custom Grid Layout for Custom Time */
+    @media (min-width: 400px) {
+        #customTimeFields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        #customTimeFields .mb-3:last-child {
+            margin-bottom: 0;
+        }
+    }
+    
+    /* Animated Transitions */
+    .modal-body {
+        animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    
+    /* Hover Effects */
+    .form-select:hover,
+    .form-control:hover {
+        border-color: #c4b5fd;
+    }
 
-     /* Modal Customization */
+   /* Meeting Details Modal Styling */
+#meetingDetailsModal .modal-dialog {
+    max-width: 500px;
+    margin: 1rem auto;
+}
+
+#meetingDetailsModal .modal-content {
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    background: #fcfcfe;
+}
+
+#meetingDetailsModal .modal-header {
+    border-bottom: 1px solid #f0f0f5;
+    padding: 1.5rem 2rem;
+    position: relative;
+}
+
+#meetingDetailsModal .modal-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: #2d2d32;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#meetingDetailsModal .btn-close {
+    position: absolute;
+    right: 1.5rem;
+    top: 1.5rem;
+    opacity: 0.7;
+}
+
+#meetingDetailsModal .modal-body {
+    padding: 2rem;
+    color: #5a5a6e;
+}
+
+/* Detail Grid Layout */
+.meeting-detail-grid {
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 1rem 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.detail-icon {
+    color: #4A3AFF;
+    margin-top: 2px;
+}
+
+.detail-label {
+    font-weight: 500;
+    color: #2d2d32;
+    margin-bottom: 4px;
+}
+
+.detail-value {
+    color: #5a5a6e;
+    line-height: 1.5;
+}
+
+/* Status Badge */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 500;
+    background: #e8e8fc;
+    color: #4A3AFF;
+}
+
+/* Description Section */
+.description-section {
+    border-top: 1px solid #f0f0f5;
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+/* Join Button Styling */
+#meetingJoinButton .btn-primary {
+    background: #4A3AFF;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-weight: 500;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+#meetingJoinButton .btn-primary:hover {
+    background: #3829E0;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74, 58, 255, 0.25);
+}
+
+/* Three-Dot Menu Styling */
+.dropdown-toggle::after {
+    display: none;
+}
+
+#meetingOptionsDropdown {
+    position: absolute;
+    right: 1.5rem;
+    top: 1.5rem;
+    color: #a0a0b0;
+    padding: 6px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+#meetingOptionsDropdown:hover {
+    background: #f5f5fd;
+    color: #4A3AFF;
+}
+
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 0.5rem;
+}
+
+.dropdown-item {
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background: #f8f8ff;
+    color: #4A3AFF;
+}
+ 
+
+/* Modal Customization */
 #calendarModal .modal-dialog {
     max-height: 80vh;
     margin: 2rem auto;
@@ -1325,9 +1616,9 @@ a {
 
            <!-- Manage Workspace Members Button -->
            <a href="{% url 'manage_members' organization.id %}" 
-           id="manageMembersBtn" 
-            class="flex items-center gap-2 px-3 py-1.5 bg-blue-700 hover:bg-blue-800 
-          text-white font-medium rounded-md transition duration-300 shadow-sm">
+            id="manageMembersBtn" 
+            class="flex items-center gap-2 text-gray-700 hover:text-blue-600 
+            font-medium px-3 py-2 rounded-lg transition duration-300">
            <span class="material-icons text-white text-[16px]">group</span>
            <span class="font-medium text-[14px]" style="font-family: 'Inter', sans-serif;">
             Manage Members
@@ -2161,7 +2452,7 @@ My Calendar
     </button>
     
      
-    <button class="btn btn-primary" id="openCalendarBtn">View Meetings Calendar</button>
+    <button class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2" id="openCalendarBtn">Instant Calendar</button>
 </div>
 
 
@@ -2634,20 +2925,11 @@ My Calendar
                     </ul>
                 </div>
 
-
-
-
-
-
-
                 <!-- Description Section -->
                 <div class="description-section">
                     <div class="detail-label mb-2">Description</div>
                     <div class="detail-value" id="meetingDescription"></div>
                 </div>
-
-                
-                
 
                 <!-- Join Button -->
                 <div id="meetingJoinButton" class="mt-4">
@@ -2665,152 +2947,6 @@ My Calendar
         </div>
     </div>
 </div>
-
-<style>
-/* Meeting Details Modal Styling */
-#meetingDetailsModal .modal-dialog {
-    max-width: 500px;
-    margin: 1rem auto;
-}
-
-#meetingDetailsModal .modal-content {
-    border: none;
-    border-radius: 14px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-    background: #fcfcfe;
-}
-
-#meetingDetailsModal .modal-header {
-    border-bottom: 1px solid #f0f0f5;
-    padding: 1.5rem 2rem;
-    position: relative;
-}
-
-#meetingDetailsModal .modal-title {
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    color: #2d2d32;
-    font-size: 1.4rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-#meetingDetailsModal .btn-close {
-    position: absolute;
-    right: 1.5rem;
-    top: 1.5rem;
-    opacity: 0.7;
-}
-
-#meetingDetailsModal .modal-body {
-    padding: 2rem;
-    color: #5a5a6e;
-}
-
-/* Detail Grid Layout */
-.meeting-detail-grid {
-    display: grid;
-    grid-template-columns: 30px 1fr;
-    gap: 1rem 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.detail-icon {
-    color: #4A3AFF;
-    margin-top: 2px;
-}
-
-.detail-label {
-    font-weight: 500;
-    color: #2d2d32;
-    margin-bottom: 4px;
-}
-
-.detail-value {
-    color: #5a5a6e;
-    line-height: 1.5;
-}
-
-/* Status Badge */
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.85em;
-    font-weight: 500;
-    background: #e8e8fc;
-    color: #4A3AFF;
-}
-
-/* Description Section */
-.description-section {
-    border-top: 1px solid #f0f0f5;
-    padding-top: 1.5rem;
-    margin-top: 1.5rem;
-}
-
-/* Join Button Styling */
-#meetingJoinButton .btn-primary {
-    background: #4A3AFF;
-    border: none;
-    border-radius: 8px;
-    padding: 12px 24px;
-    font-weight: 500;
-    width: 100%;
-    transition: all 0.2s ease;
-}
-
-#meetingJoinButton .btn-primary:hover {
-    background: #3829E0;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(74, 58, 255, 0.25);
-}
-
-/* Three-Dot Menu Styling */
-.dropdown-toggle::after {
-    display: none;
-}
-
-#meetingOptionsDropdown {
-    position: absolute;
-    right: 1.5rem;
-    top: 1.5rem;
-    color: #a0a0b0;
-    padding: 6px;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-}
-
-#meetingOptionsDropdown:hover {
-    background: #f5f5fd;
-    color: #4A3AFF;
-}
-
-.dropdown-menu {
-    border: none;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    padding: 0.5rem;
-}
-
-.dropdown-item {
-    border-radius: 6px;
-    padding: 8px 12px;
-    font-size: 0.9em;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.2s ease;
-}
-
-.dropdown-item:hover {
-    background: #f8f8ff;
-    color: #4A3AFF;
-}
-
-</style>
 
 
 
@@ -2879,8 +3015,6 @@ My Calendar
         </div>
     </div>
 </div>
-
-
 
 
 
