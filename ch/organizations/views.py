@@ -1487,6 +1487,7 @@ def delete_recurring_meeting(request, org_id, meeting_id):
     
      
     organization = get_object_or_404(Organization, id=org_id)
+    
     user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
     if not user_profile:
         return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
@@ -1504,15 +1505,21 @@ from django.db import models
 
 @login_required
 def get_meetings(request, org_id):
+    organization = get_object_or_404(Organization,id=org_id)
+    
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
     try:
-        # Fetch all meetings where the request.user is either the 'invitee' or 'user'
+        
         meetings = MeetingOrganization.objects.filter(
             organization_id=org_id,
         ).filter(
             models.Q(user=request.user) | models.Q(invitee=request.user) | models.Q(participants=request.user)
         ).distinct()
 
-        # Convert meetings into JSON format for FullCalendar
+        
         meetings_data = []
         for meeting in meetings:
             meetings_data.append({
@@ -1544,7 +1551,7 @@ def set_meeting_reminder(request, org_id, meeting_id):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-            reminder_time = data.get("reminder_time", 15)  # Default: 15 minutes
+            reminder_time = data.get("reminder_time", 15) 
             custom_minutes = data.get("custom_minutes")
             custom_hours = data.get("custom_hours")
             reminder_type = data.get("reminder_type", "email")
@@ -1552,10 +1559,18 @@ def set_meeting_reminder(request, org_id, meeting_id):
             remind_all_members = data.get("remind_all_members", False)
 
             organization = get_object_or_404(Organization, id=org_id)
-            meeting = get_object_or_404(MeetingOrganization, id=meeting_id, organization=organization)
-            user = request.user  # The user setting the reminder
+            
+            user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+            if not user_profile:
+               return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
 
-            # Calculate Reminder Time
+
+
+
+            meeting = get_object_or_404(MeetingOrganization, id=meeting_id, organization=organization)
+            user = request.user  
+
+          
             if reminder_time in [0, 15, 30, 45]:  
                 reminder_offset = timedelta(minutes=reminder_time)
             else:  
@@ -1564,7 +1579,7 @@ def set_meeting_reminder(request, org_id, meeting_id):
             meeting_datetime = datetime.combine(meeting.meeting_date, meeting.start_time)
             reminder_datetime = meeting_datetime - reminder_offset
 
-            # Create Reminder
+       
             reminder, created = MeetingReminder.objects.update_or_create(
                 organization=organization,
                 meeting=meeting,
