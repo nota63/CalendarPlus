@@ -1496,3 +1496,40 @@ def delete_recurring_meeting(request, org_id, meeting_id):
     meeting.delete()
 
     return JsonResponse({"message": "Meeting deleted successfully"}, status=200)
+
+
+# MEETINGS CALENDAR 
+from django.db import models
+
+
+@login_required
+def get_meetings(request, org_id):
+    try:
+        # Fetch all meetings where the request.user is either the 'invitee' or 'user'
+        meetings = MeetingOrganization.objects.filter(
+            organization_id=org_id,
+        ).filter(
+            models.Q(user=request.user) | models.Q(invitee=request.user) | models.Q(participants=request.user)
+        ).distinct()
+
+        # Convert meetings into JSON format for FullCalendar
+        meetings_data = []
+        for meeting in meetings:
+            meetings_data.append({
+                "id": meeting.id,
+                "title": meeting.meeting_title,
+                "description": meeting.meeting_description,
+                "start": f"{meeting.meeting_date}T{meeting.start_time}",
+                "end": f"{meeting.meeting_date}T{meeting.end_time}",
+                "status": meeting.status,
+                "meeting_link": meeting.meeting_link if meeting.meeting_link else "",
+                "meeting_type": meeting.meeting_type,
+                "meeting_location": meeting.meeting_location,
+            })
+
+        return JsonResponse({"meetings": meetings_data}, safe=False)
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+

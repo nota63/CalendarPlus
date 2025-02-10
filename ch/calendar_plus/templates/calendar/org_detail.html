@@ -4,6 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <!-- FullCalendar CSS -->
+      <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
+
+      <!-- Bootstrap (For Modal) -->
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+
+    
+
+
+
+
+
+
     <title>Organization Detail</title>
     <!-- Bootstrap 5 CSS -->
    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -20,6 +35,19 @@
 </head>
 
 <style>
+      /* Modal styling */
+      #calendarModal .modal-dialog {
+            max-width: 80%;
+        }
+        #calendar {
+            width: 100%;
+            height: 500px;
+        }
+
+
+
+
+
  /* MODAL STYLING */
  #ManageRecurringModal .modal-dialog {
     max-width: 800px; /* Increased width */
@@ -2053,8 +2081,8 @@ My Calendar
         Manage Recurring Meetings
     </button>
     
-    
-
+     
+    <button class="btn btn-primary" id="openCalendarBtn">View Meetings Calendar</button>
 </div>
 
 
@@ -2264,8 +2292,6 @@ My Calendar
 
 
 <!-- SCHEDULE RECURRING MEETING -->
- <!-- SCHEDULE RECURRING MEETING (Thinner Corners + Radio Options) -->
-<!-- SCHEDULE RECURRING MEETING -->
 <div class="modal fade" id="ScheduleMeetsModal" tabindex="-1" aria-labelledby="ScheduleMeetsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content shadow-sm rounded-3 border-0">
@@ -2388,6 +2414,20 @@ My Calendar
     </div>
 </div>
 
+<!-- Bootstrap Modal for FullCalendar -->
+   <div class="modal fade" id="calendarModal" tabindex="-1" aria-labelledby="calendarModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Your Meetings</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="calendar"></div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -2398,6 +2438,17 @@ My Calendar
 <!-- ----------------------------------------------------------------------------------------------------------------------------- -->
 <!-- Bootstrap 5 JS Bundle (includes Popper) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<!-- jQuery (Required for AJAX) -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<!-- Bootstrap JS (Optional, for modal functionality) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -2958,7 +3009,59 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+// Meetings calendar
+document.addEventListener('DOMContentLoaded', function () {
+            let calendar;
 
+            // Open Modal & Initialize Calendar on Button Click
+            $('#openCalendarBtn').on('click', function () {
+                $('#calendarModal').modal('show'); // Show modal
+
+                if (!calendar) { // Initialize only once
+                    setTimeout(() => {
+                        loadCalendar();
+                    }, 500);
+                }
+            });
+
+            function loadCalendar() {
+                let calendarEl = document.getElementById('calendar');
+                let orgId = "{{organization.id}}"; // Replace with dynamic organization ID
+                let eventsUrl = `/organizations/meetings-calendar-view/${orgId}/`; // Django view URL
+
+                calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    },
+                    events: function (fetchInfo, successCallback, failureCallback) {
+                        $.ajax({
+                            url: eventsUrl,
+                            type: "GET",
+                            dataType: "json",
+                            success: function (response) {
+                                let events = response.meetings.map(meeting => ({
+                                    id: meeting.id,
+                                    title: meeting.title,
+                                    start: meeting.start,
+                                    end: meeting.end,
+                                    url: meeting.meeting_link || null,
+                                    color: meeting.status === "completed" ? "green" : meeting.status === "canceled" ? "red" : "#007bff"
+                                }));
+                                successCallback(events);
+                            },
+                            error: function () {
+                                failureCallback();
+                            }
+                        });
+                    }
+                });
+
+                calendar.render();
+            }
+        });
 
 
 
