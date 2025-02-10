@@ -2414,29 +2414,41 @@ My Calendar
     </div>
 </div>
 
+
+
 <!-- Bootstrap Modal for FullCalendar -->
-   <div class="modal fade" id="calendarModal" tabindex="-1" aria-labelledby="calendarModalLabel" aria-hidden="true">
+
+<!-- Updated Modal Structure -->
+<div class="modal fade" id="calendarModal" tabindex="-1" aria-labelledby="calendarModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Your Meetings</h5>
+                <h5 class="modal-title">📅 Your Meetings</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <strong>
-                Power up your workspace with instant meeting access!
-            </strong>
+            <div class="px-4">
+                <p class="text-muted mb-2 mt-3" style="font-size: 0.88em; font-weight: 500; line-height: 1.4;">
+                    <strong class="text-dark" style="font-size: 1em; color: #333;">⚡ Power up your workspace</strong>  
+                    with instant meeting access!
+                </p>
+                <p class="text-secondary" style="font-size: 0.88em; font-weight: 400; line-height: 1.4;">
+                    ✨ Instant scheduling, zero effort — powered by <strong style="color: #007AFF;">NLP!</strong> 🚀
+                </p>
+                
 
+                <button type="button" class="btn btn-primary shadow-sm px-3 py-1 rounded-pill" 
+                style="background: linear-gradient(135deg, #4A90E2, #007AFF); border: none; font-weight: 500; font-size: 14px; transition: 0.3s;"
+                data-bs-toggle="modal" data-bs-target="#meetingModal"
+                onmouseover="this.style.opacity='0.9'"
+                onmouseout="this.style.opacity='1'">
+                🚀 Try Natural Language Proccesing
+              </button>
+              <br>
+            
 
-            <p>
-                Instant scheduling, zero effort—powered by Natural Language Processing! | Tap Below
-            </p>
-
-            <button type="button" class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2" data-bs-toggle="modal" data-bs-target="#meetingModal">
-                Create Meeting via NLP
-            </button>
-        
-
+    
+            </div>
 
             <div class="modal-body">
                 <div id="calendar"></div>
@@ -2444,6 +2456,94 @@ My Calendar
         </div>
     </div>
 </div>
+
+<style>
+    /* Modal Customization */
+#calendarModal .modal-dialog {
+    max-height: 80vh;
+    margin: 2rem auto;
+}
+
+#calendarModal .modal-content {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    min-height: 60vh;
+}
+
+.modal-header {
+    border-bottom: 1px solid #e8e8e8;
+    padding: 1.25rem 2rem;
+}
+
+.modal-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: #1a1a1a;
+    font-size: 1.25rem;
+}
+
+/* Calendar Customization */
+#calendar {
+    --fc-border-color: #f0f0f0;
+    --fc-today-bg-color: #f8f7ff;
+    --fc-neutral-bg-color: #ffffff;
+    padding: 0 1rem 1rem;
+}
+
+.fc-toolbar-title {
+    font-weight: 600 !important;
+    color: #2d2d2d !important;
+}
+
+.fc-button {
+    background: #f6f6f6 !important;
+    border: none !important;
+    color: #5e5e5e !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease !important;
+}
+
+.fc-button:hover {
+    background: #ececec !important;
+    color: #4A3AFF !important;
+}
+
+.fc-daygrid-day {
+    border-radius: 8px;
+    margin: 2px;
+    transition: background 0.2s ease;
+}
+
+.fc-daygrid-day:hover {
+    background: #fafafa;
+}
+
+.fc-event {
+    border-radius: 6px !important;
+    border: none !important;
+    background: #4A3AFF !important;
+    padding: 4px 8px !important;
+    font-size: 0.85em !important;
+}
+
+.fc-day-today {
+    background: #f8f7ff !important;
+}
+
+/* Modal Body Padding */
+.modal-body {
+    padding: 0 1.5rem 1.5rem;
+}
+</style>
+
+
+
+
+
+
+
 
 <!-- CALENDAR MEETING DETAILS -->
 
