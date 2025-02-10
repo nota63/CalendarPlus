@@ -20,6 +20,95 @@
 </head>
 
 <style>
+ /* MODAL STYLING */
+ #ManageRecurringModal .modal-dialog {
+    max-width: 800px; /* Increased width */
+}
+
+#ManageRecurringModal .modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15);
+    background: #ffffff;
+}
+
+#ManageRecurringModal .modal-header {
+    background: #f8f9fa;
+    border-bottom: none;
+    padding: 15px 20px;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+#ManageRecurringModal .modal-header h5 {
+    font-weight: bold;
+    color: #333;
+    font-size: 18px;
+}
+
+#ManageRecurringModal .modal-body {
+    padding: 20px;
+}
+
+/* INFO TEXT */
+#ManageRecurringModal strong {
+    display: block;
+    text-align: center;
+    padding: 10px;
+    font-size: 14px;
+    color: #555;
+    background: #f1f3f5;
+    border-radius: 8px;
+    margin: 10px auto;
+    width: 90%;
+}
+
+/* LIST ITEM STYLING */
+.list-group-item {
+    border-radius: 10px;
+    padding: 12px 15px;
+    background: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+    margin-bottom: 8px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.07);
+}
+
+.list-group-item:hover {
+    transform: scale(1.02);
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* DELETE BUTTON DROPDOWN */
+.dropdown-toggle {
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    color: #666;
+}
+
+.dropdown-toggle:hover {
+    color: #000;
+}
+
+.dropdown-menu {
+    min-width: 120px;
+    border-radius: 8px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-item {
+    font-size: 14px;
+}
+
+.dropdown-item:hover {
+    background: #ff6b6b;
+    color: #fff;
+} 
+
+
 /* Modal Overrides */
 #OverviewMeetingModal .modal-content {
     border-radius: 12px;
@@ -1960,7 +2049,7 @@ My Calendar
          Overview
     </button>
 
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ManageRecurringModal">
+    <button class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2" data-bs-toggle="modal" data-bs-target="#ManageRecurringModal">
         Manage Recurring Meetings
     </button>
     
@@ -2299,95 +2388,7 @@ My Calendar
     </div>
 </div>
 
-<style>
-   /* MODAL STYLING */
-#ManageRecurringModal .modal-dialog {
-    max-width: 800px; /* Increased width */
-}
 
-#ManageRecurringModal .modal-content {
-    border-radius: 12px;
-    border: none;
-    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15);
-    background: #ffffff;
-}
-
-#ManageRecurringModal .modal-header {
-    background: #f8f9fa;
-    border-bottom: none;
-    padding: 15px 20px;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-}
-
-#ManageRecurringModal .modal-header h5 {
-    font-weight: bold;
-    color: #333;
-    font-size: 18px;
-}
-
-#ManageRecurringModal .modal-body {
-    padding: 20px;
-}
-
-/* INFO TEXT */
-#ManageRecurringModal strong {
-    display: block;
-    text-align: center;
-    padding: 10px;
-    font-size: 14px;
-    color: #555;
-    background: #f1f3f5;
-    border-radius: 8px;
-    margin: 10px auto;
-    width: 90%;
-}
-
-/* LIST ITEM STYLING */
-.list-group-item {
-    border-radius: 10px;
-    padding: 12px 15px;
-    background: #ffffff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: all 0.3s ease;
-    margin-bottom: 8px;
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.07);
-}
-
-.list-group-item:hover {
-    transform: scale(1.02);
-    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
-}
-
-/* DELETE BUTTON DROPDOWN */
-.dropdown-toggle {
-    border: none;
-    background: transparent;
-    font-size: 18px;
-    color: #666;
-}
-
-.dropdown-toggle:hover {
-    color: #000;
-}
-
-.dropdown-menu {
-    min-width: 120px;
-    border-radius: 8px;
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.dropdown-item {
-    font-size: 14px;
-}
-
-.dropdown-item:hover {
-    background: #ff6b6b;
-    color: #fff;
-} 
-</style>
 
 
 
