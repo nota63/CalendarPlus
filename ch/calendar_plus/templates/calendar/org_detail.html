@@ -2170,22 +2170,30 @@ My Calendar
 
 
 <!-- SCHEDULE RECURRING MEETING -->
-
+ <!-- SCHEDULE RECURRING MEETING (Thinner Corners + Radio Options) -->
+<!-- SCHEDULE RECURRING MEETING -->
 <div class="modal fade" id="ScheduleMeetsModal" tabindex="-1" aria-labelledby="ScheduleMeetsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="ScheduleMeetsModalLabel">Schedule a Recurring Meeting</h5>
+        <div class="modal-content shadow-sm rounded-3 border-0">
+            <div class="modal-header bg-light border-bottom">
+                <h5 class="modal-title fw-semibold text-primary" id="ScheduleMeetsModalLabel">
+                    Schedule a Recurring Meeting
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+
+            <div class="modal-body p-3">
+                <p class="text-muted small text-center">
+                    We will check user and workspace availability. If unavailable, booking will be prevented.
+                </p>
+
                 <form id="scheduleMeetingForm">
                     <input type="hidden" id="org_id" name="org_id">
                     <input type="hidden" id="user_id" name="user_id">
 
-                    <div class="mb-3">
-                        <label for="recurrence_type" class="form-label">Recurrence Type</label>
-                        <select class="form-select" id="recurrence_type" name="recurrence_type">
+                    <div class="mb-2">
+                        <label for="recurrence_type" class="form-label fw-medium">Recurrence Type</label>
+                        <select class="form-select shadow-none" id="recurrence_type" name="recurrence_type">
                             <option value="daily">Daily</option>
                             <option value="weekly">Weekly</option>
                             <option value="monthly">Monthly</option>
@@ -2194,74 +2202,77 @@ My Calendar
                         </select>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="start_date" class="form-label">Start Date</label>
-                        <input type="datetime-local" class="form-control" id="start_date" name="start_date" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="end_date" class="form-label">End Date (Optional)</label>
-                        <input type="datetime-local" class="form-control" id="end_date" name="end_date">
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label for="start_date" class="form-label fw-medium">Start Date</label>
+                            <input type="datetime-local" class="form-control shadow-none" id="start_date" name="start_date" required>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="end_date" class="form-label fw-medium">End Date (Optional)</label>
+                            <input type="datetime-local" class="form-control shadow-none" id="end_date" name="end_date">
+                        </div>
                     </div>
 
                     <div id="customDaysContainer" class="mb-3" style="display: none;">
-                        <label class="form-label">Select Custom Days</label>
-                        <div class="d-flex flex-wrap">
-                            <div class="form-check me-3">
+                        <label class="form-label fw-medium">Select Custom Days</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="monday" id="monday">
-                                <label class="form-check-label" for="monday">Monday</label>
+                                <label class="form-check-label small" for="monday">Monday</label>
                             </div>
-                            <div class="form-check me-3">
+                            <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="tuesday" id="tuesday">
-                                <label class="form-check-label" for="tuesday">Tuesday</label>
+                                <label class="form-check-label small" for="tuesday">Tuesday</label>
                             </div>
-                            <div class="form-check me-3">
+                            <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="wednesday" id="wednesday">
-                                <label class="form-check-label" for="wednesday">Wednesday</label>
+                                <label class="form-check-label small" for="wednesday">Wednesday</label>
                             </div>
-                            <div class="form-check me-3">
+                            <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="thursday" id="thursday">
-                                <label class="form-check-label" for="thursday">Thursday</label>
+                                <label class="form-check-label small" for="thursday">Thursday</label>
                             </div>
-                            <div class="form-check me-3">
+                            <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="friday" id="friday">
-                                <label class="form-check-label" for="friday">Friday</label>
+                                <label class="form-check-label small" for="friday">Friday</label>
                             </div>
-                            <div class="form-check me-3">
+                            <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="saturday" id="saturday">
-                                <label class="form-check-label" for="saturday">Saturday</label>
+                                <label class="form-check-label small" for="saturday">Saturday</label>
                             </div>
-                            <div class="form-check me-3">
+                            <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="sunday" id="sunday">
-                                <label class="form-check-label" for="sunday">Sunday</label>
+                                <label class="form-check-label small" for="sunday">Sunday</label>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="remind_before" class="form-label">Remind Before (Minutes)</label>
-                        <input type="number" class="form-control" id="remind_before" name="remind_before" value="15" min="1">
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label for="remind_before" class="form-label fw-medium">Remind Before (Minutes)</label>
+                            <input type="number" class="form-control shadow-none" id="remind_before" name="remind_before" value="15" min="1">
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label fw-medium">Notification Preferences</label>
+                            <div class="form-check small">
+                                <input type="checkbox" class="form-check-input" id="send_email_reminder" checked>
+                                <label class="form-check-label" for="send_email_reminder">Send Email Reminder</label>
+                            </div>
+                            <div class="form-check small">
+                                <input type="checkbox" class="form-check-input" id="send_push_notification" checked>
+                                <label class="form-check-label" for="send_push_notification">Send Push Notification</label>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="send_email_reminder" checked>
-                        <label class="form-check-label" for="send_email_reminder">Send Email Reminder</label>
-                    </div>
-
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="send_push_notification" checked>
-                        <label class="form-check-label" for="send_push_notification">Send Push Notification</label>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100">Schedule Meeting</button>
+                    <button type="submit" class="btn btn-primary w-100 mt-2 shadow-sm">
+                        Schedule Meeting
+                    </button>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
-
-
 
 
 
