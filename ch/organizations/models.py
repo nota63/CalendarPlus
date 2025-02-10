@@ -1,5 +1,5 @@
 from django.db import models
-from accounts.models import Organization
+from accounts.models import Organization, MeetingOrganization
 from django.contrib.auth.models import User
 from django.utils import timezone
 
@@ -32,5 +32,50 @@ class OrganizationHide(models.Model):
 
     def __str__(self):
         return f"{self.to_organization.name} hidden by {self.from_organization.name} (Hider: {self.hider.username})"
+
+
+
+
+# Schedule meetings
+
+class RecurringMeeting(models.Model):
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="recurring_meetings")
+    meeting = models.ForeignKey(MeetingOrganization, on_delete=models.CASCADE, related_name="recurrences")
+    
+   
+    RECURRING_CHOICES = [
+        ("daily", "Every Day"),
+        ("weekly", "Every Week"),
+        ("monthly", "Every Month"),
+        ("yearly", "Every Year"),
+        ("custom", "Custom"),
+    ]
+    
+    recurrence_type = models.CharField(max_length=10, choices=RECURRING_CHOICES, default="weekly")
+    custom_days = models.JSONField(blank=True, null=True, help_text="Store custom recurrence days as a list [1,3,5] for Mon,Wed,Fri")
+
+    start_date = models.DateField()
+    end_date = models.DateField(null=True, blank=True, help_text="Leave blank for indefinite recurrence")
+
+ 
+    remind_before = models.IntegerField(default=15, help_text="Minutes before the meeting to send a reminder")
+    send_email_reminder = models.BooleanField(default=True, help_text="Should an email reminder be sent?")
+    send_push_notification = models.BooleanField(default=True, help_text="Should a push notification be sent?")
+    
+ 
+    exclude_dates = models.JSONField(blank=True, null=True, help_text="List of dates to exclude from recurrence")
+
+
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="created_recurring_meetings")
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="recurring_meetings_set")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.meeting.meeting_title} ({self.get_recurrence_type_display()})"
+
+    class Meta:
+        unique_together = ("meeting", "recurrence_type", "start_date")
 
 
