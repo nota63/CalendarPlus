@@ -29,7 +29,9 @@ urlpatterns=[
     path("organization/<int:org_id>/suspend/<int:user_id>/<str:action>/", handle_suspend_action, name="handle_suspend_action"),
     path('create_meeting_from_nlp/<int:org_id>/',create_meeting_from_nlp, name='create_meeting_from_nlp'),
     path('meeting_analytics/<int:org_id>/',meeting_analytics, name='meeting_analytics'),
-    path('create_recurring_meetings/<int:org_id>/<int:user_id>/',create_recurring_meeting, name='create_recurring_meetings')
+    path('create_recurring_meetings/<int:org_id>/<int:user_id>/',create_recurring_meeting, name='create_recurring_meetings'),
+    path("recurring-meetings/<int:org_id>/", fetch_recurring_meetings, name="fetch_recurring_meetings"),
+    path("delete-recurring-meetings/<int:org_id>/<int:meeting_id>/", delete_recurring_meeting, name="delete_recurring_meetings"),
     
 ]
 

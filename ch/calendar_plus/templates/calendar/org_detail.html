@@ -1959,6 +1959,11 @@ My Calendar
     <button class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2 " data-bs-toggle="modal" data-bs-target="#OverviewMeetingModal">
          Overview
     </button>
+
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ManageRecurringModal">
+        Manage Recurring Meetings
+    </button>
+    
     
 
 </div>
@@ -2274,6 +2279,24 @@ My Calendar
     </div>
 </div>
 
+<!-- MANAGE RECURRING MEETINGS -->
+
+<!-- Bootstrap 5 Modal -->
+<div class="modal fade" id="ManageRecurringModal" tabindex="-1" aria-labelledby="ManageRecurringModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ManageRecurringModalLabel">Manage Recurring Meetings</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="meetings-container" class="list-group">
+                    <p class="text-center text-muted">Loading meetings...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -2761,7 +2784,87 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+// MANAGE RECURRING MEETINGS
 
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("ManageRecurringModal");
+    modal.addEventListener("show.bs.modal", fetchMeetings);
+
+    function fetchMeetings() {
+        const meetingsContainer = document.getElementById("meetings-container");
+        meetingsContainer.innerHTML = '<p class="text-center text-muted">Loading meetings...</p>';
+
+        const orgId = "{{organization.id}}"; // Replace with dynamic org_id if needed
+        fetch(`/organizations/recurring-meetings/${orgId}/`)
+            .then(response => response.json())
+            .then(data => {
+                meetingsContainer.innerHTML = "";
+                if (data.meetings.length === 0) {
+                    meetingsContainer.innerHTML = '<p class="text-center text-muted">No recurring meetings found.</p>';
+                    return;
+                }
+
+                data.meetings.forEach(meeting => {
+                    const meetingItem = document.createElement("div");
+                    meetingItem.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
+
+                    meetingItem.innerHTML = `
+                        <div>
+                            <strong>${meeting.type}</strong> - ${meeting.recurrence_type} <br>
+                            <small>Start: ${meeting.start_date} | End: ${meeting.end_date}</small>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                &#x22EE;
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item text-danger delete-meeting" data-id="${meeting.id}" href="#">Delete</a></li>
+                            </ul>
+                        </div>
+                    `;
+
+                    meetingsContainer.appendChild(meetingItem);
+                });
+
+                attachDeleteHandlers();
+            })
+            .catch(error => {
+                console.error("Error fetching meetings:", error);
+                meetingsContainer.innerHTML = '<p class="text-danger text-center">Failed to load meetings.</p>';
+            });
+    }
+
+    function attachDeleteHandlers() {
+        document.querySelectorAll(".delete-meeting").forEach(button => {
+            button.addEventListener("click", function (event) {
+                event.preventDefault();
+                const meetingId = this.getAttribute("data-id");
+                deleteMeeting(meetingId);
+            });
+        });
+    }
+
+    function deleteMeeting(meetingId) {
+        const orgId = "{{organization.id}}"; // Replace with dynamic org_id if needed
+        fetch(`/organizations/delete-recurring-meetings/${orgId}/${meetingId}/`,{
+            method: "DELETE",
+            headers: { "X-CSRFToken": getCSRFToken() }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                fetchMeetings(); // Refresh meeting list
+            }
+        })
+        .catch(error => console.error("Error deleting meeting:", error));
+    }
+
+    function getCSRFToken() {
+        return document.cookie.split("; ")
+            .find(row => row.startsWith("csrftoken"))
+            ?.split("=")[1];
+    }
+});
 
 
 

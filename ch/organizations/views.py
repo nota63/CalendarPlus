@@ -33,7 +33,7 @@ from accounts.models import ProjectEmployeeAssignment, Project, ProjectManagerAs
 from groups.models import Group, GroupMember
 import logging
 from .models import RecurringMeeting
-
+from django.views.decorators.http import require_http_methods
 
 
 
@@ -1439,3 +1439,46 @@ def create_recurring_meeting(request, org_id, user_id):
             return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+
+# MANAGE RECURRING MEETINGS
+
+def fetch_recurring_meetings(request, org_id):
+    """
+    Fetches all recurring meetings created by the logged-in user for a specific organization.
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Unauthorized"}, status=401)
+
+    meetings = RecurringMeeting.objects.filter(organization_id=org_id, created_by=request.user)
+
+    meetings_list = [
+        {
+            "id": meeting.id,
+            "type": meeting.type,
+            "recurrence_type": meeting.recurrence_type,
+            "start_date": meeting.start_date.strftime("%Y-%m-%d"),
+            "end_date": meeting.end_date.strftime("%Y-%m-%d") if meeting.end_date else "Indefinite",
+            "remind_before": meeting.remind_before,
+            "send_email_reminder": meeting.send_email_reminder,
+            "send_push_notification": meeting.send_push_notification,
+        }
+        for meeting in meetings
+    ]
+
+    return JsonResponse({"meetings": meetings_list}, status=200)
+
+
+@csrf_exempt 
+def delete_recurring_meeting(request, org_id, meeting_id):
+    """
+    Deletes a specific recurring meeting if the logged-in user is the creator.
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Unauthorized"}, status=401)
+
+    meeting = get_object_or_404(RecurringMeeting, id=meeting_id, organization_id=org_id, created_by=request.user)
+    meeting.delete()
+
+    return JsonResponse({"message": "Meeting deleted successfully"}, status=200)
