@@ -81,7 +81,6 @@ INSTALLED_APPS = [
      'groups',
      'group_tasks',
     'widget_tweaks',
-    'solo_communication',
     'ckeditor_uploader',
     'organization_channels',
      'formtools',
