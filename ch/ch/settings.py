@@ -124,6 +124,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # Custom context processor
+
+                'calendar_plus.context_processors.user_profile',
             ],
         },
     },

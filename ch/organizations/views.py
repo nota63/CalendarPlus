@@ -34,7 +34,7 @@ from groups.models import Group, GroupMember
 import logging
 from .models import RecurringMeeting
 from django.views.decorators.http import require_http_methods
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 
@@ -1732,10 +1732,9 @@ def manage_meetings(request, org_id):
 
 
 # IN APP LIVE MEETINGS
-from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 class LaunchRoom(View,LoginRequiredMixin):
-    login_url = '/auth/login/'
     template_name = 'organizations/zeegocloud/initiate_meeting.html'
 
     def get(self,request, org_id):
@@ -1748,7 +1747,7 @@ class LaunchRoom(View,LoginRequiredMixin):
     
 
 # Initiate the live meeting
-@login_required(login_url='/auth/login/')
+@login_required
 def start_meeting(request,org_id):
     username=request.user.username
     organization = get_object_or_404(Organization, id=org_id)

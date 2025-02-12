@@ -113,7 +113,7 @@ class LandingPageView(LoginRequiredMixin, TemplateView):
     Otherwise, shows an option to create an organization.
     """
     template_name = "landing_page/landing_page.html"
-    login_url = '/login/' 
+
 
     def get(self, request, *args, **kwargs):
         try:
@@ -373,7 +373,6 @@ import calendar
 # DISPLAY AND CONFIGURE HIDDEN WORKSPACES
 class OrganizationListView(LoginRequiredMixin, ListView):
     model = Organization
-    login_url = '/accounts/login/' 
     template_name = 'calendar/organizations_list.html'
     context_object_name = 'organizations'
 
