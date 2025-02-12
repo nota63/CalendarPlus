@@ -3028,24 +3028,51 @@ My Calendar
 
 
 <!-- GENERATE EMBED CODE -->
-
+<!-- Embed Code Modal -->
 <div class="modal fade" id="embedModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Embed Code</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <h5 class="modal-title">Embed Your Meetings on Your Website</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <textarea id="embedCode" class="form-control" readonly></textarea>
+                <h6>📌 How It Works?</h6>
+                <p>This embed feature allows you to display your Calendar Plus meetings directly on your website. Just copy and paste the provided code into your website's HTML.</p>
+                
+                <h6>🎯 Benefits of Embedding:</h6>
+                <ul>
+                    <li>✅ Easily share your availability and scheduled meetings.</li>
+                    <li>✅ Clients and team members can view your meetings without logging in.</li>
+                    <li>✅ Works with all websites (WordPress, React, Django, etc.).</li>
+                    <li>✅ Auto-refreshes every 5 minutes.</li>
+                </ul>
+
+                <h6>📌 Step-by-Step Guide:</h6>
+                
+                <!-- Iframe Embed Code -->
+                <p>Copy and paste the following <strong>Iframe</strong> code where you want to display your meetings:</p>
+                <div class="position-relative">
+                    <pre class="bg-light p-3 rounded"><code class="language-html" id="embedIframe"></code></pre>
+                    <button id="copyIframeBtn" class="btn btn-sm btn-primary position-absolute top-0 end-0">Copy</button>
+                </div>
+
+                <!-- Script Embed Code -->
+                <p>To enable automatic refreshing, include this <strong>Script</strong> just before the closing <code>&lt;/body&gt;</code> tag:</p>
+                <div class="position-relative">
+                    <pre class="bg-light p-3 rounded"><code class="language-javascript" id="embedScript"></code></pre>
+                    <button id="copyScriptBtn" class="btn btn-sm btn-primary position-absolute top-0 end-0">Copy</button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-
+<!-- Include Prism.js for syntax highlighting -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-html.min.js"></script>
 
 
 <!-- ----------------------------------------------------------------------------------------------------------------------------- -->
@@ -3767,29 +3794,65 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// GENERATE EMBED CODE 
 
-// Function to fetch and display embed code
+// GENERATE EMBED CODE 
+// Function to fetch and display embed code (Iframe + Script)
 function generateEmbedCode(orgId) {
     fetch(`/organizations/generate-embed-code/${orgId}/`)
         .then(response => response.json())
         .then(data => {
-            document.getElementById("embedCode").value = data.embed_code;
-            let embedModal = new bootstrap.Modal(document.getElementById("embedModal"));
-            embedModal.show();
+            console.log("Response Data:", data);  // Debugging response data
+
+            // Check if data contains embed_iframe and embed_script
+            if (data.embed_iframe && data.embed_script) {
+                document.getElementById("embedIframe").textContent = data.embed_iframe;
+                document.getElementById("embedScript").textContent = data.embed_script;
+
+                // Apply syntax highlighting
+                Prism.highlightAll();
+
+                // Show the modal after data is loaded
+                let embedModal = new bootstrap.Modal(document.getElementById("embedModal"));
+                embedModal.show();
+            } else {
+                alert("❌ Failed to generate embed code. Please try again.");
+            }
         })
-        .catch(error => console.error("Error generating embed code:", error));
+        .catch(error => {
+            console.error("Error generating embed code:", error);
+            alert("❌ An error occurred while generating the embed code.");
+        });
 }
 
 // Attach event listener to the button
-const embedButton = document.getElementById("generateEmbedBtn");
-if (embedButton) {
-    embedButton.addEventListener("click", function () {
-        let orgId = this.getAttribute("data-org-id");
-        generateEmbedCode(orgId);
+document.addEventListener("DOMContentLoaded", function () {
+    const embedButton = document.getElementById("generateEmbedBtn");
+    if (embedButton) {
+        embedButton.addEventListener("click", function () {
+            let orgId = this.getAttribute("data-org-id");
+            generateEmbedCode(orgId);
+        });
+    }
+
+    // Copy buttons for Iframe & Script
+    document.getElementById("copyIframeBtn").addEventListener("click", function () {
+        copyToClipboard("embedIframe");
+    });
+
+    document.getElementById("copyScriptBtn").addEventListener("click", function () {
+        copyToClipboard("embedScript");
+    });
+});
+
+// Function to copy text from a code block
+function copyToClipboard(elementId) {
+    let text = document.getElementById(elementId).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        alert("✅ Copied to clipboard!");
+    }).catch(err => {
+        console.error("Failed to copy:", err);
     });
 }
-
 
 
 

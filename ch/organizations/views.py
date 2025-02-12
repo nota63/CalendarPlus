@@ -1616,8 +1616,6 @@ def set_meeting_reminder(request, org_id, meeting_id):
 # EMBBED CALENDARPLUS
 
 # FILTER MEETINGS BASED ON WORKSPACE AND FOR REQUEST.USER
-
-# 1️⃣ API View - Return Meetings as JSON
 @login_required
 def user_meetings_api(request, org_id):
     meetings = MeetingOrganization.objects.filter(organization_id=org_id, user=request.user, status="scheduled")
@@ -1635,14 +1633,24 @@ def user_meetings_api(request, org_id):
     return JsonResponse(events, safe=False)
 
 
-# 2️⃣ Generate Embed Code View
+
+# 2️⃣ Generate Embed Code (Iframe + Script)
 @login_required
 def generate_embed_code(request, org_id):
-    embed_code = f"""
-    <iframe src="https://calendarplus.com/embed/{org_id}/" width="800" height="600" frameborder="0"></iframe>
+    embed_iframe = f"""
+    <iframe id="calendar-iframe" src="https://calendarplus.com/embed/{org_id}/" width="100%" height="600" frameborder="0"></iframe>
     """
 
-    return JsonResponse({"embed_code": embed_code})
+    embed_script = f"""
+    <script>
+        function loadCalendar() {{
+            var iframe = document.getElementById('calendar-iframe');
+            if (iframe) {{
+                iframe.src = iframe.src; // Reload to refresh meetings
+            }}
+        }}
+        setInterval(loadCalendar, 300000); // Auto-refresh every 5 minutes
+    </script>
+    """
 
-
-
+    return JsonResponse({"embed_iframe": embed_iframe, "embed_script": embed_script})
