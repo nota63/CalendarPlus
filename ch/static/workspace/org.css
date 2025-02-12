@@ -1807,3 +1807,29 @@ a {
     height: 100%;
     object-fit: cover; /* Ensures the image fills the circle without distortion */
 }
+
+
+#reload-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease-in-out;
+}
+
+#reload-icon {
+    width: 22px;  /* Thin, compact, modern */
+    height: 22px;
+    stroke: #4A90E2;  /* Soft blue, premium feel */
+    stroke-width: 1.5;  /* Thinner stroke */
+    transition: transform 0.3s ease-in-out, stroke 0.3s ease-in-out;
+}
+
+#reload-btn:hover #reload-icon {
+    transform: rotate(360deg);
+    stroke: #2563EB;  /* Darker blue on hover */
+}
