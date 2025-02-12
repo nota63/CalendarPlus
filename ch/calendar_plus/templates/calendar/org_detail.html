@@ -38,6 +38,135 @@
 </head>
 
 <style>
+#embedModal .modal-content {
+    background: #ffffff;
+    color: #333;
+    border-radius: 12px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+    border: none;
+}
+
+/* Modal Header */
+#embedModal .modal-header {
+    border-bottom: 2px solid #f0f0f0;
+    background: #f8f9fa;
+    color: #333;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    padding: 16px;
+}
+
+#embedModal .modal-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Close Button */
+#embedModal .btn-close {
+    opacity: 0.7;
+}
+#embedModal .btn-close:hover {
+    opacity: 1;
+}
+
+/* Modal Body */
+#embedModal .modal-body {
+    padding: 24px;
+}
+
+/* Guide Section Styling */
+#embedModal h6 {
+    color: #007bff;
+    font-size: 1.1rem;
+    margin-top: 15px;
+    font-weight: 600;
+}
+
+#embedModal p {
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.6;
+}
+
+/* Benefits List */
+#embedModal ul {
+    list-style: none;
+    padding: 0;
+}
+
+#embedModal ul li {
+    margin: 10px 0;
+    padding-left: 28px;
+    position: relative;
+    font-size: 0.95rem;
+    color: #333;
+    font-weight: 500;
+}
+
+#embedModal ul li::before {
+    content: "✔";
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 1.2rem;
+    color: #28a745;
+}
+
+/* Code Block Styling */
+#embedModal pre {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 0.9rem;
+    overflow-x: auto;
+    position: relative;
+    color: #333;
+    border-left: 4px solid #007bff;
+}
+
+#embedModal pre code {
+    font-family: "Courier New", monospace;
+    color: #d63384;
+}
+
+/* Copy Button */
+.copy-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: 0.3s ease-in-out;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-weight: 500;
+}
+
+.copy-btn:hover {
+    background: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 576px) {
+    #embedModal .modal-dialog {
+        max-width: 95%;
+    }
+
+    #embedModal .modal-body {
+        padding: 16px;
+    }
+
+    .copy-btn {
+        font-size: 0.85rem;
+        padding: 5px 10px;
+    }
+}
+
+
   /* Modal Container */
   #MeetsReminderModal .modal-dialog {
         max-width: 500px;
@@ -3067,6 +3196,9 @@ My Calendar
         </div>
     </div>
 </div>
+
+
+
 
 <!-- Include Prism.js for syntax highlighting -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
