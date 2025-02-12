@@ -1671,7 +1671,13 @@ def generate_embed_code(request, org_id):
 # SHUT DOWN ALL MEETINGS
 @login_required
 def manage_meetings(request, org_id):
-    user = request.user  # Get current user
+    user = request.user  
+
+    organization = get_object_or_404(Organization, id=org_id)
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
 
     if request.method == "GET":
         """Fetch last 3 meetings before deletion"""
@@ -1699,12 +1705,12 @@ def manage_meetings(request, org_id):
             if not authenticate(username=user.username, password=password):
                 return JsonResponse({"success": False, "message": "❌ Incorrect password!"}, status=400)
 
-            # Delete all meetings where user is a participant
+      
             deleted_count, _ = MeetingOrganization.objects.filter(
                 organization_id=org_id
             ).filter(Q(user=user) | Q(invitee=user)).delete()
 
-            # Send confirmation email
+        
             send_mail(
                 subject="🗑️ Your Meetings Have Been Deleted",
                 message=f"Hello {user.get_full_name()},\n\nAll your meetings in this organization have been successfully deleted.",
