@@ -2592,6 +2592,14 @@ My Calendar
     <button id="generateEmbedBtn" data-org-id="{{ organization.id }}" class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2">
         Embed Your Calendar & Meetings
     </button>
+
+    <!-- Delete Meetings Button -->
+   <button class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2" id="openDeleteMeetsModal" data-org-id="{{ organization.id }}">
+      Shut Down My Meetings
+   </button>
+
+
+
 </div>
 
 
@@ -3191,6 +3199,44 @@ My Calendar
                 <div class="position-relative">
                     <pre class="bg-light p-3 rounded"><code class="language-javascript" id="embedScript"></code></pre>
                     <button id="copyScriptBtn" class="btn btn-sm btn-primary position-absolute top-0 end-0">Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- SHUT DOWN ALL MEETINGS -->
+
+<!-- Delete Meetings Modal -->
+<div class="modal fade" id="DeleteMeetsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">⚠️ Delete All Your Meetings</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>📌 What Happens When You Delete?</h6>
+                <p>Deleting your meetings will:</p>
+                <ul>
+                    <li>❌ Permanently remove all your scheduled meetings in this organization.</li>
+                    <li>❌ You won't be able to recover deleted meetings.</li>
+                    <li>📩 A confirmation email will be sent to you after deletion.</li>
+                </ul>
+
+                <h6>📅 Your Last 3 Meetings:</h6>
+                <div id="lastMeetingsContainer">
+                    <p>Loading meetings...</p>
+                </div>
+
+                <div class="mb-3">
+                    <label for="deletePassword" class="form-label">🔑 Enter Your Password to Confirm:</label>
+                    <input type="password" class="form-control" id="deletePassword" placeholder="Enter your password" required>
+                </div>
+
+                <div class="text-end">
+                    <button class="btn btn-danger" id="confirmDeleteMeetings">🗑️ Confirm Delete</button>
                 </div>
             </div>
         </div>
@@ -3985,6 +4031,95 @@ function copyToClipboard(elementId) {
         console.error("Failed to copy:", err);
     });
 }
+
+
+
+// SHUTDOWN ALL MEETINGS
+document.addEventListener("DOMContentLoaded", function () {
+    const openModalBtn = document.getElementById("openDeleteMeetsModal");
+    const confirmDeleteBtn = document.getElementById("confirmDeleteMeetings");
+    const lastMeetingsContainer = document.getElementById("lastMeetingsContainer");
+    const deletePasswordInput = document.getElementById("deletePassword");
+    let orgId = null;
+
+    if (openModalBtn) {
+        openModalBtn.addEventListener("click", function () {
+            orgId = this.getAttribute("data-org-id");
+            fetchLastMeetings(orgId);
+            let deleteMeetsModal = new bootstrap.Modal(document.getElementById("DeleteMeetsModal"));
+            deleteMeetsModal.show();
+        });
+    }
+
+    function fetchLastMeetings(orgId) {
+        fetch(`/organizations/delete-all-meetings/${orgId}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    let meetingsHtml = data.last_meetings.length
+                        ? data.last_meetings.map(meeting => `
+                            <div class="alert alert-secondary">
+                                <strong>📅 ${meeting.title}</strong><br>
+                                🕒 ${meeting.date} at ${meeting.time}
+                            </div>
+                        `).join("")
+                        : "<p>No recent meetings found.</p>";
+                    lastMeetingsContainer.innerHTML = meetingsHtml;
+                } else {
+                    lastMeetingsContainer.innerHTML = `<p class="text-danger">${data.message}</p>`;
+                }
+            })
+            .catch(error => {
+                lastMeetingsContainer.innerHTML = `<p class="text-danger">Error fetching meetings.</p>`;
+                console.error("Error fetching last meetings:", error);
+            });
+    }
+
+    confirmDeleteBtn.addEventListener("click", function () {
+        const password = deletePasswordInput.value.trim();
+        if (!password) {
+            alert("❌ Please enter your password to confirm deletion.");
+            return;
+        }
+
+        // Show loading state on the button
+        confirmDeleteBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...`;
+        confirmDeleteBtn.disabled = true;
+
+        fetch(`/organizations/delete-all-meetings/${orgId}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCSRFToken(),
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ password: password })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`✅ ${data.message}`);
+                location.reload();
+            } else {
+                alert(`❌ ${data.message}`);
+            }
+        })
+        .catch(error => {
+            alert("❌ Error deleting meetings.");
+            console.error("Error deleting meetings:", error);
+        })
+        .finally(() => {
+            // Reset button state after request completes
+            confirmDeleteBtn.innerHTML = `Confirm Deletion`;
+            confirmDeleteBtn.disabled = false;
+        });
+    });
+
+    function getCSRFToken() {
+        return document.cookie.split("; ")
+            .find(row => row.startsWith("csrftoken="))
+            ?.split("=")[1] || "";
+    }
+});
 
 
 

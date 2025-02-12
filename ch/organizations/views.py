@@ -1664,3 +1664,61 @@ def generate_embed_code(request, org_id):
     """
 
     return JsonResponse({"embed_iframe": embed_iframe, "embed_script": embed_script})
+
+
+
+
+# SHUT DOWN ALL MEETINGS
+@login_required
+def manage_meetings(request, org_id):
+    user = request.user  # Get current user
+
+    if request.method == "GET":
+        """Fetch last 3 meetings before deletion"""
+        last_meetings = MeetingOrganization.objects.filter(
+            organization_id=org_id
+        ).filter(Q(user=user) | Q(invitee=user)).order_by("-created_at")[:3]
+
+        last_meetings_data = [
+            {"title": meeting.meeting_title, "date":str(meeting.created_at), "time": str(meeting.start_time)}
+            for meeting in last_meetings
+        ]
+
+        return JsonResponse({"success": True, "last_meetings": last_meetings_data})
+
+    elif request.method == "POST":
+        """Handle password validation and delete meetings"""
+        try:
+            data = json.loads(request.body)
+            password = data.get("password")
+
+            if not password:
+                return JsonResponse({"success": False, "message": "❌ Password is required!"}, status=400)
+
+            # Validate password
+            if not authenticate(username=user.username, password=password):
+                return JsonResponse({"success": False, "message": "❌ Incorrect password!"}, status=400)
+
+            # Delete all meetings where user is a participant
+            deleted_count, _ = MeetingOrganization.objects.filter(
+                organization_id=org_id
+            ).filter(Q(user=user) | Q(invitee=user)).delete()
+
+            # Send confirmation email
+            send_mail(
+                subject="🗑️ Your Meetings Have Been Deleted",
+                message=f"Hello {user.get_full_name()},\n\nAll your meetings in this organization have been successfully deleted.",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=True,
+            )
+
+            return JsonResponse({
+                "success": True,
+                "message": f"✅ Deleted {deleted_count} meetings successfully!",
+            })
+
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "message": "❌ Invalid request data!"}, status=400)
+
+    return JsonResponse({"success": False, "message": "❌ Invalid request method!"}, status=400)
