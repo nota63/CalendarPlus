@@ -1613,3 +1613,36 @@ def set_meeting_reminder(request, org_id, meeting_id):
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
 
+# EMBBED CALENDARPLUS
+
+# FILTER MEETINGS BASED ON WORKSPACE AND FOR REQUEST.USER
+
+# 1️⃣ API View - Return Meetings as JSON
+@login_required
+def user_meetings_api(request, org_id):
+    meetings = MeetingOrganization.objects.filter(organization_id=org_id, user=request.user, status="scheduled")
+
+    events = [
+        {
+            "title": meeting.meeting_title,
+            "start": f"{meeting.meeting_date}T{meeting.start_time}",
+            "end": f"{meeting.meeting_date}T{meeting.end_time}",
+            "url": meeting.meeting_link if meeting.meeting_link else "#",
+        }
+        for meeting in meetings
+    ]
+
+    return JsonResponse(events, safe=False)
+
+
+# 2️⃣ Generate Embed Code View
+@login_required
+def generate_embed_code(request, org_id):
+    embed_code = f"""
+    <iframe src="https://calendarplus.com/embed/{org_id}/" width="800" height="600" frameborder="0"></iframe>
+    """
+
+    return JsonResponse({"embed_code": embed_code})
+
+
+

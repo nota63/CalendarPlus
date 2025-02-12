@@ -2459,6 +2459,10 @@ My Calendar
     
      
     <button class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2" id="openCalendarBtn">Instant Calendar</button>
+
+    <button id="generateEmbedBtn" data-org-id="{{ organization.id }}" class="btn btn-primary">
+        Generate Embed Code
+    </button>
 </div>
 
 
@@ -3022,6 +3026,24 @@ My Calendar
     </div>
 </div>
 
+
+<!-- GENERATE EMBED CODE -->
+
+<div class="modal fade" id="embedModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Embed Code</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <textarea id="embedCode" class="form-control" readonly></textarea>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -3744,6 +3766,29 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+// GENERATE EMBED CODE 
+
+// Function to fetch and display embed code
+function generateEmbedCode(orgId) {
+    fetch(`/organizations/generate-embed-code/${orgId}/`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("embedCode").value = data.embed_code;
+            let embedModal = new bootstrap.Modal(document.getElementById("embedModal"));
+            embedModal.show();
+        })
+        .catch(error => console.error("Error generating embed code:", error));
+}
+
+// Attach event listener to the button
+const embedButton = document.getElementById("generateEmbedBtn");
+if (embedButton) {
+    embedButton.addEventListener("click", function () {
+        let orgId = this.getAttribute("data-org-id");
+        generateEmbedCode(orgId);
+    });
+}
 
 
 

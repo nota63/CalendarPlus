@@ -33,7 +33,9 @@ urlpatterns=[
     path("recurring-meetings/<int:org_id>/", fetch_recurring_meetings, name="fetch_recurring_meetings"),
     path("delete-recurring-meetings/<int:org_id>/<int:meeting_id>/", delete_recurring_meeting, name="delete_recurring_meetings"),
     path('meetings-calendar-view/<int:org_id>/',get_meetings, name='meetings_calendar_view'),
-    path('meeting-reminder-ajax/<int:org_id>/<int:meeting_id>/',set_meeting_reminder,name='meeting_reminder_ajax')
+    path('meeting-reminder-ajax/<int:org_id>/<int:meeting_id>/',set_meeting_reminder,name='meeting_reminder_ajax'),
+    path("api/meetings/<int:org_id>/", user_meetings_api, name="user_meetings_api"),
+    path("generate-embed-code/<int:org_id>/", generate_embed_code, name="generate_embed_code"),
     
 ]
 
