@@ -38,6 +38,47 @@
 </head>
 
 <style>
+/* Greeting Text - Slim, Elegant */
+#greeting {
+    font-size: 20px; /* Reduced for a thinner look */
+    font-weight: 500; /* Lighter typography */
+    color: #1E293B; /* Dark Slate Blue */
+    text-transform: capitalize;
+    text-shadow: none;
+    margin-bottom: 6px;
+    letter-spacing: 0.3px;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Date & Time - Thin & Minimal */
+#datetime {
+    font-size: 16px; /* Slimmer font size */
+    font-weight: 400; /* Lighter weight for a refined look */
+    color: #334155; /* Muted Dark Gray-Blue */
+    background: linear-gradient(135deg, #93C5FD, #60A5FA); /* Softer, modern gradient */
+    padding: 6px 12px; /* Reduced padding for slim feel */
+    border-radius: 6px; /* Less rounded corners for a sharper UI */
+    display: inline-block;
+    box-shadow: 2px 4px 10px rgba(96, 165, 250, 0.2);
+    backdrop-filter: blur(5px);
+    letter-spacing: 0.4px;
+    border: 1px solid rgba(96, 165, 250, 0.3); /* Subtle border for premium UI */
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Interactive Hover Effect */
+#datetime:hover {
+    transform: scale(1.02);
+    box-shadow: 2px 5px 12px rgba(96, 165, 250, 0.3);
+}
+
+
+
+
+
+
+
 #DeleteMeetsModal {
     font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
 }
@@ -2322,7 +2363,10 @@ My Calendar
     <!-- Main Content -->
     <div class="main-content">
         <div class="profile-header">
-            <h2>Welcome Back, {{ request.user }}</h2>
+            <div class="clock-container">
+                <div id="greeting"></div>
+                <div id="datetime"></div>
+            </div>
             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgzlAIaq9_fY1FwvEaetGEades903CrQ0syQ&s" alt="User Avatar">
             
         </div>
@@ -4452,7 +4496,48 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-// nlp
+
+
+// HANDLE THE GREETING
+function updateTime() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            
+            const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+            const dayName = days[now.getDay()];
+            const monthName = months[now.getMonth()];
+            const dayNumber = now.getDate();
+            const year = now.getFullYear();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const formattedHours = hours % 12 || 12; // Convert to 12-hour format
+
+            // Generate greeting based on time
+            let greeting = "Hello";
+            if (hours >= 5 && hours < 12) {
+                greeting = "Good Morning";
+            } else if (hours >= 12 && hours < 17) {
+                greeting = "Good Afternoon";
+            } else if (hours >= 17 && hours < 21) {
+                greeting = "Good Evening";
+            } else {
+                greeting = "Good Night";
+            }
+
+            // Set the content
+            document.getElementById("greeting").innerHTML = `${greeting}, Vishal ❤️`;
+            document.getElementById("datetime").innerHTML = `${dayName}, ${monthName} ${dayNumber}, ${year} - ${formattedHours}:${minutes}:${seconds} ${ampm}`;
+        }
+
+        // Update every second
+        setInterval(updateTime, 1000);
+
+        // Call once immediately to prevent delay
+        updateTime();
+
 
 
 
