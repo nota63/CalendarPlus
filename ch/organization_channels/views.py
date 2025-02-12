@@ -1384,9 +1384,7 @@ def set_retention_policy(request, org_id, channel_id):
     if not user_profile:
         return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
 
-    if request.user != organization.created_by:
-        return JsonResponse({'error': 'You must be the admin of the organization to set policies.'}, status=403)
-
+ 
     if request.method == "POST":
         try:
         
@@ -1757,9 +1755,7 @@ def fetch_flagged_messages(request, org_id, channel_id):
     organization = get_object_or_404(Organization, id=org_id)
     channel = get_object_or_404(Channel, id=channel_id, organization=organization)
 
-    if request.user != organization.created_by:
-        return JsonResponse({'error': 'You must be the admin of the organization to set policies.'}, status=403)
-    
+   
     user_profile = Profile.objects.filter(user=request.user,organization=organization).first()
    
     if not user_profile and not ChannelAccess.objects.filter(channel_id=channel_id, granted_to_organization=organization, user=request.user).exists():
