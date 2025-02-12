@@ -1618,6 +1618,11 @@ def set_meeting_reminder(request, org_id, meeting_id):
 # FILTER MEETINGS BASED ON WORKSPACE AND FOR REQUEST.USER
 @login_required
 def user_meetings_api(request, org_id):
+    organization = get_object_or_404(Organization, id=org_id)
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
     meetings = MeetingOrganization.objects.filter(organization_id=org_id, user=request.user, status="scheduled")
 
     events = [
@@ -1637,6 +1642,11 @@ def user_meetings_api(request, org_id):
 # 2️⃣ Generate Embed Code (Iframe + Script)
 @login_required
 def generate_embed_code(request, org_id):
+    organization = get_object_or_404(Organization, id=org_id)
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
     embed_iframe = f"""
     <iframe id="calendar-iframe" src="https://calendarplus.com/embed/{org_id}/" width="100%" height="600" frameborder="0"></iframe>
     """
