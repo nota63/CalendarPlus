@@ -27,7 +27,7 @@ urlpatterns = [
     # path('',LandingPageView.as_view(), name='landing_page'),
     path('',views.home, name='home'),
     path('meet/', include('meet.urls')),
-    path('auth/', include('accounts.urls')),
+    path('accounts/', include('accounts.urls')),
     path('chat/', include('chat.urls')),
     path('notify/', include('notify.urls')),
     path('ai/', include('ai.urls')),

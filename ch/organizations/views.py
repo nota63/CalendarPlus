@@ -1732,8 +1732,10 @@ def manage_meetings(request, org_id):
 
 
 # IN APP LIVE MEETINGS
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-class LaunchRoom(View):
+class LaunchRoom(View,LoginRequiredMixin):
+    login_url = '/auth/login/'
     template_name = 'organizations/zeegocloud/initiate_meeting.html'
 
     def get(self,request, org_id):
@@ -1746,7 +1748,7 @@ class LaunchRoom(View):
     
 
 # Initiate the live meeting
-@login_required(login_url='/accounts/login/')
+@login_required(login_url='/auth/login/')
 def start_meeting(request,org_id):
     username=request.user.username
     organization = get_object_or_404(Organization, id=org_id)
