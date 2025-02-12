@@ -1738,8 +1738,26 @@ class LaunchRoom(View):
 
     def get(self,request, org_id):
         organization = get_object_or_404(Organization, id=org_id)
+        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+        if not user_profile:
+            return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
         return render(request, self.template_name,{'organization':organization})
     
+
+# Initiate the live meeting
+@login_required(login_url='/accounts/login/')
+def start_meeting(request,org_id):
+    username=request.user.username
+    organization = get_object_or_404(Organization, id=org_id)
+    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+    if not user_profile:
+        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+    return render(request,'organizations/zeegocloud/zeego_video.html',{'name':username,'organization':organization})
+
+
+
 
 
 

@@ -90,6 +90,10 @@ from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from outh.models import GoogleAuth
+from django.db import models
+from accounts.models import EventOrganization
+
 
 
 # Create your views here.
@@ -369,6 +373,7 @@ import calendar
 # DISPLAY AND CONFIGURE HIDDEN WORKSPACES
 class OrganizationListView(LoginRequiredMixin, ListView):
     model = Organization
+    login_url = '/accounts/login/' 
     template_name = 'calendar/organizations_list.html'
     context_object_name = 'organizations'
 
@@ -435,11 +440,9 @@ class OrganizationListView(LoginRequiredMixin, ListView):
 # org detail
 
 # PREVENT HIDDEN WORKSPACE ACCESS AND DISPLAY DETAILS 
-from outh.models import GoogleAuth
-from django.db import models
-from accounts.models import EventOrganization
 
 class OrgDetailView(LoginRequiredMixin, View):
+    login_url = '/accounts/login/'  
     template_name = 'calendar/org_detail.html'
 
     def get(self, request, org_id):
