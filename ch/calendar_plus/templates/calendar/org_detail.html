@@ -38,6 +38,149 @@
 </head>
 
 <style>
+#DeleteMeetsModal {
+    font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+}
+
+#DeleteMeetsModal .modal-dialog {
+    max-width: 800px;
+    margin: 1.75rem auto;
+}
+
+#DeleteMeetsModal .modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 8px 32px rgba(0 0 0 / 12%);
+    overflow: hidden;
+}
+
+#DeleteMeetsModal .modal-header {
+    background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+    border-bottom: 2px solid #ffe3e3;
+    padding: 1.5rem 2rem;
+}
+
+#DeleteMeetsModal .modal-title {
+    color: #dc3545;
+    font-weight: 600;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+#DeleteMeetsModal .btn-close {
+    background-size: 0.8em;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+#DeleteMeetsModal .modal-body {
+    padding: 2rem;
+    color: #4a5568;
+}
+
+#DeleteMeetsModal h6 {
+    color: #2d3748;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#DeleteMeetsModal ul {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 2rem;
+}
+
+#DeleteMeetsModal ul li {
+    padding: 0.5rem 0;
+    display: flex;
+    align-items: start;
+    gap: 0.75rem;
+}
+
+#DeleteMeetsModal ul li::before {
+    content: '⚠️';
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+#lastMeetingsContainer {
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.meeting-item {
+    padding: 0.75rem;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #edf2f7;
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.meeting-item:last-child {
+    margin-bottom: 0;
+}
+
+#deletePassword {
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+}
+
+#deletePassword:focus {
+    border-color: #feb2b2;
+    box-shadow: 0 0 0 3px rgba(254 178 178 / 30%);
+}
+
+#confirmDeleteMeetings {
+    background: #dc3545;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    border: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#confirmDeleteMeetings:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+}
+
+#confirmDeleteMeetings:active {
+    transform: translateY(0);
+}
+
+/* Loading Animation */
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.loading-placeholder {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    height: 20px;
+    border-radius: 4px;
+}
+
+
 #embedModal .modal-content {
     background: #ffffff;
     color: #333;
@@ -3242,6 +3385,7 @@ My Calendar
         </div>
     </div>
 </div>
+
 
 
 
