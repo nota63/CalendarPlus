@@ -2,10 +2,61 @@
 
 <head>
     <style>
-        #root {
-            width: 100vw;
-            height: 100vh;
-            }
+        /* Make the video call container full screen and immersive */
+#root {
+    width: 100vw;
+    height: 100vh;
+    background-color: #f8f9fa; /* Light background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* Customize the video call UI */
+.zego-ui-container {
+    border-radius: 12px; /* Soft rounded edges */
+    overflow: hidden;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+    background: #ffffff; /* Clean white background */
+}
+
+/* Customizing video screens */
+.zego-video-container {
+    border-radius: 8px;
+}
+
+/* Styling buttons */
+.zego-ui-container .zego-button {
+    background: #007bff !important; /* Primary color */
+    color: white !important;
+    border-radius: 8px !important;
+    transition: 0.3s ease-in-out;
+}
+
+.zego-ui-container .zego-button:hover {
+    background: #0056b3 !important;
+}
+
+/* Customizing user list */
+.zego-user-list {
+    background: #ffffff !important;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+/* Hide branding elements */
+.zego-branding {
+    display: none !important;
+}
+
+/* Custom grid layout */
+.zego-layout-container {
+    border-radius: 12px;
+    padding: 10px;
+    background: #f0f2f5; /* Light gray background */
+}
+
     </style>
 </head>
 
