@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Video Call | Calendar Plus</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .launch-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .launch-btn:hover {
+            background-color: #0056b3;
+        }
+        .guide-box {
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2>📹 Live Video Meetings</h2>
+        <a href="#" id="launchMeeting" class="launch-btn">🚀 Launch Meeting</a>
+    </div>
+
+    <hr>
+
+    <div class="guide-box">
+        <h4>📖 How it Works</h4>
+        <ul>
+            <li>💡 You can start a video meeting with your workspace members.</li>
+            <li>👥 Only members of your organization can join the call.</li>
+            <li>🔒 Meetings are **end-to-end encrypted** for security.</li>
+            <li>⏳ Meeting duration is **unlimited** (depends on your plan).</li>
+            <li>📅 Schedule or start an **instant meeting** anytime.</li>
+        </ul>
+    </div>
+
+    <div class="mt-4">
+        <h4>🔹 Features</h4>
+        <ul>
+            <li>🎥 **HD Video & Audio Calls**</li>
+            <li>💬 **Live Chat During Meetings**</li>
+            <li>📺 **Screen Sharing**</li>
+            <li>🎙️ **Mute/Unmute Participants**</li>
+            <li>📤 **Recording (Coming Soon!)**</li>
+        </ul>
+    </div>
+
+    <div class="mt-4">
+        <h4>❓ Need Help?</h4>
+        <p>📩 Contact support if you face any issues setting up or joining meetings.</p>
+    </div>
+</div>
+
+<script>
+    document.getElementById("launchMeeting").addEventListener("click", function() {
+        alert("🚀 Redirecting to ZegoCloud Meeting...");
+        window.location.href = "/start-video-call";  // Update with your actual meeting link
+    });
+</script>
+
+</body>
+</html>

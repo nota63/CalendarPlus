@@ -1728,3 +1728,18 @@ def manage_meetings(request, org_id):
             return JsonResponse({"success": False, "message": "❌ Invalid request data!"}, status=400)
 
     return JsonResponse({"success": False, "message": "❌ Invalid request method!"}, status=400)
+
+
+
+# IN APP LIVE MEETINGS
+
+class LaunchRoom(View):
+    template_name = 'organizations/zeegocloud/initiate_meeting.html'
+
+    def get(self,request, org_id):
+        organization = get_object_or_404(Organization, id=org_id)
+        return render(request, self.template_name,{'organization':organization})
+    
+
+
+

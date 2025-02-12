@@ -2741,6 +2741,12 @@ My Calendar
       Shut Down My Meetings
    </button>
 
+   <a href="{% url 'initiate_meeting' org_id=organization.id%}">
+      <button class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2" type="submit">
+          Instant Live Meeting
+      </button>
+   </a>
+
 
 
 </div>
