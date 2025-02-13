@@ -58,7 +58,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Application definition
 
 INSTALLED_APPS = [
-    'private_chat',
     'axes',
     'alert',
     'outh',
@@ -327,3 +326,4 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 AXES_FAILURE_LIMIT = 2  
 AXES_COOLOFF_TIME = 30  
+
