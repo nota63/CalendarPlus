@@ -59,7 +59,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 INSTALLED_APPS = [
     'conversation',
-    'axes',
+    # 'axes',
     'alert',
     'outh',
     'profiles',
@@ -106,7 +106,7 @@ MIDDLEWARE = [
     'ch.middlewares.CheckEmailMiddleware',
     'ch.middlewares.FirstTimeGuideMiddleware',
     'ch.middlewares.OrgGuideMiddleware',
-    'axes.middleware.AxesMiddleware',
+    # 'axes.middleware.AxesMiddleware',
 
 ]
 
@@ -320,11 +320,15 @@ GOOGLE_REDIRECT_URI = "http://localhost:8000/oauth/callback/"
 
 #  Session Expiry & Auto Logout (Prevent Stolen Sessions)
 
-SESSION_COOKIE_AGE = 1800 
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True  
+# SESSION_COOKIE_AGE = 1800 
+# SESSION_EXPIRE_AT_BROWSER_CLOSE = True  
 
 #  Brute Force Attack Protection (Limit Login Attempts)
 
-AXES_FAILURE_LIMIT = 2  
-AXES_COOLOFF_TIME = 30  
+# AXES_FAILURE_LIMIT = 2  
+# AXES_COOLOFF_TIME = 30  
 
+
+
+
+# LOGGING SET-UP
