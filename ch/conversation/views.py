@@ -9,6 +9,9 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 import json
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+
 
 
 User = get_user_model()
@@ -40,6 +43,7 @@ def chat_view(request, user_id):
 
 
 # SAVE MESSAGES VIA AJAX
+# SAVE MESSAGES VIA AJAX
 @csrf_exempt
 def save_message(request):
     if request.method == "POST":
@@ -48,19 +52,36 @@ def save_message(request):
         message_text = data.get("message")
         sender_id = data.get("sender_id")
         conversation_id = data.get("conversation_id")
-
         if not conversation_id:  # If conversation_id is empty, return an error
             return JsonResponse({"status": "error", "message": "Conversation ID is missing!"}, status=400)
-
         sender = User.objects.get(id=sender_id)
         conversation = Conversation.objects.get(id=conversation_id)
-
         message = Message.objects.create(
             conversation=conversation,
             sender=sender,
             text=message_text
         )
-
         return JsonResponse({"status": "success", "message_id": message.id})
-
     return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)
+
+
+# SAVE FILES 
+@csrf_exempt
+def save_file(request):
+    if request.method == "POST" and request.FILES.get("file"):
+        uploaded_file = request.FILES["file"]
+        file_path = default_storage.save(f"chat_files/{uploaded_file.name}", uploaded_file)
+        file_url = default_storage.url(file_path)
+
+        sender_id = request.POST.get("sender_id")
+        conversation_id = request.POST.get("conversation_id")
+
+        # Save file message in DB
+        Message.objects.create(
+            conversation_id=conversation_id,
+            sender_id=sender_id,
+            file=file_path
+        )
+
+        return JsonResponse({"file_url": file_url})
+    return JsonResponse({"error": "No file uploaded"}, status=400)

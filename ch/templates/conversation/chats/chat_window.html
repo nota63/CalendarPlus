@@ -6,124 +6,171 @@
     <title>Chat with {{ other_user.username }}</title>
 
 
-    
+
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const chatLog = document.getElementById("chat-log");
-            const chatInput = document.getElementById("chat-message-input");
-            const sendButton = document.getElementById("chat-message-submit");
-            const typingIndicator = document.getElementById("typing-indicator");
-    
-            const roomName = "{{ room_name }}";
-            const chatSocket = new WebSocket(
-                "ws://" + window.location.host + "/ws/chat/" + roomName + "/"
-            );
-    
-            function getCurrentTime() {
-                const now = new Date();
-                return now.getHours() + ":" + now.getMinutes().toString().padStart(2, '0');
+
+document.addEventListener("DOMContentLoaded", function () {
+    const chatLog = document.getElementById("chat-log");
+    const chatInput = document.getElementById("chat-message-input");
+    const sendButton = document.getElementById("chat-message-submit");
+    const fileInput = document.getElementById("chat-file-input"); // File input
+    const typingIndicator = document.getElementById("typing-indicator");
+
+    const roomName = "{{ room_name }}";
+    const chatSocket = new WebSocket(
+        "ws://" + window.location.host + "/ws/chat/" + roomName + "/"
+    );
+
+    function getCurrentTime() {
+        const now = new Date();
+        return now.getHours() + ":" + now.getMinutes().toString().padStart(2, '0');
+    }
+
+    chatSocket.onopen = function () {
+        console.log("WebSocket connection established.");
+    };
+
+    chatSocket.onmessage = function (e) {
+        const data = JSON.parse(e.data);
+        
+        if (data.message) {
+            appendMessage(data.sender_id, data.message, data.timestamp);
+        }
+
+        if (data.file_url) {
+            appendFileMessage(data.sender_id, data.file_url, data.timestamp);
+        }
+
+        if (data.typing) {
+            showTypingIndicator(data.typing);
+        }
+    };
+
+    chatSocket.onclose = function () {
+        console.error("Chat socket closed unexpectedly.");
+    };
+
+    chatInput.addEventListener("input", function () {
+        if (chatInput.value.trim()) {
+            chatSocket.send(JSON.stringify({
+                "typing": "{{ request.user.username }} is typing..."
+            }));
+        }
+    });
+
+    sendButton.onclick = function () {
+        sendMessage();
+    };
+
+    chatInput.onkeyup = function (e) {
+        if (e.key === "Enter") {
+            sendMessage();
+        }
+    };
+
+    // **🔥 Auto-send file when selected 🔥**
+    fileInput.addEventListener("change", function () {
+        if (fileInput.files.length > 0) {
+            sendFile();
+        }
+    });
+
+    function sendMessage() {
+        const message = chatInput.value.trim();
+        if (message) {
+            chatSocket.send(JSON.stringify({
+                "message": message,
+                "sender_id": "{{ request.user.id }}"
+            }));
+
+            saveMessage(message);
+            chatInput.value = "";
+        }
+    }
+
+    function sendFile() {
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("sender_id", "{{ request.user.id }}");
+        formData.append("conversation_id", "{{ conversation.id|default:0 }}");
+
+        fetch("{% url 'save_file' %}", {
+            method: "POST",
+            headers: { "X-CSRFToken": "{{ csrf_token }}" },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.file_url) {
+                chatSocket.send(JSON.stringify({
+                    "file_url": data.file_url,
+                    "sender_id": "{{ request.user.id }}"
+                }));
             }
-    
-            chatSocket.onopen = function () {
-                console.log("WebSocket connection established.");
-            };
-    
-            chatSocket.onmessage = function (e) {
-                const data = JSON.parse(e.data);
-                
-                if (data.message) {
-                    appendMessage(data.sender_id, data.message);
-                }
-    
-                if (data.typing) {
-                    showTypingIndicator(data.typing);
-                }
-            };
-    
-            chatSocket.onclose = function () {
-                console.error("Chat socket closed unexpectedly.");
-            };
-    
-            chatInput.addEventListener("input", function () {
-                // Send typing event only if there's text in the input
-                if (chatInput.value.trim()) {
-                    chatSocket.send(JSON.stringify({
-                        "typing": "{{ request.user.username }} is typing..."
-                    }));
-                }
-            });
-    
-            sendButton.onclick = function () {
-                sendMessage();
-            };
-    
-            chatInput.onkeyup = function (e) {
-                if (e.key === "Enter") {
-                    sendMessage();
-                }
-            };
-    
-            function sendMessage() {
-                const message = chatInput.value.trim();
-                if (message) {
-                    chatSocket.send(JSON.stringify({
-                        "message": message,
-                        "sender_id": "{{ request.user.id }}"
-                    }));
-    
-                    saveMessage(message);
-                    chatInput.value = "";
-                }
-            }
-    
-            function saveMessage(message) {
-                fetch("{% url 'save_message' %}", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": "{{ csrf_token }}"
-                    },
-                    body: JSON.stringify({
-                        "message": message,
-                        "sender_id": "{{ request.user.id }}",
-                        "conversation_id": "{{ conversation.id|default:0 }}"
-                    })
-                })
-                .then(response => response.json())
-                .then(data => console.log("Message saved:", data))
-                .catch(error => console.error("Error saving message:", error));
-            }
-    
-            function appendMessage(sender_id, message) {
-                const messageType = sender_id == "{{ request.user.id }}" ? 'me' : 'other';
-                const messageElement = document.createElement("div");
-                messageElement.classList.add("message", messageType);
-                messageElement.innerHTML = `<strong>${sender_id == "{{ request.user.id }}" ? "You" : "{{ other_user.username }}"}</strong>: ${message} <span class="timestamp">${getCurrentTime()}</span>`;
-                chatLog.appendChild(messageElement);
-                chatLog.scrollTop = chatLog.scrollHeight;
-            }
-    
-            function showTypingIndicator(text) {
-                typingIndicator.textContent = text;
-                typingIndicator.style.display = "block";
-    
-                // Hide after 3 seconds
-                clearTimeout(typingIndicator.timer);
-                typingIndicator.timer = setTimeout(() => {
-                    typingIndicator.style.display = "none";
-                }, 3000);
-            }
-        });
+        })
+        .catch(error => console.error("Error uploading file:", error));
+
+        fileInput.value = ""; // Reset file input
+    }
+
+    function saveMessage(message) {
+        fetch("{% url 'save_message' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({
+                "message": message,
+                "sender_id": "{{ request.user.id }}",
+                "conversation_id": "{{ conversation.id|default:0 }}"
+            })
+        })
+        .then(response => response.json())
+        .then(data => console.log("Message saved:", data))
+        .catch(error => console.error("Error saving message:", error));
+    }
+
+    function appendMessage(sender_id, message, timestamp = getCurrentTime()) {
+        const messageType = sender_id == "{{ request.user.id }}" ? 'me' : 'other';
+        const messageElement = document.createElement("div");
+        messageElement.classList.add("message", messageType);
+        messageElement.innerHTML = `<strong>${sender_id == "{{ request.user.id }}" ? "You" : "{{ other_user.username }}"}</strong>: ${message} <span class="timestamp">${timestamp}</span>`;
+        chatLog.appendChild(messageElement);
+        chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    function appendFileMessage(sender_id, file_url, timestamp = getCurrentTime()) {
+        const messageType = sender_id == "{{ request.user.id }}" ? 'me' : 'other';
+        const messageElement = document.createElement("div");
+        messageElement.classList.add("message", messageType);
+
+        let fileHtml = `<a href="${file_url}" target="_blank">Download File</a>`;
+        if (file_url.match(/\.(jpeg|jpg|png|gif)$/i)) {
+            fileHtml = `<img src="${file_url}" alt="Sent Image" style="max-width: 200px; border-radius: 5px;">`;
+        }
+
+        messageElement.innerHTML = `<strong>${sender_id == "{{ request.user.id }}" ? "You" : "{{ other_user.username }}"}</strong>: ${fileHtml} <span class="timestamp">${timestamp}</span>`;
+        chatLog.appendChild(messageElement);
+        chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    function showTypingIndicator(text) {
+        typingIndicator.textContent = text;
+        typingIndicator.style.display = "block";
+
+        clearTimeout(typingIndicator.timer);
+        typingIndicator.timer = setTimeout(() => {
+            typingIndicator.style.display = "none";
+        }, 3000);
+    }
+});
+
     </script>
     
-
-
-
-
-
-
-
-
 
 
 
@@ -158,6 +205,11 @@
         </div>
         <div id="typing-indicator"></div>
         <div class="input-container">
+
+
+            <input type="file" id="chat-file-input">
+         
+
             <input id="chat-message-input" type="text" placeholder="Type a message...">
             <button id="chat-message-submit">Send</button>
         </div>
