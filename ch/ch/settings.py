@@ -59,11 +59,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 INSTALLED_APPS = [
     'private_chat',
-    'custom_header',
     'axes',
     'alert',
     'outh',
-    'direct_message',
     'profiles',
     'organizations',
     'meet',
