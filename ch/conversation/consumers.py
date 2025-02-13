@@ -26,7 +26,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message_text = data.get("message", "").strip()
         file_url = data.get("file_url", None)
         # handle code snippet
-        code_snippet = data.get("code_snippet", None)
+        code_snippet = data.get("code_snippet", "").strip()  # Get code snippet
+
         
         user1_id, user2_id = map(int, self.room_name.split("_")[1:])
         receiver_id = user2_id if sender_id == user1_id else user1_id
@@ -69,7 +70,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "sender_id": sender_id,
                 "timestamp": message.timestamp.strftime("%H:%M"),
             }
-        ) 
+        )
 
     async def chat_message(self, event):
         await self.send(text_data=json.dumps({
@@ -86,12 +87,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         }))
 
     async def chat_code(self, event):
-      await self.send(text_data=json.dumps({
+     
+        await self.send(text_data=json.dumps({
         "code_snippet": event["code_snippet"],
         "sender_id": event["sender_id"],
         "timestamp": event["timestamp"],
-    }))
-
+      }))
 
     @database_sync_to_async
     def get_or_create_conversation(self, user1_id, user2_id):
