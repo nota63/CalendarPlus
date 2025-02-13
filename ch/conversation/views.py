@@ -85,3 +85,50 @@ def save_file(request):
 
         return JsonResponse({"file_url": file_url})
     return JsonResponse({"error": "No file uploaded"}, status=400)
+
+
+# save code snippet
+@csrf_exempt
+def save_code_snippet(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            sender_id = data.get("sender_id")
+            receiver_id = data.get("receiver_id")
+            code_snippet = data.get("code_snippet", "").strip()
+
+            if not sender_id or not receiver_id or not code_snippet:
+                return JsonResponse({"error": "Missing required fields"}, status=400)
+
+            sender = User.objects.get(id=sender_id)
+            receiver = User.objects.get(id=receiver_id)
+
+            # Get or create conversation
+            conversation, _ = Conversation.objects.get_or_create(
+                user1=min(sender, receiver, key=lambda u: u.id),
+                user2=max(sender, receiver, key=lambda u: u.id)
+            )
+
+            # Save message with code snippet
+            message = Message.objects.create(
+                conversation=conversation,
+                sender=sender,
+                text=None,  # No regular text, just the code snippet
+                code_snippet=code_snippet
+            )
+
+            return JsonResponse({
+                "success": True,
+                "message_id": message.id,
+                "code_snippet": message.code_snippet,
+                "timestamp": message.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+            })
+
+        except User.DoesNotExist:
+            return JsonResponse({"error": "Invalid sender or receiver ID"}, status=400)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON format"}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)

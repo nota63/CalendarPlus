@@ -25,12 +25,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         sender_id = self.user.id
         message_text = data.get("message", "").strip()
         file_url = data.get("file_url", None)
-
+        # handle code snippet
+        code_snippet = data.get("code_snippet", None)
+        
         user1_id, user2_id = map(int, self.room_name.split("_")[1:])
         receiver_id = user2_id if sender_id == user1_id else user1_id
 
         conversation = await self.get_or_create_conversation(user1_id, user2_id)
-        
+
+       
         if message_text:
             message = await self.save_message(conversation, sender_id, message_text, None)
             await self.channel_layer.group_send(
@@ -55,6 +58,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 }
             )
 
+        # code snippet 
+        if code_snippet:
+          message = await self.save_message(conversation, sender_id, code_snippet, None)
+          await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                "type": "chat_code",
+                "code_snippet": code_snippet,
+                "sender_id": sender_id,
+                "timestamp": message.timestamp.strftime("%H:%M"),
+            }
+        ) 
+
     async def chat_message(self, event):
         await self.send(text_data=json.dumps({
             "message": event["message"],
@@ -68,6 +84,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "sender_id": event["sender_id"],
             "timestamp": event["timestamp"],
         }))
+
+    async def chat_code(self, event):
+      await self.send(text_data=json.dumps({
+        "code_snippet": event["code_snippet"],
+        "sender_id": event["sender_id"],
+        "timestamp": event["timestamp"],
+    }))
+
 
     @database_sync_to_async
     def get_or_create_conversation(self, user1_id, user2_id):
