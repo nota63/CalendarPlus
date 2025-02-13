@@ -2,9 +2,6 @@ import json
 import logging
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
-from django.core.files.base import ContentFile
-import base64
-from django.utils import timezone
 from django.contrib.auth import get_user_model
 from conversation.models import Conversation, Message
 
@@ -38,26 +35,38 @@ class ChatConsumer(AsyncWebsocketConsumer):
             message = await self.save_message(conversation, sender_id, message_text, None)
             await self.channel_layer.group_send(
                 self.room_group_name,
-                {"type": "chat_message", "message": message.text, "sender_id": sender_id}
+                {
+                    "type": "chat_message",
+                    "message": message.text,
+                    "sender_id": sender_id,
+                    "timestamp": message.timestamp.strftime("%H:%M"),
+                }
             )
         
         if file_url:
             message = await self.save_message(conversation, sender_id, None, file_url)
             await self.channel_layer.group_send(
                 self.room_group_name,
-                {"type": "chat_file", "file_url": file_url, "sender_id": sender_id}
+                {
+                    "type": "chat_file",
+                    "file_url": file_url,
+                    "sender_id": sender_id,
+                    "timestamp": message.timestamp.strftime("%H:%M"),
+                }
             )
 
     async def chat_message(self, event):
         await self.send(text_data=json.dumps({
             "message": event["message"],
             "sender_id": event["sender_id"],
+            "timestamp": event["timestamp"],
         }))
 
     async def chat_file(self, event):
         await self.send(text_data=json.dumps({
             "file_url": event["file_url"],
             "sender_id": event["sender_id"],
+            "timestamp": event["timestamp"],
         }))
 
     @database_sync_to_async
@@ -76,8 +85,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = Message.objects.create(
             conversation=conversation,
             sender=sender,
-            text=text if text else "",
-            file=file_url if file_url else None,
+            text=text or "",
+            file=file_url or None,
             is_read=True,
         )
         return message
