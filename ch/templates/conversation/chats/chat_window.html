@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with {{ other_user.username }}</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const chatLog = document.getElementById("chat-log");
+            const chatInput = document.getElementById("chat-message-input");
+            const sendButton = document.getElementById("chat-message-submit");
+            const typingIndicator = document.getElementById("typing-indicator");
+
+            const roomName = "{{ room_name }}";  
+            const chatSocket = new WebSocket(
+            "ws://" + window.location.host + "/ws/chat/" + roomName + "/"
+         );
+
+            function getCurrentTime() {
+                const now = new Date();
+                return now.getHours() + ":" + now.getMinutes().toString().padStart(2, '0');
+            }
+
+            chatSocket.onopen = function () {
+                console.log("WebSocket connection established.");
+            };
+
+            chatSocket.onmessage = function (e) {
+                const data = JSON.parse(e.data);
+
+                if (data.message) {
+                    const messageType = data.sender_id == "{{ request.user.id }}" ? 'me' : 'other';
+                    const messageElement = document.createElement("div");
+                    messageElement.classList.add("message", messageType);
+                    messageElement.innerHTML = `<strong>${data.sender_id == "{{ request.user.id }}" ? "You" : "{{ other_user.username }}"}</strong>: ${data.message} <span class="timestamp">${getCurrentTime()}</span>`;
+                    chatLog.appendChild(messageElement);
+                    chatLog.scrollTop = chatLog.scrollHeight;
+                }
+
+                if (data.typing) {
+                    typingIndicator.textContent = data.typing;
+                    typingIndicator.style.display = "block";
+                    setTimeout(() => {
+                        typingIndicator.style.display = "none";
+                    }, 3000);
+                }
+            };
+
+            chatSocket.onclose = function () {
+                console.error("Chat socket closed unexpectedly.");
+            };
+
+            chatInput.onkeyup = function (e) {
+                if (e.key === "Enter") {
+                    sendMessage();
+                }
+
+                // Send typing indicator
+                chatSocket.send(JSON.stringify({
+                    "typing": "{{ request.user.username }} is typing..."
+                }));
+            };
+
+            sendButton.onclick = function () {
+                sendMessage();
+            };
+
+            function sendMessage() {
+                const message = chatInput.value.trim();
+                if (message) {
+                    chatSocket.send(JSON.stringify({
+                        "message": message,
+                        "sender_id": "{{ request.user.id }}"
+                    }));
+                    chatInput.value = "";
+                }
+            }
+        });
+    </script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .chat-container { max-width: 600px; margin: auto; border: 1px solid #ccc; padding: 10px; border-radius: 10px; }
+        .chat-log { height: 300px; overflow-y: auto; border-bottom: 1px solid #ccc; margin-bottom: 10px; padding: 10px; }
+        .message { margin-bottom: 5px; }
+        .message.me { text-align: right; color: blue; }
+        .message.other { text-align: left; color: green; }
+        .timestamp { font-size: 0.8em; color: gray; margin-left: 5px; }
+        .input-container { display: flex; gap: 10px; }
+        input { flex: 1; padding: 8px; }
+        button { padding: 8px 12px; cursor: pointer; }
+        #typing-indicator { display: none; font-style: italic; color: gray; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <h2>Chat with {{ other_user.username }}</h2>
+        <div id="chat-log" class="chat-log">
+            {% for message in messages %}
+                <div class="message {% if message.sender == request.user %}me{% else %}other{% endif %}">
+                    <strong>{% if message.sender == request.user %}You{% else %}{{ other_user.username }}{% endif %}</strong>: 
+                    {{ message.text }}
+                    <span class="timestamp">{{ message.timestamp|date:"H:i" }}</span>
+                </div>
+            {% endfor %}
+        </div>
+        <div id="typing-indicator"></div>
+        <div class="input-container">
+            <input id="chat-message-input" type="text" placeholder="Type a message...">
+            <button id="chat-message-submit">Send</button>
+        </div>
+    </div>
+</body>
+</html>
+
+

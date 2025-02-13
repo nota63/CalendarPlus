@@ -15,8 +15,7 @@ from django.urls import path
 import chat.routing
 import calendar_plus.routing
 import organization_channels.routing
-
-
+import conversation.routing
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ch.settings')
 
 
@@ -30,7 +29,8 @@ application = ProtocolTypeRouter({
     'websocket':AuthMiddlewareStack(URLRouter(
         chat.routing.ws_urlpatterns + 
         calendar_plus.routing.websocket_urlpatterns +
-        organization_channels.routing.websocket_urlpatterns
+        organization_channels.routing.websocket_urlpatterns+
+        conversation.routing.websocket_urlpatterns
         
           
         
