@@ -14,8 +14,7 @@ from django.core.files.base import ContentFile
 from datetime import datetime
 from django.contrib import messages
 from django.urls import reverse_lazy
-from accounts.models import Organization
-
+from accounts.models import Organization,Profile
 User = get_user_model()
 
 
@@ -23,6 +22,14 @@ User = get_user_model()
 def chat_view(request, user_id,org_id):
     other_user = get_object_or_404(User, id=user_id)
     organization= get_object_or_404(Organization,id=org_id)
+
+    profile = Profile.objects.filter(organization=organization, user=other_user).first()
+    if profile and profile.profile_picture:
+      url = profile.profile_picture.url
+    else:
+       url = None  
+
+    print("URL FOUND:",url)
 
     # Ensure a unique conversation exists between the two users
     conversation, created = Conversation.objects.get_or_create(
@@ -43,6 +50,7 @@ def chat_view(request, user_id,org_id):
         "room_name": room_name,
         'conversation':conversation,
         'organization':organization,
+        'profile':profile,
     })
 
 
