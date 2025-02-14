@@ -140,6 +140,45 @@
     </div>
 </div>
 
+<!-- Repeat Message Modal -->
+<div class="modal fade" id="repeatMessageModal" tabindex="-1" aria-labelledby="repeatMessageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="repeatMessageModalLabel">Set Message Recurrence</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="repeatMessageForm">
+                    <input type="hidden" id="repeatMessageId">
+
+                    <!-- Select Recurrence Option -->
+                    <div class="mb-3">
+                        <label for="repeatType" class="form-label">Recurrence Type</label>
+                        <select class="form-select" id="repeatType">
+                            <option value="none">None</option>
+                            <option value="daily">Daily</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="yearly">Yearly</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+
+                    <!-- Custom Date-Time (Hidden by Default) -->
+                    <div class="mb-3 d-none" id="customDateTimeContainer">
+                        <label for="customDateTime" class="form-label">Select Date & Time</label>
+                        <input type="datetime-local" class="form-control" id="customDateTime">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveRepeatMessage">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!-- SCRIPT LOGIC -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -189,6 +228,66 @@
         .catch(error => console.error("Error:", error));
     });
 });
+
+// HANDLE MESSAGE RECURRENCE
+document.addEventListener("DOMContentLoaded", function () {
+    const repeatModal = new bootstrap.Modal(document.getElementById("repeatMessageModal"));
+    let currentMessageId = null;
+
+    // Open modal on clicking "Repeat"
+    document.querySelectorAll(".repeat-message-btn").forEach(btn => {
+        btn.addEventListener("click", function () {
+            currentMessageId = this.getAttribute("data-message-id");
+            document.getElementById("repeatMessageId").value = currentMessageId;
+            document.getElementById("repeatType").value = "none"; 
+            document.getElementById("customDateTimeContainer").classList.add("d-none");
+            repeatModal.show();
+        });
+    });
+
+    // Show/hide custom date-time input
+    document.getElementById("repeatType").addEventListener("change", function () {
+        if (this.value === "custom") {
+            document.getElementById("customDateTimeContainer").classList.remove("d-none");
+        } else {
+            document.getElementById("customDateTimeContainer").classList.add("d-none");
+        }
+    });
+
+    // Save recurrence via AJAX
+    document.getElementById("saveRepeatMessage").addEventListener("click", function () {
+        if (!currentMessageId) return;
+
+        const repeatType = document.getElementById("repeatType").value;
+        let customDateTime = document.getElementById("customDateTime").value;
+
+        if (repeatType === "custom" && !customDateTime) {
+            alert("Please select a date and time for custom recurrence.");
+            return;
+        }
+
+        fetch(`/dm/set-recurrence/${currentMessageId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({ repeat: repeatType, custom_datetime: customDateTime })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Recurrence set successfully!");
+                repeatModal.hide();
+            } else {
+                alert("Error setting recurrence!");
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+});
+
+
 
 </script>
 

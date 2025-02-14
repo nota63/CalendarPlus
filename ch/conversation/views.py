@@ -11,7 +11,7 @@ from django.shortcuts import get_object_or_404
 import json
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-
+from datetime import datetime
 
 
 User = get_user_model()
@@ -153,6 +153,35 @@ def edit_message(request, message_id):
             # 🔥 SEND MESSAGE ID IN RESPONSE
             return JsonResponse({"success": True, "message_id": message.id, "new_text": message.text})
 
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "error": "Invalid data!"}, status=400)
+
+    return JsonResponse({"success": False, "error": "Invalid request!"}, status=405)
+
+
+# SET MESSAGE RECURRANCE
+@csrf_exempt
+def set_recurrence(request, message_id):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            repeat_type = data.get("repeat", "none")
+            custom_datetime = data.get("custom_datetime", None)
+
+            message = get_object_or_404(Message, id=message_id, sender=request.user)
+            message.repeat = repeat_type
+
+            # Handle custom date-time
+            if repeat_type == "custom" and custom_datetime:
+                try:
+                    message.custom_repeat_datetime = datetime.strptime(custom_datetime, "%Y-%m-%dT%H:%M")
+                except ValueError:
+                    return JsonResponse({"success": False, "error": "Invalid date format!"}, status=400)
+            else:
+                message.custom_repeat_datetime = None
+
+            message.save()
+            return JsonResponse({"success": True, "repeat": message.repeat})
         except json.JSONDecodeError:
             return JsonResponse({"success": False, "error": "Invalid data!"}, status=400)
 
