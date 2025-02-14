@@ -223,3 +223,21 @@ def delete_message(request, message_id,org_id):
     
     return redirect(reverse_lazy('dm', kwargs={'user_id': message.conversation.user1.id, 'org_id':message.conversation.organization.id}))
 
+
+
+# DELETE ALL MESSAGES 
+@login_required
+def delete_all_messages(request, conversation_id, org_id):
+    if request.method == "POST":
+        organization = get_object_or_404(Organization, id=org_id)
+        conversation = get_object_or_404(Conversation, id=conversation_id, organization=organization)
+        user_input = request.POST.get("workspace_name", "").strip()
+
+        if user_input.lower() == organization.name.lower():
+            # Delete all messages where the request.user is the sender
+            Message.objects.filter(conversation=conversation, sender=request.user,organization=organization).delete()
+            return JsonResponse({"success": True, "message": "All your messages have been deleted!"})
+        else:
+            return JsonResponse({"success": False, "message": "Workspace name does not match!"})
+
+    return JsonResponse({"success": False, "message": "Invalid request!"}, status=400)

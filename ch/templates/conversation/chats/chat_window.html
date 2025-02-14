@@ -25,7 +25,21 @@
         
         
             <span class="status-dot" id="user-status" style="width: 10px; height: 10px; background-color: gray; border-radius: 50%; display: inline-block;"></span>
+              <!-- Search Bar -->
+           <div class="search-container mb-2">
+               <input type="text" id="searchMessages" class="form-control" placeholder="Search messages, files, codes and media..">
+           </div>
+           <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteMessagesModal">
+            Delete All My Messages
+          </button>
         </h2>
+
+        
+        
+
+
+
+
 
         <div class="video-call-container">
             <video id="local-video" autoplay playsinline class="video-feed"></video>
@@ -35,13 +49,9 @@
 
         
         
-        <!-- Chat Log -->
+<!-- Chat Log -->
 <div class="chat-log" id="chat-log">
-     <!-- Search Bar -->
-<div class="search-container mb-2">
-    <input type="text" id="searchMessages" class="form-control" placeholder="Search messages...">
-</div>
-
+   
     {% for message in messages %}
     <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}" data-message-text="{{ message.text|default:'' }}">
         <span class="message-text">{% if message.text %}{{ message.text }}{% endif %}</span>
@@ -71,7 +81,7 @@
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
                 <li>
-                    <button class="dropdown-item edit-message-btn" data-message-id="{{ message.id }}" data-message-text="{{ message.text }}">✏️ Edit</button>
+                    <button class="dropdown-item edit-message-btn" data-message-id="{{ message.id }}" data-message-text="{{ message.text }}">Modify</button>
                     <button class="dropdown-item repeat-message-btn" data-message-id="{{ message.id }}">Repeat</button>
                     <a href="{% url 'delete_text' message_id=message.id org_id=organization.id %}">
                         <button type="submit" class="dropdown-item repeat-message-btn">Wipe</button>
@@ -212,6 +222,26 @@
     </div>
 </div>
 
+<!-- Handle message deletion with confirmation -->
+<div class="modal fade" id="deleteMessagesModal" tabindex="-1" aria-labelledby="deleteMessagesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteMessagesModalLabel">Confirm Message Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Enter your workspace name to confirm deletion of all your messages:</p>
+                <input type="text" id="workspaceNameInput" class="form-control" placeholder="Enter workspace name">
+                <div id="deleteMessageError" class="text-danger mt-2" style="display: none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteMessages">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <!-- SCRIPT LOGIC -->
@@ -344,6 +374,38 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     });
+});
+
+// HANDLE ALL MESSAGES DELETION
+document.getElementById("confirmDeleteMessages").addEventListener("click", function() {
+    let workspaceName = document.getElementById("workspaceNameInput").value.trim();
+    let errorDiv = document.getElementById("deleteMessageError");
+
+    if (workspaceName === "") {
+        errorDiv.textContent = "Workspace name cannot be empty!";
+        errorDiv.style.display = "block";
+        return;
+    }
+
+    fetch(`/dm/delete-all-messages/{{ conversation.id }}/{{ organization.id }}/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: new URLSearchParams({ "workspace_name": workspaceName })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();  // Refresh to reflect deletion
+        } else {
+            errorDiv.textContent = data.message;
+            errorDiv.style.display = "block";
+        }
+    })
+    .catch(error => console.error("Error:", error));
 });
 
 </script>
