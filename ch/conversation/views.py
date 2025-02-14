@@ -132,3 +132,28 @@ def save_code_snippet(request):
             return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+
+# edit message
+@csrf_exempt  
+def edit_message(request, message_id):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            new_text = data.get("text", "").strip()
+            
+            if not new_text:
+                return JsonResponse({"success": False, "error": "Message cannot be empty!"}, status=400)
+
+            message = get_object_or_404(Message, id=message_id, sender=request.user)
+            message.text = new_text
+            message.save()
+
+            # 🔥 SEND MESSAGE ID IN RESPONSE
+            return JsonResponse({"success": True, "message_id": message.id, "new_text": message.text})
+
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "error": "Invalid data!"}, status=400)
+
+    return JsonResponse({"success": False, "error": "Invalid request!"}, status=405)
