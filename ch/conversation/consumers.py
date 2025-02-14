@@ -5,8 +5,11 @@ from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
 from conversation.models import Conversation, Message
 
+
 User = get_user_model()
 logger = logging.getLogger("channels")
+
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -14,11 +17,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = self.room_name
 
+       
+
+
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 
+    
+    
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+        # Broadcast that the user went offline
+       
 
     async def receive(self, text_data):
         data = json.loads(text_data)
@@ -27,7 +37,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         file_url = data.get("file_url", None)
         code_snippet = data.get("code_snippet", None)
 
-        print(f"📩 Received Data: {data}")  # Debugging line
+        print(f"📩 Received Data: {data}")  
 
 
         user1_id, user2_id = map(int, self.room_name.split("_")[1:])
@@ -71,6 +81,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 }
             )
 
+        # **Send read receipt**
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                "type": "message_read",
+                    "message_id": message.id,
+                    "receiver_id": message.receiver.id if message.receiver else None,
+                },
+            )
+
     async def chat_message(self, event):
         await self.send(text_data=json.dumps({
             "message": event["message"],
@@ -92,6 +112,36 @@ class ChatConsumer(AsyncWebsocketConsumer):
         "sender_id": event["sender_id"],
         "timestamp": event["timestamp"],
     }))
+     
+    #  send read reciepts
+    async def message_read(self, event):
+        """Handle read receipts"""
+        message_id = event["message_id"]
+        receiver_id = event.get("receiver_id")
+
+        if receiver_id and receiver_id == self.user.id:
+            await self.mark_message_as_read(message_id)
+            await self.send(text_data=json.dumps({"type": "message_read", "message_id": message_id}))
+
+    # BROADCAST THE USER STATUS
+    async def broadcast_user_status(self, user_id, status):
+        """Broadcast user status to all users in the chat room"""
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                "type": "user_status",
+                "user_id": user_id,
+                "status": status,
+            },
+        )      
+
+    async def user_status(self, event):
+        """Send user status update to frontend"""
+        await self.send(text_data=json.dumps(event))  
+
+    
+ 
+
 
 
     @database_sync_to_async

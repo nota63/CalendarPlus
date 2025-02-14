@@ -15,8 +15,10 @@
     <div class="chat-container">
         <h2>
             {{ other_user.username }}
-            <span class="status-dot"></span>
+            <span class="status-dot" id="user-status" style="width: 10px; height: 10px; background-color: gray; border-radius: 50%; display: inline-block;"></span>
         </h2>
+
+        
         
         <div class="chat-log" id="chat-log">
             {% for message in messages %}
@@ -57,6 +59,12 @@
 
              <!-- Code Icon to Open Code Snippet Modal -->
             <button id="open-code-modal" class="btn btn-secondary"><i class="fas fa-code"></i></button>
+            <!-- record voice -->
+            <button id="record-voice" class="btn btn-secondary">
+                🎙️
+            </button>
+            <audio id="audio-preview" controls style="display: none;"></audio>
+            
 
           
             <input type="text" id="chat-message-input" placeholder="Message...">
@@ -99,6 +107,8 @@
     const sendButton = document.getElementById("chat-message-submit");
     const fileInput = document.getElementById("chat-file-input"); // File input
     const typingIndicator = document.getElementById("typing-indicator");
+  
+
 
     // HANDLE CODE SNIPPETS
     const openCodeModal = document.getElementById("open-code-modal");
@@ -106,10 +116,99 @@
     const sendCodeButton = document.getElementById("send-code-snippet");
     const codeInput = document.getElementById("code-snippet-input");
 
+    // Handle record voice 
+    const recordButton = document.getElementById("record-voice");
+    const audioPreview = document.getElementById("audio-preview");
+    let mediaRecorder;
+    let audioChunks = [];
+
+    // Handle record button
+    recordButton.addEventListener("click", async function () {
+        if (!mediaRecorder || mediaRecorder.state === "inactive") {
+            startRecording();
+        } else {
+            stopRecording();
+        }
+    });
+
+    async function startRecording() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+
+            mediaRecorder.ondataavailable = event => {
+                audioChunks.push(event.data);
+            };
+
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                
+                // Preview audio
+                audioPreview.src = audioUrl;
+                audioPreview.style.display = "block";
+
+                // **🔥 Auto-send after stopping**
+                await sendAudio(audioBlob);
+            };
+
+            mediaRecorder.start();
+            recordButton.textContent = "⏹️"; // Change to stop icon
+        } catch (error) {
+            console.error("Error accessing microphone:", error);
+        }
+    }
+
+
+    function stopRecording() {
+        if (mediaRecorder && mediaRecorder.state === "recording") {
+            mediaRecorder.stop();
+            recordButton.textContent = "🎙️"; // Reset to microphone icon
+        }
+    }
+
+
+    async function sendAudio(audioBlob) {
+        const formData = new FormData();
+        formData.append("file", audioBlob, "voice_message.webm");
+        formData.append("sender_id", "{{ request.user.id }}");
+        formData.append("conversation_id", "{{ conversation.id|default:0 }}");
+
+        try {
+            const response = await fetch("{% url 'save_file' %}", {
+                method: "POST",
+                headers: { "X-CSRFToken": "{{ csrf_token }}" },
+                body: formData,
+            });
+            const data = await response.json();
+            
+            if (data.file_url) {
+                chatSocket.send(JSON.stringify({
+                    "file_url": data.file_url,
+                    "sender_id": "{{ request.user.id }}"
+                }));
+            }
+        } catch (error) {
+            console.error("Error sending audio:", error);
+        }
+    }
+
+
+
     const roomName = "{{ room_name }}";
     const chatSocket = new WebSocket(
         "ws://" + window.location.host + "/ws/chat/" + roomName + "/"
     );
+
+    // **🔹 Notify server when connected**
+    chatSocket.onopen = function () {
+        console.log("✅ WebSocket connected.");
+        chatSocket.send(JSON.stringify({
+            "status": "online",
+            "user_id": "{{ request.user.id }}"
+        }));
+    };
 
     function getCurrentTime() {
         const now = new Date();
@@ -138,11 +237,17 @@
             appendCodeSnippet(data.sender_id, data.code_snippet, data.timestamp);
         }
 
+        
         if (data.typing) {
             showTypingIndicator(data.typing);
         }
     };
 
+
+    
+
+  
+    
     chatSocket.onclose = function () {
         console.error("Chat socket closed unexpectedly.");
     };
