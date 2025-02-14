@@ -10,7 +10,7 @@ class Conversation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ("user1", "user2")  # Ensures one conversation per user pair
+        unique_together = ("user1", "user2") 
 
     def __str__(self):
         return f"Conversation between {self.user1} and {self.user2}"
@@ -25,6 +25,17 @@ class Message(models.Model):
     code_snippet = models.TextField(blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
+    REPEAT_CHOICES = [
+        ('daily', 'Daily'),
+        ('monthly', 'Monthly'),
+        ('yearly', 'Yearly'),
+        ('none', 'None'),
+        ('custom', 'Custom')  
+    ]
+
+    repeat = models.CharField(max_length=55, choices=REPEAT_CHOICES, default='none', null=True, blank=True)
+    custom_repeat_datetime = models.DateTimeField(null=True, blank=True) 
+
 
     class Meta:
         ordering = ["timestamp"]
