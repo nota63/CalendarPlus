@@ -11,7 +11,7 @@ class Conversation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ("user1", "user2") 
+        unique_together = ("user1", "user2","organization",) 
 
     def __str__(self):
         return f"Conversation between {self.user1} and {self.user2}"

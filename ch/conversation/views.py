@@ -14,23 +14,25 @@ from django.core.files.base import ContentFile
 from datetime import datetime
 from django.contrib import messages
 from django.urls import reverse_lazy
-
+from accounts.models import Organization
 
 User = get_user_model()
 
 
 @login_required
-def chat_view(request, user_id):
+def chat_view(request, user_id,org_id):
     other_user = get_object_or_404(User, id=user_id)
+    organization= get_object_or_404(Organization,id=org_id)
 
     # Ensure a unique conversation exists between the two users
     conversation, created = Conversation.objects.get_or_create(
         user1=min(request.user, other_user, key=lambda x: x.id),
-        user2=max(request.user, other_user, key=lambda x: x.id)
+        user2=max(request.user, other_user, key=lambda x: x.id),
+        organization=organization,
     )
 
     # Fetch messages related to this conversation
-    messages = Message.objects.filter(conversation=conversation).order_by("timestamp")
+    messages = Message.objects.filter(conversation=conversation,organization=organization).order_by("timestamp")
 
     # FIXED: Ensure the room name is always the same for the same user pair
     room_name = f"chat_{min(request.user.id, other_user.id)}_{max(request.user.id, other_user.id)}"
@@ -40,6 +42,7 @@ def chat_view(request, user_id):
         "messages": messages,
         "room_name": room_name,
         'conversation':conversation,
+        'organization':organization,
     })
 
 
@@ -47,7 +50,9 @@ def chat_view(request, user_id):
 # SAVE MESSAGES VIA AJAX
 # SAVE MESSAGES VIA AJAX
 @csrf_exempt
-def save_message(request):
+def save_message(request,org_id):
+
+    organization = get_object_or_404(Organization, id=org_id)
     if request.method == "POST":
         data = json.loads(request.body)
         print("Received Data:", data)  
@@ -61,7 +66,9 @@ def save_message(request):
         message = Message.objects.create(
             conversation=conversation,
             sender=sender,
-            text=message_text
+            text=message_text,
+            organization=organization,
+           
         )
         return JsonResponse({"status": "success", "message_id": message.id})
     return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)

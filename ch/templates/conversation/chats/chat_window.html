@@ -652,7 +652,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function saveMessage(message) {
-        fetch("{% url 'save_message' %}", {
+        fetch("{% url 'save_message' org_id=organization.id %}", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
