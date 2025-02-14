@@ -1,5 +1,9 @@
-{% load static %}
+{% extends 'custom.html' %}
 
+{% block content %}
+
+
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +17,6 @@
     <link rel="stylesheet" href="{% static 'workspace/one_on_one.css'%}">
 
     
-
     <div class="chat-container">
         <h2>
             {{ other_user.username }}
@@ -765,4 +768,4 @@ document.addEventListener("DOMContentLoaded", function () {
 </body>
 </html>
 
-
+{% endblock %}

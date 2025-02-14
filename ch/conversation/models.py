@@ -1,10 +1,11 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-
+from accounts.models import Organization
 User = get_user_model()
 
 class Conversation(models.Model):
     """Tracks conversations between two users."""
+    organization=models.ForeignKey(Organization,on_delete=models.CASCADE,null=True, blank=True)
     user1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="conversations_initiated")
     user2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="conversations_received")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -18,6 +19,7 @@ class Conversation(models.Model):
 
 class Message(models.Model):
     """Stores individual messages within a conversation."""
+    organization = models.ForeignKey(Organization,on_delete=models.CASCADE, null=True, blank=True)
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name="messages")
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_messages")
     text = models.TextField(blank=True, null=True) 
