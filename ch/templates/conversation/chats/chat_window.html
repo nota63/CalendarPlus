@@ -16,7 +16,6 @@
 
     <link rel="stylesheet" href="{% static 'workspace/one_on_one.css'%}">
 
-    
     <div class="chat-container">
         <h2>
             {{ other_user.username }}
@@ -36,49 +35,56 @@
 
         
         
-        <div class="chat-log" id="chat-log">
-            {% for message in messages %}
-            <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
-                <span class="message-text">{% if message.text %}{{ message.text }}{% endif %}</span>
-
-                {% if message.code_snippet %}
-                  <pre class="code-snippet"><code>{{ message.code_snippet }}</code></pre>
-                {% endif %}
-
-                
-                {% if message.file %}
-                    <div class="file-preview">
-                        {% if message.file.url|lower|slice:"-4:" == ".jpg" or message.file.url|lower|slice:"-5:" == ".jpeg" or message.file.url|lower|slice:"-4:" == ".png" or message.file.url|lower|slice:"-4:" == ".gif" %}
-                            <img src="{{ message.file.url }}" alt="Sent file">
-                        {% else %}
-                            <a href="{{ message.file.url }}" class="file-download">
-                                📎 {{ message.file.name|slice:"6:" }}
-                            </a>
-                        {% endif %}
-                    </div>
-                {% endif %}
-                <span class="timestamp">{{ message.timestamp|date:"H:i" }}</span>
-
-                {% if message.sender == request.user %}
-                <!-- Bootstrap Dropdown for 3-dot menu -->
-                <div class="dropdown">
-                    <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        ⋮
-                    </button>
-                    <ul class="dropdown-menu  dropdown-menu-end">
-                        <li>
-                            <button class="dropdown-item edit-message-btn" data-message-id="{{ message.id }}" data-message-text="{{ message.text }}">✏️ Edit</button>
-                            <button class="dropdown-item repeat-message-btn" data-message-id="{{ message.id }}">Repeat</button>
-                            <a href="{% url 'delete_text' message_id=message.id org_id=organization.id%}"><button type="submit" class="dropdown-item repeat-message-btn">Wipe</button></a>
-                        </li>
-                    </ul>
-                </div>
-            {% endif %}
-                
-              </div>
-            {% endfor %}
+        <!-- Chat Log -->
+<div class="chat-log" id="chat-log">
+     <!-- Search Bar -->
+<div class="search-container mb-2">
+    <input type="text" id="searchMessages" class="form-control" placeholder="Search messages...">
 </div>
-    
+
+    {% for message in messages %}
+    <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}" data-message-text="{{ message.text|default:'' }}">
+        <span class="message-text">{% if message.text %}{{ message.text }}{% endif %}</span>
+
+        {% if message.code_snippet %}
+          <pre class="code-snippet"><code>{{ message.code_snippet }}</code></pre>
+        {% endif %}
+
+        {% if message.file %}
+            <div class="file-preview">
+                {% if message.file.url|lower|slice:"-4:" == ".jpg" or message.file.url|lower|slice:"-5:" == ".jpeg" or message.file.url|lower|slice:"-4:" == ".png" or message.file.url|lower|slice:"-4:" == ".gif" %}
+                    <img src="{{ message.file.url }}" alt="Sent file">
+                {% else %}
+                    <a href="{{ message.file.url }}" class="file-download">
+                        📎 {{ message.file.name|slice:"6:" }}
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <span class="timestamp">{{ message.timestamp|date:"H:i" }}</span>
+
+        {% if message.sender == request.user %}
+        <div class="dropdown">
+            <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                ⋮
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                    <button class="dropdown-item edit-message-btn" data-message-id="{{ message.id }}" data-message-text="{{ message.text }}">✏️ Edit</button>
+                    <button class="dropdown-item repeat-message-btn" data-message-id="{{ message.id }}">Repeat</button>
+                    <a href="{% url 'delete_text' message_id=message.id org_id=organization.id %}">
+                        <button type="submit" class="dropdown-item repeat-message-btn">Wipe</button>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+
+
         <div id="typing-indicator">
             {{ other_user.username }} is typing<span class="typing-dots">...</span>
         </div>
@@ -321,7 +327,24 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+// HANDLE SEARCH 
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("searchMessages");
+    const messages = document.querySelectorAll(".chat-log .message");
 
+    searchInput.addEventListener("input", function () {
+        const searchTerm = searchInput.value.toLowerCase();
+
+        messages.forEach(msg => {
+            const messageText = msg.dataset.messageText.toLowerCase();
+            if (messageText.includes(searchTerm)) {
+                msg.style.display = "block";
+            } else {
+                msg.style.display = "none";
+            }
+        });
+    });
+});
 
 </script>
 
