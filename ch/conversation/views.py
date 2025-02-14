@@ -198,3 +198,4 @@ def delete_message(request, message_id):
     message.delete()
     
     return redirect(reverse_lazy('dm', kwargs={'user_id': message.conversation.user1.id}))
+
