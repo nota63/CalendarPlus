@@ -64,7 +64,7 @@
                         <li>
                             <button class="dropdown-item edit-message-btn" data-message-id="{{ message.id }}" data-message-text="{{ message.text }}">✏️ Edit</button>
                             <button class="dropdown-item repeat-message-btn" data-message-id="{{ message.id }}">Repeat</button>
-                            <a href="{% url 'delete_text' message_id=message.id %}"><button type="submit" class="dropdown-item repeat-message-btn">Wipe</button></a>
+                            <a href="{% url 'delete_text' message_id=message.id org_id=organization.id%}"><button type="submit" class="dropdown-item repeat-message-btn">Wipe</button></a>
                         </li>
                     </ul>
                 </div>
@@ -209,9 +209,11 @@
 <!-- AJAX SCRIPTS INAPP CONTROLS -->
 
 <script>
+    // EDIT THE MESSAGE
    document.addEventListener("DOMContentLoaded", function () {
     const editModal = new bootstrap.Modal(document.getElementById("editMessageModal"));
     let currentMessageId = null;
+    const orgId="{{organization.id}}";
 
     // Open edit modal when clicking "Edit"
     document.querySelectorAll(".edit-message-btn").forEach(btn => {
@@ -227,7 +229,7 @@
         const newText = document.getElementById("editMessageInput").value;
         if (!currentMessageId || newText.trim() === "") return;
 
-        fetch(`/dm/edit-message/${currentMessageId}/`, {
+        fetch(`/dm/edit-message/${currentMessageId}/${orgId}/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -252,11 +254,12 @@
     });
 });
 
-// HANDLE MESSAGE RECURRENCE
+
 // HANDLE MESSAGE RECURRENCE
 document.addEventListener("DOMContentLoaded", function () {
     const repeatModal = new bootstrap.Modal(document.getElementById("repeatMessageModal"));
     let currentMessageId = null;
+    const orgId = "{{organization.id}}";
 
     // Open modal on clicking "Repeat"
     document.querySelectorAll(".repeat-message-btn").forEach(btn => {
@@ -292,7 +295,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        fetch(`/dm/set-recurrence/${currentMessageId}/`, {
+        fetch(`/dm/set-recurrence/${currentMessageId}/${orgId}/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

@@ -150,7 +150,8 @@ def save_code_snippet(request,org_id):
 
 # edit message
 @csrf_exempt  
-def edit_message(request, message_id):
+def edit_message(request, message_id,org_id):
+    organization = get_object_or_404(Organization, id=org_id)
     if request.method == "POST":
         try:
             data = json.loads(request.body)
@@ -161,6 +162,7 @@ def edit_message(request, message_id):
 
             message = get_object_or_404(Message, id=message_id, sender=request.user)
             message.text = new_text
+            message.organization=organization
             message.save()
 
             # 🔥 SEND MESSAGE ID IN RESPONSE
@@ -174,7 +176,8 @@ def edit_message(request, message_id):
 
 # SET MESSAGE RECURRANCE
 @csrf_exempt
-def set_recurrence(request, message_id):
+def set_recurrence(request, message_id,org_id):
+    organization = get_object_or_404(Organization,id=org_id)
     if request.method == "POST":
         try:
             data = json.loads(request.body)
@@ -183,6 +186,7 @@ def set_recurrence(request, message_id):
 
             message = get_object_or_404(Message, id=message_id, sender=request.user)
             message.repeat = repeat_type
+            message.organization=organization
 
             # Handle custom date-time
             if repeat_type == "custom" and custom_datetime:
@@ -203,10 +207,11 @@ def set_recurrence(request, message_id):
 
 # Wipe message 
 @login_required
-def delete_message(request, message_id):
-    message = get_object_or_404(Message, id=message_id, sender=request.user)
+def delete_message(request, message_id,org_id):
+    organization = get_object_or_404(Organization, id=org_id)
+    message = get_object_or_404(Message, id=message_id, sender=request.user,organization=organization)
     conversation = message.conversation  
     message.delete()
     
-    return redirect(reverse_lazy('dm', kwargs={'user_id': message.conversation.user1.id}))
+    return redirect(reverse_lazy('dm', kwargs={'user_id': message.conversation.user1.id, 'org_id':message.conversation.organization.id}))
 
