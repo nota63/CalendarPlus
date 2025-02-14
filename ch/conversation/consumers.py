@@ -39,6 +39,22 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         print(f"📩 Received Data: {data}")  
 
+        if data["type"] == "video_offer":
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {"type": "video.offer", "offer": data["offer"]}
+            )
+        elif data["type"] == "video_answer":
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {"type": "video.answer", "answer": data["answer"]}
+            )
+        elif data["type"] == "ice_candidate":
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {"type": "video.ice", "candidate": data["candidate"]}
+            )
+
 
         user1_id, user2_id = map(int, self.room_name.split("_")[1:])
         receiver_id = user2_id if sender_id == user1_id else user1_id
@@ -135,14 +151,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
             },
         )      
 
-    async def user_status(self, event):
-        """Send user status update to frontend"""
-        await self.send(text_data=json.dumps(event))  
+    async def video_offer(self, event):
+        await self.send(text_data=json.dumps({"type": "video_offer", "offer": event["offer"]}))
 
-    
- 
+    async def video_answer(self, event):
+        await self.send(text_data=json.dumps({"type": "video_answer", "answer": event["answer"]}))
 
-
+    async def video_ice(self, event):
+        await self.send(text_data=json.dumps({"type": "ice_candidate", "candidate": event["candidate"]}))
 
     @database_sync_to_async
     def get_or_create_conversation(self, user1_id, user2_id):

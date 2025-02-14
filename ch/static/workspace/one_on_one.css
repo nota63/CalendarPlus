@@ -189,3 +189,20 @@ h2 span.status-dot {
 }
 .online { background-color: green; }
 .offline { background-color: gray; }
+
+
+.video-call-container {
+    display: none; /* Hide initially */
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.video-feed {
+    width: 45%;
+    height: 300px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background: black;
+}
