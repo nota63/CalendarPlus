@@ -140,25 +140,45 @@
 
 <!-- MODALS ------------------------------------------------------------------------------------------------------------------>
  <!-- Code Snippet Modal -->
-<div class="modal fade" id="codeModal" tabindex="-1" aria-labelledby="codeModalLabel">
-    <div class="modal-dialog">
+ <div class="modal fade" id="codeModal" tabindex="-1" aria-labelledby="codeModalLabel">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Share Code Snippet</h5>
+                <h5 class="modal-title">
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 8px;">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M4.555 2.168a1 1 0 0 0-1.11 1.62l6 4.211a1 1 0 0 0 1.11 0l6-4.211a1 1 0 1 0-1.11-1.62L8 6.03l-3.445-2.862z"/>
+                    </svg>
+                    code-snippet.js
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <textarea id="code-snippet-input" class="form-control" rows="6" placeholder="Write your code here..."></textarea>
+                <div class="code-editor-wrapper">
+                    <div class="line-numbers"></div>
+                    <textarea id="code-snippet-input" class="form-control" spellcheck="false" placeholder="// Start typing your code here..."></textarea>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
-                <button id="send-code-snippet" class="btn btn-primary">Send Code</button>
+                <div class="status-bar-item">
+                    <span>JavaScript</span>
+                    <span>UTF-8</span>
+                    <span>LF</span>
+                </div>
+                <div class="status-bar-item">
+                    <span>Ln 1, Col 1</span>
+                    <span>Spaces: 4</span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+                    <button id="send-code-snippet" class="btn btn-primary">Send Code</button>
+                </div>
+    
             </div>
         </div>
     </div>
 </div>
 
-<!-- Edit Message Modal -->
+
 <!-- Edit Message Modal -->
 <div class="modal fade" id="editMessageModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
@@ -427,6 +447,7 @@ document.getElementById("confirmDeleteMessages").addEventListener("click", funct
     })
     .catch(error => console.error("Error:", error));
 });
+
 
 </script>
 

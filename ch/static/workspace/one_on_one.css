@@ -1,3 +1,157 @@
+/* Code Modal Styling */
+/* VS Code Theme Modal */
+#codeModal .modal-content {
+    background-color: #1e1e1e;
+    border: 1px solid #383838;
+    border-radius: 0;
+    min-height: 400px;
+}
+
+/* Title Bar */
+#codeModal .modal-header {
+    background-color: #3c3c3c;
+    border-bottom: 1px solid #252526;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+}
+
+#codeModal .modal-title {
+    color: #cccccc;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* VS Code-style Close Button */
+#codeModal .btn-close {
+    filter: invert(0.7);
+    opacity: 1;
+    background-size: 12px;
+    margin: 0;
+    padding: 4px;
+}
+
+#codeModal .btn-close:hover {
+    filter: invert(1);
+    background-color: rgba(255,255,255,0.1);
+}
+
+/* Editor Area */
+#codeModal .modal-body {
+    padding: 0;
+    position: relative;
+}
+
+.code-editor-wrapper {
+    position: relative;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.line-numbers {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 40px;
+    height: 100%;
+    background-color: #252526;
+    color: #858585;
+    text-align: right;
+    padding: 8px 4px;
+    counter-reset: line;
+}
+
+.line-numbers span {
+    counter-increment: line;
+    display: block;
+}
+
+.line-numbers span::before {
+    content: counter(line);
+}
+
+#code-snippet-input {
+    background-color: transparent;
+    color: #d4d4d4;
+    border: none;
+    border-radius: 0;
+    padding: 8px 8px 8px 48px;
+    min-height: 300px;
+    width: 100%;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    resize: none;
+    white-space: pre;
+    overflow-x: auto;
+}
+
+/* Status Bar */
+.modal-footer {
+    background-color: #007acc;
+    color: white;
+    border-top: 1px solid #252526;
+    padding: 4px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    font-size: 12px;
+}
+
+.status-bar-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Scrollbar Styling */
+#code-snippet-input::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+#code-snippet-input::-webkit-scrollbar-track {
+    background: #252526;
+}
+
+#code-snippet-input::-webkit-scrollbar-thumb {
+    background: #3e3e42;
+    border-radius: 5px;
+}
+
+#code-snippet-input::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* VS Code-style Buttons */
+#codeModal .btn-primary {
+    background-color: #0e639c;
+    border-color: #0e639c;
+    border-radius: 2px;
+    font-size: 12px;
+    padding: 4px 12px;
+}
+
+#codeModal .btn-primary:hover {
+    background-color: #1177bb;
+    border-color: #1177bb;
+}
+
+#codeModal .btn-danger {
+    background-color: #5a5a5a;
+    border-color: #5a5a5a;
+    color: #fff;
+    border-radius: 2px;
+    font-size: 12px;
+    padding: 4px 12px;
+}
+
 
 
 
