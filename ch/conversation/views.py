@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.db.models import Q
@@ -12,6 +12,8 @@ import json
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from datetime import datetime
+from django.contrib import messages
+from django.urls import reverse_lazy
 
 
 User = get_user_model()
@@ -186,3 +188,13 @@ def set_recurrence(request, message_id):
             return JsonResponse({"success": False, "error": "Invalid data!"}, status=400)
 
     return JsonResponse({"success": False, "error": "Invalid request!"}, status=405)
+
+
+# Wipe message 
+@login_required
+def delete_message(request, message_id):
+    message = get_object_or_404(Message, id=message_id, sender=request.user)
+    conversation = message.conversation  
+    message.delete()
+    
+    return redirect(reverse_lazy('dm', kwargs={'user_id': message.conversation.user1.id}))

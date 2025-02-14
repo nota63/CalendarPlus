@@ -12,6 +12,8 @@
 
     <link rel="stylesheet" href="{% static 'workspace/one_on_one.css'%}">
 
+    
+
     <div class="chat-container">
         <h2>
             {{ other_user.username }}
@@ -59,6 +61,7 @@
                         <li>
                             <button class="dropdown-item edit-message-btn" data-message-id="{{ message.id }}" data-message-text="{{ message.text }}">✏️ Edit</button>
                             <button class="dropdown-item repeat-message-btn" data-message-id="{{ message.id }}">Repeat</button>
+                            <a href="{% url 'delete_text' message_id=message.id %}"><button type="submit" class="dropdown-item repeat-message-btn">Wipe</button></a>
                         </li>
                     </ul>
                 </div>

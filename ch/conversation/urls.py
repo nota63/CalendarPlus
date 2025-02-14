@@ -7,5 +7,6 @@ urlpatterns=[
     path('save_file/',save_file, name='save_file'),
     path("save-code/", save_code_snippet, name="save_code_snippet"),
     path("edit-message/<int:message_id>/", edit_message, name="edit_message"),
-    path('set-recurrence/<int:message_id>/',set_recurrence, name='set_recurrence')
+    path('set-recurrence/<int:message_id>/',set_recurrence, name='set_recurrence'),
+    path('delete_text/<int:message_id>/',delete_message, name='delete_text'),
 ]
