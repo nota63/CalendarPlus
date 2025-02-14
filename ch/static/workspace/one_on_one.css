@@ -1,4 +1,116 @@
 
+
+/* Edit Message Modal Styles */
+#editMessageModal .modal-content {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    background: #f8f9fa;
+}
+
+#editMessageModal .modal-header {
+    background: linear-gradient(135deg, #6BDFF5 0%, #4A90E2 100%);
+    border-radius: 15px 15px 0 0;
+    border-bottom: none;
+    padding: 1.2rem;
+}
+
+#editMessageModal .modal-title {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 1.4rem;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+#editMessageModal .btn-close {
+    filter: invert(1) brightness(100%);
+    transition: transform 0.2s ease;
+}
+
+#editMessageModal .btn-close:hover {
+    transform: rotate(90deg);
+}
+
+#editMessageModal .modal-body {
+    padding: 25px;
+    background: #ffffff;
+}
+
+#editMessageModal #editMessageInput {
+    min-height: 120px;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+    padding: 15px;
+    font-size: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#editMessageModal #editMessageInput:focus {
+    border-color: #6BDFF5;
+    box-shadow: 0 4px 12px rgba(107, 223, 245, 0.2);
+    outline: none;
+}
+
+#editMessageModal .modal-footer {
+    border-top: 1px solid #eceff1;
+    background: #f8f9fa;
+    padding: 15px 25px;
+}
+
+#editMessageModal #saveMessageEdit {
+    background: #4A90E2;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+#editMessageModal #saveMessageEdit:hover {
+    background: #357ABD;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+#editMessageModal .btn-secondary {
+    background: #eceff1;
+    border: none;
+    color: #607D8B;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+#editMessageModal .btn-secondary:hover {
+    background: #dde2e5;
+    color: #546E7A;
+}
+
+/* Animation */
+@keyframes modalEntry {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#editMessageModal .modal-content {
+    animation: modalEntry 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+
+
+
+
+
+
+
 :root {
     --primary-blue: #007AFF;
     --hover-blue: #0063CC;

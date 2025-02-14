@@ -175,7 +175,11 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                document.querySelector(`[data-message-id="${currentMessageId}"] .message-text`).textContent = newText;
+                // 🔥 Find the message using message_id from response
+                let messageTextElement = document.querySelector(`[data-message-id="${data.message_id}"] .message-text`);
+                if (messageTextElement) {
+                    messageTextElement.textContent = data.new_text; // ✅ Update text in real time
+                }
                 editModal.hide();
             } else {
                 alert("Error updating message!");
