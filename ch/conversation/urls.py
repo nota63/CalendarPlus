@@ -9,5 +9,6 @@ urlpatterns=[
     path("edit-message/<int:message_id>/<int:org_id>/", edit_message, name="edit_message"),
     path('set-recurrence/<int:message_id>/<int:org_id>/',set_recurrence, name='set_recurrence'),
     path('delete_text/<int:message_id>/<int:org_id>/',delete_message, name='delete_text'),
-    path('delete-all-messages/<int:conversation_id>/<int:org_id>/',delete_all_messages, name='delete_all_messages')
+    path('delete-all-messages/<int:conversation_id>/<int:org_id>/',delete_all_messages, name='delete_all_messages'),
+    path('get-conversation-analytics/<int:conversation_id>/<int:org_id>/',get_conversation_analytics, name='get_conversation_analytics')
 ]

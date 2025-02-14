@@ -241,3 +241,68 @@ def delete_all_messages(request, conversation_id, org_id):
             return JsonResponse({"success": False, "message": "Workspace name does not match!"})
 
     return JsonResponse({"success": False, "message": "Invalid request!"}, status=400)
+
+
+# Overview of messages 
+from django.db.models import Count, Sum, Avg
+from django.utils.timezone import localtime
+from datetime import timedelta
+from django.conf import settings
+import os
+
+
+def get_file_size(file_field):
+    """Returns file size in bytes, or 0 if no file exists."""
+    if file_field and file_field.name:
+        file_path = os.path.join(settings.MEDIA_ROOT, file_field.name)
+        return os.path.getsize(file_path) if os.path.exists(file_path) else 0
+    return 0
+
+def get_conversation_analytics(request, conversation_id, org_id):
+    """Fetch analytics data for a conversation."""
+    conversation = get_object_or_404(Conversation, id=conversation_id, organization_id=org_id)
+    messages = Message.objects.filter(conversation=conversation)
+
+    # Total Messages
+    total_messages = messages.count()
+
+    # Total Storage Used (All Messages)
+    total_storage = sum(get_file_size(message.file) for message in messages)
+
+    # Storage Used by User (Only Sent Messages)
+    user_messages = messages.filter(sender=request.user)
+    user_storage = sum(get_file_size(message.file) for message in user_messages)
+
+    # Total Code Snippets
+    total_code_snippets = messages.exclude(code_snippet="").count()
+
+    # Total Files Sent
+    total_files = messages.exclude(file="").count()
+
+    # Most Active Day
+    most_active_day = messages.values('timestamp__date').annotate(
+        count=Count('id')).order_by('-count').first()
+    most_active_day = most_active_day['timestamp__date'] if most_active_day else "No Data"
+
+    # Average Messages Per Day
+    if total_messages > 0:
+        first_message = messages.order_by('timestamp').first().timestamp
+        days_active = (localtime() - first_message).days or 1
+        avg_messages_per_day = round(total_messages / days_active, 2)
+    else:
+        avg_messages_per_day = 0
+
+    # Unread Messages Count
+    unread_messages = messages.filter(is_read=False).count()
+
+    # Return data as JSON
+    return JsonResponse({
+        "total_messages": total_messages,
+        "total_storage": total_storage,  # In bytes
+        "user_storage": user_storage,  # In bytes
+        "total_code_snippets": total_code_snippets,
+        "total_files": total_files,
+        "most_active_day": most_active_day,
+        "avg_messages_per_day": avg_messages_per_day,
+        "unread_messages": unread_messages,
+    })

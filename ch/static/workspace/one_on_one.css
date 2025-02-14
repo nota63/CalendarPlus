@@ -1042,3 +1042,17 @@ h2 span.status-dot {
 }
 
 /* Fix Overlapping Issue */
+/* Chat insights */
+.font-poppins { font-family: 'Poppins', sans-serif; }
+.hover-scale { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.hover-scale:hover { 
+    transform: translateY(-5px); 
+    box-shadow: 0 12px 24px -6px rgba(0,0,0,0.1);
+}
+.bg-primary-soft { background: rgba(13,110,253,0.15); }
+.bg-info-soft { background: rgba(13,202,240,0.15); }
+.bg-success-soft { background: rgba(25,135,84,0.15); }
+.bg-warning-soft { background: rgba(255,193,7,0.15); }
+.text-purple { color: #6f42c1; }
+.text-teal { color: #20c997; }
+.text-pink { color: #d63384; }

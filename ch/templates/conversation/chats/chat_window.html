@@ -15,6 +15,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
+    <!-- Add these CDN links in your head -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+
 
     <!-- Load a better Prism.js theme for multi-color syntax -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet">
@@ -48,6 +52,12 @@
                     Delete All My Messages
                   </button>
                </li>
+               <li>
+                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#analyticsModal">
+                    Overview
+                </button>
+                
+               </li>
             </ul>
            </div>
         </h2>
@@ -72,7 +82,7 @@
                 <span class="message-text">{{ message.text }}</span>
             {% endif %}
         </div>
-            
+
         {% if message.code_snippet %}
           <pre class="code-snippet"><code class="language-python">{{ message.code_snippet }}</code></pre>
         {% endif %}
@@ -307,6 +317,151 @@
     </div>
 </div>
 
+<!-- Chats Overview -->
+<div class="modal fade" id="analyticsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content border-0" style="background: linear-gradient(145deg, #f8f9fa 0%, #e9ecef 100%); backdrop-filter: blur(20px);">
+            <div class="modal-header border-0 pb-0">
+                <div class="w-100">
+                    <h2 class="modal-title fw-bold text-dark mb-0 font-poppins">📈 Chat Insights</h2>
+                 
+                </div>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body pt-4">
+                <div class="row g-4">
+                    <!-- Total Messages Card -->
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="card border-0 p-3 h-100 hover-scale transition-all" 
+                             style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px);">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="icon-container bg-primary-soft rounded-circle p-3">
+                                        <i class="bi bi-chat-text-fill text-primary fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1 text-muted font-poppins">Total Messages</h6>
+                                        <h3 class="mb-0 fw-bold" id="totalMessages">1,842</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Storage Usage Card -->
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="card border-0 p-3 h-100 hover-scale transition-all" 
+                             style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px);">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="icon-container bg-info-soft rounded-circle p-3">
+                                        <i class="bi bi-database-fill text-info fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1 text-muted">Total Storage</h6>
+                                        <h3 class="mb-0 fw-bold" id="totalStorage">64.2<span class="text-sm ms-1">MB</span></h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Storage Card -->
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="card border-0 p-3 h-100 hover-scale transition-all" 
+                             style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px);">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="icon-container bg-success-soft rounded-circle p-3">
+                                        <i class="bi bi-person-fill-gear text-success fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1 text-muted">My Storage</h6>
+                                        <h3 class="mb-0 fw-bold" id="userStorage">18.5<span class="text-sm ms-1">MB</span></h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Code Snippets Card -->
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="card border-0 p-3 h-100 hover-scale transition-all" 
+                             style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px);">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="icon-container bg-warning-soft rounded-circle p-3">
+                                        <i class="bi bi-file-code-fill text-warning fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1 text-muted">Code Snippets</h6>
+                                        <h3 class="mb-0 fw-bold" id="totalCodeSnippets">327</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Metrics -->
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="card border-0 p-3 h-100" style="background: rgba(255, 255, 255, 0.7);">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-muted mb-2">Files Shared</h6>
+                                        <h3 class="mb-0 fw-bold" id="totalFiles">42</h3>
+                                    </div>
+                                    <i class="bi bi-folder-fill text-purple fs-1 opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="card border-0 p-3 h-100" style="background: rgba(255, 255, 255, 0.7);">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-muted mb-2">Most Active Day</h6>
+                                        <h3 class="mb-0 fw-bold" id="mostActiveDay">Wednesday</h3>
+                                    </div>
+                                    <i class="bi bi-graph-up-arrow text-teal fs-1 opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="card border-0 p-3 h-100" style="background: rgba(255, 255, 255, 0.7);">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-muted mb-2">Unread Messages</h6>
+                                        <h3 class="mb-0 fw-bold" id="unreadMessages">12</h3>
+                                    </div>
+                                    <i class="bi bi-envelope-exclamation-fill text-pink fs-1 opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Activity Chart (Placeholder) -->
+                    <div class="col-12 mt-4">
+                        <div class="card border-0 p-3" style="background: rgba(255, 255, 255, 0.7);">
+                            <div class="card-body">
+                                <h6 class="text-muted mb-3">Weekly Activity</h6>
+                                <div class="chart-placeholder" style="height: 200px; background: rgba(0,0,0,0.05); border-radius: 12px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <!-- SCRIPT LOGIC -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -475,6 +630,39 @@ document.getElementById("confirmDeleteMessages").addEventListener("click", funct
     })
     .catch(error => console.error("Error:", error));
 });
+
+
+// CHATS OVERVIEW 
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("analyticsModal").addEventListener("show.bs.modal", function () {
+        const conversationId = "{{ conversation.id }}";
+        const orgId = "{{ organization.id }}";
+        fetch(`/dm/get-conversation-analytics/${conversationId}/${orgId}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("totalMessages").innerText = data.total_messages;
+                document.getElementById("totalStorage").innerText = formatBytes(data.total_storage);
+                document.getElementById("userStorage").innerText = formatBytes(data.user_storage);
+                document.getElementById("totalCodeSnippets").innerText = data.total_code_snippets;
+                document.getElementById("totalFiles").innerText = data.total_files;
+                document.getElementById("mostActiveDay").innerText = data.most_active_day;
+                document.getElementById("avgMessagesPerDay").innerText = data.avg_messages_per_day;
+                document.getElementById("unreadMessages").innerText = data.unread_messages;
+            })
+            .catch(error => console.error("Error fetching analytics:", error));
+    });
+});
+
+// Function to Format Bytes into KB, MB, GB
+function formatBytes(bytes, decimals = 2) {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) + " " + sizes[i];
+}
+
+
 
 
 </script>
