@@ -20,12 +20,9 @@
     <div class="chat-container">
         <h2>
             {{ other_user.username }}
-            {% if profile  %}
-            <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle img-fluid" style="width: 40px; height: 40px; object-fit: cover;">
-
-           {% else %}
-            No profile found!
-        {% endif %}
+              {% if profile and profile.profile_picture %}
+                 <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle img-fluid" style="width: 40px; height: 40px; object-fit: cover;">
+              {% endif %}
         
         
             <span class="status-dot" id="user-status" style="width: 10px; height: 10px; background-color: gray; border-radius: 50%; display: inline-block;"></span>
