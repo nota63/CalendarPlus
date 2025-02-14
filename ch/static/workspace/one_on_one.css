@@ -1,4 +1,133 @@
+/* Repeat Message Modal Styling */
+#repeatMessageModal .modal-content {
+    border: none;
+    border-radius: 15px;
+    background: linear-gradient(145deg, #f8f9fa 0%, #e9ecef 100%);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
 
+#repeatMessageModal .modal-header {
+    background: linear-gradient(135deg, #2c3e50, #3498db);
+    color: white;
+    border-bottom: 3px solid #2980b9;
+    padding: 1.2rem;
+}
+
+#repeatMessageModal .modal-title {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#repeatMessageModal .modal-body {
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+#repeatMessageModal .form-label {
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+/* Radio Button Styling */
+#repeatMessageModal label.btn {
+    border-radius: 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 1rem;
+    border: 2px solid transparent;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+}
+
+#repeatMessageModal label.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+#repeatMessageModal label.btn input[type="radio"] {
+    opacity: 0;
+    position: absolute;
+}
+
+#repeatMessageModal label.btn:has(input[type="radio"]:checked) {
+    background: rgba(52, 152, 219, 0.1);
+    border-color: #3498db;
+    transform: scale(1.02);
+}
+
+#repeatMessageModal label.btn i {
+    font-size: 1.2rem;
+    min-width: 25px;
+}
+
+/* Custom Colors for Each Option */
+#repeatMessageModal .btn-outline-primary { color: #e74c3c; border-color: #e74c3c; }
+#repeatMessageModal .btn-outline-success { color: #27ae60; border-color: #27ae60; }
+#repeatMessageModal .btn-outline-warning { color: #f1c40f; border-color: #f1c40f; }
+#repeatMessageModal .btn-outline-info { color: #2980b9; border-color: #2980b9; }
+#repeatMessageModal .btn-outline-dark { color: #2c3e50; border-color: #2c3e50; }
+
+/* Custom DateTime Picker */
+#customDateTimeContainer {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+}
+
+#customDateTime {
+    border-radius: 8px;
+    border: 2px solid #3498db;
+    padding: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+#customDateTime:focus {
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25);
+    border-color: #2980b9;
+}
+
+/* Modal Footer Styling */
+#repeatMessageModal .modal-footer {
+    background: rgba(241, 243, 245, 0.95);
+    border-top: 1px solid #dee2e6;
+    padding: 1rem;
+}
+
+#repeatMessageModal .btn-primary {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+#repeatMessageModal .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+}
+
+#repeatMessageModal .btn-secondary {
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+/* Animation for Checked State */
+@keyframes radioChecked {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+#repeatMessageModal label.btn:has(input[type="radio"]:checked) i {
+    animation: radioChecked 0.4s ease;
+}
 
 /* Edit Message Modal Styles */
 #editMessageModal .modal-content {
