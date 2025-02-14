@@ -1,4 +1,19 @@
-/* Delete Messages Modal - Modern Style */
+
+
+
+.code-snippet {
+    background-color: #2d2d2d; 
+    color: #f8f8f2;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+/* delete message modal */
 #deleteMessagesModal .modal-dialog {
     max-width: 420px;
     margin: 1rem;

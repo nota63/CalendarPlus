@@ -13,6 +13,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Load a better Prism.js theme for multi-color syntax -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet">
+
+
     
 
     <link rel="stylesheet" href="{% static 'workspace/one_on_one.css'%}">
@@ -63,7 +68,7 @@
         <span class="message-text">{% if message.text %}{{ message.text }}{% endif %}</span>
 
         {% if message.code_snippet %}
-          <pre class="code-snippet"><code>{{ message.code_snippet }}</code></pre>
+          <pre class="code-snippet"><code class="language-python">{{ message.code_snippet }}</code></pre>
         {% endif %}
 
         {% if message.file %}
@@ -257,6 +262,10 @@
 
 <!-- SCRIPT LOGIC -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- prisma js to style the code snippets -->
+ <!-- Prism.js for syntax highlighting -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
 
 <!-- AJAX SCRIPTS INAPP CONTROLS -->
 
