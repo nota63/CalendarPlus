@@ -1,4 +1,119 @@
-/* Code Modal Styling */
+.file-preview {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 8px;
+    background: #f8f9fa;
+    margin-top: 5px;
+    width: fit-content;
+}
+
+.file-icon {
+    font-size: 32px;
+}
+
+.pdf { color: red; }
+.word { color: blue; }
+.excel { color: green; }
+.ppt { color: orange; }
+.zip { color: purple; }
+.audio { color: #ff9800; }
+.video { color: #2196f3; }
+.generic { color: gray; }
+
+.file-download {
+    text-decoration: none;
+    font-weight: bold;
+    color: #333;
+}
+
+.file-image {
+    max-width: 100px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+
+
+.message-container {
+    display: flex;
+    margin: 5px 0;
+    max-width: 75%;
+}
+
+.sent {
+    justify-content: flex-end;
+}
+
+.received {
+    justify-content: flex-start;
+}
+
+.message-bubble {
+    padding: 8px 12px;
+    border-radius: 10px;
+    position: relative;
+    max-width: 100%;
+    word-wrap: break-word;
+    font-size: 14px;
+    font-family: "Inter", sans-serif;
+    line-height: 1.4;
+    transition: all 0.2s ease-in-out;
+}
+
+.sent .message-bubble {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border-radius: 15px 15px 5px 15px;
+}
+
+.received .message-bubble {
+    background: #f8f9fa;
+    color: #333;
+    border-radius: 15px 15px 15px 5px;
+}
+
+.message-text {
+    display: block;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+.message-time {
+    font-size: 11px;
+    opacity: 0.6;
+    display: block;
+    text-align: right;
+    margin-top: 3px;
+}
+
+/* Add smooth hover effect */
+.message-bubble:hover {
+    transform: scale(1.02);
+}
+
+/* Mobile Friendly */
+@media screen and (max-width: 600px) {
+    .message-container {
+        max-width: 90%;
+    }
+    
+    .message-bubble {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
+}
+
+
+
+
+
+
+
+
+
+
 /* VS Code Theme Modal */
 #codeModal .modal-content {
     background-color: #1e1e1e;
