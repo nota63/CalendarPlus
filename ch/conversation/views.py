@@ -48,7 +48,6 @@ def chat_view(request, user_id,org_id):
 
 
 # SAVE MESSAGES VIA AJAX
-# SAVE MESSAGES VIA AJAX
 @csrf_exempt
 def save_message(request,org_id):
 
@@ -76,7 +75,8 @@ def save_message(request,org_id):
 
 # SAVE FILES 
 @csrf_exempt
-def save_file(request):
+def save_file(request,org_id):
+    organization=get_object_or_404(Organization, id=org_id)
     if request.method == "POST" and request.FILES.get("file"):
         uploaded_file = request.FILES["file"]
         file_path = default_storage.save(f"chat_files/{uploaded_file.name}", uploaded_file)
@@ -89,7 +89,8 @@ def save_file(request):
         Message.objects.create(
             conversation_id=conversation_id,
             sender_id=sender_id,
-            file=file_path
+            file=file_path,
+            organization=organization,
         )
 
         return JsonResponse({"file_url": file_url})
@@ -98,7 +99,8 @@ def save_file(request):
 
 # save code snippet
 @csrf_exempt
-def save_code_snippet(request):
+def save_code_snippet(request,org_id):
+    organization=get_object_or_404(Organization,id=org_id)
     if request.method == "POST":
         try:
             data = json.loads(request.body)
@@ -115,15 +117,17 @@ def save_code_snippet(request):
             # Get or create conversation
             conversation, _ = Conversation.objects.get_or_create(
                 user1=min(sender, receiver, key=lambda u: u.id),
-                user2=max(sender, receiver, key=lambda u: u.id)
+                user2=max(sender, receiver, key=lambda u: u.id),
+                organization=organization
             )
 
             # Save message with code snippet
             message = Message.objects.create(
                 conversation=conversation,
                 sender=sender,
-                text=None,  # No regular text, just the code snippet
-                code_snippet=code_snippet
+                text=None, 
+                code_snippet=code_snippet,
+                organization=organization
             )
 
             return JsonResponse({

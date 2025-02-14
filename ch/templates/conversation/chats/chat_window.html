@@ -405,7 +405,7 @@ document.addEventListener("DOMContentLoaded", function () {
         formData.append("conversation_id", "{{ conversation.id|default:0 }}");
 
         try {
-            const response = await fetch("{% url 'save_file' %}", {
+            const response = await fetch("{% url 'save_file' org_id=organization.id %}", {
                 method: "POST",
                 headers: { "X-CSRFToken": "{{ csrf_token }}" },
                 body: formData,
@@ -632,7 +632,7 @@ document.addEventListener("DOMContentLoaded", function () {
         formData.append("sender_id", "{{ request.user.id }}");
         formData.append("conversation_id", "{{ conversation.id|default:0 }}");
 
-        fetch("{% url 'save_file' %}", {
+        fetch("{% url 'save_file' org_id=organization.id %}", {
             method: "POST",
             headers: { "X-CSRFToken": "{{ csrf_token }}" },
             body: formData
@@ -727,7 +727,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Save Code Snippet
     function saveCodeSnippet(codeSnippet) {
-        fetch("{% url 'save_code_snippet' %}", {
+        fetch("{% url 'save_code_snippet' org_id=organization.id %}", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
