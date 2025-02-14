@@ -141,6 +141,7 @@
 </div>
 
 <!-- Repeat Message Modal -->
+ <!-- Repeat Message Modal -->
 <div class="modal fade" id="repeatMessageModal" tabindex="-1" aria-labelledby="repeatMessageModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -152,19 +153,34 @@
                 <form id="repeatMessageForm">
                     <input type="hidden" id="repeatMessageId">
 
-                    <!-- Select Recurrence Option -->
+                    <!-- Radio Buttons for Recurrence Options -->
                     <div class="mb-3">
-                        <label for="repeatType" class="form-label">Recurrence Type</label>
-                        <select class="form-select" id="repeatType">
-                            <option value="none">None</option>
-                            <option value="daily">Daily</option>
-                            <option value="monthly">Monthly</option>
-                            <option value="yearly">Yearly</option>
-                            <option value="custom">Custom</option>
-                        </select>
+                        <label class="form-label">Recurrence Type</label>
+                        <div class="d-flex flex-column">
+                            <label class="btn btn-outline-primary d-flex align-items-center mb-2">
+                                <input type="radio" name="repeatType" value="none" class="me-2" checked>
+                                <i class="bi bi-x-circle text-danger me-2"></i> None
+                            </label>
+                            <label class="btn btn-outline-success d-flex align-items-center mb-2">
+                                <input type="radio" name="repeatType" value="daily" class="me-2">
+                                <i class="bi bi-calendar-day text-success me-2"></i> Daily
+                            </label>
+                            <label class="btn btn-outline-warning d-flex align-items-center mb-2">
+                                <input type="radio" name="repeatType" value="monthly" class="me-2">
+                                <i class="bi bi-calendar-month text-warning me-2"></i> Monthly
+                            </label>
+                            <label class="btn btn-outline-info d-flex align-items-center mb-2">
+                                <input type="radio" name="repeatType" value="yearly" class="me-2">
+                                <i class="bi bi-calendar text-info me-2"></i> Yearly
+                            </label>
+                            <label class="btn btn-outline-dark d-flex align-items-center">
+                                <input type="radio" name="repeatType" value="custom" class="me-2">
+                                <i class="bi bi-clock text-dark me-2"></i> Custom
+                            </label>
+                        </div>
                     </div>
 
-                    <!-- Custom Date-Time (Hidden by Default) -->
+                    <!-- Custom Date-Time Picker (Hidden by Default) -->
                     <div class="mb-3 d-none" id="customDateTimeContainer">
                         <label for="customDateTime" class="form-label">Select Date & Time</label>
                         <input type="datetime-local" class="form-control" id="customDateTime">
@@ -178,6 +194,7 @@
         </div>
     </div>
 </div>
+
 
 
 <!-- SCRIPT LOGIC -->
@@ -230,6 +247,7 @@
 });
 
 // HANDLE MESSAGE RECURRENCE
+// HANDLE MESSAGE RECURRENCE
 document.addEventListener("DOMContentLoaded", function () {
     const repeatModal = new bootstrap.Modal(document.getElementById("repeatMessageModal"));
     let currentMessageId = null;
@@ -239,26 +257,28 @@ document.addEventListener("DOMContentLoaded", function () {
         btn.addEventListener("click", function () {
             currentMessageId = this.getAttribute("data-message-id");
             document.getElementById("repeatMessageId").value = currentMessageId;
-            document.getElementById("repeatType").value = "none"; 
+            document.querySelector('input[name="repeatType"][value="none"]').checked = true;
             document.getElementById("customDateTimeContainer").classList.add("d-none");
             repeatModal.show();
         });
     });
 
     // Show/hide custom date-time input
-    document.getElementById("repeatType").addEventListener("change", function () {
-        if (this.value === "custom") {
-            document.getElementById("customDateTimeContainer").classList.remove("d-none");
-        } else {
-            document.getElementById("customDateTimeContainer").classList.add("d-none");
-        }
+    document.querySelectorAll('input[name="repeatType"]').forEach(radio => {
+        radio.addEventListener("change", function () {
+            if (this.value === "custom") {
+                document.getElementById("customDateTimeContainer").classList.remove("d-none");
+            } else {
+                document.getElementById("customDateTimeContainer").classList.add("d-none");
+            }
+        });
     });
 
     // Save recurrence via AJAX
     document.getElementById("saveRepeatMessage").addEventListener("click", function () {
         if (!currentMessageId) return;
 
-        const repeatType = document.getElementById("repeatType").value;
+        const repeatType = document.querySelector('input[name="repeatType"]:checked').value;
         let customDateTime = document.getElementById("customDateTime").value;
 
         if (repeatType === "custom" && !customDateTime) {
