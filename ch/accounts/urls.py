@@ -39,9 +39,9 @@ urlpatterns=[
 
 
  
-   path('schedule_event/<int:user_id>/<int:org_id>/<str:date>/<slug:event_slug>/', ScheduleEventView.as_view(), name='schedule_event'),
-   path('confirm_event/<int:user_id>/<int:org_id>/<str:date>/<slug:event_slug>/', ConfirmEventView.as_view(), name='confirm_event'),
-   path('schedule_event_action/<int:user_id>/<int:org_id>/<str:date>/<slug:event_slug>/', ScheduleEventActionView.as_view(), name='schedule_event_action'),
+    path('schedule_event/<int:user_id>/<int:org_id>/<str:date>/<slug:event_slug>/', ScheduleEventView.as_view(), name='schedule_event'),
+    path('confirm_event/<int:user_id>/<int:org_id>/<str:date>/<slug:event_slug>/', ConfirmEventView.as_view(), name='confirm_event'),
+    path('schedule_event_action/<int:user_id>/<int:org_id>/<str:date>/<slug:event_slug>/', ScheduleEventActionView.as_view(), name='schedule_event_action'),
 
     #display user bookings
     path('bookings/<int:org_id>/', UserOrganizationBookingsView.as_view(), name='user_organization_bookings'),

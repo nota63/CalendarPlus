@@ -14,7 +14,7 @@ from django.core.files.base import ContentFile
 from datetime import datetime
 from django.contrib import messages
 from django.urls import reverse_lazy
-from accounts.models import Organization,Profile
+from accounts.models import (Organization,Profile,EventOrganization,MeetingOrganization,BookingOrganization)
 from django.db.models import Count, Sum, Avg
 from django.utils.timezone import localtime
 from datetime import timedelta
@@ -337,7 +337,7 @@ def handle_repeat_status(request, conversation_id, org_id):
         messages_list = []
         for msg in messages:
             if msg.text:  
-                message_content = msg.text  # ✅ Show actual message text if available
+                message_content = msg.text  
             elif msg.code_snippet:
                 message_content = f"📜 Code Snippet: {msg.code_snippet[:20]}..."  
             else:
@@ -371,3 +371,77 @@ def handle_repeat_status(request, conversation_id, org_id):
             return JsonResponse({"success": False, "error": str(e)})
 
     return JsonResponse({"success": False, "error": "Invalid request method"})
+
+
+# FETCH OTHER USERS MEETINGS,EVENTS
+
+@login_required
+def fetch_user_meetings_events(request, org_id, other_user_id):
+    """Fetch the latest 3 meetings and events involving the other user."""
+    
+    try:
+        organization = get_object_or_404(Organization, id=org_id)
+        other_user = get_object_or_404(User, id=other_user_id)
+
+        # Get 'expand' parameter from AJAX request (default: False)
+        expand = request.GET.get("expand", "false").lower() == "true"
+
+        # Define the limit (3 for normal, all if expanded)
+        limit = None if expand else 3
+
+        # Fetch meetings where other_user is a participant, sender, or invitee
+        meetings = MeetingOrganization.objects.filter(
+            organization=organization
+        ).filter(
+            participants=other_user
+        ) | MeetingOrganization.objects.filter(
+            organization=organization, user=other_user
+        ) | MeetingOrganization.objects.filter(
+            organization=organization, invitee=other_user
+        ).order_by("-meeting_date", "-start_time")[:limit]
+
+        # Fetch events where other_user is a host or invitee
+        events = BookingOrganization.objects.filter(
+            organization=organization
+        ).filter(
+            event_host=other_user
+        ) | BookingOrganization.objects.filter(
+            invitee=other_user
+        ).order_by("-start_time")[:limit]
+
+        # Convert meetings to JSON
+        meetings_data = [
+            {
+                "id": meeting.id,
+                "title": meeting.meeting_title,
+                "description": meeting.meeting_description,
+                "date": meeting.meeting_date.strftime("%Y-%m-%d"),
+                "start_time": meeting.start_time.strftime("%H:%M"),
+                "end_time": meeting.end_time.strftime("%H:%M"),
+                "meeting_link": meeting.meeting_link,
+                "meeting_type": meeting.get_meeting_type_display(),
+            }
+            for meeting in meetings
+        ]
+
+        # Convert events to JSON
+        events_data = [
+            {
+                "id": event.id,
+                "title": event.event.title,
+                "description": event.event.description,
+                "start_time": event.start_time.strftime("%Y-%m-%d %H:%M"),
+                "end_time": event.end_time.strftime("%Y-%m-%d %H:%M"),
+                "location": event.event.location,
+                "status": event.status,
+            }
+            for event in events
+        ]
+
+        return JsonResponse({"meetings": meetings_data, "events": events_data}, safe=False)
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
+
+
+

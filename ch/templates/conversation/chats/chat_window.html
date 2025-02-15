@@ -66,8 +66,13 @@
                 <button id="openRepeatModal" class="dropdown-item" data-conversation-id="{{ conversation.id }}" data-org-id="{{ organization.id }}">
                     Manage repeat settings
                 </button>
-                
-                
+               </li>
+
+               <li>
+                <button id="fetchMeetingsEventsBtn" class="dropdown-item">
+                    View Meetings & Events
+                 </button>
+
                </li>
             </ul>
            </div>
@@ -562,6 +567,29 @@
     </div>
 </div>
 
+<!-- OTHER USER MEETINGS & EVENTS -->
+
+<!-- Modal -->
+<div class="modal fade" id="meetingsEventsModal" tabindex="-1" aria-labelledby="meetingsEventsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="meetingsEventsLabel">📅 Meetings & Events</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="meetingsEventsContainer">
+                    <p class="text-center">Fetching data...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="expandMeetingsEvents" class="btn btn-secondary d-none">Show All</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 
@@ -844,6 +872,96 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+// MEETINGS & EVENTS WITH OTHER USER
+document.addEventListener("DOMContentLoaded", function () {
+    const fetchBtn = document.getElementById("fetchMeetingsEventsBtn");
+    const expandBtn = document.getElementById("expandMeetingsEvents");
+    const modalContainer = document.getElementById("meetingsEventsContainer");
+
+    const orgId = "{{ organization.id }}";  
+    const otherUserId = "{{ other_user.id }}";  
+    let expanded = false;
+
+    function fetchMeetingsEvents(expand = false) {
+        modalContainer.innerHTML = `<p class="text-center">Fetching data...</p>`;
+        
+        fetch(`/dm/other-user-connections/${orgId}/${otherUserId}/?expand=${expand}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    modalContainer.innerHTML = `<p class="text-danger">${data.error}</p>`;
+                    return;
+                }
+
+                const { meetings, events } = data;
+                if (meetings.length === 0 && events.length === 0) {
+                    modalContainer.innerHTML = `<p class="text-center text-muted">No upcoming meetings or events.</p>`;
+                    return;
+                }
+
+                let html = `<div class="list-group">`;
+
+                // 🟢 Render Meetings
+                if (meetings.length > 0) {
+                    html += `<h6 class="mt-2">📅 Meetings</h6>`;
+                    meetings.forEach(meeting => {
+                        html += `
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>${meeting.title}</strong> 
+                                <p class="text-muted">${meeting.date} | ${meeting.start_time} - ${meeting.end_time}</p>
+                                <p>${meeting.description || "No description available."}</p>
+                            </div>
+                            <div class="btn-group">
+                                ${meeting.meeting_link ? `<a href="${meeting.meeting_link}" target="_blank" class="btn btn-sm btn-primary">Join</a>` : ""}
+                                <a href="/calendar/meeting_detail_view/${orgId}/${meeting.id}/" class="btn btn-sm btn-secondary">Details</a>
+                            </div>
+                        </div>`;
+                    });
+                }
+
+                // 🔵 Render Events
+                if (events.length > 0) {
+                    html += `<h6 class="mt-2">🎉 Events</h6>`;
+                    events.forEach(event => {
+                        html += `
+                        <div class="list-group-item">
+                            <strong>${event.title}</strong>
+                            <p class="text-muted">${event.start_time} - ${event.end_time}</p>
+                            <p>${event.description || "No description available."}</p>
+                            <p><strong>Location:</strong> ${event.location}</p>
+                        </div>`;
+                    });
+                }
+
+                html += `</div>`;
+                modalContainer.innerHTML = html;
+
+                // Show "Expand" button if not expanded yet
+                if (!expanded && (meetings.length >= 3 || events.length >= 3)) {
+                    expandBtn.classList.remove("d-none");
+                } else {
+                    expandBtn.classList.add("d-none");
+                }
+            })
+            .catch(error => {
+                modalContainer.innerHTML = `<p class="text-danger">Error fetching data. Try again.</p>`;
+            });
+    }
+
+    // Open modal and fetch initial data
+    fetchBtn.addEventListener("click", function () {
+        expanded = false;
+        fetchMeetingsEvents(false);
+        new bootstrap.Modal(document.getElementById("meetingsEventsModal")).show();
+    });
+
+    // Expand to show all
+    expandBtn.addEventListener("click", function () {
+        expanded = true;
+        fetchMeetingsEvents(true);
+    });
+});
 
 </script>
 

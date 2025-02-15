@@ -11,5 +11,6 @@ urlpatterns=[
     path('delete_text/<int:message_id>/<int:org_id>/',delete_message, name='delete_text'),
     path('delete-all-messages/<int:conversation_id>/<int:org_id>/',delete_all_messages, name='delete_all_messages'),
     path('get-conversation-analytics/<int:conversation_id>/<int:org_id>/',get_conversation_analytics, name='get_conversation_analytics'),
-    path('chat/<int:conversation_id>/repeat/<int:org_id>/modify/',handle_repeat_status, name='handle_repeat')
+    path('chat/<int:conversation_id>/repeat/<int:org_id>/modify/',handle_repeat_status, name='handle_repeat'),
+    path('other-user-connections/<int:org_id>/<int:other_user_id>/',fetch_user_meetings_events, name='other_user_connections')
 ]
