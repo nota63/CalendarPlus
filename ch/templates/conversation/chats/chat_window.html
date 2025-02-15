@@ -41,13 +41,25 @@
 <!-- Main content   -->
 
     <div class="chat-container">
+      
         <h2>
             {{ other_user.username }}
               {% if profile and profile.profile_picture %}
                  <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle img-fluid" style="width: 40px; height: 40px; object-fit: cover;">
               {% endif %}
-        
-        
+
+             <!-- Modern Compact Time Display -->
+          <div id="timeContainer" class="bg-gray-100 px-2 py-1 rounded-full shadow flex items-center space-x-2 w-fit text-xs font-medium text-gray-700">
+             <span>It's</span>
+             <span id="timeText">Loading...</span>
+             <span>for {{other_user.username}}</span>
+            <span id="timeIcon" class="text-base">🌞</span>
+          </div>
+
+
+          
+                
+              
             <span class="status-dot" id="user-status" style="width: 10px; height: 10px; background-color: gray; border-radius: 50%; display: inline-block;"></span>
               <!-- Search Bar -->
            <div class="search-container mb-2">
@@ -85,12 +97,17 @@
            </div>
         </h2>
 
-        
+ <!-- Time Display -->
+ 
 
-        <div class="video-call-container">
-            <video id="local-video" autoplay playsinline class="video-feed"></video>
-            <video id="remote-video" autoplay playsinline class="video-feed"></video>
-        </div>
+
+
+        
+<!--Video call container  -->
+<div class="video-call-container">
+    <video id="local-video" autoplay playsinline class="video-feed"></video>
+    <video id="remote-video" autoplay playsinline class="video-feed"></video>
+</div>
         
 
         
@@ -236,7 +253,7 @@
          <button id="startMeeting" class="btn btn-light shadow-sm" style="border-radius: 50%; padding: 10px;">
             <i class="fas fa-broadcast-tower" style="color: #e91e63; font-size: 18px;"></i>
          </button>
-         
+
             <input type="text" id="chat-message-input" placeholder="Message...">
             <button id="chat-message-submit">
                 Send ➔
@@ -1033,6 +1050,37 @@ if (events.length > 0) {
         fetchMeetingsEvents(true);
     });
 });
+
+
+// SHOW CURRENT TIME 
+function updateTime() {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes().toString().padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+
+    const formattedHours = hours % 12 || 12; // Convert 24-hour to 12-hour format
+    const timeString = `${formattedHours}:${minutes} ${ampm}`;
+
+    // Select elements
+    const timeText = document.getElementById("timeText");
+    const timeIcon = document.getElementById("timeIcon");
+
+    // Ensure elements exist before updating
+    if (timeText && timeIcon) {
+        timeText.textContent = timeString;
+
+        // Set Sun/Moon icon based on time
+        timeIcon.textContent = (hours >= 6 && hours < 18) ? "🌞" : "🌙";
+    }
+}
+
+// Call function on load & update every second
+document.addEventListener("DOMContentLoaded", () => {
+    updateTime();
+    setInterval(updateTime, 1000);
+});
+
 </script>
 
 
