@@ -1833,3 +1833,90 @@ a {
     transform: rotate(360deg);
     stroke: #2563EB;  /* Darker blue on hover */
 }
+
+
+
+
+
+
+
+
+
+
+/* Containers styles */
+:root {
+    --primary: #6750A4;
+    --on-primary: #FFFFFF;
+    --primary-container: #EADDFF;
+    --secondary: #625B71;
+    --surface: #FEF7FF;
+    --surface-container: #F3EDF7;
+    --outline: #79747E;
+}
+
+.material-card {
+    background: var(--surface);
+    border-radius: 28px;
+    box-shadow: 0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.material-card:hover {
+    box-shadow: 0px 4px 8px 4px rgba(0, 0, 0, 0.15), 0px 1px 3px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+.material-header {
+    background: var(--primary);
+    color: var(--on-primary);
+    border-radius: 28px 28px 0 0;
+    padding: 16px 24px;
+}
+
+.material-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--outline) transparent;
+}
+
+.material-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.material-scroll::-webkit-scrollbar-thumb {
+    background-color: var(--outline);
+    border-radius: 4px;
+}
+
+.material-chip {
+    background: var(--primary-container);
+    color: var(--primary);
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+}
+
+.ripple {
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+}
+
+.ripple:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.ripple:active:after {
+    width: 200px;
+    height: 200px;
+    opacity: 0.2;
+    transition: all 0.5s;
+}
