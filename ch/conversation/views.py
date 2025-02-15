@@ -320,3 +320,39 @@ def get_conversation_analytics(request, conversation_id, org_id):
     })
 
 
+
+
+# HANDLE REPEAT MESSAGES 
+@login_required
+@csrf_exempt
+def handle_repeat_status(request, conversation_id, org_id):
+    """Fetch or toggle the repeat status of a message via AJAX."""
+    if request.method == "GET":
+        messages = Message.objects.filter(
+            conversation_id=conversation_id, 
+            organization_id=org_id,
+            sender=request.user
+        ).values("id", "repeat", "custom_repeat_datetime")
+
+        return JsonResponse({"messages": list(messages)}, safe=False)
+
+    elif request.method == "POST":
+        try:
+            data = json.loads(request.body) 
+            message_id = data.get("message_id")
+            new_repeat = data.get("repeat")
+
+            message = get_object_or_404(Message, id=message_id, conversation_id=conversation_id, organization_id=org_id)
+
+            # If the user is the sender, allow toggle
+            if message.sender == request.user:
+                message.repeat = new_repeat  
+                message.save()
+                return JsonResponse({"success": True, "new_repeat": message.repeat})
+            else:
+                return JsonResponse({"success": False, "error": "Permission denied"})
+
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "error": "Invalid JSON data"})
+
+    return JsonResponse({"success": False, "error": "Invalid request method"})

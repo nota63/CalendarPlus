@@ -9,6 +9,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+
     <title>Chat with {{ other_user.username }}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -59,6 +61,12 @@
                 <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#analyticsModal">
                     Overview
                 </button>
+               </li>
+               <li>
+                <button id="openRepeatModal" class="dropdown-item" data-conversation-id="{{ conversation.id }}" data-org-id="{{ organization.id }}">
+                    Manage repeat settings
+                </button>
+                
                 
                </li>
             </ul>
@@ -495,6 +503,40 @@
 </div>
 
 
+<!-- Manage Repeat Settings -->
+<div id="repeatModal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Manage Repeat Messages</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Message</th>
+                            <th>Current Repeat</th>
+                            <th>Change Repeat</th>
+                        </tr>
+                    </thead>
+                    <tbody id="repeatMessagesTable">
+                        <!-- Messages will be loaded dynamically here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
 
 <!-- SCRIPT LOGIC -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -696,6 +738,79 @@ function formatBytes(bytes, decimals = 2) {
 }
 
 
+// HANDLE REPEAT SETTINGS
+
+document.addEventListener("DOMContentLoaded", function () {
+    let conversationId = document.getElementById("openRepeatModal").dataset.conversationId;  
+    let orgId = document.getElementById("openRepeatModal").dataset.orgId;  
+
+    const openModalButton = document.getElementById("openRepeatModal");
+    const repeatMessagesTable = document.getElementById("repeatMessagesTable");
+    const repeatModalElement = document.getElementById("repeatModal");
+    const repeatModal = new bootstrap.Modal(repeatModalElement);
+    const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");  
+
+    // Open Modal and Fetch Data
+    openModalButton.addEventListener("click", function () {
+        repeatMessagesTable.innerHTML = "<tr><td colspan='3' class='text-center'>Loading...</td></tr>";  
+        repeatModal.show();
+
+        fetch(`/dm/chat/${conversationId}/repeat/${orgId}/modify/`)
+            .then(response => response.json())
+            .then(data => {
+                let rows = data.messages.map(msg => `
+                    <tr>
+                        <td>${msg.text || "📎 File Message"}</td>
+                        <td>${msg.repeat}</td>
+                        <td>
+                            <select class="form-select change-repeat" data-message-id="${msg.id}">
+                                <option value="none" ${msg.repeat === "none" ? "selected" : ""}>None</option>
+                                <option value="daily" ${msg.repeat === "daily" ? "selected" : ""}>Daily</option>
+                                <option value="monthly" ${msg.repeat === "monthly" ? "selected" : ""}>Monthly</option>
+                                <option value="yearly" ${msg.repeat === "yearly" ? "selected" : ""}>Yearly</option>
+                                <option value="custom" ${msg.repeat === "custom" ? "selected" : ""}>Custom</option>
+                            </select>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                repeatMessagesTable.innerHTML = rows || "<tr><td colspan='3' class='text-center'>No messages found.</td></tr>";
+            })
+            .catch(error => {
+                console.error("Error fetching messages:", error);
+                repeatMessagesTable.innerHTML = "<tr><td colspan='3' class='text-center text-danger'>Failed to load messages.</td></tr>";
+            });
+    });
+
+    // Handle Repeat Change
+    repeatMessagesTable.addEventListener("change", function (event) {
+        if (event.target.classList.contains("change-repeat")) {
+            let messageId = event.target.getAttribute("data-message-id");
+            let newRepeat = event.target.value;
+
+            fetch(`/dm/chat/${conversationId}/repeat/${orgId}/modify/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken  
+                },
+                body: JSON.stringify({ message_id: messageId, repeat: newRepeat })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    event.target.closest("tr").querySelector("td:nth-child(2)").textContent = newRepeat;
+                } else {
+                    alert("Error: " + data.error);
+                }
+            })
+            .catch(error => {
+                console.error("Error updating repeat:", error);
+                alert("Failed to update repeat setting.");
+            });
+        }
+    });
+});
 
 
 </script>
