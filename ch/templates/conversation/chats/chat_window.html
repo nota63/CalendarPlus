@@ -123,19 +123,20 @@
     </div>
 {% endif %}
 
-<div class="message-footer">
-    <span class="timestamp">{{ message.timestamp|date:"H:i" }}</span>
+<div class="message-footer d-flex align-items-center">
+    <span class="timestamp me-1">{{ message.timestamp|date:"H:i" }}</span>
     
     {% if message.sender == request.user %}
     <span class="read-status">
         {% if message.is_read %}
-            <i class="fas fa-check-double" style="color: #d4af37;"></i>  <!-- Dark Yellow Double Check -->
+            <i class="fas fa-check-double" style="color: #d4af37; font-size: 14px; font-weight: bold;"></i>  <!-- Modern Double Check -->
         {% else %}
-            <i class="fas fa-check" style="color: #d4af37;"></i>  <!-- Dark Yellow Single Check -->
+            <i class="fas fa-check" style="color: #d4af37; font-size: 14px; font-weight: bold;"></i>  <!-- Modern Single Check -->
         {% endif %}
     </span>
     {% endif %}
 </div>
+
 
     
         {% if message.sender == request.user %}
