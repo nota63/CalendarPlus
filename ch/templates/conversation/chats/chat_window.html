@@ -504,31 +504,46 @@
 
 
 <!-- Manage Repeat Settings -->
+ 
 <div id="repeatModal" class="modal fade" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Manage Repeat Messages</h5>
+                <h5 class="modal-title">🔄 Repeat Settings</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <table class="table table-striped">
+                <table class="table">
                     <thead>
                         <tr>
                             <th>Message</th>
                             <th>Current Repeat</th>
-                            <th>Change Repeat</th>
+                            <th>Change Frequency</th>
                         </tr>
                     </thead>
                     <tbody id="repeatMessagesTable">
-                        <!-- Messages will be loaded dynamically here -->
+                        <thead>
+                            <tr>
+                                <th>Message</th>
+                                <th>Current Repeat</th>
+                                <th>Change Repeat</th>
+                            </tr>
+                        </thead>
+    
+                        <!-- End Example Row -->
+                        <tbody id="repeatMessagesTable">
+                            <!-- Messages will be loaded dynamically here -->
+                        </tbody>
+    
                     </tbody>
                 </table>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn-save ms-auto">Save Changes</button>
             </div>
         </div>
     </div>
 </div>
-
 
 
 

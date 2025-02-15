@@ -1056,3 +1056,158 @@ h2 span.status-dot {
 .text-purple { color: #6f42c1; }
 .text-teal { color: #20c997; }
 .text-pink { color: #d63384; }
+
+
+
+
+
+/* Custom Material UI-inspired Styles */
+.modal {
+    backdrop-filter: blur(5px);
+    background-color: rgba(40, 40, 40, 0.4);
+}
+
+.modal-content {
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    border: none;
+    overflow: hidden;
+}
+
+.modal-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 16px 24px;
+}
+
+.modal-title {
+    font-weight: 600;
+    color: #1a73e8;
+    font-size: 1.25rem;
+}
+
+.modal-body {
+    padding: 0;
+    background: #fff;
+}
+
+.table {
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+}
+
+.table thead th {
+    border-bottom: none;
+    color: #5f6368;
+    font-weight: 500;
+    padding: 12px 24px;
+    background: #f8f9fa;
+}
+
+.table tbody tr {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #fff;
+    margin: 8px 0;
+}
+
+.table tbody tr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.table td {
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+    vertical-align: middle;
+    padding: 16px 24px;
+    color: #202124;
+}
+
+.table td:first-child {
+    border-left: 1px solid #e0e0e0;
+    border-radius: 8px 0 0 8px;
+}
+
+.table td:last-child {
+    border-right: 1px solid #e0e0e0;
+    border-radius: 0 8px 8px 0;
+}
+
+.select-repeat {
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.875rem;
+    color: #202124;
+    transition: all 0.2s ease;
+    appearance: none;
+    background: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235f6368'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e") no-repeat right 12px center;
+    background-size: 16px;
+}
+
+.select-repeat:hover {
+    border-color: #1a73e8;
+}
+
+.select-repeat:focus {
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+    outline: none;
+}
+
+.btn-close {
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+    background-size: 0.8rem;
+}
+
+.btn-close:hover {
+    opacity: 1;
+}
+
+.btn-save {
+    background: #1a73e8;
+    color: white;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.btn-save:hover {
+    background: #1557b0;
+    transform: translateY(-1px);
+}
+
+.message-preview {
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #5f6368;
+}
+
+.repeat-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 16px;
+    background: #e8f0fe;
+    color: #1967d2;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+/* Enable scrolling inside the repeat modal only */
+#repeatModal .modal-body {
+    max-height: 60vh; /* Adjust height if needed */
+    overflow-y: auto;
+}
+
+/* Keep the modal styling modern */
+#repeatModal .modal-content {
+    border-radius: 8px; /* Smooth rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
