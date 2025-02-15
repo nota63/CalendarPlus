@@ -922,8 +922,8 @@ h2 span.status-dot {
 
 #typing-indicator {
     padding: 0 24px 12px;
-    font-size: 0.9rem;
-    color: #2cda15;
+    font-size: 1.1rem;
+    color: #70776f;
     display: none;
 }
 
