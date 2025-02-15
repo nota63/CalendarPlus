@@ -323,6 +323,7 @@ def get_conversation_analytics(request, conversation_id, org_id):
 
 
 # HANDLE REPEAT MESSAGES 
+# HANDLE REPEAT MESSAGES 
 @login_required
 @csrf_exempt
 def handle_repeat_status(request, conversation_id, org_id):
@@ -332,13 +333,33 @@ def handle_repeat_status(request, conversation_id, org_id):
             conversation_id=conversation_id, 
             organization_id=org_id,
             sender=request.user
-        ).values("id", "repeat", "custom_repeat_datetime")
+        ).values("id", "repeat", "custom_repeat_datetime", "text", "code_snippet")
 
-        return JsonResponse({"messages": list(messages)}, safe=False)
+        # Modify to display text or code snippet properly
+        messages_list = []
+        for msg in messages:
+            text_content = msg["text"]
+            code_snippet_content = msg["code_snippet"]
+
+            if text_content:
+                message_content = text_content  # If message text exists, show it
+            elif code_snippet_content:
+                message_content = f"📜 Code Snippet: {code_snippet_content[:20]}..."  # Show preview of code snippet
+            else:
+                message_content = "📎 File Message"  # Default fallback
+
+            messages_list.append({
+                "id": msg["id"],
+                "repeat": msg["repeat"],
+                "custom_repeat_datetime": msg["custom_repeat_datetime"],
+                "content": message_content  
+            })
+
+        return JsonResponse({"messages": messages_list}, safe=False)
 
     elif request.method == "POST":
         try:
-            data = json.loads(request.body) 
+            data = json.loads(request.body)
             message_id = data.get("message_id")
             new_repeat = data.get("repeat")
 
@@ -352,7 +373,7 @@ def handle_repeat_status(request, conversation_id, org_id):
             else:
                 return JsonResponse({"success": False, "error": "Permission denied"})
 
-        except json.JSONDecodeError:
-            return JsonResponse({"success": False, "error": "Invalid JSON data"})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
 
     return JsonResponse({"success": False, "error": "Invalid request method"})

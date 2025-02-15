@@ -504,7 +504,7 @@
 
 
 <!-- Manage Repeat Settings -->
- 
+
 <div id="repeatModal" class="modal fade" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
@@ -514,13 +514,7 @@
             </div>
             <div class="modal-body">
                 <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Message</th>
-                            <th>Current Repeat</th>
-                            <th>Change Frequency</th>
-                        </tr>
-                    </thead>
+                    
                     <tbody id="repeatMessagesTable">
                         <thead>
                             <tr>
@@ -754,20 +748,20 @@ function formatBytes(bytes, decimals = 2) {
 
 
 // HANDLE REPEAT SETTINGS
-
 document.addEventListener("DOMContentLoaded", function () {
-    let conversationId = document.getElementById("openRepeatModal").dataset.conversationId;  
-    let orgId = document.getElementById("openRepeatModal").dataset.orgId;  
-
     const openModalButton = document.getElementById("openRepeatModal");
     const repeatMessagesTable = document.getElementById("repeatMessagesTable");
     const repeatModalElement = document.getElementById("repeatModal");
     const repeatModal = new bootstrap.Modal(repeatModalElement);
-    const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");  
+    const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
+
+    // Get conversation & organization IDs dynamically
+    let conversationId = openModalButton.dataset.conversationId;
+    let orgId = openModalButton.dataset.orgId;
 
     // Open Modal and Fetch Data
     openModalButton.addEventListener("click", function () {
-        repeatMessagesTable.innerHTML = "<tr><td colspan='3' class='text-center'>Loading...</td></tr>";  
+        repeatMessagesTable.innerHTML = "<tr><td colspan='3' class='text-center'>Loading...</td></tr>";
         repeatModal.show();
 
         fetch(`/dm/chat/${conversationId}/repeat/${orgId}/modify/`)
@@ -775,7 +769,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(data => {
                 let rows = data.messages.map(msg => `
                     <tr>
-                        <td>${msg.text || "📎 File Message"}</td>
+                        <td>${msg.content || "📎 File Message"}</td>
                         <td>${msg.repeat}</td>
                         <td>
                             <select class="form-select change-repeat" data-message-id="${msg.id}">
@@ -788,7 +782,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         </td>
                     </tr>
                 `).join('');
-                
+
                 repeatMessagesTable.innerHTML = rows || "<tr><td colspan='3' class='text-center'>No messages found.</td></tr>";
             })
             .catch(error => {
