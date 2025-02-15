@@ -165,20 +165,29 @@
         </div>
     
         <div class="input-container">
-            <label class="attach-button">
-                📎
-                <input type="file" id="chat-file-input" hidden>
-            </label>
+            <!-- Attach File Button -->
+         <label class="attach-button" style="cursor: pointer; padding: 8px; border-radius: 50%; background: #f0f2f5; display: flex; align-items: center; justify-content: center;">
+             <i class="fas fa-paperclip" style="color: #007bff; font-size: 18px;"></i>
+            <input type="file" id="chat-file-input" hidden>
+         </label>
 
-             <!-- Code Icon to Open Code Snippet Modal -->
-            <button id="open-code-modal" class="btn btn-secondary"><i class="fas fa-code"></i></button>
-            <!-- record voice -->
-            <button id="record-voice" class="btn btn-secondary">
-                🎙️
-            </button>
-            <audio id="audio-preview" controls style="display: none;"></audio>
-            <!-- START VIDEO CALL -->
-            <button id="start-video-call" class="video-call-btn">📹</button>
+        <!-- Code Snippet Button -->
+        <button id="open-code-modal" class="btn btn-light shadow-sm" style="border-radius: 50%; padding: 10px;">
+            <i class="fas fa-code" style="color: #ff5722; font-size: 18px;"></i>
+        </button>
+
+         <!-- Voice Recording Button -->
+         <button id="record-voice" class="btn btn-light shadow-sm" style="border-radius: 50%; padding: 10px;">
+           <i class="fas fa-microphone" style="color: #28a745; font-size: 18px;"></i>
+         </button>
+
+         <audio id="audio-preview" controls style="display: none;"></audio>
+
+        <!-- Video Call Button -->
+          <button id="start-video-call" class="btn btn-light shadow-sm" style="border-radius: 50%; padding: 10px;">
+             <i class="fas fa-video" style="color: #e91e63; font-size: 18px;"></i>
+          </button>
+
 
             
 
