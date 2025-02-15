@@ -97,38 +97,61 @@
         {% if message.code_snippet %}
           <pre class="code-snippet"><code class="language-python">{{ message.code_snippet }}</code></pre>
         {% endif %}
-
         {% if message.file %}
         <div class="file-preview">
-          {% with file_ext=message.file.url|lower|slice:"-4:" %}
-            {% if file_ext == ".jpg" or file_ext == ".jpeg" or file_ext == ".png" or file_ext == ".gif" %}
-                <!-- Image Preview -->
-                <img src="{{ message.file.url }}" alt="Sent image" class="file-image">
-            {% else %}
-                <!-- File Icon Preview -->
-                <a href="{{ message.file.url }}" class="file-download" target="_blank">
-                    {% if file_ext == ".pdf" %}
-                        <i class="fas fa-file-pdf file-icon pdf"></i>
-                    {% elif file_ext == ".docx" or file_ext == ".doc" %}
-                        <i class="fas fa-file-word file-icon word"></i>
-                    {% elif file_ext == ".xlsx" or file_ext == ".csv" %}
-                        <i class="fas fa-file-excel file-icon excel"></i>
-                    {% elif file_ext == ".pptx" or file_ext == ".ppt" %}
-                        <i class="fas fa-file-powerpoint file-icon ppt"></i>
-                    {% elif file_ext == ".zip" or file_ext == ".rar" %}
-                        <i class="fas fa-file-archive file-icon zip"></i>
+            {% with file_ext=message.file.url|lower|slice:"-4:" %}
+                {% if file_ext == ".jpg" or file_ext == ".jpeg" or file_ext == ".png" or file_ext == ".gif" %}
+                    <!-- 🖼️ Image Preview -->
+                    <img src="{{ message.file.url }}" alt="Sent image" class="file-image-preview">
+    
+                {% elif file_ext == ".pdf" %}
+                    <!-- 📄 PDF Preview -->
+                    <iframe src="{{ message.file.url }}" class="file-pdf-preview"></iframe>
+    
+                {% elif file_ext == ".mp4" or file_ext == ".avi" %}
+                    <!-- 🎥 Video Preview -->
+                    <video controls class="file-video-preview">
+                        <source src="{{ message.file.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+    
                     {% elif file_ext == ".mp3" or file_ext == ".wav" %}
-                        <i class="fas fa-file-audio file-icon audio"></i>
-                    {% elif file_ext == ".mp4" or file_ext == ".avi" %}
-                        <i class="fas fa-file-video file-icon video"></i>
-                    {% else %}
-                        <i class="fas fa-file file-icon generic"></i>
-                    {% endif %}
-                    <span>{{ message.file.name|slice:"6:" }}</span>
-                </a>
-            {% endif %}
-        {% endwith %}
-    </div>
+                    <!-- 🎵 Audio Preview -->
+                    <div class="audio-container">
+                        <audio controls class="file-audio-preview">
+                            <source src="{{ message.file.url }}" type="audio/{{ file_ext|slice:"-3:" }}">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <a href="{{ message.file.url }}" class="file-download" target="_blank">
+                            <i class="fas fa-file-audio file-icon audio"></i>  
+                            <span>{{ message.file.name }}</span>
+                        </a>
+                    </div>
+    
+                {% else %}
+                    <!-- 📁 File Icon Preview -->
+                    <a href="{{ message.file.url }}" class="file-download" target="_blank">
+                        {% if file_ext == ".docx" or file_ext == ".doc" %}
+                            <i class="fas fa-file-word file-icon word"></i>
+                        {% elif file_ext == ".xlsx" or file_ext == ".csv" %}
+                            <i class="fas fa-file-excel file-icon excel"></i>
+
+                        {% elif file_ext == ".mp3" or file_ext == ".wav" %}
+                            <i class="fas fa-file-audio file-icon audio"></i>
+                        {% elif file_ext == ".pptx" or file_ext == ".ppt" %}
+                            <i class="fas fa-file-powerpoint file-icon ppt"></i>
+                        {% elif file_ext == ".zip" or file_ext == ".rar" %}
+                            <i class="fas fa-file-archive file-icon zip"></i>
+                        {% else %}
+                            <i class="fas fa-file file-icon generic"></i>
+                        {% endif %}
+                        <span>{{ message.file.name|slice:"6:" }}</span>
+                    </a>
+                {% endif %}
+            {% endwith %}
+        </div>
+
+    
 {% endif %}
 
 <div class="message-footer d-flex align-items-center">

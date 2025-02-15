@@ -322,7 +322,7 @@ def get_conversation_analytics(request, conversation_id, org_id):
 
 
 
-# HANDLE REPEAT MESSAGES 
+
 # HANDLE REPEAT MESSAGES 
 @login_required
 @csrf_exempt
@@ -342,11 +342,11 @@ def handle_repeat_status(request, conversation_id, org_id):
             code_snippet_content = msg["code_snippet"]
 
             if text_content:
-                message_content = text_content  # If message text exists, show it
+                message_content = text_content 
             elif code_snippet_content:
-                message_content = f"📜 Code Snippet: {code_snippet_content[:20]}..."  # Show preview of code snippet
+                message_content = f"📜 Code Snippet: {code_snippet_content[:20]}..."  
             else:
-                message_content = "📎 File Message"  # Default fallback
+                message_content = "📎 File Message"  
 
             messages_list.append({
                 "id": msg["id"],
@@ -365,7 +365,7 @@ def handle_repeat_status(request, conversation_id, org_id):
 
             message = get_object_or_404(Message, id=message_id, conversation_id=conversation_id, organization_id=org_id)
 
-            # If the user is the sender, allow toggle
+            
             if message.sender == request.user:
                 message.repeat = new_repeat  
                 message.save()
