@@ -16,6 +16,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -70,7 +74,7 @@
 
                <li>
                 <button id="fetchMeetingsEventsBtn" class="dropdown-item">
-                    View Meetings & Events
+                    Planned Interactions
                  </button>
 
                </li>
@@ -568,23 +572,70 @@
 </div>
 
 <!-- OTHER USER MEETINGS & EVENTS -->
-
 <!-- Modal -->
 <div class="modal fade" id="meetingsEventsModal" tabindex="-1" aria-labelledby="meetingsEventsLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="meetingsEventsLabel">📅 Meetings & Events</h5>
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content rounded-4" style="box-shadow: 0 8px 32px rgba(0,0,0,0.15);">
+            <div class="modal-header border-bottom-0 pb-0">
+                <div class="d-flex align-items-center w-100">
+                    <span class="bg-gradient-primary rounded-circle p-3 me-3">
+                        <i class="material-icons text-white" style="font-size: 2rem;">event</i>
+                    </span>
+                    <div>
+                        <h3 class="modal-title fw-600" id="meetingsEventsLabel">Meetings & Events</h3>
+                        <p class="text-muted mb-0">Upcoming schedule with {{other_user.username}}</p>
+                    </div>
+                </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div id="meetingsEventsContainer">
-                    <p class="text-center">Fetching data...</p>
+
+            <div class="modal-body pt-0">
+                <div id="meetingsEventsContainer" class="max-h-96 overflow-y-auto px-2">
+                    <!-- Loading State -->
+                    <div class="col-12 text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="text-muted mt-2">Fetching events...</p>
+                    </div>
+
+                    <!-- Example Event Entry (for demonstration) -->
+                    <div class="col-12 d-none">
+                        <div class="card-hover rounded-3 p-4">
+                            <div class="row align-items-center">
+                                <div class="col-auto">
+                                    <div class="bg-primary-soft rounded-2 p-3">
+                                        <i class="material-icons text-primary" style="font-size: 1.5rem;">meeting_room</i>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <span class="badge bg-primary-soft text-primary mb-1">Team Meeting</span>
+                                    <h5 class="mb-1">Project Kickoff</h5>
+                                    <p class="text-muted mb-0">
+                                        <i class="material-icons align-text-bottom" style="font-size: 1rem;">schedule</i>
+                                        15:00 - 16:30 · Google Meet
+                                    </p>
+                                </div>
+                                <div class="col-auto text-end">
+                                    <p class="mb-0 text-primary">Mon, 12 Jun</p>
+                                    <button class="btn btn-sm btn-light rounded-pill mt-2">
+                                        <i class="material-icons">link</i> Join
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button id="expandMeetingsEvents" class="btn btn-secondary d-none">Show All</button>
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+
+            <div class="modal-footer border-top-0">
+                <button id="expandMeetingsEvents" class="text-yellow-500 hover:text-yellow-600 font-medium d-none flex items-center gap-1">
+                    <i class="material-icons">expand_more</i> Show All Events
+                </button>
+                
+                <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-dismiss="modal">
+                    <i class="material-icons me-1">close</i>Close
+                </button>
             </div>
         </div>
     </div>
@@ -872,7 +923,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+
+
 // MEETINGS & EVENTS WITH OTHER USER
+
 document.addEventListener("DOMContentLoaded", function () {
     const fetchBtn = document.getElementById("fetchMeetingsEventsBtn");
     const expandBtn = document.getElementById("expandMeetingsEvents");
@@ -901,38 +955,39 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 let html = `<div class="list-group">`;
 
-                // 🟢 Render Meetings
-                if (meetings.length > 0) {
-                    html += `<h6 class="mt-2">📅 Meetings</h6>`;
-                    meetings.forEach(meeting => {
-                        html += `
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong>${meeting.title}</strong> 
-                                <p class="text-muted">${meeting.date} | ${meeting.start_time} - ${meeting.end_time}</p>
-                                <p>${meeting.description || "No description available."}</p>
-                            </div>
-                            <div class="btn-group">
-                                ${meeting.meeting_link ? `<a href="${meeting.meeting_link}" target="_blank" class="btn btn-sm btn-primary">Join</a>` : ""}
-                                <a href="/calendar/meeting_detail_view/${orgId}/${meeting.id}/" class="btn btn-sm btn-secondary">Details</a>
-                            </div>
-                        </div>`;
-                    });
-                }
+               // 🟢 Render Meetings
+         // 🟢 Render Meetings
+if (meetings.length > 0) {
+    html += `<h6 class="mt-2 text-base font-semibold text-gray-800">📅 Meetings</h6>`;
+    meetings.forEach(meeting => {
+        html += `
+        <div class="bg-white shadow-sm rounded-lg p-3 mb-2 border border-gray-200 flex justify-between items-center text-sm">
+            <div class="w-3/4">
+                <p class="font-semibold text-gray-900">${meeting.title}</p> 
+                <p class="text-gray-500">${meeting.date} | ${meeting.start_time} - ${meeting.end_time}</p>
+                <p class="text-gray-600 truncate">${meeting.description || "No description available."}</p>
+            </div>
+            <div class="flex space-x-2">
+                ${meeting.meeting_link ? `<a href="${meeting.meeting_link}" target="_blank" class="text-white bg-blue-500 hover:bg-blue-600 px-2 py-1 rounded text-xs">Join</a>` : ""}
+                <a href="/calendar/meeting_detail_view/${orgId}/${meeting.id}/" class="text-white bg-gray-600 hover:bg-gray-700 px-2 py-1 rounded text-xs">Details</a>
+            </div>
+        </div>`;
+    });
+}
 
-                // 🔵 Render Events
-                if (events.length > 0) {
-                    html += `<h6 class="mt-2">🎉 Events</h6>`;
-                    events.forEach(event => {
-                        html += `
-                        <div class="list-group-item">
-                            <strong>${event.title}</strong>
-                            <p class="text-muted">${event.start_time} - ${event.end_time}</p>
-                            <p>${event.description || "No description available."}</p>
-                            <p><strong>Location:</strong> ${event.location}</p>
-                        </div>`;
-                    });
-                }
+// 🔵 Render Events
+if (events.length > 0) {
+    html += `<h6 class="mt-2 text-base font-semibold text-gray-800">🎉 Events</h6>`;
+    events.forEach(event => {
+        html += `
+        <div class="bg-white shadow-sm rounded-lg p-3 mb-2 border border-gray-200 text-sm">
+            <p class="font-semibold text-gray-900">${event.title}</p>
+            <p class="text-gray-500">${event.start_time} - ${event.end_time}</p>
+            <p class="text-gray-600 truncate">${event.description || "No description available."}</p>
+            <p class="text-gray-600"><strong>📍 Location:</strong> ${event.location}</p>
+        </div>`;
+    });
+}
 
                 html += `</div>`;
                 modalContainer.innerHTML = html;
@@ -962,7 +1017,6 @@ document.addEventListener("DOMContentLoaded", function () {
         fetchMeetingsEvents(true);
     });
 });
-
 </script>
 
 

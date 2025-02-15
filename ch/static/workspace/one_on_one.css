@@ -1325,3 +1325,36 @@ h2 span.status-dot {
     flex-wrap: wrap;
     gap: 10px;
 }
+
+
+.modal-content {
+    border: 1px solid #f0f0f0;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+}
+
+.card-hover {
+    transition: all 0.2s ease;
+    border: 1px solid #f8f9fa;
+}
+
+.card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    border-color: #e9ecef;
+}
+
+.bg-primary-soft {
+    background-color: rgba(99, 102, 241, 0.1);
+}
+
+.btn-light {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+}
+
+.material-icons {
+    vertical-align: middle;
+}
