@@ -322,36 +322,31 @@ def get_conversation_analytics(request, conversation_id, org_id):
 
 
 
-
 # HANDLE REPEAT MESSAGES 
 @login_required
 @csrf_exempt
 def handle_repeat_status(request, conversation_id, org_id):
-    """Fetch or toggle the repeat status of a message via AJAX."""
+    """Fetch or toggle the repeat status of messages with repeat enabled via AJAX."""
     if request.method == "GET":
         messages = Message.objects.filter(
             conversation_id=conversation_id, 
             organization_id=org_id,
             sender=request.user
-        ).values("id", "repeat", "custom_repeat_datetime", "text", "code_snippet")
+        ).exclude(repeat="none")  
 
-        # Modify to display text or code snippet properly
         messages_list = []
         for msg in messages:
-            text_content = msg["text"]
-            code_snippet_content = msg["code_snippet"]
-
-            if text_content:
-                message_content = text_content 
-            elif code_snippet_content:
-                message_content = f"📜 Code Snippet: {code_snippet_content[:20]}..."  
+            if msg.text:  
+                message_content = msg.text  # ✅ Show actual message text if available
+            elif msg.code_snippet:
+                message_content = f"📜 Code Snippet: {msg.code_snippet[:20]}..."  
             else:
                 message_content = "📎 File Message"  
 
             messages_list.append({
-                "id": msg["id"],
-                "repeat": msg["repeat"],
-                "custom_repeat_datetime": msg["custom_repeat_datetime"],
+                "id": msg.id,
+                "repeat": msg.repeat,
+                "custom_repeat_datetime": msg.custom_repeat_datetime,
                 "content": message_content  
             })
 
@@ -365,7 +360,6 @@ def handle_repeat_status(request, conversation_id, org_id):
 
             message = get_object_or_404(Message, id=message_id, conversation_id=conversation_id, organization_id=org_id)
 
-            
             if message.sender == request.user:
                 message.repeat = new_repeat  
                 message.save()
