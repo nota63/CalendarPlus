@@ -1231,7 +1231,7 @@ const screenPreview = document.getElementById("screenPreview");
 // Start Recording Function
 startRecordingBtn.addEventListener("click", async () => {
     try {
-        screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+        screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
         mediaRecorder = new MediaRecorder(screenStream, { mimeType: "video/webm" });
 
         mediaRecorder.ondataavailable = (event) => {
