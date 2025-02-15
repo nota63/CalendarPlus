@@ -232,12 +232,11 @@
           </button>
 
          
-        <!-- Button to Start Meeting -->
-        <button id="startMeeting">Start Meeting</button>
-
-            
-
-          
+        <!-- Instant chat meeting -->
+         <button id="startMeeting" class="btn btn-light shadow-sm" style="border-radius: 50%; padding: 10px;">
+            <i class="fas fa-broadcast-tower" style="color: #e91e63; font-size: 18px;"></i>
+         </button>
+         
             <input type="text" id="chat-message-input" placeholder="Message...">
             <button id="chat-message-submit">
                 Send ➔
@@ -650,7 +649,7 @@
 
 
 <!-- Modal for Jitsi Meet -->
- 
+
     <!-- Your HTML with Tailwind classes added -->
     <div id="meetingModal" class="hidden">
         <div class="modal-content transform transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]">
