@@ -774,12 +774,17 @@
 
 
 
+/* Chat container styles */
 :root {
-    --primary-blue: #007AFF;
-    --hover-blue: #0063CC;
-    --background-light: #F7F8FC;
-    --bubble-gray: #F1F0F5;
+    --primary-blue: #4A90E2; /* 🌊 Softer, modern blue */
+    --hover-blue: #4285F4; /* 🔵 Slightly darker on hover */
+    --background-light: #FAFAFA; /* 🌿 Lighter background for a clean look */
+    --bubble-gray: #EDEDED; /* 💬 Soft gray for received messages */
+    --border-light: #E0E0E0; /* 📏 Subtle border color */
+    --text-dark: #333; /* ✏️ Dark gray for better readability */
 }
+
+
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell;
@@ -825,19 +830,25 @@ h2 span.status-dot {
     background: #FBFBFD;
 }
 
+
 .message {
     max-width: 70%;
     margin: 12px 0;
-    padding: 12px 16px;
-    border-radius: 18px;
+    padding: 0px 0px;
+    border-radius: 11px;
     position: relative;
     animation: messageFade 0.3s ease-in;
     transition: transform 0.2s ease;
 }
 
+
+
+
+
 .message:hover {
     transform: translateY(-2px);
 }
+
 
 .message.sent {
     background: var(--primary-blue);
@@ -856,7 +867,7 @@ h2 span.status-dot {
 .timestamp {
     display: block;
     font-size: 0.75rem;
-    color: #86868B;
+    color: #000000;
     margin-top: 6px;
     margin-left: 0;
 }
