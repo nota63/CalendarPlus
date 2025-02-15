@@ -56,6 +56,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
             )
 
 
+        if data["type"] == "screen_recording":
+          await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                "type": "screen_recording",
+                "video_data": data["video_data"],
+            }
+        )
+
+
         user1_id, user2_id = map(int, self.room_name.split("_")[1:])
         receiver_id = user2_id if sender_id == user1_id else user1_id
 
@@ -159,6 +169,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def video_ice(self, event):
         await self.send(text_data=json.dumps({"type": "ice_candidate", "candidate": event["candidate"]}))
+
+
+    async def screen_recording(self, event):
+     await self.send(text_data=json.dumps({
+        "type": "screen_recording",
+        "video_data": event["video_data"],
+    }))
 
     @database_sync_to_async
     def get_or_create_conversation(self, user1_id, user2_id):

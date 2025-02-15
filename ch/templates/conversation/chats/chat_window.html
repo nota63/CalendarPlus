@@ -110,7 +110,10 @@
 </div>
         
 
-        
+<!-- Video Preview -->
+<video id="screenPreview" class="hidden rounded-lg shadow-lg mt-3" controls></video>
+
+
         
 <!-- Chat Log -->
 <div class="chat-log" id="chat-log">
@@ -253,6 +256,23 @@
          <button id="startMeeting" class="btn btn-light shadow-sm" style="border-radius: 50%; padding: 10px;">
             <i class="fas fa-broadcast-tower" style="color: #e91e63; font-size: 18px;"></i>
          </button>
+
+
+         <div class="flex items-center space-x-3">
+            <!-- Start Recording Button -->
+            <button id="startRecording" class="btn btn-light shadow-sm rounded-full p-2">
+                <i class="fas fa-record-vinyl text-red-500 text-lg"></i>
+            </button>
+        
+            <!-- Save Recording Button (Hidden Initially) -->
+            <button id="saveRecording" class="btn btn-light shadow-sm rounded-full p-2 hidden">
+                <i class="fas fa-save text-blue-500 text-lg"></i>
+            </button>
+        </div>
+
+
+
+
 
             <input type="text" id="chat-message-input" placeholder="Message...">
             <button id="chat-message-submit">
@@ -1096,6 +1116,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const sendButton = document.getElementById("chat-message-submit");
     const fileInput = document.getElementById("chat-file-input"); // File input
     const typingIndicator = document.getElementById("typing-indicator");
+
+    // Handle live screen-recording
+    // let mediaRecorder; // This line is removed to avoid redeclaration error
+    let recordedChunks = [];
+    let screenStream;
   
 
 
@@ -1119,6 +1144,8 @@ document.addEventListener("DOMContentLoaded", function () {
     let peerConnection;
     let localStream;
 
+
+    
 
     // Handle record button
     recordButton.addEventListener("click", async function () {
@@ -1200,6 +1227,101 @@ document.addEventListener("DOMContentLoaded", function () {
     const chatSocket = new WebSocket(
         "ws://" + window.location.host + "/ws/chat/" + roomName + "/"
     );
+
+
+
+// Get elements Live recording
+
+// Get elements Live recording
+const startRecordingBtn = document.getElementById("startRecording");
+const screenPreview = document.getElementById("screenPreview");
+
+
+// Start Recording Function
+startRecordingBtn.addEventListener("click", async () => {
+    try {
+        screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+        mediaRecorder = new MediaRecorder(screenStream, { mimeType: "video/webm" });
+
+        mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+                recordedChunks.push(event.data);
+            }
+        };
+
+        mediaRecorder.onstop = () => {
+            const recordedBlob = new Blob(recordedChunks, { type: "video/webm" });
+            const videoURL = URL.createObjectURL(recordedBlob);
+            screenPreview.src = videoURL;
+            screenPreview.classList.remove("hidden");
+
+            // Send recording in real-time
+            sendRecordingToWebSocket(recordedBlob);
+
+            // Auto-save the recording
+            saveRecording(recordedBlob);
+        };
+
+        mediaRecorder.start();
+        startRecordingBtn.classList.add("hidden");
+
+        // Automatically stop recording after 30 seconds (adjust as needed)
+        setTimeout(() => {
+            mediaRecorder.stop();
+            startRecordingBtn.classList.remove("hidden");
+        }, 30000);
+        
+    } catch (error) {
+        console.error("Error starting screen recording:", error);
+    }
+});
+
+// Send Recording via WebSocket
+function sendRecordingToWebSocket(blob) {
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = function () {
+        chatSocket.send(JSON.stringify({
+            type: "screen_recording",
+            video_data: reader.result,
+        }));
+    };
+}
+
+// Handle Incoming Screen Recordings
+chatSocket.onmessage = function (event) {
+    const data = JSON.parse(event.data);
+    if (data.type === "screen_recording") {
+        screenPreview.src = data.video_data;
+        screenPreview.classList.remove("hidden");
+    }
+};
+
+// Auto-Save Recording via Django AJAX Request
+// Auto-Save Recording via Django AJAX Request
+function saveRecording(blob) {
+    const formData = new FormData();
+    formData.append("file", blob, "screen_recording.webm");
+    formData.append("sender_id", "{{ request.user.id }}");
+    formData.append("conversation_id", "{{ conversation.id|default:0 }}");
+
+    fetch("{% url 'save_file' org_id=organization.id %}", {
+        method: "POST",
+        headers: { "X-CSRFToken": "{{ csrf_token }}" },
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.file_url) {
+            chatSocket.send(JSON.stringify({
+                "type": "screen_recording",
+                "file_url": data.file_url,
+                "sender_id": "{{ request.user.id }}"
+            }));
+        }
+    })
+    .catch(error => console.error("Error saving screen recording:", error));
+}
 
 
     // SET UP VIDEO CALL
