@@ -48,9 +48,8 @@ def chat_view(request, user_id,org_id):
     )
 
     # Fetch messages related to this conversation
-    messages = Message.objects.filter(conversation=conversation,organization=organization).order_by("timestamp")
+    messages = Message.objects.filter(conversation=conversation,organization=organization).order_by("timestamp").only("text", "file", "timestamp", "sender", "is_read","code_snippet")
 
-    # ✅ Mark unread messages as read (where the current user is NOT the sender)
     messages.filter(~Q(sender=request.user), is_read=False).update(is_read=True)
 
    
@@ -277,10 +276,9 @@ def get_conversation_analytics(request, conversation_id, org_id):
     conversation = get_object_or_404(Conversation, id=conversation_id, organization_id=org_id)
     messages = Message.objects.filter(conversation=conversation, organization_id=org_id)
 
-    # Total Messages Count
+
     total_messages = messages.count()
 
-    # Total Storage Used (Files + Text)
     total_storage = sum(get_file_size(msg.file) + get_text_size(msg.text) for msg in messages)
 
     # Storage Used by User (Only Sent Messages)
@@ -301,7 +299,7 @@ def get_conversation_analytics(request, conversation_id, org_id):
     # Average Messages Per Day
     if total_messages > 0:
         first_message = messages.order_by('timestamp').first().timestamp
-        days_active = max((localtime() - first_message).days, 1)  # Prevent division by zero
+        days_active = max((localtime() - first_message).days, 1) 
         avg_messages_per_day = round(total_messages / days_active, 2)
     else:
         avg_messages_per_day = 0
@@ -320,3 +318,5 @@ def get_conversation_analytics(request, conversation_id, org_id):
         "avg_messages_per_day": avg_messages_per_day,
         "unread_messages": unread_messages,
     })
+
+
