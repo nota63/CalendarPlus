@@ -114,6 +114,7 @@
 <video id="screenPreview" class="hidden rounded-lg shadow-lg mt-3" controls></video>
 
 
+
         
 <!-- Chat Log -->
 <div class="chat-log" id="chat-log">
@@ -258,22 +259,12 @@
          </button>
 
 
-         <div class="flex items-center space-x-3">
+
             <!-- Start Recording Button -->
             <button id="startRecording" class="btn btn-light shadow-sm rounded-full p-2">
                 <i class="fas fa-record-vinyl text-red-500 text-lg"></i>
             </button>
         
-            <!-- Save Recording Button (Hidden Initially) -->
-            <button id="saveRecording" class="btn btn-light shadow-sm rounded-full p-2 hidden">
-                <i class="fas fa-save text-blue-500 text-lg"></i>
-            </button>
-        </div>
-
-
-
-
-
             <input type="text" id="chat-message-input" placeholder="Message...">
             <button id="chat-message-submit">
                 Send ➔
@@ -1324,7 +1315,7 @@ function saveRecording(blob) {
 }
 
 
-    // SET UP VIDEO CALL
+// SET UP VIDEO CALL
     videoCallButton.addEventListener("click", startCall);
 
     async function startCall() {
