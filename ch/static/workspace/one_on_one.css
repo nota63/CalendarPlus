@@ -789,7 +789,7 @@ body {
 }
 
 .chat-container {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 20px auto;
     background: white;
     border-radius: 18px;
@@ -819,6 +819,7 @@ h2 span.status-dot {
 
 .chat-log {
     height: 65vh;
+ 
     padding: 16px 24px;
     overflow-y: auto;
     background: #FBFBFD;
