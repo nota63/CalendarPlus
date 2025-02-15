@@ -37,6 +37,9 @@
 
     <link rel="stylesheet" href="{% static 'workspace/one_on_one.css'%}">
 
+
+<!-- Main content   -->
+
     <div class="chat-container">
         <h2>
             {{ other_user.username }}
@@ -228,6 +231,9 @@
              <i class="fas fa-video" style="color: #e91e63; font-size: 18px;"></i>
           </button>
 
+         
+        <!-- Button to Start Meeting -->
+        <button id="startMeeting">Start Meeting</button>
 
             
 
@@ -240,6 +246,7 @@
     </div>
 
 
+    
 
 <!-- MODALS ------------------------------------------------------------------------------------------------------------------>
  <!-- Code Snippet Modal -->
@@ -642,14 +649,24 @@
 </div>
 
 
-
-
-
+<!-- Modal for Jitsi Meet -->
+ 
+    <!-- Your HTML with Tailwind classes added -->
+    <div id="meetingModal" class="hidden">
+        <div class="modal-content transform transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]">
+            <span class="close">&times;</span>
+            <div id="jitsiContainer" class="rounded-xl bg-gray-50 h-[600px]"></div>
+        </div>
+    </div>
 
 
 
 
 <!-- SCRIPT LOGIC -->
+<script src="https://8x8.vc/external_api.js"></script>
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <!-- prisma js to style the code snippets -->
  <!-- Prism.js for syntax highlighting -->
@@ -1022,7 +1039,10 @@ if (events.length > 0) {
 
 
 <!-- WEBSOCKETS SCRIPT -->
+
 <script>
+
+
 document.addEventListener("DOMContentLoaded", function () {
     const chatLog = document.getElementById("chat-log");
     const chatInput = document.getElementById("chat-message-input");
@@ -1458,8 +1478,33 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+// MEETING JITSI
+document.getElementById("startMeeting").addEventListener("click", function () {
+    const domain = "8x8.vc";
+    const roomName = "{{ room_name }}"; // Chat room name as Jitsi meeting ID
+    const appID = "vpaas-magic-cookie-c4f2e575bcdb4c649c134b38d54132b3";
+    const fullRoomName = `${appID}/${roomName}`;
 
+    // Ensure modal is empty before reloading Jitsi
+    document.getElementById("jitsiContainer").innerHTML = "";
 
+    const options = {
+        roomName: fullRoomName,
+        parentNode: document.getElementById("jitsiContainer"),
+        configOverwrite: { startWithVideoMuted: false, startWithAudioMuted: false },
+        interfaceConfigOverwrite: { SHOW_JITSI_WATERMARK: false }
+    };
+
+    const api = new JitsiMeetExternalAPI(domain, options);
+
+    document.getElementById("meetingModal").style.display = "block";
+});
+
+// Close the modal and remove Jitsi instance
+document.querySelector(".close").addEventListener("click", function () {
+    document.getElementById("meetingModal").style.display = "none";
+    document.getElementById("jitsiContainer").innerHTML = ""; // Reset meeting when closed
+});
 
  </script>
 
