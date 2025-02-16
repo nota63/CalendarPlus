@@ -1357,11 +1357,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.head.appendChild(style);
 });
 
-
-
-
-
-    // Event delegation for delete button
+// Event delegation for delete button
     scheduledMessagesList.addEventListener("click", function (event) {
         if (event.target.classList.contains("delete-btn")) {
             const messageId = event.target.getAttribute("data-id");

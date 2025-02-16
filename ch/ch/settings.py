@@ -84,6 +84,10 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'organization_channels',
      'formtools',
+
+    #  Unfold admin configurations
+    "unfold",  # before django.contrib.admin
+    "unfold.contrib.filters",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -331,4 +335,134 @@ GOOGLE_REDIRECT_URI = "http://localhost:8000/oauth/callback/"
 
 
 
-# LOGGING SET-UP
+# DJANGO ADMIN - UNFOLD THEME SET-UP
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
+
+
+UNFOLD = {
+    "SITE_DROPDOWN": [
+        {
+            "icon": "diamond",
+            "title": _("CalendarPlus"),
+            "link": "http://127.0.0.1:8000/",
+        },
+        {
+            "icon": "diamond",
+            "title": _("Workspace"),
+            "link": "http://127.0.0.1:8000/calendar/organizations/",
+        },
+    ]
+}
+
+
+
+from django.templatetags.static import static
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
+
+
+UNFOLD = {
+    "SITE_TITLE": "Administration | Calendar Plus",  # No _() needed here
+    "SITE_HEADER": "CalendarPlus Administration",
+    "SITE_SUBHEADER": "Powered By Django-Admin",
+   
+ 
+    "SHOW_HISTORY": True,
+    "SHOW_VIEW_ON_SITE": True,
+    "SHOW_BACK_BUTTON": True,
+    "ENVIRONMENT": lambda request: ["Production", "danger"],  # 🔥 FIXED: No function call needed
+    "DASHBOARD_CALLBACK": lambda request, context: dashboard_callback(request, context),
+   
+    "LOGIN": {
+        "image": lambda request: static("sample/login-bg.jpg"),
+        "redirect_after": lambda request: reverse_lazy("admin:auth_user_changelist"),
+    },
+    "STYLES": [
+        lambda request: static("css/style.css"),
+    ],
+    "SCRIPTS": [
+        lambda request: static("js/script.js"),
+    ],
+    "BORDER_RADIUS": "6px",
+    "COLORS": {
+        "base": {
+            "50": "249 250 251",
+            "100": "243 244 246",
+            "200": "229 231 235",
+            "300": "209 213 219",
+            "400": "156 163 175",
+            "500": "107 114 128",
+            "600": "75 85 99",
+            "700": "55 65 81",
+            "800": "31 41 55",
+            "900": "17 24 39",
+            "950": "3 7 18",
+        },
+        "primary": {
+            "50": "250 245 255",
+            "100": "243 232 255",
+            "200": "233 213 255",
+            "300": "216 180 254",
+            "400": "192 132 252",
+            "500": "168 85 247",
+            "600": "147 51 234",
+            "700": "126 34 206",
+            "800": "107 33 168",
+            "900": "88 28 135",
+            "950": "59 7 100",
+        },
+        "font": {
+            "subtle-light": "var(--color-base-500)",
+            "subtle-dark": "var(--color-base-400)",
+            "default-light": "var(--color-base-600)",
+            "default-dark": "var(--color-base-300)",
+            "important-light": "var(--color-base-900)",
+            "important-dark": "var(--color-base-100)",
+        },
+    },
+    "EXTENSIONS": {
+        "modeltranslation": {
+            "flags": {
+                "en": "🇬🇧",
+                "fr": "🇫🇷",
+                "nl": "🇧🇪",
+            },
+        },
+    },
+    "SIDEBAR": {
+        "show_search": False,
+        "show_all_applications": True,
+        "navigation": [
+            {
+                "title": "Navigation",  # 🔥 FIXED: No _() because it's not user-facing
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Dashboard"),
+                        "icon": "dashboard",
+                        "link": lambda request: reverse_lazy("admin:index"),  # 🔥 FIXED
+                        "badge": lambda request: 3,  # 🔥 FIXED: No function call needed
+                        "permission": lambda request: request.user.is_superuser,
+                    },
+                    {
+                        "title": _("Users"),
+                        "icon": "people",
+                        "link": lambda request: reverse_lazy("admin:auth_user_changelist"),
+                    },
+                ],
+            },
+        ],
+    },
+   
+}
+
+def dashboard_callback(request, context):
+    """Prepares custom variables for the dashboard template."""
+    context.update(
+        {
+            "sample": "example",
+        }
+    )
+    return context

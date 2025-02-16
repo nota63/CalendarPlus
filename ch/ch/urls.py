@@ -44,7 +44,7 @@ urlpatterns = [
     path('oauth/',include('outh.urls')),
     path('dm/',include('conversation.urls')),
     # ui components
-    path('styles/', views.styles, name= 'styles'),
+    path('index/', views.styles, name= 'index'),
     path('weather/',views.weather, name='weather'),
     path('ckeditor/', include('ckeditor_uploader.urls')),
     # middlewares
