@@ -693,65 +693,105 @@
 
 <!-- SCHEDULE & MANAGE -->
 
+<!-- Include Material Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+
 <!-- Modal -->
 <div class="modal fade" id="ScheduledManageModal" tabindex="-1" aria-labelledby="ScheduledManageModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="ScheduledManageModalLabel">Schedule & Manage Messages</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content shadow-lg rounded-lg border border-gray-200">
+            
+            <!-- Header -->
+            <div class="modal-header bg-gray-100 border-b border-gray-300 rounded-t-lg">
+                <h5 class="modal-title font-semibold text-gray-800" id="ScheduledManageModalLabel">Schedule & Manage Messages</h5>
+                <button type="button" class="btn-close focus:ring-2 focus:ring-gray-400" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+
+            <!-- Body -->
+            <div class="modal-body bg-white p-6">
+                
                 <!-- Tabs -->
-                <ul class="nav nav-tabs" id="scheduleTabs">
+                <ul class="nav nav-tabs border-b border-gray-200">
                     <li class="nav-item">
-                        <a class="nav-link active" id="schedule-tab" data-bs-toggle="tab" href="#scheduleContent">Schedule Message</a>
+                        <a class="nav-link active text-gray-700 font-medium hover:text-blue-600 transition" id="schedule-tab" data-bs-toggle="tab" href="#scheduleContent">Schedule Message</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="manage-tab" data-bs-toggle="tab" href="#manageContent">Manage Scheduled</a>
+                        <a class="nav-link text-gray-700 font-medium hover:text-blue-600 transition" id="manage-tab" data-bs-toggle="tab" href="#manageContent">Manage Scheduled</a>
                     </li>
                 </ul>
 
-                <div class="tab-content mt-3">
+                <div class="tab-content mt-4">
+                    
                     <!-- Schedule Message Section -->
                     <div class="tab-pane fade show active" id="scheduleContent">
-                        <form id="scheduleForm">
-                            <div class="mb-3">
-                                <label class="form-label">Select Message Type:</label>
-                                <div>
-                                    <input type="radio" name="messageType" value="text" id="textOption" checked> <label for="textOption">Text</label>
-                                    <input type="radio" name="messageType" value="file" id="fileOption"> <label for="fileOption">File</label>
-                                    <input type="radio" name="messageType" value="code" id="codeOption"> <label for="codeOption">Code Snippet</label>
+                        <form id="scheduleForm" class="space-y-4">
+
+                            <!-- Message Type Selection -->
+                            <div>
+                                <label class="form-label text-gray-700 font-medium">Select Message Type:</label>
+                                <div class="grid grid-cols-3 gap-3">
+                                    <!-- Text Message -->
+                                    <label class="cursor-pointer flex items-center p-3 border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
+                                        <input type="radio" name="messageType" value="text" id="textOption" checked class="hidden">
+                                        <span class="ml-2 text-gray-600 font-medium">Text</span>
+                                    </label>
+                                    
+                                    <!-- File Upload -->
+                                    <label class="cursor-pointer flex items-center p-3 border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
+                                        <input type="radio" name="messageType" value="file" id="fileOption" class="hidden">
+                                        <span class="ml-2 text-gray-600 font-medium">File</span>
+                                    </label>
+
+                                    <!-- Code Snippet -->
+                                    <label class="cursor-pointer flex items-center p-3 border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
+                                        <input type="radio" name="messageType" value="code" id="codeOption" class="hidden">
+                                        <span class="ml-2 text-gray-600 font-medium">Code Snippet</span>
+                                    </label>
                                 </div>
                             </div>
 
-                            <div id="textField" class="mb-3">
-                                <label class="form-label">Message</label>
-                                <textarea class="form-control" name="text"></textarea>
+                            <!-- Guide for Each Selection -->
+                            <div id="messageGuide" class="p-3 bg-blue-100 border border-blue-300 rounded-md text-gray-800">
+                                Please select the message type above.
                             </div>
 
-                            <div id="fileField" class="mb-3 d-none">
-                                <label class="form-label">Upload File</label>
-                                <input type="file" class="form-control" name="file">
+                            <!-- Text Message Input -->
+                            <div id="textField">
+                                <label class="form-label text-gray-700 font-medium">Message</label>
+                                <textarea class="form-control border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" name="text"></textarea>
                             </div>
 
-                            <div id="codeField" class="mb-3 d-none">
-                                <label class="form-label">Code Snippet</label>
-                                <textarea class="form-control" name="code_snippet"></textarea>
+                            <!-- File Input -->
+                            <div id="fileField" class="d-none">
+                                <label class="form-label text-gray-700 font-medium">Upload File</label>
+                                <input type="file" class="form-control border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" name="file">
                             </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Schedule Time</label>
-                                <input type="datetime-local" class="form-control" name="scheduled_time" required>
+                            <!-- Code Snippet Input (With Syntax Highlighting) -->
+                            <div id="codeField" class="d-none">
+                                <label class="form-label text-gray-700 font-medium">Code Snippet</label>
+                                <pre class="bg-gray-900 text-green-300 p-4 rounded-md overflow-auto shadow-sm">
+                                    <code id="codeSnippetPreview">// Type your code here...</code>
+                                </pre>
+                                <textarea id="codeSnippetInput" class="form-control border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" name="code_snippet"></textarea>
                             </div>
 
-                            <button type="submit" class="btn btn-success">Schedule</button>
+                            <!-- Schedule Time Input -->
+                            <div>
+                                <label class="form-label text-gray-700 font-medium">Schedule Time</label>
+                                <input type="datetime-local" class="form-control border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" name="scheduled_time" required>
+                            </div>
+
+                            <button type="submit" class="w-full py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md shadow-md transition">Schedule</button>
                         </form>
                     </div>
 
                     <!-- Manage Scheduled Messages Section -->
                     <div class="tab-pane fade" id="manageContent">
-                        <ul id="scheduledMessagesList" class="list-group"></ul>
+                        <ul id="scheduledMessagesList" class="list-group space-y-2">
+                            <!-- Messages will be dynamically inserted here -->
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -759,7 +799,40 @@
     </div>
 </div>
 
+<!-- JavaScript for Guide and Code Snippet Styling -->
+<script>
+    document.querySelectorAll('input[name="messageType"]').forEach(radio => {
+        radio.addEventListener("change", function () {
+            const guide = document.getElementById("messageGuide");
+            if (this.value === "text") {
+                guide.innerHTML = "Write your text message below.";
+            } else if (this.value === "file") {
+                guide.innerHTML = "Upload a file to send.";
+            } else if (this.value === "code") {
+                guide.innerHTML = "Write your code snippet below. It will be formatted.";
+            }
+        });
+    });
 
+    // Code Snippet Live Preview
+    document.getElementById("codeSnippetInput").addEventListener("input", function () {
+        document.getElementById("codeSnippetPreview").innerText = this.value;
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
 
 
 
@@ -1211,24 +1284,36 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Fetch Scheduled Messages
     function fetchScheduledMessages() {
-        fetch(`/dm/manage-scheduled-messages/${orgId}/${conversationId}/`)
-            .then(response => response.json())
-            .then(data => {
-                scheduledMessagesList.innerHTML = "";
-                data.scheduled_messages.forEach(msg => {
-                    let listItem = document.createElement("li");
-                    listItem.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
-                    listItem.innerHTML = `
-                        <div>
-                            <strong>Type:</strong> ${msg.text ? "Text" : msg.file ? "File" : "Code Snippet"}
-                            <br><strong>Scheduled for:</strong> ${msg.scheduled_time}
-                        </div>
-                        <button class="btn btn-danger btn-sm delete-btn" data-id="${msg.id}">Delete</button>
-                    `;
-                    scheduledMessagesList.appendChild(listItem);
-                });
+    fetch(`/dm/manage-scheduled-messages/${orgId}/${conversationId}/`)
+        .then(response => response.json())
+        .then(data => {
+            scheduledMessagesList.innerHTML = "";
+            data.scheduled_messages.forEach(msg => {
+                let content = "";
+
+                if (msg.text) {
+                    content = `<p><strong>Message:</strong> ${msg.text}</p>`;
+                } else if (msg.file) {
+                    content = `<p><strong>File:</strong> <a href="${msg.file}" target="_blank">Download File</a></p>`;
+                } else if (msg.code_snippet) {
+                    content = `<pre><code>${msg.code_snippet}</code></pre>`;
+                }
+
+                let listItem = document.createElement("li");
+                listItem.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
+                listItem.innerHTML = `
+                    <div>
+                        <strong>Type:</strong> ${msg.text ? "Text" : msg.file ? "File" : "Code Snippet"}
+                        <br><strong>Scheduled for:</strong> ${msg.scheduled_time}
+                        <br>${content}
+                    </div>
+                    <button class="btn btn-danger btn-sm" onclick="deleteScheduledMessage(${msg.id})">Delete</button>
+                `;
+                scheduledMessagesList.appendChild(listItem);
             });
-    }
+        });
+}
+
 
     // Event delegation for delete button
     scheduledMessagesList.addEventListener("click", function (event) {
