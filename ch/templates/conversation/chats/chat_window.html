@@ -91,7 +91,11 @@
                 <button id="fetchMeetingsEventsBtn" class="dropdown-item">
                     Planned Interactions
                  </button>
-
+               </li>
+               <li>
+                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#ScheduledManageModal"  data-org-id="{{ organization.id }}" data-conv-id="{{ conversation.id }}" >
+                    Schedule & Manage
+                </button>
                </li>
             </ul>
            </div>
@@ -687,6 +691,77 @@
     </div>
 
 
+<!-- SCHEDULE & MANAGE -->
+
+<!-- Modal -->
+<div class="modal fade" id="ScheduledManageModal" tabindex="-1" aria-labelledby="ScheduledManageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ScheduledManageModalLabel">Schedule & Manage Messages</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Tabs -->
+                <ul class="nav nav-tabs" id="scheduleTabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="schedule-tab" data-bs-toggle="tab" href="#scheduleContent">Schedule Message</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="manage-tab" data-bs-toggle="tab" href="#manageContent">Manage Scheduled</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content mt-3">
+                    <!-- Schedule Message Section -->
+                    <div class="tab-pane fade show active" id="scheduleContent">
+                        <form id="scheduleForm">
+                            <div class="mb-3">
+                                <label class="form-label">Select Message Type:</label>
+                                <div>
+                                    <input type="radio" name="messageType" value="text" id="textOption" checked> <label for="textOption">Text</label>
+                                    <input type="radio" name="messageType" value="file" id="fileOption"> <label for="fileOption">File</label>
+                                    <input type="radio" name="messageType" value="code" id="codeOption"> <label for="codeOption">Code Snippet</label>
+                                </div>
+                            </div>
+
+                            <div id="textField" class="mb-3">
+                                <label class="form-label">Message</label>
+                                <textarea class="form-control" name="text"></textarea>
+                            </div>
+
+                            <div id="fileField" class="mb-3 d-none">
+                                <label class="form-label">Upload File</label>
+                                <input type="file" class="form-control" name="file">
+                            </div>
+
+                            <div id="codeField" class="mb-3 d-none">
+                                <label class="form-label">Code Snippet</label>
+                                <textarea class="form-control" name="code_snippet"></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Schedule Time</label>
+                                <input type="datetime-local" class="form-control" name="scheduled_time" required>
+                            </div>
+
+                            <button type="submit" class="btn btn-success">Schedule</button>
+                        </form>
+                    </div>
+
+                    <!-- Manage Scheduled Messages Section -->
+                    <div class="tab-pane fade" id="manageContent">
+                        <ul id="scheduledMessagesList" class="list-group"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
 
 
 <!-- SCRIPT LOGIC -->
@@ -1091,6 +1166,111 @@ document.addEventListener("DOMContentLoaded", () => {
     updateTime();
     setInterval(updateTime, 1000);
 });
+
+
+
+// SCHEDULE & MANAGE
+document.addEventListener("DOMContentLoaded", function () {
+    const scheduleForm = document.getElementById("scheduleForm");
+    const scheduledMessagesList = document.getElementById("scheduledMessagesList");
+
+    // Fetch orgId and conversationId dynamically from modal
+    const modal = document.getElementById("ScheduledManageModal");
+    const orgId = "{{organization.id}}";
+    const conversationId = "{{conversation.id}}";
+
+    // Toggle input fields based on selected message type
+    document.querySelectorAll('input[name="messageType"]').forEach(radio => {
+        radio.addEventListener("change", function () {
+            document.getElementById("textField").classList.toggle("d-none", this.value !== "text");
+            document.getElementById("fileField").classList.toggle("d-none", this.value !== "file");
+            document.getElementById("codeField").classList.toggle("d-none", this.value !== "code");
+        });
+    });
+
+    // Handle message scheduling
+    scheduleForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const formData = new FormData(scheduleForm);
+        formData.append("schedule_type", "specific_time"); // Default schedule type
+
+        fetch(`/dm/manage-scheduled-messages/${orgId}/${conversationId}/`, {
+            method: "POST",
+            body: formData,
+            headers: { "X-CSRFToken": getCSRFToken() }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert("Message Scheduled Successfully!");
+                fetchScheduledMessages();
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+
+    // Fetch Scheduled Messages
+    function fetchScheduledMessages() {
+        fetch(`/dm/manage-scheduled-messages/${orgId}/${conversationId}/`)
+            .then(response => response.json())
+            .then(data => {
+                scheduledMessagesList.innerHTML = "";
+                data.scheduled_messages.forEach(msg => {
+                    let listItem = document.createElement("li");
+                    listItem.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
+                    listItem.innerHTML = `
+                        <div>
+                            <strong>Type:</strong> ${msg.text ? "Text" : msg.file ? "File" : "Code Snippet"}
+                            <br><strong>Scheduled for:</strong> ${msg.scheduled_time}
+                        </div>
+                        <button class="btn btn-danger btn-sm delete-btn" data-id="${msg.id}">Delete</button>
+                    `;
+                    scheduledMessagesList.appendChild(listItem);
+                });
+            });
+    }
+
+    // Event delegation for delete button
+    scheduledMessagesList.addEventListener("click", function (event) {
+        if (event.target.classList.contains("delete-btn")) {
+            const messageId = event.target.getAttribute("data-id");
+            deleteScheduledMessage(messageId);
+        }
+    });
+
+    // Load scheduled messages when modal is opened
+    modal.addEventListener("show.bs.modal", fetchScheduledMessages);
+});
+
+// ✅ Define deleteScheduledMessage globally
+function deleteScheduledMessage(id) {
+    const modal = document.getElementById("ScheduledManageModal");
+    const orgId = "{{organization.id}}";
+    const conversationId ="{{conversation.id}}";
+
+    fetch(`/dm/manage-scheduled-messages/${orgId}/${conversationId}/`, {
+        method: "DELETE",
+        body: JSON.stringify({ id }),
+        headers: { 
+            "X-CSRFToken": getCSRFToken(),
+            "Content-Type": "application/json"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert("Message Deleted Successfully!");
+            fetchScheduledMessages();
+        }
+    })
+    .catch(error => console.error("Error:", error));
+}
+
+// CSRF Token Helper Function
+function getCSRFToken() {
+    return document.cookie.split("; ").find(row => row.startsWith("csrftoken="))?.split("=")[1] || "";
+}
+
 
 </script>
 

@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from .models import Conversation, Message
+from .models import (Conversation, Message,ScheduledMessage)
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -444,4 +444,56 @@ def fetch_user_meetings_events(request, org_id, other_user_id):
         return JsonResponse({"error": str(e)}, status=400)
 
 
+# handle message schedule 
+@csrf_exempt
+def manage_scheduled_messages(request, org_id, conversation_id):
+    """Handles scheduling, fetching, and deleting scheduled messages via AJAX."""
+    
+    if request.method == "POST":
+        # Schedule a new message
+        organization = get_object_or_404(Organization, id=org_id)
+        conversation = get_object_or_404(Conversation, id=conversation_id)
+        sender = request.user  # Ensure user is logged in
+        
+        # Use request.POST for non-file data and request.FILES for files
+        scheduled_time = request.POST.get("scheduled_time")
+        text = request.POST.get("text", "")
+        file = request.FILES.get("file")  # Fetch file properly
+        code_snippet = request.POST.get("code_snippet", "")
+        schedule_type = request.POST.get("schedule_type", "specific_time")
+        custom_interval = request.POST.get("custom_interval")
 
+        scheduled_message = ScheduledMessage.objects.create(
+            organization=organization,
+            conversation=conversation,
+            sender=sender,
+            text=text,
+            file=file,
+            code_snippet=code_snippet,
+            scheduled_time=scheduled_time,
+            schedule_type=schedule_type,
+            custom_interval=custom_interval,
+        )
+
+        return JsonResponse({"message": "Scheduled successfully!", "id": scheduled_message.id}, status=201)
+
+    elif request.method == "GET":
+        # Fetch all scheduled messages for this conversation
+        scheduled_messages = ScheduledMessage.objects.filter(
+            organization_id=org_id, conversation_id=conversation_id, is_sent=False
+        ).values("id", "text", "file", "code_snippet", "scheduled_time", "schedule_type")
+
+        return JsonResponse({"scheduled_messages": list(scheduled_messages)}, status=200)
+
+    elif request.method == "DELETE":
+        try:
+            data = json.loads(request.body.decode("utf-8"))  # Decode JSON properly
+            message_id = data.get("id")
+            scheduled_message = get_object_or_404(ScheduledMessage, id=message_id, organization_id=org_id, conversation_id=conversation_id)
+
+            scheduled_message.delete()
+            return JsonResponse({"message": "Deleted successfully!"}, status=200)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON data"}, status=400)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
