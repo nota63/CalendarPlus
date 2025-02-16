@@ -693,11 +693,6 @@
 
 <!-- SCHEDULE & MANAGE -->
 
-<!-- Include Material Icons -->
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-
-<!-- Modal -->
 <div class="modal fade" id="ScheduledManageModal" tabindex="-1" aria-labelledby="ScheduledManageModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content shadow-lg rounded-lg border border-gray-200">
@@ -799,26 +794,6 @@
     </div>
 </div>
 
-<!-- JavaScript for Guide and Code Snippet Styling -->
-<script>
-    document.querySelectorAll('input[name="messageType"]').forEach(radio => {
-        radio.addEventListener("change", function () {
-            const guide = document.getElementById("messageGuide");
-            if (this.value === "text") {
-                guide.innerHTML = "Write your text message below.";
-            } else if (this.value === "file") {
-                guide.innerHTML = "Upload a file to send.";
-            } else if (this.value === "code") {
-                guide.innerHTML = "Write your code snippet below. It will be formatted.";
-            }
-        });
-    });
-
-    // Code Snippet Live Preview
-    document.getElementById("codeSnippetInput").addEventListener("input", function () {
-        document.getElementById("codeSnippetPreview").innerText = this.value;
-    });
-</script>
 
 
 
@@ -851,7 +826,26 @@
 <!-- AJAX SCRIPTS INAPP CONTROLS -->
 
 <script>
-    // EDIT THE MESSAGE
+// Handle live code snippet input
+document.querySelectorAll('input[name="messageType"]').forEach(radio => {
+        radio.addEventListener("change", function () {
+            const guide = document.getElementById("messageGuide");
+            if (this.value === "text") {
+                guide.innerHTML = "Write your text message below.";
+            } else if (this.value === "file") {
+                guide.innerHTML = "Upload a file to send.";
+            } else if (this.value === "code") {
+                guide.innerHTML = "Write your code snippet below. It will be formatted.";
+            }
+        });
+    });
+
+    // Code Snippet Live Preview
+    document.getElementById("codeSnippetInput").addEventListener("input", function () {
+        document.getElementById("codeSnippetPreview").innerText = this.value;
+    });
+
+// EDIT THE MESSAGE
    document.addEventListener("DOMContentLoaded", function () {
     const editModal = new bootstrap.Modal(document.getElementById("editMessageModal"));
     let currentMessageId = null;
@@ -1283,36 +1277,88 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Fetch Scheduled Messages
-    function fetchScheduledMessages() {
+   // Fetch Scheduled Messages
+function fetchScheduledMessages() {
     fetch(`/dm/manage-scheduled-messages/${orgId}/${conversationId}/`)
         .then(response => response.json())
         .then(data => {
             scheduledMessagesList.innerHTML = "";
+            
+            // If no messages, show a friendly message
+            if (data.scheduled_messages.length === 0) {
+                scheduledMessagesList.innerHTML = `
+                    <div class="text-center text-gray-600 py-4">
+                        <i class="material-icons text-gray-400" style="font-size: 48px;">hourglass_empty</i>
+                        <p class="mt-2 font-medium">No scheduled messages yet.</p>
+                    </div>
+                `;
+                return;
+            }
+
             data.scheduled_messages.forEach(msg => {
                 let content = "";
 
                 if (msg.text) {
-                    content = `<p><strong>Message:</strong> ${msg.text}</p>`;
+                    content = `<p class="text-gray-800"><strong>Message:</strong> ${msg.text}</p>`;
                 } else if (msg.file) {
-                    content = `<p><strong>File:</strong> <a href="${msg.file}" target="_blank">Download File</a></p>`;
+                    content = `<p class="text-gray-800"><strong>File:</strong> <a href="${msg.file}" target="_blank" class="text-blue-600 hover:text-blue-800 transition">Download File</a></p>`;
                 } else if (msg.code_snippet) {
-                    content = `<pre><code>${msg.code_snippet}</code></pre>`;
+                    content = `
+                        <div class="bg-gray-900 text-green-300 p-3 rounded-md overflow-auto shadow-sm relative">
+                            <pre class="text-sm"><code>${msg.code_snippet}</code></pre>
+                        </div>
+                    `;
                 }
 
-                let listItem = document.createElement("li");
-                listItem.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
+                let listItem = document.createElement("div");
+                listItem.classList.add(
+                    "bg-white", "shadow-md", "rounded-lg", "p-4", "flex", "justify-between", 
+                    "items-center", "border", "border-gray-200", "mb-3", "fade-in"
+                );
+
                 listItem.innerHTML = `
                     <div>
-                        <strong>Type:</strong> ${msg.text ? "Text" : msg.file ? "File" : "Code Snippet"}
-                        <br><strong>Scheduled for:</strong> ${msg.scheduled_time}
-                        <br>${content}
+                        <div class="text-sm font-medium text-gray-700">
+                            <i class="material-icons text-blue-500 mr-2">schedule</i>
+                            <strong>Type:</strong> ${msg.text ? "Text" : msg.file ? "File" : "Code Snippet"}
+                        </div>
+                        <span class="inline-block bg-gray-200 text-gray-800 text-xs font-semibold rounded px-3 py-1 mt-1">
+                            <i class="material-icons text-sm align-middle mr-1">event</i> ${msg.scheduled_time}
+                        </span>
+                        <div class="mt-2">${content}</div>
                     </div>
-                    <button class="btn btn-danger btn-sm" onclick="deleteScheduledMessage(${msg.id})">Delete</button>
+                    <button class="text-red-500 hover:text-red-700 transition flex items-center gap-1" onclick="deleteScheduledMessage(${msg.id})">
+                        <i class="material-icons">delete</i> 
+                        <span class="font-medium">Delete</span>
+                    </button>
                 `;
+
                 scheduledMessagesList.appendChild(listItem);
             });
         });
 }
+
+// Add Fade-in Animation
+document.addEventListener("DOMContentLoaded", () => {
+    const style = document.createElement("style");
+    style.innerHTML = `
+        .fade-in {
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    `;
+    document.head.appendChild(style);
+});
+
+
+
 
 
     // Event delegation for delete button
