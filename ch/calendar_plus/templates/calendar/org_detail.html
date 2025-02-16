@@ -555,13 +555,19 @@ My Calendar
 
     <!-- Main Content -->
     <div class="main-content">
-        <div class="profile-header">
-            <div class="clock-container">
-                <div id="greeting"></div>
-                <div id="datetime"></div>
+        <div class="profile-header bg-white rounded-lg p-6 flex items-center justify-between transition-shadow duration-200 hover:shadow-xl">
+            <div class="clock-container space-y-1">
+                <div id="greeting" class="text-2xl text-gray-800">Good Morning</div>
+                <div id="datetime" class="text-base text-gray-600">Friday, May 24, 2024 9:41 AM</div>
             </div>
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgzlAIaq9_fY1FwvEaetGEades903CrQ0syQ&s" alt="User Avatar">
+            <img 
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgzlAIaq9_fY1FwvEaetGEades903CrQ0syQ&s" 
+                alt="User Avatar"
+                class="w-14 h-14 rounded-full shadow-md border-4 border-white bg-gray-100 transform transition-transform duration-200 hover:scale-105"
+            >
         </div>
+
+
    
 
 
@@ -2719,43 +2725,64 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // HANDLE THE GREETING
 function updateTime() {
-            const now = new Date();
-            const hours = now.getHours();
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const seconds = now.getSeconds().toString().padStart(2, '0');
-            
-            const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const now = new Date();
+  const hours = now.getHours();
+  const minutes = now.getMinutes().toString().padStart(2, "0");
+  const seconds = now.getSeconds().toString().padStart(2, "0");
+  
+  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  
+  const dayName = days[now.getDay()];
+  const monthName = months[now.getMonth()];
+  const dayNumber = now.getDate();
+  const year = now.getFullYear();
+  const ampm = hours >= 12 ? "PM" : "AM";
+  const formattedHours = hours % 12 || 12;
 
-            const dayName = days[now.getDay()];
-            const monthName = months[now.getMonth()];
-            const dayNumber = now.getDate();
-            const year = now.getFullYear();
-            const ampm = hours >= 12 ? 'PM' : 'AM';
-            const formattedHours = hours % 12 || 12; // Convert to 12-hour format
+  let greeting = "Hello";
+  if (hours >= 5 && hours < 12) greeting = "Good Morning";
+  else if (hours >= 12 && hours < 17) greeting = "Good Afternoon";
+  else if (hours >= 17 && hours < 21) greeting = "Good Evening";
+  else greeting = "Good Night";
 
-            // Generate greeting based on time
-            let greeting = "Hello";
-            if (hours >= 5 && hours < 12) {
-                greeting = "Good Morning";
-            } else if (hours >= 12 && hours < 17) {
-                greeting = "Good Afternoon";
-            } else if (hours >= 17 && hours < 21) {
-                greeting = "Good Evening";
-            } else {
-                greeting = "Good Night";
-            }
+  document.getElementById("greeting").innerHTML = `${greeting}, Vishal ❤️`;
+  document.getElementById("datetime").innerHTML = `${dayName}, ${monthName} ${dayNumber}, ${year} - ${formattedHours}:${minutes}:${seconds} ${ampm}`;
+}
 
-            // Set the content
-            document.getElementById("greeting").innerHTML = `${greeting}, Vishal ❤️`;
-            document.getElementById("datetime").innerHTML = `${dayName}, ${monthName} ${dayNumber}, ${year} - ${formattedHours}:${minutes}:${seconds} ${ampm}`;
-        }
+setInterval(updateTime, 1000);
+updateTime();
 
-        // Update every second
-        setInterval(updateTime, 1000);
+const style = document.createElement("style");
+style.innerHTML = `
+  .card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    color: white;
+    font-family: Arial, sans-serif;
+  }
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+  p {
+    font-size: 1.2rem;
+  }
+`;
+document.head.appendChild(style);
 
-        // Call once immediately to prevent delay
-        updateTime();
+const container = document.createElement("div");
+container.classList.add("card");
+container.innerHTML = `
+  <h1 id="greeting"></h1>
+  <p id="datetime"></p>
+`;
+document.body.appendChild(container);
+
 
 // Handle reload
 
