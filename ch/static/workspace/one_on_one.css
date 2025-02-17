@@ -1439,3 +1439,51 @@ h2 span.status-dot {
 
 
 
+
+/* suggestion styles */
+
+#suggestion-box {
+    position: absolute;
+    top: 50px;  /* Adjust position based on your UI */
+    z-index: 999;
+    background-color: white;
+    border: 1px solid #ddd;
+    max-height: 150px;
+    overflow-y: auto;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    width: 100%; /* Ensure the suggestion box is as wide as the input field */
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0;
+    transform: translateY(-10px); /* Start position for animation */
+}
+
+/* Add transition effect to suggestion items */
+.suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+.suggestion-item:hover {
+    background-color: #f4f4f4;
+    color: #007BFF;
+}
+
+#suggestion-box.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#suggestion-box.no-suggestions {
+    text-align: center;
+    font-style: italic;
+    color: #999;
+    padding: 10px;
+}
+

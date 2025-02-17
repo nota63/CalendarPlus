@@ -580,7 +580,7 @@ def get_message_suggestions(request, org_id):
         # Ensure the organization exists
         organization = get_object_or_404(Organization, id=org_id)
 
-        # Fetch suggestions that start with the typed query and belong to the specified organization
+ 
         suggestions = MessageSuggestion.objects.filter(
             content__icontains=query, 
             organization=organization

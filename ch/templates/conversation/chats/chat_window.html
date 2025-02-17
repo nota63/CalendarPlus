@@ -1551,13 +1551,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const inputField = document.getElementById("chat-message-input");
     const suggestionBox = document.createElement('ul');
     suggestionBox.id = 'suggestion-box';
-    suggestionBox.style.position = 'absolute';
-    suggestionBox.style.top = '50px';  // Adjust position based on your UI
-    suggestionBox.style.zIndex = '999';
-    suggestionBox.style.backgroundColor = '#fff';
-    suggestionBox.style.border = '1px solid #ddd';
-    suggestionBox.style.maxHeight = '150px';
-    suggestionBox.style.overflowY = 'auto';
     inputField.parentElement.appendChild(suggestionBox);
 
     inputField.addEventListener('input', function() {
@@ -1581,20 +1574,22 @@ document.addEventListener('DOMContentLoaded', function() {
         if (xhr.status >= 200 && xhr.status < 300) {
           const data = JSON.parse(xhr.responseText);
           suggestionBox.innerHTML = '';  // Clear previous suggestions
+          suggestionBox.classList.add('show');  // Show the suggestion box with animation
+          
           if (data.suggestions && data.suggestions.length) {
             data.suggestions.forEach(suggestion => {
               const li = document.createElement('li');
               li.textContent = suggestion;
               li.classList.add('suggestion-item');
-              li.style.padding = '5px';
-              li.style.cursor = 'pointer';
               li.addEventListener('click', function() {
                 inputField.value = suggestion;
                 suggestionBox.innerHTML = '';  // Clear suggestions after selection
+                suggestionBox.classList.remove('show');  // Hide suggestions after selection
               });
               suggestionBox.appendChild(li);
             });
           } else {
+            suggestionBox.classList.add('no-suggestions');
             suggestionBox.innerHTML = '<li>No suggestions available.</li>';
           }
         } else {
@@ -1608,6 +1603,7 @@ document.addEventListener('DOMContentLoaded', function() {
       xhr.send();
     });
   });
+
 </script>
 
 

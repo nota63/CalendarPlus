@@ -8,7 +8,9 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.utils.html import strip_tags
-
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from conversation.models import MessageSuggestion
 
 
 
@@ -105,5 +107,53 @@ def create_social_channel_and_send_email(sender, instance, created, **kwargs):
         except Exception as e:
             # General error handling
             print(f"Error creating channel or sending email: {e}")
+
+
+
+# CREATE PREDEFINED SUGGESTIONS FOR ORGANIZATION 
+
+@receiver(post_save, sender=Organization)
+def create_default_suggestions(sender, instance, created, **kwargs):
+    if created:
+        # Predefined suggestions for different categories
+        greetings = [
+            "Hello, how can I assist you?",
+            "Hey there! How can I help today?",
+            "Welcome! How can I be of assistance?",
+            "Hi, what can I do for you?",
+            "Good to see you! How can I help?",
+        ]
+        
+        support_messages = [
+            "How can I help you today?",
+            "Can I provide you with any assistance?",
+            "Is there anything I can do to support you?",
+            "Feel free to ask anything, I'm here to help.",
+            "What do you need help with?",
+        ]
+        
+        follow_up_messages = [
+            "Just checking in, how are you doing?",
+            "Is there anything else you'd like to ask?",
+            "Do you need further assistance?",
+            "Let me know if you have more questions!",
+            "Would you like to know anything else?",
+        ]
+        
+        goodbye_messages = [
+            "Goodbye! Let me know if you need anything in the future.",
+            "Thanks for chatting! Take care!",
+            "Goodbye, have a great day ahead!",
+            "See you soon! Feel free to reach out if needed.",
+            "Take care, talk soon!",
+        ]
+        
+        # Add suggestions for the new organization
+        all_suggestions = greetings + support_messages + follow_up_messages + goodbye_messages
+        
+        for suggestion_text in all_suggestions:
+            MessageSuggestion.objects.create(organization=instance, content=suggestion_text)
+
+        print(f"Default suggestions created for organization {instance.name}")
 
 
