@@ -633,3 +633,53 @@ def profile_view(request, org_id):
 
     except Profile.DoesNotExist:
         return JsonResponse({'error': 'Profile not found'}, status=404)
+    
+
+# /WHOIS
+from django.utils.timezone import now
+
+@csrf_exempt
+@login_required
+def whois_view(request, org_id, other_user_id, conversation_id):
+    if request.method != "GET":
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+    user = request.user  # The logged-in user
+    other_user = get_object_or_404(Profile, user_id=other_user_id, organization_id=org_id)
+    
+    # Count total meetings where either user or other_user is a participant
+    total_meetings = MeetingOrganization.objects.filter(
+        organization_id=org_id,
+        participants__in=[user, other_user.user]
+    ).distinct().count()
+    
+    # Get the latest 2 upcoming meetings
+    upcoming_meetings = MeetingOrganization.objects.filter(
+        organization_id=org_id,
+        participants__in=[user, other_user.user],
+        meeting_date__gte=now().date()
+    ).order_by('meeting_date', 'start_time')[:2]
+    
+    # Serialize meeting data
+    meetings_data = [
+        {
+            'meeting_title': meeting.meeting_title,
+            'meeting_date': meeting.meeting_date.strftime('%Y-%m-%d'),
+            'start_time': meeting.start_time.strftime('%H:%M'),
+            'end_time': meeting.end_time.strftime('%H:%M'),
+            'meeting_location': meeting.meeting_location,
+            'meeting_type': meeting.meeting_type,
+        }
+        for meeting in upcoming_meetings
+    ]
+    
+    response_data = {
+        'full_name': other_user.full_name,
+        'role': 'Admin' if other_user.is_admin else 'Manager' if other_user.is_manager else 'Employee',
+        'organization': other_user.organization.name if other_user.organization else 'N/A',
+        'profile_picture': other_user.profile_picture.url if other_user.profile_picture else '',
+        'total_meetings': total_meetings,
+        'upcoming_meetings': meetings_data,
+    }
+    
+    return JsonResponse(response_data)

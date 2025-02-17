@@ -1640,6 +1640,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </li>
 
+
+                <li class="group flex items-center gap-4 p-4 rounded-xl bg-white/50 hover:bg-white/90 transition-all duration-200 shadow-sm hover:shadow-md border border-white/80 hover:border-gray-200/50">
+                    <div class="shrink-0 w-10 h-10 rounded-lg bg-green-100/80 flex items-center justify-center group-hover:bg-green-200/50">
+                        <i class="fas fa-user text-green-600 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-800">/whois</p>
+                        <p class="text-sm text-gray-600 mt-1">View your pairs details & access the latest meeting you have with {{other_user.username}}</p>
+                    </div>
+                </li>
+
                 <li class="group flex items-center gap-4 p-4 rounded-xl bg-white/50 hover:bg-white/90 transition-all duration-200 shadow-sm hover:shadow-md border border-white/80 hover:border-gray-200/50">
                     <div class="shrink-0 w-10 h-10 rounded-lg bg-purple-100/80 flex items-center justify-center group-hover:bg-purple-200/50">
                         <i class="fas fa-users text-purple-600 text-lg"></i>
@@ -1704,9 +1715,44 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </div>
 
-<!-- /WHOIS IMPLEMENTATION -->
- 
 
+<!-- /WHOIS IMPLEMENTATION -->
+
+    
+    <div class="modal fade" id="WhoiseModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog custom-modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">👤 User Profile</h5>
+                    <button type="button" class="btn-close" id="closeWhoiseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <img id="whoisProfilePicture" class="img-fluid rounded-circle mb-3" src="placeholder.jpg">
+                    <h5 id="whoisFullName" class="mb-4">John Doe</h5>
+                    
+                    <div class="detail-card mb-4">
+                        <p class="mb-2"><strong>🎭 Role:</strong> <span id="whoisRole">Project Manager</span></p>
+                        <p><strong>🏢 Organization:</strong> <span id="whoisOrgName">Tech Corp Inc.</span></p>
+                    </div>
+    
+                    <div class="stats-card mb-4">
+                        <p id="whoisMeetingCount" class="mb-0">📅 5 upcoming meetings this week</p>
+                    </div>
+    
+                    <h6 class="section-title mb-3">📅 Upcoming Meetings:</h6>
+                    <ul id="whoisUpcomingMeetings" class="meetings-list">
+                        <!-- Sample meetings -->
+                        <li>Team Sync - Mon 10:00 AM</li>
+                        <li>Client Review - Tue 2:30 PM</li>
+                        <li>Project Planning - Wed 9:00 AM</li>
+                        <li>Demo Presentation - Fri 4:00 PM</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+ 
 
 
 
@@ -1716,6 +1762,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- COMMANDS AND AUTOMATIONS -->
 <script>
+
+  // Add animation when modal is shown (Whois)
+  document.getElementById('WhoiseModal').addEventListener('show.bs.modal', function () {
+        this.querySelector('.modal-content').classList.add('animate-in');
+    });
+    
+    // Add closing animation
+    document.getElementById('closeWhoiseModal').addEventListener('click', function() {
+        const modal = document.getElementById('WhoiseModal');
+        modal.querySelector('.modal-content').classList.add('animate-out');
+        setTimeout(() => modal.classList.remove('show'), 300);
+    });
+
+
+// Show all commands     
 document.addEventListener('DOMContentLoaded', function() {
     const inputField = document.getElementById("chat-message-input");
     const modal = document.getElementById("commandsModal");
@@ -1780,6 +1841,64 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('profilePicture').src = profilePicUrl;
             })
             .catch(error => console.error('Error fetching profile data:', error));
+    }
+});
+
+
+
+// /WHOISE IMPLEMENTATION
+document.addEventListener('DOMContentLoaded', function () {
+    const inputField = document.getElementById("chat-message-input");
+    const modal = new bootstrap.Modal(document.getElementById('WhoiseModal')); // Bootstrap modal initialization
+    const closeModal = document.getElementById("closeWhoiseModal");
+
+    inputField.addEventListener('input', function () {
+        if (inputField.value.trim() === '/whois') {
+            const otherUserId = "{{other_user.id}}";  // Getting from template
+            const orgId = "{{organization.id}}";      // Organization ID
+            const conversationId = "{{conversation.id}}"; // Conversation ID
+            
+            fetchWhoisData(orgId, otherUserId, conversationId); // Fetch user details
+            modal.show(); // This will open the modal using Bootstrap's method
+        }
+    });
+
+    closeModal.addEventListener('click', function () {
+        modal.hide(); // Hide the modal using Bootstrap's method
+    });
+
+    function fetchWhoisData(orgId, otherUserId, conversationId) {
+        fetch(`/dm/dm/whois/${orgId}/${otherUserId}/${conversationId}/`)  // Django URL for fetching user data
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('whoisFullName').textContent = data.full_name;
+                document.getElementById('whoisRole').textContent = data.role;
+                document.getElementById('whoisOrgName').textContent = data.organization;
+                document.getElementById('whoisMeetingCount').textContent = `Total Meetings: ${data.total_meetings}`;
+
+                // Display upcoming meetings
+                const meetingsContainer = document.getElementById('whoisUpcomingMeetings');
+                meetingsContainer.innerHTML = ""; // Clear previous content
+                if (data.upcoming_meetings.length > 0) {
+                    data.upcoming_meetings.forEach(meeting => {
+                        const meetingItem = document.createElement('li');
+                        meetingItem.textContent = `${meeting.meeting_title} on ${meeting.meeting_date} at ${meeting.start_time}`;
+                        meetingsContainer.appendChild(meetingItem);
+                    });
+                } else {
+                    meetingsContainer.innerHTML = "<li>No upcoming meetings</li>";
+                }
+
+                // Set profile picture from the response directly
+                const profilePic = document.getElementById('whoisProfilePicture');
+                if (data.profile_picture) {
+                    profilePic.src = data.profile_picture; // Use the URL from the response
+                    profilePic.classList.remove('hidden'); // Ensure it's visible
+                } else {
+                    profilePic.classList.add('hidden'); // Hide if no picture
+                }
+            })
+            .catch(error => console.error('Error fetching whois data:', error));
     }
 });
 
@@ -2382,7 +2501,138 @@ document.querySelector(".close").addEventListener("click", function () {
 
  </script>
 
+<style>
 
+ /* Animation Keyframes */
+ @keyframes fadeInSlide {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Modal Overlay */
+.modal {
+    backdrop-filter: blur(8px);
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Modal Dialog */
+.custom-modal-dialog {
+    max-width: 800px;
+    min-height: 70vh;
+    animation: fadeInSlide 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.modal-content {
+    border: none;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    min-height: 600px;
+}
+
+/* Modal Header */
+.modal-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 16px 16px 0 0;
+    color: white;
+}
+
+.modal-title {
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.btn-close {
+    filter: invert(1);
+    opacity: 0.8;
+}
+
+/* Modal Body */
+.modal-body {
+    padding: 2rem;
+    color: #374151;
+}
+
+#whoisProfilePicture {
+    width: 120px;
+    height: 120px;
+    border: 3px solid white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin: -75px auto 1.5rem;
+    display: block;
+    object-fit: cover;
+}
+
+#whoisFullName {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1f2937;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+#whoisRole, #whoisOrgName {
+    font-size: 1.1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+#whoisMeetingCount {
+    background: #eef2ff;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-weight: 500;
+    margin: 1.5rem 0;
+}
+
+/* Meetings List */
+#whoisUpcomingMeetings {
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    margin-top: 1rem;
+}
+
+#whoisUpcomingMeetings li {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: rgba(199, 210, 254, 0.3);
+    border-radius: 8px;
+    transition: transform 0.2s ease;
+}
+
+#whoisUpcomingMeetings li:hover {
+    transform: translateX(5px);
+    background: rgba(199, 210, 254, 0.5);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+    background: #6366f1;
+    border-radius: 4px;
+}
+
+
+
+
+</style>
 
 
 
