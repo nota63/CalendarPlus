@@ -1974,17 +1974,49 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         // Render data based on the type
                         if (type === 'code') {
-                            itemElement.textContent = `Code Snippet: ${item.code_snippet} - Sent at: ${item.timestamp}`;
+                            itemElement.innerHTML = `
+                                <p><strong>Code Snippet:</strong></p>
+                                <pre><code class="language-javascript">${item.code_snippet}</code></pre>
+                                <p><small>Sent at: ${item.timestamp}</small></p>
+                            `;
+                            recentContainer.appendChild(itemElement);
+
+                            // Apply syntax highlighting for the code snippet
+                            Prism.highlightAll();
                         } else if (type === 'message') {
-                            itemElement.textContent = `Message: ${item.text} - Sent at: ${item.timestamp}`;
+                            itemElement.innerHTML = `
+                                <p><strong>Message:</strong> ${item.text}</p>
+                                <p><small>Sent at: ${item.timestamp}</small></p>
+                            `;
+                            recentContainer.appendChild(itemElement);
                         } else if (type === 'files') {
                             const link = document.createElement('a');
-                            link.href = `/media/${item.file_url}`; // Ensure correct file URL
-                            link.textContent = `File: ${item.file_url}`;
-                            itemElement.appendChild(link);
-                        }
+                            const fileUrl = `/media/${item.file_url}`; // Ensure correct file URL
 
-                        recentContainer.appendChild(itemElement);
+                            const fileExtension = item.file_url.split('.').pop().toLowerCase();
+                            if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                                // Image preview
+                                const img = document.createElement('img');
+                                img.src = fileUrl;
+                                img.style.maxWidth = '200px';  // Adjust size for better preview
+                                itemElement.appendChild(img);
+                            } else if (fileExtension === 'pdf') {
+                                // Embed PDF preview
+                                const iframe = document.createElement('iframe');
+                                iframe.src = fileUrl;
+                                iframe.style.width = '100%';
+                                iframe.style.height = '300px';
+                                itemElement.appendChild(iframe);
+                            } else {
+                                // Provide download link for other file types
+                                link.href = fileUrl;
+                                link.textContent = `File: ${item.file_url}`;
+                                itemElement.appendChild(link);
+                            }
+
+                            itemElement.innerHTML += `<p><small>Sent at: ${item.timestamp}</small></p>`;
+                            recentContainer.appendChild(itemElement);
+                        }
                     });
                 } else {
                     recentContainer.innerHTML = "<li>No recent data available.</li>";
@@ -1996,11 +2028,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 });
-
-
-
-
-
 
 
 </script>
