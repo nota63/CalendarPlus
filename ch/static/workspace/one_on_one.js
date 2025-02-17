@@ -337,7 +337,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 // TENOR API AND GIFS
-
 document.addEventListener('DOMContentLoaded', function () {
     const inputField = document.getElementById("chat-message-input");
     const modal = new bootstrap.Modal(document.getElementById("gifModal"));
@@ -369,11 +368,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Add GIFs to the modal
                     gifs.forEach(gif => {
                         const gifItem = document.createElement('li');
-                        gifItem.classList.add('list-group-item');
+                        gifItem.classList.add('list-group-item', 'flex', 'flex-col', 'justify-start', 'items-center', 'p-4', 'm-4', 'rounded-xl', 'bg-white', 'border', 'border-gray-300', 'shadow-lg', 'cursor-pointer', 'transition-all', 'hover:bg-gray-100', 'hover:scale-105', 'hover:shadow-2xl', 'duration-300', 'w-full', 'max-w-xs');
+
                         const img = document.createElement('img');
                         img.src = gif.media[0].gif.url;
                         img.alt = 'GIF';
-                        img.style.width = '100%';  // Adjust width as needed
+                        img.classList.add('w-full', 'h-64', 'object-cover', 'rounded-lg', 'transition-all', 'hover:scale-110', 'duration-300');  // High quality and zoom effect on hover
+
                         gifItem.appendChild(img);
 
                         // Add click event listener to each GIF
@@ -385,7 +386,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         gifList.appendChild(gifItem);
                     });
                 } else {
-                    gifList.innerHTML = "<li>No GIFs found.</li>";
+                    gifList.innerHTML = "<li class='text-center text-gray-500'>No GIFs found.</li>";
                 }
             })
             .catch(error => {
@@ -394,4 +395,3 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 });
-
