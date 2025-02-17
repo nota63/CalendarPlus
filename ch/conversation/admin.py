@@ -1,6 +1,6 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from .models import Conversation, Message
+from .models import Conversation, Message, MessageSuggestion
 
 @admin.register(Conversation)
 class ConversationAdmin(ModelAdmin):
@@ -9,3 +9,9 @@ class ConversationAdmin(ModelAdmin):
 @admin.register(Message)
 class MessageAdmin(ModelAdmin):
     list_display = [field.name for field in Message._meta.fields]
+
+
+@admin.register(MessageSuggestion)
+class MessageSuggestionAdmin(ModelAdmin):
+    list_display = [field.name for field in MessageSuggestion._meta.fields]
+

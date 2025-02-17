@@ -94,3 +94,15 @@ class ScheduledMessage(models.Model):
 
     def __str__(self):
         return f"Scheduled Message by {self.sender} for {self.scheduled_time}"
+
+
+
+# Message Suggestion
+
+class MessageSuggestion(models.Model):
+    content = models.CharField(max_length=255)  # The message suggestion itself
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)  # Link to the organization
+    created_at = models.DateTimeField(auto_now_add=True)  # Timestamp when the suggestion is added
+
+    def __str__(self):
+        return self.content

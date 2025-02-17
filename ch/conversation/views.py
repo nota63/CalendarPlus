@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from .models import (Conversation, Message,ScheduledMessage)
+from .models import (Conversation, Message,ScheduledMessage,MessageSuggestion)
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -568,3 +568,28 @@ def manage_scheduled_messages(request, org_id, conversation_id):
             return JsonResponse({"error": "Invalid JSON data"}, status=400)
 
     return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+
+# GET MESSAGES SUGGESTIONS
+
+def get_message_suggestions(request, org_id):
+    if request.method == 'GET':
+        query = request.GET.get('query', '').strip()
+
+        # Ensure the organization exists
+        organization = get_object_or_404(Organization, id=org_id)
+
+        # Fetch suggestions that start with the typed query and belong to the specified organization
+        suggestions = MessageSuggestion.objects.filter(
+            content__icontains=query, 
+            organization=organization
+        ).values_list('content', flat=True)
+
+        return JsonResponse({'suggestions': list(suggestions)})
+
+
+
+
+
+

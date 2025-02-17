@@ -13,5 +13,6 @@ urlpatterns=[
     path('get-conversation-analytics/<int:conversation_id>/<int:org_id>/',get_conversation_analytics, name='get_conversation_analytics'),
     path('chat/<int:conversation_id>/repeat/<int:org_id>/modify/',handle_repeat_status, name='handle_repeat'),
     path('other-user-connections/<int:org_id>/<int:other_user_id>/',fetch_user_meetings_events, name='other_user_connections'),
-    path('manage-scheduled-messages/<int:org_id>/<int:conversation_id>/', manage_scheduled_messages, name='manage_scheduled_messages')
+    path('manage-scheduled-messages/<int:org_id>/<int:conversation_id>/', manage_scheduled_messages, name='manage_scheduled_messages'),
+    path('get_message_suggestions/<int:org_id>/',get_message_suggestions, name='get_message_suggestions'),
 ]
