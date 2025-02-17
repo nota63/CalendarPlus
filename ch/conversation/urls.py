@@ -19,4 +19,5 @@ urlpatterns=[
     path('dm/whois/<int:org_id>/<int:other_user_id>/<int:conversation_id>/',whois_view, name='whois_data'),
     path('recent/<int:org_id>/<int:other_user_id>/<int:conversation_id>/<str:type>/',recent_messages, name='recent_messages'),
     path('jokes/',jokes,name='jokes'),
+    path('gifs/',fetch_gifs, name='fetch_gifs'),
 ]

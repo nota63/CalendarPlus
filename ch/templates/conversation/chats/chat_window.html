@@ -1808,11 +1808,23 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
   
 
-
-
-
-
-
+<!-- TENOR API & GIFS -->
+ <!-- GIF Modal -->
+<div class="modal fade" id="gifModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #3f51b5; color: white;">
+                <h5 class="modal-title">Select a GIF</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="overflow-y: auto; max-height: 400px;">
+                <ul id="gifList" class="list-group" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+                    <!-- GIF items will be dynamically added here -->
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 

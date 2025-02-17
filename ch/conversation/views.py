@@ -798,3 +798,30 @@ def jokes(request):
 
 
     return JsonResponse({'jokes': all_jokes})
+
+
+# Tenor gifs
+import requests
+def fetch_gifs(request):
+    query = request.GET.get('query', '')
+    if not query:
+        return JsonResponse({'error': 'No query provided'}, status=400)
+    
+    apikey = "LIVDSRZULELA"  # Your Tenor API key
+    limit = 8  # Number of GIFs to fetch
+    search_term = query  # Use the query provided by the user
+    
+    # Fetch the top GIFs using Tenor API
+    url = f"https://g.tenor.com/v1/search?q={search_term}&key={apikey}&limit={limit}"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an exception for HTTP errors
+        gifs = response.json().get('results', [])
+        
+        if gifs:
+            return JsonResponse({'gifs': gifs})
+        else:
+            return JsonResponse({'error': 'No GIFs found for the given search term.'}, status=404)
+    
+    except requests.exceptions.RequestException as e:
+        return JsonResponse({'error': str(e)}, status=500)

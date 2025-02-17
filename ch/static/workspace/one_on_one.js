@@ -334,3 +334,64 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 });
+
+
+// TENOR API AND GIFS
+
+document.addEventListener('DOMContentLoaded', function () {
+    const inputField = document.getElementById("chat-message-input");
+    const modal = new bootstrap.Modal(document.getElementById("gifModal"));
+    const gifList = document.getElementById("gifList");
+
+    // Event listener for user input in the message input field
+    inputField.addEventListener('input', function () {
+        const command = inputField.value.trim();
+
+        // Trigger if the command starts with '/gif'
+        if (command.startsWith('/gif')) {
+            const keyword = command.split(' ')[1];  // Get the keyword after '/gif'
+            if (keyword) {
+                fetchGifs(keyword);  // Fetch GIFs based on the keyword
+                modal.show();  // Show the modal using Bootstrap's method
+            }
+        }
+    });
+
+    // Function to fetch GIFs from the Tenor API
+    function fetchGifs(keyword) {
+        fetch(`/dm/gifs/?query=${keyword}`)
+            .then(response => response.json())
+            .then(data => {
+                const gifs = data.gifs;
+                gifList.innerHTML = ''; // Clear previous GIFs
+                
+                if (gifs && gifs.length > 0) {
+                    // Add GIFs to the modal
+                    gifs.forEach(gif => {
+                        const gifItem = document.createElement('li');
+                        gifItem.classList.add('list-group-item');
+                        const img = document.createElement('img');
+                        img.src = gif.media[0].gif.url;
+                        img.alt = 'GIF';
+                        img.style.width = '100%';  // Adjust width as needed
+                        gifItem.appendChild(img);
+
+                        // Add click event listener to each GIF
+                        gifItem.addEventListener('click', function () {
+                            inputField.value = gif.media[0].gif.url;  // Append the selected GIF URL to the input field
+                            modal.hide();  // Close the modal
+                        });
+
+                        gifList.appendChild(gifItem);
+                    });
+                } else {
+                    gifList.innerHTML = "<li>No GIFs found.</li>";
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching GIFs:', error);
+                alert('Failed to load GIFs.');
+            });
+    }
+});
+
