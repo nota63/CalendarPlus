@@ -1606,50 +1606,138 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </script>
 
+<!-- Help Command Modal -->
+ <!-- Help Command Modal -->
+<div id="commandsModal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center transition-all duration-300">
+    <div class="bg-white/80 backdrop-blur-lg rounded-xl shadow-2xl p-8 w-full max-w-2xl max-h-[90vh] overflow-hidden transform transition-all duration-300 scale-95 animate-fade-in-up">
+        <div class="flex justify-between items-center pb-4 border-b border-gray-200/60">
+            <h2 class="text-2xl font-bold text-gray-800">✨ Available Commands</h2>
+            <button id="closeCommandsModal" class="p-2 hover:bg-gray-100/50 rounded-full transition-colors duration-200">
+                <i class="fas fa-times text-xl text-gray-600 hover:text-gray-800"></i>
+            </button>
+        </div>
+        
+        <div class="overflow-y-auto max-h-[70vh] pr-4 mt-6 custom-scrollbar">
+            <ul class="space-y-3">
+                <!-- Command Items -->
+                <li class="group flex items-center gap-4 p-4 rounded-xl bg-white/50 hover:bg-white/90 transition-all duration-200 shadow-sm hover:shadow-md border border-white/80 hover:border-gray-200/50">
+                    <div class="shrink-0 w-10 h-10 rounded-lg bg-blue-100/80 flex items-center justify-center group-hover:bg-blue-200/50 transition-colors duration-200">
+                        <i class="fas fa-question-circle text-blue-600 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-800">/help</p>
+                        <p class="text-sm text-gray-600 mt-1">Show all available commands</p>
+                    </div>
+                </li>
+
+                <li class="group flex items-center gap-4 p-4 rounded-xl bg-white/50 hover:bg-white/90 transition-all duration-200 shadow-sm hover:shadow-md border border-white/80 hover:border-gray-200/50">
+                    <div class="shrink-0 w-10 h-10 rounded-lg bg-green-100/80 flex items-center justify-center group-hover:bg-green-200/50">
+                        <i class="fas fa-user text-green-600 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-800">/profile</p>
+                        <p class="text-sm text-gray-600 mt-1">View your profile details</p>
+                    </div>
+                </li>
+
+                <li class="group flex items-center gap-4 p-4 rounded-xl bg-white/50 hover:bg-white/90 transition-all duration-200 shadow-sm hover:shadow-md border border-white/80 hover:border-gray-200/50">
+                    <div class="shrink-0 w-10 h-10 rounded-lg bg-purple-100/80 flex items-center justify-center group-hover:bg-purple-200/50">
+                        <i class="fas fa-users text-purple-600 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-800">/members</p>
+                        <p class="text-sm text-gray-600 mt-1">List all organization members</p>
+                    </div>
+                </li>
+
+                <li class="group flex items-center gap-4 p-4 rounded-xl bg-white/50 hover:bg-white/90 transition-all duration-200 shadow-sm hover:shadow-md border border-white/80 hover:border-gray-200/50">
+                    <div class="shrink-0 w-10 h-10 rounded-lg bg-yellow-100/80 flex items-center justify-center group-hover:bg-yellow-200/50">
+                        <i class="fas fa-bell text-yellow-600 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-800">/notifications</p>
+                        <p class="text-sm text-gray-600 mt-1">Show recent notifications</p>
+                    </div>
+                </li>
+
+                <li class="group flex items-center gap-4 p-4 rounded-xl bg-white/50 hover:bg-white/90 transition-all duration-200 shadow-sm hover:shadow-md border border-white/80 hover:border-gray-200/50">
+                    <div class="shrink-0 w-10 h-10 rounded-lg bg-red-100/80 flex items-center justify-center group-hover:bg-red-200/50">
+                        <i class="fas fa-cog text-red-600 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-800">/settings</p>
+                        <p class="text-sm text-gray-600 mt-1">Open user settings</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes fade-in-up {
+        0% {
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .animate-fade-in-up {
+        animation: fade-in-up 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.15);
+        border-radius: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.2);
+    }
+</style>
+
 <!-- COMMANDS AND AUTOMATIONS -->
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener('DOMContentLoaded', function() {
     const inputField = document.getElementById("chat-message-input");
-    const suggestionBox = document.createElement("ul");
-    suggestionBox.id = "command-suggestion-box";
-    suggestionBox.style.position = "absolute";
-    suggestionBox.style.top = "50px"; // Adjust position
-    suggestionBox.style.zIndex = "999";
-    suggestionBox.style.backgroundColor = "#fff";
-    suggestionBox.style.border = "1px solid #ddd";
-    suggestionBox.style.maxHeight = "150px";
-    suggestionBox.style.overflowY = "auto";
-    inputField.parentElement.appendChild(suggestionBox);
+    const modal = document.getElementById("commandsModal");
+    const closeModal = document.getElementById("closeCommandsModal");
+    const commandItems = document.querySelectorAll('.group'); // Selecting command items
 
-    const commands = [
-        "/help - Show available commands",
-        "/faq - Get answers to common questions",
-        "/clear - Clear the chat input",
-        "/greet - Send a greeting message",
-        "/whois @username - Get user info",
-        "/quote <message_id> - Quote a message",
-        "/remind <time> <task> - Set a reminder"
-    ];
-
-    inputField.addEventListener("input", function () {
-        const query = inputField.value.trim();
-
-        if (query === "/help") {
-            suggestionBox.innerHTML = "";
-            commands.forEach(command => {
-                const li = document.createElement("li");
-                li.textContent = command;
-                li.style.padding = "5px";
-                li.style.cursor = "pointer";
-                li.addEventListener("click", function () {
-                    inputField.value = command.split(" - ")[0]; // Select command
-                    suggestionBox.innerHTML = "";
-                });
-                suggestionBox.appendChild(li);
-            });
-        } else {
-            suggestionBox.innerHTML = "";
+    // Show the modal if the input is "/help"
+    inputField.addEventListener('input', function() {
+        if (inputField.value.trim() === '/help') {
+            modal.classList.remove('hidden'); // Show modal when "/help" is typed
         }
+    });
+
+    // Close the modal
+    closeModal.addEventListener('click', function() {
+        modal.classList.add('hidden');
+        inputField.value = ''; // Clear input after closing the modal
+    });
+
+    // When a command is selected from the modal
+    commandItems.forEach(item => {
+        item.addEventListener('click', function() {
+            inputField.value = ''; // Clear existing input
+            const selectedCommand = item.querySelector('p').textContent.split(' ')[0]; // Get the command part
+            inputField.value += selectedCommand + " "; // Append the selected command to the input
+            modal.classList.add('hidden'); // Close the modal after selecting the command
+        });
     });
 });
 
