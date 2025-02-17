@@ -1547,4 +1547,60 @@ h2 span.status-dot {
 }
 
 
-/* Whois modal implementation */
+/* recent modal implementation */
+    /* Add a Material UI style to the modal */
+    #RecentModal .modal-content {
+        border-radius: 8px; /* Rounded corners */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    }
+    
+    #RecentModal .modal-header {
+        background-color: #1976d2; /* Material UI Blue */
+        color: white;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+    
+    #RecentModal .modal-title {
+        font-weight: bold;
+    }
+    
+    #RecentModal .btn-close {
+        background-color: transparent;
+        border: none;
+    }
+    
+    #RecentModal .modal-body {
+        max-height: 70vh; /* Set maximum height for scrolling */
+        overflow-y: auto; /* Enable vertical scrolling */
+        padding-right: 15px; /* Adjust padding to prevent clipping of scroll */
+    }
+    
+    /* Material UI List Styling */
+    #recentDataList {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    #recentDataList li {
+        padding: 10px 15px;
+        margin-bottom: 15px;
+        background-color: #f1f1f1;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    #recentDataList li p {
+        margin: 0;
+        font-size: 14px;
+    }
+    
+    #recentDataList li img,
+    #recentDataList li iframe,
+    #recentDataList li video,
+    #recentDataList li audio {
+        max-width: 100%;
+        border-radius: 8px;
+    }
+    

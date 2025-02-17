@@ -1753,8 +1753,9 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
     
 <!-- /RECENT IMPLEMENTATION -->
+ <!-- /RECENT IMPLEMENTATION -->
 <div class="modal fade" id="RecentModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg"> <!-- Increased width using 'modal-lg' class -->
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Recent Data</h5>
@@ -1767,6 +1768,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 </div>
+
 
 
 
@@ -1975,61 +1977,73 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         // Render data based on the type
                         if (type === 'code') {
+                            itemElement.classList.add('material-card', 'code-snippet');
                             itemElement.innerHTML = `
-                                <p><strong>Code Snippet:</strong></p>
-                                <pre><code class="language-javascript">${item.code_snippet}</code></pre>
-                                <p><small>Sent at: ${timestamp}</small></p>
+                                <div class="card">
+                                    <div class="card-body">
+                                        <p><strong>Code Snippet:</strong></p>
+                                        <pre><code class="language-javascript">${item.code_snippet}</code></pre>
+                                        <p><small>Sent at: ${timestamp}</small></p>
+                                    </div>
+                                </div>
                             `;
                             recentContainer.appendChild(itemElement);
 
                             // Apply syntax highlighting for the code snippet
                             Prism.highlightAll();
                         } else if (type === 'message') {
+                            itemElement.classList.add('material-card', 'message');
                             itemElement.innerHTML = `
-                                <p><strong>Message:</strong> ${item.text}</p>
-                                <p><small>Sent at: ${timestamp}</small></p>
+                                <div class="card">
+                                    <div class="card-body">
+                                        <p><strong>Message:</strong> ${item.text}</p>
+                                        <p><small>Sent at: ${timestamp}</small></p>
+                                    </div>
+                                </div>
                             `;
                             recentContainer.appendChild(itemElement);
                         } else if (type === 'files') {
+                            itemElement.classList.add('material-card', 'file-preview');
                             const fileUrl = `/media/${item.file_url}`; // Ensure correct file URL
                             const fileExtension = item.file_url.split('.').pop().toLowerCase();
 
+                            let filePreviewContent = '';
                             if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
                                 // Image preview
-                                const img = document.createElement('img');
-                                img.src = fileUrl;
-                                img.style.maxWidth = '200px';  // Adjust size for better preview
-                                img.style.maxHeight = '200px';  // Adjust height
-                                itemElement.appendChild(img);
+                                filePreviewContent = `
+                                    <img src="${fileUrl}" alt="Image Preview" style="max-width: 100%; border-radius: 8px;" />
+                                `;
                             } else if (fileExtension === 'pdf') {
                                 // Embed PDF preview
-                                const iframe = document.createElement('iframe');
-                                iframe.src = fileUrl;
-                                iframe.style.width = '100%';
-                                iframe.style.height = '300px';
-                                itemElement.appendChild(iframe);
+                                filePreviewContent = `
+                                    <iframe src="${fileUrl}" style="width: 100%; height: 300px; border-radius: 8px;"></iframe>
+                                `;
                             } else if (['mp4', 'webm', 'ogg'].includes(fileExtension)) {
                                 // Video preview
-                                const video = document.createElement('video');
-                                video.src = fileUrl;
-                                video.controls = true;
-                                video.style.maxWidth = '100%';
-                                itemElement.appendChild(video);
+                                filePreviewContent = `
+                                    <video src="${fileUrl}" controls style="max-width: 100%; border-radius: 8px;"></video>
+                                `;
                             } else if (['mp3', 'wav', 'ogg'].includes(fileExtension)) {
                                 // Audio preview
-                                const audio = document.createElement('audio');
-                                audio.src = fileUrl;
-                                audio.controls = true;
-                                itemElement.appendChild(audio);
+                                filePreviewContent = `
+                                    <audio src="${fileUrl}" controls style="border-radius: 8px;"></audio>
+                                `;
                             } else {
                                 // Provide download link for other file types
-                                const link = document.createElement('a');
-                                link.href = fileUrl;
-                                link.textContent = `Download file: ${item.file_url}`;
-                                itemElement.appendChild(link);
+                                filePreviewContent = `
+                                    <a href="${fileUrl}" download style="color: #007bff;">Download file: ${item.file_url}</a>
+                                `;
                             }
 
-                            itemElement.innerHTML += `<p><small>Sent at: ${timestamp}</small></p>`;
+                            itemElement.innerHTML = `
+                                <div class="card">
+                                    <div class="card-body">
+                                        <p><strong>File:</strong></p>
+                                        ${filePreviewContent}
+                                        <p><small>Sent at: ${timestamp}</small></p>
+                                    </div>
+                                </div>
+                            `;
                             recentContainer.appendChild(itemElement);
                         }
                     });
