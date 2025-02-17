@@ -1971,13 +1971,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (data.recent_data && data.recent_data.length > 0) {
                     data.recent_data.forEach(item => {
                         const itemElement = document.createElement('li');
+                        const timestamp = new Date(item.timestamp).toLocaleString();
 
                         // Render data based on the type
                         if (type === 'code') {
                             itemElement.innerHTML = `
                                 <p><strong>Code Snippet:</strong></p>
                                 <pre><code class="language-javascript">${item.code_snippet}</code></pre>
-                                <p><small>Sent at: ${item.timestamp}</small></p>
+                                <p><small>Sent at: ${timestamp}</small></p>
                             `;
                             recentContainer.appendChild(itemElement);
 
@@ -1986,19 +1987,19 @@ document.addEventListener('DOMContentLoaded', function () {
                         } else if (type === 'message') {
                             itemElement.innerHTML = `
                                 <p><strong>Message:</strong> ${item.text}</p>
-                                <p><small>Sent at: ${item.timestamp}</small></p>
+                                <p><small>Sent at: ${timestamp}</small></p>
                             `;
                             recentContainer.appendChild(itemElement);
                         } else if (type === 'files') {
-                            const link = document.createElement('a');
                             const fileUrl = `/media/${item.file_url}`; // Ensure correct file URL
-
                             const fileExtension = item.file_url.split('.').pop().toLowerCase();
+
                             if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
                                 // Image preview
                                 const img = document.createElement('img');
                                 img.src = fileUrl;
                                 img.style.maxWidth = '200px';  // Adjust size for better preview
+                                img.style.maxHeight = '200px';  // Adjust height
                                 itemElement.appendChild(img);
                             } else if (fileExtension === 'pdf') {
                                 // Embed PDF preview
@@ -2007,14 +2008,28 @@ document.addEventListener('DOMContentLoaded', function () {
                                 iframe.style.width = '100%';
                                 iframe.style.height = '300px';
                                 itemElement.appendChild(iframe);
+                            } else if (['mp4', 'webm', 'ogg'].includes(fileExtension)) {
+                                // Video preview
+                                const video = document.createElement('video');
+                                video.src = fileUrl;
+                                video.controls = true;
+                                video.style.maxWidth = '100%';
+                                itemElement.appendChild(video);
+                            } else if (['mp3', 'wav', 'ogg'].includes(fileExtension)) {
+                                // Audio preview
+                                const audio = document.createElement('audio');
+                                audio.src = fileUrl;
+                                audio.controls = true;
+                                itemElement.appendChild(audio);
                             } else {
                                 // Provide download link for other file types
+                                const link = document.createElement('a');
                                 link.href = fileUrl;
-                                link.textContent = `File: ${item.file_url}`;
+                                link.textContent = `Download file: ${item.file_url}`;
                                 itemElement.appendChild(link);
                             }
 
-                            itemElement.innerHTML += `<p><small>Sent at: ${item.timestamp}</small></p>`;
+                            itemElement.innerHTML += `<p><small>Sent at: ${timestamp}</small></p>`;
                             recentContainer.appendChild(itemElement);
                         }
                     });
