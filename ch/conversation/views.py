@@ -767,7 +767,7 @@ import random
 
 def jokes(request):
     # Define joke categories (use only valid ones)
-    joke_categories = ['neutral', 'chuck_norris', 'all']  # Valid categories
+    joke_categories = ['neutral', 'chuck_norris', 'all']  
 
     # Store jokes from each category
     all_jokes = []
@@ -779,23 +779,22 @@ def jokes(request):
                 if isinstance(joke, str):
                     all_jokes.append({
                         'category': category,
-                        'joke': joke,  # Directly append the joke string
-                        'type': 'single'  # Assuming all jokes are 'single' for simplicity
+                        'joke': joke,  
+                        'type': 'single'  
                     })
                 else:
                     all_jokes.append({
                         'category': category,
-                        'joke': joke.joke,  # Access .joke only if it's an object
-                        'type': joke.type  # Jokes can be 'twopart' or 'single'
+                        'joke': joke.joke,  
+                        'type': joke.type  
                     })
         except pyjokes.exc.CategoryNotFoundError:
             print(f"Category '{category}' not found. Skipping.")
-    
-    # Randomize the order of the jokes
+
     random.shuffle(all_jokes)
     
-    # Limit the number of jokes to 5
-    all_jokes = all_jokes[:5]  # Get the first 5 jokes
 
-    # Return the jokes in a structured format
+    all_jokes = all_jokes[:5] 
+
+
     return JsonResponse({'jokes': all_jokes})

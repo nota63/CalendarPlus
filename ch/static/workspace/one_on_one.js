@@ -284,6 +284,8 @@ function fetchRecentData(orgId, otherUserId, conversationId, type) {
 
 
 // /JOKES (RETURN PYJOKES)
+
+// /JOKES (RETURN PYJOKES)
 document.addEventListener('DOMContentLoaded', function () {
     const inputField = document.getElementById("chat-message-input");
     const modal = new bootstrap.Modal(document.getElementById("jokeModal"));
@@ -311,11 +313,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Add jokes to the modal
                 jokes.forEach(joke => {
                     const jokeItem = document.createElement('li');
-                    jokeItem.classList.add('list-group-item');
-                    jokeItem.textContent = joke.joke;
-
+                    jokeItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center', 'joke-item');
+                    jokeItem.innerHTML = `
+                        <span class="joke-text">${joke.joke}</span>
+                        <button class="btn btn-sm btn-outline-primary select-joke">Select</button>
+                    `;
+                    
                     // Add click event listener to each joke
-                    jokeItem.addEventListener('click', function () {
+                    jokeItem.querySelector('.select-joke').addEventListener('click', function () {
                         inputField.value = joke.joke;  // Append the selected joke to the input field
                         modal.hide();  // Close the modal
                     });
