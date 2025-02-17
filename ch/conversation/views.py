@@ -610,3 +610,26 @@ def get_message_suggestions(request, org_id):
 
 
 
+# CUSTOM COMMANDS / 
+
+# /PROFILE
+@login_required
+def profile_view(request, org_id):
+    try:
+        profile = Profile.objects.get(organization_id=org_id, user=request.user)
+        org = Organization.objects.get(id=org_id)
+        
+        # Build the response data
+        profile_data = {
+            'full_name': profile.full_name if profile.full_name else request.user.username ,
+            'role': 'Admin' if profile.is_admin else 'Manager' if profile.is_manager else 'Employee',
+            'organization': org.name,
+            'profile_picture': profile.profile_picture.url if profile.profile_picture else None,
+            'last_login': profile.last_login.strftime('%Y-%m-%d %H:%M:%S') if profile.last_login else 'N/A'
+        }
+      
+
+        return JsonResponse(profile_data)
+
+    except Profile.DoesNotExist:
+        return JsonResponse({'error': 'Profile not found'}, status=404)

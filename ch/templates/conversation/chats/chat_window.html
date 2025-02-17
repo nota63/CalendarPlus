@@ -1674,40 +1674,45 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </div>
 
-<style>
-    @keyframes fade-in-up {
-        0% {
-            opacity: 0;
-            transform: translateY(20px) scale(0.95);
-        }
-        100% {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-    }
+<!-- ------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
+<!-- Commands modals -->
 
-    .animate-fade-in-up {
-        animation: fade-in-up 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    }
+<!-- /PROFILE COMMAND -->
+<!-- Profile Modal -->
+<div id="profileModal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center transition-all duration-300">
+    <div class="bg-white/80 backdrop-blur-lg rounded-xl shadow-2xl p-8 w-full max-w-2xl max-h-[90vh] overflow-hidden transform transition-all duration-300 scale-95 animate-fade-in-up">
+        <div class="flex justify-between items-center pb-4 border-b border-gray-200/60">
+            <h2 class="text-2xl font-bold text-gray-800">✨ User Profile</h2>
+            <button id="closeProfileModal" class="p-2 hover:bg-gray-100/50 rounded-full transition-colors duration-200">
+                <i class="fas fa-times text-xl text-gray-600 hover:text-gray-800"></i>
+            </button>
+        </div>
+        
+        <div class="flex gap-6 items-center">
+            <!-- Profile Picture -->
+            <div class="w-28 h-28 rounded-full overflow-hidden border-2 border-gray-300">
+                <img src="" id="profilePicture" class="w-full h-full object-cover" alt="Profile Picture">
+            </div>
+            <!-- Profile Details -->
+            <div>
+                <h3 class="text-xl font-semibold text-gray-800" id="profileFullName"></h3>
+                <p class="text-sm text-gray-600 mt-2" id="profileRole"></p>
+                <p class="text-sm text-gray-600 mt-1" id="profileOrgName"></p>
+                <p class="text-sm text-gray-600 mt-1" id="profileLastLogin"></p>
+            </div>
+        </div>
+    </div>
+</div>
 
-    .custom-scrollbar::-webkit-scrollbar {
-        width: 6px;
-    }
+<!-- /WHOIS IMPLEMENTATION -->
+ 
 
-    .custom-scrollbar::-webkit-scrollbar-track {
-        background: rgba(0, 0, 0, 0.05);
-        border-radius: 4px;
-    }
 
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: rgba(0, 0, 0, 0.15);
-        border-radius: 4px;
-    }
 
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: rgba(0, 0, 0, 0.2);
-    }
-</style>
+
+
+
+
 
 <!-- COMMANDS AND AUTOMATIONS -->
 <script>
@@ -1740,6 +1745,48 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// ---------------------------------------------------------------------------------------------------------------------------
+// /PROFILE COMMAND TO SHOW USERS PROFILE
+document.addEventListener('DOMContentLoaded', function() {
+    const inputField = document.getElementById("chat-message-input");
+    const modal = document.getElementById("profileModal");
+    const closeModal = document.getElementById("closeProfileModal");
+
+    inputField.addEventListener('input', function() {
+        if (inputField.value.trim() === '/profile') {
+            fetchProfileData(); // Fetch user profile details
+            modal.classList.remove('hidden');
+        }
+    });
+
+    closeModal.addEventListener('click', function() {
+        modal.classList.add('hidden');
+    });
+
+    function fetchProfileData() {
+        // Assuming org_id is available and profile info can be fetched from a Django view
+        const orgId = "{{organization.id}}"; // Replace with actual org ID
+        fetch(`/dm/profile/${orgId}/`)  // Your Django URL that handles this request
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('profileFullName').textContent = data.full_name;
+                document.getElementById('profileRole').textContent = data.role; 
+                document.getElementById('profileOrgName').textContent = data.organization;
+                document.getElementById('profileLastLogin').textContent = `Last login: ${data.last_login}`;
+
+                // Set profile picture if available
+                const profilePicUrl = data.profile_picture.url? `/media/${data.profile_picture} ` : '';
+                document.getElementById('profilePicture').src = profilePicUrl;
+            })
+            .catch(error => console.error('Error fetching profile data:', error));
+    }
+});
+
+
+
+
+
 
 
 </script>
