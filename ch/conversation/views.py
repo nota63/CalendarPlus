@@ -759,3 +759,43 @@ def recent_messages(request, org_id, other_user_id, conversation_id, type):
 
     # Return the recent data as a JSON response
     return JsonResponse({'recent_data': recent_data})
+
+
+# /JOKES
+import pyjokes
+import random
+
+def jokes(request):
+    # Define joke categories (use only valid ones)
+    joke_categories = ['neutral', 'chuck_norris', 'all']  # Valid categories
+
+    # Store jokes from each category
+    all_jokes = []
+    for category in joke_categories:
+        try:
+            jokes = pyjokes.get_jokes(language='en', category=category)
+            for joke in jokes:
+                # Check if joke is a string or an object with .joke
+                if isinstance(joke, str):
+                    all_jokes.append({
+                        'category': category,
+                        'joke': joke,  # Directly append the joke string
+                        'type': 'single'  # Assuming all jokes are 'single' for simplicity
+                    })
+                else:
+                    all_jokes.append({
+                        'category': category,
+                        'joke': joke.joke,  # Access .joke only if it's an object
+                        'type': joke.type  # Jokes can be 'twopart' or 'single'
+                    })
+        except pyjokes.exc.CategoryNotFoundError:
+            print(f"Category '{category}' not found. Skipping.")
+    
+    # Randomize the order of the jokes
+    random.shuffle(all_jokes)
+    
+    # Limit the number of jokes to 5
+    all_jokes = all_jokes[:5]  # Get the first 5 jokes
+
+    # Return the jokes in a structured format
+    return JsonResponse({'jokes': all_jokes})

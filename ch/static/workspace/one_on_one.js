@@ -282,3 +282,50 @@ function fetchRecentData(orgId, otherUserId, conversationId, type) {
 }
 });
 
+
+// /JOKES (RETURN PYJOKES)
+document.addEventListener('DOMContentLoaded', function () {
+    const inputField = document.getElementById("chat-message-input");
+    const modal = new bootstrap.Modal(document.getElementById("jokeModal"));
+    const jokeList = document.getElementById("jokeList");
+
+    // Event listener for user input in the message input field
+    inputField.addEventListener('input', function () {
+        const command = inputField.value.trim();
+
+        // Trigger if the command starts with '/joke'
+        if (command.startsWith('/joke')) {
+            fetchJokes();  // Fetch jokes from the server and display in modal
+            modal.show();  // Show the modal using Bootstrap's method
+        }
+    });
+
+    // Function to fetch jokes from the server
+    function fetchJokes() {
+        fetch('/dm/jokes/')
+            .then(response => response.json())
+            .then(data => {
+                const jokes = data.jokes;
+                jokeList.innerHTML = ''; // Clear previous jokes
+                
+                // Add jokes to the modal
+                jokes.forEach(joke => {
+                    const jokeItem = document.createElement('li');
+                    jokeItem.classList.add('list-group-item');
+                    jokeItem.textContent = joke.joke;
+
+                    // Add click event listener to each joke
+                    jokeItem.addEventListener('click', function () {
+                        inputField.value = joke.joke;  // Append the selected joke to the input field
+                        modal.hide();  // Close the modal
+                    });
+
+                    jokeList.appendChild(jokeItem);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching jokes:', error);
+                alert('Failed to load jokes.');
+            });
+    }
+});

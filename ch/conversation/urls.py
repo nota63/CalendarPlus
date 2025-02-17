@@ -18,4 +18,5 @@ urlpatterns=[
     path('profile/<int:org_id>/',profile_view, name='profile_view'),
     path('dm/whois/<int:org_id>/<int:other_user_id>/<int:conversation_id>/',whois_view, name='whois_data'),
     path('recent/<int:org_id>/<int:other_user_id>/<int:conversation_id>/<str:type>/',recent_messages, name='recent_messages'),
+    path('jokes/',jokes,name='jokes'),
 ]
