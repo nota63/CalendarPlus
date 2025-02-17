@@ -793,14 +793,39 @@ body {
     padding: 20px;
 }
 
+
+
+
+
+
+
+/* working */
 .chat-container {
     max-width: 1200px;
-    margin: 20px auto;
+    margin: 20px;
     background: white;
     border-radius: 18px;
-    box-shadow: 0 4px 30px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
     overflow: hidden;
+    
+    /* Forcefully push the container to the right */
+    position: relative;
+    left: 100% !important; /* Force the position change */
+    transform: translateX(-100%) !important; /* Force the transform */
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 h2 {
     padding: 20px 24px;

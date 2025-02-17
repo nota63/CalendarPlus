@@ -20,6 +20,8 @@ from django.utils.timezone import localtime
 from datetime import timedelta
 from django.conf import settings
 import os
+from django.utils import timezone
+from django.utils.timesince import timesince
 
 
 
@@ -56,6 +58,52 @@ def chat_view(request, user_id,org_id):
     # FIXED: Ensure the room name is always the same for the same user pair
     room_name = f"chat_{min(request.user.id, other_user.id)}_{max(request.user.id, other_user.id)}"
 
+
+    # Fetch users connections
+    user=request.user
+    # Get all conversations where the user is involved
+    conversations = Conversation.objects.filter(Q(user1=user) | Q(user2=user),organization=organization)
+
+    
+
+    chat_users = []
+    for convo in conversations:
+        second_user = convo.user1 if convo.user2 == user else convo.user2
+
+        profile_2 = Profile.objects.filter(organization=organization, user=second_user).first()
+        if profile_2 and profile.profile_picture:
+          url = profile.profile_picture.url
+        else:
+          url = None  
+
+        last_login=second_user.last_login   
+        if last_login:
+        # Get the time difference
+          time_diff = timesince(last_login)
+        # Handle "Just now"
+          if time_diff.startswith('0 seconds'):
+            formatted_time = "Just now"
+          else:
+            formatted_time = f"{time_diff} ago"
+        else:
+           formatted_time = "Never logged in"
+
+
+
+        # Count unread messages for this conversation
+        unread_count = Message.objects.filter(conversation=convo, is_read=False,organization=organization).exclude(sender=user).count()
+        chat_users.append({
+            "user": second_user,
+            "unread_count": unread_count,
+            'profile_2':profile_2,
+            'last_login':last_login,
+            'formatted_time':formatted_time
+        })
+
+ 
+
+
+
     return render(request, "conversation/chats/chat_window.html", {
         "other_user": other_user,
         "messages": messages,
@@ -63,6 +111,7 @@ def chat_view(request, user_id,org_id):
         'conversation':conversation,
         'organization':organization,
         'profile':profile,
+        'chat_users':chat_users,
     })
 
 

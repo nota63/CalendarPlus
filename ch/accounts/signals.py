@@ -106,3 +106,4 @@ def create_social_channel_and_send_email(sender, instance, created, **kwargs):
             # General error handling
             print(f"Error creating channel or sending email: {e}")
 
+

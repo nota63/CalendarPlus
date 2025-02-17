@@ -62,6 +62,7 @@ class Profile(models.Model):
     is_employee = models.BooleanField(default=False)  
     profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)  
     full_name = models.CharField(max_length=255, null=True, blank=True)  
+    last_active = models.DateTimeField(null=True, blank=True) 
 
     class Meta:
         unique_together = ('user', 'organization') 
