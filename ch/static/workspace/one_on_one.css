@@ -1487,3 +1487,30 @@ h2 span.status-dot {
     padding: 10px;
 }
 
+
+/* COMMAND SUGGESTIONS */
+#command-suggestion-box {
+    border-radius: 6px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    list-style: none;
+    font-size: 14px;
+    transition: all 0.2s ease-in-out;
+}
+
+#command-suggestion-box li {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+#command-suggestion-box li:hover {
+    background-color: #f5f5f5;
+}
+
+
+
+
+
+

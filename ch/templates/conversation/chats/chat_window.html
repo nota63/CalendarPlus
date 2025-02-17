@@ -1606,6 +1606,73 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </script>
 
+<!-- COMMANDS AND AUTOMATIONS -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const inputField = document.getElementById("chat-message-input");
+    const suggestionBox = document.createElement("ul");
+    suggestionBox.id = "command-suggestion-box";
+    suggestionBox.style.position = "absolute";
+    suggestionBox.style.top = "50px"; // Adjust position
+    suggestionBox.style.zIndex = "999";
+    suggestionBox.style.backgroundColor = "#fff";
+    suggestionBox.style.border = "1px solid #ddd";
+    suggestionBox.style.maxHeight = "150px";
+    suggestionBox.style.overflowY = "auto";
+    inputField.parentElement.appendChild(suggestionBox);
+
+    const commands = [
+        "/help - Show available commands",
+        "/faq - Get answers to common questions",
+        "/clear - Clear the chat input",
+        "/greet - Send a greeting message",
+        "/whois @username - Get user info",
+        "/quote <message_id> - Quote a message",
+        "/remind <time> <task> - Set a reminder"
+    ];
+
+    inputField.addEventListener("input", function () {
+        const query = inputField.value.trim();
+
+        if (query === "/help") {
+            suggestionBox.innerHTML = "";
+            commands.forEach(command => {
+                const li = document.createElement("li");
+                li.textContent = command;
+                li.style.padding = "5px";
+                li.style.cursor = "pointer";
+                li.addEventListener("click", function () {
+                    inputField.value = command.split(" - ")[0]; // Select command
+                    suggestionBox.innerHTML = "";
+                });
+                suggestionBox.appendChild(li);
+            });
+        } else {
+            suggestionBox.innerHTML = "";
+        }
+    });
+});
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 <!-- WEBSOCKETS SCRIPT -->
