@@ -573,23 +573,40 @@ def manage_scheduled_messages(request, org_id, conversation_id):
 
 # GET MESSAGES SUGGESTIONS
 
+# def get_message_suggestions(request, org_id):
+#     if request.method == 'GET':
+#         query = request.GET.get('query', '').strip()
+
+#         # Ensure the organization exists
+#         organization = get_object_or_404(Organization, id=org_id)
+
+ 
+#         suggestions = MessageSuggestion.objects.filter(
+#             content__icontains=query, 
+#             organization=organization
+#         ).values_list('content', flat=True)
+
+#         return JsonResponse({'suggestions': list(suggestions)})
+
+
 def get_message_suggestions(request, org_id):
     if request.method == 'GET':
-        query = request.GET.get('query', '').strip()
+        query = request.GET.get('query', '').strip().lower()  # Normalize query
 
         # Ensure the organization exists
         organization = get_object_or_404(Organization, id=org_id)
 
- 
+        # Fetch suggestions with case-insensitive filtering and flexible matching
         suggestions = MessageSuggestion.objects.filter(
-            content__icontains=query, 
+            Q(content__icontains=query) | Q(content__iexact=query),
             organization=organization
-        ).values_list('content', flat=True)
+        ).only('content').values_list('content', flat=True).distinct()[:50]  # Limit results for efficiency
 
-        return JsonResponse({'suggestions': list(suggestions)})
+        # Handle empty results gracefully
+        if not suggestions:
+            return JsonResponse({'suggestions': [], 'message': "No suggestions found"}, status=200)
 
-
-
+        return JsonResponse({'suggestions': list(suggestions)}, status=200)
 
 
 
