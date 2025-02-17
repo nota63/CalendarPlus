@@ -1752,7 +1752,22 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
     
- 
+<!-- /RECENT IMPLEMENTATION -->
+<div class="modal fade" id="RecentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Recent Data</h5>
+                <button type="button" class="btn-close" id="closeRecentModal"></button>
+            </div>
+            <div class="modal-body">
+                <h6 id="recentTitle"></h6>
+                <ul id="recentDataList"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 
@@ -1899,6 +1914,86 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             })
             .catch(error => console.error('Error fetching whois data:', error));
+    }
+});
+
+// RECENT IMPLEMENTATION
+document.addEventListener('DOMContentLoaded', function () {
+    const inputField = document.getElementById("chat-message-input");
+    const modal = new bootstrap.Modal(document.getElementById("RecentModal"));
+    const closeModal = document.getElementById("closeRecentModal");
+
+    // Event listener for user input in the message input field
+    inputField.addEventListener('input', function () {
+        const command = inputField.value.trim();
+
+        // Only trigger if the command starts with '/recent' and contains a valid type at the end
+        if (command.startsWith('/recent') && command.split(' ').length === 2) {
+            const parts = command.split(' ');
+            const type = parts[1]; // The second word after '/recent': 'code', 'message', or 'files'
+
+            // Validate that type is one of the valid types
+            if (['code', 'message', 'files'].includes(type)) {
+                // Get dynamic data from your template context
+                const otherUserId = "{{ other_user.id }}";  // Get user ID dynamically
+                const orgId = "{{ organization.id }}";      // Get organization ID dynamically
+                const conversationId = "{{ conversation.id }}"; // Get conversation ID dynamically
+
+                // Fetch the recent data based on the type
+                fetchRecentData(orgId, otherUserId, conversationId, type);
+                modal.show(); // Show the modal using Bootstrap's method
+            }
+        }
+    });
+
+    // Close modal when the close button is clicked
+    closeModal.addEventListener('click', function () {
+        modal.hide(); // Hide the modal
+    });
+
+    // Function to fetch recent data based on the type
+    function fetchRecentData(orgId, otherUserId, conversationId, type) {
+        // Construct URL for the API endpoint
+        const url = `/dm/recent/${orgId}/${otherUserId}/${conversationId}/${type}/`;
+
+        // Fetch data from the server
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const recentContainer = modal._element.querySelector('#recentDataList');
+                if (!recentContainer) {
+                    console.error("Recent content container not found in the modal.");
+                    return; // Exit if there's no container for recent data
+                }
+
+                recentContainer.innerHTML = ''; // Clear previous content
+
+                if (data.recent_data && data.recent_data.length > 0) {
+                    data.recent_data.forEach(item => {
+                        const itemElement = document.createElement('li');
+
+                        // Render data based on the type
+                        if (type === 'code') {
+                            itemElement.textContent = `Code Snippet: ${item.code_snippet} - Sent at: ${item.timestamp}`;
+                        } else if (type === 'message') {
+                            itemElement.textContent = `Message: ${item.text} - Sent at: ${item.timestamp}`;
+                        } else if (type === 'files') {
+                            const link = document.createElement('a');
+                            link.href = `/media/${item.file_url}`; // Ensure correct file URL
+                            link.textContent = `File: ${item.file_url}`;
+                            itemElement.appendChild(link);
+                        }
+
+                        recentContainer.appendChild(itemElement);
+                    });
+                } else {
+                    recentContainer.innerHTML = "<li>No recent data available.</li>";
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching recent data:', error);
+                alert('Failed to load recent data.');
+            });
     }
 });
 
@@ -2500,6 +2595,8 @@ document.querySelector(".close").addEventListener("click", function () {
 });
 
  </script>
+
+
 
 <style>
 

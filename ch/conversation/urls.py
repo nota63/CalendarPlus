@@ -16,5 +16,6 @@ urlpatterns=[
     path('manage-scheduled-messages/<int:org_id>/<int:conversation_id>/', manage_scheduled_messages, name='manage_scheduled_messages'),
     path('get_message_suggestions/<int:org_id>/',get_message_suggestions, name='get_message_suggestions'),
     path('profile/<int:org_id>/',profile_view, name='profile_view'),
-    path('dm/whois/<int:org_id>/<int:other_user_id>/<int:conversation_id>/',whois_view, name='whois_data')
+    path('dm/whois/<int:org_id>/<int:other_user_id>/<int:conversation_id>/',whois_view, name='whois_data'),
+    path('recent/<int:org_id>/<int:other_user_id>/<int:conversation_id>/<str:type>/',recent_messages, name='recent_messages'),
 ]

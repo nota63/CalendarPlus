@@ -683,3 +683,79 @@ def whois_view(request, org_id, other_user_id, conversation_id):
     }
     
     return JsonResponse(response_data)
+
+
+# /RECENT 
+# Set up logger for debugging
+import logging
+logger = logging.getLogger(__name__)
+
+@login_required
+def recent_messages(request, org_id, other_user_id, conversation_id, type):
+    """Fetches recent messages based on the type (code, message, file)."""
+    
+    # Ensure the user has access to the conversation
+    conversation = get_object_or_404(Conversation, id=conversation_id, organization_id=org_id)
+    other_user = get_object_or_404(User, id=other_user_id)
+    
+    logger.debug(f"Fetching recent {type} messages for conversation {conversation_id} between user {request.user.id} and {other_user.id}")
+
+    # Initialize an empty list for recent data
+    recent_data = []
+
+    # Filter the messages based on type
+    if type == "code":
+        # Get last 5 code snippets sent by the other user
+        messages = Message.objects.filter(
+            conversation=conversation, sender=other_user, code_snippet__isnull=False
+        ).order_by('-timestamp')[:5]
+        
+        logger.debug(f"Found {len(messages)} code snippets for user {other_user.id}")
+        
+        recent_data = [{
+            'code_snippet': msg.code_snippet,
+            'timestamp': msg.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+        } for msg in messages]
+
+    elif type == "message":
+        # Get last 5 text messages sent by the other user
+        messages = Message.objects.filter(
+            conversation=conversation, sender=other_user, text__isnull=False
+        ).order_by('-timestamp')[:5]
+        
+        logger.debug(f"Found {len(messages)} text messages for user {other_user.id}")
+        
+        recent_data = [{
+            'text': msg.text,
+            'timestamp': msg.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+        } for msg in messages]
+
+    elif type == "files":
+        # Get last 5 files sent by the other user
+        messages = Message.objects.filter(
+            conversation=conversation, sender=other_user, file__isnull=False
+        ).order_by('-timestamp')[:5]
+        
+        logger.debug(f"Found {len(messages)} files for user {other_user.id}")
+
+        for msg in messages:
+            if msg.file:  # Ensure the file exists
+                recent_data.append({
+                    'file_url': msg.file.url,
+                    'timestamp': msg.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+                })
+            else:
+                logger.debug(f"Message {msg.id} does not have a file associated with it.")
+        
+        if not recent_data:  # If no files found, send a placeholder message
+            recent_data = [{'message': 'No files available.'}]
+            logger.debug("No files available for this user.")
+
+    else:
+        return JsonResponse({'error': 'Invalid type'}, status=400)
+
+    # Log the final recent data being returned
+    logger.debug(f"Returning {len(recent_data)} recent data items for type {type}")
+
+    # Return the recent data as a JSON response
+    return JsonResponse({'recent_data': recent_data})
