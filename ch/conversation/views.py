@@ -825,3 +825,48 @@ def fetch_gifs(request):
     
     except requests.exceptions.RequestException as e:
         return JsonResponse({'error': str(e)}, status=500)
+    
+
+# /SCHEDULE MESSAGE VIA COMMAND
+@csrf_exempt
+def schedule_message_command(request, org_id, conversation_id):
+    if request.method == 'POST':
+        try:
+            # Fetch the conversation object using the passed conversation_id
+            conversation = get_object_or_404(Conversation, id=conversation_id, organization_id=org_id)
+            user = request.user  # Assuming the user is logged in
+
+            # Get data from POST request
+            message = request.POST.get('message')
+            schedule_time = request.POST.get('schedule_time')  # Format: 'YYYY-MM-DD HH:MM:SS'
+            schedule_type = request.POST.get('schedule_type', 'specific_time')  # Default to 'specific_time'
+
+            # Ensure that both schedule_time and message are provided
+            if not schedule_time or not message:
+                return JsonResponse({'status': 'error', 'message': 'Both time and message are required.'}, status=400)
+
+            # Parse the scheduled time
+            try:
+                scheduled_time = datetime.strptime(schedule_time, "%Y-%m-%d %H:%M:%S")
+                scheduled_time = timezone.make_aware(scheduled_time, timezone.get_current_timezone())
+            except ValueError:
+                return JsonResponse({'status': 'error', 'message': 'Invalid time format. Please use YYYY-MM-DD HH:MM:SS.'}, status=400)
+
+            # Create ScheduledMessage entry
+            scheduled_message = ScheduledMessage.objects.create(
+                organization=conversation.organization,
+                conversation=conversation,
+                sender=user,
+                text=message,
+                schedule_type=schedule_type,
+                scheduled_time=scheduled_time,
+            )
+
+            return JsonResponse({'status': 'success', 'message': 'Message scheduled successfully!'})
+        
+        except Conversation.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Conversation not found.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)

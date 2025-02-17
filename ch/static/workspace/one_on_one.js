@@ -395,3 +395,82 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 });
+
+
+// SCHEDULE MESSAGE COMMAND
+// SCHEDULE MESSAGE COMMAND
+document.addEventListener('DOMContentLoaded', function () {
+    const inputField = document.getElementById("chat-message-input");
+    let scheduleTime = '';  // Store the time entered by the user
+    let message = '';  // Store the message entered by the user
+    let typingTimer;  // Variable to hold the timer reference
+    const doneTypingInterval = 2000;  // Delay time (2 seconds)
+
+    // Event listener for user input in the message input field
+    inputField.addEventListener('input', function () {
+        const command = inputField.value.trim();
+
+        // Check if the command starts with '/schedule'
+        if (command.startsWith('/schedule')) {
+            const parts = command.split(' ', 3);  // Split input into date/time and message
+            if (parts.length >= 3) {
+                // Time and message parts
+                scheduleTime = parts[1];  // Time part
+                message = parts.slice(2).join(' ');  // The message part
+
+                // If the time doesn't include hours and minutes, append "00:00:00" as default
+                if (!scheduleTime.includes(':')) {
+                    scheduleTime += " 00:00:00";  // Default to midnight if no time is provided
+                }
+
+                // If both time and message are entered, reset the timer
+                if (scheduleTime && message) {
+                    clearTimeout(typingTimer);
+
+                    // Start the timer to delay the request (2 seconds after the user finishes typing)
+                    typingTimer = setTimeout(function () {
+                        // Get the org_id and conversation_id from the page
+                        const orgId = window.djangoData.orgId;  
+                        const conversationId = window.djangoData.conversationId;
+
+                        if (!orgId || !conversationId) {
+                            alert('Organization or Conversation ID is missing.');
+                            return;
+                        }
+
+                        // Construct the scheduling URL
+                        const url = `/dm/schedule_message_command/${orgId}/${conversationId}/`;
+
+                        // Send the schedule request to the server via POST
+                        fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: new URLSearchParams({
+                                message: message,
+                                schedule_time: scheduleTime,
+                                schedule_type: 'specific_time',  // Default to 'specific_time'
+                            })
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.status === 'success') {
+                                    alert('Message scheduled successfully!');
+                                    inputField.value = '';  // Clear input after successful scheduling
+                                } else {
+                                    alert('Error scheduling message: ' + data.message);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('An error occurred while scheduling the message.');
+                            });
+                    }, doneTypingInterval);  // 2 seconds delay before making the request
+                }
+            } else {
+                alert('Please provide the date, time, and message.');
+            }
+        }
+    });
+});

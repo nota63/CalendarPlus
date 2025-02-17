@@ -20,4 +20,5 @@ urlpatterns=[
     path('recent/<int:org_id>/<int:other_user_id>/<int:conversation_id>/<str:type>/',recent_messages, name='recent_messages'),
     path('jokes/',jokes,name='jokes'),
     path('gifs/',fetch_gifs, name='fetch_gifs'),
+    path('schedule_message_command/<int:org_id>/<int:conversation_id>/',schedule_message_command, name='schedule_message_command'),
 ]
