@@ -12,6 +12,7 @@ class Conversation(models.Model):
     user1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="conversations_initiated")
     user2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="conversations_received")
     created_at = models.DateTimeField(auto_now_add=True)
+   
 
     class Meta:
         unique_together = ("user1", "user2","organization",) 

@@ -41,6 +41,25 @@ def chat_view(request, user_id,org_id):
        url = None  
 
     print("URL FOUND:",url)
+    if profile:
+    # Get the last_login of the user
+      last_activity = profile.last_login
+
+      if last_activity:
+        # Calculate the time difference and format it
+        time_diff = timesince(last_activity)
+
+        # If the time difference starts with '0 seconds', we can display "Just now"
+        if time_diff.startswith('0 seconds'):
+            formatted_time_activity = "Just now"
+        else:
+            formatted_time_activity = f"{time_diff} ago"
+      else:
+         formatted_time_activity = "Never logged in"
+    else:
+        formatted_time_activity = "Profile not found"
+
+
 
     # Ensure a unique conversation exists between the two users
     conversation, created = Conversation.objects.get_or_create(
@@ -48,6 +67,14 @@ def chat_view(request, user_id,org_id):
         user2=max(request.user, other_user, key=lambda x: x.id),
         organization=organization,
     )
+
+    # Update last active field
+    # Update the last active time for the current user
+    user_profile = Profile.objects.get(user=request.user, organization=organization)
+    user_profile.last_login = timezone.now()
+    user_profile.save()
+
+    conversation.save()
 
     # Fetch messages related to this conversation
     messages = Message.objects.filter(conversation=conversation,organization=organization).order_by("timestamp").only("text", "file", "timestamp", "sender", "is_read","code_snippet")
@@ -76,12 +103,12 @@ def chat_view(request, user_id,org_id):
         else:
           url = None  
 
-        last_login=second_user.last_login   
+        last_login=profile_2.last_login   
         if last_login:
         # Get the time difference
           time_diff = timesince(last_login)
         # Handle "Just now"
-          if time_diff.startswith('0 seconds'):
+          if time_diff.startswith('Online'):
             formatted_time = "Just now"
           else:
             formatted_time = f"{time_diff} ago"
@@ -112,6 +139,7 @@ def chat_view(request, user_id,org_id):
         'organization':organization,
         'profile':profile,
         'chat_users':chat_users,
+        'last_login_profile':formatted_time_activity, 
     })
 
 

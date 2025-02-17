@@ -73,6 +73,12 @@
             <span id="timeIcon" class="text-base">🌞</span>
           </div>
 
+          {% if last_login_profile %}
+            {{ last_login_profile }} ago
+         {% else %}
+             Never logged in
+          {% endif %}
+
             <span class="status-dot" id="user-status" style="width: 10px; height: 10px; background-color: gray; border-radius: 50%; display: inline-block;"></span>
               <!-- Search Bar -->
            <div class="search-container mb-2">
