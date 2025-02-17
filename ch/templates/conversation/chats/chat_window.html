@@ -72,12 +72,16 @@
              <span>for {{other_user.username}}</span>
             <span id="timeIcon" class="text-base">🌞</span>
           </div>
+          <br>
 
-          {% if last_login_profile %}
-            {{ last_login_profile }} ago
-         {% else %}
-             Never logged in
-          {% endif %}
+          <p class="text-xs text-gray-500 font-medium">
+            {% if last_login_profile %}
+                {{ last_login_profile }} ago
+            {% else %}
+                Never logged in
+            {% endif %}
+        </p>
+        
 
             <span class="status-dot" id="user-status" style="width: 10px; height: 10px; background-color: gray; border-radius: 50%; display: inline-block;"></span>
               <!-- Search Bar -->
@@ -851,11 +855,17 @@
                             </div>
                         {% endif %}
                     </div>
+                    <br>
 
+              
                     <!-- User Info -->
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-gray-900 truncate">{{ chat.user.username }}</p>
-                        <p class="text-xs text-gray-400 font-medium">{{chat.formatted_time}}</p>
+               <div class="flex items-center space-x-2 p-2">
+                 <!-- Username -->
+                 <div class="flex-1 min-w-0">
+                   <p class="text-sm font-medium text-gray-900 truncate">{{ chat.user.username }}</p>
+                  <p class="text-xs text-gray-500 font-medium">Last seen {{ chat.formatted_time }}</p>
+                </div>
+
                     </div>
                 </a>
 

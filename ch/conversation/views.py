@@ -115,8 +115,6 @@ def chat_view(request, user_id,org_id):
         else:
            formatted_time = "Never logged in"
 
-
-
         # Count unread messages for this conversation
         unread_count = Message.objects.filter(conversation=convo, is_read=False,organization=organization).exclude(sender=user).count()
         chat_users.append({
@@ -126,10 +124,6 @@ def chat_view(request, user_id,org_id):
             'last_login':last_login,
             'formatted_time':formatted_time
         })
-
- 
-
-
 
     return render(request, "conversation/chats/chat_window.html", {
         "other_user": other_user,
