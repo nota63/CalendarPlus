@@ -106,3 +106,44 @@ class MessageSuggestion(models.Model):
 
     def __str__(self):
         return self.content
+
+
+# TODO FOR SPECIFIC CHAT
+class Todo(models.Model):
+    TODO_TYPES = [
+        ('meeting', 'Meeting'),
+        ('task', 'Task'),
+        ('reminder', 'Reminder'),
+    ]
+
+    PRIORITY_LEVELS = [
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+        ('urgent', 'Urgent'),
+    ]
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+    ]
+
+    organization = models.ForeignKey(Organization, related_name='todos', on_delete=models.CASCADE)
+    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='todo_creator')
+
+    todo = models.CharField(max_length=500)
+    type = models.CharField(max_length=100, choices=TODO_TYPES, default='task')
+    priority = models.CharField(max_length=10, choices=PRIORITY_LEVELS, default='medium')
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='pending')
+
+    due_date = models.DateTimeField(null=True, blank=True, help_text="Optional due date for the task.")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']  
+        
+    def __str__(self):
+        return f"{self.todo} ({self.get_status_display()}) - {self.user.username}"
