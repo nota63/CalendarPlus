@@ -479,12 +479,23 @@ document.addEventListener('DOMContentLoaded', function () {
 // /TODO COMMAND
 document.addEventListener('DOMContentLoaded', function () {
     const inputField = document.getElementById("chat-message-input");
-    let dueDate = '';  // Store the due date
-    let todoText = '';  // Store the todo text
-    let typingTimer;  // Timer reference
-    const doneTypingInterval = 2000;  // 2-second delay before request
+    let dueDate = '';  
+    let todoText = '';  
+    let typingTimer;  
+    const doneTypingInterval = 2000;  
 
-    // Function to get CSRF token from cookies
+    // Create a spinner
+    const spinner = document.createElement('div');
+    spinner.innerHTML = `<div class="mui-spinner"></div>`;
+    spinner.style.display = "none"; // Initially hidden
+    document.body.appendChild(spinner);
+
+    // Create a pop-up container
+    const popup = document.createElement('div');
+    popup.classList.add('todo-popup');
+    popup.style.display = "none"; // Initially hidden
+    document.body.appendChild(popup);
+
     function getCSRFToken() {
         let csrfToken = null;
         document.cookie.split(';').forEach(cookie => {
@@ -496,64 +507,72 @@ document.addEventListener('DOMContentLoaded', function () {
         return csrfToken;
     }
 
-    // Event listener for user input
     inputField.addEventListener('input', function () {
         const command = inputField.value.trim();
-        // Check if the command starts with '/todo'
         if (command.startsWith('/todo')) {
-            const parts = command.split(' ');  // Split input into parts
+            const parts = command.split(' ');  
             if (parts.length >= 3) {
-                // Extract due date (2nd word) and todo text (remaining words)
                 dueDate = parts[1] + (parts.length >= 4 ? ` ${parts[2]}` : " 00:00:00");  
                 todoText = parts.slice(3).join(' ');  
-                // If both due date and todo text are entered, start the timer
+
                 if (dueDate && todoText) {
                     clearTimeout(typingTimer);
-                    // Start the timer to delay request after user stops typing
                     typingTimer = setTimeout(function () {
-                        // Get org_id and conversation_id
                         const orgId = window.djangoData.orgId;  
                         const conversationId = window.djangoData.conversationId;
                         if (!orgId || !conversationId) {
                             alert('Organization or Conversation ID is missing.');
                             return;
                         }
-                        // Construct the URL
+
                         const url = `/dm/schedule_todo_command/${orgId}/${conversationId}/`;
-                        // Debugging Logs
-                        console.log("Sending Todo Request to:", url);
-                        console.log("Formatted Due Date:", dueDate);
-                        console.log("Todo Text:", todoText);
-                        console.log("CSRF Token:", getCSRFToken());
-                        // Send the todo request to the server via POST
+
+                        // Show spinner
+                        spinner.style.display = "flex";
+
                         fetch(url, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/x-www-form-urlencoded',
-                                'X-CSRFToken': getCSRFToken(),  // Send CSRF Token
+                                'X-CSRFToken': getCSRFToken(),
                             },
                             body: new URLSearchParams({
                                 todo: todoText,
-                                due_date: dueDate,  // Pass due date as is without encoding
+                                due_date: dueDate,
                             })
                         })
-                            .then(response => response.json())
-                            .then(data => {
-                                console.log("Server Response:", data);
-                                if (data.status === 'success') {
-                                    alert('Todo saved successfully!');
-                                    inputField.value = '';  // Clear input after success
-                                } else {
-                                    alert('Error saving todo: ' + data.message);
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                alert('An error occurred while saving the todo.');
-                            });
-                    }, doneTypingInterval);  // 2 seconds delay before making request
+                        .then(response => response.json())
+                        .then(data => {
+                            spinner.style.display = "none"; // Hide spinner
+
+                            if (data.status === 'success') {
+                                showPopup(todoText, dueDate, "task", "medium"); // Show popup
+                                inputField.value = '';  
+                            } else {
+                                alert('Error saving todo: ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            spinner.style.display = "none"; 
+                            console.error('Error:', error);
+                            alert('An error occurred while saving the todo.');
+                        });
+                    }, doneTypingInterval);
                 }
             }
         }
     });
+
+    function showPopup(todo, dueDate, type, priority) {
+        popup.innerHTML = `
+            <div class="popup-content">
+                <span class="mui-icon">📌</span> <strong>Task:</strong> ${todo} <br>
+                <span class="mui-icon">⏳</span> <strong>Due:</strong> ${dueDate} <br>
+                <span class="mui-icon">📂</span> <strong>Type:</strong> ${type} <br>
+                <span class="mui-icon">⚡</span> <strong>Priority:</strong> ${priority}
+            </div>
+        `;
+        popup.style.display = "block";
+        setTimeout(() => popup.style.display = "none", 8000); // Hide after 5s
+    }
 });
