@@ -637,6 +637,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Populate Todos in Modal with smooth transitions
+    // Populate Todos in Modal with smooth transitions
     function populateTodos(todos) {
         todoContainer.innerHTML = ""; // Clear previous todos
         todos.forEach(todo => {
@@ -676,6 +677,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         attachEventListeners(); // Attach event listeners for updates and deletion
     }
+
+
+
 
     // Update Chart with smooth transitions
     function updateChart(todoCounts) {
