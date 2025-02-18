@@ -576,3 +576,227 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(() => popup.style.display = "none", 8000); // Hide after 5s
     }
 });
+
+
+
+
+
+// /todo manage (MANAGE USER TODOS)
+document.addEventListener("DOMContentLoaded", function () {
+    const inputField = document.getElementById("chat-message-input");
+    const modal = document.getElementById("todoManageModal");
+    const closeModal = document.getElementById("closeTodoModal");
+    const todoContainer = document.getElementById("todoContainer");
+    const messageContainer = document.getElementById("messageContainer"); // Container to show messages
+    const ctx = document.getElementById("todoChart").getContext("2d");
+    let todoChart; // Chart reference
+    let isFetching = false; // To prevent multiple fetches
+
+    // Function to get CSRF token
+    function getCSRFToken() {
+        let csrfToken = null;
+        document.cookie.split(";").forEach(cookie => {
+            let [name, value] = cookie.trim().split("=");
+            if (name === "csrftoken") {
+                csrfToken = value;
+            }
+        });
+        return csrfToken;
+    }
+
+    // Fetch Todos from backend with smooth transition
+    function fetchTodos() {
+        if (isFetching) return; // Prevent multiple fetch calls simultaneously
+        isFetching = true;
+
+        const orgId = window.djangoData.orgId;
+        const conversationId = window.djangoData.conversationId;
+
+        if (!orgId || !conversationId) {
+            alert("Organization or Conversation ID is missing.");
+            isFetching = false;
+            return;
+        }
+
+        fetch(`/dm/manage_todo/${orgId}/${conversationId}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    populateTodos(data.todos);
+                    updateChart(data.todo_counts); // Pass counts for chart update
+                } else {
+                    alert("Error fetching todos: " + data.message);
+                }
+                isFetching = false;
+            })
+            .catch(error => {
+                console.error("Error fetching todos:", error);
+                alert("An error occurred while fetching todos.");
+                isFetching = false;
+            });
+    }
+
+    // Populate Todos in Modal with smooth transitions
+    function populateTodos(todos) {
+        todoContainer.innerHTML = ""; // Clear previous todos
+        todos.forEach(todo => {
+            const todoElement = document.createElement("div");
+            todoElement.classList.add("todo-item");
+            todoElement.innerHTML = `
+                <div class="todo-details">
+                    <p><strong>${todo.todo}</strong></p>
+                    <p>Type: <select data-id="${todo.id}" class="todo-type">
+                        <option value="meeting" ${todo.type === "meeting" ? "selected" : ""}>Meeting</option>
+                        <option value="task" ${todo.type === "task" ? "selected" : ""}>Task</option>
+                        <option value="reminder" ${todo.type === "reminder" ? "selected" : ""}>Reminder</option>
+                    </select></p>
+                    <p>Priority: <select data-id="${todo.id}" class="todo-priority">
+                        <option value="low" ${todo.priority === "low" ? "selected" : ""}>Low</option>
+                        <option value="medium" ${todo.priority === "medium" ? "selected" : ""}>Medium</option>
+                        <option value="high" ${todo.priority === "high" ? "selected" : ""}>High</option>
+                        <option value="urgent" ${todo.priority === "urgent" ? "selected" : ""}>Urgent</option>
+                    </select></p>
+                    <p>Reminder: <select data-id="${todo.id}" class="todo-reminder">
+                        <option value="Before 10 minutes" ${todo.reminder === "Before 10 minutes" ? "selected" : ""}>Before 10 minutes</option>
+                        <option value="Before 20 minutes" ${todo.reminder === "Before 20 minutes" ? "selected" : ""}>Before 20 minutes</option>
+                        <option value="Before an hour" ${todo.reminder === "Before an hour" ? "selected" : ""}>Before an hour</option>
+                        <option value="None" ${todo.reminder === "None" ? "selected" : ""}>None</option>
+                    </select></p>
+                    <p>Status: <select data-id="${todo.id}" class="todo-status">
+                        <option value="pending" ${todo.status === "pending" ? "selected" : ""}>Pending</option>
+                        <option value="in_progress" ${todo.status === "in_progress" ? "selected" : ""}>In Progress</option>
+                        <option value="completed" ${todo.status === "completed" ? "selected" : ""}>Completed</option>
+                         <p>Due Date: <input type="datetime-local" value="${todo.due_date}" class="todo-due-date" data-id="${todo.id}" /></p>
+                    </select></p>
+                </div>
+                <button class="delete-todo" data-id="${todo.id}">🗑️ Delete</button>
+            `;
+            todoContainer.appendChild(todoElement);
+        });
+
+        attachEventListeners(); // Attach event listeners for updates and deletion
+    }
+
+    // Update Chart with smooth transitions
+    function updateChart(todoCounts) {
+        if (todoChart) {
+            todoChart.destroy();
+        }
+        todoChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: ["Pending", "In Progress", "Completed"],
+                datasets: [{
+                    label: "Todo Status Count",
+                    data: [todoCounts.pending, todoCounts.in_progress, todoCounts.completed],
+                    backgroundColor: ["#f39c12", "#3498db", "#2ecc71"]
+                }]
+            },
+            options: {
+                animation: {
+                    duration: 1000, // Smooth transition for chart updates
+                    easing: "easeInOutQuart"
+                }
+            }
+        });
+    }
+
+    // Event Listeners for Todo Updates & Deletion
+    function attachEventListeners() {
+        document.querySelectorAll(".todo-type, .todo-priority, .todo-reminder, .todo-status").forEach(select => {
+            select.addEventListener("change", function () {
+                const todoId = this.dataset.id;
+                const field = this.className.split("-")[1];
+                const value = this.value;
+                updateTodo(todoId, field, value);
+            });
+        });
+
+        document.querySelectorAll(".delete-todo").forEach(button => {
+            button.addEventListener("click", function () {
+                const todoId = this.dataset.id;
+                deleteTodo(todoId);
+            });
+        });
+    }
+
+    // Update Todo (Handle via backend with smooth transitions)
+    function updateTodo(todoId, field, value) {
+        const orgId = window.djangoData.orgId;
+        const conversationId = window.djangoData.conversationId;
+    
+        fetch(`/dm/manage_todo/update/${orgId}/${conversationId}/${todoId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",  // Change this to application/json
+                "X-CSRFToken": getCSRFToken()
+            },
+            body: JSON.stringify({
+                [field]: value                   // Ensure the data is sent as a JSON object
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                showMessage("Todo updated successfully!", "success");
+            } else {
+                showMessage("Error updating todo: " + data.message, "error");
+            }
+        })
+        .catch(error => showMessage("Error updating todo: " + error, "error"));
+    }
+
+    // Delete Todo with smooth transitions
+    function deleteTodo(todoId) {
+        const orgId = window.djangoData.orgId;
+        const conversationId = window.djangoData.conversationId;
+
+        fetch(`/dm/manage_todo/delete/${orgId}/${conversationId}/${todoId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": getCSRFToken()
+            },
+            body: new URLSearchParams({ todo_id: todoId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                fetchTodos(); // Refresh todos after delete
+                showMessage("Todo deleted successfully!", "success");
+            } else {
+                showMessage("Error deleting todo: " + data.message, "error");
+            }
+        })
+        .catch(error => showMessage("Error deleting todo: " + error, "error"));
+    }
+
+    // Show success/error message
+    function showMessage(message, type) {
+        messageContainer.innerHTML = `<div class="message ${type}">${message}</div>`;
+        setTimeout(() => {
+            messageContainer.innerHTML = ''; // Hide the message after 3 seconds
+        }, 3000);
+    }
+
+    // Open Modal When "/todo manage" is typed
+    inputField.addEventListener("input", function () {
+        if (inputField.value.trim() === "/todo manage") {
+            inputField.value = ""; // Clear input
+            modal.style.display = "block"; // Show modal
+            fetchTodos(); // Fetch todos
+        }
+    });
+
+    // Close Modal
+    closeModal.addEventListener("click", function () {
+        modal.style.display = "none";
+    });
+
+    // Close Modal when clicking outside
+    window.addEventListener("click", function (event) {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+});

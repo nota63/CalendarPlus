@@ -1860,6 +1860,22 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 
+<!-- /TODO MANAGE (MANAGE USER TODOS) -->
+<!-- Todo Management Modal -->
+<div id="todoManageModal" class="modal">
+    <div class="modal-content">
+        <span id="closeTodoModal" class="close-btn">&times;</span>
+        <h2>Manage Todos</h2>
+
+        <!-- Todo List -->
+        <div id="todoContainer">
+            <!-- Dynamic Todo List will be inserted here -->
+        </div>
+
+        <!-- Todo Chart -->
+        <canvas id="todoChart"></canvas>
+    </div>
+</div>
 
 
 
@@ -1893,6 +1909,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
  <!-- Link your JS file -->
 <script src="{% static 'workspace/one_on_one.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {

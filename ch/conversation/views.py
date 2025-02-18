@@ -930,3 +930,84 @@ def schedule_todo_command(request, org_id, conversation_id):
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
 
     return JsonResponse({"status": "error", "message": "Invalid request method."}, status=400)
+
+
+# /todo manage 
+# (MANAGE USERS TODOS )
+@csrf_exempt
+def fetch_todos(request, org_id, conversation_id):
+    user = request.user  # Get the logged-in user
+    
+    if request.method == "GET":
+        # Fetch todos for the given org and conversation
+        todos = Todo.objects.filter(organization_id=org_id, conversation_id=conversation_id, user=user)
+        todos_data = [
+            {
+                "id": todo.id,
+                "todo": todo.todo,
+                "type": todo.type,
+                "priority": todo.priority,
+                "status": todo.status,
+                "reminder": todo.reminder,
+                "due_date": todo.due_date.strftime('%Y-%m-%d %H:%M:%S') if todo.due_date else None,
+            }
+            for todo in todos
+        ]
+        return JsonResponse({"status": "success", "todos": todos_data})
+    
+    return JsonResponse({"status": "error", "message": "Invalid request method."}, status=405)
+
+
+# Update todos 
+import logging
+
+logger = logging.getLogger(__name__)
+
+@csrf_exempt
+def update_todo(request, org_id, conversation_id, todo_id):
+    user = request.user  # Get the logged-in user
+    
+    if request.method == "POST":
+        try:
+            # Log the request body
+            logger.debug(f"Request body: {request.body}")
+            
+            data = json.loads(request.body)
+            
+            todo = get_object_or_404(Todo, id=todo_id, user=user, organization_id=org_id, conversation_id=conversation_id)
+            
+            todo.status = data.get("status", todo.status)
+            todo.priority = data.get("priority", todo.priority)
+            todo.type = data.get("type", todo.type)
+            todo.reminder = data.get("reminder", todo.reminder)
+            
+            if data.get("due_date"):
+                todo.due_date = data.get("due_date")
+            
+            todo.save()
+            
+            return JsonResponse({"status": "success", "message": "Todo updated successfully."})
+        
+        except Exception as e:
+            logger.error(f"Error: {e}")  # Log the exception
+            return JsonResponse({"status": "error", "message": str(e)}, status=400)
+    
+    return JsonResponse({"status": "error", "message": "Invalid request method."}, status=405)
+
+
+# delete todo
+
+@csrf_exempt
+def delete_todo(request, org_id, conversation_id, todo_id):
+    user = request.user  # Get the logged-in user
+    
+    if request.method == "POST":
+        try:
+            todo = get_object_or_404(Todo, id=todo_id, user=user, organization_id=org_id, conversation_id=conversation_id)
+            todo.delete()
+            return JsonResponse({"status": "success", "message": "Todo deleted successfully."})
+        
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=400)
+    
+    return JsonResponse({"status": "error", "message": "Invalid request method."}, status=405)

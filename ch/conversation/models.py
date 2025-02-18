@@ -140,6 +140,19 @@ class Todo(models.Model):
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='pending')
 
     due_date = models.DateTimeField(null=True, blank=True, help_text="Optional due date for the task.")
+    reminder = models.CharField(
+    max_length=100,
+    choices=[
+        ('Before 10 minutes', 'Before 10 minutes'),
+        ('Before 20 minutes', 'Before 20 minutes'),
+        ('Before an hour', 'Before an hour'),
+        ('None', 'None')
+    ],
+    default='Before 10 minutes',
+    null=True,
+    blank=True
+   )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

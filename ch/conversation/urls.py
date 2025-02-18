@@ -21,5 +21,8 @@ urlpatterns=[
     path('jokes/',jokes,name='jokes'),
     path('gifs/',fetch_gifs, name='fetch_gifs'),
     path('schedule_message_command/<int:org_id>/<int:conversation_id>/',schedule_message_command, name='schedule_message_command'),
-    path('schedule_todo_command/<int:org_id>/<int:conversation_id>/',schedule_todo_command, name='schedule_todo_command')
+    path('schedule_todo_command/<int:org_id>/<int:conversation_id>/',schedule_todo_command, name='schedule_todo_command'),
+    path('manage_todo/<int:org_id>/<int:conversation_id>/', fetch_todos, name='fetch_todos'),
+    path('manage_todo/update/<int:org_id>/<int:conversation_id>/<int:todo_id>/',update_todo, name='update_todo'),
+    path('manage_todo/delete/<int:org_id>/<int:conversation_id>/<int:todo_id>/',delete_todo, name='delete_todo'),
 ]
