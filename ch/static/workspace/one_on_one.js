@@ -804,3 +804,18 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+
+// /GREET 
+
+document.addEventListener("DOMContentLoaded", function () {
+    const inputField = document.getElementById("chat-message-input");
+
+    inputField.addEventListener("input", function () {
+        if (inputField.value.trim() === "/greet") {
+            setTimeout(() => {
+                inputField.value = "Hello there! 😊 I hope you're having a fantastic day! How can I assist you today? Whether it's managing tasks, scheduling reminders, or just chatting, I'm here to help! 💡";
+            }, 100); // Adding a small delay for better UX
+        }
+    });
+});

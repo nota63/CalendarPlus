@@ -989,7 +989,7 @@ def update_todo(request, org_id, conversation_id, todo_id):
             return JsonResponse({"status": "success", "message": "Todo updated successfully."})
         
         except Exception as e:
-            logger.error(f"Error: {e}")  # Log the exception
+            logger.error(f"Error: {e}")  
             return JsonResponse({"status": "error", "message": str(e)}, status=400)
     
     return JsonResponse({"status": "error", "message": "Invalid request method."}, status=405)
@@ -999,7 +999,7 @@ def update_todo(request, org_id, conversation_id, todo_id):
 
 @csrf_exempt
 def delete_todo(request, org_id, conversation_id, todo_id):
-    user = request.user  # Get the logged-in user
+    user = request.user 
     
     if request.method == "POST":
         try:
@@ -1011,3 +1011,5 @@ def delete_todo(request, org_id, conversation_id, todo_id):
             return JsonResponse({"status": "error", "message": str(e)}, status=400)
     
     return JsonResponse({"status": "error", "message": "Invalid request method."}, status=405)
+
+
