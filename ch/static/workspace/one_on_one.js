@@ -474,3 +474,94 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+
+// /TODO COMMAND
+// TODO COMMAND
+document.addEventListener('DOMContentLoaded', function () {
+    const inputField = document.getElementById("chat-message-input");
+    let dueDate = '';  // Store the due date
+    let todoText = '';  // Store the todo text
+    let typingTimer;  // Timer reference
+    const doneTypingInterval = 2000;  // 2-second delay before request
+
+    // Function to get CSRF token from cookies
+    function getCSRFToken() {
+        let csrfToken = null;
+        document.cookie.split(';').forEach(cookie => {
+            let [name, value] = cookie.trim().split('=');
+            if (name === 'csrftoken') {
+                csrfToken = value;
+            }
+        });
+        return csrfToken;
+    }
+
+    // Event listener for user input
+    inputField.addEventListener('input', function () {
+        const command = inputField.value.trim();
+
+        // Check if the command starts with '/todo'
+        if (command.startsWith('/todo')) {
+            const parts = command.split(' ');  // Split input into parts
+            if (parts.length >= 3) {
+                // Extract due date (2nd word) and todo text (remaining words)
+                dueDate = parts[1] + (parts.length >= 4 ? ` ${parts[2]}` : " 00:00:00");  
+                todoText = parts.slice(3).join(' ');  
+
+                // If both due date and todo text are entered, start the timer
+                if (dueDate && todoText) {
+                    clearTimeout(typingTimer);
+
+                    // Start the timer to delay request after user stops typing
+                    typingTimer = setTimeout(function () {
+                        // Get org_id and conversation_id
+                        const orgId = window.djangoData.orgId;  
+                        const conversationId = window.djangoData.conversationId;
+
+                        if (!orgId || !conversationId) {
+                            alert('Organization or Conversation ID is missing.');
+                            return;
+                        }
+
+                        // Construct the URL
+                        const url = `/dm/todo_command/${orgId}/${conversationId}/`;
+
+                        // Debugging Logs
+                        console.log("Sending Todo Request to:", url);
+                        console.log("Formatted Due Date:", dueDate);
+                        console.log("Todo Text:", todoText);
+                        console.log("CSRF Token:", getCSRFToken());
+
+                        // Send the todo request to the server via POST
+                        fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'X-CSRFToken': getCSRFToken(),  // Send CSRF Token
+                            },
+                            body: new URLSearchParams({
+                                todo: todoText,
+                                due_date: dueDate.replace(" ", "%20"),  // Encode spaces properly
+                            })
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log("Server Response:", data);
+                                if (data.status === 'success') {
+                                    alert('Todo saved successfully!');
+                                    inputField.value = '';  // Clear input after success
+                                } else {
+                                    alert('Error saving todo: ' + data.message);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('An error occurred while saving the todo.');
+                            });
+                    }, doneTypingInterval);  // 2 seconds delay before making request
+                }
+            }
+        }
+    });
+});

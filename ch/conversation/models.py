@@ -109,6 +109,7 @@ class MessageSuggestion(models.Model):
 
 
 # TODO FOR SPECIFIC CHAT
+
 class Todo(models.Model):
     TODO_TYPES = [
         ('meeting', 'Meeting'),
@@ -144,6 +145,6 @@ class Todo(models.Model):
 
     class Meta:
         ordering = ['-created_at']  
-        
+
     def __str__(self):
         return f"{self.todo} ({self.get_status_display()}) - {self.user.username}"

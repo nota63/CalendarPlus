@@ -21,4 +21,5 @@ urlpatterns=[
     path('jokes/',jokes,name='jokes'),
     path('gifs/',fetch_gifs, name='fetch_gifs'),
     path('schedule_message_command/<int:org_id>/<int:conversation_id>/',schedule_message_command, name='schedule_message_command'),
+    path('schedule_todo_command/<int:org_id>/<int:conversation_id>/',schedule_todo_command, name='schedule_todo_command')
 ]

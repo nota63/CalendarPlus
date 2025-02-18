@@ -1,6 +1,6 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from .models import Conversation, Message, MessageSuggestion, ScheduledMessage
+from .models import Conversation, Message, MessageSuggestion, ScheduledMessage,Todo
 
 @admin.register(Conversation)
 class ConversationAdmin(ModelAdmin):
@@ -18,6 +18,12 @@ class MessageSuggestionAdmin(ModelAdmin):
 
 
 @admin.register(ScheduledMessage)
-class MessageSuggestionAdmin(ModelAdmin):
+class ScheduledMessagesAdmin(ModelAdmin):
     list_display = [field.name for field in ScheduledMessage._meta.fields]
+
+
+
+@admin.register(Todo)
+class TodoAdmin(ModelAdmin):
+    list_display = [field.name for field in Todo._meta.fields]
 

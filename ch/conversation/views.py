@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from .models import (Conversation, Message,ScheduledMessage,MessageSuggestion)
+from .models import (Conversation, Message,ScheduledMessage,MessageSuggestion,Todo)
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -870,3 +870,68 @@ def schedule_message_command(request, org_id, conversation_id):
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
+
+
+
+# /todo <due_date> <task> command
+@csrf_exempt
+def schedule_todo_command(request, org_id, conversation_id):
+    if request.method == "POST":
+        try:
+            print("📥 Raw POST Data:", request.POST)
+
+            conversation = get_object_or_404(Conversation, id=conversation_id, organization_id=org_id)
+            user = request.user  
+
+            due_date_str = request.POST.get("due_date")  # Expected format: YYYY-MM-DD
+            todo_text_raw = request.POST.get("todo")  # Comes with time and actual task
+
+            print(f"🔍 Received - Due Date: {due_date_str}, Raw Todo: {todo_text_raw}")
+
+            if not due_date_str or not todo_text_raw:
+                return JsonResponse({"status": "error", "message": "Due date and task are required."}, status=400)
+
+            # Splitting time and actual task from the todo_text_raw
+            parts = todo_text_raw.split(" ", 1)  
+            if len(parts) < 2:
+                return JsonResponse({"status": "error", "message": "Invalid format. Use /todo YYYY-MM-DD HH:MM:SS Task Description"}, status=400)
+
+            time_part, todo_text = parts  # Extract time and actual task
+
+            # Merge date and time into a full timestamp string
+            full_datetime_str = f"{due_date_str} {time_part}"
+
+            print(f"🛠 Merged Date-Time: {full_datetime_str}, Task: {todo_text}")
+
+            # Convert to timezone-aware datetime
+            try:
+                due_date = datetime.strptime(full_datetime_str, "%Y-%m-%d %H:%M:%S")
+                due_date = timezone.make_aware(due_date, timezone.get_current_timezone())
+            except ValueError:
+                print("❌ Invalid Date Format:", full_datetime_str)
+                return JsonResponse({"status": "error", "message": "Invalid date format. Use YYYY-MM-DD HH:MM:SS."}, status=400)
+
+            print("✅ Final Due Date:", due_date)
+
+            # Save the todo
+            todo = Todo.objects.create(
+                organization=conversation.organization,
+                conversation=conversation,
+                user=user,
+                todo=todo_text,
+                type="task",  
+                due_date=due_date,
+            )
+
+            print("✅ Todo Created Successfully:", todo)
+            return JsonResponse({"status": "success", "message": "Todo scheduled successfully!"})
+
+        except Conversation.DoesNotExist:
+            print("❌ Conversation Not Found")
+            return JsonResponse({"status": "error", "message": "Conversation not found."}, status=400)
+
+        except Exception as e:
+            print("❌ Unexpected Error:", str(e))
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
+    return JsonResponse({"status": "error", "message": "Invalid request method."}, status=400)
