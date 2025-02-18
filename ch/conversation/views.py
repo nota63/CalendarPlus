@@ -879,39 +879,36 @@ def schedule_todo_command(request, org_id, conversation_id):
     if request.method == "POST":
         try:
             print("📥 Raw POST Data:", request.POST)
-
             conversation = get_object_or_404(Conversation, id=conversation_id, organization_id=org_id)
             user = request.user  
 
-            due_date_str = request.POST.get("due_date")  # Expected format: YYYY-MM-DD
+            due_date_str = request.POST.get("due_date")  # Expected format: YYYY-MM-DD HH:MM:SS
             todo_text_raw = request.POST.get("todo")  # Comes with time and actual task
-
             print(f"🔍 Received - Due Date: {due_date_str}, Raw Todo: {todo_text_raw}")
 
             if not due_date_str or not todo_text_raw:
                 return JsonResponse({"status": "error", "message": "Due date and task are required."}, status=400)
 
-            # Splitting time and actual task from the todo_text_raw
-            parts = todo_text_raw.split(" ", 1)  
+            # Split the input to separate due date and task description
+            parts = due_date_str.split(" ", 1)  # Split into date and time part
             if len(parts) < 2:
-                return JsonResponse({"status": "error", "message": "Invalid format. Use /todo YYYY-MM-DD HH:MM:SS Task Description"}, status=400)
+                return JsonResponse({"status": "error", "message": "Invalid due date format. Expected YYYY-MM-DD HH:MM:SS."}, status=400)
+            
+            due_date = f"{parts[0]} {parts[1]}"  # Format like '2025-02-19 14:30:00'
 
-            time_part, todo_text = parts  # Extract time and actual task
-
-            # Merge date and time into a full timestamp string
-            full_datetime_str = f"{due_date_str} {time_part}"
-
-            print(f"🛠 Merged Date-Time: {full_datetime_str}, Task: {todo_text}")
+            # Extract the todo text (task description)
+            todo_text = todo_text_raw.strip()  # Get the actual task text
+            print(f"🛠 Merged Date-Time: {due_date}, Task: {todo_text}")
 
             # Convert to timezone-aware datetime
             try:
-                due_date = datetime.strptime(full_datetime_str, "%Y-%m-%d %H:%M:%S")
-                due_date = timezone.make_aware(due_date, timezone.get_current_timezone())
+                due_date_obj = datetime.strptime(due_date, "%Y-%m-%d %H:%M:%S")
+                due_date_obj = timezone.make_aware(due_date_obj, timezone.get_current_timezone())
             except ValueError:
-                print("❌ Invalid Date Format:", full_datetime_str)
+                print("❌ Invalid Date Format:", due_date)
                 return JsonResponse({"status": "error", "message": "Invalid date format. Use YYYY-MM-DD HH:MM:SS."}, status=400)
 
-            print("✅ Final Due Date:", due_date)
+            print("✅ Final Due Date:", due_date_obj)
 
             # Save the todo
             todo = Todo.objects.create(
@@ -920,16 +917,14 @@ def schedule_todo_command(request, org_id, conversation_id):
                 user=user,
                 todo=todo_text,
                 type="task",  
-                due_date=due_date,
+                due_date=due_date_obj,
             )
-
             print("✅ Todo Created Successfully:", todo)
             return JsonResponse({"status": "success", "message": "Todo scheduled successfully!"})
 
         except Conversation.DoesNotExist:
             print("❌ Conversation Not Found")
             return JsonResponse({"status": "error", "message": "Conversation not found."}, status=400)
-
         except Exception as e:
             print("❌ Unexpected Error:", str(e))
             return JsonResponse({"status": "error", "message": str(e)}, status=500)

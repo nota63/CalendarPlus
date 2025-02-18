@@ -398,7 +398,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 // SCHEDULE MESSAGE COMMAND
-// SCHEDULE MESSAGE COMMAND
+
 document.addEventListener('DOMContentLoaded', function () {
     const inputField = document.getElementById("chat-message-input");
     let scheduleTime = '';  // Store the time entered by the user
@@ -477,7 +477,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 // /TODO COMMAND
-// TODO COMMAND
 document.addEventListener('DOMContentLoaded', function () {
     const inputField = document.getElementById("chat-message-input");
     let dueDate = '';  // Store the due date
@@ -500,7 +499,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Event listener for user input
     inputField.addEventListener('input', function () {
         const command = inputField.value.trim();
-
         // Check if the command starts with '/todo'
         if (command.startsWith('/todo')) {
             const parts = command.split(' ');  // Split input into parts
@@ -508,31 +506,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Extract due date (2nd word) and todo text (remaining words)
                 dueDate = parts[1] + (parts.length >= 4 ? ` ${parts[2]}` : " 00:00:00");  
                 todoText = parts.slice(3).join(' ');  
-
                 // If both due date and todo text are entered, start the timer
                 if (dueDate && todoText) {
                     clearTimeout(typingTimer);
-
                     // Start the timer to delay request after user stops typing
                     typingTimer = setTimeout(function () {
                         // Get org_id and conversation_id
                         const orgId = window.djangoData.orgId;  
                         const conversationId = window.djangoData.conversationId;
-
                         if (!orgId || !conversationId) {
                             alert('Organization or Conversation ID is missing.');
                             return;
                         }
-
                         // Construct the URL
-                        const url = `/dm/todo_command/${orgId}/${conversationId}/`;
-
+                        const url = `/dm/schedule_todo_command/${orgId}/${conversationId}/`;
                         // Debugging Logs
                         console.log("Sending Todo Request to:", url);
                         console.log("Formatted Due Date:", dueDate);
                         console.log("Todo Text:", todoText);
                         console.log("CSRF Token:", getCSRFToken());
-
                         // Send the todo request to the server via POST
                         fetch(url, {
                             method: 'POST',
@@ -542,7 +534,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             },
                             body: new URLSearchParams({
                                 todo: todoText,
-                                due_date: dueDate.replace(" ", "%20"),  // Encode spaces properly
+                                due_date: dueDate,  // Pass due date as is without encoding
                             })
                         })
                             .then(response => response.json())
