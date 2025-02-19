@@ -1737,6 +1737,13 @@ document.addEventListener("DOMContentLoaded", function () {
     let wikiTriggered = false;
     let typingTimer; // Timer for delay
 
+    const loaderHTML = `
+        <div class="wiki-loader-container">
+            <div class="wiki-loader"></div>
+            <span class="wiki-loader-text">Fetching Wikipedia...</span>
+        </div>
+    `;
+
     inputField.addEventListener("input", function () {
         clearTimeout(typingTimer); // Reset timer on each keystroke
         const userInput = inputField.value.trim();
@@ -1760,7 +1767,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function fetchWikiData(query) {
-        inputField.value = "Fetching Wikipedia details..."; // Show loading
+        inputField.value = ""; // Clear input
+        inputField.insertAdjacentHTML("afterend", loaderHTML); // Show Material UI Spinner
 
         fetch(`/dm/fetch-wiki/?query=${encodeURIComponent(query)}`)
             .then(response => {
@@ -1769,6 +1777,8 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .then(data => {
                 console.log("Response received:", data); // ✅ Debugging
+                document.querySelector(".wiki-loader-container")?.remove(); // Remove Spinner
+
                 if (data.extract) {
                     displayWikiModal(data);
                 } else {
@@ -1778,6 +1788,7 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(error => {
                 console.error("Fetch error:", error); // ✅ Debugging
+                document.querySelector(".wiki-loader-container")?.remove(); // Remove Spinner
                 inputField.value = "Error fetching Wikipedia details.";
                 wikiTriggered = false;
             });
@@ -1786,11 +1797,13 @@ document.addEventListener("DOMContentLoaded", function () {
     function displayWikiModal(data) {
         let modalBody = document.getElementById("wikiModalBody");
         modalBody.innerHTML = `
-            <h4 class="modal-title">${data.title}</h4>
-            <p>${data.extract}</p>
-            ${data.thumbnail ? `<img src="${data.thumbnail.source}" class="wiki-image" alt="${data.title}">` : ""}
-            <p><a href="${data.content_urls.desktop.page}" target="_blank">Read more on Wikipedia</a></p>
-            <button class="btn btn-primary select-content-btn">📌 Select Content</button>
+            <div class="wiki-card">
+                <h4 class="wiki-title">${data.title}</h4>
+                <p class="wiki-text">${data.extract}</p>
+                ${data.thumbnail ? `<img src="${data.thumbnail.source}" class="wiki-image" alt="${data.title}">` : ""}
+                <p><a href="${data.content_urls.desktop.page}" target="_blank" class="wiki-link">Read more on Wikipedia</a></p>
+                <button class="btn btn-primary select-content-btn">📌 Select Content</button>
+            </div>
         `;
 
         let wikiModal = new bootstrap.Modal(document.getElementById("wikiModal"));
