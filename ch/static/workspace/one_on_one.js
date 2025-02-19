@@ -1543,8 +1543,16 @@ document.addEventListener("DOMContentLoaded", function () {
     function displayPingModal(data) {
         let modalBody = document.getElementById("pingModalBody");
         modalBody.innerHTML = `
-            <h4>Server Uptime: ${data.uptime_percentage.toFixed(2)}%</h4>
-            <canvas id="pingChart"></canvas>
+            <h4>System Uptime: ${data.system_uptime}</h4>
+            <div class="chart-container">
+                <canvas id="pingChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="speedChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="apiLatencyChart"></canvas>
+            </div>
         `;
 
         let pingModal = new bootstrap.Modal(document.getElementById("pingModal"));
@@ -1552,6 +1560,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         setTimeout(() => {
             renderPingChart(data);
+            renderSpeedChart(data);
+            renderApiLatencyChart(data);
         }, 500);
     }
 
@@ -1560,23 +1570,54 @@ document.addEventListener("DOMContentLoaded", function () {
         new Chart(ctx, {
             type: "line",
             data: {
+                labels: ["Min", "Avg", "Max"],
+                datasets: [{
+                    label: "Ping Times (ms)",
+                    data: [data.server_response_times.min, data.server_response_times.avg, data.server_response_times.max],
+                    borderColor: "#FF6384",
+                    backgroundColor: "rgba(255,99,132,0.2)",
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+
+    function renderSpeedChart(data) {
+        let ctx = document.getElementById("speedChart").getContext("2d");
+        new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: ["Download", "Upload"],
+                datasets: [{
+                    label: "Speed (Mbps)",
+                    data: [data.network_speed.download_speed, data.network_speed.upload_speed],
+                    backgroundColor: ["#36A2EB", "#4CAF50"]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+
+    function renderApiLatencyChart(data) {
+        let ctx = document.getElementById("apiLatencyChart").getContext("2d");
+        new Chart(ctx, {
+            type: "line",
+            data: {
                 labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-                datasets: [
-                    {
-                        label: "Response Time (ms)",
-                        data: data.server_response_times,
-                        borderColor: "#FF6384",
-                        backgroundColor: "rgba(255,99,132,0.2)",
-                        fill: true,
-                    },
-                    {
-                        label: "API Latency (ms)",
-                        data: data.api_latency,
-                        borderColor: "#36A2EB",
-                        backgroundColor: "rgba(54,162,235,0.2)",
-                        fill: true,
-                    }
-                ]
+                datasets: [{
+                    label: "API Latency (ms)",
+                    data: data.api_latency,
+                    borderColor: "#FFA500",
+                    backgroundColor: "rgba(255,165,0,0.2)",
+                    fill: true
+                }]
             },
             options: {
                 responsive: true,

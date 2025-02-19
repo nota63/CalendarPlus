@@ -1089,14 +1089,52 @@ def fetch_roast(request):
 
 # /ping (current network status)
 import subprocess
+import speedtest
+import psutil
+import time
+
+
+
+def get_ping():
+    """Ping Google's DNS (8.8.8.8) and return the response time in ms."""
+    try:
+        result = subprocess.run(["ping", "-c", "4", "8.8.8.8"], capture_output=True, text=True)
+        lines = result.stdout.split("\n")
+        stats = lines[-2].split("=")[-1].strip().split("/")
+        return {"min": float(stats[0]), "avg": float(stats[1]), "max": float(stats[2])}
+    except Exception:
+        return {"min": None, "avg": None, "max": None}
+
+def get_network_speed():
+    """Get download and upload speed using speedtest library."""
+    try:
+        st = speedtest.Speedtest()
+        st.get_best_server()
+        download_speed = round(st.download() / 1_000_000, 2)  # Convert to Mbps
+        upload_speed = round(st.upload() / 1_000_000, 2)  # Convert to Mbps
+        return {"download_speed": download_speed, "upload_speed": upload_speed}
+    except Exception:
+        return {"download_speed": None, "upload_speed": None}
+
+def get_system_uptime():
+    """Get system uptime in hours and minutes."""
+    uptime_seconds = time.time() - psutil.boot_time()
+    uptime_hours = int(uptime_seconds // 3600)
+    uptime_minutes = int((uptime_seconds % 3600) // 60)
+    return f"{uptime_hours}h {uptime_minutes}m"
 
 def fetch_ping_stats(request):
     """
-    Returns random server response times and uptime stats for the ping command.
+    Returns real-time server response times, network speed, system uptime, and API latency.
     """
+    ping_data = get_ping()
+    speed_data = get_network_speed()
+    uptime = get_system_uptime()
+    
     data = {
-        "server_response_times": [random.randint(50, 300) for _ in range(7)],  # Simulating response times (ms)
-        "uptime_percentage": random.uniform(98.5, 99.99),  # Simulating uptime %
+        "server_response_times": ping_data,  # Min, Avg, Max ping (ms)
+        "network_speed": speed_data,  # Download & Upload speed (Mbps)
+        "system_uptime": uptime,  # System uptime in hours & minutes
         "api_latency": [random.randint(100, 500) for _ in range(7)],  # Simulating API latency (ms)
     }
     return JsonResponse(data)
