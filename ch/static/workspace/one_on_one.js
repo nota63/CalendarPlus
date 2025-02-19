@@ -1732,25 +1732,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // /wiki <query>
-
 document.addEventListener("DOMContentLoaded", function () {
     const inputField = document.getElementById("chat-message-input");
     let wikiTriggered = false;
+    let typingTimer; // Timer for delay
 
     inputField.addEventListener("input", function () {
+        clearTimeout(typingTimer); // Reset timer on each keystroke
         const userInput = inputField.value.trim();
 
-        if (userInput.startsWith("/wiki") && !wikiTriggered) {
-            wikiTriggered = true;  
-            console.log("Wiki command detected!"); // ✅ Debugging
+        if (userInput.startsWith("/wiki")) {
+            typingTimer = setTimeout(() => {
+                if (!wikiTriggered) {
+                    wikiTriggered = true;
+                    console.log("Wiki command detected!"); // ✅ Debugging
 
-            const query = userInput.replace("/wiki", "").trim();
-            if (query) {
-                console.log(`Fetching Wikipedia for: ${query}`); // ✅ Debugging
-                fetchWikiData(query);
-            } else {
-                wikiTriggered = false; // Reset trigger if no query
-            }
+                    const query = userInput.replace("/wiki", "").trim();
+                    if (query) {
+                        console.log(`Fetching Wikipedia for: ${query}`); // ✅ Debugging
+                        fetchWikiData(query);
+                    } else {
+                        wikiTriggered = false; // Reset trigger if no query
+                    }
+                }
+            }, 3000); // 3 seconds delay
         }
     });
 
@@ -1785,9 +1790,16 @@ document.addEventListener("DOMContentLoaded", function () {
             <p>${data.extract}</p>
             ${data.thumbnail ? `<img src="${data.thumbnail.source}" class="wiki-image" alt="${data.title}">` : ""}
             <p><a href="${data.content_urls.desktop.page}" target="_blank">Read more on Wikipedia</a></p>
+            <button class="btn btn-primary select-content-btn">📌 Select Content</button>
         `;
 
         let wikiModal = new bootstrap.Modal(document.getElementById("wikiModal"));
         wikiModal.show();
+
+        // Attach event listener to "Select Content" button
+        document.querySelector(".select-content-btn").addEventListener("click", function () {
+            inputField.value = `/wiki ${data.extract.substring(0, 100)}...`; // Append first 100 chars
+            wikiModal.hide();
+        });
     }
 });
