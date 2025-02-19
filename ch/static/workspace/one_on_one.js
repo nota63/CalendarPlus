@@ -1507,7 +1507,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // /ping (current network status)
-
 document.addEventListener("DOMContentLoaded", function () {
     const inputField = document.getElementById("chat-message-input");
     let pingTriggered = false; // Prevent duplicate requests
@@ -1543,15 +1542,12 @@ document.addEventListener("DOMContentLoaded", function () {
     function displayPingModal(data) {
         let modalBody = document.getElementById("pingModalBody");
         modalBody.innerHTML = `
-            <h4>System Uptime: ${data.system_uptime}</h4>
-            <div class="chart-container">
-                <canvas id="pingChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <canvas id="speedChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <canvas id="apiLatencyChart"></canvas>
+            <h4 class="modal-title">📊 Network & Server Stats</h4>
+            <p class="system-uptime">System Uptime: ${data.system_uptime}</p>
+            <div class="chart-row">
+                <div class="chart-container"><canvas id="pingChart"></canvas></div>
+                <div class="chart-container"><canvas id="speedChart"></canvas></div>
+                <div class="chart-container"><canvas id="apiLatencyChart"></canvas></div>
             </div>
         `;
 
@@ -1575,7 +1571,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     label: "Ping Times (ms)",
                     data: [data.server_response_times.min, data.server_response_times.avg, data.server_response_times.max],
                     borderColor: "#FF6384",
-                    backgroundColor: "rgba(255,99,132,0.2)",
+                    backgroundColor: "rgba(255,99,132,0.5)",
+                    borderWidth: 2,
+                    tension: 0.4,
                     fill: true
                 }]
             },
@@ -1595,7 +1593,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 datasets: [{
                     label: "Speed (Mbps)",
                     data: [data.network_speed.download_speed, data.network_speed.upload_speed],
-                    backgroundColor: ["#36A2EB", "#4CAF50"]
+                    backgroundColor: ["#36A2EB", "#4CAF50"],
+                    borderRadius: 10
                 }]
             },
             options: {
@@ -1615,7 +1614,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     label: "API Latency (ms)",
                     data: data.api_latency,
                     borderColor: "#FFA500",
-                    backgroundColor: "rgba(255,165,0,0.2)",
+                    backgroundColor: "rgba(255,165,0,0.5)",
+                    borderWidth: 2,
+                    tension: 0.4,
                     fill: true
                 }]
             },
