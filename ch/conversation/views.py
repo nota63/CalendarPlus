@@ -1093,8 +1093,6 @@ import speedtest
 import psutil
 import time
 
-
-
 def get_ping():
     """Ping Google's DNS (8.8.8.8) and return the response time in ms."""
     try:
@@ -1123,18 +1121,55 @@ def get_system_uptime():
     uptime_minutes = int((uptime_seconds % 3600) // 60)
     return f"{uptime_hours}h {uptime_minutes}m"
 
+def get_cpu_usage():
+    """Get CPU usage percentage."""
+    return psutil.cpu_percent(interval=1)
+
+def get_memory_usage():
+    """Get memory usage percentage."""
+    memory_info = psutil.virtual_memory()
+    return memory_info.percent
+
+def get_disk_usage():
+    """Get disk usage percentage."""
+    disk_info = psutil.disk_usage('/')
+    return disk_info.percent
+
+def get_active_processes():
+    """Get the number of active processes."""
+    return len(psutil.pids())
+
+def get_network_usage():
+    """Get network sent/received data in MB."""
+    net_io = psutil.net_io_counters()
+    return {
+        "sent": round(net_io.bytes_sent / (1024 * 1024), 2),  # Convert to MB
+        "received": round(net_io.bytes_recv / (1024 * 1024), 2),  # Convert to MB
+    }
+
 def fetch_ping_stats(request):
     """
-    Returns real-time server response times, network speed, system uptime, and API latency.
+    Returns real-time server response times, network speed, system uptime, API latency,
+    CPU usage, memory usage, disk usage, active processes, and network usage.
     """
     ping_data = get_ping()
     speed_data = get_network_speed()
     uptime = get_system_uptime()
+    cpu_usage = get_cpu_usage()
+    memory_usage = get_memory_usage()
+    disk_usage = get_disk_usage()
+    active_processes = get_active_processes()
+    network_usage = get_network_usage()
     
     data = {
         "server_response_times": ping_data,  # Min, Avg, Max ping (ms)
         "network_speed": speed_data,  # Download & Upload speed (Mbps)
         "system_uptime": uptime,  # System uptime in hours & minutes
         "api_latency": [random.randint(100, 500) for _ in range(7)],  # Simulating API latency (ms)
+        "cpu_usage": cpu_usage,  # CPU usage %
+        "memory_usage": memory_usage,  # Memory usage %
+        "disk_usage": disk_usage,  # Disk usage %
+        "active_processes": active_processes,  # Number of running processes
+        "network_usage": network_usage,  # Network sent & received MB
     }
     return JsonResponse(data)

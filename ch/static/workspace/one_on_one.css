@@ -2599,49 +2599,70 @@ hr {
 
 
 /* /ping Modal */
-/* Increase modal width */
+/* Modal styling */
 #pingModal .modal-dialog {
-    max-width: 90%;
+    max-width: 80%;
+    border-radius: 12px;
+    background-color: #fff;
+    box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.15);
 }
 
-/* Style modal body */
+/* Modal body with scrolling */
 #pingModalBody {
-    padding: 20px;
+    padding: 24px;
     text-align: center;
-    overflow-x: auto; /* Enables horizontal scrolling */
-    white-space: nowrap;
+    overflow-y: auto; /* Enables vertical scrolling */
+    max-height: 80vh;
 }
 
 /* Title styling */
 .modal-title {
-    font-size: 22px;
-    font-weight: bold;
-    margin-bottom: 10px;
+    font-size: 24px;
+    font-weight: 600;
+    color: #212121;
+    margin-bottom: 16px;
+    font-family: 'Roboto', sans-serif;
 }
 
 /* System uptime text */
 .system-uptime {
     font-size: 18px;
-    color: #555;
-    margin-bottom: 15px;
+    color: #616161;
+    margin-bottom: 20px;
 }
 
-/* Chart container row */
-.chart-row {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    gap: 20px;
+/* Chart container grid layout */
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
     justify-content: center;
+    padding-bottom: 16px;
 }
 
 /* Individual chart container */
 .chart-container {
-    flex: 1;
-    min-width: 300px; /* Ensures proper spacing */
-    height: 300px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    padding: 15px;
+    min-width: 200px;
+    height: 220px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Material UI styled scrollbar */
+#pingModalBody::-webkit-scrollbar {
+    width: 8px;
+}
+
+#pingModalBody::-webkit-scrollbar-thumb {
+    background: #90a4ae;
+    border-radius: 8px;
+}
+
+#pingModalBody::-webkit-scrollbar-track {
+    background: #eceff1;
 }

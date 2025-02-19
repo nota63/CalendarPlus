@@ -1542,12 +1542,17 @@ document.addEventListener("DOMContentLoaded", function () {
     function displayPingModal(data) {
         let modalBody = document.getElementById("pingModalBody");
         modalBody.innerHTML = `
-            <h4 class="modal-title">📊 Network & Server Stats</h4>
+            <h4 class="modal-title">📊 System & Network Statistics</h4>
             <p class="system-uptime">System Uptime: ${data.system_uptime}</p>
-            <div class="chart-row">
+            <div class="chart-grid">
                 <div class="chart-container"><canvas id="pingChart"></canvas></div>
                 <div class="chart-container"><canvas id="speedChart"></canvas></div>
                 <div class="chart-container"><canvas id="apiLatencyChart"></canvas></div>
+                <div class="chart-container"><canvas id="cpuUsageChart"></canvas></div>
+                <div class="chart-container"><canvas id="memoryUsageChart"></canvas></div>
+                <div class="chart-container"><canvas id="diskUsageChart"></canvas></div>
+                <div class="chart-container"><canvas id="activeProcessesChart"></canvas></div>
+                <div class="chart-container"><canvas id="networkUsageChart"></canvas></div>
             </div>
         `;
 
@@ -1558,12 +1563,16 @@ document.addEventListener("DOMContentLoaded", function () {
             renderPingChart(data);
             renderSpeedChart(data);
             renderApiLatencyChart(data);
+            renderCPUUsageChart(data);
+            renderMemoryUsageChart(data);
+            renderDiskUsageChart(data);
+            renderActiveProcessesChart(data);
+            renderNetworkUsageChart(data);
         }, 500);
     }
 
     function renderPingChart(data) {
-        let ctx = document.getElementById("pingChart").getContext("2d");
-        new Chart(ctx, {
+        new Chart(document.getElementById("pingChart").getContext("2d"), {
             type: "line",
             data: {
                 labels: ["Min", "Avg", "Max"],
@@ -1576,17 +1585,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     tension: 0.4,
                     fill: true
                 }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
             }
         });
     }
 
     function renderSpeedChart(data) {
-        let ctx = document.getElementById("speedChart").getContext("2d");
-        new Chart(ctx, {
+        new Chart(document.getElementById("speedChart").getContext("2d"), {
             type: "bar",
             data: {
                 labels: ["Download", "Upload"],
@@ -1596,17 +1600,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     backgroundColor: ["#36A2EB", "#4CAF50"],
                     borderRadius: 10
                 }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
             }
         });
     }
 
     function renderApiLatencyChart(data) {
-        let ctx = document.getElementById("apiLatencyChart").getContext("2d");
-        new Chart(ctx, {
+        new Chart(document.getElementById("apiLatencyChart").getContext("2d"), {
             type: "line",
             data: {
                 labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
@@ -1619,11 +1618,82 @@ document.addEventListener("DOMContentLoaded", function () {
                     tension: 0.4,
                     fill: true
                 }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
+            }
+        });
+    }
+
+    function renderCPUUsageChart(data) {
+        new Chart(document.getElementById("cpuUsageChart").getContext("2d"), {
+            type: "line",
+            data: {
+                labels: ["CPU Usage"],
+                datasets: [{
+                    label: "CPU Usage (%)",
+                    data: [data.cpu_usage],
+                    borderColor: "#FF5733",
+                    backgroundColor: "rgba(255,87,51,0.5)",
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true
+                }]
+            }
+        });
+    }
+
+    function renderMemoryUsageChart(data) {
+        new Chart(document.getElementById("memoryUsageChart").getContext("2d"), {
+            type: "doughnut",
+            data: {
+                labels: ["Used", "Free"],
+                datasets: [{
+                    data: [data.memory_usage, 100 - data.memory_usage],
+                    backgroundColor: ["#8E44AD", "#D5DBDB"]
+                }]
+            }
+        });
+    }
+
+    function renderDiskUsageChart(data) {
+        new Chart(document.getElementById("diskUsageChart").getContext("2d"), {
+            type: "doughnut",
+            data: {
+                labels: ["Used", "Free"],
+                datasets: [{
+                    data: [data.disk_usage, 100 - data.disk_usage],
+                    backgroundColor: ["#2ECC71", "#D5DBDB"]
+                }]
+            }
+        });
+    }
+
+    function renderActiveProcessesChart(data) {
+        new Chart(document.getElementById("activeProcessesChart").getContext("2d"), {
+            type: "bar",
+            data: {
+                labels: ["Active Processes"],
+                datasets: [{
+                    label: "Processes Count",
+                    data: [data.active_processes],
+                    backgroundColor: "#3498DB",
+                    borderRadius: 10
+                }]
+            }
+        });
+    }
+
+    function renderNetworkUsageChart(data) {
+        new Chart(document.getElementById("networkUsageChart").getContext("2d"), {
+            type: "bar",
+            data: {
+                labels: ["Sent", "Received"],
+                datasets: [{
+                    label: "Network Usage (MB)",
+                    data: [data.network_usage.sent, data.network_usage.received],
+                    backgroundColor: ["#E74C3C", "#F1C40F"],
+                    borderRadius: 10
+                }]
             }
         });
     }
 });
+ 
