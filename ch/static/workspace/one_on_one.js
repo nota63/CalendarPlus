@@ -1091,16 +1091,27 @@ document.addEventListener("DOMContentLoaded", function () {
     let timeLeft;
     let isRunning = false;
     let initialTime;
+    let typingTimeout;
 
     inputField.addEventListener("input", function () {
+        clearTimeout(typingTimeout); // Clear previous timeout to allow proper timing
+
         const userInput = inputField.value.trim();
         if (userInput.startsWith("/timer ")) {
             const parts = userInput.split(" ");
             if (parts.length === 2) {
                 const minutes = parseInt(parts[1]);
                 if (!isNaN(minutes) && minutes > 0) {
-                    inputField.value = ""; // Clear input
-                    startCountdown(minutes);
+                    // Wait 3 seconds to ensure the user finishes typing
+                    typingTimeout = setTimeout(() => {
+                        // Show loading effect before the timer starts
+                        timerMessage.innerHTML = `<span class="mui-loader">⏳ Preparing timer...</span>`;
+
+                        setTimeout(() => {
+                            inputField.value = ""; // Clear input field
+                            startCountdown(minutes);
+                        }, 1000); // Another 2 seconds delay before starting the timer
+                    }, 2000); // 3 seconds delay after user enters time
                 }
             }
         }
@@ -1122,7 +1133,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function startTimer() {
         if (!isRunning) {
             isRunning = true;
-            timerMessage.innerHTML = "⏳ Timer is running...";
+            timerMessage.innerHTML = `<span class="mui-running">✅ Timer is running...</span>`;
             startStopButton.innerHTML = '<i class="fas fa-pause"></i>'; // Change to Pause Icon
 
             timerInterval = setInterval(() => {
@@ -1132,7 +1143,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
                     countdownTimer.innerHTML = "00:00";
-                    timerMessage.innerHTML = "🎉 Time's up!";
+                    timerMessage.innerHTML = `<span class="mui-complete">🎉 Time's up!</span>`;
                     startStopButton.innerHTML = '<i class="fas fa-play"></i>'; // Reset to Play Icon
                     isRunning = false;
                 }
@@ -1140,7 +1151,7 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
             clearInterval(timerInterval);
             isRunning = false;
-            timerMessage.innerHTML = "⏸️ Timer Paused.";
+            timerMessage.innerHTML = `<span class="mui-paused">⏸️ Timer Paused.</span>`;
             startStopButton.innerHTML = '<i class="fas fa-play"></i>'; // Change back to Play Icon
         }
     }
@@ -1150,7 +1161,7 @@ document.addEventListener("DOMContentLoaded", function () {
         timeLeft = initialTime;
         updateTimerDisplay(timeLeft);
         isRunning = false;
-        timerMessage.innerHTML = "🔄 Timer Reset.";
+        timerMessage.innerHTML = `<span class="mui-reset">🔄 Timer Reset.</span>`;
         startStopButton.innerHTML = '<i class="fas fa-play"></i>'; // Change back to Play Icon
     }
 
@@ -1163,6 +1174,11 @@ document.addEventListener("DOMContentLoaded", function () {
     startStopButton.addEventListener("click", startTimer);
     resetButton.addEventListener("click", resetTimer);
 });
+
+
+
+
+
 
 
 // /emoji text
