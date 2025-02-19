@@ -1016,10 +1016,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // /translate <text> <language>
+// /translate <text> <language>
+
 document.addEventListener("DOMContentLoaded", function () {
     const inputField = document.getElementById("chat-message-input");
     let translateTimeout;
-
+    
     inputField.addEventListener("input", function () {
         clearTimeout(translateTimeout); // Clear any previous timeout to avoid unnecessary requests
 
@@ -1031,25 +1033,47 @@ document.addEventListener("DOMContentLoaded", function () {
                     const textToTranslate = parts.slice(1, parts.length - 1).join(" ");
                     const targetLanguage = parts[parts.length - 1];
 
-                    inputField.value = "Translating..."; // Show loading message
+                    showLoadingState(); // Apply Material UI styled loading effect
                     fetchTranslation(textToTranslate, targetLanguage);
                 }
             }, 500); // Small delay to ensure user completes typing
         }
     });
 
+    function showLoadingState() {
+        inputField.value = ""; // Clear the input field
+        inputField.style.backgroundColor = "#f5f5f5"; // Light gray background
+        inputField.style.color = "#555"; // Dark gray text
+        inputField.style.fontWeight = "bold";
+        inputField.style.textAlign = "center";
+        inputField.style.padding = "12px";
+        inputField.style.borderRadius = "8px";
+        inputField.style.transition = "all 0.3s ease-in-out";
+
+        inputField.placeholder = "⏳ Translating..."; // Show loading text in placeholder
+    }
+
+    function resetInputStyle(translatedText) {
+        inputField.style.backgroundColor = "#fff"; // Reset to white
+        inputField.style.color = "#000"; // Reset text color
+        inputField.style.textAlign = "left";
+        inputField.style.fontWeight = "normal";
+        inputField.placeholder = "Type a message...";
+        inputField.value = translatedText;
+    }
+
     function fetchTranslation(text, lang) {
         fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${lang}`)
             .then(response => response.json())
             .then(data => {
                 if (data.responseData && data.responseData.translatedText) {
-                    inputField.value = data.responseData.translatedText;
+                    resetInputStyle(data.responseData.translatedText);
                 } else {
-                    inputField.value = "Translation not found.";
+                    resetInputStyle("Translation not found.");
                 }
             })
             .catch(error => {
-                inputField.value = "Error fetching translation.";
+                resetInputStyle("Error fetching translation.");
             });
     }
 });
