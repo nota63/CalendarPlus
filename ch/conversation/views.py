@@ -1192,11 +1192,11 @@ def fetch_wikipedia(request):
 
 
 # /github <username>
-from django.conf import settings
+
 
 
 GITHUB_GRAPHQL_URL = "https://api.github.com/graphql"
-GITHUB_ACCESS_TOKEN = settings.GITHUB_ACCESS_TOKEN  # Ensure this is in your .env file
+GITHUB_ACCESS_TOKEN = settings.GITHUB_ACCESS_TOKEN  
 
 def fetch_github_user(request):
     username = request.GET.get("username")
@@ -1244,3 +1244,7 @@ def fetch_github_user(request):
         return JsonResponse(response.json().get("data", {}))
     else:
         return JsonResponse({"error": "Failed to fetch data"}, status=response.status_code)
+    
+
+
+    
