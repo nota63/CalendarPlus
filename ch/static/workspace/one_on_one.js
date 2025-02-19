@@ -1438,7 +1438,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // /roast (FETCH ROASTS INSTANTLY)
-
 document.addEventListener("DOMContentLoaded", function () {
     const inputField = document.getElementById("chat-message-input");
 
@@ -1470,13 +1469,13 @@ document.addEventListener("DOMContentLoaded", function () {
             <div class="roast-container">
                 <p class="roast-text">${roast}</p>
                 <div class="roast-actions">
-                    <span class="send-roast" onclick="sendRoast('${roast}')">
+                    <span class="send-roast" data-roast="${roast}">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M22 2 11 13"></path>
                             <path d="M22 2 15 22 11 13 2 9 22 2z"></path>
                         </svg>
                     </span>
-                    <span class="get-another-roast" onclick="fetchRoast()">
+                    <span class="get-another-roast">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 2v4"></path>
                             <path d="M12 18v4"></path>
@@ -1494,9 +1493,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         let roastModal = new bootstrap.Modal(document.getElementById("roastModal"));
         roastModal.show();
-    }
 
-    window.sendRoast = function (roast) {
-        inputField.value = roast;
-    };
+        // Attach event listeners for send and get new roast
+        document.querySelector(".send-roast").addEventListener("click", function () {
+            inputField.value = this.getAttribute("data-roast");
+        });
+
+        document.querySelector(".get-another-roast").addEventListener("click", function () {
+            fetchRoast();
+        });
+    }
 });
