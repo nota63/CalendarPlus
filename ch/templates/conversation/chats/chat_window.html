@@ -2048,17 +2048,24 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- FontAwesome for Icons -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
 
-
-
-
-
-
-
-
-
-
-
-
+<!-- WEATHER MODAL -->
+<div class="modal fade" id="weatherModal" tabindex="-1" aria-labelledby="weatherModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center p-4" style="border-radius: 15px; background: #f4f4f4;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="weatherModalLabel">🌤 Weather Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h2 id="weatherCity" class="fw-bold text-primary"></h2>
+                <h1 id="weatherTemp" class="fw-bold display-3 text-danger"></h1>
+                <p id="weatherDesc" class="fs-4"></p>
+                <p id="weatherWind" class="fs-5 text-secondary"></p>
+                <p id="weatherTime" class="text-muted"></p>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 

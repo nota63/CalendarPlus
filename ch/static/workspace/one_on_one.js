@@ -1221,3 +1221,90 @@ document.addEventListener("DOMContentLoaded", function () {
         return textarea.value; // Converts &x1F3E9; to 🏩
     }
 });
+
+
+// /WEATHER <CITY>/
+document.addEventListener("DOMContentLoaded", function () {
+    const inputField = document.getElementById("chat-message-input");
+    let weatherTimeout;
+
+    inputField.addEventListener("input", function () {
+        clearTimeout(weatherTimeout);
+
+        const userInput = inputField.value.trim();
+        if (userInput.startsWith("/weather ")) {
+            weatherTimeout = setTimeout(() => {
+                const parts = userInput.split(" ");
+                if (parts.length >= 2) {
+                    const city = parts.slice(1).join(" ");
+                    inputField.value = ""; // Clear input
+                    fetchWeather(city);
+                }
+            }, 600); // Delay to allow user input
+        }
+    });
+
+    function fetchWeather(city) {
+        // Fetch latitude & longitude for the city
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}`)
+            .then(response => response.json())
+            .then(locationData => {
+                if (locationData.length > 0) {
+                    const { lat, lon } = locationData[0];
+
+                    // Fetch weather data from Open-Meteo
+                    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
+                        .then(response => response.json())
+                        .then(weatherData => {
+                            if (weatherData.current_weather) {
+                                updateWeatherModal(city, weatherData.current_weather);
+                            } else {
+                                showError("Weather data not available.");
+                            }
+                        })
+                        .catch(error => showError("Error fetching weather data."));
+                } else {
+                    showError("City not found.");
+                }
+            })
+            .catch(error => showError("Error fetching location data."));
+    }
+
+    function updateWeatherModal(city, weather) {
+        document.getElementById("weatherCity").textContent = city;
+        document.getElementById("weatherTemp").innerHTML = `${weather.temperature}°C`;
+        document.getElementById("weatherDesc").innerHTML = getWeatherEmoji(weather.weathercode);
+        document.getElementById("weatherWind").innerHTML = `💨 Wind Speed: ${weather.windspeed} km/h`;
+        document.getElementById("weatherTime").innerHTML = `🕒 Last Updated: ${new Date().toLocaleTimeString()}`;
+
+        const weatherModal = new bootstrap.Modal(document.getElementById("weatherModal"));
+        weatherModal.show();
+    }
+
+    function showError(message) {
+        document.getElementById("weatherCity").textContent = "Error";
+        document.getElementById("weatherTemp").innerHTML = "❌";
+        document.getElementById("weatherDesc").innerHTML = message;
+        document.getElementById("weatherWind").innerHTML = "";
+        document.getElementById("weatherTime").innerHTML = "";
+
+        const weatherModal = new bootstrap.Modal(document.getElementById("weatherModal"));
+        weatherModal.show();
+    }
+
+    function getWeatherEmoji(code) {
+        const weatherIcons = {
+            0: "☀️ Clear Sky",
+            1: "🌤️ Mainly Clear",
+            2: "⛅ Partly Cloudy",
+            3: "☁️ Overcast",
+            45: "🌫️ Fog",
+            48: "🌫️ Depositing Rime Fog",
+            51: "🌦️ Drizzle",
+            61: "🌧️ Rain",
+            71: "❄️ Snow",
+            95: "⛈️ Thunderstorm"
+        };
+        return weatherIcons[code] || "❓ Unknown Weather";
+    }
+});
