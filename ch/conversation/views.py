@@ -1075,3 +1075,20 @@ def fetch_docs(request, tech):
     
     except requests.exceptions.RequestException:
         return JsonResponse({"error": "Failed to fetch documentation"}, status=500)
+
+
+
+# /ROAST 
+ROASTS = [
+    "You're proof that even evolution takes a step back sometimes. 😂🔥",
+    "You bring everyone so much joy... when you leave the room. 😆",
+    "You're like a cloud. When you disappear, it's a beautiful day. ☀️",
+    "Your secrets are safe with me. I never even listen when you tell me them. 😜",
+    "You have something on your chin... no, the third one. 😭",
+    "Your jokes are so bad, even crickets refuse to chirp. 🦗😂",
+]
+
+def fetch_roast(request):
+    roast = random.choice(ROASTS)
+    return JsonResponse({"roast": roast})
+

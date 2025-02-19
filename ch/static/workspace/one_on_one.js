@@ -1434,3 +1434,69 @@ document.addEventListener("DOMContentLoaded", function () {
         docsModal.show();
     }
 });
+
+
+
+// /roast (FETCH ROASTS INSTANTLY)
+
+document.addEventListener("DOMContentLoaded", function () {
+    const inputField = document.getElementById("chat-message-input");
+
+    inputField.addEventListener("input", function () {
+        if (inputField.value.trim() === "/roast") {
+            inputField.value = ""; // Clear input
+            fetchRoast(); // Fetch a roast
+        }
+    });
+
+    function fetchRoast() {
+        fetch("/dm/fetch-roast/")
+            .then(response => response.json())
+            .then(data => {
+                if (data.roast) {
+                    displayRoast(data.roast);
+                } else {
+                    displayRoast("You're so unroastable, even fire gives up on you. 🔥😂");
+                }
+            })
+            .catch(() => {
+                displayRoast("Oops! The roast master is sleeping. Try again later.");
+            });
+    }
+
+    function displayRoast(roast) {
+        let modalBody = document.getElementById("roastModalBody");
+        modalBody.innerHTML = `
+            <div class="roast-container">
+                <p class="roast-text">${roast}</p>
+                <div class="roast-actions">
+                    <span class="send-roast" onclick="sendRoast('${roast}')">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 2 11 13"></path>
+                            <path d="M22 2 15 22 11 13 2 9 22 2z"></path>
+                        </svg>
+                    </span>
+                    <span class="get-another-roast" onclick="fetchRoast()">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2v4"></path>
+                            <path d="M12 18v4"></path>
+                            <path d="M4.93 4.93l2.83 2.83"></path>
+                            <path d="M16.24 16.24l2.83 2.83"></path>
+                            <path d="M2 12h4"></path>
+                            <path d="M18 12h4"></path>
+                            <path d="M4.93 19.07l2.83-2.83"></path>
+                            <path d="M16.24 7.76l2.83-2.83"></path>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+        `;
+
+        let roastModal = new bootstrap.Modal(document.getElementById("roastModal"));
+        roastModal.show();
+    }
+
+    window.sendRoast = function (roast) {
+        inputField.value = roast;
+    };
+});

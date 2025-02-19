@@ -28,4 +28,5 @@ urlpatterns=[
     path("get_meme/", get_random_meme, name="get_random_meme"),
     path('define/<str:word>/', get_definition, name='get_definition'),
     path('fetch-docs/<str:tech>/', fetch_docs, name='fetch_docs'),
+    path('fetch-roast/',fetch_roast, name='fetch_roasts'),
 ]

@@ -2487,3 +2487,56 @@ hr {
 }
 
 
+
+/* /roast */
+#getAnotherRoast {
+    background-color: #ff1744;
+    border: none;
+    font-size: 1.1rem;
+}
+
+#getAnotherRoast:hover {
+    background-color: #d50000;
+}
+
+.roast-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #282828;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 4px rgba(255, 0, 0, 0.2);
+}
+
+.roast-text {
+    font-size: 1.2rem;
+    color: #e63946;
+    flex: 1;
+    margin-right: 10px;
+}
+
+.send-roast {
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.send-roast svg {
+    color: #ff4d4d;
+}
+
+.send-roast:hover {
+    transform: scale(1.1);
+}
+
+#roastModal .modal-content {
+    background: #212121;
+    color: #fff;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(255, 0, 0, 0.2);
+}
+
+#roastModal .modal-header {
+    border-bottom: 1px solid #ff4d4d;
+}
