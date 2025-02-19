@@ -1504,3 +1504,84 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+
+// /ping (current network status)
+
+document.addEventListener("DOMContentLoaded", function () {
+    const inputField = document.getElementById("chat-message-input");
+    let pingTriggered = false; // Prevent duplicate requests
+
+    inputField.addEventListener("input", function () {
+        const userInput = inputField.value.trim();
+
+        if (userInput.startsWith("/ping") && !pingTriggered) {
+            pingTriggered = true; // Mark as triggered to prevent duplicate requests
+            fetchPingStats();
+        }
+    });
+
+    function fetchPingStats() {
+        inputField.value = "Fetching ping stats..."; // Show loading message
+
+        fetch("/dm/fetch-ping-stats/")
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    displayPingModal(data);
+                } else {
+                    inputField.value = "No data available.";
+                }
+                pingTriggered = false; // Reset trigger after request completes
+            })
+            .catch(() => {
+                inputField.value = "Error fetching ping stats.";
+                pingTriggered = false; // Reset on error
+            });
+    }
+
+    function displayPingModal(data) {
+        let modalBody = document.getElementById("pingModalBody");
+        modalBody.innerHTML = `
+            <h4>Server Uptime: ${data.uptime_percentage.toFixed(2)}%</h4>
+            <canvas id="pingChart"></canvas>
+        `;
+
+        let pingModal = new bootstrap.Modal(document.getElementById("pingModal"));
+        pingModal.show();
+
+        setTimeout(() => {
+            renderPingChart(data);
+        }, 500);
+    }
+
+    function renderPingChart(data) {
+        let ctx = document.getElementById("pingChart").getContext("2d");
+        new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                datasets: [
+                    {
+                        label: "Response Time (ms)",
+                        data: data.server_response_times,
+                        borderColor: "#FF6384",
+                        backgroundColor: "rgba(255,99,132,0.2)",
+                        fill: true,
+                    },
+                    {
+                        label: "API Latency (ms)",
+                        data: data.api_latency,
+                        borderColor: "#36A2EB",
+                        backgroundColor: "rgba(54,162,235,0.2)",
+                        fill: true,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+});

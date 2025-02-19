@@ -2596,3 +2596,24 @@ hr {
 #roastModal .modal-header {
     border-bottom: 1px solid #ff4d4d;
 }
+
+
+/* /ping Modal */
+
+#pingModal .modal-content {
+    background-color: #121212;
+    color: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
+}
+
+#pingModalBody {
+    padding: 20px;
+    text-align: center;
+}
+
+#pingChart {
+    width: 100% !important;
+    height: 400px !important;
+}
+

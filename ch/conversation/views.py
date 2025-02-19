@@ -1086,3 +1086,17 @@ def fetch_roast(request):
     roast = random.choice(ROASTS)
     return JsonResponse({"roast": roast})
 
+
+# /ping (current network status)
+import subprocess
+
+def fetch_ping_stats(request):
+    """
+    Returns random server response times and uptime stats for the ping command.
+    """
+    data = {
+        "server_response_times": [random.randint(50, 300) for _ in range(7)],  # Simulating response times (ms)
+        "uptime_percentage": random.uniform(98.5, 99.99),  # Simulating uptime %
+        "api_latency": [random.randint(100, 500) for _ in range(7)],  # Simulating API latency (ms)
+    }
+    return JsonResponse(data)
