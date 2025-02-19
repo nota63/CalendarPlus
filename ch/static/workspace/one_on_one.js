@@ -1189,7 +1189,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(data => {
                 if (data && data.contents && data.contents.translated) {
-                    inputField.value = data.contents.translated; // Insert emoji version
+                    inputField.value = decodeHTMLEntities(data.contents.translated); // Convert to real emoji
                 } else {
                     inputField.value = "No emojis found. 😢";
                 }
@@ -1197,5 +1197,11 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(error => {
                 inputField.value = "Error fetching emojis. ❌";
             });
+    }
+
+    function decodeHTMLEntities(text) {
+        const textarea = document.createElement("textarea");
+        textarea.innerHTML = text;
+        return textarea.value; // Converts &x1F3E9; to 🏩
     }
 });
