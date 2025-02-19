@@ -1084,7 +1084,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const inputField = document.getElementById("chat-message-input");
     const countdownTimer = document.getElementById("countdownTimer");
     const timerMessage = document.getElementById("timerMessage");
+    const startStopButton = document.getElementById("startStopTimer");
+    const resetButton = document.getElementById("resetTimer");
+
     let timerInterval;
+    let timeLeft;
+    let isRunning = false;
+    let initialTime;
 
     inputField.addEventListener("input", function () {
         const userInput = inputField.value.trim();
@@ -1101,33 +1107,59 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function startCountdown(minutes) {
-        let timeLeft = minutes * 60;
+        timeLeft = minutes * 60;
+        initialTime = timeLeft;
         updateTimerDisplay(timeLeft);
 
         // Open Bootstrap Modal
         const timerModal = new bootstrap.Modal(document.getElementById("timerModal"));
         timerModal.show();
 
-        // Clear any existing interval
+        clearInterval(timerInterval); // Reset any existing timer
+        startTimer();
+    }
+
+    function startTimer() {
+        if (!isRunning) {
+            isRunning = true;
+            timerMessage.innerHTML = "⏳ Timer is running...";
+            startStopButton.innerHTML = '<i class="fas fa-pause"></i>'; // Change to Pause Icon
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay(timeLeft);
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    countdownTimer.innerHTML = "00:00";
+                    timerMessage.innerHTML = "🎉 Time's up!";
+                    startStopButton.innerHTML = '<i class="fas fa-play"></i>'; // Reset to Play Icon
+                    isRunning = false;
+                }
+            }, 1000);
+        } else {
+            clearInterval(timerInterval);
+            isRunning = false;
+            timerMessage.innerHTML = "⏸️ Timer Paused.";
+            startStopButton.innerHTML = '<i class="fas fa-play"></i>'; // Change back to Play Icon
+        }
+    }
+
+    function resetTimer() {
         clearInterval(timerInterval);
-
-        // Start countdown
-        timerInterval = setInterval(() => {
-            timeLeft--;
-            updateTimerDisplay(timeLeft);
-
-            if (timeLeft <= 0) {
-                clearInterval(timerInterval);
-                countdownTimer.innerHTML = "00:00";
-                timerMessage.innerHTML = "⏳ Time's up!";
-            }
-        }, 1000);
+        timeLeft = initialTime;
+        updateTimerDisplay(timeLeft);
+        isRunning = false;
+        timerMessage.innerHTML = "🔄 Timer Reset.";
+        startStopButton.innerHTML = '<i class="fas fa-play"></i>'; // Change back to Play Icon
     }
 
     function updateTimerDisplay(seconds) {
         const minutes = Math.floor(seconds / 60);
         const secs = seconds % 60;
         countdownTimer.innerHTML = `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-        timerMessage.innerHTML = seconds > 0 ? "⏳ Timer is running..." : "🎉 Time's up!";
     }
+
+    startStopButton.addEventListener("click", startTimer);
+    resetButton.addEventListener("click", resetTimer);
 });
