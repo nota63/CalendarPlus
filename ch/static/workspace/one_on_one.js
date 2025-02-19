@@ -1163,3 +1163,39 @@ document.addEventListener("DOMContentLoaded", function () {
     startStopButton.addEventListener("click", startTimer);
     resetButton.addEventListener("click", resetTimer);
 });
+
+
+// /emoji text
+document.addEventListener("DOMContentLoaded", function () {
+    const inputField = document.getElementById("chat-message-input");
+    let emojiTimeout;
+
+    inputField.addEventListener("input", function () {
+        clearTimeout(emojiTimeout); // Clear previous timeout to avoid unnecessary requests
+
+        if (inputField.value.startsWith("/emoji ")) {
+            emojiTimeout = setTimeout(() => {
+                const textToConvert = inputField.value.replace("/emoji ", "").trim();
+                if (textToConvert) {
+                    inputField.value = "Fetching emojis... 🔄"; // Show loading effect
+                    fetchEmoji(textToConvert);
+                }
+            }, 500); // Delay before fetching
+        }
+    });
+
+    function fetchEmoji(text) {
+        fetch(`https://api.funtranslations.com/translate/emoji.json?text=${encodeURIComponent(text)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.contents && data.contents.translated) {
+                    inputField.value = data.contents.translated; // Insert emoji version
+                } else {
+                    inputField.value = "No emojis found. 😢";
+                }
+            })
+            .catch(error => {
+                inputField.value = "Error fetching emojis. ❌";
+            });
+    }
+});
