@@ -1013,3 +1013,43 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 });
+
+
+// /translate <text> <language>
+document.addEventListener("DOMContentLoaded", function () {
+    const inputField = document.getElementById("chat-message-input");
+    let translateTimeout;
+
+    inputField.addEventListener("input", function () {
+        clearTimeout(translateTimeout); // Clear any previous timeout to avoid unnecessary requests
+
+        const userInput = inputField.value.trim();
+        if (userInput.startsWith("/translate ")) {
+            translateTimeout = setTimeout(() => {
+                const parts = userInput.split(" ");
+                if (parts.length >= 3) {
+                    const textToTranslate = parts.slice(1, parts.length - 1).join(" ");
+                    const targetLanguage = parts[parts.length - 1];
+
+                    inputField.value = "Translating..."; // Show loading message
+                    fetchTranslation(textToTranslate, targetLanguage);
+                }
+            }, 500); // Small delay to ensure user completes typing
+        }
+    });
+
+    function fetchTranslation(text, lang) {
+        fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${lang}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.responseData && data.responseData.translatedText) {
+                    inputField.value = data.responseData.translatedText;
+                } else {
+                    inputField.value = "Translation not found.";
+                }
+            })
+            .catch(error => {
+                inputField.value = "Error fetching translation.";
+            });
+    }
+});
