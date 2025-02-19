@@ -1410,16 +1410,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function displayDocs(docs, tech) {
         let modalBody = document.getElementById("docsModalBody");
-        modalBody.innerHTML = `<h4>${tech.toUpperCase()} Documentation</h4>`;
+        modalBody.innerHTML = `<h4 class="doc-title">${tech.toUpperCase()} Documentation</h4>`;
 
         docs.forEach(doc => {
-            const docLink = document.createElement("p");
-            docLink.innerHTML = `<a href="${doc}" target="_blank">${doc}</a>`;
-            docLink.style.cursor = "pointer";
-            docLink.addEventListener("click", function () {
+            const docItem = document.createElement("div");
+            docItem.classList.add("doc-item");
+
+            docItem.innerHTML = `
+                <a href="${doc}" target="_blank" class="doc-link">${doc}</a>
+                <button class="doc-copy-btn">➕</button>
+            `;
+
+            // Append to input when clicked
+            docItem.querySelector(".doc-copy-btn").addEventListener("click", function () {
                 inputField.value += ` ${doc}`;
+                inputField.focus();
             });
-            modalBody.appendChild(docLink);
+
+            modalBody.appendChild(docItem);
         });
 
         let docsModal = new bootstrap.Modal(document.getElementById("docsModal"));

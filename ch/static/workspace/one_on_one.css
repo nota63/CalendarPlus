@@ -2418,3 +2418,72 @@ hr {
 }
 
 
+
+
+
+/* Modal Styling */
+#docsModal .modal-content {
+    border-radius: 12px;
+    background: #1e1e2f;
+    color: #ffffff;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Title */
+.doc-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+    color: #61dafb; /* React Blue */
+}
+
+/* Documentation Items */
+.doc-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #29294d;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: 0.3s;
+    border: 1px solid #3a3a5c;
+}
+
+.doc-item:hover {
+    background: #35355e;
+    transform: translateY(-2px);
+}
+
+/* Links */
+.doc-link {
+    color: #61dafb;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    flex: 1;
+}
+
+.doc-link:hover {
+    text-decoration: underline;
+}
+
+/* Copy Button */
+.doc-copy-btn {
+    background: #4caf50;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.doc-copy-btn:hover {
+    background: #388e3c;
+    transform: scale(1.1);
+}
+
+
