@@ -1820,7 +1820,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // /git <username>
 
-
 // /git <username>
 document.addEventListener("DOMContentLoaded", function () {
     const inputField = document.getElementById("chat-message-input");
