@@ -975,3 +975,41 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+
+// /DEFINE (WORD)
+document.addEventListener("DOMContentLoaded", function () {
+    const inputField = document.getElementById("chat-message-input");
+
+    inputField.addEventListener("input", function () {
+        if (inputField.value.startsWith("/define ")) {
+            const word = inputField.value.replace("/define ", "").trim();
+            if (word) {
+                setTimeout(() => {
+                    fetchDefinition(word);
+                }, 100); // Small delay for UX
+            }
+        }
+    });
+
+    function fetchDefinition(word) {
+        fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Word not found! ❌");
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.length > 0 && data[0].meanings.length > 0) {
+                    const meaning = data[0].meanings[0].definitions[0].definition;
+                    inputField.value = `📖 "${word}": ${meaning}`;
+                } else {
+                    inputField.value = `❌ No definition found for "${word}".`;
+                }
+            })
+            .catch(error => {
+                inputField.value = `⚠️ ${error.message}`;
+            });
+    }
+});

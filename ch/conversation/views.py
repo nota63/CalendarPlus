@@ -1039,3 +1039,17 @@ def get_random_meme(request):
     except ValueError as ve:
         print(f"JSON Decode Error: {ve}")
         return JsonResponse({"status": "error", "message": "Invalid JSON response from API."})
+    
+
+
+# /DEFINE <WORD>/
+
+def get_definition(request, word):
+    url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        definition = data[0]['meanings'][0]['definitions'][0]['definition']
+        return JsonResponse({"status": "success", "word": word, "definition": definition})
+    else:
+        return JsonResponse({"status": "error", "message": "Definition not found"})
