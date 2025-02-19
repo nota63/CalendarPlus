@@ -819,3 +819,159 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+
+// /MEME (GENERATES RANDOM MEME FROM MEME API)
+document.addEventListener("DOMContentLoaded", function () {
+    const inputField = document.getElementById("chat-message-input");
+    const memeModal = document.createElement("div");
+    const memeBox = document.createElement("div");
+    const memeImage = document.createElement("img");
+    const selectMemeButton = document.createElement("button");
+    const closeMemeButton = document.createElement("span");
+    const loader = document.createElement("div");
+
+    // Apply styles to the modal (Material UI look)
+    Object.assign(memeModal.style, {
+        position: "fixed",
+        top: "0",
+        left: "0",
+        width: "100%",
+        height: "100%",
+        background: "rgba(0, 0, 0, 0.7)",
+        display: "none",
+        justifyContent: "center",
+        alignItems: "center",
+        transition: "opacity 0.3s ease-in-out",
+    });
+
+    // Meme Box (White Container)
+    Object.assign(memeBox.style, {
+        background: "white",
+        padding: "20px",
+        borderRadius: "12px",
+        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.3)",
+        textAlign: "center",
+        maxWidth: "350px",
+        width: "90%",
+        position: "relative",
+    });
+
+    // Meme Image (Rounded, Smaller)
+    Object.assign(memeImage.style, {
+        width: "250px",
+        height: "250px",
+        borderRadius: "12px",
+        boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.2)",
+        display: "none",
+        marginBottom: "10px",
+    });
+
+    // Select Meme Button (Material UI Style)
+    Object.assign(selectMemeButton.style, {
+        background: "#6200ea",
+        color: "white",
+        border: "none",
+        padding: "10px 16px",
+        borderRadius: "8px",
+        cursor: "pointer",
+        transition: "background 0.3s",
+        display: "none",
+    });
+
+    selectMemeButton.innerText = "Select Meme";
+    selectMemeButton.addEventListener("mouseover", () => {
+        selectMemeButton.style.background = "#3700b3";
+    });
+    selectMemeButton.addEventListener("mouseout", () => {
+        selectMemeButton.style.background = "#6200ea";
+    });
+
+    // Close Button (X)
+    Object.assign(closeMemeButton.style, {
+        position: "absolute",
+        top: "10px",
+        right: "15px",
+        fontSize: "20px",
+        cursor: "pointer",
+        color: "#777",
+    });
+
+    closeMemeButton.innerHTML = "&times;";
+    closeMemeButton.addEventListener("click", closeMeme);
+
+    // Loader (While Fetching Meme)
+    Object.assign(loader.style, {
+        fontSize: "18px",
+        textAlign: "center",
+        padding: "10px",
+        display: "none",
+    });
+
+    loader.innerText = "Loading Meme...";
+
+    // Append elements
+    memeBox.appendChild(closeMemeButton);
+    memeBox.appendChild(loader);
+    memeBox.appendChild(memeImage);
+    memeBox.appendChild(selectMemeButton);
+    memeModal.appendChild(memeBox);
+    document.body.appendChild(memeModal);
+
+    // Open Meme Modal when "/meme" is typed
+    inputField.addEventListener("input", function () {
+        if (inputField.value.trim() === "/meme") {
+            inputField.value = ""; // Clear input
+            memeModal.style.display = "flex"; // Show modal
+            memeModal.style.opacity = "0";
+            setTimeout(() => {
+                memeModal.style.opacity = "1";
+            }, 100);
+            fetchMeme(); // Fetch meme
+        }
+    });
+
+    // Fetch a random meme
+    function fetchMeme() {
+        memeImage.style.display = "none";
+        selectMemeButton.style.display = "none";
+        loader.style.display = "block"; // Show loader
+
+        fetch("https://api.memegen.link/templates")
+            .then(response => response.json())
+            .then(templates => {
+                const randomTemplate = templates[Math.floor(Math.random() * templates.length)].id;
+                const memeURL = `https://api.memegen.link/images/${randomTemplate}/This_is_a_meme/Enjoy_it.png`;
+
+                memeImage.src = memeURL;
+                memeImage.style.display = "block";
+                memeImage.style.animation = "fadeIn 0.5s ease-in-out";
+                selectMemeButton.style.display = "block";
+            })
+            .catch(error => alert("Error fetching meme: " + error))
+            .finally(() => {
+                loader.style.display = "none"; // Hide loader
+            });
+    }
+
+    // Select Meme and insert into input field
+    selectMemeButton.addEventListener("click", function () {
+        inputField.value = memeImage.src; // Insert meme link
+        closeMeme();
+    });
+
+    // Close Meme Modal
+    function closeMeme() {
+        memeModal.style.opacity = "0";
+        setTimeout(() => {
+            memeModal.style.display = "none";
+        }, 200);
+    }
+
+    // Close Modal when clicking outside
+    window.addEventListener("click", function (event) {
+        if (event.target === memeModal) {
+            closeMeme();
+        }
+    });
+});

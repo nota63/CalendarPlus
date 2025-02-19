@@ -1013,3 +1013,29 @@ def delete_todo(request, org_id, conversation_id, todo_id):
     return JsonResponse({"status": "error", "message": "Invalid request method."}, status=405)
 
 
+# /meme (GENERATES RANDOM MEME USING MEME API)
+def get_random_meme(request):
+    url = "https://meme-api.com/gimme"
+    try:
+        response = requests.get(url, timeout=5)
+        print(f"Status Code: {response.status_code}")  # Print status code
+        print(f"Response Headers: {response.headers}")  # Print response headers
+        print(f"Response Content: {response.content}")  # Print raw content
+
+        response.raise_for_status()  # Raises HTTPError for bad responses
+
+        data = response.json()
+        print(f"JSON Data: {data}")  # Print JSON data
+
+        if "url" in data:
+            return JsonResponse({"status": "success", "meme_url": data["url"]})
+        else:
+            print("No 'url' in JSON response.")
+            return JsonResponse({"status": "error", "message": "No meme URL found in response."})
+
+    except requests.exceptions.RequestException as e:
+        print(f"Request Exception: {e}")
+        return JsonResponse({"status": "error", "message": f"API request error: {str(e)}"})
+    except ValueError as ve:
+        print(f"JSON Decode Error: {ve}")
+        return JsonResponse({"status": "error", "message": "Invalid JSON response from API."})
