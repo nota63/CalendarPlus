@@ -1224,9 +1224,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // /WEATHER <CITY>/
+
 document.addEventListener("DOMContentLoaded", function () {
     const inputField = document.getElementById("chat-message-input");
     let weatherTimeout;
+    let weatherChart;
 
     inputField.addEventListener("input", function () {
         clearTimeout(weatherTimeout);
@@ -1238,48 +1240,104 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (parts.length >= 2) {
                     const city = parts.slice(1).join(" ");
                     inputField.value = ""; // Clear input
-                    fetchWeather(city);
+                    fetchCityDetails(city);
                 }
-            }, 600); // Delay to allow user input
+            }, 700); // Delay for better user input
         }
     });
 
-    function fetchWeather(city) {
-        // Fetch latitude & longitude for the city
+    function fetchCityDetails(city) {
+        // Fetch city details (Latitude, Longitude, Country, Population)
         fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}`)
             .then(response => response.json())
             .then(locationData => {
                 if (locationData.length > 0) {
-                    const { lat, lon } = locationData[0];
+                    const { lat, lon, display_name } = locationData[0];
 
                     // Fetch weather data from Open-Meteo
-                    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
-                        .then(response => response.json())
-                        .then(weatherData => {
-                            if (weatherData.current_weather) {
-                                updateWeatherModal(city, weatherData.current_weather);
-                            } else {
-                                showError("Weather data not available.");
-                            }
-                        })
-                        .catch(error => showError("Error fetching weather data."));
+                    fetchWeather(city, lat, lon, display_name);
                 } else {
                     showError("City not found.");
                 }
             })
-            .catch(error => showError("Error fetching location data."));
+            .catch(() => showError("Error fetching city data."));
     }
 
-    function updateWeatherModal(city, weather) {
+    function fetchWeather(city, lat, lon, display_name) {
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m&current_weather=true`)
+            .then(response => response.json())
+            .then(weatherData => {
+                if (weatherData.current_weather) {
+                    updateWeatherModal(city, weatherData, display_name);
+                } else {
+                    showError("Weather data not available.");
+                }
+            })
+            .catch(() => showError("Error fetching weather data."));
+    }
+
+    function updateWeatherModal(city, weatherData, display_name) {
+        const currentWeather = weatherData.current_weather;
         document.getElementById("weatherCity").textContent = city;
-        document.getElementById("weatherTemp").innerHTML = `${weather.temperature}°C`;
-        document.getElementById("weatherDesc").innerHTML = getWeatherEmoji(weather.weathercode);
-        document.getElementById("weatherWind").innerHTML = `💨 Wind Speed: ${weather.windspeed} km/h`;
+        document.getElementById("weatherTemp").innerHTML = `${currentWeather.temperature}°C`;
+        document.getElementById("weatherDesc").innerHTML = getWeatherEmoji(currentWeather.weathercode);
+        document.getElementById("weatherWind").innerHTML = `💨 Wind Speed: ${currentWeather.windspeed} km/h`;
         document.getElementById("weatherTime").innerHTML = `🕒 Last Updated: ${new Date().toLocaleTimeString()}`;
 
+        // Set city details
+        document.getElementById("cityDetails").innerHTML = `
+            <p><strong>📍 Location:</strong> ${display_name}</p>
+            <p><strong>🌍 Latitude:</strong> ${weatherData.latitude}</p>
+            <p><strong>🌍 Longitude:</strong> ${weatherData.longitude}</p>
+        `;
+
+        // Display the modal
         const weatherModal = new bootstrap.Modal(document.getElementById("weatherModal"));
         weatherModal.show();
+
+        // Render the temperature chart
+        renderWeatherChart(weatherData.hourly.temperature_2m);
     }
+
+    function renderWeatherChart(temperatureData) {
+        const ctx = document.getElementById("weatherChart").getContext("2d");
+    
+        if (weatherChart) {
+            weatherChart.destroy(); // Destroy previous chart if exists
+        }
+    
+        weatherChart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: Array.from({ length: temperatureData.length }, (_, i) => `${i}:00`), // Hour labels
+                datasets: [{
+                    label: "Temperature (°C)",
+                    data: temperatureData,
+                    borderColor: "#ff4757",
+                    backgroundColor: "rgba(255, 71, 87, 0.2)",
+                    borderWidth: 2,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks: { color: "#333", font: { size: 14 } }
+                    },
+                    x: {
+                        ticks: { color: "#333", font: { size: 14 } }
+                    }
+                }
+            }
+        });
+    }
+    
 
     function showError(message) {
         document.getElementById("weatherCity").textContent = "Error";
@@ -1287,6 +1345,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("weatherDesc").innerHTML = message;
         document.getElementById("weatherWind").innerHTML = "";
         document.getElementById("weatherTime").innerHTML = "";
+        document.getElementById("cityDetails").innerHTML = "";
 
         const weatherModal = new bootstrap.Modal(document.getElementById("weatherModal"));
         weatherModal.show();

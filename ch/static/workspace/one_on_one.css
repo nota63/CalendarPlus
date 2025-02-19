@@ -2315,3 +2315,77 @@ select {
         transform: scale(1);
     }
 }
+
+
+/* /weather <city> styles */
+/* 🌟 Weather Modal Custom Styles */
+#weatherModal .modal-content {
+    background: linear-gradient(135deg, #ffffff, #f5f7fa);
+    border-radius: 15px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    font-family: "Inter", sans-serif;
+}
+
+/* 🌍 City Name */
+#weatherCity {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #3742fa;
+    margin-bottom: 5px;
+}
+
+/* 🌡️ Temperature */
+#weatherTemp {
+    font-size: 3.5rem;
+    font-weight: bold;
+    color: #ff4757;
+    margin-bottom: 10px;
+}
+
+/* ☁️ Weather Description */
+#weatherDesc {
+    font-size: 1.3rem;
+    color: #2f3542;
+    font-weight: 500;
+}
+
+/* 💨 Wind Speed */
+#weatherWind {
+    font-size: 1.2rem;
+    color: #57606f;
+    font-style: italic;
+}
+
+/* 🕒 Time */
+#weatherTime {
+    font-size: 1rem;
+    color: #7f8c8d;
+}
+
+/* 📌 City Details Box */
+#cityDetails {
+    background: #f1f2f6;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: inset 0px 4px 8px rgba(0, 0, 0, 0.08);
+    font-size: 1rem;
+    color: #333;
+    text-align: left;
+    line-height: 1.6;
+}
+
+/* 📊 Weather Chart */
+#weatherChart {
+    background: #fff;
+    border-radius: 10px;
+    padding: 15px;
+}
+
+/* 🎨 Divider Line */
+hr {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #dfe4ea, transparent);
+    margin: 20px 0;
+}

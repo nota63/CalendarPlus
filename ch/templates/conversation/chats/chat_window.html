@@ -2060,23 +2060,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- WEATHER MODAL -->
 <div class="modal fade" id="weatherModal" tabindex="-1" aria-labelledby="weatherModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content text-center p-4" style="border-radius: 15px; background: #f4f4f4;">
+    <div class="modal-dialog modal-lg modal-dialog-centered" style="max-width: 800px;">
+        <div class="modal-content p-4" style="border-radius: 15px; background: #f4f4f4; max-height: 80vh; overflow-y: auto;">
             <div class="modal-header border-0">
-                <h5 class="modal-title" id="weatherModalLabel">🌤 Weather Information</h5>
+                <h5 class="modal-title" id="weatherModalLabel">🌦 Weather Dashboard</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body text-center">
                 <h2 id="weatherCity" class="fw-bold text-primary"></h2>
                 <h1 id="weatherTemp" class="fw-bold display-3 text-danger"></h1>
                 <p id="weatherDesc" class="fs-4"></p>
                 <p id="weatherWind" class="fs-5 text-secondary"></p>
                 <p id="weatherTime" class="text-muted"></p>
+
+                <hr>
+
+                <!-- City Details -->
+                <div id="cityDetails" class="text-start fw-bold"></div>
+
+                <hr>
+
+                <!-- Chart with fixed height -->
+                <div style="width: 100%; height: 350px;">
+                    <canvas id="weatherChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
 
 
 
