@@ -1697,3 +1697,35 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
  
+
+
+// /calc <expression>
+
+document.addEventListener("DOMContentLoaded", function () {
+    const inputField = document.getElementById("chat-message-input");
+    
+    inputField.addEventListener("input", function () {
+        const userInput = inputField.value.trim();
+
+        // Check if the input starts with /calc and has an expression inside <>
+        const calcRegex = /^\/calc\s*<(.+)>$/;
+        const match = userInput.match(calcRegex);
+
+        if (match) {
+            const expression = match[1].trim(); // Extract the math expression
+
+            try {
+                // Evaluate the expression safely
+                const result = new Function(`return (${expression})`)(); 
+                
+                if (!isNaN(result)) {
+                    inputField.value = `/calc <${expression}> = ${result}`; // Append result
+                } else {
+                    inputField.value = "Invalid calculation!";
+                }
+            } catch (error) {
+                inputField.value = "Error in expression!";
+            }
+        }
+    });
+});
