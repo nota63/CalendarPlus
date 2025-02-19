@@ -2666,3 +2666,24 @@ hr {
 #pingModalBody::-webkit-scrollbar-track {
     background: #eceff1;
 }
+
+
+/* /wiki <query> */
+
+/* Modal Styling */
+#wikiModalBody {
+    text-align: center;
+    padding: 20px;
+}
+
+#wikiModalBody .wiki-image {
+    max-width: 100%;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+/* Ensure Modal is Scrollable */
+#wikiModal .modal-body {
+    max-height: 500px;
+    overflow-y: auto;
+}

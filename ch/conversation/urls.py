@@ -30,4 +30,5 @@ urlpatterns=[
     path('fetch-docs/<str:tech>/', fetch_docs, name='fetch_docs'),
     path('fetch-roast/',fetch_roast, name='fetch_roasts'),
     path("fetch-ping-stats/", fetch_ping_stats, name="ping_status"),
+    path("fetch-wiki/", fetch_wikipedia, name="fetch_wikipedia"),
 ]

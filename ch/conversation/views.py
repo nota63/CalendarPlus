@@ -1162,14 +1162,35 @@ def fetch_ping_stats(request):
     network_usage = get_network_usage()
     
     data = {
-        "server_response_times": ping_data,  # Min, Avg, Max ping (ms)
-        "network_speed": speed_data,  # Download & Upload speed (Mbps)
-        "system_uptime": uptime,  # System uptime in hours & minutes
-        "api_latency": [random.randint(100, 500) for _ in range(7)],  # Simulating API latency (ms)
-        "cpu_usage": cpu_usage,  # CPU usage %
-        "memory_usage": memory_usage,  # Memory usage %
-        "disk_usage": disk_usage,  # Disk usage %
-        "active_processes": active_processes,  # Number of running processes
-        "network_usage": network_usage,  # Network sent & received MB
+        "server_response_times": ping_data,  
+        "network_speed": speed_data,  
+        "system_uptime": uptime,  
+        "api_latency": [random.randint(100, 500) for _ in range(7)],  
+        "cpu_usage": cpu_usage, 
+        "memory_usage": memory_usage,
+        "disk_usage": disk_usage, 
+        "active_processes": active_processes, 
+        "network_usage": network_usage,  
     }
     return JsonResponse(data)
+
+
+
+
+
+
+
+# /wiki <query>
+def fetch_wikipedia(request):
+    query = request.GET.get("query", "").strip()
+    
+    if not query:
+        return JsonResponse({"error": "No query provided"}, status=400)
+    
+    url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{query}"
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        return JsonResponse(response.json())
+    else:
+        return JsonResponse({"error": "Failed to fetch Wikipedia data"}, status=500)

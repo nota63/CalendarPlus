@@ -1729,3 +1729,65 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+
+// /wiki <query>
+
+document.addEventListener("DOMContentLoaded", function () {
+    const inputField = document.getElementById("chat-message-input");
+    let wikiTriggered = false;
+
+    inputField.addEventListener("input", function () {
+        const userInput = inputField.value.trim();
+
+        if (userInput.startsWith("/wiki") && !wikiTriggered) {
+            wikiTriggered = true;  
+            console.log("Wiki command detected!"); // ✅ Debugging
+
+            const query = userInput.replace("/wiki", "").trim();
+            if (query) {
+                console.log(`Fetching Wikipedia for: ${query}`); // ✅ Debugging
+                fetchWikiData(query);
+            } else {
+                wikiTriggered = false; // Reset trigger if no query
+            }
+        }
+    });
+
+    function fetchWikiData(query) {
+        inputField.value = "Fetching Wikipedia details..."; // Show loading
+
+        fetch(`/dm/fetch-wiki/?query=${encodeURIComponent(query)}`)
+            .then(response => {
+                console.log("Fetch request sent!"); // ✅ Debugging
+                return response.json();
+            })
+            .then(data => {
+                console.log("Response received:", data); // ✅ Debugging
+                if (data.extract) {
+                    displayWikiModal(data);
+                } else {
+                    inputField.value = "No Wikipedia data found.";
+                }
+                wikiTriggered = false;
+            })
+            .catch(error => {
+                console.error("Fetch error:", error); // ✅ Debugging
+                inputField.value = "Error fetching Wikipedia details.";
+                wikiTriggered = false;
+            });
+    }
+
+    function displayWikiModal(data) {
+        let modalBody = document.getElementById("wikiModalBody");
+        modalBody.innerHTML = `
+            <h4 class="modal-title">${data.title}</h4>
+            <p>${data.extract}</p>
+            ${data.thumbnail ? `<img src="${data.thumbnail.source}" class="wiki-image" alt="${data.title}">` : ""}
+            <p><a href="${data.content_urls.desktop.page}" target="_blank">Read more on Wikipedia</a></p>
+        `;
+
+        let wikiModal = new bootstrap.Modal(document.getElementById("wikiModal"));
+        wikiModal.show();
+    }
+});
