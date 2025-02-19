@@ -1175,11 +1175,6 @@ def fetch_ping_stats(request):
     return JsonResponse(data)
 
 
-
-
-
-
-
 # /wiki <query>
 def fetch_wikipedia(request):
     query = request.GET.get("query", "").strip()
@@ -1194,3 +1189,59 @@ def fetch_wikipedia(request):
         return JsonResponse(response.json())
     else:
         return JsonResponse({"error": "Failed to fetch Wikipedia data"}, status=500)
+
+
+# /github <username>
+from django.conf import settings
+
+
+GITHUB_GRAPHQL_URL = "https://api.github.com/graphql"
+GITHUB_ACCESS_TOKEN = settings.GITHUB_ACCESS_TOKEN  # Ensure this is in your .env file
+
+
+def fetch_github_user(request):
+    username = request.GET.get("username")
+    print("USERNAME RECIVED:",username)
+    if not username:
+        return JsonResponse({"error": "Username is required"}, status=400)
+
+    query = """
+    {
+        user(login: "%s") {
+            name
+            login
+            avatarUrl
+            bio
+            location
+            websiteUrl
+            followers {
+                totalCount
+            }
+            following {
+                totalCount
+            }
+            repositories(first: 10, orderBy: {field: STARGAZERS, direction: DESC}) {
+                nodes {
+                    name
+                    description
+                    url
+                    stargazers {
+                        totalCount
+                    }
+                }
+            }
+        }
+    }
+    """ % username
+
+    headers = {
+        "Authorization": f"Bearer {GITHUB_ACCESS_TOKEN}",
+        "Content-Type": "application/json"
+    }
+
+    response = requests.post(GITHUB_GRAPHQL_URL, json={"query": query}, headers=headers)
+
+    if response.status_code == 200:
+        return JsonResponse(response.json().get("data", {}))
+    else:
+        return JsonResponse({"error": "Failed to fetch data"}, status=response.status_code)

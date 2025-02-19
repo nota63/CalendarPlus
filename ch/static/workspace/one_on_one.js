@@ -1816,3 +1816,90 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+
+// /git <username>
+
+
+// /git <username>
+document.addEventListener("DOMContentLoaded", function () {
+    const inputField = document.getElementById("chat-message-input");
+    let gitTriggered = false;
+    let typingTimer;
+
+    inputField.addEventListener("input", function () {
+        clearTimeout(typingTimer);
+        const userInput = inputField.value.trim();
+
+        if (userInput.startsWith("/git")) {
+            typingTimer = setTimeout(() => {
+                if (!gitTriggered) {
+                    gitTriggered = true;
+                    const username = userInput.replace("/git", "").trim();
+                    if (username) {
+                        fetchGitHubData(username);
+                    } else {
+                        gitTriggered = false;
+                    }
+                }
+            }, 3000); // 3 seconds delay
+        }
+    });
+
+    function fetchGitHubData(username) {
+        inputField.value = "";
+        inputField.insertAdjacentHTML("afterend", `<div class="git-loader">Fetching GitHub data...</div>`);
+
+        fetch(`/dm/fetch-github/?username=${encodeURIComponent(username)}`)
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector(".git-loader").remove();
+
+                if (data.user) {
+                    displayGitHubModal(data.user);
+                } else {
+                    inputField.value = "GitHub user not found.";
+                }
+                gitTriggered = false;
+            })
+            .catch(error => {
+                console.error("Fetch error:", error);
+                inputField.value = "Error fetching GitHub details.";
+                gitTriggered = false;
+            });
+    }
+
+    function displayGitHubModal(user) {
+        let modalBody = document.getElementById("gitModalBody");
+        modalBody.innerHTML = `
+            <div class="git-dashboard">
+                <div class="git-header">
+                    <img src="${user.avatarUrl}" class="git-avatar">
+                    <div class="git-user-info">
+                        <h2>${user.name || user.login}</h2>
+                        <p>${user.bio || "No bio available"}</p>
+                        <p><i class="fas fa-map-marker-alt"></i> ${user.location || "Unknown"}</p>
+                        <p><a href="${user.websiteUrl}" target="_blank">${user.websiteUrl || "No Website"}</a></p>
+                    </div>
+                </div>
+                <div class="git-stats">
+                    <div><strong>Followers:</strong> ${user.followers.totalCount}</div>
+                    <div><strong>Following:</strong> ${user.following.totalCount}</div>
+                </div>
+                <h3>Top Repositories</h3>
+                <div class="git-repos">
+                    ${user.repositories.nodes.map(repo => `
+                        <div class="git-repo">
+                            <a href="${repo.url}" target="_blank"><strong>${repo.name}</strong></a>
+                            <p>${repo.description || "No description"}</p>
+                            <span>⭐ ${repo.stargazers.totalCount}</span>
+                        </div>
+                    `).join("")}
+                </div>
+            </div>
+        `;
+
+        let gitModal = new bootstrap.Modal(document.getElementById("gitModal"));
+        gitModal.show();
+    }
+});

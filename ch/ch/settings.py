@@ -18,6 +18,13 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# load github access token 
+from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables
+
+GITHUB_ACCESS_TOKEN = os.getenv("GITHUB_ACCESS_TOKEN")
+
 
 
 

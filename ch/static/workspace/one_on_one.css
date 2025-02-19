@@ -2749,3 +2749,122 @@ hr {
     text-decoration: none;
     font-weight: bold;
 }
+
+
+/* github account stats */
+.git-dashboard {
+    font-family: 'Roboto', sans-serif;
+    padding: 20px;
+    background: #f5f5f5;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.git-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: #fff;
+    border-radius: 10px;
+}
+
+.git-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid #007bff;
+}
+
+.git-user-info h2 {
+    margin: 0;
+    font-size: 22px;
+    color: #333;
+}
+
+.git-user-info p {
+    margin: 3px 0;
+    font-size: 14px;
+    color: #555;
+}
+
+.git-stats, .git-repos, .git-pinned, .git-orgs, .git-gists, .git-prs, .git-issues {
+    margin-top: 15px;
+    padding: 15px;
+    background: #fff;
+    border-radius: 10px;
+}
+
+.git-repo, .git-gist, .git-pr, .git-issue, .git-org {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.git-repo a, .git-gist a, .git-pr a, .git-issue a, .git-org a {
+    font-weight: bold;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.git-repo a:hover, .git-gist a:hover, .git-pr a:hover, .git-issue a:hover, .git-org a:hover {
+    text-decoration: underline;
+}
+
+
+.git-dashboard {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.git-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.git-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid #007bff;
+}
+
+.git-user-info h2 {
+    margin: 0;
+    color: #333;
+}
+
+.git-user-info p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.git-stats {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+.git-repos {
+    margin-top: 15px;
+}
+
+.git-repo {
+    padding: 10px;
+    border-radius: 8px;
+    background: #f8f9fa;
+    margin-bottom: 10px;
+}
+
+.git-loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    font-weight: bold;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    color: #333;
+}
+
