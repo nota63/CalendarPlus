@@ -2389,3 +2389,32 @@ hr {
     background: linear-gradient(to right, transparent, #dfe4ea, transparent);
     margin: 20px 0;
 }
+
+
+
+
+/* /docs <tech> */
+.doc-item {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.doc-item:hover {
+    background: #e2e6ea;
+}
+
+.doc-link {
+    text-decoration: none;
+    color: #007bff;
+    font-size: 16px;
+}
+
+.doc-link:hover {
+    text-decoration: underline;
+}
+
+

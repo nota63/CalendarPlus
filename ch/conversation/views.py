@@ -1053,3 +1053,25 @@ def get_definition(request, word):
         return JsonResponse({"status": "success", "word": word, "definition": definition})
     else:
         return JsonResponse({"status": "error", "message": "Definition not found"})
+
+
+
+# /docs <tech> (FETCH DOCUMENTATION ABOUT TECHSTACK)
+@csrf_exempt
+def fetch_docs(request, tech):
+    url = "https://devdocs.io/docs.json"
+    
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()  # Raise error if bad response
+
+        all_docs = response.json()
+        tech_docs = [f"https://devdocs.io/{doc['slug']}" for doc in all_docs if tech.lower() in doc['slug'].lower()]
+        
+        if tech_docs:
+            return JsonResponse({"docs": tech_docs})
+        else:
+            return JsonResponse({"error": "Documentation not found"}, status=404)
+    
+    except requests.exceptions.RequestException:
+        return JsonResponse({"error": "Failed to fetch documentation"}, status=500)

@@ -1367,3 +1367,62 @@ document.addEventListener("DOMContentLoaded", function () {
         return weatherIcons[code] || "❓ Unknown Weather";
     }
 });
+
+
+
+// /docs [tech]
+document.addEventListener("DOMContentLoaded", function () {
+    const inputField = document.getElementById("chat-message-input");
+
+    let timer;  // Timer to delay request
+
+    inputField.addEventListener("input", function () {
+        clearTimeout(timer); // Reset timer on new input
+
+        const userInput = inputField.value.trim();
+        if (userInput.startsWith("/docs ")) {
+            timer = setTimeout(() => {
+                const parts = userInput.split(" ");
+                if (parts.length === 2) {
+                    const tech = parts[1].toLowerCase();
+                    fetchDocs(tech);
+                }
+            }, 3000); // 3 seconds delay for user to type
+        }
+    });
+
+    function fetchDocs(tech) {
+        inputField.value = "Fetching docs..."; // Show loading message
+
+        fetch(`/dm/fetch-docs/${tech}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.docs) {
+                    displayDocs(data.docs, tech);
+                } else {
+                    inputField.value = "Documentation not found.";
+                }
+            })
+            .catch(() => {
+                inputField.value = "Error fetching documentation.";
+            });
+    }
+
+    function displayDocs(docs, tech) {
+        let modalBody = document.getElementById("docsModalBody");
+        modalBody.innerHTML = `<h4>${tech.toUpperCase()} Documentation</h4>`;
+
+        docs.forEach(doc => {
+            const docLink = document.createElement("p");
+            docLink.innerHTML = `<a href="${doc}" target="_blank">${doc}</a>`;
+            docLink.style.cursor = "pointer";
+            docLink.addEventListener("click", function () {
+                inputField.value += ` ${doc}`;
+            });
+            modalBody.appendChild(docLink);
+        });
+
+        let docsModal = new bootstrap.Modal(document.getElementById("docsModal"));
+        docsModal.show();
+    }
+});

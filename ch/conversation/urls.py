@@ -27,4 +27,5 @@ urlpatterns=[
     path('manage_todo/delete/<int:org_id>/<int:conversation_id>/<int:todo_id>/',delete_todo, name='delete_todo'),
     path("get_meme/", get_random_meme, name="get_random_meme"),
     path('define/<str:word>/', get_definition, name='get_definition'),
+    path('fetch-docs/<str:tech>/', fetch_docs, name='fetch_docs'),
 ]
