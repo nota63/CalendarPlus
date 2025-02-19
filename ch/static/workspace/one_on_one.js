@@ -1902,3 +1902,28 @@ document.addEventListener("DOMContentLoaded", function () {
         gitModal.show();
     }
 });
+
+
+// /uuid (Generate UUID for development purposes)
+
+document.addEventListener("DOMContentLoaded", function () {
+    const inputField = document.getElementById("chat-message-input");
+
+    inputField.addEventListener("input", function () {
+        const userInput = inputField.value.trim();
+
+        if (userInput === "/uuid") {
+            const uuid = generateUUID();
+            inputField.value = uuid;
+            inputField.setSelectionRange(uuid.length, uuid.length); // Move cursor to the end
+        }
+    });
+
+    function generateUUID() {
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (char) {
+            const rand = (Math.random() * 16) | 0;
+            const value = char === "x" ? rand : (rand & 0x3) | 0x8;
+            return value.toString(16);
+        });
+    }
+});
