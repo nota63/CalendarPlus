@@ -1247,4 +1247,55 @@ def fetch_github_user(request):
     
 
 
+
+# /generate <topic>
+from openai import OpenAI
+from django.http import JsonResponse
+
+client = OpenAI(api_key="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")
+
+def generate_content(request):
+    topic = request.GET.get("topic", "")
+    if not topic:
+        return JsonResponse({"error": "No topic provided"}, status=400)
+
+    prompt = f"Write a detailed blog post about {topic}."
     
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        store=True,
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    content = response.choices[0].message.content.strip()
+    return JsonResponse({"content": content})
+
+
+
+# /code <topic> <language> 
+def generate_code(request):
+    topic = request.GET.get("topic", "").strip()
+    language = request.GET.get("language", "").strip()
+
+    if not topic or not language:
+        return JsonResponse({"error": "Invalid request. Provide both topic and language."}, status=400)
+
+    try:
+        prompt = f"Write a {language} code snippet for {topic} with proper syntax and best practices."
+        
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            store=True,
+            messages=[{"role": "user", "content": prompt}]
+        )
+
+        code = response.choices[0].message.content
+
+        return JsonResponse({"code": code, "language": language})
+    
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+
+        

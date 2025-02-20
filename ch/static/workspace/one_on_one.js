@@ -1927,3 +1927,194 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+
+// /generate <topic> (Generates blog on the topic)
+document.addEventListener("DOMContentLoaded", function () {
+    const inputField = document.getElementById("chat-message-input");
+    let typingTimer;
+    let generateTriggered = false;
+
+    inputField.addEventListener("input", function () {
+        clearTimeout(typingTimer);
+        const userInput = inputField.value.trim();
+
+        if (userInput.startsWith("/generate")) {
+            typingTimer = setTimeout(() => {
+                if (!generateTriggered) {
+                    generateTriggered = true;
+                    let topic = userInput.replace("/generate", "").trim();
+                    if (topic) {
+                        fetchGeneratedContent(topic);
+                    } else {
+                        generateTriggered = false;
+                    }
+                }
+            }, 4000); // 4-second delay
+        }
+    });
+
+    function fetchGeneratedContent(topic) {
+        inputField.value = "";
+        inputField.insertAdjacentHTML("afterend", `<div class="gen-loader">Generating content...</div>`);
+
+        fetch(`/dm/generate-content/?topic=${encodeURIComponent(topic)}`)
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector(".gen-loader").remove();
+                
+                if (data.content) {
+                    displayGeneratedModal(data.content);
+                } else {
+                    displayGeneratedModal("Error generating content.");
+                }
+                generateTriggered = false;
+            })
+            .catch(error => {
+                console.error("Fetch error:", error);
+                displayGeneratedModal("Error fetching content.");
+                generateTriggered = false;
+            });
+    }
+
+    function displayGeneratedModal(content) {
+        let modalBody = document.getElementById("generateModalBody");
+        modalBody.innerHTML = `<p>${content}</p>`;
+
+        let generateModal = new bootstrap.Modal(document.getElementById("generateModal"));
+        generateModal.show();
+    }
+});
+
+
+// /code <topic> <language>
+document.addEventListener("DOMContentLoaded", function () {
+    const inputField = document.getElementById("chat-message-input");
+    let codeTriggered = false;
+    let typingTimer;
+
+    inputField.addEventListener("input", function () {
+        clearTimeout(typingTimer);
+        const userInput = inputField.value.trim();
+
+        if (userInput.startsWith("/code")) {
+            typingTimer = setTimeout(() => {
+                if (!codeTriggered) {
+                    codeTriggered = true;
+                    const parts = userInput.split(" ").slice(1);
+                    const topic = parts.slice(0, -1).join(" ");
+                    const language = parts.slice(-1)[0];
+
+                    if (topic && language) {
+                        fetchCodeSnippet(topic, language);
+                    } else {
+                        inputField.value = "Invalid format. Use: /code <topic> <language>";
+                        codeTriggered = false;
+                    }
+                }
+            }, 4000);
+        }
+    });
+
+    function fetchCodeSnippet(topic, language) {
+        inputField.value = "";
+
+        // Insert Material UI-style spinner
+        const spinnerHTML = `
+            <div class="gen-loader">
+                <div class="spinner"></div>
+                <span>Generating Code...</span>
+            </div>
+        `;
+        inputField.insertAdjacentHTML("afterend", spinnerHTML);
+
+        fetch(`/dm/generate-code/?topic=${encodeURIComponent(topic)}&language=${encodeURIComponent(language)}`)
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector(".gen-loader").remove();
+
+                if (data.code) {
+                    displayProgrammingModal(data.code, data.language);
+                } else {
+                    inputField.value = data.error || "Error generating code.";
+                }
+                codeTriggered = false;
+            })
+            .catch(error => {
+                console.error("Fetch error:", error);
+                document.querySelector(".gen-loader").remove();
+                inputField.value = "Error fetching code.";
+                codeTriggered = false;
+            });
+    }
+
+    function displayProgrammingModal(code, language) {
+        let modalBody = document.getElementById("ProgrammingModalBody");
+        modalBody.innerHTML = `
+            <pre class="code-container"><code class="language-${language}">${code}</code></pre>
+            <button class="btn btn-primary copy-btn" onclick="copyCode()">Copy Code</button>
+        `;
+
+        let programmingModal = new bootstrap.Modal(document.getElementById("ProgrammingModal"));
+        programmingModal.show();
+
+        Prism.highlightAll(); // Apply syntax highlighting
+    }
+
+    function copyCode() {
+        const codeElement = document.querySelector("#ProgrammingModalBody pre code");
+        const textArea = document.createElement("textarea");
+        textArea.value = codeElement.textContent;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+
+        alert("Code copied to clipboard!");
+    }
+});
+
+
+// /Embed <website_url>
+document.addEventListener("DOMContentLoaded", function () {
+    const inputField = document.getElementById("chat-message-input");
+    let embedTriggered = false;
+
+    inputField.addEventListener("input", function () {
+        const userInput = inputField.value.trim();
+
+        if (userInput === "/embed" && !embedTriggered) {
+            embedTriggered = true;
+            openEmbedModal();
+        }
+    });
+
+    function openEmbedModal() {
+        console.log("Opening Embed Modal..."); // Debugging
+        inputField.value = ""; // Clear input field
+
+        let embedModal = new bootstrap.Modal(document.getElementById("EmbedModal"));
+        embedModal.show();
+    }
+
+    document.getElementById("embed-url-input").addEventListener("input", function () {
+        let url = this.value.trim();
+        let iframe = document.getElementById("embedded-website");
+
+        if (url && isValidURL(url)) {
+            console.log("Embedding URL:", url); // Debugging
+            iframe.src = url;
+        } else {
+            console.warn("Invalid URL entered!"); // Debugging
+        }
+    });
+
+    function isValidURL(url) {
+        try {
+            new URL(url);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+});

@@ -32,4 +32,6 @@ urlpatterns=[
     path("fetch-ping-stats/", fetch_ping_stats, name="ping_status"),
     path("fetch-wiki/", fetch_wikipedia, name="fetch_wikipedia"),
     path("fetch-github/", fetch_github_user, name="fetch_github_user"),
+    path('generate-content/',generate_content, name='generate_content'),
+    path('generate-code/',generate_code, name='generate_code')
 ]
