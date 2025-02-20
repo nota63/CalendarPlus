@@ -2075,46 +2075,46 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-// /Embed <website_url>
+// /Embed <website_url>8
+
 document.addEventListener("DOMContentLoaded", function () {
     const inputField = document.getElementById("chat-message-input");
-    let embedTriggered = false;
+    const embedSelectionModal = new bootstrap.Modal(document.getElementById("EmbedSelectionModal"));
+    const embedModal = new bootstrap.Modal(document.getElementById("EmbedModal"));
+    const embedContainer = document.getElementById("EmbedContainer");
+    const manualUrlInput = document.getElementById("manualUrlInput");
+    const embedChoices = document.querySelectorAll(".embed-choice");
 
+    // Detect /embed command
     inputField.addEventListener("input", function () {
-        const userInput = inputField.value.trim();
-
-        if (userInput === "/embed" && !embedTriggered) {
-            embedTriggered = true;
-            openEmbedModal();
+        if (inputField.value.trim() === "/embed") {
+            inputField.value = "";
+            embedSelectionModal.show();
         }
     });
 
-    function openEmbedModal() {
-        console.log("Opening Embed Modal..."); // Debugging
-        inputField.value = ""; // Clear input field
+    // Predefined choices
+    embedChoices.forEach(choice => {
+        choice.addEventListener("click", function () {
+            const embedUrl = this.getAttribute("data-url");
+            openEmbedModal(embedUrl);
+        });
+    });
 
-        let embedModal = new bootstrap.Modal(document.getElementById("EmbedModal"));
-        embedModal.show();
-    }
-
-    document.getElementById("embed-url-input").addEventListener("input", function () {
-        let url = this.value.trim();
-        let iframe = document.getElementById("embedded-website");
-
-        if (url && isValidURL(url)) {
-            console.log("Embedding URL:", url); // Debugging
-            iframe.src = url;
-        } else {
-            console.warn("Invalid URL entered!"); // Debugging
+    // Manual URL submission
+    document.getElementById("embedManualBtn").addEventListener("click", function () {
+        const userUrl = manualUrlInput.value.trim();
+        if (userUrl) {
+            openEmbedModal(userUrl);
         }
     });
 
-    function isValidURL(url) {
-        try {
-            new URL(url);
-            return true;
-        } catch (e) {
-            return false;
-        }
+    // Function to open the embed modal with an iframe
+    function openEmbedModal(embedUrl) {
+        embedContainer.innerHTML = `<iframe src="${embedUrl}" class="embed-iframe" allowfullscreen></iframe>`;
+        embedSelectionModal.hide();
+        setTimeout(() => {
+            embedModal.show();
+        }, 500);
     }
 });

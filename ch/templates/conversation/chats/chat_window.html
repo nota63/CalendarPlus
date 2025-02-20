@@ -1966,7 +1966,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <i class="fas fa-history text-teal-600"></i>
                             </div>
                             <div>
-                                <p class="font-semibold text-gray-800">/embed [website url]</p>
+                                <p class="font-semibold text-gray-800">/embed </p>
                                 <p class="text-sm text-gray-600 mt-1">Embed a website and use on the way in real time.
                                 </p>
                             </div>
@@ -2306,23 +2306,141 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 
-<!-- /Embed <website_url> -->
-    <div class="modal fade" id="EmbedModal" tabindex="-1" aria-labelledby="EmbedModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="EmbedModalLabel">Embed Website</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- /Embed <website_url> -->8
+<!-- Embed Selection Modal -->
+<div class="modal fade" id="EmbedSelectionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content embed-modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select a Website to Embed</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="embed-choice-container">
+                    
+                    <!-- YouTube -->
+                    <div class="embed-choice" data-url="https://www.youtube.com">
+                        <img src="https://www.svgrepo.com/show/13671/youtube.svg" class="embed-icon" alt="YouTube">
+                        <span>YouTube</span>
+                    </div>
+                    
+                    <!-- Figma -->
+                    <div class="embed-choice" data-url="https://www.figma.com">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/33/Figma-logo.svg" class="embed-icon" alt="Figma">
+                        <span>Figma</span>
+                    </div>
+                    
+                    <!-- Loom -->
+                    <div class="embed-choice" data-url="https://www.loom.com">
+                        <img src="https://www.svgrepo.com/show/448238/loom.svg" class="embed-icon" alt="Loom">
+                        <span>Loom</span>
+                    </div>
+                    
+                    <!-- Miro -->
+                    <div class="embed-choice" data-url="https://clickup.com">
+                        <img src="https://cdn.brandfetch.io/idU6lzwMYA/w/400/h/400/theme/dark/icon.jpeg?c=1bx1742630732907id64Mup7ac1219QvPk&t=1678376718338" class="embed-icon" alt="Click-up">
+                        <span>Clickup</span>
+                    </div>
+                    
+                    <!-- Google Drive -->
+                    <div class="embed-choice" data-url="https://drive.google.com">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/d/da/Google_Drive_logo.png" class="embed-icon" alt="Google Drive">
+                        <span>Google Drive</span>
+                    </div>
+                    
+                    <!-- Google Docs -->
+                    <div class="embed-choice" data-url="https://docs.google.com">
+                        <img src="https://www.svgrepo.com/show/349387/google-docs-editors.svg" class="embed-icon" alt="Google Docs">
+                        <span>Google Docs</span>
+                    </div>
+                    
+                    <!-- Notion -->
+                    <div class="embed-choice" data-url="https://www.notion.so">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e9/Notion-logo.svg" class="embed-icon" alt="Notion">
+                        <span>Notion</span>
+                    </div>
+                    
+                    <!-- Trello -->
+                    <div class="embed-choice" data-url="https://trello.com">
+                        <img src="https://www.svgrepo.com/show/354463/trello.svg" class="embed-icon" alt="Trello">
+                        <span>Trello</span>
+                    </div>
+                    
+                    <!-- Asana -->
+                    <div class="embed-choice" data-url="https://asana.com">
+                        <img src="https://www.svgrepo.com/show/353425/asana.svg" class="embed-icon" alt="Asana">
+                        <span>Asana</span>
+                    </div>
+                    
+                    <!-- Spotify -->
+                    <div class="embed-choice" data-url="https://spotify.com">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/8/84/Spotify_icon.svg" class="embed-icon" alt="Spotify">
+                        <span>Spotify</span>
+                    </div>
+                    
+                    <!-- Jira -->
+                    <div class="embed-choice" data-url="https://www.atlassian.com/software/jira">
+                        <img src="https://www.svgrepo.com/show/353935/jira.svg" class="embed-icon" alt="Jira">
+                        <span>Jira</span>
+                    </div>
+                    
+                    <!-- Slack -->
+                    <div class="embed-choice" data-url="https://slack.com">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/76/Slack_Icon.png" class="embed-icon" alt="Slack">
+                        <span>Slack</span>
+                    </div>
+                    
+                    <!-- GitHub -->
+                    <div class="embed-choice" data-url="https://github.com">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" class="embed-icon" alt="GitHub">
+                        <span>GitHub</span>
+                    </div>
+                    
+                    <!-- Dropbox -->
+                    <div class="embed-choice" data-url="https://www.dropbox.com">
+                        <img src="https://www.svgrepo.com/show/452190/dropbox.svg" class="embed-icon" alt="Dropbox">
+                        <span>Dropbox</span>
+                    </div>
+                    
+                    <!-- Zoom -->
+                    <div class="embed-choice" data-url="https://zoom.us">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/7b/Zoom_Communications_Logo.svg" class="embed-icon" alt="Zoom">
+                        <span>Zoom</span>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <input type="text" id="embed-url-input" class="form-control" placeholder="Enter website URL...">
-                    <div class="mt-3 embed-responsive">
-                        <iframe id="embedded-website" class="w-100" style="height: 400px; border: 1px solid #ddd;"></iframe>
+
+                <div class="embed-manual mt-4">
+                    <div class="input-group">
+                        <input type="text" id="manualUrlInput" class="form-control" placeholder="Enter website URL">
+                        <button id="embedManualBtn" class="btn btn-primary">Embed</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
+
+
+
+
+
+
+
+<!-- Embed Display Modal -->
+<div class="modal fade" id="EmbedModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Embedded Content</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="EmbedContainer"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
     
     
 
