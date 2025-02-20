@@ -1252,7 +1252,7 @@ def fetch_github_user(request):
 from openai import OpenAI
 from django.http import JsonResponse
 
-client = OpenAI(api_key="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")
+client = OpenAI(api_key="#")
 
 def generate_content(request):
     topic = request.GET.get("topic", "")
@@ -1298,4 +1298,3 @@ def generate_code(request):
 
 
 
-        
