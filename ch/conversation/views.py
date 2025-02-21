@@ -1299,13 +1299,13 @@ def generate_code(request):
 
 
 # /ai (HANDLE REAL TIME AI QUERIES)
-client = OpenAI(api_key="#")  # Replace with your key
+client = OpenAI(api_key="#")  
 
 
 import re
 
 
-
+# PENDING AI OPTIMIZATION
 
 @csrf_exempt
 @login_required

@@ -2229,3 +2229,19 @@ document.addEventListener("DOMContentLoaded", function () {
             ?.split("=")[1];
     }
 });
+
+
+
+// /shrug
+document.addEventListener("DOMContentLoaded", function () {
+    const inputField = document.getElementById("chat-message-input");
+
+    inputField.addEventListener("input", function (event) {
+        const value = inputField.value.trim();
+
+        if (value === "/shrug") {
+            inputField.value = "¯\\_(ツ)_/¯ "; // Append shrug emoji
+            inputField.setSelectionRange(inputField.value.length, inputField.value.length); // Move cursor to end
+        }
+    });
+});
