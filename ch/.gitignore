@@ -1,0 +1,14 @@
+# Ignore environment variables
+.env
+
+# Ignore compiled files
+__pycache__/
+
+# Ignore database files
+
+
+# Ignore IDE settings (for VS Code, PyCharm, etc.)
+.vscode/
+.idea/
+
+
