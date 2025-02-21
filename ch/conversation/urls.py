@@ -33,5 +33,6 @@ urlpatterns=[
     path("fetch-wiki/", fetch_wikipedia, name="fetch_wikipedia"),
     path("fetch-github/", fetch_github_user, name="fetch_github_user"),
     path('generate-content/',generate_content, name='generate_content'),
-    path('generate-code/',generate_code, name='generate_code')
+    path('generate-code/',generate_code, name='generate_code'),
+    path('ai_chat_view/<int:org_id>/<int:conversation_id>/<int:other_user_id>/',ai_chat_view, name='ai_chat_view')
 ]

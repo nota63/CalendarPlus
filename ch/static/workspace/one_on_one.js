@@ -2118,3 +2118,114 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 500);
     }
 });
+
+
+
+
+
+// /ai queries
+// /ai queries with Tailwind styling (Modal Opening Fixed)
+document.addEventListener("DOMContentLoaded", function () {
+    const inputField = document.getElementById("chat-message-input");
+    const aiChatModalEl = document.getElementById("aiChatModal");
+    const aiChatModal = new bootstrap.Modal(aiChatModalEl, { backdrop: 'static', keyboard: false }); // Prevent auto-opening
+    const aiChatInput = document.getElementById("aiChatInput");
+    const aiChatSend = document.getElementById("aiChatSend");
+    const aiChatMessages = document.getElementById("aiChatMessages");
+    const predefinedQueriesContainer = document.getElementById("predefinedQueries");
+
+    // Ensure modal is hidden on load
+    aiChatModalEl.classList.remove("show");
+    aiChatModalEl.style.display = "none";
+
+    // Detect /ai command and force open modal
+    inputField.addEventListener("input", function () {
+        if (inputField.value.trim() === "/ai") {
+            inputField.value = "";
+            aiChatModal.show();  // Open modal only when command is typed
+            aiChatInput.focus();
+        }
+    });
+
+    // Predefined queries
+    const queries = [
+        "What is my next meeting?",
+        "How many todos do I have?",
+        "Summarize my conversations",
+        "List my pending tasks",
+        "Tell me a random fact!",
+        "Tell me my events I created?",
+    ];
+
+    // Generate query buttons with Tailwind styling
+    predefinedQueriesContainer.innerHTML = "";
+    queries.forEach(query => {
+        let queryBtn = document.createElement("button");
+        queryBtn.textContent = query;
+        queryBtn.classList.add(
+            "px-4", "py-2", "rounded-lg", "shadow-md", "text-white",
+            "font-medium", "transition-all", "duration-300",
+            "bg-gradient-to-r", "from-blue-500", "to-purple-500",
+            "hover:from-purple-500", "hover:to-blue-500", "focus:ring-4", "focus:ring-purple-300"
+        );
+        queryBtn.addEventListener("click", function () {
+            sendMessageToAI(query);
+        });
+        predefinedQueriesContainer.appendChild(queryBtn);
+    });
+
+    // Send message on button click
+    aiChatSend.addEventListener("click", function () {
+        let userMessage = aiChatInput.value.trim();
+        if (!userMessage) return;
+        sendMessageToAI(userMessage);
+    });
+
+    // Function to send message to AI
+    function sendMessageToAI(userMessage) {
+        aiChatMessages.innerHTML += `<div class="user-message p-2 bg-blue-500 text-white rounded-md mb-2"><b>You:</b> ${userMessage}</div>`;
+        aiChatInput.value = "";
+
+        // Typing animation
+        let typingDots = document.createElement("div");
+        typingDots.classList.add("ai-message", "typing-animation", "flex", "items-center", "gap-1", "text-gray-500", "font-semibold");
+        typingDots.innerHTML = `<b>AI:</b> <span class="dot-animation inline-block w-2 h-2 bg-gray-500 rounded-full animate-bounce"></span>
+                                 <span class="dot-animation inline-block w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-150"></span>
+                                 <span class="dot-animation inline-block w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-300"></span>`;
+        aiChatMessages.appendChild(typingDots);
+        aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+
+        const orgId = window.djangoData.orgId;
+        const conversationId = window.djangoData.conversationId;
+        const otherUserId = window.djangoData.otherUserId;
+
+        // Send AJAX request to AI backend
+        fetch(`/dm/ai_chat_view/${orgId}/${conversationId}/${otherUserId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken(),
+            },
+            body: JSON.stringify({ message: userMessage }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                typingDots.remove();
+                aiChatMessages.innerHTML += `<div class="ai-message p-2 bg-gray-200 text-gray-900 rounded-md mb-2"><b>AI:</b> ${data.response}</div>`;
+                aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                typingDots.remove();
+                aiChatMessages.innerHTML += `<div class="ai-message error p-2 bg-red-500 text-white rounded-md mb-2"><b>AI:</b> ❌ Error fetching response.</div>`;
+            });
+    }
+
+    // Function to get CSRF token
+    function getCSRFToken() {
+        return document.cookie
+            .split("; ")
+            .find(row => row.startsWith("csrftoken="))
+            ?.split("=")[1];
+    }
+});

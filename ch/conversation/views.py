@@ -1298,3 +1298,206 @@ def generate_code(request):
 
 
 
+# /ai (HANDLE REAL TIME AI QUERIES)
+client = OpenAI(api_key="#")  # Replace with your key
+
+
+import re
+
+
+
+
+@csrf_exempt
+@login_required
+def ai_chat_view(request, org_id, conversation_id, other_user_id):
+    organization = get_object_or_404(Organization, id=org_id)
+    conversation = get_object_or_404(Conversation, id=conversation_id, organization=organization)
+    other_user = get_object_or_404(User, id=other_user_id)
+
+    if request.method == "POST":
+        data = json.loads(request.body)
+        user_message = data.get("message", "").strip().lower()
+        user = request.user
+
+        if not user_message:
+            return JsonResponse({"error": "Message cannot be empty"}, status=400)
+
+        # Determine intent using NLP
+        intent, entity = analyze_intent(user_message)
+
+        if intent in ["create", "update", "delete", "read"]:
+            result = handle_crud_operation(intent, entity, user, organization, conversation)
+            return JsonResponse({"response": result})
+        
+        # General AI Chat Response
+        context_data = generate_context(user, organization, conversation)
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            store=True,
+            messages=[
+                {"role": "system", "content": "This is the calendar Plus webapp built by django for team management & real time scheduling software, and you are the main character AI of CalendarPlus , users will interact with you to know about their meetings, events, todos and more and you have to provide valid answers to them and also give Welcome to CalendarPlus Message|You are an AI assistant helping users manage meetings, tasks, and events in Calendar Plus."},
+                {"role": "user", "content": f"User Query: {user_message}\n\nContext: {context_data}"}
+            ]
+        )
+        ai_response = response.choices[0].message.content.strip()
+        return JsonResponse({"response": ai_response})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+# Analyze user intent using basic NLP (can be replaced with an AI model)
+def analyze_intent(user_message):
+    words = user_message.split()
+    
+    if "add" in words or "create" in words:
+        return "create", extract_entity(user_message)
+    elif "update" in words or "edit" in words:
+        return "update", extract_entity(user_message)
+    elif "delete" in words or "remove" in words:
+        return "delete", extract_entity(user_message)
+    elif "show" in words or "fetch" in words:
+        return "read", extract_entity(user_message)
+    
+    return "chat", None  # Default to chat if no intent is detected
+
+# Extract relevant entity (meeting, todo, etc.) from user input
+def extract_entity(user_message):
+    entities = ["meeting", "todo", "task", "event", "message"]
+    for entity in entities:
+        if entity in user_message:
+            return entity
+    return None
+
+# Perform CRUD operations based on intent and entity
+def handle_crud_operation(intent, entity, user, organization, conversation):
+    if entity == "meeting":
+        return handle_meeting_crud(intent, user, organization)
+    elif entity == "todo" or entity == "task":
+        return handle_todo_crud(intent, user, organization, conversation)
+    elif entity == "event":
+        return handle_event_crud(intent, user, organization)
+    elif entity == "message":
+        return handle_message_crud(intent, user, organization, conversation)
+    
+    return "I couldn't understand what you want to do. Please try again!"
+
+# CRUD Functions for Different Entities
+def handle_meeting_crud(intent, user, organization):
+    if intent == "create":
+        MeetingOrganization.objects.create(user=user, organization=organization, meeting_title="New Meeting")
+        return "Meeting created successfully."
+    elif intent == "update":
+        meeting = MeetingOrganization.objects.filter(user=user, organization=organization).first()
+        if meeting:
+            meeting.meeting_title = "Updated Meeting"
+            meeting.save()
+            return "Meeting updated successfully."
+        return "No meeting found to update."
+    elif intent == "delete":
+        MeetingOrganization.objects.filter(user=user, organization=organization).delete()
+        return "Meeting deleted successfully."
+    elif intent == "read":
+        meetings = MeetingOrganization.objects.filter(user=user, organization=organization)
+        return "Your meetings: " + ", ".join(m.meeting_title for m in meetings) if meetings else "No meetings found."
+
+    return "Invalid meeting operation."
+
+def handle_todo_crud(intent, user, organization, conversation):
+    if intent == "create":
+        Todo.objects.create(user=user, organization=organization, conversation=conversation, todo="New Task")
+        return "Task added successfully."
+    elif intent == "update":
+        todo = Todo.objects.filter(user=user, organization=organization, conversation=conversation).first()
+        if todo:
+            todo.todo = "Updated Task"
+            todo.save()
+            return "Task updated successfully."
+        return "No task found to update."
+    elif intent == "delete":
+        Todo.objects.filter(user=user, organization=organization, conversation=conversation).delete()
+        return "Task deleted successfully."
+    elif intent == "read":
+        todos = Todo.objects.filter(user=user, organization=organization, conversation=conversation)
+        return "Your tasks: " + ", ".join(t.todo for t in todos) if todos else "No tasks found."
+
+    return "Invalid task operation."
+
+def handle_event_crud(intent, user, organization):
+    if intent == "create":
+        EventOrganization.objects.create(user=user, organization=organization, title="New Event")
+        return "Event created successfully."
+    elif intent == "update":
+        event = EventOrganization.objects.filter(user=user, organization=organization).first()
+        if event:
+            event.title = "Updated Event"
+            event.save()
+            return "Event updated successfully."
+        return "No event found to update."
+    elif intent == "delete":
+        EventOrganization.objects.filter(user=user, organization=organization).delete()
+        return "Event deleted successfully."
+    elif intent == "read":
+        events = EventOrganization.objects.filter(user=user, organization=organization)
+        return "Your events: " + ", ".join(e.title for e in events) if events else "No events found."
+
+    return "Invalid event operation."
+
+def handle_message_crud(intent, user, organization, conversation):
+    if intent == "create":
+        Message.objects.create(sender=user, organization=organization, conversation=conversation, text="New Message")
+        return "Message sent successfully."
+    elif intent == "delete":
+        Message.objects.filter(sender=user, organization=organization, conversation=conversation).delete()
+        return "Message deleted successfully."
+    elif intent == "read":
+        messages = Message.objects.filter(sender=user, organization=organization, conversation=conversation)
+        return "Your messages: " + ", ".join(m.text for m in messages) if messages else "No messages found."
+    
+    return "Invalid message operation."
+
+
+# ✅ **Generate Full Context for AI**
+def generate_context(user, organization, conversation):
+    """Fetch and structure user-specific data for AI to process."""
+
+    meetings = MeetingOrganization.objects.filter(user=user, organization=organization).values("meeting_title", "meeting_date", "start_time")
+    todos = Todo.objects.filter(user=user, conversation=conversation, organization=organization).values("todo", "priority", "status")
+    messages = Message.objects.filter(sender=user, organization=organization, conversation=conversation).values("text", "timestamp")
+    latest_events = EventOrganization.objects.filter(user=user, organization=organization).order_by('-created_at')[:4]
+
+    # 🔹 **Structuring the data for AI**
+    formatted_meetings = "\n".join([f"📅 {m['meeting_title']} on {m['meeting_date']} at {m['start_time']}" for m in meetings]) or "No meetings found."
+    formatted_todos = "\n".join([f"✅ {t['todo']} (Priority: {t['priority']}, Status: {t['status']})" for t in todos]) or "No todos found."
+    formatted_messages = "\n".join([f"💬 {m['text']} (Sent at: {m['timestamp']})" for m in messages]) or "No messages found."
+    formatted_events = get_latest_events_formatted(latest_events)
+
+    return (
+        f"User's Data:\n"
+        f"📌 Meetings:\n{formatted_meetings}\n\n"
+        f"📝 Todos:\n{formatted_todos}\n\n"
+        f"💬 Messages:\n{formatted_messages}\n\n"
+        f"🎉 Latest Events:\n{formatted_events}"
+    )
+
+
+# ✅ **Fetch Latest 4 Events and Format**
+def get_latest_events_formatted(events):
+    count = events.count()
+    if count == 0:
+        return "🔍 No recent events found."
+
+    response = f"🎉 **I found {count} of your most recent events:**\n\n"
+    for idx, event in enumerate(events, start=1):
+        response += (
+            f"🔹 **Event {idx}:**\n"
+            f"   📖 **Title**: {event.title}\n"
+            f"   📂 **Type**: {event.event_type}\n"
+            f"   📝 **Description**: {event.description}\n"
+            f"   ⏳ **Duration**: {event.duration}\n"
+            f"   📍 **Location**: {event.location}\n"
+            f"   📅 **Created On**: {event.created_at.strftime('%B %d, %Y')}\n"
+            f"   -----------------------------------\n"
+        )
+
+    return response + "💡 Need more details? Just let me know! 🚀"
+
+
