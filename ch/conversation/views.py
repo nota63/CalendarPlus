@@ -1513,7 +1513,7 @@ def save_reminder(request, org_id, conversation_id=None):
             data = json.loads(request.body)
             user = request.user
             text = data.get("text")
-            remind_at = data.get("remind_at")  # Format: "YYYY-MM-DD HH:MM:SS"
+            remind_at = data.get("remind_at")  
 
             if not (text and remind_at):
                 return JsonResponse({"error": "Missing required fields"}, status=400)
@@ -1555,3 +1555,4 @@ def save_reminder(request, org_id, conversation_id=None):
             return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
+
