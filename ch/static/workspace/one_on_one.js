@@ -2619,3 +2619,54 @@ document.addEventListener("DOMContentLoaded", function () {
         screenshotModal.hide();
     });
 });
+
+
+// /stack <query> - find solutions on stackoverflow
+let stackSearchTimeout; // Variable to track timeout
+
+document.getElementById("chat-message-input").addEventListener("input", function (e) {
+    let inputValue = this.value.trim();
+
+    if (inputValue.startsWith("/stack ")) {
+        clearTimeout(stackSearchTimeout); // Clear previous timeout
+        stackSearchTimeout = setTimeout(() => {
+            let query = inputValue.replace("/stack ", "").trim();
+            if (query.length > 0) {
+                fetchStackOverflowResults(query);
+            }
+        }, 3000); // 3-second delay
+    }
+});
+
+function fetchStackOverflowResults(query) {
+    let apiUrl = `https://api.stackexchange.com/2.3/search?order=desc&sort=relevance&intitle=${encodeURIComponent(query)}&site=stackoverflow`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            let resultsContainer = document.getElementById("stackResultsList");
+            resultsContainer.innerHTML = "";
+
+            if (data.items && data.items.length > 0) {
+                data.items.forEach(item => {
+                    let listItem = document.createElement("li");
+                    listItem.innerHTML = `
+                        <a href="${item.link}" target="_blank">${item.title}</a>
+                        <button class="select-btn" onclick="selectStackResult('${item.title}')">Select</button>
+                    `;
+                    resultsContainer.appendChild(listItem);
+                });
+            } else {
+                resultsContainer.innerHTML = "<p>No results found. Try a different query.</p>";
+            }
+
+            let stackModal = new bootstrap.Modal(document.getElementById("stackModal"));
+            stackModal.show();
+        })
+        .catch(error => console.error("Error fetching Stack Overflow results:", error));
+}
+
+function selectStackResult(selectedText) {
+    let chatInput = document.getElementById("chat-message-input");
+    chatInput.value = selectedText;
+}
