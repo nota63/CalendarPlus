@@ -2799,7 +2799,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let typingTimer;
     const inputField = document.getElementById("chat-message-input");
 
-    inputField.addEventListener("keyup", function (event) {
+    inputField.addEventListener("keyup", function () {
         clearTimeout(typingTimer);
         if (inputField.value.startsWith("/location")) {
             typingTimer = setTimeout(() => {
@@ -2815,23 +2815,41 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         navigator.geolocation.getCurrentPosition(
-            (position) => {
+            async (position) => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
                 const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lon}`;
+                const mapEmbedUrl = `https://maps.google.com/maps?q=${lat},${lon}&z=15&output=embed`;
+
+                // Reverse Geocoding for Address Lookup
+                const address = await getAddress(lat, lon);
+                document.getElementById("location-address").innerText = address || "Address not found";
 
                 // Update modal content
-                document.getElementById("location-map").src = `https://maps.google.com/maps?q=${lat},${lon}&z=15&output=embed`;
+                document.getElementById("location-map").src = mapEmbedUrl;
                 document.getElementById("location-url").value = googleMapsUrl;
                 document.getElementById("send-location").setAttribute("data-url", googleMapsUrl);
-
+                document.getElementById("copy-location").setAttribute("data-url", googleMapsUrl);
+                
                 // Show modal
                 new bootstrap.Modal(document.getElementById("locationModal")).show();
             },
             (error) => {
                 alert("Unable to retrieve location. Please allow location access.");
-            }
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
+    }
+
+    async function getAddress(lat, lon) {
+        try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+            const data = await response.json();
+            return data.display_name;
+        } catch (error) {
+            console.error("Error fetching address:", error);
+            return null;
+        }
     }
 
     // Send Location to Chat
@@ -2841,5 +2859,18 @@ document.addEventListener("DOMContentLoaded", function () {
         chatInput.value = url;  // Append location to chat input
         chatInput.focus();
         new bootstrap.Modal(document.getElementById("locationModal")).hide();
+    });
+
+    // Copy to Clipboard
+    document.getElementById("copy-location").addEventListener("click", function () {
+        const url = this.getAttribute("data-url");
+        navigator.clipboard.writeText(url).then(() => {
+            alert("Location copied to clipboard!");
+        });
+    });
+
+    // Refresh Location
+    document.getElementById("refresh-location").addEventListener("click", function () {
+        getUserLocation();
     });
 });
