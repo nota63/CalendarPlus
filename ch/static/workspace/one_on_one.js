@@ -2496,3 +2496,44 @@ function showSuccessMessage(msg) {
 function showErrorMessage(msg) {
     alert(msg);
 }
+
+
+// /browse [URL] - browse a website in chromebrowser
+let browseTimeout;
+
+document.getElementById("chat-message-input").addEventListener("input", function (e) {
+    let inputValue = this.value.trim();
+
+    if (inputValue.startsWith("/browse")) {
+        clearTimeout(browseTimeout);
+
+        browseTimeout = setTimeout(() => {
+            let query = inputValue.replace("/browse", "").trim();
+            this.value = ""; // Clear input field
+
+            let url;
+            if (!query) {
+                url = "https://www.google.com"; // Default to Google
+            } else if (query.includes(".")) {
+                url = query.startsWith("http") ? query : `https://${query}`; // If it's a website URL
+            } else {
+                url = `https://www.google.com/search?q=${encodeURIComponent(query)}`; // If it's a search
+            }
+
+            openMiniBrowser(url);
+        }, 3000); // Wait 3 seconds before launching
+    }
+});
+
+function openMiniBrowser(url) {
+    document.getElementById("browserFrame").src = url;
+    let modal = new bootstrap.Modal(document.getElementById("browserModal"));
+    modal.show();
+}
+
+// Function to update the embedded browser URL
+function updateBrowserURL() {
+    let inputURL = document.getElementById("browserURL").value.trim();
+    let finalURL = inputURL.includes(".") ? `https://${inputURL}` : `https://www.google.com/search?q=${encodeURIComponent(inputURL)}`;
+    document.getElementById("browserFrame").src = finalURL;
+}

@@ -4035,3 +4035,98 @@ hr {
 
 
 /* /remind <what> <when> */
+
+/* Custom Modal CSS */
+#browserModal .modal-dialog {
+    max-width: 1400px;
+    width: 95%;
+    margin: 1rem auto;
+}
+
+#browserModal .modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+
+#browserModal .modal-header {
+    background: #ffffff;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    z-index: 1;
+}
+
+#browserURL {
+    border-radius: 24px;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #e0e0e0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 1rem;
+    margin-right: 1rem;
+}
+
+#browserURL:focus {
+    border-color: #1976d2;
+    box-shadow: 0 0 0 3px rgba(25,118,210,0.2);
+    outline: none;
+}
+
+#browserModal .btn-primary {
+    background: #1976d2;
+    border: none;
+    border-radius: 24px;
+    padding: 0.75rem 1.5rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#browserModal .btn-primary:hover {
+    background: #1565c0;
+    transform: translateY(-1px);
+}
+
+#browserModal .btn-close {
+    filter: invert(0.5);
+    margin-left: 1rem;
+}
+
+#browserModal .modal-body {
+    background: #f5f5f5;
+}
+
+#browserFrame {
+    border-radius: 0 0 12px 12px;
+    background: white;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.08);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    #browserModal .modal-dialog {
+        width: 100%;
+        margin: 0;
+        height: 100vh;
+    }
+    
+    #browserModal .modal-content {
+        border-radius: 0;
+        height: 100vh;
+    }
+    
+    #browserModal .modal-header {
+        flex-wrap: nowrap;
+    }
+    
+    #browserURL {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    #browserModal .btn-primary {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+}
