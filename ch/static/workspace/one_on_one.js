@@ -2311,3 +2311,78 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+
+
+
+// /emoji <context>
+document.getElementById("chat-message-input").addEventListener("input", function () {
+    let inputValue = this.value.trim();
+
+    if (inputValue.startsWith("/emoji ")) {
+        let searchQuery = inputValue.replace("/emoji ", "").trim();
+        if (searchQuery.length > 0) {
+            fetchEmojis(searchQuery);
+        }
+    }
+});
+
+function fetchEmojis(query) {
+    let apiKey = "ccc1720ab12d0a7db1b42eefc68ae9f9223135f1"; // Replace with your actual API key
+    let url = `https://emoji-api.com/emojis?search=${query}&access_key=${apiKey}`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            console.log("API Response:", data); // Log to debug response
+
+            if (!Array.isArray(data)) {
+                console.error("Emoji API returned unexpected data:", data);
+                return;
+            }
+
+            let emojis = data.map(emoji => emoji.character).slice(0, 10); // Extract first 10 emojis
+            showEmojiModal(emojis);
+        })
+        .catch(error => console.error("Emoji fetch failed:", error));
+}
+
+function showEmojiModal(emojis) {
+    let modal = document.getElementById("emoji-modal");
+    let emojiContainer = document.getElementById("emoji-list");
+
+    // Clear previous emojis
+    emojiContainer.innerHTML = "";
+
+    // Add new emojis
+    emojis.forEach(emoji => {
+        let btn = document.createElement("button");
+        btn.innerHTML = emoji;
+        btn.classList.add("emoji-btn", "text-xl", "p-2", "hover:bg-gray-200", "rounded");
+        btn.onclick = () => appendEmoji(emoji);
+        emojiContainer.appendChild(btn);
+    });
+
+    // Show modal
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+}
+
+function appendEmoji(emoji) {
+    let input = document.getElementById("chat-message-input");
+    input.value += " " + emoji;
+    closeEmojiModal();
+}
+
+function closeEmojiModal() {
+    let modal = document.getElementById("emoji-modal");
+    modal.classList.add("hidden");
+}
+
+// Close modal when clicking outside
+window.onclick = function (event) {
+    let modal = document.getElementById("emoji-modal");
+    if (event.target === modal) {
+        closeEmojiModal();
+    }
+};

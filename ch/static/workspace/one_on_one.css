@@ -3597,3 +3597,133 @@ hr {
         font-size: 13px;
     }
 }
+
+/* /emoji <context> */
+
+#emoji-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    z-index: 1000;
+    text-align: center;
+}
+
+#emoji-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.emoji-btn {
+    font-size: 24px;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    transition: 0.2s;
+}
+
+.emoji-btn:hover {
+    transform: scale(1.2);
+}
+
+
+
+
+/* 🌸 Modal Background */
+#emoji-modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4); /* Dark overlay */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* 🌟 Emoji Modal Container */
+.emoji-container {
+    background: white;
+    width: 320px;
+    max-width: 90%;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* ✨ Title Styling */
+.emoji-container h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* 🌟 Emoji Grid */
+#emoji-list {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    padding: 10px;
+}
+
+/* 💎 Emoji Buttons */
+.emoji-btn {
+    font-size: 1.5rem;
+    background: #f5f5f5;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 🖌️ Emoji Button Hover Effect */
+.emoji-btn:hover {
+    background: #e0e0e0;
+    transform: scale(1.1);
+}
+
+/* ❌ Close Button */
+.close-btn {
+    width: 100%;
+    background: #d32f2f;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* Close Button Hover */
+.close-btn:hover {
+    background: #b71c1c;
+}
+
+/* 🎬 Fade In Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
