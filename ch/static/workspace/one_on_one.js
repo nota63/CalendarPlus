@@ -2386,3 +2386,111 @@ window.onclick = function (event) {
         closeEmojiModal();
     }
 };
+
+
+
+// /remind [what] [when]
+document.getElementById("chat-message-input").addEventListener("input", function (e) {
+    let inputValue = this.value.trim();
+    
+    if (inputValue.startsWith("/remind ")) {
+        let args = inputValue.replace("/remind ", "").trim().split(" ");
+
+        if (args.length < 2) {
+            console.warn("Incomplete reminder command");
+            return;
+        }
+
+        let what = args.slice(0, args.length - 1).join(" "); // Reminder text
+        let when = args[args.length - 1]; // Reminder time (last argument)
+
+        let remindAt = parseReminderTime(when); // Convert to proper datetime format
+
+        if (!remindAt) {
+            console.warn("Invalid time format, reminder not set");
+            return;
+        }
+
+        let orgId = window.djangoData?.orgId; // Injected from Django template
+        let conversationId = window.djangoData?.conversationId || null; // Can be null
+
+        if (!orgId) {
+            console.error("Organization ID is missing");
+            return;
+        }
+
+        saveReminder(orgId, conversationId, what, remindAt);
+        this.value = ""; // Clear input after sending
+    }
+});
+
+function parseReminderTime(timeStr) {
+    try {
+        let now = new Date();
+        let dateTime;
+
+        if (timeStr.includes(":")) {
+            let [hours, minutes] = timeStr.split(":").map(Number);
+            dateTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+        } else if (timeStr.toLowerCase() === "tomorrow") {
+            dateTime = new Date(now);
+            dateTime.setDate(now.getDate() + 1);
+            dateTime.setHours(9, 0, 0); // Default to 9 AM
+        } else if (timeStr.toLowerCase() === "nextweek") {
+            dateTime = new Date(now);
+            dateTime.setDate(now.getDate() + 7);
+            dateTime.setHours(9, 0, 0);
+        } else {
+            console.error("Invalid reminder time input:", timeStr);
+            return null;
+        }
+
+        return dateTime.toISOString().slice(0, 19).replace("T", " "); // Format: YYYY-MM-DD HH:MM:SS
+    } catch (error) {
+        console.error("Time parsing error:", error);
+        return null;
+    }
+}
+
+function saveReminder(orgId, conversationId, text, remindAt) {
+    let url = `/reminder/save/${orgId}/`;
+    if (conversationId) {
+        url = `/dm/reminder/save/${orgId}/${conversationId}/`;
+    }
+
+    fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken()
+        },
+        body: JSON.stringify({ text: text, remind_at: remindAt })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log("✅ Reminder saved successfully!");
+            showSuccessMessage("Reminder set!");
+        } else {
+            console.error("❌ Error saving reminder:", data.error);
+            showErrorMessage("Failed to set reminder!");
+        }
+    })
+    .catch(error => console.error("⚠️ Request failed:", error));
+}
+
+// Function to get CSRF token (Required for Django POST requests)
+function getCSRFToken() {
+    let csrfToken = document.cookie.split("; ").find(row => row.startsWith("csrftoken="));
+    return csrfToken ? csrfToken.split("=")[1] : "";
+}
+
+// Success message display (Replace with modal/toast if needed)
+function showSuccessMessage(msg) {
+    alert(msg);
+}
+
+// Error message display (Replace with modal/toast if needed)
+function showErrorMessage(msg) {
+    alert(msg);
+}

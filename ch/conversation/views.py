@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from .models import (Conversation, Message,ScheduledMessage,MessageSuggestion,Todo)
+from .models import (Conversation, Message,ScheduledMessage,MessageSuggestion,Todo,Reminder)
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -1501,3 +1501,57 @@ def get_latest_events_formatted(events):
     return response + "💡 Need more details? Just let me know! 🚀"
 
 
+
+# InChat Reminders 
+# /remind <what> <when>
+
+@csrf_exempt
+@login_required
+def save_reminder(request, org_id, conversation_id=None):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            user = request.user
+            text = data.get("text")
+            remind_at = data.get("remind_at")  # Format: "YYYY-MM-DD HH:MM:SS"
+
+            if not (text and remind_at):
+                return JsonResponse({"error": "Missing required fields"}, status=400)
+
+            # Validate organization
+            try:
+                organization = Organization.objects.get(id=org_id)
+            except Organization.DoesNotExist:
+                return JsonResponse({"error": "Invalid organization"}, status=400)
+
+            # Validate conversation (optional)
+            conversation = None
+            if conversation_id:
+                try:
+                    conversation = Conversation.objects.get(id=conversation_id)
+                except Conversation.DoesNotExist:
+                    return JsonResponse({"error": "Invalid conversation"}, status=400)
+
+            # Convert remind_at to datetime object
+            try:
+                remind_at_dt = datetime.strptime(remind_at, "%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                return JsonResponse({"error": "Invalid date format"}, status=400)
+
+            # Create and save reminder
+            reminder = Reminder.objects.create(
+                user=user,
+                organization=organization,
+                conversation=conversation,
+                text=text,
+                remind_at=remind_at_dt
+            )
+
+            return JsonResponse({"success": True, "message": "Reminder saved successfully!"}, status=201)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON data"}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)

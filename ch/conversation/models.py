@@ -161,3 +161,20 @@ class Todo(models.Model):
 
     def __str__(self):
         return f"{self.todo} ({self.get_status_display()}) - {self.user.username}"
+
+
+
+# Inchat Reminder
+class Reminder(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="remindersss")
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="remindersss")
+    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name="remindersss", null=True, blank=True)
+    text = models.TextField()  
+    remind_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Reminder for {self.user.username}: {self.text} at {self.remind_at}"
+
+    class Meta:
+        ordering = ["remind_at"]
