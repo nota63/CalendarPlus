@@ -2540,63 +2540,82 @@ function updateBrowserURL() {
 
 
 // /screenshot - captures the entire screen
-document.getElementById("chat-message-input").addEventListener("input", function (e) {
-    let inputValue = this.value.trim();
+document.addEventListener("DOMContentLoaded", function () {
+    let screenshotStream = null;
 
-    if (inputValue === "/screenshot") {
-        this.value = ""; // Clear input
-        takeScreenshot();
+    // Detects /screenshot command and starts screen capture
+    document.getElementById("chat-message-input").addEventListener("input", function (e) {
+        let inputValue = this.value.trim();
+
+        if (inputValue === "/screenshot") {
+            startScreenCapture();
+            this.value = "";  // Clear input after command
+        }
+    });
+
+    async function startScreenCapture() {
+        try {
+            screenshotStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+
+            const track = screenshotStream.getVideoTracks()[0];
+            const imageCapture = new ImageCapture(track);
+
+            const bitmap = await imageCapture.grabFrame();
+            track.stop(); // Stop capturing after screenshot
+
+            let canvas = document.createElement("canvas");
+            canvas.width = bitmap.width;
+            canvas.height = bitmap.height;
+            let ctx = canvas.getContext("2d");
+            ctx.drawImage(bitmap, 0, 0);
+
+            let screenshotData = canvas.toDataURL("image/png"); // Convert to Base64
+
+            // Show preview in modal
+            let screenshotPreview = document.getElementById("screenshot-preview");
+            screenshotPreview.src = screenshotData;
+            screenshotPreview.style.display = "block";
+
+            // Open the modal
+            let screenshotModal = new bootstrap.Modal(document.getElementById("screenshot-modal"));
+            screenshotModal.show();
+
+        } catch (error) {
+            console.error("Screen capture failed:", error);
+        }
     }
+
+    // Sends the screenshot in the chat container
+    document.getElementById("send-screenshot").addEventListener("click", function () {
+        let chatContainer = document.getElementById("chat-container");
+        let screenshotPreview = document.getElementById("screenshot-preview");
+
+        if (!screenshotPreview.src) {
+            console.error("No screenshot available!");
+            return;
+        }
+
+        let messageDiv = document.createElement("div");
+        messageDiv.classList.add("chat-message", "screenshot-message"); 
+
+        let img = document.createElement("img");
+        img.src = screenshotPreview.src;
+        img.classList.add("sent-screenshot");
+
+        messageDiv.appendChild(img);
+        chatContainer.appendChild(messageDiv);
+
+        // Scroll to latest message
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        // Close the modal
+        let screenshotModal = bootstrap.Modal.getInstance(document.getElementById("screenshot-modal"));
+        screenshotModal.hide();
+    });
+
+    // Function to close modal manually
+    document.getElementById("close-screenshot-modal").addEventListener("click", function () {
+        let screenshotModal = bootstrap.Modal.getInstance(document.getElementById("screenshot-modal"));
+        screenshotModal.hide();
+    });
 });
-
-async function takeScreenshot() {
-    try {
-        // Request screen capture
-        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-
-        const video = document.createElement("video");
-        video.srcObject = stream;
-
-        // Wait for video to load before capturing
-        video.onloadedmetadata = async () => {
-            video.play();
-
-            setTimeout(() => {
-                const canvas = document.createElement("canvas");
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                const ctx = canvas.getContext("2d");
-
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                // Stop the stream after capturing
-                stream.getTracks().forEach(track => track.stop());
-
-                showScreenshotModal(canvas.toDataURL("image/png")); // Open modal with image
-            }, 500); // Small delay to ensure proper rendering
-        };
-    } catch (error) {
-        console.error("Screenshot failed:", error);
-    }
-}
-
-function showScreenshotModal(imageSrc) {
-    let modal = new bootstrap.Modal(document.getElementById("screenshot-modal"));
-    let imgElement = document.getElementById("screenshot-preview");
-
-    imgElement.src = imageSrc;
-    modal.show();
-}
-
-function downloadScreenshot() {
-    let imgSrc = document.getElementById("screenshot-preview").src;
-    let link = document.createElement("a");
-    link.href = imgSrc;
-    link.download = "screenshot.png";
-    link.click();
-}
-
-function sendScreenshot() {
-    let imgSrc = document.getElementById("screenshot-preview").src;
-    console.log("Send this image via AJAX:", imgSrc);
-}
