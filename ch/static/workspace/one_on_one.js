@@ -2389,7 +2389,9 @@ window.onclick = function (event) {
 
 
 
+
 // /remind [what] [when]
+
 document.getElementById("chat-message-input").addEventListener("input", function (e) {
     let inputValue = this.value.trim();
     
