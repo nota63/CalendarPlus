@@ -2622,51 +2622,75 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // /stack <query> - find solutions on stackoverflow
-let stackSearchTimeout; // Variable to track timeout
 
 document.getElementById("chat-message-input").addEventListener("input", function (e) {
     let inputValue = this.value.trim();
-
+    
     if (inputValue.startsWith("/stack ")) {
-        clearTimeout(stackSearchTimeout); // Clear previous timeout
-        stackSearchTimeout = setTimeout(() => {
+        clearTimeout(window.stackTimeout);
+        
+        window.stackTimeout = setTimeout(() => {
             let query = inputValue.replace("/stack ", "").trim();
             if (query.length > 0) {
-                fetchStackOverflowResults(query);
+                searchStackOverflow(query);
             }
-        }, 3000); // 3-second delay
+        }, 3000);  // Wait 3 seconds after the user stops typing
     }
 });
 
-function fetchStackOverflowResults(query) {
+function searchStackOverflow(query) {
     let apiUrl = `https://api.stackexchange.com/2.3/search?order=desc&sort=relevance&intitle=${encodeURIComponent(query)}&site=stackoverflow`;
 
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
-            let resultsContainer = document.getElementById("stackResultsList");
-            resultsContainer.innerHTML = "";
+            let resultsList = document.getElementById("stackResultsList");
+            resultsList.innerHTML = "";
 
-            if (data.items && data.items.length > 0) {
-                data.items.forEach(item => {
-                    let listItem = document.createElement("li");
-                    listItem.innerHTML = `
-                        <a href="${item.link}" target="_blank">${item.title}</a>
-                        <button class="select-btn" onclick="selectStackResult('${item.title}')">Select</button>
-                    `;
-                    resultsContainer.appendChild(listItem);
-                });
-            } else {
-                resultsContainer.innerHTML = "<p>No results found. Try a different query.</p>";
+            if (data.items.length === 0) {
+                resultsList.innerHTML = "<p>No results found! 😞</p>";
+                return;
             }
 
-            let stackModal = new bootstrap.Modal(document.getElementById("stackModal"));
-            stackModal.show();
+            data.items.forEach(item => {
+                let listItem = document.createElement("li");
+
+                let questionLink = document.createElement("a");
+                questionLink.href = "#";
+                questionLink.textContent = item.title;
+                questionLink.onclick = function () {
+                    fetchStackAnswer(item.question_id);
+                };
+
+                listItem.appendChild(questionLink);
+                resultsList.appendChild(listItem);
+            });
+
+            let modal = new bootstrap.Modal(document.getElementById("stackModal"));
+            modal.show();
         })
         .catch(error => console.error("Error fetching Stack Overflow results:", error));
 }
 
-function selectStackResult(selectedText) {
-    let chatInput = document.getElementById("chat-message-input");
-    chatInput.value = selectedText;
+function fetchStackAnswer(questionId) {
+    let apiUrl = `https://api.stackexchange.com/2.3/questions/${questionId}/answers?order=desc&sort=votes&site=stackoverflow&filter=withbody`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            let answerContainer = document.getElementById("stackAnswerContainer");
+            answerContainer.innerHTML = "";
+
+            if (data.items.length === 0) {
+                answerContainer.innerHTML = "<p>No answers available! 😞</p>";
+                return;
+            }
+
+            let bestAnswer = data.items[0].body;
+            answerContainer.innerHTML = `<div class="answer-box">${bestAnswer}</div>`;
+
+            let modal = new bootstrap.Modal(document.getElementById("stackAnswerModal"));
+            modal.show();
+        })
+        .catch(error => console.error("Error fetching Stack Overflow answer:", error));
 }
