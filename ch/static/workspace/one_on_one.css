@@ -4130,3 +4130,17 @@ hr {
         font-size: 0.9rem;
     }
 }
+
+/* /screenshot - capture the entire screen */
+#screenshot-modal .modal-content {
+    border-radius: 15px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+#screenshot-preview {
+    max-width: 100%;
+    border-radius: 10px;
+    border: 2px solid #ddd;
+}
+.modal-footer button {
+    min-width: 100px;
+}

@@ -2537,3 +2537,66 @@ function updateBrowserURL() {
     let finalURL = inputURL.includes(".") ? `https://${inputURL}` : `https://www.google.com/search?q=${encodeURIComponent(inputURL)}`;
     document.getElementById("browserFrame").src = finalURL;
 }
+
+
+// /screenshot - captures the entire screen
+document.getElementById("chat-message-input").addEventListener("input", function (e) {
+    let inputValue = this.value.trim();
+
+    if (inputValue === "/screenshot") {
+        this.value = ""; // Clear input
+        takeScreenshot();
+    }
+});
+
+async function takeScreenshot() {
+    try {
+        // Request screen capture
+        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+
+        const video = document.createElement("video");
+        video.srcObject = stream;
+
+        // Wait for video to load before capturing
+        video.onloadedmetadata = async () => {
+            video.play();
+
+            setTimeout(() => {
+                const canvas = document.createElement("canvas");
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext("2d");
+
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // Stop the stream after capturing
+                stream.getTracks().forEach(track => track.stop());
+
+                showScreenshotModal(canvas.toDataURL("image/png")); // Open modal with image
+            }, 500); // Small delay to ensure proper rendering
+        };
+    } catch (error) {
+        console.error("Screenshot failed:", error);
+    }
+}
+
+function showScreenshotModal(imageSrc) {
+    let modal = new bootstrap.Modal(document.getElementById("screenshot-modal"));
+    let imgElement = document.getElementById("screenshot-preview");
+
+    imgElement.src = imageSrc;
+    modal.show();
+}
+
+function downloadScreenshot() {
+    let imgSrc = document.getElementById("screenshot-preview").src;
+    let link = document.createElement("a");
+    link.href = imgSrc;
+    link.download = "screenshot.png";
+    link.click();
+}
+
+function sendScreenshot() {
+    let imgSrc = document.getElementById("screenshot-preview").src;
+    console.log("Send this image via AJAX:", imgSrc);
+}
