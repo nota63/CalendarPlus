@@ -2622,7 +2622,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // /stack <query> - find solutions on stackoverflow
-
 document.getElementById("chat-message-input").addEventListener("input", function (e) {
     let inputValue = this.value.trim();
     
@@ -2634,7 +2633,7 @@ document.getElementById("chat-message-input").addEventListener("input", function
             if (query.length > 0) {
                 searchStackOverflow(query);
             }
-        }, 3000);  // Wait 3 seconds after the user stops typing
+        }, 3000);  // Wait 3 seconds after user stops typing
     }
 });
 
@@ -2687,10 +2686,23 @@ function fetchStackAnswer(questionId) {
             }
 
             let bestAnswer = data.items[0].body;
-            answerContainer.innerHTML = `<div class="answer-box">${bestAnswer}</div>`;
+            answerContainer.innerHTML = `
+                <div class="answer-box">${bestAnswer}</div>
+                <button class="btn btn-primary mt-3" onclick="selectAnswer()">Select</button>
+            `;
 
             let modal = new bootstrap.Modal(document.getElementById("stackAnswerModal"));
             modal.show();
         })
         .catch(error => console.error("Error fetching Stack Overflow answer:", error));
+}
+
+function selectAnswer() {
+    let answerText = document.querySelector("#stackAnswerContainer .answer-box").innerText.trim();
+    let chatInput = document.getElementById("chat-message-input");
+
+    chatInput.value = answerText;
+    
+    let modal = bootstrap.Modal.getInstance(document.getElementById("stackAnswerModal"));
+    modal.hide();
 }
