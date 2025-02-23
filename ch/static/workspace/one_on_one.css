@@ -3598,132 +3598,435 @@ hr {
     }
 }
 
+
+
 /* /emoji <context> */
-
-#emoji-modal {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 300px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-    padding: 15px;
-    z-index: 1000;
-    text-align: center;
-}
-
-#emoji-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-}
-
-.emoji-btn {
-    font-size: 24px;
-    cursor: pointer;
-    background: transparent;
-    border: none;
-    transition: 0.2s;
-}
-
-.emoji-btn:hover {
-    transform: scale(1.2);
-}
-
-
-
-
-/* 🌸 Modal Background */
-#emoji-modal {
-    display: none; /* Hidden by default */
+/* ================================================
+   Material Design 3 Theme Variables
+================================================ */
+:root {
+    --md-sys-color-primary: #6750A4;
+    --md-sys-color-on-primary: #FFFFFF;
+    --md-sys-color-primary-container: #EADDFF;
+    --md-sys-color-secondary: #625B71;
+    --md-sys-color-surface: #FEF7FF;
+    --md-sys-color-surface-container: #F3EDF7;
+    --md-sys-color-outline: #79747E;
+    --md-sys-color-shadow: #000000;
+    
+    --md-sys-elevation-1: 0 1px 3px 1px rgba(0,0,0,0.15);
+    --md-sys-elevation-2: 0 2px 6px 2px rgba(0,0,0,0.15);
+    --md-sys-elevation-3: 0 4px 8px 3px rgba(0,0,0,0.15);
+    
+    --md-sys-shape-corner-extra-large: 28px;
+    --md-sys-shape-corner-large: 16px;
+    --md-sys-shape-corner-medium: 12px;
+    
+    --md-sys-motion-duration-short-1: 100ms;
+    --md-sys-motion-duration-medium-1: 250ms;
+    --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+    --md-sys-motion-easing-decelerated: cubic-bezier(0, 0, 0, 1);
+  }
+  
+  /* ================================================
+     Base Modal Architecture
+  ================================================ */
+  #emoji-modal {
+    --modal-inset: 16px;
+    --modal-max-width: 360px;
+    --modal-elevation: var(--md-sys-elevation-3);
+    --modal-backdrop: rgba(0,0,0,0.3);
+    
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.4); /* Dark overlay */
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-/* 🌟 Emoji Modal Container */
-.emoji-container {
-    background: white;
-    width: 320px;
-    max-width: 90%;
-    padding: 16px;
-    border-radius: 12px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-/* ✨ Title Styling */
-.emoji-container h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #333;
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-/* 🌟 Emoji Grid */
-#emoji-list {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-    padding: 10px;
-}
-
-/* 💎 Emoji Buttons */
-.emoji-btn {
-    font-size: 1.5rem;
-    background: #f5f5f5;
-    border: none;
-    padding: 10px;
-    border-radius: 8px;
-    transition: all 0.2s ease-in-out;
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-/* 🖌️ Emoji Button Hover Effect */
-.emoji-btn:hover {
-    background: #e0e0e0;
-    transform: scale(1.1);
-}
-
-/* ❌ Close Button */
-.close-btn {
-    width: 100%;
-    background: #d32f2f;
-    color: white;
-    padding: 10px;
-    border-radius: 8px;
-    font-size: 1rem;
+    background: var(--modal-backdrop);
+    opacity: 0;
+    visibility: hidden;
+    transition: 
+      opacity var(--md-sys-motion-duration-medium-1) var(--md-sys-motion-easing-decelerated),
+      visibility 0ms linear var(--md-sys-motion-duration-medium-1);
+    z-index: 9999;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  
+  #emoji-modal.modal--visible {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0ms;
+  }
+  
+  .emoji-modal__container {
+    position: relative;
+    width: calc(100% - 2 * var(--modal-inset));
+    max-width: var(--modal-max-width);
+    background: var(--md-sys-color-surface);
+    border-radius: var(--md-sys-shape-corner-extra-large);
+    box-shadow: var(--modal-elevation);
+    transform: scale(0.95) translateY(20px);
+    opacity: 0;
+    transition: 
+      transform var(--md-sys-motion-duration-medium-1) var(--md-sys-motion-easing-emphasized),
+      opacity var(--md-sys-motion-duration-medium-1) var(--md-sys-motion-easing-emphasized);
+    overflow: hidden;
+  }
+  
+  #emoji-modal.modal--visible .emoji-modal__container {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+  
+  /* ================================================
+     Modal Header Section
+  ================================================ */
+  .emoji-modal__header {
+    padding: 24px 24px 16px;
+    position: relative;
+  }
+  
+  .emoji-modal__title {
+    font-family: 'Roboto', sans-serif;
+    font-size: 22px;
     font-weight: 500;
+    line-height: 28px;
+    color: var(--md-sys-color-primary);
+    margin: 0;
+    letter-spacing: 0.15px;
+  }
+  
+  /* ================================================
+     Emoji Grid System
+  ================================================ */
+  .emoji-grid {
+    --grid-columns: 8;
+    --grid-gap: 8px;
+    --emoji-size: 40px;
+    
+    display: grid;
+    grid-template-columns: repeat(var(--grid-columns), 1fr);
+    gap: var(--grid-gap);
+    padding: 0 24px 24px;
+    max-height: 50vh;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+  }
+  
+  .emoji-grid__item {
+    position: relative;
+    aspect-ratio: 1;
+  }
+  
+  .emoji-grid__button {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(var(--emoji-size) * 0.75);
+    border: none;
+    background: transparent;
+    border-radius: var(--md-sys-shape-corner-medium);
     cursor: pointer;
-    transition: background 0.2s;
-    text-align: center;
-    margin-top: 10px;
-}
-
-/* Close Button Hover */
-.close-btn:hover {
-    background: #b71c1c;
-}
-
-/* 🎬 Fade In Animation */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.9);
+    transition: 
+      background-color 100ms linear,
+      transform 150ms var(--md-sys-motion-easing-emphasized);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* Ripple Effect */
+  .emoji-grid__button::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: currentColor;
+    opacity: 0;
+    border-radius: inherit;
+    transition: opacity 100ms linear;
+  }
+  
+  .emoji-grid__button:hover::after {
+    opacity: 0.08;
+  }
+  
+  .emoji-grid__button:active::after {
+    opacity: 0.12;
+  }
+  
+  /* ================================================
+     Advanced Interaction States
+  ================================================ */
+  .emoji-grid__button:focus-visible {
+    outline: 2px solid var(--md-sys-color-primary);
+    outline-offset: 2px;
+  }
+  
+  .emoji-grid__button:hover {
+    transform: scale(1.08);
+  }
+  
+  .emoji-grid__button:active {
+    transform: scale(0.95);
+  }
+  
+  /* ================================================
+     Scrollbar Styling
+  ================================================ */
+  .emoji-grid::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .emoji-grid::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+  }
+  
+  .emoji-grid::-webkit-scrollbar-thumb {
+    background: var(--md-sys-color-outline);
+    border-radius: 4px;
+    opacity: 0.24;
+  }
+  
+  .emoji-grid::-webkit-scrollbar-thumb:hover {
+    opacity: 0.48;
+  }
+  
+  /* ================================================
+     Modal Footer & Actions
+  ================================================ */
+  .emoji-modal__footer {
+    padding: 16px 24px 24px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    border-top: 1px solid rgba(0,0,0,0.12);
+  }
+  
+  /* ================================================
+     Material Design Button System
+  ================================================ */
+  .mdc-button {
+    --button-height: 40px;
+    --button-padding: 24px;
+    
+    min-width: 64px;
+    height: var(--button-height);
+    padding: 0 var(--button-padding);
+    border: none;
+    border-radius: var(--md-sys-shape-corner-large);
+    background: transparent;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: 
+      background-color 100ms linear,
+      box-shadow 150ms linear;
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .mdc-button--filled {
+    background: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+    box-shadow: var(--md-sys-elevation-1);
+  }
+  
+  .mdc-button--filled:hover {
+    box-shadow: var(--md-sys-elevation-2);
+  }
+  
+  .mdc-button--filled:active {
+    box-shadow: var(--md-sys-elevation-1);
+  }
+  
+  /* ================================================
+     State Layer Animation
+  ================================================ */
+  .mdc-button::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: currentColor;
+    opacity: 0;
+    transition: opacity 100ms linear;
+  }
+  
+  .mdc-button:hover::after {
+    opacity: 0.08;
+  }
+  
+  .mdc-button:active::after {
+    opacity: 0.12;
+  }
+  
+  /* ================================================
+     Keyboard Navigation
+  ================================================ */
+  .emoji-grid__button:focus-visible,
+  .mdc-button:focus-visible {
+    outline: 2px solid var(--md-sys-color-primary);
+    outline-offset: 2px;
+  }
+  
+  /* ================================================
+     Responsive Adaptations
+  ================================================ */
+  @media (max-width: 480px) {
+    .emoji-grid {
+      --grid-columns: 6;
+      --emoji-size: 44px;
     }
-    to {
-        opacity: 1;
-        transform: scale(1);
+    
+    .emoji-modal__container {
+      border-radius: var(--md-sys-shape-corner-large);
     }
-}
+  }
+  
+  @media (max-width: 360px) {
+    .emoji-grid {
+      --grid-columns: 5;
+    }
+  }
+  
+  /* ================================================
+     Dark Theme Overrides
+  ================================================ */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --md-sys-color-primary: #D0BCFF;
+      --md-sys-color-on-primary: #381E72;
+      --md-sys-color-primary-container: #4F378B;
+      --md-sys-color-secondary: #CCC2DC;
+      --md-sys-color-surface: #1D1B20;
+      --md-sys-color-outline: #938F99;
+      --modal-backdrop: rgba(0,0,0,0.6);
+    }
+    
+    .emoji-modal__footer {
+      border-top-color: rgba(255,255,255,0.12);
+    }
+  }
+  
+  /* ================================================
+     Performance Optimizations
+  ================================================ */
+  .emoji-modal__container,
+  .emoji-grid__button,
+  .mdc-button {
+    will-change: transform, opacity;
+  }
+  
+  /* ================================================
+     Advanced Entrance Animation
+  ================================================ */
+  @keyframes modalContentEntrance {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .emoji-grid {
+    animation: modalContentEntrance 300ms var(--md-sys-motion-easing-emphasized) both;
+    animation-delay: 150ms;
+  }
+  
+  /* ================================================
+     Micro-interaction Animations
+  ================================================ */
+  @keyframes emojiPop {
+    0% { transform: scale(0); }
+    90% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+  
+  .emoji-grid__button {
+    animation: emojiPop 150ms var(--md-sys-motion-easing-emphasized) both;
+  }
+  
+  .emoji-grid__item:nth-child(1) { animation-delay: 50ms; }
+  .emoji-grid__item:nth-child(2) { animation-delay: 75ms; }
+  .emoji-grid__item:nth-child(3) { animation-delay: 100ms; }
+  /* ... continue pattern for all grid items ... */
+  
+  /* ================================================
+     Touch Optimization
+  ================================================ */
+  @media (pointer: coarse) {
+    .emoji-grid__button {
+      min-width: 48px;
+      min-height: 48px;
+    }
+    
+    .emoji-grid {
+      --grid-gap: 12px;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    .emoji-modal__container {
+      margin-bottom: env(safe-area-inset-bottom);
+    }
+  }
+  
+  /* ================================================
+     Density Adjustments
+  ================================================ */
+  .emoji-grid--high-density {
+    --grid-columns: 10;
+    --emoji-size: 32px;
+  }
+  
+  .emoji-grid--comfortable {
+    --grid-columns: 6;
+    --emoji-size: 48px;
+  }
+  
+  /* ================================================
+     Utility Classes
+  ================================================ */
+  .md-elevation-1 {
+    box-shadow: var(--md-sys-elevation-1);
+  }
+  
+  .md-elevation-2 {
+    box-shadow: var(--md-sys-elevation-2);
+  }
+  
+  .md-elevation-transition {
+    transition: box-shadow 150ms var(--md-sys-motion-easing-emphasized);
+  }
+  
+  /* ================================================
+     Advanced Focus States
+  ================================================ */
+  .focus-ring {
+    position: relative;
+  }
+  
+  .focus-ring::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border: 2px solid var(--md-sys-color-primary);
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 100ms linear;
+  }
+  
+  .focus-ring:focus-visible::before {
+    opacity: 1;
+  }
