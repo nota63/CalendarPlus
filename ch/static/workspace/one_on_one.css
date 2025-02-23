@@ -4368,3 +4368,40 @@ hr {
 #stackModal .modal-header .btn-close {
     filter: invert(1);
 }
+
+
+/* /Screen recorder */
+#recordModal .modal-content {
+    background: #121212;
+    color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+#recordModal .modal-header {
+    border-bottom: 1px solid #333;
+}
+
+#recordModal .modal-body video {
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+#recordModal .modal-footer {
+    border-top: 1px solid #333;
+}
+
+#recordModal .btn {
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+#recordModal .btn-success {
+    background: #4caf50;
+    border: none;
+}
+
+#recordModal .btn-danger {
+    background: #e53935;
+    border: none;
+}

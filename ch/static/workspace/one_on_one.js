@@ -2706,3 +2706,85 @@ function selectAnswer() {
     let modal = bootstrap.Modal.getInstance(document.getElementById("stackAnswerModal"));
     modal.hide();
 }
+
+
+// /Screen record /record <time>
+let mediaRecorder;
+let recordedChunks = [];
+let stopTimeout;
+
+document.getElementById("chat-message-input").addEventListener("input", function () {
+    let inputValue = this.value.trim();
+
+    if (inputValue.startsWith("/record ")) {
+        let args = inputValue.replace("/record ", "").trim();
+        let duration = parseInt(args, 10);
+
+        if (isNaN(duration) || duration <= 0) {
+            console.log("Invalid recording duration");
+            return;
+        }
+
+        startScreenRecording(duration);
+        this.value = ""; // Clear input after triggering
+    }
+});
+
+async function startScreenRecording(duration) {
+    try {
+        const stream = await navigator.mediaDevices.getDisplayMedia({
+            video: { mediaSource: "screen" },
+            audio: true
+        });
+
+        mediaRecorder = new MediaRecorder(stream);
+        recordedChunks = [];
+
+        mediaRecorder.ondataavailable = event => {
+            if (event.data.size > 0) recordedChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = () => {
+            const recordedBlob = new Blob(recordedChunks, { type: "video/webm" });
+            const recordedUrl = URL.createObjectURL(recordedBlob);
+            document.getElementById("recordedVideo").src = recordedUrl;
+
+            // Show the modal with video
+            let recordModal = new bootstrap.Modal(document.getElementById("recordModal"));
+            recordModal.show();
+        };
+
+        mediaRecorder.start();
+
+        // Stop recording after specified duration
+        stopTimeout = setTimeout(() => {
+            mediaRecorder.stop();
+            stopScreenSharing(stream);
+        }, duration * 1000);
+    } catch (error) {
+        console.error("Error starting screen recording:", error);
+    }
+}
+
+function stopScreenSharing(stream) {
+    stream.getTracks().forEach(track => track.stop());
+}
+
+// Download Recording
+document.getElementById("downloadRecording").addEventListener("click", function () {
+    if (recordedChunks.length === 0) return;
+
+    const recordedBlob = new Blob(recordedChunks, { type: "video/webm" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(recordedBlob);
+    a.download = "screen_recording.webm";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+});
+
+// Delete Recording
+document.getElementById("deleteRecording").addEventListener("click", function () {
+    document.getElementById("recordedVideo").src = "";
+    recordedChunks = [];
+});
