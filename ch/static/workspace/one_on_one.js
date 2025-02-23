@@ -2245,3 +2245,69 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+
+// Multiple commands
+document.addEventListener("DOMContentLoaded", function () {
+    const inputField = document.getElementById("chat-message-input");
+
+    // Command-to-text mapping
+    const commandReplacements = {
+        "/tableflip": "(╯°□°）╯︵ ┻━┻",
+        "/unflip": "┬─┬ ノ( ゜-゜ノ)",
+        "/lenny": "( ͡° ͜ʖ ͡°)",
+        "/wave": "👋",
+        "/happy": "😄",
+        "/sad": "😢",
+        "/love": "❤️",
+        "/shrug": "¯\\_(ツ)_/¯",
+        "/yawn": "😴",
+        "/excited": "🤩",
+        "/angry": "😡",
+        "/cry": "😭",
+        "/wow": "😲",
+        "/facepalm": "🤦",
+        "/dance": "💃🕺",
+        "/wink": "😉",
+        "/cheers": "🥂",
+        "/clap": "👏",
+        "/thumbsup": "👍",
+        "/thumbsdown": "👎",
+        "/fire": "🔥",
+        "/cool": "😎",
+        "/party": "🎉",
+        "/sleepy": "🥱",
+        "/hug": "🤗",
+        "/kiss": "😘",
+        "/heart": "💖",
+        "/mindblown": "🤯",
+        "/star": "⭐",
+        "/poop": "💩",
+        "/boom": "💥",
+        "/ghost": "👻",
+        "/robot": "🤖",
+        "/skull": "💀",
+        "/alien": "👽",
+        "/money": "🤑",
+        "/coffee": "☕",
+        "/tea": "🍵",
+        "/pizza": "🍕",
+        "/burger": "🍔",
+        "/beer": "🍺",
+        "/cake": "🎂",
+        "/cookie": "🍪",
+        "/gift": "🎁"
+    };
+
+    // Detect input change
+    inputField.addEventListener("input", function () {
+        const words = inputField.value.trim().split(/\s+/);
+        const lastWord = words[words.length - 1];
+
+        if (commandReplacements[lastWord]) {
+            // Replace command with emoji/text
+            words[words.length - 1] = commandReplacements[lastWord];
+            inputField.value = words.join(" ") + " ";
+        }
+    });
+});
