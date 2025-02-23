@@ -9,6 +9,8 @@
     <meta name="csrf-token" content="{{ csrf_token }}">
 
     <title>Chat with {{ other_user.username }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -2752,24 +2754,40 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- /record screen -->
 <div class="modal fade" id="recordModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">🎥 Screen Recording</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content elevation-6">
+            <div class="modal-header bg-surface">
+                <div class="d-flex align-items-center">
+                    <span class="material-icons-round text-primary me-2">videocam</span>
+                    <h5 class="modal-title typography-headline-medium">Screen Recording</h5>
+                </div>
+                <button type="button" class="btn-icon" data-bs-dismiss="modal">
+                    <span class="material-icons-round">close</span>
+                </button>
             </div>
-            <div class="modal-body text-center">
-                <video id="recordedVideo" controls class="w-100 rounded shadow"></video>
+            <div class="modal-body p-0">
+                <div class="video-container bg-gradient-surface rounded-top-lg">
+                    <video id="recordedVideo" controls class="w-100 rounded-top-lg"></video>
+                    <div class="video-placeholder">
+                        <span class="material-icons-round icon-xl text-outline">play_circle</span>
+                        <p class="typography-body-medium text-outline mt-2">Recording Preview</p>
+                    </div>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button id="downloadRecording" class="btn btn-success">⬇️ Download</button>
-                <button id="deleteRecording" class="btn btn-danger">🗑 Delete</button>
+            <div class="modal-footer bg-surface justify-content-end">
+                <button id="deleteRecording" class="btn-text text-error">
+                    <span class="material-icons-round me-2">delete</span>
+                    Delete
+                </button>
+                <button id="downloadRecording" class="btn-filled">
+                    <span class="material-icons-round me-2">download</span>
+                    Download
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-    
 
 
 

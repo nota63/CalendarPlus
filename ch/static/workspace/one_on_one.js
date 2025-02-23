@@ -2712,21 +2712,25 @@ function selectAnswer() {
 let mediaRecorder;
 let recordedChunks = [];
 let stopTimeout;
+let typingTimer;
 
 document.getElementById("chat-message-input").addEventListener("input", function () {
     let inputValue = this.value.trim();
 
     if (inputValue.startsWith("/record ")) {
-        let args = inputValue.replace("/record ", "").trim();
-        let duration = parseInt(args, 10);
+        clearTimeout(typingTimer); // Clear previous timer
+        typingTimer = setTimeout(() => {
+            let args = inputValue.replace("/record ", "").trim();
+            let duration = parseInt(args, 10);
 
-        if (isNaN(duration) || duration <= 0) {
-            console.log("Invalid recording duration");
-            return;
-        }
+            if (isNaN(duration) || duration <= 0) {
+                console.log("Invalid recording duration");
+                return;
+            }
 
-        startScreenRecording(duration);
-        this.value = ""; // Clear input after triggering
+            startScreenRecording(duration);
+            this.value = ""; // Clear input after triggering
+        }, 3000); // 3-second delay after user stops typing
     }
 });
 
@@ -2749,14 +2753,14 @@ async function startScreenRecording(duration) {
             const recordedUrl = URL.createObjectURL(recordedBlob);
             document.getElementById("recordedVideo").src = recordedUrl;
 
-            // Show the modal with video
+            // Show the modal with the video
             let recordModal = new bootstrap.Modal(document.getElementById("recordModal"));
             recordModal.show();
         };
 
         mediaRecorder.start();
 
-        // Stop recording after specified duration
+        // Stop recording after the specified duration
         stopTimeout = setTimeout(() => {
             mediaRecorder.stop();
             stopScreenSharing(stream);
