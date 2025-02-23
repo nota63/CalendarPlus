@@ -4458,3 +4458,37 @@ hr {
     font-weight: 500;
     line-height: 1.5;
 }
+
+/* /location - share your live location */
+
+.location-modal {
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.location-modal .modal-header {
+    background: #007bff;
+    color: white;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.location-modal .modal-body {
+    padding: 20px;
+}
+
+.location-modal .modal-footer {
+    border-top: none;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

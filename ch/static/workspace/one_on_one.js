@@ -2792,3 +2792,54 @@ document.getElementById("deleteRecording").addEventListener("click", function ()
     document.getElementById("recordedVideo").src = "";
     recordedChunks = [];
 });
+
+
+// /location - share your live location
+document.addEventListener("DOMContentLoaded", function () {
+    let typingTimer;
+    const inputField = document.getElementById("chat-message-input");
+
+    inputField.addEventListener("keyup", function (event) {
+        clearTimeout(typingTimer);
+        if (inputField.value.startsWith("/location")) {
+            typingTimer = setTimeout(() => {
+                getUserLocation();
+            }, 3000);  // 3-sec delay to let the user finish typing
+        }
+    });
+
+    function getUserLocation() {
+        if (!navigator.geolocation) {
+            alert("Geolocation is not supported by your browser.");
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lon}`;
+
+                // Update modal content
+                document.getElementById("location-map").src = `https://maps.google.com/maps?q=${lat},${lon}&z=15&output=embed`;
+                document.getElementById("location-url").value = googleMapsUrl;
+                document.getElementById("send-location").setAttribute("data-url", googleMapsUrl);
+
+                // Show modal
+                new bootstrap.Modal(document.getElementById("locationModal")).show();
+            },
+            (error) => {
+                alert("Unable to retrieve location. Please allow location access.");
+            }
+        );
+    }
+
+    // Send Location to Chat
+    document.getElementById("send-location").addEventListener("click", function () {
+        const url = this.getAttribute("data-url");
+        const chatInput = document.getElementById("chat-message-input");
+        chatInput.value = url;  // Append location to chat input
+        chatInput.focus();
+        new bootstrap.Modal(document.getElementById("locationModal")).hide();
+    });
+});

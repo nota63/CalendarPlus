@@ -2789,6 +2789,25 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 
+<!-- /location - SHare your live location -->
+<div class="modal fade" id="locationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content location-modal">
+            <div class="modal-header">
+                <h5 class="modal-title">📍 Your Live Location</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <iframe id="location-map" width="100%" height="250px" style="border-radius: 10px;"></iframe>
+                <input type="text" id="location-url" class="form-control mt-3" readonly>
+            </div>
+            <div class="modal-footer d-flex justify-content-between">
+                <button class="btn btn-secondary" onclick="navigator.clipboard.writeText(document.getElementById('location-url').value)">📋 Copy</button>
+                <button id="send-location" class="btn btn-primary">📩 Send</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
