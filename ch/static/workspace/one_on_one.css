@@ -4554,3 +4554,84 @@ hr {
     padding: 0.5rem;
     margin: -0.5rem -0.5rem -0.5rem auto;
 }
+
+/* /security-check */
+.scanner-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.scanner-circle {
+    width: 80px;
+    height: 80px;
+    border: 6px solid rgba(255, 255, 255, 0.3);
+    border-top: 6px solid #4caf50;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.security-report {
+    background: #1e1e1e;
+    color: #ffffff;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: left;
+}
+
+.report-title {
+    text-align: center;
+    font-size: 22px;
+    margin-bottom: 15px;
+    color: #4caf50;
+}
+
+.report-section p {
+    margin: 5px 0;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.report-section p:nth-child(odd) {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.scan-fix-btn {
+    display: block;
+    width: 100%;
+    margin-top: 15px;
+    background: red;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.scan-fix-btn:hover {
+    background: darkred;
+}
+
+.fixed-message {
+    text-align: center;
+    font-size: 18px;
+    color: #4caf50;
+    font-weight: bold;
+    margin-top: 20px;
+}

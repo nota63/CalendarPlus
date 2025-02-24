@@ -2845,58 +2845,67 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+
+
 // /security check 
 document.addEventListener("DOMContentLoaded", function () {
     let typingTimer;
     const inputField = document.getElementById("chat-message-input");
 
-    inputField.addEventListener("keyup", function (event) {
+    inputField.addEventListener("keyup", function () {
         clearTimeout(typingTimer);
         if (inputField.value.trim() === "/security-check") {
             typingTimer = setTimeout(() => {
                 startSecurityCheck();
-            }, 2000);  // Delay for user to finish typing
+            }, 2000);
         }
     });
 
     function startSecurityCheck() {
-        console.log("🔍 Initiating Security Check...");
-        
-        // Show the modal first
-        const securityModal = new bootstrap.Modal(document.getElementById("securityCheckModal"));
-        securityModal.show();
-
-        document.getElementById("security-result").innerHTML = "🔍 Scanning system...";
+        const securityResult = document.getElementById("security-result");
+        securityResult.innerHTML = `
+            <div class="scanner-container">
+                <div class="scanner-circle"></div>
+                <p>🔍 Scanning system for vulnerabilities...</p>
+            </div>
+        `;
 
         fetch("/dm/security-check/")
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Network response was not OK");
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                document.getElementById("security-result").innerHTML = `
-                    <h4>🛡 Security Report</h4>
-                    <p><b>Open Ports:</b> ${data.open_ports.length > 0 ? data.open_ports.join(", ") : "✅ Secure"}</p>
-                    <p><b>Outdated Software:</b> ${data.outdated_software.length > 0 ? "⚠️ Needs Update" : "✅ Up-to-date"}</p>
-                    <p><b>Weak Passwords:</b> ${data.weak_passwords.length > 0 ? "🚨 Weak Passwords Found!" : "✅ Strong Passwords"}</p>
-                    <p><b>Malware Check:</b> ${data.malware ? "🚨 Suspicious Files Found!" : "✅ Clean"}</p>
-                    <button class="btn btn-danger" id="fix-issues-btn">🛠 Fix Issues</button>
-                `;
+                setTimeout(() => { // Simulate scanning delay for better UX
+                    securityResult.innerHTML = `
+                        <div class="security-report">
+                            <h3 class="report-title">🛡 Security Report</h3>
+                            <div class="report-section">
+                                <p><b>Open Ports:</b> ${data.open_ports.length > 0 ? data.open_ports.join(", ") : "✅ Secure"}</p>
+                                <p><b>Outdated Software:</b> ${data.outdated_software.length > 0 ? "⚠️ Needs Update" : "✅ Up-to-date"}</p>
+                                <p><b>System Uptime:</b> ${data.system_uptime}</p>
+                                <p><b>Suspicious Processes:</b> ${data.suspicious_processes.length > 0 ? "🚨 Threat Detected!" : "✅ No Threats"}</p>
+                                <p><b>Network Connections:</b> ${data.network_connections.length > 0 ? "⚠️ Active Connections Found" : "✅ Secure"}</p>
+                                <p><b>Firewall Status:</b> ${data.firewall_status.includes("active") ? "✅ Firewall Enabled" : "🚨 Firewall Disabled"}</p>
+                                <p><b>Running Services:</b> ${data.running_services.length > 0 ? data.running_services.join(", ") : "✅ Minimal Services Running"}</p>
+                                <p><b>File Integrity:</b> ${data.file_integrity.includes("root") ? "⚠️ Changes Detected" : "✅ Files Intact"}</p>
+                                <p><b>Rootkit Check:</b> ${data.rootkit_check.includes("INFECTED") ? "🚨 Rootkit Found!" : "✅ System Clean"}</p>
+                                <p><b>Unused Users:</b> ${data.unused_users.length > 0 ? "⚠️ Inactive Accounts Found" : "✅ All Active Accounts"}</p>
+                                <p><b>Malware Check:</b> ${data.malware ? "🚨 Malware Detected!" : "✅ No Malware Found"}</p>
+                            </div>
+                            <button class="btn btn-danger scan-fix-btn" id="fix-issues-btn">🛠 Fix Issues</button>
+                        </div>
+                    `;
 
-                document.getElementById("fix-issues-btn").addEventListener("click", function () {
-                    fetch("/dm/fix-security-issues/", { method: "POST" })
-                        .then(response => response.json())
-                        .then(data => {
-                            alert(data.message);
-                            document.getElementById("security-result").innerHTML = "✅ All security issues fixed!";
-                        });
-                });
-            })
-            .catch(error => {
-                document.getElementById("security-result").innerHTML = "⚠️ Error occurred. Please try again.";
-                console.error("Security check failed:", error);
+                    document.getElementById("fix-issues-btn").addEventListener("click", function () {
+                        fetch("/dm/fix-security-issues/", { method: "POST" })
+                            .then(response => response.json())
+                            .then(data => {
+                                alert(data.message);
+                                securityResult.innerHTML = `<p class="fixed-message">✅ All security issues fixed!</p>`;
+                            });
+                    });
+
+                }, 3000); // Delay to enhance scanning effect
             });
+
+        new bootstrap.Modal(document.getElementById("securityCheckModal")).show();
     }
 });

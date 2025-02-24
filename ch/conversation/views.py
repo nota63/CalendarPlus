@@ -1568,48 +1568,54 @@ VIRUSTOTAL_API_KEY = "ef739edd44d6bd2d21e1bb5f45e92f941dac3b3e96cbd60ddce6a63b75
 @csrf_exempt
 def security_check_view(request):
     if request.method == "GET":
-        # 1️⃣ Check Open Ports
-        if os.name == "nt":  # Windows
-            open_ports = subprocess.getoutput("netstat -ano").split("\n")[4:]
-        else:  # Linux/macOS
-            open_ports = subprocess.getoutput("netstat -tuln").split("\n")[2:]
-        
-        # 2️⃣ Check for outdated software (Windows/Linux)
-        outdated_software = []
-        if os.name == "nt":  # Windows
-            outdated_software = ["Windows Update required"]  # Placeholder
-        else:
-            outdated_software = subprocess.getoutput("apt list --upgradable").split("\n")[1:]
-        
-        # 3️⃣ Check Weak Passwords (Cross-Platform)
-        weak_passwords = []
-        password_list = ["1234", "password", "admin", "qwerty"]
-        users = ["user1", "admin", "testuser"]  # Simulated users (as /etc/passwd is not available)
+        # 1️⃣ Open Ports Check
+        open_ports = subprocess.getoutput("netstat -tuln").split("\n")[2:]
 
-        for user in users:
-            if any(pw in user for pw in password_list):
-                weak_passwords.append(user)
-        
-        # 4️⃣ Check for Malware (VirusTotal API)
+        # 2️⃣ Outdated Software Check
+        outdated_software = subprocess.getoutput("apt list --upgradable").split("\n")[1:]
+
+        # 3️⃣ System Uptime
+        system_uptime = subprocess.getoutput("uptime -p")
+
+        # 4️⃣ Suspicious Processes
+        suspicious_processes = subprocess.getoutput("ps aux | grep -i 'cryptominer'").split("\n")
+
+        # 5️⃣ Active Network Connections
+        network_connections = subprocess.getoutput("netstat -an").split("\n")
+
+        # 6️⃣ Firewall Status
+        firewall_status = subprocess.getoutput("ufw status")
+
+        # 7️⃣ Running Services
+        running_services = subprocess.getoutput("systemctl list-units --type=service --state=running").split("\n")
+
+        # 8️⃣ File Integrity Check (Example: Check for root file modifications)
+        file_integrity = subprocess.getoutput("ls -lah /root/")
+
+        # 9️⃣ Rootkit Detection
+        rootkit_check = subprocess.getoutput("chkrootkit | grep INFECTED")
+
+        # 🔟 Unused Users & SSH Keys
+        unused_users = subprocess.getoutput("awk -F: '{ if ($3 >= 1000) print $1}' /etc/passwd").split("\n")
+
+        # 🛡 Malware Check (VirusTotal API)
         malware = False
         headers = {"x-apikey": VIRUSTOTAL_API_KEY}
-        files_to_scan = ["C:/Windows/System32/cmd.exe"] if os.name == "nt" else ["/bin/bash"]  # Example file
-
-        for file_path in files_to_scan:
-            if os.path.exists(file_path):
-                with open(file_path, "rb") as file:
-                    response = requests.post(
-                        "https://www.virustotal.com/api/v3/files",
-                        headers=headers,
-                        files={"file": file}
-                    )
-                    if response.status_code == 200 and "malicious" in response.text:
-                        malware = True
+        response = requests.get("https://www.virustotal.com/api/v3/files", headers=headers)
+        if response.status_code == 200 and "malicious" in response.text:
+            malware = True
 
         return JsonResponse({
             "open_ports": open_ports,
             "outdated_software": outdated_software,
-            "weak_passwords": weak_passwords,
+            "system_uptime": system_uptime,
+            "suspicious_processes": suspicious_processes,
+            "network_connections": network_connections,
+            "firewall_status": firewall_status,
+            "running_services": running_services,
+            "file_integrity": file_integrity,
+            "rootkit_check": rootkit_check,
+            "unused_users": unused_users,
             "malware": malware
         })
 
