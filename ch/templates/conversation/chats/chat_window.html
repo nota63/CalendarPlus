@@ -1899,6 +1899,18 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <p class="text-sm text-gray-600 mt-1">Manage your conversation todos</p>
                             </div>
                         </li>
+
+                        <li class="group flex items-center gap-4 p-4 rounded-xl bg-white/50 hover:bg-white/90 transition-all duration-200 shadow-sm hover:shadow-md border border-white/80 hover:border-gray-200/50">
+                            <div class="shrink-0 w-10 h-10 rounded-lg bg-yellow-100/80 flex items-center justify-center group-hover:bg-yellow-200/50">
+                                <i class="fas fa-edit text-yellow-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-800">/draw</p>
+                                <p class="text-sm text-gray-600 mt-1">Canvases & real time collaboration</p>
+                            </div>
+                        </li>
+
+
                         <li class="group flex items-center gap-4 p-4 rounded-xl bg-white/50 hover:bg-white/90 transition-all duration-200 shadow-sm hover:shadow-md border border-white/80 hover:border-gray-200/50">
                             <div class="shrink-0 w-10 h-10 rounded-lg bg-yellow-100/80 flex items-center justify-center group-hover:bg-yellow-200/50">
                                 <i class="fas fa-calendar-alt text-yellow-600"></i>
@@ -3162,27 +3174,31 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <!-- /draw -- draw canvases in real time -->
-<!-- /draw Modal -->
-<div class="modal fade" id="drawModal" tabindex="-1" aria-labelledby="drawModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">🎨 Draw & Sketch</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+ <!-- /draw Modal -->
+<div class="modal fade" id="drawModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content" style="background-color: transparent; border: none;">
+            <!-- Close Button (minimal) -->
+            <button type="button" 
+                    class="btn btn-sm btn-light position-absolute top-0 end-0 m-3 z-3" 
+                    style="border-radius: 50%; width: 40px; height: 40px;"
+                    data-bs-dismiss="modal">
+                &times;
+            </button>
+            
+            <!-- Fullscreen Excalidraw Container -->
+            <div class="modal-body p-0">
+                <iframe id="excalidrawFrame" 
+                        src="https://excalidraw.com/" 
+                        width="100%" 
+                        height="100%"
+                        style="border: none; border-radius: 0;"
+                        allowfullscreen>
+                </iframe>
+            </div>
         </div>
-        <div class="modal-body">
-          <!-- Excalidraw Container -->
-          <iframe id="excalidrawFrame" src="https://excalidraw.com/" width="100%" height="500px" style="border: none;"></iframe>
-        </div>
-        <div class="modal-footer">
-          <button id="downloadDrawing" class="btn btn-success">Download</button>
-          <button id="sendDrawingEmail" class="btn btn-primary">Send via Email</button>
-        </div>
-      </div>
     </div>
-  </div>
-  
-
+</div>
 
 
 

@@ -5169,3 +5169,19 @@ body.hacker-active {
     background: #FF8F00;
     transform: translateY(-1px);
 }
+
+
+/* /draw - canvases */
+ /* Custom styling to remove modal padding */
+ #drawModal .modal-content {
+    background: transparent;
+    border: none;
+}
+#drawModal .modal-body {
+    padding: 0;
+    height: 100vh;
+}
+/* Optional: Add a subtle shadow to the close button */
+#drawModal .btn-close-custom {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}

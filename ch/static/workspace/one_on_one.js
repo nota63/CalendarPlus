@@ -3243,15 +3243,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+
+
 // /draw open canvases
 document.addEventListener("DOMContentLoaded", function () {
     let inputField = document.getElementById("chat-message-input");
+    let excalidrawFrame = document.getElementById("excalidrawFrame").contentWindow;
 
+    // Detect `/draw` command and open modal
     inputField.addEventListener("input", function () {
-        let inputValue = inputField.value.trim();
-        
-        if (inputValue === "/draw") {
-            inputField.value = ""; // Clear input field
+        if (inputField.value.trim() === "/draw") {
+            inputField.value = "";
             let drawModal = new bootstrap.Modal(document.getElementById("drawModal"));
             drawModal.show();
         }
@@ -3259,23 +3261,51 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Handle Download Button Click
     document.getElementById("downloadDrawing").addEventListener("click", function () {
-        let excalidrawFrame = document.getElementById("excalidrawFrame").contentWindow;
-        excalidrawFrame.postMessage({ type: "export-image", exportBackground: true }, "*");
+        excalidrawFrame.postMessage({ type: "export-image", exportBackground: true, trigger: "download" }, "*");
     });
 
-    // Handle Send via Email Button
+    // Handle Send via Email Button Click
     document.getElementById("sendDrawingEmail").addEventListener("click", function () {
-        alert("📧 This feature is under construction! Will be added soon.");
+        excalidrawFrame.postMessage({ type: "export-image", exportBackground: true, trigger: "email" }, "*");
     });
 
     // Listen for Excalidraw Export Response
     window.addEventListener("message", function (event) {
         if (event.data.type === "export-image") {
             let imageData = event.data.dataURL;
-            let link = document.createElement("a");
-            link.href = imageData;
-            link.download = "drawing.png";
-            link.click();
+
+            // Download Image
+            if (event.data.trigger === "download") {
+                let link = document.createElement("a");
+                link.href = imageData;
+                link.download = "drawing.png";
+                link.click();
+            }
+
+            // Send to Email
+            if (event.data.trigger === "email") {
+                sendDrawingViaEmail(imageData);
+            }
         }
     });
+
+    function sendDrawingViaEmail(imageData) {
+        fetch("/dm/send-drawing/", {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken() 
+            },
+            body: JSON.stringify({ image_data: imageData })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.success ? "📨 Email Sent Successfully!" : "❌ Failed to Send Email.");
+        })
+        .catch(error => console.error("Error sending email:", error));
+    }
+
+    function getCSRFToken() {
+        return document.querySelector("[name=csrfmiddlewaretoken]").value;
+    }
 });

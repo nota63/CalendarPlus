@@ -1801,37 +1801,37 @@ import base64
 import re
 
 @csrf_exempt
-def send_drawing(request):
+def send_drawing_email(request):
     if request.method == "POST":
         try:
-            import json
             data = json.loads(request.body)
+            user = request.user  # Get logged-in user
             image_data = data.get("image_data")
 
-            # Decode the base64 image
-            image_data = re.sub("^data:image/png;base64,", "", image_data)
-            image_binary = base64.b64decode(image_data)
+            if not user.email:
+                return JsonResponse({"success": False, "error": "No email found for this user!"})
 
-            # Save Image Temporarily
-            file_path = "/tmp/drawing.png"
-            with open(file_path, "wb") as f:
-                f.write(image_binary)
+            if not image_data:
+                return JsonResponse({"success": False, "error": "No image data provided!"})
 
-            # Send Email
-            email = EmailMessage(
-                subject="Your Drawing",
-                body="Here is your drawing!",
-                from_email="noreply@calendarplus.com",
-                to=[request.user.email],  
+            # Convert base64 image to binary
+            header, encoded = image_data.split(",", 1)
+            image_binary = base64.b64decode(encoded)
+
+            # Create email
+            mail = EmailMessage(
+                "Your Sketch from Calendar Plus",
+                "Hey! Here's the sketch you created. 🎨",
+                "your_email@example.com",
+                [user.email]  # Send to the logged-in user
             )
-            email.attach("drawing.png", image_binary, "image/png")
-            email.send()
+            mail.attach("drawing.png", image_binary, "image/png")
+            mail.send()
 
-            os.remove(file_path)  # Delete the file after sending
-
-            return JsonResponse({"message": "Drawing sent successfully!"})
-
+            return JsonResponse({"success": True})
+        
         except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
-
-    return JsonResponse({"error": "Invalid request!"}, status=400)
+            logger.error(f"Email sending failed: {e}")
+            return JsonResponse({"success": False, "error": str(e)})
+    
+    return JsonResponse({"success": False, "error": "Invalid request!"})
