@@ -3059,3 +3059,104 @@ document.addEventListener("DOMContentLoaded", function () {
         setInterval(draw, 33);
     }
 });
+
+
+// /panic-delete <minutes>
+document.addEventListener("DOMContentLoaded", function () {
+    let inputField = document.getElementById("chat-message-input");
+    let panicDeleteTimeout;
+
+    inputField.addEventListener("input", function () {
+        let inputValue = inputField.value.trim();
+
+        if (inputValue.startsWith("/panic-delete ")) {
+            clearTimeout(panicDeleteTimeout); // Clear any previous timeout
+            panicDeleteTimeout = setTimeout(() => {
+                let minutes = parseInt(inputValue.split(" ")[1]);
+
+                if (!isNaN(minutes) && minutes > 0) {
+                    startPanicDelete(minutes);
+                    inputField.value = "";  // Clear input field after detecting the command
+                }
+            }, 2500); // 🔥 1.5 seconds delay before processing
+        }
+    });
+
+    function startPanicDelete(minutes) {
+        let orgId = window.djangoData.orgId;
+        let conversationId = window.djangoData.conversationId;
+        let csrfToken = getCSRFToken();
+
+        if (!orgId || !conversationId) {
+            alert("Missing organization or conversation ID!");
+            return;
+        }
+
+        if (!csrfToken) {
+            alert("CSRF token not found!");
+            return;
+        }
+
+        showLoadingSpinner();
+
+        fetch("/dm/panic-del/", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken,
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({
+                "org_id": orgId,
+                "conversation_id": conversationId,
+                "minutes": minutes
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoadingSpinner();
+            if (data.success) {
+                removeDeletedMessages(minutes);
+            } else {
+                alert("Error: " + data.error);
+            }
+        })
+        .catch(error => {
+            hideLoadingSpinner();
+            console.error("Panic Delete Failed:", error);
+        });
+    }
+
+    function removeDeletedMessages(minutes) {
+        let messages = document.querySelectorAll(".chat-message");
+        let now = new Date();
+
+        messages.forEach(msg => {
+            let timestamp = new Date(msg.getAttribute("data-timestamp"));
+            let diffMinutes = (now - timestamp) / (1000 * 60);
+
+            if (diffMinutes <= minutes) {
+                msg.remove();
+            }
+        });
+    }
+
+    function showLoadingSpinner() {
+        let spinner = document.createElement("div");
+        spinner.id = "loading-spinner";
+        spinner.innerHTML = `<div class="spinner"></div>`;
+        document.body.appendChild(spinner);
+    }
+
+    function hideLoadingSpinner() {
+        let spinner = document.getElementById("loading-spinner");
+        if (spinner) spinner.remove();
+    }
+
+    function getCSRFToken() {
+        let token = document.querySelector("[name=csrfmiddlewaretoken]")?.value;
+        if (!token) {
+            token = document.querySelector("meta[name='csrf-token']")?.getAttribute("content");
+        }
+        return token || "";
+    }
+});

@@ -1738,3 +1738,29 @@ def export_messages_view(request):
             return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"error": "Invalid request method."}, status=400)
+
+
+# /panic-delete <minutes> -- delete messages for tht minutes
+
+@login_required
+@csrf_exempt
+def panic_delete_messages(request):
+    if request.method == "POST":
+        org_id = request.POST.get("org_id")
+        conversation_id = request.POST.get("conversation_id")
+        minutes = int(request.POST.get("minutes", 0))
+        
+        if not org_id or not conversation_id or minutes <= 0:
+            return JsonResponse({"success": False, "error": "Invalid data"}, status=400)
+        
+        try:
+            cutoff_time = now() - timedelta(minutes=minutes)
+            messages_deleted = Message.objects.filter(
+                sender=request.user, 
+                conversation_id=conversation_id, 
+                timestamp__gte=cutoff_time
+            ).delete()
+
+            return JsonResponse({"success": True, "deleted_count": messages_deleted[0]})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
