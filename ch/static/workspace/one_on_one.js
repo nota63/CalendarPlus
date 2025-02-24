@@ -2865,7 +2865,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const securityResult = document.getElementById("security-result");
         securityResult.innerHTML = `
             <div class="scanner-container">
-                <div class="scanner-circle"></div>
+                <div class="scanner-circle">
+                    <div class="scanner-inner"></div>
+                    <div class="scanning-wave"></div>
+                </div>
                 <p>🔍 Scanning system for vulnerabilities...</p>
             </div>
         `;
@@ -2873,7 +2876,7 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch("/dm/security-check/")
             .then(response => response.json())
             .then(data => {
-                setTimeout(() => { // Simulate scanning delay for better UX
+                setTimeout(() => {
                     securityResult.innerHTML = `
                         <div class="security-report">
                             <h3 class="report-title">🛡 Security Report</h3>
@@ -2903,7 +2906,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             });
                     });
 
-                }, 3000); // Delay to enhance scanning effect
+                }, 4000);
             });
 
         new bootstrap.Modal(document.getElementById("securityCheckModal")).show();

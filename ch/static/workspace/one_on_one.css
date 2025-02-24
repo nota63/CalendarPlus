@@ -4555,62 +4555,102 @@ hr {
     margin: -0.5rem -0.5rem -0.5rem auto;
 }
 
+
+
 /* /security-check */
 .scanner-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 200px;
+    height: 250px;
     text-align: center;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: bold;
     color: #ffffff;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.8);
     border-radius: 10px;
     padding: 20px;
+    position: relative;
+    overflow: hidden;
 }
 
+/* Outer Glowing Circle */
 .scanner-circle {
-    width: 80px;
-    height: 80px;
-    border: 6px solid rgba(255, 255, 255, 0.3);
-    border-top: 6px solid #4caf50;
+    width: 100px;
+    height: 100px;
+    position: relative;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 10px;
+    background: rgba(0, 255, 0, 0.1);
+    box-shadow: 0px 0px 20px rgba(0, 255, 0, 0.7);
+    animation: glow 1.5s infinite alternate;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+/* Inner Pulsating Scanner */
+.scanner-inner {
+    width: 60px;
+    height: 60px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: rgba(0, 255, 0, 0.3);
+    box-shadow: 0px 0px 10px rgba(0, 255, 0, 0.9);
+    animation: pulse 2s infinite alternate;
 }
 
+/* Scanning Wave Animation */
+.scanning-wave {
+    width: 120px;
+    height: 120px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 3px solid rgba(0, 255, 0, 0.4);
+    animation: scan-wave 2s infinite linear;
+}
+
+/* Animations */
+@keyframes glow {
+    0% { box-shadow: 0px 0px 20px rgba(0, 255, 0, 0.5); }
+    100% { box-shadow: 0px 0px 40px rgba(0, 255, 0, 1); }
+}
+
+@keyframes pulse {
+    0% { transform: translate(-50%, -50%) scale(1); }
+    100% { transform: translate(-50%, -50%) scale(1.3); }
+}
+
+@keyframes scan-wave {
+    0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+}
+
+/* Security Report Enhancements */
 .security-report {
-    background: #1e1e1e;
-    color: #ffffff;
-    padding: 15px;
+    background: linear-gradient(to right, #111, #222);
+    color: #00ff00;
+    padding: 20px;
     border-radius: 10px;
+    font-family: 'Courier New', monospace;
     text-align: left;
+    border: 2px solid #00ff00;
+    box-shadow: 0px 0px 15px rgba(0, 255, 0, 0.7);
 }
 
 .report-title {
     text-align: center;
-    font-size: 22px;
+    font-size: 24px;
     margin-bottom: 15px;
-    color: #4caf50;
+    color: #00ff00;
+    text-transform: uppercase;
+    font-weight: bold;
 }
 
-.report-section p {
-    margin: 5px 0;
-    padding: 5px;
-    border-radius: 5px;
-}
-
-.report-section p:nth-child(odd) {
-    background: rgba(255, 255, 255, 0.1);
-}
-
+/* Security Fix Button */
 .scan-fix-btn {
     display: block;
     width: 100%;
@@ -4618,20 +4658,24 @@ hr {
     background: red;
     color: white;
     border: none;
-    padding: 10px;
+    padding: 12px;
     border-radius: 5px;
     font-weight: bold;
+    font-size: 18px;
+    text-transform: uppercase;
     cursor: pointer;
+    transition: 0.3s ease-in-out;
 }
 
 .scan-fix-btn:hover {
     background: darkred;
+    box-shadow: 0px 0px 10px rgba(255, 0, 0, 0.7);
 }
 
 .fixed-message {
     text-align: center;
-    font-size: 18px;
-    color: #4caf50;
+    font-size: 20px;
+    color: #00ff00;
     font-weight: bold;
     margin-top: 20px;
 }
