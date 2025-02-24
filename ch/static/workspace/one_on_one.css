@@ -5009,3 +5009,163 @@ body.hacker-active {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
+
+
+/* /speech to text */
+/* Custom Material Design Styles */
+#voiceModal .modal-content {
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    border: none;
+}
+
+.modal-header {
+    background: #4285f4;
+    color: white;
+    border-radius: 16px 16px 0 0;
+    padding: 18px 24px;
+}
+
+.modal-title {
+    font-weight: 500;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.modal-title .material-icons {
+    font-size: 1.5rem;
+}
+
+.btn-close {
+    filter: invert(1);
+    opacity: 0.8;
+    padding: 12px;
+}
+
+#speechText {
+    min-height: 120px;
+    border: 2px dashed #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 16px 0;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background: #f8f9fa;
+    color: #202124;
+}
+
+#speechText:empty::after {
+    content: "Click the microphone to start speaking...";
+    color: #9aa0a6;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 24px;
+}
+
+.btn-mic {
+    background: #4285f4;
+    color: white;
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(66,133,244,0.3);
+    transition: all 0.2s ease;
+}
+
+.btn-mic:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(66,133,244,0.4);
+}
+
+.btn-mic .material-icons {
+    font-size: 28px;
+}
+
+.status-message {
+    background: #fff3cd;
+    color: #856404;
+    padding: 12px;
+    border-radius: 8px;
+    margin: 16px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 0.9rem;
+}
+/* Custom Warning Modal Styles */
+#emojiWarningModal .modal-content {
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    border: none;
+}
+
+.emoji-modal-header {
+    background: #FFA000; /* Material Amber 700 */
+    color: white;
+    border-radius: 16px 16px 0 0;
+    padding: 18px 24px;
+}
+
+.emoji-modal-header .modal-title {
+    font-weight: 500;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.warning-body {
+    padding: 24px;
+    color: #5F6368;
+}
+
+.feature-status {
+    display: flex;
+    align-items: start;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.command-instruction {
+    background: #FFF8E1;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px 0;
+}
+
+.command-code {
+    font-family: 'Roboto Mono', monospace;
+    background: #FFECB3;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: #FFA000;
+}
+
+.emoji-modal-footer {
+    border-top: none;
+    padding: 0 24px 24px;
+    justify-content: center;
+}
+
+.confirm-btn {
+    background: #FFA000;
+    color: white;
+    border-radius: 24px;
+    padding: 8px 32px;
+    transition: all 0.2s ease;
+}
+
+.confirm-btn:hover {
+    background: #FF8F00;
+    transform: translateY(-1px);
+}

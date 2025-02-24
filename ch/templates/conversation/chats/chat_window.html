@@ -299,8 +299,15 @@
           <button id="startVoiceCall" class="btn btn-light shadow-sm rounded-full p-2">
             <i class="fas fa-phone-alt text-green-500 text-lg"></i>
         </button>
+
+         <!-- Emoji -->
+         <button id="emojiBtn" class="btn btn-light shadow-sm rounded-full p-2" data-bs-toggle="modal" data-bs-target="#emojiWarningModal">
+            <i class="fas fa-smile text-yellow-500 text-lg"></i>
+        </button>
         
-            <input type="text" id="chat-message-input" placeholder="Message...">
+        
+        
+            <input type="text" id="chat-message-input" placeholder="Write something or /help for commands...">
             <button id="chat-message-submit">
                 Send ➔
             </button>
@@ -350,6 +357,46 @@
     </div>
 </div>
 
+<!-- EmojiWarningModal -->
+    <div class="modal fade" id="emojiWarningModal" tabindex="-1" aria-labelledby="emojiWarningModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header emoji-modal-header">
+                    <i class="material-icons">warning</i>
+                    <h5 class="modal-title" id="emojiWarningModalLabel">Feature Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body warning-body">
+                    <div class="feature-status">
+                        <i class="material-icons" style="color: #FFA000;">construction</i>
+                        <div>
+                            <p class="mb-2">This feature is currently in active development.</p>
+                            <small class="text-muted">Experimental version 0.2.1</small>
+                        </div>
+                    </div>
+    
+                    <div class="command-instruction">
+                        <div class="d-flex gap-2 align-items-center mb-2">
+                            <i class="material-icons" style="color: #FFA000;">help_outline</i>
+                            <strong>Available Commands:</strong>
+                        </div>
+                        <div class="ms-4">
+                            <p>Use <span class="command-code">/help</span> for command list</p>
+                            <p>Try <span class="command-code">/emoji &lt;context&gt;</span> 
+                                <i class="material-icons" style="font-size: 1rem; color: #FFA000;">emoji_emotions</i>
+                                to generate perfect emojis</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer emoji-modal-footer">
+                    <button type="button" class="btn confirm-btn" data-bs-dismiss="modal">
+                        <i class="material-icons me-2">check_circle</i>
+                        Understood
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 <!-- Edit Message Modal -->
 <div class="modal fade" id="editMessageModal" tabindex="-1" aria-hidden="true">
@@ -3072,23 +3119,42 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <!-- /convert-voice -->
- <!-- Bootstrap 5 Modal -->
+<!-- Include Material Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
 <div class="modal fade" id="voiceModal" tabindex="-1" aria-labelledby="voiceModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="voiceModalLabel">🎙️ Speak & Convert to Text</h5>
+                <i class="material-icons">mic</i>
+                <h5 class="modal-title" id="voiceModalLabel">Voice to Text</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body text-center">
-                <div id="speechText" class="border p-3 rounded bg-light text-dark">Start speaking...</div>
-                <div class="mt-3">
-                    <button id="startRecording" class="btn btn-primary">🎤 Start</button>
-                    <button id="stopRecording" class="btn btn-warning d-none">⏸️ Stop</button>
-                    <button id="endRecording" class="btn btn-danger d-none">🛑 End</button>
+            <div class="modal-body">
+                <div class="status-message">
+                    <i class="material-icons">construction</i>
+                    <span>Feature in Development - Experimental</span>
                 </div>
-                <div class="mt-3">
-                    <button id="selectText" class="btn btn-success d-none">✅ Select</button>
+                
+                <div id="speechText" contenteditable="true"></div>
+                
+                <div class="action-buttons">
+                    <button id="startRecording" class="btn btn-mic">
+                        <i class="material-icons">mic_none</i>
+                    </button>
+                    <button id="stopRecording" class="btn btn-secondary d-none">
+                        <i class="material-icons">pause</i>
+                    </button>
+                    <button id="endRecording" class="btn btn-danger d-none">
+                        <i class="material-icons">stop</i>
+                    </button>
+                </div>
+                
+                <div class="mt-4 text-center">
+                    <button id="selectText" class="btn btn-success d-none" style="border-radius: 24px; padding: 8px 24px">
+                        <i class="material-icons me-2">check_circle</i>
+                        Insert Selected Text
+                    </button>
                 </div>
             </div>
         </div>
