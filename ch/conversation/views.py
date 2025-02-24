@@ -22,7 +22,8 @@ from django.conf import settings
 import os
 from django.utils import timezone
 from django.utils.timesince import timesince
-
+import os
+import speech_recognition as sr
 
 
 
@@ -1764,3 +1765,32 @@ def panic_delete_messages(request):
             return JsonResponse({"success": True, "deleted_count": messages_deleted[0]})
         except Exception as e:
             return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+
+# /convert-voice -- speech to text
+@csrf_exempt
+def convert_voice(request):
+    if request.method == "POST" and request.FILES.get("audio_file"):
+        audio_file = request.FILES["audio_file"]
+
+        # Save audio temporarily
+        temp_path = f"/tmp/{audio_file.name}"
+        with open(temp_path, "wb") as f:
+            for chunk in audio_file.chunks():
+                f.write(chunk)
+
+        # Recognize speech
+        recognizer = sr.Recognizer()
+        with sr.AudioFile(temp_path) as source:
+            audio_data = recognizer.record(source)
+
+        try:
+            transcript = recognizer.recognize_google(audio_data)  # Using Google's free API
+            os.remove(temp_path)  # Delete temp file
+            return JsonResponse({"success": True, "transcript": transcript})
+        except sr.UnknownValueError:
+            return JsonResponse({"success": False, "error": "Could not understand audio!"})
+        except sr.RequestError:
+            return JsonResponse({"success": False, "error": "Speech recognition service unavailable!"})
+
+    return JsonResponse({"success": False, "error": "Invalid request!"})

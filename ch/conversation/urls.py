@@ -40,4 +40,5 @@ urlpatterns=[
     path("fix-security-issues/", fix_security_issues, name="fix_security_issues"),
     path("export-messages/", export_messages_view, name="export_messages"),
     path('panic-del/',panic_delete_messages, name='panic_del'),
+    path('convert-voice/',convert_voice, name='convert_voice'),
 ]

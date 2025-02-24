@@ -1689,6 +1689,17 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </p>
                             </div>
                         </li>
+
+                        <li class="group flex items-center gap-4 p-4 rounded-xl bg-white/50 hover:bg-white/90 transition-all duration-200 shadow-sm hover:shadow-md border border-white/80 hover:border-gray-200/50">
+                            <div class="shrink-0 w-10 h-10 rounded-lg bg-blue-100/80 flex items-center justify-center group-hover:bg-blue-200/50">
+                                <i class="fas fa-cog text-blue-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-800">/convert-voice</p>
+                                <p class="text-sm text-gray-600 mt-1">Enjoy seamlessly Speech to text via machine learning
+                                </p>
+                            </div>
+                        </li>
                     </ul>
                 </div>
 
@@ -3060,6 +3071,29 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </div>
 
+<!-- /convert-voice -->
+ <!-- Bootstrap 5 Modal -->
+<div class="modal fade" id="voiceModal" tabindex="-1" aria-labelledby="voiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="voiceModalLabel">🎙️ Speak & Convert to Text</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div id="speechText" class="border p-3 rounded bg-light text-dark">Start speaking...</div>
+                <div class="mt-3">
+                    <button id="startRecording" class="btn btn-primary">🎤 Start</button>
+                    <button id="stopRecording" class="btn btn-warning d-none">⏸️ Stop</button>
+                    <button id="endRecording" class="btn btn-danger d-none">🛑 End</button>
+                </div>
+                <div class="mt-3">
+                    <button id="selectText" class="btn btn-success d-none">✅ Select</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 

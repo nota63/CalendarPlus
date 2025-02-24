@@ -3160,3 +3160,83 @@ document.addEventListener("DOMContentLoaded", function () {
         return token || "";
     }
 });
+
+
+// /convert-voice - convert voice to text
+document.addEventListener("DOMContentLoaded", function () {
+    let inputField = document.getElementById("chat-message-input");
+
+    inputField.addEventListener("keyup", function () {
+        if (inputField.value.trim() === "/convert-voice") {
+            let modal = new bootstrap.Modal(document.getElementById("voiceModal"));
+            modal.show();
+            inputField.value = "";
+        }
+    });
+
+    let mediaRecorder;
+    let audioChunks = [];
+    let startBtn = document.getElementById("startRecording");
+    let stopBtn = document.getElementById("stopRecording");
+    let convertBtn = document.getElementById("convertRecording");
+    let speechText = document.getElementById("speechText");
+
+    // Start Recording
+    startBtn.addEventListener("click", async function () {
+        try {
+            let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+
+            mediaRecorder.ondataavailable = function (event) {
+                audioChunks.push(event.data);
+            };
+
+            mediaRecorder.onstop = function () {
+                console.log("🎤 Audio Recorded Successfully!");
+            };
+
+            mediaRecorder.start();
+            console.log("🎙 Recording Started...");
+            startBtn.classList.add("d-none");
+            stopBtn.classList.remove("d-none");
+
+        } catch (error) {
+            console.error("❌ Microphone Access Error:", error);
+            alert("Microphone access failed. Please allow permissions.");
+        }
+    });
+
+    // Stop Recording
+    stopBtn.addEventListener("click", function () {
+        if (mediaRecorder) {
+            mediaRecorder.stop();
+            console.log("🛑 Recording Stopped.");
+        }
+        stopBtn.classList.add("d-none");
+        convertBtn.classList.remove("d-none");
+    });
+
+    // Convert Audio to Text
+    convertBtn.addEventListener("click", function () {
+        let audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+        let formData = new FormData();
+        formData.append("audio_file", audioBlob);
+
+        fetch("/dm/convert-voice/", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                speechText.innerText = data.transcript;
+                console.log("📜 Converted Text:", data.transcript);
+            } else {
+                alert("Conversion failed!");
+            }
+        })
+        .catch(error => {
+            console.error("❌ Conversion Error:", error);
+        });
+    });
+});
