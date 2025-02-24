@@ -4954,3 +4954,31 @@ hr {
 body.hacker-active {
     overflow: hidden;
 }
+
+
+/* GUI elements */
+#hacker-ui {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    background: black;
+    color: lime;
+    font-family: "Courier New", monospace;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 20px;
+}
+
+#logs-panel, #network-graph, #radar {
+    background: rgba(0, 255, 0, 0.1);
+    padding: 10px;
+    border: 2px solid lime;
+}
+
+#matrixCanvas {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+}
