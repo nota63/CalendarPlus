@@ -38,4 +38,5 @@ urlpatterns=[
     path("reminder/save/<int:org_id>/<int:conversation_id>/", save_reminder, name="save_reminder"),
     path("security-check/", security_check_view, name="security_check"),
     path("fix-security-issues/", fix_security_issues, name="fix_security_issues"),
+    path("export-messages/", export_messages_view, name="export_messages"),
 ]

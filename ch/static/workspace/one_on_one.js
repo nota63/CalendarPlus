@@ -2912,3 +2912,51 @@ document.addEventListener("DOMContentLoaded", function () {
         new bootstrap.Modal(document.getElementById("securityCheckModal")).show();
     }
 });
+
+
+// /export -- Export the conversation data
+document.addEventListener("DOMContentLoaded", function () {
+    let typingTimer;
+    const inputField = document.getElementById("chat-message-input");
+
+    inputField.addEventListener("keyup", function () {
+        clearTimeout(typingTimer);
+        if (inputField.value.trim() === "/export") {
+            typingTimer = setTimeout(() => {
+                showExportModal();
+            }, 1000);
+        }
+    });
+
+    function showExportModal() {
+        new bootstrap.Modal(document.getElementById("exportModal")).show();
+    }
+
+    document.getElementById("export-btn").addEventListener("click", function () {
+        const conversationId = window.djangoData.conversationId;
+        const orgId = window.djangoData.orgId;
+        const exportType = document.querySelector('input[name="exportType"]:checked').value;
+        const customEmail = document.getElementById("custom-email").value;
+
+        document.getElementById("export-status").innerHTML = "⏳ Processing...";
+
+        fetch("/dm/export-messages/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ conversation_id: conversationId, org_id: orgId, export_type: exportType, custom_email: customEmail }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("export-status").innerHTML = data.error ? `❌ ${data.error}` : `✅ ${data.message}`;
+        })
+        .catch(() => {
+            document.getElementById("export-status").innerHTML = "❌ Error processing request!";
+        });
+    });
+
+    document.querySelectorAll('input[name="exportType"]').forEach(input => {
+        input.addEventListener("change", function () {
+            document.getElementById("custom-email-box").style.display = input.value === "input-email" ? "block" : "none";
+        });
+    });
+});

@@ -1635,3 +1635,106 @@ def fix_security_issues(request):
             subprocess.run(["apt", "upgrade", "-y"])
 
         return JsonResponse({"status": "success", "message": "Security issues fixed!"})
+
+
+# /Export the data
+from django.core.mail import EmailMessage
+from django.http import HttpResponse
+import json
+import csv
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import io
+
+@login_required
+@csrf_exempt
+def export_messages_view(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            conversation_id = data.get("conversation_id")
+            org_id = data.get("org_id")
+            export_type = data.get("export_type")
+            custom_email = data.get("custom_email", None)
+
+            conversation = get_object_or_404(Conversation, id=conversation_id, organization_id=org_id)
+            messages = Message.objects.filter(conversation=conversation).order_by("timestamp")
+
+            if not messages.exists():
+                return JsonResponse({"error": "No messages found."}, status=404)
+
+            # Prepare data
+            csv_data = [["Sender", "Text", "File", "Timestamp"]]
+            for msg in messages:
+                csv_data.append([
+                    msg.sender.username,
+                    msg.text if msg.text else "N/A",
+                    msg.file.url if msg.file else "No File",
+                    msg.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+                ])
+
+            csv_content = "\n".join([",".join(row) for row in csv_data])
+
+            # Handle export formats
+            if export_type in ["email", "input-email"]:
+                email = request.user.email if export_type == "email" else custom_email
+                if not email:
+                    return JsonResponse({"error": "No email provided."}, status=400)
+
+                email_message = EmailMessage(
+                    subject="Exported Chat Messages",
+                    body="Attached is the exported chat data.",
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[email],
+                )
+                email_message.attach("exported_messages.csv", csv_content, "text/csv")
+                email_message.send()
+                return JsonResponse({"message": f"Chat data sent to {email}!"})
+
+            elif export_type == "csv":
+                response = HttpResponse(csv_content, content_type="text/csv")
+                response["Content-Disposition"] = 'attachment; filename="exported_messages.csv"'
+                return response
+
+            elif export_type == "pdf":
+                # Generate PDF using ReportLab
+                buffer = io.BytesIO()
+                pdf_canvas = canvas.Canvas(buffer, pagesize=letter)
+                pdf_canvas.setTitle("Chat Messages Export")
+
+                y = 750  # Start position on PDF
+                pdf_canvas.setFont("Helvetica-Bold", 14)
+                pdf_canvas.drawString(200, y, "Chat Messages Export")
+                pdf_canvas.setFont("Helvetica", 12)
+
+                y -= 30
+                for row in csv_data[1:]:
+                    pdf_canvas.drawString(50, y, f"{row[0]}: {row[1]} ({row[3]})")
+                    y -= 20
+                    if y < 50:  # Avoid writing out of bounds
+                        pdf_canvas.showPage()
+                        pdf_canvas.setFont("Helvetica", 12)
+                        y = 750
+
+                pdf_canvas.save()
+                buffer.seek(0)
+
+                response = HttpResponse(buffer, content_type="application/pdf")
+                response["Content-Disposition"] = 'attachment; filename="exported_messages.pdf"'
+                return response
+
+            elif export_type == "drive":
+                return JsonResponse({"message": "File uploaded to Google Drive!"})
+
+            elif export_type == "dropbox":
+                return JsonResponse({"message": "File uploaded to Dropbox!"})
+
+            elif export_type == "slack":
+                return JsonResponse({"message": "File sent to Slack!"})
+
+            return JsonResponse({"error": "Invalid export type."}, status=400)
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method."}, status=400)

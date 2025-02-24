@@ -2865,9 +2865,68 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 
+<!-- /Export conversation data -->
+<div class="modal fade" id="exportModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">📤 Export Messages</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Choose how you want to export your messages:</p>
 
+                <input type="hidden" id="conversation-id" value="123">
+                <input type="hidden" id="org-id" value="1">
 
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="exportType" value="email" checked>
+                    <label class="form-check-label">📧 Send to My Email</label>
+                </div>
 
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="exportType" value="input-email">
+                    <label class="form-check-label">📩 Send to Custom Email</label>
+                </div>
+
+                <div id="custom-email-box" style="display:none;" class="mt-2">
+                    <input type="email" id="custom-email" class="form-control" placeholder="Enter email">
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="exportType" value="csv">
+                    <label class="form-check-label">📥 Download as CSV</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="exportType" value="pdf">
+                    <label class="form-check-label">📄 Download as PDF</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="exportType" value="drive">
+                    <label class="form-check-label">📂 Save to Google Drive</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="exportType" value="dropbox">
+                    <label class="form-check-label">☁️ Save to Dropbox</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="exportType" value="slack">
+                    <label class="form-check-label">💬 Send to Slack</label>
+                </div>
+
+                <div class="mt-3 text-center">
+                    <button class="btn btn-primary" id="export-btn">🚀 Export Now</button>
+                </div>
+
+                <p id="export-status" class="mt-3 text-center"></p>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
