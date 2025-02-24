@@ -2868,66 +2868,165 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- /Export conversation data -->
 <div class="modal fade" id="exportModal" tabindex="-1">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">📤 Export Messages</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="modal-content" style="
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        ">
+            <div class="modal-header" style="border-bottom: none; padding: 24px 24px 16px">
+                <h5 class="modal-title" style="font-size: 1.5rem; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                    <span style="background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 8px; border-radius: 8px;">
+                        <svg style="width:24px;height:24px;color:white" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M14 12V19.88C14.04 20.18 13.94 20.5 13.71 20.71C13.32 21.1 12.69 21.1 12.3 20.71L10.29 18.7C10.06 18.47 9.96 18.16 10 17.87V12H9.97L4.21 4.62C3.87 4.19 3.95 3.56 4.38 3.22C4.57 3.08 4.78 3 5 3H19C19.22 3 19.43 3.08 19.62 3.22C20.05 3.56 20.13 4.19 19.79 4.62L14.03 12H14Z"/>
+                        </svg>
+                    </span>
+                    Export Conversation
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" style="font-size: 0.8rem;"></button>
             </div>
-            <div class="modal-body">
-                <p>Choose how you want to export your messages:</p>
+            
+            <div class="modal-body" style="padding: 0 24px 24px">
+                <div style="margin-bottom: 16px; color: #6b7280;">Choose your preferred export method:</div>
+                
+                <div class="export-options" style="display: grid; gap: 12px;">
+                    <!-- Email Options -->
+                    <div class="export-option" style="
+                        padding: 16px;
+                        border-radius: 12px;
+                        background: rgba(255, 255, 255, 0.6);
+                        border: 1px solid rgba(209, 213, 219, 0.3);
+                        transition: all 0.2s ease;
+                    ">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="
+                                background: #e0e7ff;
+                                padding: 12px;
+                                border-radius: 8px;
+                                color: #4f46e5;
+                            ">
+                                <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                                </svg>
+                            </div>
+                            <div style="flex-grow: 1;">
+                                <div style="font-weight: 500; color: #111827;">Email Export</div>
+                                <div style="font-size: 0.875rem; color: #6b7280; margin-top: 4px;">
+                                    <div id="custom-email-box" style="display:none; margin-top: 8px;">
+                                        <input type="email" id="custom-email" class="form-control" 
+                                               placeholder="name@example.com" 
+                                               style="padding: 8px 12px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                                    </div>
+                                    <div class="form-check" style="margin-top: 8px;">
+                                        <input class="form-check-input" type="radio" name="exportType" value="email" checked
+                                               style="margin-top: 0.2rem;">
+                                        <label class="form-check-label" style="font-size: 0.875rem;">
+                                            Send to registered email
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="exportType" value="input-email">
+                                        <label class="form-check-label" style="font-size: 0.875rem;">
+                                            Send to custom email address
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                <input type="hidden" id="conversation-id" value="123">
-                <input type="hidden" id="org-id" value="1">
+                    <!-- File Options -->
+                    <div class="export-option" style="... (similar styling)">
+                        <div style="...">
+                            <div style="background: #f0fdf4; color: #22c55e;">
+                                <svg style="..."><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/></svg>
+                            </div>
+                            <div>
+                                <div style="...">File Export</div>
+                                <div style="...">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="exportType" value="csv">
+                                        <label class="form-check-label">
+                                            CSV Format (Spreadsheet ready)
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="exportType" value="pdf">
+                                        <label class="form-check-label">
+                                            PDF Document (Printable format)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="exportType" value="email" checked>
-                    <label class="form-check-label">📧 Send to My Email</label>
+                    <!-- Cloud Options -->
+                    <div class="export-option" style="...">
+                        <div style="...">
+                            <div style="background: #eff6ff; color: #3b82f6;">
+                                <svg style="..."><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/></svg>
+                            </div>
+                            <div>
+                                <div style="...">Cloud Save</div>
+                                <div style="...">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="exportType" value="drive">
+                                        <label class="form-check-label">
+                                            Google Drive (Requires login)
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="exportType" value="dropbox">
+                                        <label class="form-check-label">
+                                            Dropbox (Direct upload)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Integration Options -->
+                    <div class="export-option" style="...">
+                        <div style="...">
+                            <div style="background: #f5f3ff; color: #8b5cf6;">
+                                <svg style="..."><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/></svg>
+                            </div>
+                            <div>
+                                <div style="...">Integrations</div>
+                                <div style="...">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="exportType" value="slack">
+                                        <label class="form-check-label">
+                                            Slack Channel (Direct message)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="exportType" value="input-email">
-                    <label class="form-check-label">📩 Send to Custom Email</label>
+                <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" 
+                            style="...">Cancel</button>
+                    <button class="btn btn-primary" id="export-btn" 
+                            style="background: #4f46e5; padding: 8px 20px; border-radius: 8px; 
+                                   display: flex; align-items: center; gap: 8px;">
+                        <svg style="width:18px;height:18px;color:white" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M13 12V7.5L15.5 10M13 3H6V21H18V8L13 3M12 18.5A2.5 2.5 0 0 1 9.5 16A2.5 2.5 0 0 1 12 13.5A2.5 2.5 0 0 1 14.5 16A2.5 2.5 0 0 1 12 18.5Z"/>
+                        </svg>
+                        Export Now
+                    </button>
                 </div>
 
-                <div id="custom-email-box" style="display:none;" class="mt-2">
-                    <input type="email" id="custom-email" class="form-control" placeholder="Enter email">
-                </div>
-
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="exportType" value="csv">
-                    <label class="form-check-label">📥 Download as CSV</label>
-                </div>
-
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="exportType" value="pdf">
-                    <label class="form-check-label">📄 Download as PDF</label>
-                </div>
-
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="exportType" value="drive">
-                    <label class="form-check-label">📂 Save to Google Drive</label>
-                </div>
-
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="exportType" value="dropbox">
-                    <label class="form-check-label">☁️ Save to Dropbox</label>
-                </div>
-
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="exportType" value="slack">
-                    <label class="form-check-label">💬 Send to Slack</label>
-                </div>
-
-                <div class="mt-3 text-center">
-                    <button class="btn btn-primary" id="export-btn">🚀 Export Now</button>
-                </div>
-
-                <p id="export-status" class="mt-3 text-center"></p>
+                <div id="export-status" style="..."></div>
             </div>
         </div>
     </div>
 </div>
-
 
 
 

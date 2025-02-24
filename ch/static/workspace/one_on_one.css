@@ -4806,3 +4806,62 @@ hr {
     padding: 24px;
     border-radius: 8px;
 }
+
+/* /export conversation data */
+
+/* Custom Modal Width and Scroll */
+#exportModal .modal-dialog {
+    max-width: 800px; /* Adjust this value as needed */
+    width: 90%;
+    margin: 1.75rem auto;
+  }
+  
+  #exportModal .modal-content {
+    max-height: 80vh; /* 80% of viewport height */
+    display: flex;
+    flex-direction: column;
+  }
+  
+  #exportModal .modal-body {
+    overflow-y: auto;
+    flex: 1 1 auto;
+    padding: 24px;
+    /* Maintain glass effect while scrolling */
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+  }
+  
+  #exportModal .export-options {
+    max-height: calc(80vh - 150px); /* Account for header/footer */
+  }
+  
+  /* Custom Scrollbar */
+  #exportModal ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  #exportModal ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+  }
+  
+  #exportModal ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  }
+  
+  #exportModal ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    #exportModal .modal-dialog {
+      width: 95%;
+      max-width: 95%;
+    }
+    
+    #exportModal .modal-content {
+      max-height: 90vh;
+    }
+  }
