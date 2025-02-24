@@ -3161,6 +3161,46 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </div>
 
+<!-- /draw -- draw canvases in real time -->
+<!-- Drawing Canvas Modal -->
+<div class="modal fade" id="drawModal" tabindex="-1" aria-labelledby="drawModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">🎨 Drawing Canvas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Toolbar -->
+                <div class="d-flex justify-content-between mb-2">
+                    <select id="penSize" class="form-select w-auto">
+                        <option value="2">Thin</option>
+                        <option value="5">Medium</option>
+                        <option value="10">Thick</option>
+                    </select>
+
+                    <input type="color" id="penColor" class="form-control form-control-color w-auto" value="#000000">
+
+                    <button id="eraserBtn" class="btn btn-danger">Eraser</button>
+                    <button id="undoBtn" class="btn btn-secondary">Undo</button>
+                    <button id="clearBtn" class="btn btn-warning">Clear</button>
+                </div>
+
+                <!-- Canvas -->
+                <canvas id="drawingCanvas" width="600" height="400" style="border:1px solid #000; width: 100%;"></canvas>
+
+                <div class="d-flex justify-content-between mt-3">
+                    <button id="downloadBtn" class="btn btn-success">Download</button>
+                    <button id="sendEmailBtn" class="btn btn-primary">Send via Email</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
 
 
 

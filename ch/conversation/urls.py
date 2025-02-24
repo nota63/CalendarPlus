@@ -41,4 +41,5 @@ urlpatterns=[
     path("export-messages/", export_messages_view, name="export_messages"),
     path('panic-del/',panic_delete_messages, name='panic_del'),
     path('convert-voice/',convert_voice, name='convert_voice'),
+    path('send-drawing/',send_drawing, name='send_drawing')
 ]

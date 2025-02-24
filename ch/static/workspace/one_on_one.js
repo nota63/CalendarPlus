@@ -3240,3 +3240,142 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+
+
+// /draw open canvases
+
+document.addEventListener("DOMContentLoaded", function () {
+    const chatInput = document.getElementById("chat-message-input");
+    const canvas = document.getElementById("drawingCanvas");
+    const ctx = canvas.getContext("2d");
+    let drawing = false;
+    let penSize = 2;
+    let penColor = "#000000";
+    let paths = [];
+    let currentPath = [];
+
+    // Set initial canvas properties
+    ctx.lineCap = "round";
+
+    // Get tools
+    const drawModal = new bootstrap.Modal(document.getElementById("drawModal"));
+    const penSizeSelect = document.getElementById("penSize");
+    const penColorPicker = document.getElementById("penColor");
+    const eraserBtn = document.getElementById("eraserBtn");
+    const undoBtn = document.getElementById("undoBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const sendEmailBtn = document.getElementById("sendEmailBtn");
+
+    // **🔥 Detect `/draw` Command in Chat Input 🔥**
+    chatInput.addEventListener("input", function () {
+        let inputValue = this.value.trim();
+        if (inputValue === "/draw") {
+            this.value = ""; // Clear input
+            drawModal.show(); // Open modal
+        }
+    });
+
+    // **🖌 Change pen size**
+    penSizeSelect.addEventListener("change", function () {
+        penSize = parseInt(this.value);
+    });
+
+    // **🎨 Change pen color**
+    penColorPicker.addEventListener("input", function () {
+        penColor = this.value;
+    });
+
+    // **✏️ Start drawing**
+    canvas.addEventListener("mousedown", (e) => {
+        drawing = true;
+        ctx.beginPath();
+        ctx.moveTo(e.offsetX, e.offsetY);
+        currentPath = [{ x: e.offsetX, y: e.offsetY, color: penColor, size: penSize }];
+    });
+
+    // **🖍 Draw on canvas**
+    canvas.addEventListener("mousemove", (e) => {
+        if (!drawing) return;
+        ctx.lineWidth = penSize;
+        ctx.strokeStyle = penColor;
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+        currentPath.push({ x: e.offsetX, y: e.offsetY, color: penColor, size: penSize });
+    });
+
+    // **🛑 Stop drawing**
+    canvas.addEventListener("mouseup", () => {
+        drawing = false;
+        paths.push([...currentPath]);
+    });
+
+    // **↩️ Undo last action**
+    undoBtn.addEventListener("click", function () {
+        if (paths.length > 0) {
+            paths.pop();
+            redrawCanvas();
+        }
+    });
+
+    // **🚀 Clear canvas**
+    clearBtn.addEventListener("click", function () {
+        paths = [];
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
+
+    // **🧽 Eraser tool**
+    eraserBtn.addEventListener("click", function () {
+        penColor = "#FFFFFF";
+    });
+
+    // **🎨 Redraw canvas after undo**
+    function redrawCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        paths.forEach((path) => {
+            ctx.beginPath();
+            ctx.lineCap = "round";
+            ctx.lineWidth = path[0].size;
+            ctx.strokeStyle = path[0].color;
+            ctx.moveTo(path[0].x, path[0].y);
+            path.forEach((point) => {
+                ctx.lineWidth = point.size;
+                ctx.strokeStyle = point.color;
+                ctx.lineTo(point.x, point.y);
+                ctx.stroke();
+            });
+        });
+    }
+
+    // **📥 Download Drawing as Image**
+    downloadBtn.addEventListener("click", function () {
+        const link = document.createElement("a");
+        link.download = "drawing.png";
+        link.href = canvas.toDataURL();
+        link.click();
+    });
+
+    // **📧 Send Drawing via Email**
+    sendEmailBtn.addEventListener("click", function () {
+        const imageData = canvas.toDataURL();
+
+        fetch("/dm/send-drawing/", {
+            method: "POST",
+            headers: { "X-CSRFToken": getCSRFToken() },
+            body: JSON.stringify({ image_data: imageData }),
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            alert(data.message);
+        })
+        .catch((error) => {
+            console.error("Email sending failed:", error);
+        });
+    });
+
+    // **🔐 Get CSRF Token**
+    function getCSRFToken() {
+        return document.querySelector("[name=csrfmiddlewaretoken]").value;
+    }
+});

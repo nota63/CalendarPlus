@@ -1794,3 +1794,44 @@ def convert_voice(request):
             return JsonResponse({"success": False, "error": "Speech recognition service unavailable!"})
 
     return JsonResponse({"success": False, "error": "Invalid request!"})
+
+
+# /draw - canvases
+import base64
+import re
+
+@csrf_exempt
+def send_drawing(request):
+    if request.method == "POST":
+        try:
+            import json
+            data = json.loads(request.body)
+            image_data = data.get("image_data")
+
+            # Decode the base64 image
+            image_data = re.sub("^data:image/png;base64,", "", image_data)
+            image_binary = base64.b64decode(image_data)
+
+            # Save Image Temporarily
+            file_path = "/tmp/drawing.png"
+            with open(file_path, "wb") as f:
+                f.write(image_binary)
+
+            # Send Email
+            email = EmailMessage(
+                subject="Your Drawing",
+                body="Here is your drawing!",
+                from_email="noreply@calendarplus.com",
+                to=[request.user.email],  
+            )
+            email.attach("drawing.png", image_binary, "image/png")
+            email.send()
+
+            os.remove(file_path)  # Delete the file after sending
+
+            return JsonResponse({"message": "Drawing sent successfully!"})
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request!"}, status=400)
