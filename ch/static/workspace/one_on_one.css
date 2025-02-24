@@ -4867,7 +4867,6 @@ hr {
   }
 
 /* /hacker-mode  */
-
 /* Hacker Mode Full-Screen Effect */
 #hacker-mode-screen {
     position: fixed;
@@ -4882,10 +4881,36 @@ hr {
     z-index: 9999;
     overflow: hidden;
     padding: 20px;
-    animation: fadeIn 0.5s ease-in-out;
+    animation: flicker 0.2s infinite alternate;
 }
 
+/* Green Glitching Effect */
+@keyframes flicker {
+    0% {
+        opacity: 0.8;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Matrix-Style Rainfall Effect */
+#matrixCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    opacity: 0.7;
+    z-index: 1;
+}
+
+/* Glitching Text */
 #hacker-text {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
     white-space: pre;
     height: 100%;
     display: flex;
@@ -4893,11 +4918,26 @@ hr {
     justify-content: flex-start;
     align-items: center;
     overflow-y: hidden;
+    z-index: 2;
 }
 
 #hacker-text p {
     margin: 0;
-    text-shadow: 0 0 5px #00ff00;
+    text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 15px #00ff00;
+    animation: textGlitch 1s infinite;
+}
+
+/* CRT Scan Lines */
+@keyframes textGlitch {
+    0% {
+        opacity: 0.9;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 0.9;
+    }
 }
 
 /* Smooth fade-in effect */

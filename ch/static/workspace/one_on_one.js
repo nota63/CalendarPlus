@@ -2993,12 +2993,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.body.classList.add("hacker-active");
 
+        // Create Matrix Rain Effect
+        let matrixCanvas = document.createElement("canvas");
+        matrixCanvas.id = "matrixCanvas";
+        hackerScreen.appendChild(matrixCanvas);
+
         let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
         let hackerInterval = setInterval(() => {
             hackerText.innerHTML = "";
-            for (let i = 0; i < 40; i++) {
+            for (let i = 0; i < 20; i++) {
                 let randomCode = "";
-                for (let j = 0; j < 60; j++) {
+                for (let j = 0; j < 50; j++) {
                     randomCode += chars.charAt(Math.floor(Math.random() * chars.length));
                 }
                 hackerText.innerHTML += `<p>${randomCode}</p>`;
@@ -3006,6 +3011,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 100);
 
         hackerScreen.dataset.interval = hackerInterval;
+
+        startMatrixEffect();
     }
 
     function stopHackerMode() {
@@ -3015,5 +3022,40 @@ document.addEventListener("DOMContentLoaded", function () {
             document.body.classList.remove("hacker-active");
             hackerScreen.remove();
         }
+    }
+
+    function startMatrixEffect() {
+        let canvas = document.getElementById("matrixCanvas");
+        let ctx = canvas.getContext("2d");
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        letters = letters.split("");
+
+        let fontSize = 16;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+        for (let x = 0; x < columns; x++) drops[x] = 1;
+
+        function draw() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = "#00ff00";
+            ctx.font = fontSize + "px monospace";
+
+            for (let i = 0; i < drops.length; i++) {
+                let text = letters[Math.floor(Math.random() * letters.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        setInterval(draw, 33);
     }
 });
