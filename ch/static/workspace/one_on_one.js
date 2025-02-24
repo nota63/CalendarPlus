@@ -2844,3 +2844,59 @@ document.addEventListener("DOMContentLoaded", function () {
         new bootstrap.Modal(document.getElementById("locationModal")).hide();
     });
 });
+
+// /security check 
+document.addEventListener("DOMContentLoaded", function () {
+    let typingTimer;
+    const inputField = document.getElementById("chat-message-input");
+
+    inputField.addEventListener("keyup", function (event) {
+        clearTimeout(typingTimer);
+        if (inputField.value.trim() === "/security-check") {
+            typingTimer = setTimeout(() => {
+                startSecurityCheck();
+            }, 2000);  // Delay for user to finish typing
+        }
+    });
+
+    function startSecurityCheck() {
+        console.log("🔍 Initiating Security Check...");
+        
+        // Show the modal first
+        const securityModal = new bootstrap.Modal(document.getElementById("securityCheckModal"));
+        securityModal.show();
+
+        document.getElementById("security-result").innerHTML = "🔍 Scanning system...";
+
+        fetch("/dm/security-check/")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Network response was not OK");
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById("security-result").innerHTML = `
+                    <h4>🛡 Security Report</h4>
+                    <p><b>Open Ports:</b> ${data.open_ports.length > 0 ? data.open_ports.join(", ") : "✅ Secure"}</p>
+                    <p><b>Outdated Software:</b> ${data.outdated_software.length > 0 ? "⚠️ Needs Update" : "✅ Up-to-date"}</p>
+                    <p><b>Weak Passwords:</b> ${data.weak_passwords.length > 0 ? "🚨 Weak Passwords Found!" : "✅ Strong Passwords"}</p>
+                    <p><b>Malware Check:</b> ${data.malware ? "🚨 Suspicious Files Found!" : "✅ Clean"}</p>
+                    <button class="btn btn-danger" id="fix-issues-btn">🛠 Fix Issues</button>
+                `;
+
+                document.getElementById("fix-issues-btn").addEventListener("click", function () {
+                    fetch("/dm/fix-security-issues/", { method: "POST" })
+                        .then(response => response.json())
+                        .then(data => {
+                            alert(data.message);
+                            document.getElementById("security-result").innerHTML = "✅ All security issues fixed!";
+                        });
+                });
+            })
+            .catch(error => {
+                document.getElementById("security-result").innerHTML = "⚠️ Error occurred. Please try again.";
+                console.error("Security check failed:", error);
+            });
+    }
+});

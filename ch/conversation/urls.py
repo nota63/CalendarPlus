@@ -36,4 +36,6 @@ urlpatterns=[
     path('generate-code/',generate_code, name='generate_code'),
     path('ai_chat_view/<int:org_id>/<int:conversation_id>/<int:other_user_id>/',ai_chat_view, name='ai_chat_view'),
     path("reminder/save/<int:org_id>/<int:conversation_id>/", save_reminder, name="save_reminder"),
+    path("security-check/", security_check_view, name="security_check"),
+    path("fix-security-issues/", fix_security_issues, name="fix_security_issues"),
 ]

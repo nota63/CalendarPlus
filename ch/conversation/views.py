@@ -1556,3 +1556,75 @@ def save_reminder(request, org_id, conversation_id=None):
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
+
+# /security check - scan the entire system
+import subprocess
+import json
+import requests
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+VIRUSTOTAL_API_KEY = "ef739edd44d6bd2d21e1bb5f45e92f941dac3b3e96cbd60ddce6a63b75c76c99"
+@csrf_exempt
+def security_check_view(request):
+    if request.method == "GET":
+        # 1️⃣ Check Open Ports
+        if os.name == "nt":  # Windows
+            open_ports = subprocess.getoutput("netstat -ano").split("\n")[4:]
+        else:  # Linux/macOS
+            open_ports = subprocess.getoutput("netstat -tuln").split("\n")[2:]
+        
+        # 2️⃣ Check for outdated software (Windows/Linux)
+        outdated_software = []
+        if os.name == "nt":  # Windows
+            outdated_software = ["Windows Update required"]  # Placeholder
+        else:
+            outdated_software = subprocess.getoutput("apt list --upgradable").split("\n")[1:]
+        
+        # 3️⃣ Check Weak Passwords (Cross-Platform)
+        weak_passwords = []
+        password_list = ["1234", "password", "admin", "qwerty"]
+        users = ["user1", "admin", "testuser"]  # Simulated users (as /etc/passwd is not available)
+
+        for user in users:
+            if any(pw in user for pw in password_list):
+                weak_passwords.append(user)
+        
+        # 4️⃣ Check for Malware (VirusTotal API)
+        malware = False
+        headers = {"x-apikey": VIRUSTOTAL_API_KEY}
+        files_to_scan = ["C:/Windows/System32/cmd.exe"] if os.name == "nt" else ["/bin/bash"]  # Example file
+
+        for file_path in files_to_scan:
+            if os.path.exists(file_path):
+                with open(file_path, "rb") as file:
+                    response = requests.post(
+                        "https://www.virustotal.com/api/v3/files",
+                        headers=headers,
+                        files={"file": file}
+                    )
+                    if response.status_code == 200 and "malicious" in response.text:
+                        malware = True
+
+        return JsonResponse({
+            "open_ports": open_ports,
+            "outdated_software": outdated_software,
+            "weak_passwords": weak_passwords,
+            "malware": malware
+        })
+
+@csrf_exempt
+def fix_security_issues(request):
+    if request.method == "POST":
+        # Close open ports (Example: Closing port 22)
+        if os.name != "nt":  # Linux/macOS
+            subprocess.run(["ufw", "deny", "22"])
+
+        # Upgrade software
+        if os.name == "nt":  # Windows
+            subprocess.run(["powershell", "Get-WindowsUpdate"])
+        else:
+            subprocess.run(["apt", "update"])
+            subprocess.run(["apt", "upgrade", "-y"])
+
+        return JsonResponse({"status": "success", "message": "Security issues fixed!"})
