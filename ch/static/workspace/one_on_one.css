@@ -4679,3 +4679,130 @@ hr {
     font-weight: bold;
     margin-top: 20px;
 }
+
+
+#securityCheckModal .modal-dialog {
+    max-width: 600px; /* Adjust width as needed */
+}
+
+#securityCheckModal .modal-content {
+    max-height: 80vh; /* Keep modal responsive */
+    display: flex;
+    flex-direction: column;
+}
+
+#securityCheckModal .modal-body {
+    overflow-y: auto; /* Enable scrolling */
+    max-height: 60vh; /* Adjust as per design */
+    padding-right: 10px;
+}
+
+/* Add smooth scrollbar styling */
+#securityCheckModal .modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+#securityCheckModal .modal-body::-webkit-scrollbar-thumb {
+    background: #ff6b6b; /* Adjust color */
+    border-radius: 5px;
+}
+
+#securityCheckModal .modal-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+
+
+.modal-content {
+    border-radius: 12px;
+    border: none;
+}
+
+.icon-container {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -28px;
+    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.1);
+}
+
+.scan-result-container {
+    background: #f8f9fe;
+    border-radius: 8px;
+    min-height: 120px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: #3f51b5;
+    border: none;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: #334296;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(63, 81, 181, 0.2);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.scan-result-container {
+    padding: 1rem;
+    position: relative;
+}
+
+.vulnerability-item {
+    background: white;
+    border-radius: 6px;
+    padding: 12px;
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.checkmark {
+    color: #4caf50;
+    flex-shrink: 0;
+}
+
+.warning-icon {
+    color: #ff9800;
+    flex-shrink: 0;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    justify-content: center;
+    padding: 12px;
+}
+
+.scanning-animation {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.8; }
+    50% { opacity: 1; }
+    100% { opacity: 0.8; }
+}
+
+.result-placeholder {
+    border: 2px dashed #e0e0e0;
+    color: #9e9e9e;
+    text-align: center;
+    padding: 24px;
+    border-radius: 8px;
+}
