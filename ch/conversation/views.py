@@ -1564,7 +1564,8 @@ import requests
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-VIRUSTOTAL_API_KEY = "ef739edd44d6bd2d21e1bb5f45e92f941dac3b3e96cbd60ddce6a63b75c76c99"
+VIRUSTOTAL_API_KEY = "#"
+
 @csrf_exempt
 def security_check_view(request):
     if request.method == "GET":
