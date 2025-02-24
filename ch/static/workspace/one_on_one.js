@@ -2960,3 +2960,60 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+
+// /hacker-mode 
+document.addEventListener("DOMContentLoaded", function () {
+    let typingTimer;
+    const inputField = document.getElementById("chat-message-input");
+
+    inputField.addEventListener("keyup", function () {
+        clearTimeout(typingTimer);
+        if (inputField.value.trim() === "/hacker-mode") {
+            typingTimer = setTimeout(() => {
+                startHackerMode();
+                inputField.value = ""; // Clear input
+            }, 1000);
+        } else if (inputField.value.trim() === "/exit-hacker-mode") {
+            typingTimer = setTimeout(() => {
+                stopHackerMode();
+                inputField.value = ""; // Clear input
+            }, 1000);
+        }
+    });
+
+    function startHackerMode() {
+        let hackerScreen = document.createElement("div");
+        hackerScreen.id = "hacker-mode-screen";
+        document.body.appendChild(hackerScreen);
+
+        let hackerText = document.createElement("div");
+        hackerText.id = "hacker-text";
+        hackerScreen.appendChild(hackerText);
+
+        document.body.classList.add("hacker-active");
+
+        let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
+        let hackerInterval = setInterval(() => {
+            hackerText.innerHTML = "";
+            for (let i = 0; i < 40; i++) {
+                let randomCode = "";
+                for (let j = 0; j < 60; j++) {
+                    randomCode += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                hackerText.innerHTML += `<p>${randomCode}</p>`;
+            }
+        }, 100);
+
+        hackerScreen.dataset.interval = hackerInterval;
+    }
+
+    function stopHackerMode() {
+        let hackerScreen = document.getElementById("hacker-mode-screen");
+        if (hackerScreen) {
+            clearInterval(hackerScreen.dataset.interval);
+            document.body.classList.remove("hacker-active");
+            hackerScreen.remove();
+        }
+    }
+});

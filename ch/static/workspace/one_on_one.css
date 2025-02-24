@@ -4865,3 +4865,52 @@ hr {
       max-height: 90vh;
     }
   }
+
+/* /hacker-mode  */
+
+/* Hacker Mode Full-Screen Effect */
+#hacker-mode-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: black;
+    color: #00ff00;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 14px;
+    z-index: 9999;
+    overflow: hidden;
+    padding: 20px;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+#hacker-text {
+    white-space: pre;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    overflow-y: hidden;
+}
+
+#hacker-text p {
+    margin: 0;
+    text-shadow: 0 0 5px #00ff00;
+}
+
+/* Smooth fade-in effect */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Body class for hacker mode */
+body.hacker-active {
+    overflow: hidden;
+}
