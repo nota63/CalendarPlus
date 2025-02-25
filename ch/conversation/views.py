@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from .models import (Conversation, Message,ScheduledMessage,MessageSuggestion,Todo,Reminder)
+from .models import (Conversation, Message,ScheduledMessage,MessageSuggestion,Todo,Reminder,OneAbusedMessage)
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -38,6 +38,8 @@ import json
 import requests
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from collections import Counter
+
 
 User = get_user_model()
 
@@ -1876,6 +1878,37 @@ def analyze_mood(request):
             mood_analysis = completion.choices[0].message.content
 
             return JsonResponse({"success": True, "mood_analysis": mood_analysis})
+
+        except Conversation.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Conversation not found."})
+
+    return JsonResponse({"success": False, "error": "Invalid request!"})
+
+# /profanity -- check profane messages
+
+
+@csrf_exempt
+def check_profanity(request):
+    """Fetch users who sent profane messages and count occurrences."""
+    if request.method == "POST":
+        org_id = request.POST.get("organization_id")
+        convo_id = request.POST.get("conversation_id")
+
+        try:
+            # Get the conversation and abusive messages
+            conversation = Conversation.objects.get(id=convo_id, organization_id=org_id)
+            abused_messages = OneAbusedMessage.objects.filter(conversation=conversation)
+
+            if not abused_messages.exists():
+                return JsonResponse({"success": False, "error": "No profanity messages found."})
+
+            # Count occurrences per user
+            user_counts = Counter(abused_messages.values_list("flagged_by__username", flat=True))
+
+            # Format response
+            users_data = [{"name": user, "count": count} for user, count in user_counts.items()]
+
+            return JsonResponse({"success": True, "users": users_data})
 
         except Conversation.DoesNotExist:
             return JsonResponse({"success": False, "error": "Conversation not found."})

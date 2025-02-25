@@ -3380,3 +3380,64 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+
+// /profinity - check profane messages
+document.addEventListener("DOMContentLoaded", function () {
+    const chatInput = document.getElementById("chat-message-input");
+
+    chatInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            const message = chatInput.value.trim();
+            if (message.startsWith("/profanity")) {
+                event.preventDefault();
+                openProfanityModal();
+            }
+        }
+    });
+
+    function openProfanityModal() {
+        const modal = new bootstrap.Modal(document.getElementById("profanityModal"));
+        modal.show();
+        fetchProfanityData();
+    }
+
+    function fetchProfanityData() {
+        const conversationId = window.djangoData.conversationId;
+        const organizationId = window.djangoData.orgId;
+        const resultContainer = document.getElementById("profanityResult");
+
+        resultContainer.innerHTML = `<div class="text-center"><div class="spinner-border text-danger" role="status"></div><p>Analyzing messages...</p></div>`;
+
+        fetch("/dm/check-profanity/", {
+            method: "POST",
+            body: new URLSearchParams({
+                conversation_id: conversationId,
+                organization_id: organizationId
+            }),
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    let resultHTML = "<ul class='list-group'>";
+                    data.users.forEach(user => {
+                        resultHTML += `<li class='list-group-item d-flex justify-content-between align-items-center'>
+                            <strong>${user.name}</strong> 
+                            <span class='badge bg-danger rounded-pill'>${user.count} times</span>
+                        </li>`;
+                    });
+                    resultHTML += "</ul>";
+                    resultContainer.innerHTML = resultHTML;
+                } else {
+                    resultContainer.innerHTML = `<p class="text-danger">❌ ${data.error}</p>`;
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                resultContainer.innerHTML = `<p class="text-danger">❌ An error occurred.</p>`;
+            });
+    }
+});

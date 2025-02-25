@@ -43,4 +43,5 @@ urlpatterns=[
     path('convert-voice/',convert_voice, name='convert_voice'),
     path('send-drawing/',send_drawing_email, name='send_drawing'),
     path('analyze-mood/',analyze_mood, name='analyze_mood'),
+    path('check-profanity/',check_profanity, name='check_profanity'),
 ]
