@@ -3383,6 +3383,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // /profinity - check profane messages
+
 document.addEventListener("DOMContentLoaded", function () {
     const chatInput = document.getElementById("chat-message-input");
 
@@ -3422,13 +3423,21 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    let resultHTML = "<ul class='list-group'>";
+                    let resultHTML = `<p><strong>🚨 Total Flagged Messages:</strong> ${data.total_flagged}</p>`;
+                    resultHTML += "<ul class='list-group'>";
+
                     data.users.forEach(user => {
-                        resultHTML += `<li class='list-group-item d-flex justify-content-between align-items-center'>
-                            <strong>${user.name}</strong> 
+                        resultHTML += `
+                        <li class='list-group-item d-flex justify-content-between align-items-center'>
+                            <div>
+                                <strong>${user.name}</strong> 
+                                <p class="text-muted">🕒 Last flagged: ${user.flagged_at || "N/A"}</p>
+                                <p class="text-danger">💬 Latest: ${user.latest_message || "N/A"}</p>
+                            </div>
                             <span class='badge bg-danger rounded-pill'>${user.count} times</span>
                         </li>`;
                     });
+
                     resultHTML += "</ul>";
                     resultContainer.innerHTML = resultHTML;
                 } else {

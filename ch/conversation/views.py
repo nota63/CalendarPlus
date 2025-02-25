@@ -38,7 +38,7 @@ import json
 import requests
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from collections import Counter
+from collections import Counter,defaultdict
 
 
 User = get_user_model()
@@ -1886,29 +1886,38 @@ def analyze_mood(request):
 
 # /profanity -- check profane messages
 
-
 @csrf_exempt
 def check_profanity(request):
-    """Fetch users who sent profane messages and count occurrences."""
+    """Fetch detailed profanity report per user."""
     if request.method == "POST":
         org_id = request.POST.get("organization_id")
         convo_id = request.POST.get("conversation_id")
 
         try:
-            # Get the conversation and abusive messages
+            # Get conversation and abusive messages
             conversation = Conversation.objects.get(id=convo_id, organization_id=org_id)
-            abused_messages = OneAbusedMessage.objects.filter(conversation=conversation)
+            abused_messages = OneAbusedMessage.objects.filter(conversation=conversation).order_by("-flagged_at")
 
             if not abused_messages.exists():
                 return JsonResponse({"success": False, "error": "No profanity messages found."})
 
-            # Count occurrences per user
-            user_counts = Counter(abused_messages.values_list("flagged_by__username", flat=True))
+            # Store data in a structured way
+            user_profanity_data = defaultdict(lambda: {"count": 0, "latest_message": "", "flagged_at": ""})
+            
+            for msg in abused_messages:
+                user = msg.flagged_by.get_full_name() if msg.flagged_by.get_full_name() else msg.flagged_by.username
+                user_profanity_data[user]["count"] += 1
+                if not user_profanity_data[user]["latest_message"]:  # Store the latest profane message
+                    user_profanity_data[user]["latest_message"] = msg.content
+                    user_profanity_data[user]["flagged_at"] = msg.flagged_at.strftime("%Y-%m-%d %H:%M:%S")
 
-            # Format response
-            users_data = [{"name": user, "count": count} for user, count in user_counts.items()]
+            # Convert to JSON format
+            users_data = [{"name": user, "count": data["count"], "latest_message": data["latest_message"], "flagged_at": data["flagged_at"]} for user, data in user_profanity_data.items()]
 
-            return JsonResponse({"success": True, "users": users_data})
+            # Total flagged messages count
+            total_flagged_messages = abused_messages.count()
+
+            return JsonResponse({"success": True, "users": users_data, "total_flagged": total_flagged_messages})
 
         except Conversation.DoesNotExist:
             return JsonResponse({"success": False, "error": "Conversation not found."})
