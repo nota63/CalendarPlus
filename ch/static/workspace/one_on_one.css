@@ -5207,3 +5207,30 @@ body.hacker-active {
     box-shadow: 0 4px 8px rgba(25,118,210,0.3);
     transform: translateY(-1px);
 }
+
+
+/* /profanity - check profane messages */
+
+.modal-content {
+    font-family: 'Roboto', sans-serif;
+    border: none;
+}
+
+.profanity-indicator {
+    height: 4px;
+    background: #ffe57f;
+    border-radius: 2px;
+    margin: 16px 0;
+}
+
+.badge {
+    font-weight: 500;
+    padding: 8px 12px;
+}
+
+.alert {
+    background: #f8f9fa;
+    padding: 16px;
+    margin: 0 auto;
+    max-width: 480px;
+}

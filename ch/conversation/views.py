@@ -1907,7 +1907,7 @@ def check_profanity(request):
             for msg in abused_messages:
                 user = msg.flagged_by.get_full_name() if msg.flagged_by.get_full_name() else msg.flagged_by.username
                 user_profanity_data[user]["count"] += 1
-                if not user_profanity_data[user]["latest_message"]:  # Store the latest profane message
+                if not user_profanity_data[user]["latest_message"]: 
                     user_profanity_data[user]["latest_message"] = msg.content
                     user_profanity_data[user]["flagged_at"] = msg.flagged_at.strftime("%Y-%m-%d %H:%M:%S")
 
