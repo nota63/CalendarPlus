@@ -3309,3 +3309,57 @@ document.addEventListener("DOMContentLoaded", function () {
         return document.querySelector("[name=csrfmiddlewaretoken]").value;
     }
 });
+
+
+// /moode-analysis -- Get the current conversation tone 
+
+document.addEventListener("DOMContentLoaded", function () {
+    const chatInput = document.getElementById("chat-message-input");
+
+    // Detect /mood-analysis command
+    chatInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            const message = chatInput.value.trim();
+            if (message.startsWith("/mood-analysis")) {
+                event.preventDefault();
+                openMoodAnalysisModal();
+            }
+        }
+    });
+
+    function openMoodAnalysisModal() {
+        const modal = new bootstrap.Modal(document.getElementById("moodAnalysisModal"));
+        modal.show();
+    }
+
+    document.getElementById("analyzeMoodBtn").addEventListener("click", function () {
+        const conversationId = document.getElementById("conversation_id").value;
+        const organizationId = document.getElementById("organization_id").value;
+
+        document.getElementById("moodAnalysisResult").innerHTML = "<p>🔄 Analyzing mood... Please wait.</p>";
+
+        fetch("/dm/analyze-mood/", {
+            method: "POST",
+            body: new URLSearchParams({
+                conversation_id: conversationId,
+                organization_id: organizationId
+            }),
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById("moodAnalysisResult").innerHTML = `<p>🧠 Mood Analysis: <b>${data.mood_analysis}</b></p>`;
+                } else {
+                    document.getElementById("moodAnalysisResult").innerHTML = `<p>❌ Error: ${data.error}</p>`;
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById("moodAnalysisResult").innerHTML = "<p>❌ An error occurred.</p>";
+            });
+    });
+});
+

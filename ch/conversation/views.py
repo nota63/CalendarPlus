@@ -24,8 +24,20 @@ from django.utils import timezone
 from django.utils.timesince import timesince
 import os
 import speech_recognition as sr
-
-
+import base64
+import re
+from django.core.mail import EmailMessage
+from django.http import HttpResponse
+import json
+import csv
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import io
+import subprocess
+import json
+import requests
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 User = get_user_model()
 
@@ -1559,11 +1571,7 @@ def save_reminder(request, org_id, conversation_id=None):
 
 
 # /security check - scan the entire system
-import subprocess
-import json
-import requests
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+
 
 VIRUSTOTAL_API_KEY = "#"
 
@@ -1639,13 +1647,7 @@ def fix_security_issues(request):
 
 
 # /Export the data
-from django.core.mail import EmailMessage
-from django.http import HttpResponse
-import json
-import csv
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-import io
+
 
 @login_required
 @csrf_exempt
@@ -1797,8 +1799,6 @@ def convert_voice(request):
 
 
 # /draw - canvases
-import base64
-import re
 
 @csrf_exempt
 def send_drawing_email(request):
