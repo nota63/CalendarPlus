@@ -5234,3 +5234,78 @@ body.hacker-active {
     margin: 0 auto;
     max-width: 480px;
 }
+
+
+
+/* /theme - change themes  */
+
+/* Base Theme Variables */
+body {
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+/* Light Theme */
+.theme-light {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+/* Dark Theme */
+.theme-dark {
+    background-color: #181818;
+    color: #ffffff;
+}
+
+/* Green Theme */
+.theme-green {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+/* Red Theme */
+.theme-red {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Blue Theme */
+.theme-blue {
+    background-color: #cce5ff;
+    color: #004085;
+}
+
+/* Purple Theme */
+.theme-purple {
+    background-color: #e0c3fc;
+    color: #4a047e;
+}
+
+/* Orange Theme */
+.theme-orange {
+    background-color: #ffdab9;
+    color: #cc5500;
+}
+
+/* Pink Theme */
+.theme-pink {
+    background-color: #ffc0cb;
+    color: #a40044;
+}
+
+/* Neon Theme */
+.theme-neon {
+    background-color: #0ff0fc;
+    color: #1a1aff;
+}
+
+/* Cyberpunk Theme */
+.theme-cyberpunk {
+    background-color: #ff00ff;
+    color: #00ffff;
+}
+
+/* Retro Theme */
+.theme-retro {
+    background-color: #ffcc00;
+    color: #660000;
+}

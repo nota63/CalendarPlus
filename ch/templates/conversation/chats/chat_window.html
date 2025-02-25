@@ -1973,6 +1973,16 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <p class="text-sm text-gray-600 mt-1">Record your screen till specific time</p>
                             </div>
                         </li>
+
+                        <li class="group flex items-center gap-4 p-4 rounded-xl bg-white/50 hover:bg-white/90 transition-all duration-200 shadow-sm hover:shadow-md border border-white/80 hover:border-gray-200/50">
+                            <div class="shrink-0 w-10 h-10 rounded-lg bg-yellow-100/80 flex items-center justify-center group-hover:bg-yellow-200/50">
+                                <i class="fas fa-calendar-alt text-yellow-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-800">/theme [Press Enter]</p>
+                                <p class="text-sm text-gray-600 mt-1">Explore fresh themes & keep your mood changing|</p>
+                            </div>
+                        </li>
                     </ul>
                 </div>
 
@@ -3318,7 +3328,124 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </div>
 
+<!-- /theme - change themes dynamically -->
 
+<div class="modal fade" id="themeModal" tabindex="-1" aria-labelledby="themeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="themeModalLabel">Select a Theme</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="theme-options row">
+                    <!-- Light Theme -->
+                    <div class="col-4 text-center">
+                        <button class="theme-btn" data-theme="light">
+                            <img src="/static/themes/light.svg" alt="Light Theme" class="theme-icon">
+                            <p>Light Mode</p>
+                        </button>
+                    </div>
+
+                    <!-- Dark Theme -->
+                    <div class="col-4 text-center">
+                        <button class="theme-btn" data-theme="dark">
+                            <img src="/static/themes/dark.svg" alt="Dark Theme" class="theme-icon">
+                            <p>Dark Mode</p>
+                        </button>
+                    </div>
+
+                    <!-- Green Theme -->
+                    <div class="col-4 text-center">
+                        <button class="theme-btn" data-theme="green">
+                            <img src="/static/themes/green.svg" alt="Green Theme" class="theme-icon">
+                            <p>Green</p>
+                        </button>
+                    </div>
+
+                    <!-- Red Theme -->
+                    <div class="col-4 text-center">
+                        <button class="theme-btn" data-theme="red">
+                            <img src="/static/themes/red.svg" alt="Red Theme" class="theme-icon">
+                            <p>Red</p>
+                        </button>
+                    </div>
+
+                    <!-- More Themes -->
+                    <div class="col-4 text-center">
+                        <button class="theme-btn" data-theme="blue">
+                            <img src="/static/themes/blue.svg" alt="Blue Theme" class="theme-icon">
+                            <p>Blue</p>
+                        </button>
+                    </div>
+                    
+                    <div class="col-4 text-center">
+                        <button class="theme-btn" data-theme="purple">
+                            <img src="/static/themes/purple.svg" alt="Purple Theme" class="theme-icon">
+                            <p>Purple</p>
+                        </button>
+                    </div>
+
+                    <div class="col-4 text-center">
+                        <button class="theme-btn" data-theme="orange">
+                            <img src="/static/themes/orange.svg" alt="Orange Theme" class="theme-icon">
+                            <p>Orange</p>
+                        </button>
+                    </div>
+
+                    <div class="col-4 text-center">
+                        <button class="theme-btn" data-theme="pink">
+                            <img src="/static/themes/pink.svg" alt="Pink Theme" class="theme-icon">
+                            <p>Pink</p>
+                        </button>
+                    </div>
+
+                    <div class="col-4 text-center">
+                        <button class="theme-btn" data-theme="teal">
+                            <img src="/static/themes/teal.svg" alt="Teal Theme" class="theme-icon">
+                            <p>Teal</p>
+                        </button>
+                    </div>
+
+                    <div class="col-4 text-center">
+                        <button class="theme-btn" data-theme="gold">
+                            <img src="/static/themes/gold.svg" alt="Gold Theme" class="theme-icon">
+                            <p>Gold</p>
+                        </button>
+                    </div>
+
+                    <div class="col-4 text-center">
+                        <button class="theme-btn" data-theme="silver">
+                            <img src="/static/themes/silver.svg" alt="Silver Theme" class="theme-icon">
+                            <p>Silver</p>
+                        </button>
+                    </div>
+
+                    <div class="col-4 text-center">
+                        <button class="theme-btn" data-theme="neon">
+                            <img src="/static/themes/neon.svg" alt="Neon Theme" class="theme-icon">
+                            <p>Neon</p>
+                        </button>
+                    </div>
+
+                    <div class="col-4 text-center">
+                        <button class="theme-btn" data-theme="cyberpunk">
+                            <img src="/static/themes/cyberpunk.svg" alt="Cyberpunk Theme" class="theme-icon">
+                            <p>Cyberpunk</p>
+                        </button>
+                    </div>
+
+                    <div class="col-4 text-center">
+                        <button class="theme-btn" data-theme="retro">
+                            <img src="/static/themes/retro.svg" alt="Retro Theme" class="theme-icon">
+                            <p>Retro</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 

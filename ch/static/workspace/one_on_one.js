@@ -3529,3 +3529,50 @@ document.addEventListener("DOMContentLoaded", function () {
             ?.split("=")[1] || "";
     }
 });    
+
+
+
+// /theme - change themes in real time
+
+document.addEventListener("DOMContentLoaded", function () {
+    const chatInput = document.getElementById("chat-message-input");
+
+    // Detect "/theme" command
+    chatInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            const message = chatInput.value.trim();
+            if (message.startsWith("/theme")) {
+                event.preventDefault();
+                openThemeModal();
+            }
+        }
+    });
+
+    // Open Theme Modal
+    function openThemeModal() {
+        const modal = new bootstrap.Modal(document.getElementById("themeModal"));
+        modal.show();
+    }
+
+    // Apply Theme on Selection
+    document.querySelectorAll(".theme-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            const selectedTheme = this.getAttribute("data-theme");
+            applyTheme(selectedTheme);
+            localStorage.setItem("chatTheme", selectedTheme); // Save user preference
+        });
+    });
+
+    // Function to Apply Theme
+    function applyTheme(theme) {
+        document.body.className = ""; // Reset all classes
+        document.body.classList.add(`theme-${theme}`);
+    }
+
+    // Load Saved Theme on Page Load
+    const savedTheme = localStorage.getItem("chatTheme");
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    }
+});
+
