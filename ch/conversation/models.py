@@ -3,8 +3,16 @@ from django.contrib.auth import get_user_model
 from accounts.models import Organization
 from django.utils.timezone import now
 from datetime import timedelta, datetime
+from better_profanity import profanity
+from django.core.mail import send_mail
+from organization_channels.utils import send_abusive_message_notification 
+
 
 User = get_user_model()
+
+
+
+
 
 class Conversation(models.Model):
     """Tracks conversations between two users."""
@@ -19,6 +27,15 @@ class Conversation(models.Model):
 
     def __str__(self):
         return f"Conversation between {self.user1} and {self.user2}"
+
+
+# OneAbusedMessage
+class OneAbusedMessage(models.Model):
+    flagged_by=models.ForeignKey(User,on_delete=models.CASCADE, related_name='flagged_abused_messagesss')
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    conversation=models.ForeignKey(Conversation, on_delete=models.CASCADE)
+    flagged_at= models.DateTimeField(auto_now=True)
+    content=models.TextField()
 
 
 class Message(models.Model):
@@ -49,7 +66,27 @@ class Message(models.Model):
     def __str__(self):
         preview = self.text[:20] + "..." if self.text else "File Attached"
         return f"Message from {self.sender} - {preview}"
+    
+    def save(self, *args, **kwargs):
+       
+        if self.text and profanity.contains_profanity(self.text):
+            censored_text = profanity.censor(self.text)
 
+            # Save the censored version
+            self.text = censored_text
+
+            super().save(*args, **kwargs) 
+
+            # Save the abused message in the OneAbusedMessage model
+            OneAbusedMessage.objects.create(
+                content=censored_text, 
+                flagged_by=self.sender,  
+                organization=self.organization,
+                conversation=self.conversation
+            )
+        else:
+            super().save(*args, **kwargs) 
+ 
 
 # SCHEDULE A MESSAGE 
 class ScheduledMessage(models.Model):
