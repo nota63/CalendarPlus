@@ -3329,173 +3329,131 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <!-- /theme - change themes dynamically -->
-<div class="modal fade glass-modal" id="themeModal" tabindex="-1" aria-labelledby="themeModalLabel" aria-hidden="true">
+ <!-- Theme Selection Modal -->
+<div class="modal fade" id="themeModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-glass">
-            <div class="modal-header glass-header">
-                <h5 class="modal-title text-primary" id="themeModalLabel">Choose Theme</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body glass-body">
-                <div class="row g-4">
+        <div class="modal-content theme-modal-content">
+            <div class="modal-body">
+                <div class="theme-options">
+                    
                     <!-- Light Theme -->
-                    <div class="col-3 col-md-2">
-                        <button class="theme-btn w-100" data-theme="light">
-                            <svg width="48" height="48" viewBox="0 0 24 24" class="theme-icon">
-                                <circle cx="12" cy="12" r="6" fill="#FFEB3B"/>
-                                <path fill="#FFC107" d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10z"/>
-                            </svg>
-                            <span class="theme-label">Light</span>
-                        </button>
-                    </div>
+                    <button class="theme-btn" data-theme="light">
+                        <svg class="theme-icon" viewBox="0 0 64 64">
+                            <circle cx="32" cy="32" r="20" fill="#ffffff" stroke="#000000" stroke-width="2"/>
+                        </svg>
+                        <p>Light Mode</p>
+                    </button>
 
                     <!-- Dark Theme -->
-                    <div class="col-3 col-md-2">
-                        <button class="theme-btn w-100" data-theme="dark">
-                            <svg width="48" height="48" viewBox="0 0 24 24" class="theme-icon">
-                                <circle cx="12" cy="12" r="6" fill="#212121"/>
-                                <path fill="#424242" d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16z"/>
-                            </svg>
-                            <span class="theme-label">Dark</span>
-                        </button>
-                    </div>
+                    <button class="theme-btn" data-theme="dark">
+                        <svg class="theme-icon" viewBox="0 0 64 64">
+                            <circle cx="32" cy="32" r="20" fill="#1e1e1e" stroke="#ffffff" stroke-width="2"/>
+                        </svg>
+                        <p>Dark Mode</p>
+                    </button>
 
                     <!-- Green Theme -->
-                    <div class="col-3 col-md-2">
-                        <button class="theme-btn w-100" data-theme="green">
-                            <svg width="48" height="48" viewBox="0 0 24 24" class="theme-icon">
-                                <circle cx="12" cy="12" r="6" fill="#4CAF50"/>
-                                <path fill="#2E7D32" d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16z"/>
-                            </svg>
-                            <span class="theme-label">Green</span>
-                        </button>
-                    </div>
+                    <button class="theme-btn" data-theme="green">
+                        <svg class="theme-icon" viewBox="0 0 64 64">
+                            <circle cx="32" cy="32" r="20" fill="#4caf50" stroke="#ffffff" stroke-width="2"/>
+                        </svg>
+                        <p>Green</p>
+                    </button>
 
                     <!-- Red Theme -->
-                    <div class="col-3 col-md-2">
-                        <button class="theme-btn w-100" data-theme="red">
-                            <svg width="48" height="48" viewBox="0 0 24 24" class="theme-icon">
-                                <circle cx="12" cy="12" r="6" fill="#F44336"/>
-                                <path fill="#D32F2F" d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16z"/>
-                            </svg>
-                            <span class="theme-label">Red</span>
-                        </button>
-                    </div>
+                    <button class="theme-btn" data-theme="red">
+                        <svg class="theme-icon" viewBox="0 0 64 64">
+                            <circle cx="32" cy="32" r="20" fill="#f44336" stroke="#ffffff" stroke-width="2"/>
+                        </svg>
+                        <p>Red</p>
+                    </button>
 
                     <!-- Blue Theme -->
-                    <div class="col-3 col-md-2">
-                        <button class="theme-btn w-100" data-theme="blue">
-                            <svg width="48" height="48" viewBox="0 0 24 24" class="theme-icon">
-                                <circle cx="12" cy="12" r="6" fill="#2196F3"/>
-                                <path fill="#1976D2" d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16z"/>
-                            </svg>
-                            <span class="theme-label">Blue</span>
-                        </button>
-                    </div>
+                    <button class="theme-btn" data-theme="blue">
+                        <svg class="theme-icon" viewBox="0 0 64 64">
+                            <circle cx="32" cy="32" r="20" fill="#2196f3" stroke="#ffffff" stroke-width="2"/>
+                        </svg>
+                        <p>Blue</p>
+                    </button>
 
                     <!-- Purple Theme -->
-                    <div class="col-3 col-md-2">
-                        <button class="theme-btn w-100" data-theme="purple">
-                            <svg width="48" height="48" viewBox="0 0 24 24" class="theme-icon">
-                                <circle cx="12" cy="12" r="6" fill="#9C27B0"/>
-                                <path fill="#7B1FA2" d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16z"/>
-                            </svg>
-                            <span class="theme-label">Purple</span>
-                        </button>
-                    </div>
+                    <button class="theme-btn" data-theme="purple">
+                        <svg class="theme-icon" viewBox="0 0 64 64">
+                            <circle cx="32" cy="32" r="20" fill="#9c27b0" stroke="#ffffff" stroke-width="2"/>
+                        </svg>
+                        <p>Purple</p>
+                    </button>
 
                     <!-- Orange Theme -->
-                    <div class="col-3 col-md-2">
-                        <button class="theme-btn w-100" data-theme="orange">
-                            <svg width="48" height="48" viewBox="0 0 24 24" class="theme-icon">
-                                <circle cx="12" cy="12" r="6" fill="#FF9800"/>
-                                <path fill="#F57C00" d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16z"/>
-                            </svg>
-                            <span class="theme-label">Orange</span>
-                        </button>
-                    </div>
+                    <button class="theme-btn" data-theme="orange">
+                        <svg class="theme-icon" viewBox="0 0 64 64">
+                            <circle cx="32" cy="32" r="20" fill="#ff9800" stroke="#ffffff" stroke-width="2"/>
+                        </svg>
+                        <p>Orange</p>
+                    </button>
 
                     <!-- Pink Theme -->
-                    <div class="col-3 col-md-2">
-                        <button class="theme-btn w-100" data-theme="pink">
-                            <svg width="48" height="48" viewBox="0 0 24 24" class="theme-icon">
-                                <circle cx="12" cy="12" r="6" fill="#E91E63"/>
-                                <path fill="#C2185B" d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16z"/>
-                            </svg>
-                            <span class="theme-label">Pink</span>
-                        </button>
-                    </div>
+                    <button class="theme-btn" data-theme="pink">
+                        <svg class="theme-icon" viewBox="0 0 64 64">
+                            <circle cx="32" cy="32" r="20" fill="#e91e63" stroke="#ffffff" stroke-width="2"/>
+                        </svg>
+                        <p>Pink</p>
+                    </button>
 
                     <!-- Teal Theme -->
-                    <div class="col-3 col-md-2">
-                        <button class="theme-btn w-100" data-theme="teal">
-                            <svg width="48" height="48" viewBox="0 0 24 24" class="theme-icon">
-                                <circle cx="12" cy="12" r="6" fill="#009688"/>
-                                <path fill="#00796B" d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16z"/>
-                            </svg>
-                            <span class="theme-label">Teal</span>
-                        </button>
-                    </div>
+                    <button class="theme-btn" data-theme="teal">
+                        <svg class="theme-icon" viewBox="0 0 64 64">
+                            <circle cx="32" cy="32" r="20" fill="#009688" stroke="#ffffff" stroke-width="2"/>
+                        </svg>
+                        <p>Teal</p>
+                    </button>
 
                     <!-- Gold Theme -->
-                    <div class="col-3 col-md-2">
-                        <button class="theme-btn w-100" data-theme="gold">
-                            <svg width="48" height="48" viewBox="0 0 24 24" class="theme-icon">
-                                <circle cx="12" cy="12" r="6" fill="#FFD700"/>
-                                <path fill="#FFC400" d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16z"/>
-                            </svg>
-                            <span class="theme-label">Gold</span>
-                        </button>
-                    </div>
+                    <button class="theme-btn" data-theme="gold">
+                        <svg class="theme-icon" viewBox="0 0 64 64">
+                            <circle cx="32" cy="32" r="20" fill="#ffd700" stroke="#ffffff" stroke-width="2"/>
+                        </svg>
+                        <p>Gold</p>
+                    </button>
 
                     <!-- Silver Theme -->
-                    <div class="col-3 col-md-2">
-                        <button class="theme-btn w-100" data-theme="silver">
-                            <svg width="48" height="48" viewBox="0 0 24 24" class="theme-icon">
-                                <circle cx="12" cy="12" r="6" fill="#C0C0C0"/>
-                                <path fill="#A8A8A8" d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16z"/>
-                            </svg>
-                            <span class="theme-label">Silver</span>
-                        </button>
-                    </div>
+                    <button class="theme-btn" data-theme="silver">
+                        <svg class="theme-icon" viewBox="0 0 64 64">
+                            <circle cx="32" cy="32" r="20" fill="#c0c0c0" stroke="#ffffff" stroke-width="2"/>
+                        </svg>
+                        <p>Silver</p>
+                    </button>
 
                     <!-- Neon Theme -->
-                    <div class="col-3 col-md-2">
-                        <button class="theme-btn w-100" data-theme="neon">
-                            <svg width="48" height="48" viewBox="0 0 24 24" class="theme-icon">
-                                <circle cx="12" cy="12" r="6" fill="#39FF14"/>
-                                <path fill="#00FF00" d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16z"/>
-                            </svg>
-                            <span class="theme-label">Neon</span>
-                        </button>
-                    </div>
+                    <button class="theme-btn" data-theme="neon">
+                        <svg class="theme-icon" viewBox="0 0 64 64">
+                            <circle cx="32" cy="32" r="20" fill="#39ff14" stroke="#000000" stroke-width="2"/>
+                        </svg>
+                        <p>Neon</p>
+                    </button>
 
                     <!-- Cyberpunk Theme -->
-                    <div class="col-3 col-md-2">
-                        <button class="theme-btn w-100" data-theme="cyberpunk">
-                            <svg width="48" height="48" viewBox="0 0 24 24" class="theme-icon">
-                                <circle cx="12" cy="12" r="6" fill="#FF00FF"/>
-                                <path fill="#FF0090" d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16z"/>
-                            </svg>
-                            <span class="theme-label">Cyberpunk</span>
-                        </button>
-                    </div>
+                    <button class="theme-btn" data-theme="cyberpunk">
+                        <svg class="theme-icon" viewBox="0 0 64 64">
+                            <circle cx="32" cy="32" r="20" fill="#ff00ff" stroke="#00ffff" stroke-width="2"/>
+                        </svg>
+                        <p>Cyberpunk</p>
+                    </button>
 
                     <!-- Retro Theme -->
-                    <div class="col-3 col-md-2">
-                        <button class="theme-btn w-100" data-theme="retro">
-                            <svg width="48" height="48" viewBox="0 0 24 24" class="theme-icon">
-                                <circle cx="12" cy="12" r="6" fill="#FF5722"/>
-                                <path fill="#E64A19" d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16z"/>
-                            </svg>
-                            <span class="theme-label">Retro</span>
-                        </button>
-                    </div>
+                    <button class="theme-btn" data-theme="retro">
+                        <svg class="theme-icon" viewBox="0 0 64 64">
+                            <circle cx="32" cy="32" r="20" fill="#ffcc00" stroke="#ff6600" stroke-width="2"/>
+                        </svg>
+                        <p>Retro</p>
+                    </button>
+
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 
 
 
