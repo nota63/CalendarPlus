@@ -3313,7 +3313,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // /moode-analysis -- Get the current conversation tone 
-
 document.addEventListener("DOMContentLoaded", function () {
     const chatInput = document.getElementById("chat-message-input");
 
@@ -3331,13 +3330,18 @@ document.addEventListener("DOMContentLoaded", function () {
     function openMoodAnalysisModal() {
         const modal = new bootstrap.Modal(document.getElementById("moodAnalysisModal"));
         modal.show();
+        document.getElementById("moodAnalysisResult").innerHTML = `
+            <div class="d-flex flex-column align-items-center justify-content-center p-3">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 text-muted">🔄 Analyzing mood... Please wait.</p>
+            </div>
+        `;
+        analyzeMood();
     }
 
-    document.getElementById("analyzeMoodBtn").addEventListener("click", function () {
+    function analyzeMood() {
         const conversationId = window.djangoData.conversationId;
         const organizationId = window.djangoData.orgId;
-
-        document.getElementById("moodAnalysisResult").innerHTML = "<p>🔄 Analyzing mood... Please wait.</p>";
 
         fetch("/dm/analyze-mood/", {
             method: "POST",
@@ -3349,18 +3353,30 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Content-Type": "application/x-www-form-urlencoded"
             }
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById("moodAnalysisResult").innerHTML = `<p>🧠 Mood Analysis: <b>${data.mood_analysis}</b></p>`;
-                } else {
-                    document.getElementById("moodAnalysisResult").innerHTML = `<p>❌ Error: ${data.error}</p>`;
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                document.getElementById("moodAnalysisResult").innerHTML = "<p>❌ An error occurred.</p>";
-            });
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById("moodAnalysisResult").innerHTML = `
+                    <div class="card shadow-sm p-3 rounded border-0 bg-light">
+                        <h5 class="text-primary mb-2"><i class="fas fa-brain"></i> Mood Analysis</h5>
+                        <p class="text-dark font-weight-bold">${data.mood_analysis}</p>
+                    </div>
+                `;
+            } else {
+                document.getElementById("moodAnalysisResult").innerHTML = `
+                    <div class="alert alert-danger">
+                        ❌ Error: ${data.error}
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            document.getElementById("moodAnalysisResult").innerHTML = `
+                <div class="alert alert-danger">
+                    ❌ An error occurred. Please try again.
+                </div>
+            `;
+        });
+    }
 });
-

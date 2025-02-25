@@ -18,15 +18,22 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+# -------------------------------------------------------------------------------------------------------------------------
+
+# API KEYS
+
 # load github access token 
 from dotenv import load_dotenv
 
 load_dotenv()  # Load environment variables
 
 GITHUB_ACCESS_TOKEN = os.getenv("GITHUB_ACCESS_TOKEN")
+client = os.getenv('client')
 
 
 
+# --------------------------------------------------------------------------------------------------------------------
 
 STATIC_URL = '/static/'
 

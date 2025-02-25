@@ -3217,21 +3217,22 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="modal fade" id="moodAnalysisModal" tabindex="-1" aria-labelledby="moodAnalysisLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="moodAnalysisLabel">🔍 Mood Analysis</h5>
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-brain"></i> Mood Analysis</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <input type="hidden" id="conversation_id" value="123"> <!-- Replace dynamically -->
-                <input type="hidden" id="organization_id" value="1"> <!-- Replace dynamically -->
-
-                <p>Click the button to analyze the mood of this conversation.</p>
-                <button id="analyzeMoodBtn" class="btn btn-primary">Analyze Mood</button>
-                <div id="moodAnalysisResult" class="mt-3"></div>
+                <div id="moodAnalysisResult" class="text-center text-muted">
+                    <p>Click the button below to analyze mood.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="analyzeMoodBtn" class="btn btn-primary">🔍 Analyze Now</button>
             </div>
         </div>
     </div>
 </div>
+
 
 
 

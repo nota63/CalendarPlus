@@ -1314,10 +1314,6 @@ def generate_code(request):
 # /ai (HANDLE REAL TIME AI QUERIES)
 client = OpenAI(api_key="#")  
 
-
-import re
-
-
 # PENDING AI OPTIMIZATION
 
 @csrf_exempt
@@ -1370,7 +1366,7 @@ def analyze_intent(user_message):
     elif "show" in words or "fetch" in words:
         return "read", extract_entity(user_message)
     
-    return "chat", None  # Default to chat if no intent is detected
+    return "chat", None  
 
 # Extract relevant entity (meeting, todo, etc.) from user input
 def extract_entity(user_message):
@@ -1840,11 +1836,13 @@ def send_drawing_email(request):
 # /mood-analysis -- AI detects the mood/tone of the conversation (positive, neutral, negative) and provides insights.
 
 # Initialize OpenAI client
-client = OpenAI(api_key="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")
+client = settings.client
+
+
 
 @csrf_exempt
 def analyze_mood(request):
-    """Analyzes the mood of a conversation using AI."""
+    """Analyzes the mood of a conversation and provides insights using AI."""
     if request.method == "POST":
         org_id = request.POST.get("organization_id")
         convo_id = request.POST.get("conversation_id")
@@ -1860,8 +1858,14 @@ def analyze_mood(request):
             if not message_texts:
                 return JsonResponse({"success": False, "error": "No messages found for analysis."})
 
-            # Create the AI prompt
-            prompt = f"Analyze the mood of this conversation:\n\n" + "\n".join(message_texts)
+            # Create the AI prompt for a deeper analysis
+            prompt = (
+                "Analyze the mood of this conversation. Detect whether it is positive, neutral, or negative. "
+                "Additionally, provide at least 10 insights on how to improve the conversation. "
+                "If the conversation is negative, suggest ways to make it more productive. "
+                "Mention any potential issues like lack of engagement, misunderstandings, or aggression. "
+                "Here is the conversation:\n\n" + "\n".join(message_texts)
+            )
 
             # Send request to OpenAI API
             completion = client.chat.completions.create(
