@@ -1836,9 +1836,7 @@ def send_drawing_email(request):
 # /mood-analysis -- AI detects the mood/tone of the conversation (positive, neutral, negative) and provides insights.
 
 # Initialize OpenAI client
-client = settings.client
-
-
+client = '#'
 
 @csrf_exempt
 def analyze_mood(request):
@@ -1850,7 +1848,7 @@ def analyze_mood(request):
         try:
             # Fetch conversation and messages
             conversation = Conversation.objects.get(id=convo_id, organization_id=org_id)
-            messages = Message.objects.filter(conversation=conversation).order_by("timestamp")
+            messages = Message.objects.filter(conversation=conversation,organization_id=org_id).order_by("timestamp")
 
             # Prepare messages for AI analysis
             message_texts = [msg.text for msg in messages if msg.text]

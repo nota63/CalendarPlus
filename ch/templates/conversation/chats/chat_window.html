@@ -3214,24 +3214,50 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- /mood-analysis  -->
 <!-- Mood Analysis Modal -->
-<div class="modal fade" id="moodAnalysisModal" tabindex="-1" aria-labelledby="moodAnalysisLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title"><i class="fas fa-brain"></i> Mood Analysis</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div id="moodAnalysisResult" class="text-center text-muted">
-                    <p>Click the button below to analyze mood.</p>
+<div class="modal fade" id="moodAnalysisModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 960px;">
+        <div class="modal-content" style="border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);">
+            <!-- Close Button -->
+            <button type="button" class="btn-close position-absolute" style="right: 16px; top: 16px; z-index: 1;" data-bs-dismiss="modal" aria-label="Close">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+            </button>
+
+            <div class="modal-body p-40" style="min-height: 400px;">
+                <div class="d-flex flex-column h-100">
+                    <!-- Main Content -->
+                    <div class="flex-grow-1 text-center">
+                        <div class="mb-32">
+                            <span class="material-icons-outlined text-muted" style="font-size: 64px;">
+                                sentiment_very_satisfied
+                            </span>
+                        </div>
+                        
+                        <div id="moodAnalysisResult" class="mb-24">
+                            <h3 class="mb-16" style="font-weight: 500; color: #202124;">Mood Analysis</h3>
+                            <p class="text-muted" style="line-height: 1.6;">
+                                Analyze your recent entries to discover emotional patterns and trends.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Analysis Button -->
+                    <div class="text-center">
+                        <button id="analyzeMoodBtn" class="btn px-40 py-16" 
+                                style="background-color: #1976d2; color: white; 
+                                       border-radius: 24px; font-weight: 500;
+                                       text-transform: none; transition: all 0.2s;
+                                       box-shadow: 0 2px 4px rgba(25,118,210,0.3);">
+                            Start Analysis
+                        </button>
+                    </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button id="analyzeMoodBtn" class="btn btn-primary">🔍 Analyze Now</button>
             </div>
         </div>
     </div>
 </div>
+
 
 
 

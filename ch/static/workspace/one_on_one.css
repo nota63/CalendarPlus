@@ -5185,3 +5185,25 @@ body.hacker-active {
 #drawModal .btn-close-custom {
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
+
+/* /moood-analysis */
+.modal-content {
+    font-family: 'Roboto', sans-serif;
+    border: none;
+}
+
+.btn-close {
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.btn-close:hover {
+    opacity: 1;
+    background: none;
+}
+
+#analyzeMoodBtn:hover {
+    background-color: #1565c0 !important;
+    box-shadow: 0 4px 8px rgba(25,118,210,0.3);
+    transform: translateY(-1px);
+}
