@@ -3311,6 +3311,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+
 // /moode-analysis -- Get the current conversation tone 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -3333,8 +3334,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     document.getElementById("analyzeMoodBtn").addEventListener("click", function () {
-        const conversationId = document.getElementById("conversation_id").value;
-        const organizationId = document.getElementById("organization_id").value;
+        const conversationId = window.djangoData.conversationId;
+        const organizationId = window.djangoData.orgId;
 
         document.getElementById("moodAnalysisResult").innerHTML = "<p>🔄 Analyzing mood... Please wait.</p>";
 

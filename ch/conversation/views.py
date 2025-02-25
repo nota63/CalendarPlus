@@ -1835,3 +1835,47 @@ def send_drawing_email(request):
             return JsonResponse({"success": False, "error": str(e)})
     
     return JsonResponse({"success": False, "error": "Invalid request!"})
+
+
+# /mood-analysis -- AI detects the mood/tone of the conversation (positive, neutral, negative) and provides insights.
+
+# Initialize OpenAI client
+client = OpenAI(api_key="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")
+
+@csrf_exempt
+def analyze_mood(request):
+    """Analyzes the mood of a conversation using AI."""
+    if request.method == "POST":
+        org_id = request.POST.get("organization_id")
+        convo_id = request.POST.get("conversation_id")
+
+        try:
+            # Fetch conversation and messages
+            conversation = Conversation.objects.get(id=convo_id, organization_id=org_id)
+            messages = Message.objects.filter(conversation=conversation).order_by("timestamp")
+
+            # Prepare messages for AI analysis
+            message_texts = [msg.text for msg in messages if msg.text]
+
+            if not message_texts:
+                return JsonResponse({"success": False, "error": "No messages found for analysis."})
+
+            # Create the AI prompt
+            prompt = f"Analyze the mood of this conversation:\n\n" + "\n".join(message_texts)
+
+            # Send request to OpenAI API
+            completion = client.chat.completions.create(
+                model="gpt-4o",
+                store=True,
+                messages=[{"role": "user", "content": prompt}]
+            )
+
+            # Extract AI response
+            mood_analysis = completion.choices[0].message.content
+
+            return JsonResponse({"success": True, "mood_analysis": mood_analysis})
+
+        except Conversation.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Conversation not found."})
+
+    return JsonResponse({"success": False, "error": "Invalid request!"})
