@@ -3382,8 +3382,8 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-// /profinity - check profane messages
 
+// /profanity - check profane messages 
 document.addEventListener("DOMContentLoaded", function () {
     const chatInput = document.getElementById("chat-message-input");
 
@@ -3398,7 +3398,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function openProfanityModal() {
-        const modal = new bootstrap.Modal(document.getElementById("profanityModal"));
+        const modalElement = document.getElementById("profanityModal");
+        const modal = new bootstrap.Modal(modalElement);
         modal.show();
         fetchProfanityData();
     }
@@ -3408,7 +3409,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const organizationId = window.djangoData.orgId;
         const resultContainer = document.getElementById("profanityResult");
 
-        resultContainer.innerHTML = `<div class="text-center"><div class="spinner-border text-danger" role="status"></div><p>Analyzing messages...</p></div>`;
+        resultContainer.innerHTML = `
+            <div class="text-center">
+                <div class="spinner-border text-danger" role="status"></div>
+                <p>Analyzing messages...</p>
+            </div>
+        `;
 
         fetch("/dm/check-profanity/", {
             method: "POST",
@@ -3420,33 +3426,106 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Content-Type": "application/x-www-form-urlencoded"
             }
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    let resultHTML = `<p><strong>🚨 Total Flagged Messages:</strong> ${data.total_flagged}</p>`;
-                    resultHTML += "<ul class='list-group'>";
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && Array.isArray(data.users) && data.users.length > 0) {
+                let resultHTML = `<p><strong>🚨 Total Flagged Messages:</strong> ${data.total_flagged}</p>`;
+                resultHTML += "<ul class='list-group'>";
 
-                    data.users.forEach(user => {
-                        resultHTML += `
-                        <li class='list-group-item d-flex justify-content-between align-items-center'>
-                            <div>
-                                <strong>${user.name}</strong> 
-                                <p class="text-muted">🕒 Last flagged: ${user.flagged_at || "N/A"}</p>
-                                <p class="text-danger">💬 Latest: ${user.latest_message || "N/A"}</p>
-                            </div>
-                            <span class='badge bg-danger rounded-pill'>${user.count} times</span>
-                        </li>`;
-                    });
+                data.users.forEach(user => {
+                    resultHTML += `
+                    <li class='list-group-item d-flex justify-content-between align-items-center'>
+                        <div>
+                            <strong>${user.name}</strong> 
+                            <p class="text-muted">🕒 Last flagged: ${user.flagged_at || "N/A"}</p>
+                            <p class="text-danger">💬 Latest: ${user.latest_message || "N/A"}</p>
+                        </div>
+                        <span class='badge bg-danger rounded-pill'>${user.count} times</span>
 
-                    resultHTML += "</ul>";
-                    resultContainer.innerHTML = resultHTML;
-                } else {
-                    resultContainer.innerHTML = `<p class="text-danger">❌ ${data.error}</p>`;
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                resultContainer.innerHTML = `<p class="text-danger">❌ An error occurred.</p>`;
-            });
+                        <button class="btn btn-warning warn-user-btn" data-user-id="${user.user_id}" data-message-id="${user.message_id}">Warn User</button>
+                        <button class="btn btn-danger custom-warn-btn" data-user-id="${user.user_id}" data-message-id="${user.message_id}">Custom Warn</button>
+                    </li>`;
+                });
+
+                resultHTML += "</ul>";
+                resultContainer.innerHTML = resultHTML;
+
+                // Ensure event listeners are added for the newly added buttons
+                attachWarningButtonHandlers();
+            } else {
+                resultContainer.innerHTML = `<p class="text-danger">❌ No flagged messages found.</p>`;
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            resultContainer.innerHTML = `<p class="text-danger">❌ An error occurred.</p>`;
+        });
     }
-});
+
+
+// action buttons handle
+    function attachWarningButtonHandlers() {
+        document.querySelectorAll(".warn-user-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                const userId = window.djangoData.otherUserId;
+                
+                fetch("/dm/send-warning-email/", {
+                    method: "POST",
+                    body: JSON.stringify({ user_id: userId}),
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCSRFToken()  // Ensure CSRF token is included
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Warning email sent successfully!");
+                    } else {
+                        alert("Error: " + data.error);
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            });
+        });
+    
+        document.querySelectorAll(".custom-warn-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                const userId = window.djangoData.otherUserId;
+            
+    
+                // Show a prompt for the custom email
+                const customEmail = prompt("Enter custom email address:");
+                if (!customEmail) {
+                    alert("Email cannot be empty.");
+                    return;
+                }
+    
+                fetch("/dm/send-warning-email/", {
+                    method: "POST",
+                    body: JSON.stringify({ user_id: userId, custom_email: customEmail }),
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCSRFToken()
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Custom warning email sent successfully!");
+                    } else {
+                        alert("Error: " + data.error);
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            });
+        });
+    }
+    
+    // Function to get CSRF Token for Django requests
+    function getCSRFToken() {
+        return document.cookie.split("; ")
+            .find(row => row.startsWith("csrftoken"))
+            ?.split("=")[1] || "";
+    }
+});    

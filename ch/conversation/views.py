@@ -1917,9 +1917,52 @@ def check_profanity(request):
             # Total flagged messages count
             total_flagged_messages = abused_messages.count()
 
-            return JsonResponse({"success": True, "users": users_data, "total_flagged": total_flagged_messages})
+            return JsonResponse({"success": True, "users": users_data, "total_flagged": total_flagged_messages,'id':msg.flagged_by.id})
 
         except Conversation.DoesNotExist:
             return JsonResponse({"success": False, "error": "Conversation not found."})
 
     return JsonResponse({"success": False, "error": "Invalid request!"})
+
+
+
+# /send warning email
+from django.core.mail import send_mail
+
+@csrf_exempt
+def send_warning_email(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            user_id = data.get("user_id")
+            message_id = data.get("message_id")
+            custom_email = data.get("custom_email", None)
+
+            # Fetch user from the database
+            user = User.objects.get(id=user_id)
+            user_email = custom_email if custom_email else user.email  # Use custom email if provided
+
+            if not user_email:
+                return JsonResponse({"success": False, "error": "User does not have an email."}, status=400)
+
+            # Email Content
+            subject = "Warning Notification"
+            message = f"Dear {user.username},\n\nYou have been warned for violating our chat policies.\nMessage ID: {message_id}\n\nPlease adhere to the rules.\n\nBest Regards,\nAdmin Team"
+
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [user_email],
+                fail_silently=False,
+            )
+
+            return JsonResponse({"success": True, "message": "Email sent successfully."})
+
+        except User.DoesNotExist:
+            return JsonResponse({"success": False, "error": "User not found."}, status=404)
+
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+    return JsonResponse({"success": False, "error": "Invalid request."}, status=400)
