@@ -1022,11 +1022,11 @@ My Calendar
     </button>
 
     <!-- Button to Open Modal -->
-    <button id="openMangeTaskifyModal" class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2">Manage Tasks Board</button>
-
+    <button id="open-kanban" class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2">Open Kanban</button>
 </div>
 
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 <!-- ------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
 <!-- MODALS -->
@@ -1767,55 +1767,52 @@ My Calendar
     </div>
 </div>
 
-<!-- Manage Tasks -->
-<div id="MangeTaskifyModal" class="hidden fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white/80 backdrop-blur-lg rounded-xl shadow-2xl border border-white/20 w-full max-w-6xl h-[80vh] flex flex-col transition-all">
-        <div class="p-6 border-b border-white/30">
-            <h2 class="text-2xl font-bold text-gray-800">Task Status Board</h2>
-        </div>
 
-        <!-- Kanban Board -->
-        <div class="flex-1 grid grid-cols-4 gap-6 p-6 overflow-auto">
-            <!-- Pending Column -->
-            <div class="task-column bg-gray-100/50 backdrop-blur-sm p-4 rounded-xl border border-white/20 hover:shadow-lg transition-all">
-                <h3 class="font-medium text-gray-700 mb-4 text-sm uppercase tracking-wide">Pending</h3>
-                <div class="task-list space-y-3" id="pendingTasks">
-                    <!-- Sample Task Card -->
-                    <div class="task-card bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-sm hover:shadow-md transition-all cursor-move border border-white/20">
-                        <h4 class="font-medium text-gray-800 text-sm">Sample Task</h4>
-                        <p class="text-gray-600 text-xs mt-1">Due: Tomorrow</p>
+<!-- Manage Tasks -->
+ <!-- Modal -->
+<div id="kanban-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Kanban Board</h2>
+        <div class="kanban-board">
+            <div id="pending" class="kanban-column">
+                <h3>Pending</h3>
+                <div class="kanban-column-content">
+                    <!-- Example task -->
+                    <div class="task-card">
+                        <h4>Design homepage</h4>
+                        <p>Create mockups for the new landing page</p>
+                        <div class="task-meta">
+                          
+                        </div>
                     </div>
+                    <div class="add-task-btn">+ Add Task</div>
                 </div>
             </div>
-
-            <!-- In Progress Column -->
-            <div class="task-column bg-blue-100/50 backdrop-blur-sm p-4 rounded-xl border border-white/20 hover:shadow-lg transition-all">
-                <h3 class="font-medium text-blue-700 mb-4 text-sm uppercase tracking-wide">In Progress</h3>
-                <div class="task-list space-y-3" id="inProgressTasks"></div>
+            <div id="in_progress" class="kanban-column">
+                <h3>In Progress</h3>
+                <div class="kanban-column-content">
+                    <!-- Add your in-progress tasks here -->
+                    <div class="add-task-btn">+ Add Task</div>
+                </div>
             </div>
-
-            <!-- Completed Column -->
-            <div class="task-column bg-green-100/50 backdrop-blur-sm p-4 rounded-xl border border-white/20 hover:shadow-lg transition-all">
-                <h3 class="font-medium text-green-700 mb-4 text-sm uppercase tracking-wide">Completed</h3>
-                <div class="task-list space-y-3" id="completedTasks"></div>
+            <div id="completed" class="kanban-column">
+                <h3>Completed</h3>
+                <div class="kanban-column-content">
+                    <!-- Add your completed tasks here -->
+                    <div class="add-task-btn">+ Add Task</div>
+                </div>
             </div>
-
-            <!-- Blocked Column -->
-            <div class="task-column bg-red-100/50 backdrop-blur-sm p-4 rounded-xl border border-white/20 hover:shadow-lg transition-all">
-                <h3 class="font-medium text-red-700 mb-4 text-sm uppercase tracking-wide">Blocked</h3>
-                <div class="task-list space-y-3" id="blockedTasks"></div>
+            <div id="blocked" class="kanban-column">
+                <h3>Blocked</h3>
+                <div class="kanban-column-content">
+                    <!-- Add your blocked tasks here -->
+                    <div class="add-task-btn">+ Add Task</div>
+                </div>
             </div>
-        </div>
-
-        <!-- Close Button -->
-        <div class="border-t border-white/30 p-4 flex justify-end">
-            <button id="closeMangeTaskifyModal" class="px-5 py-2 bg-gray-500/30 hover:bg-gray-500/40 text-gray-800 rounded-lg text-sm font-medium transition-all hover:shadow-md focus:ring-2 focus:ring-gray-400/50 focus:outline-none">
-                Close Board
-            </button>
         </div>
     </div>
 </div>
-
 
 
 

@@ -57,42 +57,24 @@ def create_task(request):
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
 
+
+
 # Manage Tasks
-@csrf_protect
-def get_tasks(request, org_id):
-    """Fetch all tasks for an organization and categorize them."""
-    if request.method == "GET":
-        tasks = TaskOrganization.objects.filter(organization_id=org_id, creator=request.user)
+def organization_tasks(request, org_id):
+    organization = get_object_or_404(Organization, id=org_id)
+    tasks = TaskOrganization.objects.filter(organization=organization,creator=request.user).values("id", "title", "status")
 
-        data = {
-            "pending": list(tasks.filter(status="pending").values("id", "title")),
-            "completed": list(tasks.filter(status="completed").values("id", "title")),
-            "in_progress": list(tasks.filter(status="in_progress").values("id", "title")),
-            "blocked": list(tasks.filter(status="blocked").values("id", "title")),
-        }
-
-        return JsonResponse(data)
-
-    return JsonResponse({"error": "Invalid request method"}, status=400)
+    return JsonResponse({"tasks": list(tasks)}, safe=False)
 
 
 
 
-@csrf_protect
-def update_task_status(request):
-    """Update task status when dragged to a different column."""
+# update task status
+@csrf_exempt
+def update_task_status(request, task_id):
     if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            task_id = data.get("task_id")
-            new_status = data.get("new_status")
-
-            task = get_object_or_404(TaskOrganization, id=task_id)
-            task.status = new_status
-            task.save()
-
-            return JsonResponse({"message": "Task status updated!", "status": task.status}, status=200)
-        except json.JSONDecodeError:
-            return JsonResponse({"error": "Invalid JSON data"}, status=400)
-
-    return JsonResponse({"error": "Invalid request method"}, status=405)
+        data = json.loads(request.body)
+        task = TaskOrganization.objects.get(id=task_id)
+        task.status = data["status"]
+        task.save()
+        return JsonResponse({"message": "Task updated successfully!"})

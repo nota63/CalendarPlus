@@ -1932,3 +1932,249 @@ a {
   
 
 /* WORKSPACE TASKS CSS */
+
+/* Kanban Modal Specific Styling with increased specificity */
+#kanban-modal {
+    display: none;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: rgba(0, 0, 0, 0.6) !important;
+    z-index: 1000 !important;
+    overflow: auto !important;
+  }
+  
+  #kanban-modal .modal-content {
+    position: relative !important;
+    background-color: #f5f7fa !important;
+    margin: 5% auto !important;
+    padding: 25px !important;
+    width: 90% !important;
+    max-width: 1200px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+    animation: kanbanModalFadeIn 0.3s ease-in-out !important;
+  }
+  
+  @keyframes kanbanModalFadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* Modal Header */
+  #kanban-modal .modal-content h2 {
+    color: #2c3e50 !important;
+    text-align: center !important;
+    margin-bottom: 25px !important;
+    font-size: 28px !important;
+    font-weight: 600 !important;
+    border-bottom: 2px solid #e1e5eb !important;
+    padding-bottom: 15px !important;
+  }
+  
+  /* Close Button */
+  #kanban-modal .close {
+    position: absolute !important;
+    top: 20px !important;
+    right: 25px !important;
+    color: #7f8c8d !important;
+    font-size: 28px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    transition: color 0.2s !important;
+  }
+  
+  #kanban-modal .close:hover {
+    color: #34495e !important;
+  }
+  
+  /* Kanban Board Layout */
+  #kanban-modal .kanban-board {
+    display: flex !important;
+    justify-content: space-between !important;
+    gap: 20px !important;
+    overflow-x: auto !important;
+    padding: 10px 0 25px 0 !important;
+    min-height: 500px !important;
+  }
+  
+  /* Kanban Columns */
+  #kanban-modal .kanban-column {
+    background-color: #f0f2f5 !important;
+    border-radius: 6px !important;
+    min-width: 280px !important;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    max-height: 700px !important;
+    overflow-y: auto !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05) !important;
+  }
+  
+  /* Column Headers */
+  #kanban-modal .kanban-column h3 {
+    margin: 0 !important;
+    padding: 15px !important;
+    text-align: center !important;
+    font-size: 18px !important;
+    font-weight: 500 !important;
+    color: #4a5568 !important;
+    background-color: #e2e8f0 !important;
+    border-top-left-radius: 6px !important;
+    border-top-right-radius: 6px !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 10 !important;
+  }
+  
+  /* Column Content Area */
+  #kanban-modal .kanban-column-content {
+    padding: 10px !important;
+    flex-grow: 1 !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Kanban Task Cards */
+  #kanban-modal .task-card {
+    background-color: white !important;
+    border-radius: 5px !important;
+    padding: 12px !important;
+    margin-bottom: 10px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12) !important;
+    cursor: grab !important;
+    transition: all 0.2s ease !important;
+    border-left: 4px solid #4299e1 !important;
+  }
+  
+  #kanban-modal .task-card:hover {
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16) !important;
+    transform: translateY(-2px) !important;
+  }
+  
+  #kanban-modal .task-card h4 {
+    margin: 0 0 8px 0 !important;
+    font-size: 16px !important;
+    color: #2d3748 !important;
+  }
+  
+  #kanban-modal .task-card p {
+    margin: 0 !important;
+    font-size: 14px !important;
+    color: #718096 !important;
+  }
+  
+  /* Task Metadata */
+  #kanban-modal .task-meta {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-top: 10px !important;
+    font-size: 12px !important;
+  }
+  
+  #kanban-modal .task-assignee {
+    display: flex !important;
+    align-items: center !important;
+  }
+  
+  #kanban-modal .task-assignee img {
+    width: 24px !important;
+    height: 24px !important;
+    border-radius: 50% !important;
+    margin-right: 5px !important;
+  }
+  
+  #kanban-modal .task-date {
+    color: #a0aec0 !important;
+  }
+  
+  /* Column-specific colors */
+  #kanban-modal #pending h3 {
+    background-color: #edf2f7 !important;
+    border-bottom: 2px solid #cbd5e0 !important;
+  }
+  
+  #kanban-modal #pending .task-card {
+    border-left-color: #a0aec0 !important;
+  }
+  
+  #kanban-modal #in_progress h3 {
+    background-color: #e6f6ff !important;
+    border-bottom: 2px solid #90cdf4 !important;
+  }
+  
+  #kanban-modal #in_progress .task-card {
+    border-left-color: #4299e1 !important;
+  }
+  
+  #kanban-modal #completed h3 {
+    background-color: #f0fff4 !important;
+    border-bottom: 2px solid #9ae6b4 !important;
+  }
+  
+  #kanban-modal #completed .task-card {
+    border-left-color: #48bb78 !important;
+  }
+  
+  #kanban-modal #blocked h3 {
+    background-color: #fff5f5 !important;
+    border-bottom: 2px solid #fed7d7 !important;
+  }
+  
+  #kanban-modal #blocked .task-card {
+    border-left-color: #f56565 !important;
+  }
+  
+  /* Add Task Button */
+  #kanban-modal .add-task-btn {
+    margin: 10px !important;
+    padding: 8px 15px !important;
+    background-color: #ebf8ff !important;
+    color: #3182ce !important;
+    border: 1px dashed #90cdf4 !important;
+    border-radius: 4px !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    transition: all 0.2s !important;
+  }
+  
+  #kanban-modal .add-task-btn:hover {
+    background-color: #bee3f8 !important;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    #kanban-modal .modal-content {
+      width: 95% !important;
+      margin: 5% auto !important;
+      padding: 15px !important;
+    }
+    
+    #kanban-modal .kanban-board {
+      flex-direction: column !important;
+      align-items: center !important;
+    }
+    
+    #kanban-modal .kanban-column {
+      min-width: 90% !important;
+      margin-bottom: 20px !important;
+    }
+  }
+  
+  /* Additional fix to ensure styles persist */
+  html body #kanban-modal .kanban-column h3,
+  html body #kanban-modal .task-card h4,
+  html body #kanban-modal .task-card p {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+  }
+  
+  /* Ensure the content doesn't flash or disappear */
+  #kanban-modal * {
+    transition: none !important;
+    animation-duration: 0s !important;
+  }
