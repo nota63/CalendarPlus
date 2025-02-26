@@ -61,16 +61,22 @@ def create_task(request):
 @csrf_protect
 def get_tasks(request, org_id):
     """Fetch all tasks for an organization and categorize them."""
-    tasks = TaskOrganization.objects.filter(organization_id=org_id,creator=request.user)
+    if request.method == "GET":
+        tasks = TaskOrganization.objects.filter(organization_id=org_id, creator=request.user)
 
-    data = {
-        "pending": list(tasks.filter(status="pending").values("id", "title")),
-        "completed": list(tasks.filter(status="completed").values("id", "title")),
-        "in_progress": list(tasks.filter(status="in_progress").values("id", "title")),
-        "blocked": list(tasks.filter(status="blocked").values("id", "title")),
-    }
+        data = {
+            "pending": list(tasks.filter(status="pending").values("id", "title")),
+            "completed": list(tasks.filter(status="completed").values("id", "title")),
+            "in_progress": list(tasks.filter(status="in_progress").values("id", "title")),
+            "blocked": list(tasks.filter(status="blocked").values("id", "title")),
+        }
 
-    return JsonResponse(data)
+        return JsonResponse(data)
+
+    return JsonResponse({"error": "Invalid request method"}, status=400)
+
+
+
 
 @csrf_protect
 def update_task_status(request):
