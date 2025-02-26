@@ -20,7 +20,7 @@ class TaskOrganization(models.Model):
 
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    assigned_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name="tasksss")
+    creator=models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="tasksss")
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
     due_date = models.DateTimeField(blank=True, null=True)

@@ -43,6 +43,7 @@ urlpatterns = [
     path('organizations/',include('organizations.urls')),
     path('oauth/',include('outh.urls')),
     path('dm/',include('conversation.urls')),
+    path('taskify/',include('workspace_tasks.urls')),
     # ui components
     path('index/', views.styles, name= 'index'),
     path('weather/',views.weather, name='weather'),
