@@ -106,7 +106,19 @@ function fetchTasks() {
         .then(data => {
             let statuses = { "pending": [], "in_progress": [], "completed": [], "blocked": [] };
             data.tasks.forEach(task => {
-                let taskElement = `<div class="kanban-item" data-id="${task.id}">${task.title}</div>`;
+                let taskElement = `
+                    <div class="kanban-item" data-id="${task.id}" style="
+                        background: white;
+                        padding: 12px;
+                        margin: 8px 0;
+                        border-radius: 8px;
+                        box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.1);
+                        font-weight: 500;
+                        cursor: grab;
+                        transition: transform 0.2s;
+                    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        ${task.title}
+                    </div>`;
                 statuses[task.status].push(taskElement);
             });
 
@@ -124,6 +136,16 @@ function setupDragDrop() {
     ["pending", "in_progress", "completed", "blocked"].forEach(id => {
         let column = document.getElementById(id);
         if (column) {
+            column.style.cssText = `
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 12px;
+                padding: 12px;
+                min-height: 250px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                overflow-y: auto;
+                max-height: 400px;
+            `;
+
             new Sortable(column, {
                 group: "kanban",
                 animation: 150,
