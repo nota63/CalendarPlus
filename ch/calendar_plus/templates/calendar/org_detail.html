@@ -1671,6 +1671,19 @@ My Calendar
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-html.min.js"></script>
 
+<!-- /Tasks and dashboard-->
+<script type="text/javascript">
+    // Inject Django variables into the window object
+    window.djangoData = {
+        orgId: "{{ organization.id }}",
+    };
+</script>
+ <!-- Link your JS file -->
+ <script src="{% static 'workspace/organization_tasks.js' %}"></script>
+ <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+ 
+
 
 <!-- ----------------------------------------------------------------------------------------------------------------------------- -->
 <!-- Bootstrap 5 JS Bundle (includes Popper) -->

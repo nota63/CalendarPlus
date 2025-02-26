@@ -88,6 +88,7 @@ INSTALLED_APPS = [
     'notify',
     'new_roles',
     'rest_framework',
+    'workspace_tasks',
     'corsheaders',
      'tinymce',
      'contacts',
