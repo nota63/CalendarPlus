@@ -55,3 +55,38 @@ def create_task(request):
             return JsonResponse({"error": "Invalid JSON data"}, status=400)
 
     return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+# Manage Tasks
+@csrf_protect
+def get_tasks(request, org_id):
+    """Fetch all tasks for an organization and categorize them."""
+    tasks = TaskOrganization.objects.filter(organization_id=org_id,creator=request.user)
+
+    data = {
+        "pending": list(tasks.filter(status="pending").values("id", "title")),
+        "completed": list(tasks.filter(status="completed").values("id", "title")),
+        "in_progress": list(tasks.filter(status="in_progress").values("id", "title")),
+        "blocked": list(tasks.filter(status="blocked").values("id", "title")),
+    }
+
+    return JsonResponse(data)
+
+@csrf_protect
+def update_task_status(request):
+    """Update task status when dragged to a different column."""
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            task_id = data.get("task_id")
+            new_status = data.get("new_status")
+
+            task = get_object_or_404(TaskOrganization, id=task_id)
+            task.status = new_status
+            task.save()
+
+            return JsonResponse({"message": "Task status updated!", "status": task.status}, status=200)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON data"}, status=400)
+
+    return JsonResponse({"error": "Invalid request method"}, status=405)
