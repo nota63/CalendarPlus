@@ -445,7 +445,7 @@ class OrgDetailView(LoginRequiredMixin, View):
     template_name = 'calendar/org_detail.html'
 
     def get(self, request, org_id):
-        
+
         organization = get_object_or_404(Organization, id=org_id)
         print(f"Accessing organization: {organization.name} (ID: {organization.id})")
 

@@ -39,6 +39,20 @@ from django.http import HttpResponseForbidden
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.hashers import check_password
+
+
+from cryptography.fernet import Fernet
+import base64
+import os
+
+# Load the same SECRET_KEY used in models
+from django.conf import settings
+from cryptography.fernet import Fernet
+# Configure logging for debugging
+logger = logging.getLogger(__name__)
+
+# Load cipher with a fixed secret key
+cipher = Fernet(settings.ORG_PASSWORD_SECRET_KEY.encode())
 # Create your views here.
 
 @csrf_exempt
@@ -1949,18 +1963,6 @@ def reset_organization_password(request, org_id):
     return JsonResponse({"success": False, "message": "Invalid request method."})
 
 # MIDDLEWARE REDIRECT & VALIDATE THE PASSWORD
-from cryptography.fernet import Fernet
-import base64
-import os
-
-# Load the same SECRET_KEY used in models
-from django.conf import settings
-from cryptography.fernet import Fernet
-# Configure logging for debugging
-logger = logging.getLogger(__name__)
-
-# Load cipher with a fixed secret key
-cipher = Fernet(settings.ORG_PASSWORD_SECRET_KEY.encode())
 @login_required
 def validate_org_password(request, org_id):
     """Render password input page & handle validation securely."""
@@ -1978,23 +1980,21 @@ def validate_org_password(request, org_id):
                 logger.warning("⚠️ Empty password entered!")
                 return JsonResponse({"success": False, "message": "Password cannot be empty!"})
 
-            logger.info(f"🔹 Entered Password: {entered_password}")
-
-            # Debugging: Show if the org has a stored hashed password
-            if org_protection.hashed_password:
-                logger.info("🔐 Hashed Password Found (Stored in DB)")
-            else:
+            # Debugging logs
+            logger.info("🔹 Checking stored password existence...")
+            if not org_protection.hashed_password:
                 logger.error("❌ No password found for this organization!")
                 return JsonResponse({"success": False, "message": "No password set for this organization!"})
 
             # Check entered password using Django's secure password check
             if check_password(entered_password, org_protection.hashed_password):
-                request.session[f"org_access_{org_id}"] = True
-                logger.info("✅ Password matched! Granting access.")
+                # ✅ Grant temporary access
+                request.session[f"org_temp_access_{org_id}"] = True
+                logger.info("✅ Password matched! Granting temporary access.")
                 return JsonResponse({"success": True, "redirect_url": f"/calendar/org_detail/{org_id}/"})
-            else:
-                logger.warning("❌ Incorrect password entered!")
-                return JsonResponse({"success": False, "message": "Incorrect password!"})
+
+            logger.warning("❌ Incorrect password entered!")
+            return JsonResponse({"success": False, "message": "Incorrect password!"})
 
         except json.JSONDecodeError:
             logger.error("❌ Invalid JSON received in request!")
