@@ -495,7 +495,109 @@
     }
 }
 
+/* display request details modal  */
+.glass-modal .modal-content {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
 
+.glass-close {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 50%;
+    padding: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.glass-close:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.detail-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.detail-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+.detail-item:hover {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.detail-label {
+    display: block;
+    font-size: 0.875rem;
+    color: #666;
+    margin-bottom: 0.25rem;
+}
+
+.detail-value {
+    margin: 0;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.priority-badge,
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Priority Colors */
+.priority-badge[data-priority="High"] { background: #ffebee; color: #d32f2f; }
+.priority-badge[data-priority="Medium"] { background: #fff3e0; color: #ef6c00; }
+.priority-badge[data-priority="Low"] { background: #e8f5e9; color: #2e7d32; }
+
+/* Status Colors */
+.status-badge[data-status="Open"] { background: #e3f2fd; color: #1976d2; }
+.status-badge[data-status="In Progress"] { background: #fff3e0; color: #ef6c00; }
+.status-badge[data-status="Resolved"] { background: #e8f5e9; color: #2e7d32; }
+
+.attachment-card {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: rgba(245, 245, 245, 0.6);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.attachment-link {
+    color: #673ab7;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.attachment-link:hover {
+    color: #5e35b1;
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
 </style>
 
 
@@ -603,116 +705,17 @@
     </div>
 </div>
 
-<style>
-.glass-modal .modal-content {
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-
-.glass-close {
-    background: rgba(0, 0, 0, 0.05);
-    border-radius: 50%;
-    padding: 0.5rem;
-    transition: all 0.2s ease;
-}
-
-.glass-close:hover {
-    background: rgba(0, 0, 0, 0.1);
-}
-
-.detail-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-}
-
-.detail-column {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.detail-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    border-radius: 8px;
-    transition: background 0.2s ease;
-}
-
-.detail-item:hover {
-    background: rgba(0, 0, 0, 0.03);
-}
-
-.detail-label {
-    display: block;
-    font-size: 0.875rem;
-    color: #666;
-    margin-bottom: 0.25rem;
-}
-
-.detail-value {
-    margin: 0;
-    color: #333;
-    font-size: 0.95rem;
-}
-
-.priority-badge,
-.status-badge {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 1rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-}
-
-/* Priority Colors */
-.priority-badge[data-priority="High"] { background: #ffebee; color: #d32f2f; }
-.priority-badge[data-priority="Medium"] { background: #fff3e0; color: #ef6c00; }
-.priority-badge[data-priority="Low"] { background: #e8f5e9; color: #2e7d32; }
-
-/* Status Colors */
-.status-badge[data-status="Open"] { background: #e3f2fd; color: #1976d2; }
-.status-badge[data-status="In Progress"] { background: #fff3e0; color: #ef6c00; }
-.status-badge[data-status="Resolved"] { background: #e8f5e9; color: #2e7d32; }
-
-.attachment-card {
-    margin-top: 1.5rem;
-    padding: 1rem;
-    background: rgba(245, 245, 245, 0.6);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.attachment-link {
-    color: #673ab7;
-    text-decoration: none;
-    transition: all 0.2s ease;
-}
-
-.attachment-link:hover {
-    color: #5e35b1;
-    text-decoration: underline;
-}
-
-@media (max-width: 768px) {
-    .detail-grid {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
-    
 
 
 
 
 
+
+<!--RAISE HELP REQUEST -->
+<!-- Material Icons CDN -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+<!-- Help Request Modal -->
 <!--RAISE HELP REQUEST -->
 <!-- Help Request Modal -->
 <div class="modal fade" id="helpRequestModal" tabindex="-1" aria-labelledby="helpRequestLabel" aria-hidden="true">
@@ -783,13 +786,6 @@
         </div>
     </div>
 </div>
-
-
-
-
-
-
-
 
 
 <!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
