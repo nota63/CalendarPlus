@@ -37,6 +37,7 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
 from django.contrib.auth.hashers import make_password
+from django.core.exceptions import ObjectDoesNotExist
 # Create your views here.
 
 @csrf_exempt
@@ -1884,35 +1885,29 @@ def organization_password_settings(request, org_id):
 
 
 # Set Password AES Protection
-
-@csrf_exempt  # Since we're using AJAX, disable CSRF for now (or use CSRF token in AJAX)
+@csrf_exempt
 def set_organization_password(request, org_id):
-    """Handle AJAX request to set organization password."""
+    """Handle AJAX request to set organization password with security checks."""
     if request.method == "POST":
-        data = json.loads(request.body)  # Get data from AJAX
-        new_password = data.get("password")  # Get password input
+        try:
+            data = json.loads(request.body)
+            new_password = data.get("password")
 
-        if not new_password:
-            return JsonResponse({"success": False, "message": "Password cannot be empty."})
+            if not new_password or len(new_password) < 6:
+                return JsonResponse({"success": False, "message": "Password must be at least 6 characters."})
 
-        organization = Organization.objects.get(id=org_id)
+            organization = Organization.objects.get(id=org_id)
+            org_protection, created = OrganizationProtection.objects.get_or_create(organization=organization)
 
-        # Check if protection entry exists, else create one
-        org_protection, created = OrganizationProtection.objects.get_or_create(
-            organization=organization
-        )
+            org_protection.password = make_password(new_password, hasher="argon2")  # Use Argon2 hashing
+            org_protection.protection_status = True
+            org_protection.save()
 
-        org_protection.password = make_password(new_password)  # Hash the password
-        org_protection.protection_status = True  # Enable protection
-        org_protection.save()
+            return JsonResponse({"success": True, "message": "Password set successfully!"})
 
-        return JsonResponse({"success": True, "message": "Password set successfully!"})
+        except ObjectDoesNotExist:
+            return JsonResponse({"success": False, "message": "Organization not found."})
+        except Exception as e:
+            return JsonResponse({"success": False, "message": f"Error: {str(e)}"})
 
     return JsonResponse({"success": False, "message": "Invalid request method."})
-
-
-
-
-
-
-
