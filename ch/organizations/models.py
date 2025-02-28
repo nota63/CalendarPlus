@@ -2,7 +2,7 @@ from django.db import models
 from accounts.models import Organization, MeetingOrganization
 from django.contrib.auth.models import User
 from django.utils import timezone
-
+from django.utils.timezone import now
 # Create your models here.
 
 
@@ -80,3 +80,64 @@ class RecurringMeeting(models.Model):
         unique_together = ("recurrence_type", "start_date")
 
      
+
+# HELP MODEL TO RAISE QUERIES RELATED TO HELP
+
+class Help(models.Model):
+    HELP_TYPE_CHOICES = [
+        ("BUG", "Bug Report"),
+        ("FEATURE", "Feature Request"),
+        ("ACCOUNT", "Account Issue"),
+        ("BILLING", "Billing Issue"),
+        ("GENERAL", "General Query"),
+        ("SECURITY", "Security Concern"),
+        ("OTHER", "Other"),
+    ]
+
+    STATUS_CHOICES = [
+        ("OPEN", "Open"),
+        ("IN_PROGRESS", "In Progress"),
+        ("RESOLVED", "Resolved"),
+        ("CLOSED", "Closed"),
+    ]
+
+    PRIORITY_CHOICES = [
+        ("LOW", "Low"),
+        ("MEDIUM", "Medium"),
+        ("HIGH", "High"),
+        ("URGENT", "Urgent"),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="help_queries")
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="help_queries")
+    help_type = models.CharField(max_length=20, choices=HELP_TYPE_CHOICES, default="GENERAL")
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default="MEDIUM")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="OPEN")
+    response = models.TextField(blank=True, null=True)  # Admin response field
+    attachment = models.FileField(upload_to="help_attachments/", blank=True, null=True)  # Upload screenshots/logs
+    is_anonymous = models.BooleanField(default=False)  # Allow anonymous queries
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    responded_at = models.DateTimeField(blank=True, null=True)  # Track response time
+    resolved_at = models.DateTimeField(blank=True, null=True)  # Track resolution time
+    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name="assigned_tickets")  # Assign queries to admins
+
+    class Meta:
+        ordering = ["-created_at"]  # Show latest queries first
+
+    def __str__(self):
+        return f"{self.title} - {self.get_status_display()}"
+
+    def mark_as_responded(self):
+        """Mark the query as responded and set response time."""
+        self.status = "IN_PROGRESS"
+        self.responded_at = now()
+        self.save()
+
+    def mark_as_resolved(self):
+        """Mark the query as resolved and set resolution time."""
+        self.status = "RESOLVED"
+        self.resolved_at = now()
+        self.save()
