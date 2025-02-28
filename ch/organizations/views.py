@@ -38,6 +38,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.hashers import check_password
 # Create your views here.
 
 @csrf_exempt
@@ -1939,3 +1940,28 @@ def reset_organization_password(request, org_id):
             return JsonResponse({"success": False, "message": f"Error: {str(e)}"})
 
     return JsonResponse({"success": False, "message": "Invalid request method."})
+
+
+
+
+# MIDDLEWARE REDIRECT & VALIDATE THE PASSWORD
+@login_required
+def validate_org_password(request, org_id):
+    """Render the password input page & handle password validation."""
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            entered_password = data.get("password")
+
+            org_protection = OrganizationProtection.objects.get(organization_id=org_id)
+
+            if check_password(entered_password, org_protection.password):
+                request.session[f"org_access_{org_id}"] = True  # Store access in session
+                return JsonResponse({"success": True, "redirect_url": f"/calendar/org_detail/{org_id}/"})
+
+            return JsonResponse({"success": False, "message": "Incorrect password!"})
+
+        except OrganizationProtection.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Organization not found!"})
+
+    return render(request, "organizations/encrypt/validate_org_password.html", {"org_id": org_id})
