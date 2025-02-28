@@ -36,7 +36,7 @@ from .models import RecurringMeeting
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Help
-
+from django.http import HttpResponseForbidden
 
 # Create your views here.
 
@@ -1851,3 +1851,15 @@ def raise_help_request(request, org_id):
         return JsonResponse({"success": True, "message": "Help request submitted successfully!"})
 
     return JsonResponse({"success": False, "error": "Invalid request method."})
+
+
+# delete the request
+@login_required
+def delete_request(request, org_id,help_id):
+    organization=get_object_or_404(Organization,id=org_id)
+    help=get_object_or_404(Help,organization=organization,user=request.user)
+    user_profile=get_object_or_404(Profile, organization=organization,user=request.user)
+    if not user_profile.is_admin:
+        return HttpResponseForbidden('You are not authorized to delete the requests!')
+    help.delete()
+    return redirect('user_help_queries',org_id=organization.id)

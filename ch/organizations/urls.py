@@ -42,7 +42,8 @@ urlpatterns=[
     path('security_transport_layer/<int:org_id>/',support_transport_layer, name='security_transport_layer'),
     path("user_help_queries/<int:org_id>/", user_help_queries, name="user_help_queries"),
     path("help/query-details/<int:help_id>/", help_query_details, name="help_query_details"),
-    path('ajax-raise-help/<int:org_id>/',raise_help_request, name='ajax_raise_help')
+    path('ajax-raise-help/<int:org_id>/',raise_help_request, name='ajax_raise_help'),
+    path('delete_request/<int:org_id>/<int:help_id>/',delete_request, name='delete_request')
     
 ]
 
