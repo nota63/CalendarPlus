@@ -74,7 +74,7 @@
                                     </button>
                                     <div id="popup-{{ help.id }}" class="action-popup">
                                         <button class="action-item" onclick="openHelpModal({{ help.id }})">
-                                            <i class="bi bi-eye"></i> View Details
+                                            <i class="bi bi-eye"></i> Expand
                                         </button>
                                         <a href="{% url 'delete_request' org_id=organization.id help_id=help.id %}" class="action-item danger">
                                             <i class="bi bi-x-circle"></i> Cancel Request
