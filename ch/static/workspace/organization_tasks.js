@@ -190,6 +190,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const profilePictureInput = document.getElementById("profile_picture");
     const profilePreview = document.getElementById("profile_preview");
     const updateProfileForm = document.getElementById("updateProfileForm");
+    const meetingCount = document.getElementById("meeting_count"); // Meeting count element
+    const eventCount = document.getElementById("event_count"); // Event count element
+    const bookingCount = document.getElementById("booking_count"); // Booking count element
     const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]")?.value; // Get CSRF token
 
     if (!csrfToken) {
@@ -227,6 +230,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 } else {
                     profilePreview.style.display = "none";
                 }
+
+                // ✅ Update counts dynamically
+                meetingCount.textContent = profile.meetings || 0;
+                eventCount.textContent = profile.events || 0;
+                bookingCount.textContent = profile.bookings || 0;
+
             } else {
                 console.error("Failed to fetch profile data:", data.error);
                 alert("Failed to fetch profile data.");

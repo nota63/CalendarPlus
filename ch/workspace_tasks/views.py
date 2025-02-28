@@ -121,6 +121,8 @@ def edit_profile(request, org_id):
                 "full_name": profile.full_name,
                 "profile_picture": profile.profile_picture.url if profile.profile_picture else None,
                 "meetings":meetings,
+                "events":events,
+                'bookings':bookings,
             }
         })
 

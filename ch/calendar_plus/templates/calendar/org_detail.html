@@ -1822,27 +1822,50 @@ My Calendar
 
 <!-- ------------------------------------------------------------------------------------------------------------------------------------------- -->
 <!-- Edit profile -->
- <!-- Bootstrap 5 Modal -->
-<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true" data-org-id="{{ org.id }}">
+ <!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+                <h5 class="modal-title">Edit Profile</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="updateProfileForm" enctype="multipart/form-data">
+                    <!-- Profile Picture Preview -->
                     <div class="mb-3 text-center">
                         <img id="profile_preview" src="" class="rounded-circle mb-2" width="100" style="display:none;">
                     </div>
+
+                    <!-- Profile Picture Upload -->
                     <div class="mb-3">
-                        <label for="profile_picture" class="form-label">Profile Picture</label>
+                        <label class="form-label">Profile Picture</label>
                         <input type="file" class="form-control" id="profile_picture" name="profile_picture">
                     </div>
+
+                    <!-- Full Name Input -->
                     <div class="mb-3">
-                        <label for="full_name" class="form-label">Full Name</label>
+                        <label class="form-label">Full Name</label>
                         <input type="text" class="form-control" id="full_name" name="full_name">
                     </div>
+
+                    <!-- Counts Section -->
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Your Activity</h6>
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Meetings</span> <span id="meeting_count">0</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Events</span> <span id="event_count">0</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Bookings</span> <span id="booking_count">0</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Submit Button -->
                     <button type="submit" class="btn btn-success w-100">Save Changes</button>
                 </form>
             </div>
