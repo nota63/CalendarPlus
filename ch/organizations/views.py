@@ -1855,11 +1855,15 @@ def raise_help_request(request, org_id):
 
 # delete the request
 @login_required
-def delete_request(request, org_id,help_id):
-    organization=get_object_or_404(Organization,id=org_id)
-    help=get_object_or_404(Help,organization=organization,user=request.user)
-    user_profile=get_object_or_404(Profile, organization=organization,user=request.user)
+def delete_request(request, org_id, help_id):
+    organization = get_object_or_404(Organization, id=org_id)
+    user_profile = get_object_or_404(Profile, organization=organization, user=request.user)
+
     if not user_profile.is_admin:
-        return HttpResponseForbidden('You are not authorized to delete the requests!')
-    help.delete()
-    return redirect('user_help_queries',org_id=organization.id)
+        return HttpResponseForbidden("You are not authorized to delete the requests!")
+
+    # Ensure we delete only the specific help request
+    help_request = get_object_or_404(Help, id=help_id, organization=organization)
+    help_request.delete()
+
+    return redirect("user_help_queries", org_id=organization.id)

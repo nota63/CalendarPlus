@@ -9,6 +9,7 @@
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 </head>
 <body>
@@ -19,59 +20,60 @@
         </button>
     </div>
     
-<div class="container mt-5">
-    <h2 class="mb-4">Your Help Queries</h2>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Type</th>
-                <th>Priority</th>
-                <th>Status</th>
-                <th>Created At</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for help in helps %}
-            <tr>
-                <td>{{ help.title }}</td>
-                <td>{{ help.help_type }}</td>
-                <td>
-                    <span class="badge bg-{% if help.priority == 'High' %}danger{% elif help.priority == 'Medium' %}warning{% else %}success{% endif %}">
-                        {{ help.priority }}
-                    </span>
-                </td>
-                <td>
-                    <span class="badge bg-{% if help.status == 'Open' %}primary{% elif help.status == 'In Progress' %}warning{% else %}success{% endif %}">
-                        {{ help.status }}
-                    </span>
-                </td>
-                <td>{{ help.created_at }}</td>
-                <td>
-                    <!-- Three-dot menu button -->
-                    <button class="btn btn-secondary btn-sm" onclick="openMenuPopup({{ help.id }})">
-                        ⋮
-                    </button>
-                    
-                    <!-- Hidden popup menu -->
-                    <div id="popup-{{ help.id }}" class="popup-menu" style="display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 5px; border-radius: 5px;">
-                        <button class="btn btn-info btn-sm" onclick="openHelpModal({{ help.id }})">Details</button>
-                    </div>
 
-                    <div id="popup-{{ help.id }}" class="popup-menu" style="display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 5px; border-radius: 5px;">
-                       <a href="{% url 'delete_request' org_id=organization.id help_id=help.id%}">
-                           <button class="btn btn-info btn-sm">Cancel & Close</button>
-                       </a>
-                    </div>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+    <div class="container mt-5">
+        <h2 class="mb-4">Your Help Queries</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Created At</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for help in helps %}
+                <tr>
+                    <td>{{ help.title }}</td>
+                    <td>{{ help.help_type }}</td>
+                    <td>
+                        <span class="badge bg-{% if help.priority == 'High' %}danger{% elif help.priority == 'Medium' %}warning{% else %}success{% endif %}">
+                            {{ help.priority }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge bg-{% if help.status == 'Open' %}primary{% elif help.status == 'In Progress' %}warning{% else %}success{% endif %}">
+                            {{ help.status }}
+                        </span>
+                    </td>
+                    <td>{{ help.created_at }}</td>
+                    <td>
+                        <!-- Three-dot menu button -->
+                        <button class="btn btn-secondary btn-sm" onclick="openMenuPopup({{ help.id }})">
+                            ⋮
+                        </button>
+                        
+                        <!-- Hidden popup menu -->
+                        <div id="popup-{{ help.id }}" class="popup-menu" style="display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 5px; border-radius: 5px;">
+                            <button class="btn btn-info btn-sm" onclick="openHelpModal({{ help.id }})">Details</button>
+                        </div>
 
-
+                         <!-- Hidden popup menu -->
+                         <div id="popup-{{ help.id }}" class="popup-menu" style="display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 5px; border-radius: 5px;">
+                            <a href="{% url 'delete_request' org_id=organization.id help_id=help.id %}">
+                                <button class="btn btn-info btn-sm" type="submit">Cancel & Close</button>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
 <!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
  <!-- MODALS -->
 
