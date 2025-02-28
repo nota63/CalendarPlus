@@ -38,7 +38,8 @@ urlpatterns=[
     path("generate-embed-code/<int:org_id>/", generate_embed_code, name="generate_embed_code"),
     path('delete-all-meetings/<int:org_id>/',manage_meetings, name='delete_all_meetings'),
     path('initiate_meeting/<int:org_id>/',LaunchRoom.as_view(), name='initiate_meeting'),
-    path('start_meeting/<int:org_id>/',start_meeting, name='start_meeting')
+    path('start_meeting/<int:org_id>/',start_meeting, name='start_meeting'),
+    path('security_transport_layer/<int:org_id>/',support_transport_layer, name='security_transport_layer')
     
 ]
 

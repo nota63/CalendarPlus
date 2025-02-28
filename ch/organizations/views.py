@@ -1758,7 +1758,19 @@ def start_meeting(request,org_id):
     return render(request,'organizations/zeegocloud/zeego_video.html',{'name':username,'organization':organization})
 
 
+# Support for transport layer
+@login_required
+def support_transport_layer(request, org_id):
+    organization = get_object_or_404(Organization, id=org_id)
+    
+    try:
+        profile = Profile.objects.get(user=request.user, organization=organization)
+    except Profile.DoesNotExist:
+        return JsonResponse({'error': 'Profile not found'}, status=404)
 
-
+    if not profile.is_admin:
+        return JsonResponse({'error': 'You are not authorized to perform this action'}, status=403)
+    
+    return render(request, 'organizations/customize/security_layer.html')
 
 
