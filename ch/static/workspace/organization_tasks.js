@@ -178,3 +178,106 @@ function updateTaskStatus(taskId, newStatus) {
         .then(data => console.log("Task updated!", data))
         .catch(error => console.error("Error updating task:", error));
 }
+
+
+// -------------------------------------------------------------------------------------------------------------------
+
+// Edit Profile
+// Edit Profile
+document.addEventListener("DOMContentLoaded", function() {
+    const modal = document.getElementById("editProfileModal");
+    const fullNameInput = document.getElementById("full_name");
+    const profilePictureInput = document.getElementById("profile_picture");
+    const profilePreview = document.getElementById("profile_preview");
+    const updateProfileForm = document.getElementById("updateProfileForm");
+    const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]")?.value; // Get CSRF token
+
+    if (!csrfToken) {
+        console.error("CSRF token not found!");
+    }
+
+    let orgId = window.djangoData?.orgId; // Ensure org_id is dynamically set
+
+    if (!orgId) {
+        console.error("Organization ID is missing!");
+    }
+
+    // Fetch profile details when modal opens
+    modal.addEventListener("show.bs.modal", function() {
+        console.log("Fetching profile data for orgId:", orgId);
+        fetch(`/taskify/ajax-profile-edit/${orgId}/`, {
+            method: "GET",
+            headers: { "X-CSRFToken": csrfToken }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Profile fetch response:", data);
+            if (data.success) {
+                let profile = data.profile;
+                fullNameInput.value = profile.full_name;
+
+                if (profile.profile_picture) {
+                    profilePreview.src = profile.profile_picture;
+                    profilePreview.style.display = "block";
+                } else {
+                    profilePreview.style.display = "none";
+                }
+            } else {
+                console.error("Failed to fetch profile data:", data.error);
+                alert("Failed to fetch profile data.");
+            }
+        })
+        .catch(error => console.error("Error fetching profile:", error));
+    });
+
+    // Handle profile update with image upload
+    updateProfileForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        console.log("Submitting profile update for orgId:", orgId);
+
+        let formData = new FormData(updateProfileForm);
+        formData.append("csrfmiddlewaretoken", csrfToken); // Append CSRF token
+
+        fetch(`/taskify/ajax-profile-edit/${orgId}/`, {
+            method: "POST",
+            body: formData,
+            headers: { "X-CSRFToken": csrfToken }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Profile update response:", data);
+            if (data.success) {
+                alert("Profile updated successfully!");
+                if (data.profile_picture) {
+                    document.getElementById("profile_img_navbar").src = data.profile_picture; // Update navbar image
+                }
+                let bsModal = bootstrap.Modal.getInstance(modal);
+                bsModal.hide(); // Close modal
+            } else {
+                console.error("Error updating profile:", data.error);
+                alert("Error: " + data.error);
+            }
+        })
+        .catch(error => console.error("Error updating profile:", error));
+    });
+
+    // Preview new profile picture before upload
+    profilePictureInput.addEventListener("change", function() {
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            profilePreview.src = e.target.result;
+            profilePreview.style.display = "block";
+        };
+        reader.readAsDataURL(profilePictureInput.files[0]);
+    });
+});

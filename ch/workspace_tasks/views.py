@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from accounts.models import Organization
+from accounts.models import Organization,Profile
 from .models import TaskOrganization
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -7,6 +7,7 @@ import json
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_protect
+from django.contrib.auth.decorators import login_required
 # Workspace Tasks
 
 
@@ -78,3 +79,57 @@ def update_task_status(request, task_id):
         task.status = data["status"]
         task.save()
         return JsonResponse({"message": "Task updated successfully!"})
+
+
+
+# Edit Profile
+import logging
+logger = logging.getLogger(__name__)
+@login_required
+@csrf_protect  
+def edit_profile(request, org_id):
+    """Fetch & update user's profile (profile picture & full name) via AJAX."""
+    
+    organization = get_object_or_404(Organization, id=org_id)
+    user = request.user
+    profile = Profile.objects.filter(user=user, organization=organization).first()
+
+    if not profile:
+        profile = Profile.objects.create(user=user, organization=organization, full_name=user.get_full_name())
+
+    if request.method == "GET":
+        logger.info(f"Fetching profile for user {user} in org {org_id}")
+        return JsonResponse({
+            "success": True,
+            "profile": {
+                "full_name": profile.full_name,
+                "profile_picture": profile.profile_picture.url if profile.profile_picture else None,
+            }
+        })
+
+    elif request.method == "POST":
+        try:
+            full_name = request.POST.get("full_name", "").strip()
+            if full_name:
+                profile.full_name = full_name
+                profile.save(update_fields=["full_name"])
+
+            # Save the profile picture if it's uploaded
+            if "profile_picture" in request.FILES:
+                profile.profile_picture = request.FILES["profile_picture"]
+                profile.save(update_fields=["profile_picture"])  # Ensure it's explicitly saved
+
+            logger.info(f"Profile updated for user {user}: Full Name: {profile.full_name}, Picture Updated: {'Yes' if 'profile_picture' in request.FILES else 'No'}")
+
+            return JsonResponse({
+                "success": True,
+                "message": "Profile updated successfully!",
+                "full_name": profile.full_name,
+                "profile_picture": profile.profile_picture.url if profile.profile_picture else None
+            })
+
+        except Exception as e:
+            logger.error(f"Error updating profile for user {user}: {str(e)}")
+            return JsonResponse({"success": False, "error": str(e)})
+
+    return JsonResponse({"success": False, "error": "Invalid request method"})

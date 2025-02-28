@@ -85,6 +85,11 @@
                 
               </a>
 
+              <!-- Button to Open Modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+    Edit Profile
+</button>
+
 
             <!-- NEW FEATURES -->
 
@@ -1815,6 +1820,35 @@ My Calendar
 </div>
 
 
+<!-- ------------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- Edit profile -->
+ <!-- Bootstrap 5 Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true" data-org-id="{{ org.id }}">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="updateProfileForm" enctype="multipart/form-data">
+                    <div class="mb-3 text-center">
+                        <img id="profile_preview" src="" class="rounded-circle mb-2" width="100" style="display:none;">
+                    </div>
+                    <div class="mb-3">
+                        <label for="profile_picture" class="form-label">Profile Picture</label>
+                        <input type="file" class="form-control" id="profile_picture" name="profile_picture">
+                    </div>
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="full_name" name="full_name">
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
