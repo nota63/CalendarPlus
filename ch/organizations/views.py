@@ -1911,3 +1911,31 @@ def set_organization_password(request, org_id):
             return JsonResponse({"success": False, "message": f"Error: {str(e)}"})
 
     return JsonResponse({"success": False, "message": "Invalid request method."})
+
+
+# RESET ORGANIZATION PASSWORD
+@csrf_exempt
+def reset_organization_password(request, org_id):
+    """Handle AJAX request to reset organization password."""
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            new_password = data.get("new_password")
+
+            if not new_password or len(new_password) < 6:
+                return JsonResponse({"success": False, "message": "Password must be at least 6 characters."})
+
+            organization = Organization.objects.get(id=org_id)
+            org_protection = OrganizationProtection.objects.get(organization=organization)
+
+            org_protection.password = make_password(new_password, hasher="argon2")  # Strong encryption
+            org_protection.save()
+
+            return JsonResponse({"success": True, "message": "Password reset successfully!"})
+
+        except ObjectDoesNotExist:
+            return JsonResponse({"success": False, "message": "Organization not found."})
+        except Exception as e:
+            return JsonResponse({"success": False, "message": f"Error: {str(e)}"})
+
+    return JsonResponse({"success": False, "message": "Invalid request method."})

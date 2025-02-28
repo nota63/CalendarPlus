@@ -45,7 +45,8 @@ urlpatterns=[
     path('ajax-raise-help/<int:org_id>/',raise_help_request, name='ajax_raise_help'),
     path('delete_request/<int:org_id>/<int:help_id>/',delete_request, name='delete_request'),
     path('organization_password_seetings/<int:org_id>/',organization_password_settings, name='organization_password_settings'),
-    path('set_organization_password/<int:org_id>/',set_organization_password, name='set_organization_password')
+    path('set_organization_password/<int:org_id>/',set_organization_password, name='set_organization_password'),
+    path('reset_organization_password/<int:org_id>/',reset_organization_password, name='reset_organization_password')
     
 ]
 
