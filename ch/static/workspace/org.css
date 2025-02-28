@@ -2178,3 +2178,53 @@ a {
     transition: none !important;
     animation-duration: 0s !important;
   }
+
+
+/* Manage Profile  */
+.glass-card {
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.glass-input {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.glass-input:focus {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: #80cbc4;
+    box-shadow: 0 0 0 3px rgba(128, 203, 196, 0.2);
+}
+
+.btn-teal {
+    background: #26a69a;
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-teal:hover {
+    background: #00897b;
+    transform: translateY(-1px);
+}
+
+.text-teal-600 {
+    color: #26a69a;
+}
+
+.integration-card {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.integration-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.bg-teal-10 {
+    background: rgba(128, 203, 196, 0.1);
+}
