@@ -1771,6 +1771,6 @@ def support_transport_layer(request, org_id):
     if not profile.is_admin:
         return JsonResponse({'error': 'You are not authorized to perform this action'}, status=403)
     
-    return render(request, 'organizations/customize/security_layer.html')
+    return render(request, 'organizations/customize/security_layer.html',{'organization':organization})
 
 

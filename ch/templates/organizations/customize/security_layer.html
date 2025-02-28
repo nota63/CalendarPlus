@@ -5,82 +5,175 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oops! Something Went Wrong</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(to right, #ff758c, #ff7eb3);
-            text-align: center;
-            padding: 50px;
-            color: #fff;
-        }
-        .error-container {
-            max-width: 500px;
-            margin: auto;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-            animation: fadeIn 1s ease-in-out;
-        }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-        p {
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
-        .alert {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 15px;
-            border-radius: 5px;
-            font-size: 14px;
-            animation: shake 0.5s ease-in-out;
-        }
-        .btn {
-            display: inline-block;
-            margin: 10px;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: 0.3s;
-        }
-        .btn-back {
-            background: #ff4d6d;
-            color: white;
-        }
-        .btn-help {
-            background: #fff;
-            color: #ff4d6d;
-        }
-        .btn:hover {
-            opacity: 0.8;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap');
+
+        :root {
+            --primary: #4ECDC4;
+            --secondary: #45B7D1;
+            --glass: rgba(255, 255, 255, 0.15);
         }
 
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #4ECDC4 0%, #45B7D1 100%);
+            display: grid;
+            place-items: center;
+            margin: 0;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
         }
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-            100% { transform: translateX(0); }
+
+        .floating-shapes div {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 20s infinite linear;
+        }
+
+        .error-container {
+            position: relative;
+            max-width: 500px;
+            width: 90%;
+            padding: 40px;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
+        }
+
+        .error-container:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            color: white;
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        p {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .error-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            animation: pulse 2s infinite;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary {
+            background: var(--glass);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(10px, 10px); }
+            50% { transform: translate(-10px, 20px); }
+            75% { transform: translate(-20px, -10px); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Floating shapes background */
+        .floating-shapes div:nth-child(1) {
+            width: 150px;
+            height: 150px;
+            top: 20%;
+            left: 10%;
+        }
+        .floating-shapes div:nth-child(2) {
+            width: 100px;
+            height: 100px;
+            top: 60%;
+            right: 15%;
+        }
+        .floating-shapes div:nth-child(3) {
+            width: 80px;
+            height: 80px;
+            bottom: 20%;
+            left: 30%;
         }
     </style>
 </head>
 <body>
-
-    <div class="error-container">
-        <h1>There’s been a bit of a hitch…</h1>
-        <p>We’re not quite sure what’s gone wrong. You can go back or try looking in our Help Centre if you need a hand. or clear the cache of {{organization.name}}</p>
-        <div class="alert">⚠️ Something unexpected happened!</div>
-        <button class="btn btn-back" onclick="history.back()">⬅ Go Back</button>
-        <a href="#" class="btn btn-help">❓ Visit Help Center</a>
+    <div class="floating-shapes">
+        <div></div>
+        <div></div>
+        <div></div>
     </div>
 
+    <div class="error-container">
+        <div class="error-icon">🚨</div>
+        <h1>Unexpected Hiccup Detected</h1>
+        <p>Our digital gremlins are working overtime to fix this glitch. In the meantime, you might want to:</p>
+        <p>▸ Refresh the page<br>
+           ▸ Clear {{organization.name}}'s cache<br>
+           ▸ Check our status page</p>
+        
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="history.back()">
+                ↩ Return to Safety
+            </button>
+            <button class="btn btn-secondary">
+                📚 Knowledge Base
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Add dynamic floating effect to background shapes
+        document.querySelectorAll('.floating-shapes div').forEach((shape, index) => {
+            const baseX = Math.random() * 20 - 10;
+            const baseY = Math.random() * 20 - 10;
+            shape.style.animation = `float ${15 + index * 5}s infinite linear`;
+        });
+    </script>
 </body>
 </html>
