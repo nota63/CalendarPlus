@@ -154,7 +154,7 @@ SECRET_KEY = base64.urlsafe_b64encode(os.urandom(32))
 cipher = Fernet(SECRET_KEY)
 
 class OrganizationProtection(models.Model):
-    organization = models.OneToOneField('your_app.Organization', on_delete=models.CASCADE)
+    organization = models.OneToOneField(Organization, on_delete=models.CASCADE)
     encrypted_password = models.TextField()  # AES encrypted password
     protection_status = models.BooleanField(default=False)  # Default is False
     failed_attempts = models.IntegerField(default=0)  # Track failed login attempts

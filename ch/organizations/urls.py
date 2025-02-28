@@ -43,7 +43,8 @@ urlpatterns=[
     path("user_help_queries/<int:org_id>/", user_help_queries, name="user_help_queries"),
     path("help/query-details/<int:help_id>/", help_query_details, name="help_query_details"),
     path('ajax-raise-help/<int:org_id>/',raise_help_request, name='ajax_raise_help'),
-    path('delete_request/<int:org_id>/<int:help_id>/',delete_request, name='delete_request')
+    path('delete_request/<int:org_id>/<int:help_id>/',delete_request, name='delete_request'),
+    path('organization_password_seetings/<int:org_id>/',organization_password_settings, name='organization_password_settings'),
     
 ]
 

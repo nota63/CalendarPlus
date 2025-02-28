@@ -431,6 +431,33 @@
                     </div>
                 </div>
 
+                <!-- encrypt workspace -->
+                <div class="col-md-6">
+                    <div class="card h-100 p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="material-icons-round me-2 text-primary">visibility</i>
+                            <h5 class="mb-0">Encrypt Workspace</h5>
+                        </div>
+                        <p class="text-muted small mb-4">
+                           Encrypt Your workspace with a secured super AES Encryption And Prevent Anauthorized Access 
+                        </p>
+                        <div class="d-flex align-items-center mb-4">
+                            <span class="status-indicator"></span>
+                            <span class="text-success fw-medium">Powered By AES</span>
+                        </div>
+                        <a href="{% url 'organization_password_settings' org_id=organization.id%}">
+                            <button class="btn btn-outline-primary w-100">Enable AES Protection</button>
+                        </a>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
                 <!-- Workspace Status Card -->
                 <div class="col-md-6">
                     <div class="card h-100 p-4">

@@ -32,10 +32,9 @@ from django.utils.html import strip_tags
 from accounts.models import ProjectEmployeeAssignment, Project, ProjectManagerAssignment
 from groups.models import Group, GroupMember
 import logging
-from .models import RecurringMeeting
+from .models import RecurringMeeting,Help,OrganizationProtection
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Help
 from django.http import HttpResponseForbidden
 
 # Create your views here.
@@ -1867,4 +1866,23 @@ def delete_request(request, org_id, help_id):
     help_request.delete()
 
     return redirect("user_help_queries", org_id=organization.id)
+
+
+
+# ENCRYPT THE WORKSPACE 
+
+def organization_password_settings(request, org_id):
+    """Fetch stored password & show in template"""
+    org_protection = get_object_or_404(OrganizationProtection, organization_id=org_id)
+    
+    context = {
+        "organization": org_protection.organization,
+        "protection_status": org_protection.protection_status,
+    }
+    return render(request, "organizations/encrypt/organization_password_settings.html", context)
+
+
+
+
+
 
