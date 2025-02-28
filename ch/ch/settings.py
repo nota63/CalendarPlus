@@ -130,6 +130,11 @@ MIDDLEWARE = [
 
 ]
 
+# settings.py
+ORG_PASSWORD_SECRET_KEY = "PjLfYgjup0lHhqJXrfaLO4TzjfvG8rDxURhul1qZJ8U="  # Generate once and store securely
+
+
+
 ROOT_URLCONF = 'ch.urls'
 
 TEMPLATES = [

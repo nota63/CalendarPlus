@@ -1886,9 +1886,17 @@ def organization_password_settings(request, org_id):
 
 
 # Set Password AES Protection
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.hashers import make_password
+from .models import Organization, OrganizationProtection
+
+# 💖 Set Organization Password (Securely)
 @csrf_exempt
 def set_organization_password(request, org_id):
-    """Handle AJAX request to set organization password with security checks."""
+    """Securely set an organization's password."""
     if request.method == "POST":
         try:
             data = json.loads(request.body)
@@ -1900,7 +1908,7 @@ def set_organization_password(request, org_id):
             organization = Organization.objects.get(id=org_id)
             org_protection, created = OrganizationProtection.objects.get_or_create(organization=organization)
 
-            org_protection.password = make_password(new_password, hasher="argon2")  # Use Argon2 hashing
+            org_protection.set_password(new_password)  # Use model's hashing method
             org_protection.protection_status = True
             org_protection.save()
 
@@ -1913,11 +1921,10 @@ def set_organization_password(request, org_id):
 
     return JsonResponse({"success": False, "message": "Invalid request method."})
 
-
-# RESET ORGANIZATION PASSWORD
+# 💖 Reset Organization Password (Securely)
 @csrf_exempt
 def reset_organization_password(request, org_id):
-    """Handle AJAX request to reset organization password."""
+    """Securely reset an organization's password."""
     if request.method == "POST":
         try:
             data = json.loads(request.body)
@@ -1929,7 +1936,7 @@ def reset_organization_password(request, org_id):
             organization = Organization.objects.get(id=org_id)
             org_protection = OrganizationProtection.objects.get(organization=organization)
 
-            org_protection.password = make_password(new_password, hasher="argon2")  # Strong encryption
+            org_protection.reset_password(new_password)  # Use model's reset method
             org_protection.save()
 
             return JsonResponse({"success": True, "message": "Password reset successfully!"})
@@ -1941,27 +1948,56 @@ def reset_organization_password(request, org_id):
 
     return JsonResponse({"success": False, "message": "Invalid request method."})
 
-
-
-
 # MIDDLEWARE REDIRECT & VALIDATE THE PASSWORD
+from cryptography.fernet import Fernet
+import base64
+import os
+
+# Load the same SECRET_KEY used in models
+from django.conf import settings
+from cryptography.fernet import Fernet
+# Configure logging for debugging
+logger = logging.getLogger(__name__)
+
+# Load cipher with a fixed secret key
+cipher = Fernet(settings.ORG_PASSWORD_SECRET_KEY.encode())
 @login_required
 def validate_org_password(request, org_id):
-    """Render the password input page & handle password validation."""
+    """Render password input page & handle validation securely."""
+    logger.info(f"🔹 Received request for org_id: {org_id}")
+
+    # Fetch organization protection object
+    org_protection = get_object_or_404(OrganizationProtection, organization_id=org_id)
+
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-            entered_password = data.get("password")
+            entered_password = data.get("password", "").strip()
 
-            org_protection = OrganizationProtection.objects.get(organization_id=org_id)
+            if not entered_password:
+                logger.warning("⚠️ Empty password entered!")
+                return JsonResponse({"success": False, "message": "Password cannot be empty!"})
 
-            if check_password(entered_password, org_protection.password):
-                request.session[f"org_access_{org_id}"] = True  # Store access in session
+            logger.info(f"🔹 Entered Password: {entered_password}")
+
+            # Debugging: Show if the org has a stored hashed password
+            if org_protection.hashed_password:
+                logger.info("🔐 Hashed Password Found (Stored in DB)")
+            else:
+                logger.error("❌ No password found for this organization!")
+                return JsonResponse({"success": False, "message": "No password set for this organization!"})
+
+            # Check entered password using Django's secure password check
+            if check_password(entered_password, org_protection.hashed_password):
+                request.session[f"org_access_{org_id}"] = True
+                logger.info("✅ Password matched! Granting access.")
                 return JsonResponse({"success": True, "redirect_url": f"/calendar/org_detail/{org_id}/"})
+            else:
+                logger.warning("❌ Incorrect password entered!")
+                return JsonResponse({"success": False, "message": "Incorrect password!"})
 
-            return JsonResponse({"success": False, "message": "Incorrect password!"})
-
-        except OrganizationProtection.DoesNotExist:
-            return JsonResponse({"success": False, "message": "Organization not found!"})
+        except json.JSONDecodeError:
+            logger.error("❌ Invalid JSON received in request!")
+            return JsonResponse({"success": False, "message": "Invalid data format!"})
 
     return render(request, "organizations/encrypt/validate_org_password.html", {"org_id": org_id})

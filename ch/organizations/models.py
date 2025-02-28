@@ -8,6 +8,8 @@ from django.utils.crypto import get_random_string
 from cryptography.fernet import Fernet
 import base64
 import os
+from django.conf import settings
+from django.contrib.auth.hashers import make_password, check_password
 # Create your models here.
 
 
@@ -151,29 +153,33 @@ class Help(models.Model):
 
 # Generate a unique key for encryption (Store this securely)
 SECRET_KEY = base64.urlsafe_b64encode(os.urandom(32))
-cipher = Fernet(SECRET_KEY)
+# cipher = Fernet(SECRET_KEY)
+
+# Use the stored key from settings
+cipher = Fernet(settings.ORG_PASSWORD_SECRET_KEY.encode())
+
+from django.db import models
+from django.contrib.auth.hashers import make_password, check_password
+from django.utils.crypto import get_random_string
+
+from .models import Organization  # Import Organization model
 
 class OrganizationProtection(models.Model):
-    organization = models.OneToOneField(Organization, on_delete=models.CASCADE)
-    encrypted_password = models.TextField()  # AES encrypted password
-    protection_status = models.BooleanField(default=False)  # Default is False
-    failed_attempts = models.IntegerField(default=0)  # Track failed login attempts
-    unlock_time = models.DateTimeField(null=True, blank=True)  # Auto-unlock after timeout
-    reset_token = models.CharField(max_length=50, null=True, blank=True)  # Reset token for admin
+    organization = models.OneToOneField(Organization, on_delete=models.CASCADE,null=True,blank=True)
+    hashed_password = models.CharField(max_length=255,null=True,blank=True)  # Store securely hashed password
+    protection_status = models.BooleanField(default=False,null=True,blank=True)
+    failed_attempts = models.IntegerField(default=0,null=True,blank=True)
+    unlock_time = models.DateTimeField(null=True,)
+    reset_token = models.CharField(max_length=50, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def set_password(self, raw_password):
-        """Encrypt and store password"""
-        encrypted = cipher.encrypt(raw_password.encode())
-        self.encrypted_password = encrypted.decode()
+        """Hash and store password securely"""
+        self.hashed_password = make_password(raw_password, hasher="argon2")  # Argon2 is stronger
 
     def check_password(self, raw_password):
-        """Verify encrypted password"""
-        try:
-            decrypted = cipher.decrypt(self.encrypted_password.encode()).decode()
-            return decrypted == raw_password
-        except:
-            return False  # If decryption fails, password is incorrect
+        """Verify hashed password"""
+        return check_password(raw_password, self.hashed_password)
 
     def generate_reset_token(self):
         """Generate a secure reset token"""
@@ -181,12 +187,9 @@ class OrganizationProtection(models.Model):
         return self.reset_token
 
     def reset_password(self, new_password):
-        """Reset password using a new one"""
+        """Reset password securely"""
         self.set_password(new_password)
         self.reset_token = None  # Remove reset token after reset
 
     def __str__(self):
         return f"Protection for {self.organization.name}"
-
-
-
