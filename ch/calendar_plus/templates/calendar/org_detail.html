@@ -71,25 +71,19 @@
          </a>
 
 
-
-            
-
-
-
-            <a href="{% url 'view_edit_profile' org_id=organization.id %}"
+              <a href="#"
                  class="flex items-center space-x-2 text-gray-800 transition duration-300 hover:text-blue-500">
                  <span class="material-icons text-blue-500">person</span>
                  <span class="font-medium text-[14px]" style="font-family: 'Inter', sans-serif;">
-                    Manage Profile
+                    <button type="button" class="flex items-center space-x-2 text-gray-800 transition duration-300 hover:text-blue-500" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                       Manage Profile
+                     </button>
                 </span>
                 
               </a>
 
-              <!-- Button to Open Modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-    Edit Profile
-</button>
-
+             
+           
 
             <!-- NEW FEATURES -->
 
@@ -269,13 +263,17 @@
             </span>
           </a>
 
-            <a href="{% url 'view_edit_profile' org_id=organization.id %}"
-               class="flex items-center space-x-2 text-gray-800 transition duration-300 hover:text-blue-500">
-               <span class="material-icons text-blue-500">person</span>
-               <span class="font-medium text-[14px]" style="font-family: 'Inter', sans-serif;">
-                  Manage Profile
-              </span>
-           </a>
+          <a href="#"
+          class="flex items-center space-x-2 text-gray-800 transition duration-300 hover:text-blue-500">
+          <span class="material-icons text-blue-500">person</span>
+          <span class="font-medium text-[14px]" style="font-family: 'Inter', sans-serif;">
+             <button type="button" class="flex items-center space-x-2 text-gray-800 transition duration-300 hover:text-blue-500" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                Manage Profile
+              </button>
+         </span>
+         
+       </a>
+
 
 
            <a href="{% url 'project_views_others' organization.id %}" 
@@ -434,13 +432,17 @@ My Calendar
 
 
 
-       <a href="{% url 'view_edit_profile' org_id=organization.id %}"
+       <a href="#"
        class="flex items-center space-x-2 text-gray-800 transition duration-300 hover:text-blue-500">
        <span class="material-icons text-blue-500">person</span>
        <span class="font-medium text-[14px]" style="font-family: 'Inter', sans-serif;">
-          Manage Profile
+          <button type="button" class="flex items-center space-x-2 text-gray-800 transition duration-300 hover:text-blue-500" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+             Manage Profile
+           </button>
       </span>
-   </a>
+      
+    </a>
+
 
 
    <a href="{% url 'organization_holidays' organization.id %}" 
@@ -1907,7 +1909,7 @@ My Calendar
                             <div class="row g-3 mb-4">
                                 <div class="col-md-6">
                                     <div class="integration-card p-3 rounded-3 d-flex align-items-center">
-                                        <img src="https://cdn.worldvectorlogo.com/logos/google-calendar-2020.svg" class="me-3" width="40">
+                                        <img src="https://th.bing.com/th/id/OIP.jLv9vlFObM9lOmbUG7psKwHaEK?rs=1&pid=ImgDetMain" class="me-3" width="40">
                                         <div>
                                             <p class="mb-0 fw-bold">Google Calendar</p>
                                             <small class="text-success">Available to Connect</small>
