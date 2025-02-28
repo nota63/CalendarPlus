@@ -14,66 +14,492 @@
 </head>
 <body>
 
-    <div class="d-flex justify-content-end mb-3">
-        <button class="btn btn-primary d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#helpRequestModal">
-            <i class="bi bi-life-preserver me-2"></i> Raise Help Request
-        </button>
+    <div class="help-requests-container">
+        <!-- Floating Action Button -->
+        <div class="fab-container">
+            <button class="btn btn-primary fab" data-bs-toggle="modal" data-bs-target="#helpRequestModal">
+                <i class="bi bi-plus-lg"></i> New Request
+            </button>
+        </div>
+    
+        <div class="glass-card">
+            <div class="header-section">
+                <h2 class="page-title">Support Requests</h2>
+                <div class="search-filter">
+                    <input type="text" class="form-control search-input" placeholder="Search requests...">
+                </div>
+            </div>
+    
+            <div class="table-responsive">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th class="col-title">Title</th>
+                            <th class="col-type">Type</th>
+                            <th class="col-priority">Priority</th>
+                            <th class="col-status">Status</th>
+                            <th class="col-date">Created</th>
+                            <th class="col-actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for help in helps %}
+                        <tr class="table-row">
+                            <td>{{ help.title }}</td>
+                            <td>
+                                <span class="type-badge">
+                                    {{ help.help_type }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="priority-badge priority-{{ help.priority|lower }}">
+                                    {{ help.priority }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-indicator status-{{ help.status|lower|cut:' ' }}">
+                                    {{ help.status }}
+                                </span>
+                            </td>
+                            <td>{{ help.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                <div class="action-menu">
+                                    <button class="icon-btn" onclick="openMenuPopup({{ help.id }})">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <div id="popup-{{ help.id }}" class="action-popup">
+                                        <button class="action-item" onclick="openHelpModal({{ help.id }})">
+                                            <i class="bi bi-eye"></i> View Details
+                                        </button>
+                                        <a href="{% url 'delete_request' org_id=organization.id help_id=help.id %}" class="action-item danger">
+                                            <i class="bi bi-x-circle"></i> Cancel Request
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     
+  
 
-    <div class="container mt-5">
-        <h2 class="mb-4">Your Help Queries</h2>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Type</th>
-                    <th>Priority</th>
-                    <th>Status</th>
-                    <th>Created At</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for help in helps %}
-                <tr>
-                    <td>{{ help.title }}</td>
-                    <td>{{ help.help_type }}</td>
-                    <td>
-                        <span class="badge bg-{% if help.priority == 'High' %}danger{% elif help.priority == 'Medium' %}warning{% else %}success{% endif %}">
-                            {{ help.priority }}
-                        </span>
-                    </td>
-                    <td>
-                        <span class="badge bg-{% if help.status == 'Open' %}primary{% elif help.status == 'In Progress' %}warning{% else %}success{% endif %}">
-                            {{ help.status }}
-                        </span>
-                    </td>
-                    <td>{{ help.created_at }}</td>
-                    <td>
-                        <!-- Three-dot menu button -->
-                        <button class="btn btn-secondary btn-sm" onclick="openMenuPopup({{ help.id }})">
-                            ⋮
-                        </button>
-                        
-                        <!-- Hidden popup menu -->
-                        <div id="popup-{{ help.id }}" class="popup-menu" style="display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 5px; border-radius: 5px;">
-                            <button class="btn btn-info btn-sm" onclick="openHelpModal({{ help.id }})">Details</button>
-                        </div>
 
-                         <!-- Hidden popup menu -->
-                         <div id="popup-{{ help.id }}" class="popup-menu" style="display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 5px; border-radius: 5px;">
-                            <a href="{% url 'delete_request' org_id=organization.id help_id=help.id %}">
-                                <button class="btn btn-info btn-sm" type="submit">Cancel & Close</button>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<section class="help-center-modern">
+    <div class="help-header glass-bg">
+        <h2 class="help-title">How can we help you today?</h2>
+        <p class="help-subtitle">Explore our knowledge base or ask our support team</p>
+        
+        <div class="search-container">
+            <div class="search-bar glass-bg">
+                <i class="bi bi-search search-icon"></i>
+                <input 
+                    type="text" 
+                    id="modernSearch" 
+                    placeholder="Ask anything... (e.g. channels, emoji, reset password)"
+                    class="search-input"
+                >
+                <button class="search-button bg-deep-purple-500">
+                    Search
+                    <i class="bi bi-arrow-right-short"></i>
+                </button>
+            </div>
+        </div>
     </div>
+
+    <div class="category-grid">
+        <a href="#" class="category-card glass-bg">
+            <i class="bi bi-rocket-takeoff category-icon"></i>
+            <h3>Getting Started</h3>
+            <p>Begin your CalendarPlus journey</p>
+        </a>
+        
+        <a href="#" class="category-card glass-bg">
+            <i class="bi bi-calendar-week category-icon"></i>
+            <h3>Using CalendarPlus</h3>
+            <p>Master scheduling & integrations</p>
+        </a>
+
+        <a href="#" class="category-card glass-bg">
+            <i class="bi bi-person-circle category-icon"></i>
+            <h3>Profile & Preferences</h3>
+            <p>Customize your experience</p>
+        </a>
+
+        <a href="#" class="category-card glass-bg">
+            <i class="bi bi-puzzle category-icon"></i>
+            <h3>Add Tools to {{ organization.name }}</h3>
+            <p>Expand your workspace capabilities</p>
+        </a>
+
+        <a href="#" class="category-card glass-bg">
+            <i class="bi bi-shield-lock category-icon"></i>
+            <h3>{{ organization.name }} Administration</h3>
+            <p>Manage permissions & settings</p>
+        </a>
+
+        <a href="#" class="category-card glass-bg">
+            <i class="bi bi-film category-icon"></i>
+            <h3>CalendarPlus Tutorials</h3>
+            <p>Video guides & walkthroughs</p>
+        </a>
+    </div>
+</section>
+
+<style>
+.help-center-modern {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
+
+.glass-bg {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+}
+
+.help-header {
+    text-align: center;
+    padding: 3rem 2rem;
+    margin-bottom: 2rem;
+}
+
+.help-title {
+    font-size: 2.25rem;
+    color: #2d2d2d;
+    margin-bottom: 1rem;
+}
+
+.help-subtitle {
+    color: #616161;
+    margin-bottom: 2.5rem;
+}
+
+.search-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    gap: 8px;
+}
+
+.search-icon {
+    color: #757575;
+    margin-left: 1rem;
+}
+
+.search-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 1rem;
+    font-size: 1rem;
+}
+
+.search-input:focus {
+    outline: none;
+}
+
+.search-button {
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s ease;
+}
+
+.search-button:hover {
+    transform: translateY(-1px);
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.category-card {
+    padding: 2rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.category-icon {
+    font-size: 1.75rem;
+    color: #673ab7;
+    margin-bottom: 1rem;
+}
+
+.category-card h3 {
+    color: #424242;
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+}
+
+.category-card p {
+    color: #616161;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.bg-deep-purple-500 { background: #673ab7; }
+
+
+/* Help request container */
+:root {
+    --primary-color: #673ab7;
+    --primary-hover: #5e35b1;
+    --text-primary: #2d2d2d;
+    --text-secondary: #616161;
+    --glass-bg: rgba(255, 255, 255, 0.9);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+}
+
+.help-requests-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+/* Floating Action Button */
+.fab-container {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 100;
+}
+
+.fab {
+    padding: 1rem 1.5rem;
+    border-radius: 2rem;
+    box-shadow: 0 4px 12px rgba(103, 58, 183, 0.25);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.fab:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(103, 58, 183, 0.3);
+}
+
+/* Glass Card Container */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    border-radius: 1rem;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow);
+    padding: 2rem;
+}
+
+/* Header Section */
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    font-size: 1.75rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.search-filter {
+    width: 300px;
+}
+
+.search-input {
+    background: rgba(245, 245, 245, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(103, 58, 183, 0.1);
+}
+
+/* Modern Table Styling */
+.modern-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: transparent;
+}
+
+.modern-table thead {
+    background: rgba(245, 245, 245, 0.8);
+    border-radius: 0.75rem;
+}
+
+.modern-table th {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.modern-table td {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.table-row:hover {
+    background: rgba(245, 245, 245, 0.4);
+}
+
+/* Badges and Indicators */
+.type-badge {
+    background: rgba(103, 58, 183, 0.1);
+    color: var(--primary-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.priority-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.priority-high { background: #ffebee; color: #d32f2f; }
+.priority-medium { background: #fff3e0; color: #ef6c00; }
+.priority-low { background: #e8f5e9; color: #2e7d32; }
+
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+}
+
+.status-indicator::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.status-open::before { background: #1976d2; }
+.status-inprogress::before { background: #ffa000; }
+.status-resolved::before { background: #388e3c; }
+
+/* Action Menu */
+.action-menu {
+    position: relative;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.action-popup {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 0.5rem;
+    min-width: 160px;
+    z-index: 10;
+    display: none;
+}
+
+.action-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    background: none;
+    border: none;
+    text-align: left;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.action-item:hover {
+    background: #f5f5f5;
+}
+
+.action-item.danger {
+    color: #d32f2f;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header-section {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
     
+    .search-filter {
+        width: 100%;
+    }
+    
+    .modern-table th,
+    .modern-table td {
+        padding: 1rem;
+    }
+    
+    .fab {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.875rem;
+    }
+}
+
+
+</style>
+
+
+
 <!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
  <!-- MODALS -->
 
