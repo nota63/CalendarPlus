@@ -35,7 +35,7 @@ import logging
 from .models import RecurringMeeting
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from .models import Help
 
 
 # Create your views here.
@@ -1774,3 +1774,45 @@ def support_transport_layer(request, org_id):
     return render(request, 'organizations/customize/security_layer.html',{'organization':organization})
 
 
+# User help queries
+@login_required
+def user_help_queries(request, org_id):
+    """Fetches all help queries raised by the user in the given organization."""
+    organization = get_object_or_404(Organization, id=org_id)
+    helps = Help.objects.filter(user=request.user, organization=organization).order_by("-created_at")
+
+    # Send only required fields
+    data = [
+        {
+            "id": help.id,
+            "title": help.title,
+            "help_type": help.get_help_type_display(),
+            "priority": help.get_priority_display(),
+            "status": help.get_status_display(),
+            "created_at": help.created_at.strftime("%Y-%m-%d %H:%M"),
+        }
+        for help in helps
+    ]
+
+    return render(request, "organizations/help/user_help_queries.html", {"helps": data})
+
+
+# fetch help details
+@login_required
+def help_query_details(request, help_id):
+    """Fetches full details of a help query."""
+    help_query = get_object_or_404(Help, id=help_id, user=request.user)
+
+    data = {
+        "title": help_query.title,
+        "help_type": help_query.get_help_type_display(),
+        "priority": help_query.get_priority_display(),
+        "status": help_query.get_status_display(),
+        "description": help_query.description,
+        "response": help_query.response,
+        "created_at": help_query.created_at.strftime("%Y-%m-%d %H:%M"),
+        "resolved_at": help_query.resolved_at.strftime("%Y-%m-%d %H:%M") if help_query.resolved_at else None,
+        "attachment": help_query.attachment.url if help_query.attachment else None,
+    }
+    
+    return JsonResponse(data)

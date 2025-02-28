@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Queries</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="mb-4">Your Help Queries</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Created At</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for help in helps %}
+            <tr>
+                <td>{{ help.title }}</td>
+                <td>{{ help.help_type }}</td>
+                <td><span class="badge bg-{% if help.priority == 'High' %}danger{% elif help.priority == 'Medium' %}warning{% else %}success{% endif %}">
+                    {{ help.priority }}</span>
+                </td>
+                <td><span class="badge bg-{% if help.status == 'Open' %}primary{% elif help.status == 'In Progress' %}warning{% else %}success{% endif %}">
+                    {{ help.status }}</span>
+                </td>
+                <td>{{ help.created_at }}</td>
+                <td>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            ⋮
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="showHelpDetails({{ help.id }})">Details</a></li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal for showing Help Details -->
+<div class="modal fade" id="helpDetailModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="helpModalLabel">Help Query Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Title:</strong> <span id="helpTitle"></span></p>
+                <p><strong>Type:</strong> <span id="helpType"></span></p>
+                <p><strong>Priority:</strong> <span id="helpPriority"></span></p>
+                <p><strong>Status:</strong> <span id="helpStatus"></span></p>
+                <p><strong>Description:</strong> <span id="helpDescription"></span></p>
+                <p><strong>Response:</strong> <span id="helpResponse"></span></p>
+                <p><strong>Created At:</strong> <span id="helpCreatedAt"></span></p>
+                <p><strong>Resolved At:</strong> <span id="helpResolvedAt"></span></p>
+                <p id="helpAttachmentWrapper" style="display: none;">
+                    <strong>Attachment:</strong> <a id="helpAttachment" href="#" target="_blank">View</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showHelpDetails(helpId) {
+    fetch(`/organizations/help/query-details/${helpId}/`)
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("helpTitle").innerText = data.title;
+        document.getElementById("helpType").innerText = data.help_type;
+        document.getElementById("helpPriority").innerText = data.priority;
+        document.getElementById("helpStatus").innerText = data.status;
+        document.getElementById("helpDescription").innerText = data.description;
+        document.getElementById("helpResponse").innerText = data.response || "No response yet";
+        document.getElementById("helpCreatedAt").innerText = data.created_at;
+        document.getElementById("helpResolvedAt").innerText = data.resolved_at || "Not resolved yet";
+        
+        if (data.attachment) {
+            document.getElementById("helpAttachment").href = data.attachment;
+            document.getElementById("helpAttachmentWrapper").style.display = "block";
+        } else {
+            document.getElementById("helpAttachmentWrapper").style.display = "none";
+        }
+
+        var helpModal = new bootstrap.Modal(document.getElementById("helpDetailModal"));
+        helpModal.show();
+    })
+    .catch(error => console.error("Error fetching help details:", error));
+}
+</script>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>
