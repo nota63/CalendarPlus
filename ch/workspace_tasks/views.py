@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from accounts.models import Organization,Profile
+from accounts.models import Organization,Profile,MeetingOrganization,EventOrganization,BookingOrganization
 from .models import TaskOrganization
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 # Workspace Tasks
 
 
@@ -85,6 +86,7 @@ def update_task_status(request, task_id):
 # Edit Profile
 import logging
 logger = logging.getLogger(__name__)
+
 @login_required
 @csrf_protect  
 def edit_profile(request, org_id):
@@ -97,6 +99,20 @@ def edit_profile(request, org_id):
     if not profile:
         profile = Profile.objects.create(user=user, organization=organization, full_name=user.get_full_name())
 
+    # meetings count
+    meetings = MeetingOrganization.objects.filter(
+         Q(user=user) | Q(invitee=user, organization=organization)
+    ).count()
+     
+    #events count
+    events=EventOrganization.objects.filter(
+        user=user,organization=organization
+    ).count()
+    # bookings count
+    bookings = BookingOrganization.objects.filter(invitee=user,organization=organization).count()
+
+
+
     if request.method == "GET":
         logger.info(f"Fetching profile for user {user} in org {org_id}")
         return JsonResponse({
@@ -104,6 +120,7 @@ def edit_profile(request, org_id):
             "profile": {
                 "full_name": profile.full_name,
                 "profile_picture": profile.profile_picture.url if profile.profile_picture else None,
+                "meetings":meetings,
             }
         })
 
