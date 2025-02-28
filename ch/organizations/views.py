@@ -1965,6 +1965,8 @@ def reset_organization_password(request, org_id):
 # MIDDLEWARE REDIRECT & VALIDATE THE PASSWORD
 @login_required
 def validate_org_password(request, org_id):
+
+    organization = get_object_or_404(Organization, id=org_id)
     """Render password input page & handle validation securely."""
     logger.info(f"🔹 Received request for org_id: {org_id}")
 
@@ -2000,4 +2002,4 @@ def validate_org_password(request, org_id):
             logger.error("❌ Invalid JSON received in request!")
             return JsonResponse({"success": False, "message": "Invalid data format!"})
 
-    return render(request, "organizations/encrypt/validate_org_password.html", {"org_id": org_id})
+    return render(request, "organizations/encrypt/validate_org_password.html", {"org_id": org_id,'organization':organization})
