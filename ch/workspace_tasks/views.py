@@ -96,6 +96,8 @@ def edit_profile(request, org_id):
     user = request.user
     profile = Profile.objects.filter(user=user, organization=organization).first()
 
+    
+
     if not profile:
         profile = Profile.objects.create(user=user, organization=organization, full_name=user.get_full_name())
 
@@ -123,7 +125,11 @@ def edit_profile(request, org_id):
                 "meetings":meetings,
                 "events":events,
                 'bookings':bookings,
-            }
+               "profile_role": 
+                   "Manager" if profile.is_manager else 
+                   "Employee" if profile.is_employee else 
+                   "Admin"
+}
         })
 
     elif request.method == "POST":

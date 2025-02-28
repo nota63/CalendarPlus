@@ -223,7 +223,7 @@ document.addEventListener("DOMContentLoaded", function() {
             if (data.success) {
                 let profile = data.profile;
                 fullNameInput.value = profile.full_name;
-
+                document.getElementById("profile_role").textContent = profile.profile_role; 
                 if (profile.profile_picture) {
                     profilePreview.src = profile.profile_picture;
                     profilePreview.style.display = "block";
