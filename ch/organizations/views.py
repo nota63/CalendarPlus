@@ -36,7 +36,7 @@ from .models import RecurringMeeting,Help,OrganizationProtection
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
-
+from django.contrib.auth.hashers import make_password
 # Create your views here.
 
 @csrf_exempt
@@ -1870,16 +1870,46 @@ def delete_request(request, org_id, help_id):
 
 
 # ENCRYPT THE WORKSPACE 
-
 def organization_password_settings(request, org_id):
-    """Fetch stored password & show in template"""
-    org_protection = get_object_or_404(OrganizationProtection, organization_id=org_id)
-    
+    """Check if password exists, then fetch or render normally"""
+    organization = Organization.objects.get(id=org_id)
+    org_protection = OrganizationProtection.objects.filter(organization=organization).first()  # Fetch if exists
+
     context = {
-        "organization": org_protection.organization,
-        "protection_status": org_protection.protection_status,
+        "organization": organization,
+        "protection_status": org_protection.protection_status if org_protection else False,
+        "password_exists": bool(org_protection),  # True if protection exists
     }
     return render(request, "organizations/encrypt/organization_password_settings.html", context)
+
+
+# Set Password AES Protection
+
+@csrf_exempt  # Since we're using AJAX, disable CSRF for now (or use CSRF token in AJAX)
+def set_organization_password(request, org_id):
+    """Handle AJAX request to set organization password."""
+    if request.method == "POST":
+        data = json.loads(request.body)  # Get data from AJAX
+        new_password = data.get("password")  # Get password input
+
+        if not new_password:
+            return JsonResponse({"success": False, "message": "Password cannot be empty."})
+
+        organization = Organization.objects.get(id=org_id)
+
+        # Check if protection entry exists, else create one
+        org_protection, created = OrganizationProtection.objects.get_or_create(
+            organization=organization
+        )
+
+        org_protection.password = make_password(new_password)  # Hash the password
+        org_protection.protection_status = True  # Enable protection
+        org_protection.save()
+
+        return JsonResponse({"success": True, "message": "Password set successfully!"})
+
+    return JsonResponse({"success": False, "message": "Invalid request method."})
+
 
 
 
