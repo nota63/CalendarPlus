@@ -876,6 +876,31 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+
+
+// Search queries
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.querySelector(".search-input");
+    const tableRows = document.querySelectorAll(".modern-table tbody .table-row");
+
+    searchInput.addEventListener("keyup", function () {
+        const query = searchInput.value.toLowerCase();
+
+        tableRows.forEach((row) => {
+            const title = row.querySelector("td:first-child").textContent.toLowerCase();
+            const type = row.querySelector("td:nth-child(2)").textContent.toLowerCase();
+            const priority = row.querySelector("td:nth-child(3)").textContent.toLowerCase();
+            const status = row.querySelector("td:nth-child(4)").textContent.toLowerCase();
+
+            if (title.includes(query) || type.includes(query) || priority.includes(query) || status.includes(query)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    });
+});
+
 </script>
 
 
