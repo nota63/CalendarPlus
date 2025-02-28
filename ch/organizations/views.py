@@ -1794,7 +1794,7 @@ def user_help_queries(request, org_id):
         for help in helps
     ]
 
-    return render(request, "organizations/help/user_help_queries.html", {"helps": data})
+    return render(request, "organizations/help/user_help_queries.html", {"helps": data,'organization':organization})
 
 
 # fetch help details
@@ -1809,10 +1809,45 @@ def help_query_details(request, help_id):
         "priority": help_query.get_priority_display(),
         "status": help_query.get_status_display(),
         "description": help_query.description,
-        "response": help_query.response,
+        "response": help_query.response if help_query.response else "You can get the response directly via email or in CalendarPlus",
         "created_at": help_query.created_at.strftime("%Y-%m-%d %H:%M"),
         "resolved_at": help_query.resolved_at.strftime("%Y-%m-%d %H:%M") if help_query.resolved_at else None,
         "attachment": help_query.attachment.url if help_query.attachment else None,
     }
     
     return JsonResponse(data)
+
+
+# RAISE HELP QUERY
+@login_required
+def raise_help_request(request, org_id):
+    """Handles user help requests."""
+    organization = get_object_or_404(Organization, id=org_id)
+    user = request.user
+
+    if request.method == "POST":
+        help_type = request.POST.get("help_type")
+        title = request.POST.get("title")
+        description = request.POST.get("description")
+        priority = request.POST.get("priority", "MEDIUM")
+        is_anonymous = request.POST.get("is_anonymous") == "true"
+        attachment = request.FILES.get("attachment", None)
+
+        if not help_type or not title or not description:
+            return JsonResponse({"success": False, "error": "All fields except attachment are required."})
+
+        # Save the help request
+        help_request = Help.objects.create(
+            user=user if not is_anonymous else None,
+            organization=organization,
+            help_type=help_type,
+            title=title,
+            description=description,
+            priority=priority,
+            attachment=attachment,
+            is_anonymous=is_anonymous
+        )
+
+        return JsonResponse({"success": True, "message": "Help request submitted successfully!"})
+
+    return JsonResponse({"success": False, "error": "Invalid request method."})

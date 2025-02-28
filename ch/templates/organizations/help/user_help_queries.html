@@ -3,11 +3,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Help Queries</title>
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+
+<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#helpRequestModal">
+        Raise Help Request
+</button>
+    
+
 <div class="container mt-5">
     <h2 class="mb-4">Your Help Queries</h2>
     <table class="table table-bordered">
@@ -26,21 +34,26 @@
             <tr>
                 <td>{{ help.title }}</td>
                 <td>{{ help.help_type }}</td>
-                <td><span class="badge bg-{% if help.priority == 'High' %}danger{% elif help.priority == 'Medium' %}warning{% else %}success{% endif %}">
-                    {{ help.priority }}</span>
+                <td>
+                    <span class="badge bg-{% if help.priority == 'High' %}danger{% elif help.priority == 'Medium' %}warning{% else %}success{% endif %}">
+                        {{ help.priority }}
+                    </span>
                 </td>
-                <td><span class="badge bg-{% if help.status == 'Open' %}primary{% elif help.status == 'In Progress' %}warning{% else %}success{% endif %}">
-                    {{ help.status }}</span>
+                <td>
+                    <span class="badge bg-{% if help.status == 'Open' %}primary{% elif help.status == 'In Progress' %}warning{% else %}success{% endif %}">
+                        {{ help.status }}
+                    </span>
                 </td>
                 <td>{{ help.created_at }}</td>
                 <td>
-                    <div class="dropdown">
-                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            ⋮
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#" onclick="showHelpDetails({{ help.id }})">Details</a></li>
-                        </ul>
+                    <!-- Three-dot menu button -->
+                    <button class="btn btn-secondary btn-sm" onclick="openMenuPopup({{ help.id }})">
+                        ⋮
+                    </button>
+                    
+                    <!-- Hidden popup menu -->
+                    <div id="popup-{{ help.id }}" class="popup-menu" style="display: none; position: absolute; background: white; border: 1px solid #ccc; padding: 5px; border-radius: 5px;">
+                        <button class="btn btn-info btn-sm" onclick="openHelpModal({{ help.id }})">Details</button>
                     </div>
                 </td>
             </tr>
@@ -49,13 +62,17 @@
     </table>
 </div>
 
+
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+ <!-- MODALS -->
+
 <!-- Modal for showing Help Details -->
 <div class="modal fade" id="helpDetailModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="helpModalLabel">Help Query Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <p><strong>Title:</strong> <span id="helpTitle"></span></p>
@@ -74,8 +91,104 @@
     </div>
 </div>
 
+<!--RAISE HELP REQUEST -->
+<!-- Help Request Modal -->
+<div class="modal fade" id="helpRequestModal" tabindex="-1" aria-labelledby="helpRequestLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="helpRequestLabel">Raise a Help Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="helpRequestForm">
+                    {% csrf_token %}
+
+                    <!-- Help Type -->
+                    <div class="mb-3">
+                        <label for="help_type" class="form-label">Help Type</label>
+                        <select class="form-select" id="help_type" required>
+                            <option value="BUG">Bug Report</option>
+                            <option value="FEATURE">Feature Request</option>
+                            <option value="ACCOUNT">Account Issue</option>
+                            <option value="BILLING">Billing Issue</option>
+                            <option value="GENERAL">General Query</option>
+                            <option value="SECURITY">Security Concern</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                    </div>
+
+                    <!-- Title -->
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" placeholder="Enter a short title" required>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" rows="4" placeholder="Describe your issue" required></textarea>
+                    </div>
+
+                    <!-- Priority -->
+                    <div class="mb-3">
+                        <label for="priority" class="form-label">Priority</label>
+                        <select class="form-select" id="priority" required>
+                            <option value="LOW">Low</option>
+                            <option value="MEDIUM" selected>Medium</option>
+                            <option value="HIGH">High</option>
+                            <option value="URGENT">Urgent</option>
+                        </select>
+                    </div>
+
+                    <!-- Attachments -->
+                    <div class="mb-3">
+                        <label for="attachment" class="form-label">Attach File (Optional)</label>
+                        <input type="file" class="form-control" id="attachment">
+                    </div>
+
+                    <!-- Anonymous Request -->
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="is_anonymous">
+                        <label class="form-check-label" for="is_anonymous">
+                            Submit as Anonymous
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Submit Request</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+<!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- Bootstrap 5 JS (Including Popper for proper modal support) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-function showHelpDetails(helpId) {
+// Function to show/hide popup menu
+function openMenuPopup(helpId) {
+    let popup = document.getElementById(`popup-${helpId}`);
+    if (popup.style.display === "block") {
+        popup.style.display = "none";
+    } else {
+        // Hide other open popups
+        document.querySelectorAll(".popup-menu").forEach(menu => menu.style.display = "none");
+        popup.style.display = "block";
+    }
+}
+
+// Function to fetch and show Help details in modal
+function openHelpModal(helpId) {
     fetch(`/organizations/help/query-details/${helpId}/`)
     .then(response => response.json())
     .then(data => {
@@ -100,8 +213,46 @@ function showHelpDetails(helpId) {
     })
     .catch(error => console.error("Error fetching help details:", error));
 }
-</script>
 
-<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+// RAISE HELP REQUEST
+document.addEventListener("DOMContentLoaded", function () {
+    const helpRequestForm = document.getElementById("helpRequestForm");
+
+    helpRequestForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        let formData = new FormData();
+        formData.append("help_type", document.getElementById("help_type").value);
+        formData.append("title", document.getElementById("title").value);
+        formData.append("description", document.getElementById("description").value);
+        formData.append("priority", document.getElementById("priority").value);
+        formData.append("is_anonymous", document.getElementById("is_anonymous").checked ? "true" : "false");
+
+        let attachment = document.getElementById("attachment").files[0];
+        if (attachment) {
+            formData.append("attachment", attachment);
+        }
+
+        fetch(`/organizations/ajax-raise-help/{{ organization.id }}/`, {
+            method: "POST",
+            body: formData,
+            headers: { "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Help request submitted successfully!");
+                document.getElementById("helpRequestForm").reset();
+                let modal = bootstrap.Modal.getInstance(document.getElementById("helpRequestModal"));
+                modal.hide();
+            } else {
+                alert("Error: " + data.error);
+            }
+        })
+        .catch(error => console.error("Error submitting help request:", error));
+    });
+});
+
+</script>
 </body>
 </html>

@@ -122,8 +122,7 @@ class Help(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     responded_at = models.DateTimeField(blank=True, null=True)  # Track response time
     resolved_at = models.DateTimeField(blank=True, null=True)  # Track resolution time
-    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name="assigned_tickets")  # Assign queries to admins
-
+   
     class Meta:
         ordering = ["-created_at"]  # Show latest queries first
 
