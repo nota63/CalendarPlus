@@ -3,6 +3,11 @@ from accounts.models import Organization, MeetingOrganization
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.utils.timezone import now
+from django.contrib.auth.hashers import make_password, check_password
+from django.utils.crypto import get_random_string
+from cryptography.fernet import Fernet
+import base64
+import os
 # Create your models here.
 
 
@@ -140,3 +145,48 @@ class Help(models.Model):
         self.status = "RESOLVED"
         self.resolved_at = now()
         self.save()
+
+
+# Encrypt The Workspace
+
+# Generate a unique key for encryption (Store this securely)
+SECRET_KEY = base64.urlsafe_b64encode(os.urandom(32))
+cipher = Fernet(SECRET_KEY)
+
+class OrganizationProtection(models.Model):
+    organization = models.OneToOneField('your_app.Organization', on_delete=models.CASCADE)
+    encrypted_password = models.TextField()  # AES encrypted password
+    protection_status = models.BooleanField(default=False)  # Default is False
+    failed_attempts = models.IntegerField(default=0)  # Track failed login attempts
+    unlock_time = models.DateTimeField(null=True, blank=True)  # Auto-unlock after timeout
+    reset_token = models.CharField(max_length=50, null=True, blank=True)  # Reset token for admin
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def set_password(self, raw_password):
+        """Encrypt and store password"""
+        encrypted = cipher.encrypt(raw_password.encode())
+        self.encrypted_password = encrypted.decode()
+
+    def check_password(self, raw_password):
+        """Verify encrypted password"""
+        try:
+            decrypted = cipher.decrypt(self.encrypted_password.encode()).decode()
+            return decrypted == raw_password
+        except:
+            return False  # If decryption fails, password is incorrect
+
+    def generate_reset_token(self):
+        """Generate a secure reset token"""
+        self.reset_token = get_random_string(50)
+        return self.reset_token
+
+    def reset_password(self, new_password):
+        """Reset password using a new one"""
+        self.set_password(new_password)
+        self.reset_token = None  # Remove reset token after reset
+
+    def __str__(self):
+        return f"Protection for {self.organization.name}"
+
+
+

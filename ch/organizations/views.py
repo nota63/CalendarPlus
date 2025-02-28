@@ -1862,8 +1862,9 @@ def delete_request(request, org_id, help_id):
     if not user_profile.is_admin:
         return HttpResponseForbidden("You are not authorized to delete the requests!")
 
-    # Ensure we delete only the specific help request
+ 
     help_request = get_object_or_404(Help, id=help_id, organization=organization)
     help_request.delete()
 
     return redirect("user_help_queries", org_id=organization.id)
+
