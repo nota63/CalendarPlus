@@ -2043,23 +2043,6 @@ def validate_org_password(request, org_id):
     return render(request, "organizations/encrypt/validate_org_password.html", {"org_id": org_id, "organization": organization})
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # REMOVE WORKSPACE PASSWORD
 @login_required
 def remove_org_password(request, org_id):
