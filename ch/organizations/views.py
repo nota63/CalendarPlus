@@ -1973,20 +1973,16 @@ def get_client_ip(request):
 
 
 
-
+# VALIDATE WORKSPACE AUTHENTICATION
 
 @login_required
 def validate_org_password(request, org_id):
-
     organization = get_object_or_404(Organization, id=org_id)
-    """Render password input page & handle validation securely."""
     logger.info(f"🔹 Received request for org_id: {org_id}")
 
-    # Fetch organization protection object
     org_protection = get_object_or_404(OrganizationProtection, organization_id=org_id)
 
-    # Additional client info to keep track 
-    ip_address=get_client_ip(request)
+    ip_address = get_client_ip(request)
     device_info = request.META.get("HTTP_USER_AGENT", "Unknown Device")
 
     if request.method == "POST":
@@ -1998,40 +1994,36 @@ def validate_org_password(request, org_id):
                 logger.warning("⚠️ Empty password entered!")
                 return JsonResponse({"success": False, "message": "Password cannot be empty!"})
 
-            # Debugging logs
-            logger.info("🔹 Checking stored password existence...")
             if not org_protection.hashed_password:
                 logger.error("❌ No password found for this organization!")
                 return JsonResponse({"success": False, "message": "No password set for this organization!"})
 
-            # Check entered password using Django's secure password check
             if check_password(entered_password, org_protection.hashed_password):
-                # ✅ Grant temporary access
                 request.session[f"org_temp_access_{org_id}"] = True
                 logger.info("✅ Password matched! Granting temporary access.")
-                # Track the successfull login
-                # ✅ Successful Login → Track access
+
+                # Track successful access
                 TrackAccess.objects.create(
-                   organization=organization,
-                   organization_protect=org_protection,
-                   user=request.user,
-                   access_type="SUCCESS",
-                   ip_address=ip_address,
-                   device_info=device_info,
-                   failed_attempts=0,
+                    organization=organization,
+                    organization_protect=org_protection,
+                    user=request.user,
+                    access_type="SUCCESS",
+                    ip_address=ip_address,
+                    device_info=device_info,
+                    failed_attempts=0,
                 )
-                return JsonResponse({"success": True, "redirect_url": f"/calendar/org_detail/{org_id}/"})
+
+                # ✅ Redirect back to the original page user wanted to access
+                redirect_url = request.session.pop('org_redirect_after_auth', f"/calendar/org_detail/{org_id}/")
+                return JsonResponse({"success": True, "redirect_url": redirect_url})
 
             logger.warning("❌ Incorrect password entered!")
-             # ❌ Failed Login → Track failed attempt
+
             failed_attempts = TrackAccess.objects.filter(
                 organization=organization, user=request.user, access_type="FAILED"
-            ).count() + 1  # Track cumulative failed attempts
+            ).count() + 1
 
-
-            # prevent failed attempts
-        
-            # Track the login failed attempt
+            # Track failed login
             TrackAccess.objects.create(
                 organization=organization,
                 organization_protect=org_protection,
@@ -2048,7 +2040,24 @@ def validate_org_password(request, org_id):
             logger.error("❌ Invalid JSON received in request!")
             return JsonResponse({"success": False, "message": "Invalid data format!"})
 
-    return render(request, "organizations/encrypt/validate_org_password.html", {"org_id": org_id,'organization':organization})
+    return render(request, "organizations/encrypt/validate_org_password.html", {"org_id": org_id, "organization": organization})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # REMOVE WORKSPACE PASSWORD

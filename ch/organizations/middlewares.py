@@ -114,6 +114,8 @@ class OrganizationPasswordMiddleware:
                     # ✅ Check if protection is enabled for the specific section
                     if getattr(org_protection, protection_field, False):
                         if not request.session.get(f"org_temp_access_{org_id}"):
+                            # store before redirection
+                            request.session['org_redirect_after_auth'] = request.path
                             return redirect('validate_org_passwords', org_id=org_id)
                         else:
                             # 🧹 Remove session key after allowing first access
