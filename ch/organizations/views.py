@@ -2082,6 +2082,11 @@ def fetch_activity_logs(request, org_id):
     
     organization = get_object_or_404(Organization, id=org_id)
 
+    profile = get_object_or_404(Profile, organization=organization)
+
+    if not profile.is_admin:
+        return JsonResponse({'error:','You are not authorized to access the history!'},status=400)
+
     # Optimized query using select_related to minimize DB hits
     activities = TrackAccess.objects.filter(organization=organization).select_related("user").order_by("-accessed_at")
 
