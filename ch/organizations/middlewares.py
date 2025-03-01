@@ -83,6 +83,22 @@ class OrganizationPasswordMiddleware:
                         org_id = parts[3]  # ✅ org_id is at index 3
                         protection_field = "protect_calendars"
 
+                # protect contacts
+                elif request.path.startswith("/contacts/organization/") and "contacts" in request.path:
+                   parts = request.path.split("/")
+
+                   if len(parts) > 4 and parts[2] == "organization":  # ✅ Use [2] instead of (2)
+                      org_id = parts[3]
+                      protection_field = "protect_contacts"
+
+                # Protect events
+                elif request.path.startswith("/accounts/events/"):
+                   parts = request.path.split("/")
+
+                   if len(parts) > 3 and parts[1] == "accounts" and parts[2] == "events":
+                      org_id = parts[3]  # ✅ org_id is at index 3
+                      protection_field = "protect_events"
+
 
                 if org_id and protection_field:
                     org_protection = OrganizationProtection.objects.get(organization_id=int(org_id))  # Ensure it's an integer
