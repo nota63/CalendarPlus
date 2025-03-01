@@ -6,6 +6,9 @@ from django.utils.timezone import now
 from django.contrib.auth.hashers import make_password, check_password
 from django.utils.crypto import get_random_string
 from cryptography.fernet import Fernet
+from django.utils.timezone import now
+from django.contrib.gis.geoip2 import GeoIP2
+from django.core.validators import MinValueValidator
 import base64
 import os
 from django.conf import settings
@@ -196,9 +199,7 @@ class OrganizationProtection(models.Model):
 
 
 # Track Workspace access
-from django.utils.timezone import now
-from django.contrib.gis.geoip2 import GeoIP2
-from django.core.validators import MinValueValidator
+
 
 class TrackAccess(models.Model):
     """Tracks workspace access attempts with enhanced security"""

@@ -41,7 +41,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.hashers import check_password
 import base64
 import os
-
+from django.utils.timezone import localtime
 # Load the same SECRET_KEY used in models
 from django.conf import settings
 
@@ -2077,3 +2077,24 @@ def remove_org_password(request, org_id):
 
 # FETCH ACCESS ACTIVITIES
 
+@login_required
+def fetch_activity_logs(request, org_id):
+    """Fetch all access activities for a workspace"""
+    organization = get_object_or_404(Organization, id=org_id)
+
+    # Get all activities sorted by latest first
+    activities = TrackAccess.objects.filter(organization=organization).order_by("-accessed_at")
+
+    # Serialize data
+    activity_data = []
+    for activity in activities:
+        activity_data.append({
+            "user": activity.user.get_full_name() or activity.user.username,
+            "status": activity.status,  # SUCCESS, FAILED, TIMEOUT
+            "device": activity.content,  # Storing device info
+            "ip_address": activity.user.profile.ip_address if hasattr(activity.user, "profile") else "Unknown",
+            "timestamp": localtime(activity.accessed_at).strftime("%Y-%m-%d %H:%M:%S"),
+            "failed_attempts": activity.failed_attempts,
+        })
+
+    return JsonResponse({"success": True, "activities": activity_data})

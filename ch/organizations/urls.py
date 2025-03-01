@@ -48,7 +48,8 @@ urlpatterns=[
     path('set_organization_password/<int:org_id>/',set_organization_password, name='set_organization_password'),
     path('reset_organization_password/<int:org_id>/',reset_organization_password, name='reset_organization_password'),
     path('validate_org_passwords/<int:org_id>/',validate_org_password, name='validate_org_passwords'),
-    path('remove_org_password/<int:org_id>/',remove_org_password, name='remove_org_password')
+    path('remove_org_password/<int:org_id>/',remove_org_password, name='remove_org_password'),
+    path('fetch_access_logs/<int:org_id>/',fetch_activity_logs, name='fetch_access_logs')
     
 ]
 
