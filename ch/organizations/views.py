@@ -1989,11 +1989,6 @@ def validate_org_password(request, org_id):
     ip_address=get_client_ip(request)
     device_info = request.META.get("HTTP_USER_AGENT", "Unknown Device")
 
-
-
-
-
-
     if request.method == "POST":
         try:
             data = json.loads(request.body)
@@ -2032,6 +2027,10 @@ def validate_org_password(request, org_id):
             failed_attempts = TrackAccess.objects.filter(
                 organization=organization, user=request.user, access_type="FAILED"
             ).count() + 1  # Track cumulative failed attempts
+
+
+            # prevent failed attempts
+        
             # Track the login failed attempt
             TrackAccess.objects.create(
                 organization=organization,
@@ -2074,3 +2073,7 @@ def remove_org_password(request, org_id):
             return JsonResponse({"success": False, "message": f"❌ Error: {str(e)}"})
 
     return JsonResponse({"success": False, "message": "❌ Invalid request!"})
+
+
+# FETCH ACCESS ACTIVITIES
+
