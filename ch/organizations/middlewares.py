@@ -99,6 +99,14 @@ class OrganizationPasswordMiddleware:
                       org_id = parts[3]  # ✅ org_id is at index 3
                       protection_field = "protect_events"
 
+                # Protect Manage Members 
+                elif request.path.startswith("/profiles/manage_members/"):
+                    parts = request.path.split("/")
+
+                    if len(parts) > 3 and parts[1] == "profiles" and parts[2] == "manage_members":
+                        org_id=parts[3]
+                        protection_field='protect_manage_members'      
+
 
                 if org_id and protection_field:
                     org_protection = OrganizationProtection.objects.get(organization_id=int(org_id))  # Ensure it's an integer
