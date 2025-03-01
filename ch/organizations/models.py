@@ -176,6 +176,13 @@ class OrganizationProtection(models.Model):
     reset_token = models.CharField(max_length=50, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # protect configurations
+    # 🔒 New Fields for Protection Choices
+    protect_channels = models.BooleanField(default=False)  
+    protect_groups = models.BooleanField(default=False)  
+    protect_org_detail = models.BooleanField(default=True)  
+
+
     def set_password(self, raw_password):
         """Hash and store password securely"""
         self.hashed_password = make_password(raw_password, hasher="argon2")  # Argon2 is stronger
