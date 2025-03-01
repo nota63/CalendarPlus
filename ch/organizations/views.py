@@ -2019,7 +2019,7 @@ def remove_org_password(request, org_id):
                 return HttpResponseForbidden("❌ You are not authorized to perform this action!")
 
             # 🔥 Completely delete the password protection entry
-            org_protection.delete()  # ✅ Fully removes the record
+            org_protection.delete()  
 
             return JsonResponse({"success": True, "message": "✅ Password protection removed successfully!"})
 

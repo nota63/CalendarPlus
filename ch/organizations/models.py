@@ -193,3 +193,19 @@ class OrganizationProtection(models.Model):
 
     def __str__(self):
         return f"Protection for {self.organization.name}"
+
+
+# Track Workspace access
+class TrackAccess(models.Model):
+    organization = models.ForeignKey(Organization, related_name='track_access', on_delete=models.CASCADE)
+    organization_protect=models.ForeignKey(OrganizationProtection,on_delete=models.CASCADE)
+    user=models.ForeignKey(User, on_delete=models.CASCADE,related_name='accesor')
+    content = models.TextField()
+    accessed_at=models.DateTimeField(auto_now=True)
+    failed_attempts=models.IntegerField(default=0)
+    status=models.TextField()
+
+    def __str__(self):
+        return f'Access Overview of {self.user.username} - {self.organization.name}'
+    
+

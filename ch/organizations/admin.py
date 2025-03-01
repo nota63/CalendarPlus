@@ -1,6 +1,6 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from .models import OrganizationHide, RecurringMeeting,Help,OrganizationProtection
+from .models import OrganizationHide, RecurringMeeting,Help,OrganizationProtection,TrackAccess
 
 @admin.register(OrganizationHide)
 class OrganizationHideAdmin(ModelAdmin):
@@ -18,4 +18,10 @@ admin.site.register(Help)
 @admin.register(OrganizationProtection)
 class OrganizationProtectionAdmin(ModelAdmin):
     list_display = [field.name for field in OrganizationProtection._meta.fields]
+
+
+
+@admin.register(TrackAccess)
+class TrackAccessAdmin(ModelAdmin):
+    list_display = [field.name for field in TrackAccess._meta.fields]
 
