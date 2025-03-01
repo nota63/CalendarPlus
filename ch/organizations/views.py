@@ -2105,3 +2105,32 @@ def fetch_activity_logs(request, org_id):
 
     return JsonResponse({"success": True, "activities": activity_data})
 
+
+
+# CONFIGURE SETTINGS TO ADD PROTECTION
+def get_protection_settings(request, org_id):
+    """Fetch current protection settings for an organization."""
+    org_protection = get_object_or_404(OrganizationProtection, organization_id=org_id)
+
+    return JsonResponse({
+        "protect_channels": org_protection.protect_channels,
+        "protect_groups": org_protection.protect_groups,
+        "protect_org_detail": org_protection.protect_org_detail,
+    })
+
+@csrf_exempt
+def update_protection_settings(request, org_id):
+    """Toggle protection settings via AJAX."""
+    if request.method == "POST":
+        data = json.loads(request.body)
+        org_protection = get_object_or_404(OrganizationProtection, organization_id=org_id)
+
+        # Update settings based on received data
+        org_protection.protect_channels = data.get("protect_channels", org_protection.protect_channels)
+        org_protection.protect_groups = data.get("protect_groups", org_protection.protect_groups)
+        org_protection.protect_org_detail = data.get("protect_org_detail", org_protection.protect_org_detail)
+
+        org_protection.save()
+        return JsonResponse({"success": True, "message": "Protection settings updated!"})
+
+    return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
