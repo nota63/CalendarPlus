@@ -32,27 +32,23 @@ from django.utils.html import strip_tags
 from accounts.models import ProjectEmployeeAssignment, Project, ProjectManagerAssignment
 from groups.models import Group, GroupMember
 import logging
-from .models import RecurringMeeting,Help,OrganizationProtection
+from .models import RecurringMeeting,Help,OrganizationProtection,TrackAccess
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.hashers import check_password
-
-
-from cryptography.fernet import Fernet
 import base64
 import os
 
 # Load the same SECRET_KEY used in models
 from django.conf import settings
-from cryptography.fernet import Fernet
+
 # Configure logging for debugging
 logger = logging.getLogger(__name__)
 
-# Load cipher with a fixed secret key
-cipher = Fernet(settings.ORG_PASSWORD_SECRET_KEY.encode())
+
 # Create your views here.
 
 @csrf_exempt
@@ -1962,7 +1958,23 @@ def reset_organization_password(request, org_id):
 
     return JsonResponse({"success": False, "message": "Invalid request method."})
 
+
+
 # MIDDLEWARE REDIRECT & VALIDATE THE PASSWORD
+
+def get_client_ip(request):
+    """Extracts the client's IP address"""
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(",")[0]
+    else:
+        ip = request.META.get("REMOTE_ADDR")
+    return ip
+
+
+
+
+
 @login_required
 def validate_org_password(request, org_id):
 
@@ -1972,6 +1984,15 @@ def validate_org_password(request, org_id):
 
     # Fetch organization protection object
     org_protection = get_object_or_404(OrganizationProtection, organization_id=org_id)
+
+    # Additional client info to keep track 
+    ip_address=get_client_ip(request)
+    device_info = request.META.get("HTTP_USER_AGENT", "Unknown Device")
+
+
+
+
+
 
     if request.method == "POST":
         try:
@@ -1993,9 +2014,35 @@ def validate_org_password(request, org_id):
                 # ✅ Grant temporary access
                 request.session[f"org_temp_access_{org_id}"] = True
                 logger.info("✅ Password matched! Granting temporary access.")
+                # Track the successfull login
+                # ✅ Successful Login → Track access
+                TrackAccess.objects.create(
+                   organization=organization,
+                   organization_protect=org_protection,
+                   user=request.user,
+                   access_type="SUCCESS",
+                   ip_address=ip_address,
+                   device_info=device_info,
+                   failed_attempts=0,
+                )
                 return JsonResponse({"success": True, "redirect_url": f"/calendar/org_detail/{org_id}/"})
 
             logger.warning("❌ Incorrect password entered!")
+             # ❌ Failed Login → Track failed attempt
+            failed_attempts = TrackAccess.objects.filter(
+                organization=organization, user=request.user, access_type="FAILED"
+            ).count() + 1  # Track cumulative failed attempts
+            # Track the login failed attempt
+            TrackAccess.objects.create(
+                organization=organization,
+                organization_protect=org_protection,
+                user=request.user,
+                access_type="FAILED",
+                ip_address=ip_address,
+                device_info=device_info,
+                failed_attempts=failed_attempts,
+            )
+
             return JsonResponse({"success": False, "message": "Incorrect password!"})
 
         except json.JSONDecodeError:
