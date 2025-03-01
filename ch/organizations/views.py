@@ -2076,24 +2076,25 @@ def remove_org_password(request, org_id):
 
 
 # FETCH ACCESS ACTIVITIES
-
 @login_required
 def fetch_activity_logs(request, org_id):
-    """Fetch all access activities for a workspace"""
+    """Fetch all access activities for a workspace with security enhancements"""
+    
     organization = get_object_or_404(Organization, id=org_id)
 
-    # Get all activities sorted by latest first
-    activities = TrackAccess.objects.filter(organization=organization).order_by("-accessed_at")
+    # Optimized query using select_related to minimize DB hits
+    activities = TrackAccess.objects.filter(organization=organization).select_related("user").order_by("-accessed_at")
 
     # Serialize data
     activity_data = []
     for activity in activities:
         activity_data.append({
             "user": activity.user.get_full_name() or activity.user.username,
-            "status": activity.status,  # SUCCESS, FAILED, TIMEOUT
-            "device": activity.content,  # Storing device info
-            "ip_address": activity.user.profile.ip_address if hasattr(activity.user, "profile") else "Unknown",
-            "timestamp": localtime(activity.accessed_at).strftime("%Y-%m-%d %H:%M:%S"),
+            "status": activity.access_type,  # SUCCESS, FAILED, TIMEOUT
+            "device": activity.device_info or "Unknown Device",  
+            "ip_address": activity.ip_address or "Unknown IP",
+            "location": activity.location or "Unknown Location",
+            "timestamp": localtime(activity.accessed_at).strftime("%b %d, %Y - %I:%M %p"),
             "failed_attempts": activity.failed_attempts,
         })
 
