@@ -2117,6 +2117,9 @@ def get_protection_settings(request, org_id):
         "protect_groups": org_protection.protect_groups,
         "protect_org_detail": org_protection.protect_org_detail,
         'protect_calendars':org_protection.protect_calendars,
+        'protect_contacts':org_protection.protect_contacts,
+        'protect_events':org_protection.protect_events,
+        'protect_manage_members':org_protection.protect_manage_members,
     })
 
 
@@ -2132,7 +2135,9 @@ def update_protection_settings(request, org_id):
         org_protection.protect_groups = data.get("protect_groups", org_protection.protect_groups)
         org_protection.protect_org_detail = data.get("protect_org_detail", org_protection.protect_org_detail)
         org_protection.protect_calendars = data.get("protect_calendars", org_protection.protect_calendars)
-
+        org_protection.protect_contacts = data.get("protect_contacts", org_protection.protect_contacts)
+        org_protection.protect_events = data.get("protect_events", org_protection.protect_events)
+        org_protection.protect_manage_members = data.get("protect_manage_members", org_protection.protect_manage_members)
 
         org_protection.save()
         return JsonResponse({"success": True, "message": "Protection settings updated!"})
