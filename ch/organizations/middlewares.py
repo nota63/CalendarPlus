@@ -66,6 +66,24 @@ class OrganizationPasswordMiddleware:
                         org_id = parts[4]  # ✅ org_id is at index 4
                         protection_field = "protect_groups"
 
+                # Protected calendars
+                elif request.path.startswith("/calendar/organization/") and "/members/" in request.path:
+                    parts = request.path.split("/")
+
+                    # turns the url into this format - parts = request.path.split
+                         #   "/calendar/organization/41/members/".split("/")
+                         #   → ["", "calendar", "organization", "41", "members", ""]
+  #                          Extract org_id from the correct index
+
+                         # parts[2] == "organization" ensures we are at the right structure.
+                         # org_id = parts[3] because index 3 contains the organization ID (41 in this case).
+                       # protection_field = "protect_calendars" tells the system that this is the calendar protection field.
+
+                    if len(parts) > 4 and parts[2] == "organization":
+                        org_id = parts[3]  # ✅ org_id is at index 3
+                        protection_field = "protect_calendars"
+
+
                 if org_id and protection_field:
                     org_protection = OrganizationProtection.objects.get(organization_id=int(org_id))  # Ensure it's an integer
 
