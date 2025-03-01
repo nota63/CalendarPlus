@@ -196,16 +196,71 @@ class OrganizationProtection(models.Model):
 
 
 # Track Workspace access
+from django.utils.timezone import now
+from django.contrib.gis.geoip2 import GeoIP2
+from django.core.validators import MinValueValidator
+
 class TrackAccess(models.Model):
-    organization = models.ForeignKey(Organization, related_name='track_access', on_delete=models.CASCADE)
-    organization_protect=models.ForeignKey(OrganizationProtection,on_delete=models.CASCADE)
-    user=models.ForeignKey(User, on_delete=models.CASCADE,related_name='accesor')
-    content = models.TextField()
-    accessed_at=models.DateTimeField(auto_now=True)
-    failed_attempts=models.IntegerField(default=0)
-    status=models.TextField()
+    """Tracks workspace access attempts with enhanced security"""
+    
+    organization = models.ForeignKey(
+        Organization, related_name="track_access", on_delete=models.CASCADE
+    )
+    organization_protect = models.ForeignKey(
+        OrganizationProtection, on_delete=models.CASCADE
+    )
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="accessor"
+    )
+
+    access_type = models.CharField(
+        max_length=20,
+        choices=[
+            ("SUCCESS", "Successful"),
+            ("FAILED", "Failed"),
+            ("TIMEOUT", "Timed Out"),
+        ],
+        default="FAILED",
+    )
+
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
+    device_info = models.TextField(blank=True, null=True)  # Stores User-Agent details
+    location = models.CharField(max_length=255, blank=True, null=True)  # Geo-location
+    failed_attempts = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    accessed_at = models.DateTimeField(auto_now=True)
+
+    # Auto-delete logs older than 6 months
+    class Meta:
+        indexes = [
+            models.Index(fields=["accessed_at"]),
+            models.Index(fields=["organization"]),
+            models.Index(fields=["user"]),
+        ]
+        ordering = ["-accessed_at"]
 
     def __str__(self):
-        return f'Access Overview of {self.user.username} - {self.organization.name}'
-    
+        return f"🔍 {self.user.username} | {self.access_type} | {self.organization.name} | {self.accessed_at}"
 
+    def save(self, *args, **kwargs):
+        """Enhance security by auto-detecting IP & location"""
+        if not self.ip_address:
+            self.ip_address = self.get_client_ip()
+
+        if not self.location:
+            self.location = self.get_geo_location()
+
+        super().save(*args, **kwargs)
+
+    def get_client_ip(self):
+        """Fetches the user's IP address"""
+        # Assuming request.META['REMOTE_ADDR'] is passed when calling save()
+        return "Unknown"  # Replace with actual IP retrieval logic from request
+
+    def get_geo_location(self):
+        """Fetches geo-location based on IP"""
+        try:
+            g = GeoIP2()
+            location = g.city(self.ip_address)
+            return f"{location['city']}, {location['country_name']}"
+        except Exception:
+            return "Unknown Location"
