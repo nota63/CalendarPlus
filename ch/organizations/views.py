@@ -2003,3 +2003,27 @@ def validate_org_password(request, org_id):
             return JsonResponse({"success": False, "message": "Invalid data format!"})
 
     return render(request, "organizations/encrypt/validate_org_password.html", {"org_id": org_id,'organization':organization})
+
+
+# REMOVE WORKSPACE PASSWORD
+@login_required
+def remove_org_password(request, org_id):
+    """Handle password removal securely"""
+    if request.method == "POST":
+        try:
+            org_protection = get_object_or_404(OrganizationProtection, organization_id=org_id)
+
+            # Check if user is an admin or authorized
+            profile = get_object_or_404(Profile, user=request.user, organization_id=org_id)
+            if not profile.is_admin:
+                return HttpResponseForbidden("❌ You are not authorized to perform this action!")
+
+            # 🔥 Completely delete the password protection entry
+            org_protection.delete()  # ✅ Fully removes the record
+
+            return JsonResponse({"success": True, "message": "✅ Password protection removed successfully!"})
+
+        except Exception as e:
+            return JsonResponse({"success": False, "message": f"❌ Error: {str(e)}"})
+
+    return JsonResponse({"success": False, "message": "❌ Invalid request!"})
