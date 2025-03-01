@@ -2116,7 +2116,9 @@ def get_protection_settings(request, org_id):
         "protect_channels": org_protection.protect_channels,
         "protect_groups": org_protection.protect_groups,
         "protect_org_detail": org_protection.protect_org_detail,
+        'protect_calendars':org_protection.protect_calendars,
     })
+
 
 @csrf_exempt
 def update_protection_settings(request, org_id):
@@ -2129,6 +2131,8 @@ def update_protection_settings(request, org_id):
         org_protection.protect_channels = data.get("protect_channels", org_protection.protect_channels)
         org_protection.protect_groups = data.get("protect_groups", org_protection.protect_groups)
         org_protection.protect_org_detail = data.get("protect_org_detail", org_protection.protect_org_detail)
+        org_protection.protect_calendars = data.get("protect_calendars", org_protection.protect_calendars)
+
 
         org_protection.save()
         return JsonResponse({"success": True, "message": "Protection settings updated!"})

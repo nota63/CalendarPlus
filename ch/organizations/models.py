@@ -181,6 +181,7 @@ class OrganizationProtection(models.Model):
     protect_channels = models.BooleanField(default=False)  
     protect_groups = models.BooleanField(default=False)  
     protect_org_detail = models.BooleanField(default=True)  
+    protect_calendars = models.BooleanField(default=False)
 
 
     def set_password(self, raw_password):
