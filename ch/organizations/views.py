@@ -2104,3 +2104,4 @@ def fetch_activity_logs(request, org_id):
         })
 
     return JsonResponse({"success": True, "activities": activity_data})
+
