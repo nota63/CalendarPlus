@@ -2212,6 +2212,11 @@ def gateways(request,org_id):
 
 
 # Admin Dashboard 
+from groups.models import Group
+from group_tasks.models import GroupEvent,Task
+
+
+
 def workspace_admin_dashboard(request, org_id):
     organization = get_object_or_404(Organization, id=org_id)
     
@@ -2237,8 +2242,14 @@ def workspace_admin_dashboard(request, org_id):
     # Messaging & Channels Insights
     total_messages = Message.objects.filter(channel__organization=organization).count()
     total_channels = Channel.objects.filter(organization=organization).count()
+
+    # Groups & Tasks
+    total_groups=Group.objects.filter(organization=organization).count()
+    total_group_events=GroupEvent.objects.filter(organization=organization).count()
+
     
     context = {
+        'organization':organization,
         "total_users": total_users,
         "active_users": active_users,
         "new_users_this_month": new_users_this_month,
@@ -2254,6 +2265,8 @@ def workspace_admin_dashboard(request, org_id):
         "popular_meeting_platforms": popular_meeting_platforms,
         "total_messages": total_messages,
         "total_channels": total_channels,
+        'total_groups':total_groups,
+        "total_group_events":total_group_events,
     }
     
     return render(request, "organizations/dashboards/admin_dashboard.html", context)
