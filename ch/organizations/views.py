@@ -2191,3 +2191,11 @@ def update_protection_settings(request, org_id):
 
 # SECURITY PART ENDS --------------------------------------------------------------------------------------------------------------------
 
+# Brand Guidelines 
+@login_required
+def brand_guidelines(request, org_id):
+    organization = get_object_or_404(Organization,id=org_id)
+    profile = get_object_or_404(Profile, organization=organization, user=request.user)
+    if not profile.is_admin:
+        return HttpResponseForbidden("You are not authorized to view brand guidelines!")
+    return render(request,'organizations/brand/brand_guidelines.html',{'organization':organization})

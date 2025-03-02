@@ -1,0 +1,251 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+<br><br>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar Plus Brand Guidelines</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #007BFF;
+            --secondary: #FFC107;
+            --accent: #28A745;
+            --background: #F8F9FA;
+            --glass: rgba(255, 255, 255, 0.9);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: var(--background);
+            margin: 0;
+            padding: 40px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-gap: 30px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            padding: 80px 40px;
+            border-radius: 24px;
+            color: white;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .color-swatch {
+            width: 100px;
+            height: 100px;
+            border-radius: 12px;
+            margin: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0 0 20px 0;
+        }
+
+        .icon-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .icon-card {
+            padding: 20px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.6);
+            text-align: center;
+            width: 120px;
+        }
+
+        .logo-showcase {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .logo-card {
+            padding: 30px;
+            background: white;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .logo-card img {
+            width: 200px;
+            height: auto;
+            margin: 20px 0;
+        }
+
+        .social-example {
+            width: 300px;
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            margin: 20px 0;
+        }
+
+        .download-btn {
+            background: var(--primary);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.2s;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            .hero {
+                padding: 40px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="hero">
+            <h1>Calendar Plus Brand Guidelines</h1>
+            <p>Design System v3.0 · Updated 2023</p>
+        </header>
+
+        <section class="card">
+            <h2>Brand Philosophy</h2>
+            <div class="grid">
+                <div>
+                    <h3>🚀 Mission</h3>
+                    <p>Empower global productivity through intelligent scheduling solutions</p>
+                </div>
+                <div>
+                    <h3>🎯 Vision</h3>
+                    <p>Redefine time management for the modern digital era</p>
+                </div>
+                <div>
+                    <h3>✨ Values</h3>
+                    <p>Innovation · Clarity · Accessibility · Reliability</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Visual Identity</h2>
+            <div class="grid">
+                <div class="logo-card">
+                    <h3>Primary Logo</h3>
+                    <img src="logo.png" alt="Main Logo" style="border-radius: 12px;">
+                    <p>Minimum clear space: 24px</p>
+                </div>
+                <div class="logo-card">
+                    <h3>Alternative Version</h3>
+                    <img src="logo-dark.png" alt="Dark Logo" style="border-radius: 12px;">
+                    <p>For dark backgrounds</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Color System</h2>
+            <div class="color-swatch" style="background: var(--primary)">Primary<br>#007BFF</div>
+            <div class="color-swatch" style="background: var(--secondary); color: #333">Secondary<br>#FFC107</div>
+            <div class="color-swatch" style="background: var(--accent)">Accent<br>#28A745</div>
+            <div class="color-swatch" style="background: var(--background); color: #333; border: 2px solid #eee">Background<br>#F8F9FA</div>
+        </section>
+
+        <section class="card">
+            <h2>Typography Scale</h2>
+            <div class="grid">
+                <div>
+                    <h3 style="font-family: 'Montserrat'">Montserrat</h3>
+                    <p style="font-family: 'Montserrat'">ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz</p>
+                </div>
+                <div>
+                    <h3 style="font-family: 'Roboto'">Roboto</h3>
+                    <p style="font-family: 'Roboto'">ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Iconography</h2>
+            <div class="icon-container">
+                <div class="icon-card">
+                    <span class="material-icons-round" style="font-size: 32px;">event</span>
+                    <p>Calendar</p>
+                </div>
+                <div class="icon-card">
+                    <span class="material-icons-round" style="font-size: 32px;">notifications</span>
+                    <p>Alerts</p>
+                </div>
+                <div class="icon-card">
+                    <span class="material-icons-round" style="font-size: 32px;">group</span>
+                    <p>Teams</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Social Media Examples</h2>
+            <img src="social-example.jpg" alt="Social Media Template" class="social-example">
+            <p>Profile dimensions: 1080px × 1080px<br>Branded hashtag: #CalendarPlus</p>
+        </section>
+
+        <section class="card">
+            <h2>Asset Downloads</h2>
+            <a href="#" class="download-btn">
+                <span class="material-icons-round">download</span>
+                Download Brand Kit (ZIP 82MB)
+            </a>
+            <p>Includes: Vector logos, Social templates, Icon set</p>
+        </section>
+
+        <section class="card">
+            <h2>Need Help?</h2>
+            <p>📧 brand@calendarplus.com<br>📞 +1 (800) 555-1234</p>
+            <p>Office hours: Mon-Fri 9AM-5PM PST</p>
+        </section>
+    </div>
+</body>
+</html>
+
+{% endblock %}
