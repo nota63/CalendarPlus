@@ -2121,6 +2121,11 @@ def update_protection_settings(request, org_id):
     if request.method == "POST":
         data = json.loads(request.body)
         org_protection = get_object_or_404(OrganizationProtection, organization_id=org_id)
+        organization = get_object_or_404(Organization, id=org_id)
+
+        profile = get_object_or_404(Profile, user=request.user,organization=organization)
+        if not profile:
+            return HttpResponseForbidden("You are not Authorized to perform this action!")
 
         # Update settings based on received data
         org_protection.protect_channels = data.get("protect_channels", org_protection.protect_channels)
