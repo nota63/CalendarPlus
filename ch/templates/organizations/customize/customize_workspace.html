@@ -341,65 +341,175 @@
     }
 }
 
+
+/* New Sidebar Styles */
+.glass-sidebar {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border-radius: 0 16px 16px 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+    min-height: 100vh;
+}
+
+.org-header {
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.org-icon-initial {
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.nav-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 8px;
+    color: #5f6368;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+}
+
+.nav-item:hover {
+    background: rgba(0, 0, 0, 0.04);
+    transform: translateX(4px);
+}
+
+.nav-item.active {
+    background: rgba(25, 118, 210, 0.1);
+    color: #1976d2;
+    font-weight: 500;
+}
+
+.active-indicator {
+    position: absolute;
+    left: 0;
+    height: 24px;
+    width: 3px;
+    background: #1976d2;
+    border-radius: 0 3px 3px 0;
+}
+
+.icon-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    margin-right: 16px;
+    color: white;
+}
+
+.icon-container i {
+    font-size: 1.25rem;
+}
+
+.nav-text {
+    font-size: 0.925rem;
+}
+
+.sidebar-divider {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    opacity: 0.25;
+}
+
+/* Color variants for icon containers */
+.bg-purple { background: #9c27b0; }
+.bg-teal { background: #009688; }
+.bg-pink { background: #e91e63; }
    
-    </style>
+</style>
 </head>
 <body>
     <div class="settings-container">
-        <!-- Sidebar Navigation -->
-        <aside class="settings-sidebar">
-            <div class="org-header">
-                {% if organization.icon %}
-                <img src="{{ organization.icon.url }}" alt="{{ organization.name }} Icon" class="org-icon">
-                {% else %}
-                <div class="org-icon bg-primary text-white d-flex align-items-center justify-content-center">
-                    {{ organization.name|first|upper }}
-                </div>
-                {% endif %}
-                <div>
-                    <h3 class="mb-0">{{ organization.name }}</h3>
-                    <small class="text-muted">Workspace</small>
-                </div>
-            </div>
+       <!-- Sidebar Navigation -->
+<!-- Sidebar Navigation -->
+<aside class="settings-sidebar glass-sidebar">
+    <div class="org-header d-flex align-items-center mb-4">
+        {% if organization.icon %}
+        <img src="{{ organization.icon.url }}" alt="{{ organization.name }} Icon" class="org-icon img-fluid rounded-circle elevation-3">
+        {% else %}
+        <div class="org-icon-initial rounded-circle bg-gradient-primary d-flex align-items-center justify-content-center elevation-3">
+            {{ organization.name|first|upper }}
+        </div>
+        {% endif %}
+        <div class="ms-3">
+            <h5 class="mb-0 fw-600">{{ organization.name }}</h5>
+            <small class="text-muted text-uppercase tracking-wide">Workspace</small>
+        </div>
+    </div>
 
-            <nav class="nav flex-column">
-                <a href="#" class="nav-item active">
-                    <i class="material-icons-round me-2">settings</i>
-                    Workspace Settings
-                </a>
-                <a href="{% url 'workspace_details' org_id=organization.id %}" class="nav-item">
-                    <i class="material-icons-round me-2">info</i>
-                    About Workspace
-                </a>
-                <a href="{% url 'workspace_analytics' org_id=organization.id %}" class="nav-item">
-                    <i class="material-icons-round me-2">analytics</i>
-                    Analytics
-                </a>
-                <a href="#" class="nav-item" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-                    <i class="material-icons-round me-2">person</i>
-                    Account & Profile
-                </a>
-                <a href="{% url 'workspace_billing' org_id=organization.id%}" class="nav-item">
-                    <i class="material-icons-round me-2">person</i>
-                    Billing
-                </a>
+    <nav class="nav flex-column gap-2">
+        <a href="#" class="nav-item active">
+            <span class="icon-container bg-primary">
+                <i class="material-icons-round">settings</i>
+            </span>
+            <span class="nav-text">Workspace Settings</span>
+            <span class="active-indicator"></span>
+        </a>
+        
+        <a href="{% url 'workspace_details' org_id=organization.id %}" class="nav-item">
+            <span class="icon-container bg-info">
+                <i class="material-icons-round">info</i>
+            </span>
+            <span class="nav-text">About Workspace</span>
+        </a>
 
-                <a href="{% url 'pulse' org_id=organization.id%}" class="nav-item">
-                    <i class="material-icons-round me-2">person</i>
-                    Pulse 
-                </a>
+        <a href="{% url 'workspace_analytics' org_id=organization.id %}" class="nav-item">
+            <span class="icon-container bg-warning">
+                <i class="material-icons-round">analytics</i>
+            </span>
+            <span class="nav-text">Analytics</span>
+        </a>
 
-                <a href="{% url 'security_transport_layer' org_id=organization.id%}" class="nav-item">
-                    <i class="material-icons-round me-2">person</i>
-                    Support For Transport Layer Security(TLS)
-                </a>
+        <div class="sidebar-divider my-3"></div>
 
-                <a href="{% url 'user_help_queries' org_id=organization.id%}" class="nav-item">
-                    <i class="material-icons-round me-2">person</i>
-                    Help
-                </a>
-            </nav>
-        </aside>
+        <a href="#" class="nav-item" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+            <span class="icon-container bg-success">
+                <i class="material-icons-round">person</i>
+            </span>
+            <span class="nav-text">Account & Profile</span>
+        </a>
+
+        <a href="{% url 'workspace_billing' org_id=organization.id%}" class="nav-item">
+            <span class="icon-container bg-danger">
+                <i class="material-icons-round">credit_card</i>
+            </span>
+            <span class="nav-text">Billing</span>
+        </a>
+
+        <div class="sidebar-divider my-3"></div>
+
+        <a href="{% url 'pulse' org_id=organization.id%}" class="nav-item">
+            <span class="icon-container bg-purple">
+                <i class="material-icons-round">monitor_heart</i>
+            </span>
+            <span class="nav-text">Pulse</span>
+        </a>
+
+        <a href="{% url 'security_transport_layer' org_id=organization.id%}" class="nav-item">
+            <span class="icon-container bg-teal">
+                <i class="material-icons-round">security</i>
+            </span>
+            <span class="nav-text">TLS Support</span>
+        </a>
+
+        <a href="{% url 'user_help_queries' org_id=organization.id%}" class="nav-item">
+            <span class="icon-container bg-pink">
+                <i class="material-icons-round">help_center</i>
+            </span>
+            <span class="nav-text">Help Center</span>
+        </a>
+    </nav>
+</aside>
 
         <!-- Main Content -->
         <main class="settings-main">
