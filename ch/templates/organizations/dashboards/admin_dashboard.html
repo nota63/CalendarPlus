@@ -9,7 +9,7 @@
 <body>
     <div class="page">
         <!-- Sidebar -->
-        <aside class="navbar navbar-vertical navbar-expand-lg navbar-dark">
+        <aside class="navbar navbar-vertical navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
                 <a class="navbar-brand" href="#">Calendar Plus Admin</a>
                 <ul class="navbar-nav">
@@ -25,46 +25,111 @@
 
         <!-- Main Content -->
         <div class="page-wrapper">
-            <header class="navbar navbar-expand navbar-light">
+            <header class="navbar navbar-expand navbar-light bg-light shadow-sm">
                 <div class="container-fluid">
                     <span class="navbar-text">Welcome, Admin</span>
                 </div>
             </header>
 
             <div class="container mt-4">
-                <h1>Workspace Admin Dashboard</h1>
+                <h1 class="mb-4">Workspace Admin Dashboard</h1>
                 
                 <!-- Stats Row -->
-                <div class="row">
+                <div class="row row-cards">
                     <div class="col-md-3">
-                        <div class="card card-stats">
-                            <div class="card-body">
+                        <div class="card">
+                            <div class="card-body text-center">
                                 <h3 class="text-primary">{{ total_users }}</h3>
                                 <p>Total Users</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="card card-stats">
-                            <div class="card-body">
+                        <div class="card">
+                            <div class="card-body text-center">
                                 <h3 class="text-success">{{ active_users }}</h3>
                                 <p>Active Users</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="card card-stats">
-                            <div class="card-body">
+                        <div class="card">
+                            <div class="card-body text-center">
                                 <h3 class="text-danger">{{ total_messages }}</h3>
                                 <p>Total Messages</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="card card-stats">
-                            <div class="card-body">
+                        <div class="card">
+                            <div class="card-body text-center">
                                 <h3 class="text-warning">{{ total_channels }}</h3>
                                 <p>Total Channels</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h3 class="text-warning">{{ new_users_this_month }}</h3>
+                                <p>New Users This Month</p>
+                            </div>
+                        </div>
+                    </div>
+
+                   
+
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h3 class="text-warning">{{ accepted_invitations }}</h3>
+                                <p>Accepted Invitations</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h3 class="text-warning">{{ rejected_invitations }}</h3>
+                                <p>Rejected Invitations</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h3 class="text-warning">{{ completed_meetings }}</h3>
+                                <p>Completed Meetings</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h3 class="text-warning">{{ canceled_meetings }}</h3>
+                                <p>Cancelled Meetings</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h3 class="text-warning">{{ popular_meeting_types }}</h3>
+                                <p>Most used meeting types</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h3 class="text-warning">{{ popular_meeting_platforms }}</h3>
+                                <p>Most Used Meeting Platforms</p>
                             </div>
                         </div>
                     </div>
@@ -101,7 +166,7 @@
                             <div class="card-header">
                                 <h3>Meetings Scheduled</h3>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body text-center">
                                 <h3 class="text-info">{{ total_meetings }}</h3>
                                 <p>Total Meetings in Organization</p>
                             </div>
@@ -112,7 +177,7 @@
                             <div class="card-header">
                                 <h3>Pending Invitations</h3>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body text-center">
                                 <h3 class="text-danger">{{ pending_invitations }}</h3>
                                 <p>Pending User Invitations</p>
                             </div>
