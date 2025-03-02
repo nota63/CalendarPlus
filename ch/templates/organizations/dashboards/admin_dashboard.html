@@ -74,8 +74,8 @@
 
 
                 <div class="flex items-center space-x-4">
-                    <span class="text-gray-600">Welcome back, Admin</span>
-                    <div class="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white">A</div>
+                    <span class="text-gray-600">Welcome back, {{request.user.username}}</span>
+                    <div class="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white">{{ request.user.username|first|upper }}</div>
                 </div>
             </div>
 
