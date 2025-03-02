@@ -48,6 +48,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.hashers import make_password
 from .models import Organization, OrganizationProtection
 from django.utils.timezone import localtime
+from groups.models import Group
+from group_tasks.models import GroupEvent,Task
+from organization_channels.models import AbusedMessage,Ban
+
+
 # Load the same SECRET_KEY used in models
 from django.conf import settings
 
@@ -2212,13 +2217,14 @@ def gateways(request,org_id):
 
 
 # Admin Dashboard 
-from groups.models import Group
-from group_tasks.models import GroupEvent,Task
-from organization_channels.models import AbusedMessage
 
-
+@login_required
 def workspace_admin_dashboard(request, org_id):
     organization = get_object_or_404(Organization, id=org_id)
+
+    admin_profile=get_object_or_404(Profile,organization=organization,user=request.user)
+    if not admin_profile.is_admin:
+        return JsonResponse({'error':'you are not authorized to perform this action!'},status=400)
     
     # User Insights
     total_users = Profile.objects.filter(organization=organization).count()
@@ -2248,6 +2254,9 @@ def workspace_admin_dashboard(request, org_id):
     total_group_events=GroupEvent.objects.filter(organization=organization).count()
     # Abused Messages
     abused_messages=AbusedMessage.objects.filter(organization=organization).count()
+    # banned peoples
+    banned_peoples=Ban.objects.filter(organization=organization).count()
+    workspace_bans="coming soon.."
 
     
     context = {
@@ -2269,7 +2278,10 @@ def workspace_admin_dashboard(request, org_id):
         "total_channels": total_channels,
         'total_groups':total_groups,
         "total_group_events":total_group_events,
-        'abused_messages':abused_messages
-    }
+        'abused_messages':abused_messages,
+        'banned_peoples':banned_peoples,
+        'workspace_bans':workspace_bans,
+        "blocked":"coming soon.."
+}
     
     return render(request, "organizations/dashboards/admin_dashboard.html", context)
