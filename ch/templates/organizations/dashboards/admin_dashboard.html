@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Calendar Plus</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css">
+</head>
+<body>
+    <div class="page">
+        <!-- Sidebar -->
+        <aside class="navbar navbar-vertical navbar-expand-lg navbar-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Calendar Plus Admin</a>
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="#">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Users</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Messages</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Channels</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Meetings</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Settings</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="page-wrapper">
+            <header class="navbar navbar-expand navbar-light">
+                <div class="container-fluid">
+                    <span class="navbar-text">Welcome, Admin</span>
+                </div>
+            </header>
+
+            <div class="container mt-4">
+                <h1>Workspace Admin Dashboard</h1>
+                
+                <!-- Stats Row -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card card-stats">
+                            <div class="card-body">
+                                <h3 class="text-primary">{{ total_users }}</h3>
+                                <p>Total Users</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card card-stats">
+                            <div class="card-body">
+                                <h3 class="text-success">{{ active_users }}</h3>
+                                <p>Active Users</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card card-stats">
+                            <div class="card-body">
+                                <h3 class="text-danger">{{ total_messages }}</h3>
+                                <p>Total Messages</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card card-stats">
+                            <div class="card-body">
+                                <h3 class="text-warning">{{ total_channels }}</h3>
+                                <p>Total Channels</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>User Growth</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="userGrowthChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Messages Activity</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="messageChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Meetings and Invitations -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Meetings Scheduled</h3>
+                            </div>
+                            <div class="card-body">
+                                <h3 class="text-info">{{ total_meetings }}</h3>
+                                <p>Total Meetings in Organization</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Pending Invitations</h3>
+                            </div>
+                            <div class="card-body">
+                                <h3 class="text-danger">{{ pending_invitations }}</h3>
+                                <p>Pending User Invitations</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/js/tabler.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var userCtx = document.getElementById('userGrowthChart').getContext('2d');
+        var userGrowthChart = new Chart(userCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                datasets: [{
+                    label: 'New Users',
+                    data: [50, 75, 150, 200, 250],
+                    backgroundColor: 'blue'
+                }]
+            }
+        });
+
+        var messageCtx = document.getElementById('messageChart').getContext('2d');
+        var messageChart = new Chart(messageCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                datasets: [{
+                    label: 'Messages Sent',
+                    data: [100, 200, 300, 250, 400],
+                    borderColor: 'red',
+                    fill: false
+                }]
+            }
+        });
+    </script>
+</body>
+</html>

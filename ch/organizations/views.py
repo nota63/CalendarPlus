@@ -2209,3 +2209,51 @@ def gateways(request,org_id):
         return HttpResponseForbidden("You are not authorized to view brand guidelines!")
     
     return render(request,'organizations/brand/gateways.html',{'organization':organization})
+
+
+# Admin Dashboard 
+def workspace_admin_dashboard(request, org_id):
+    organization = get_object_or_404(Organization, id=org_id)
+    
+    # User Insights
+    total_users = Profile.objects.filter(organization=organization).count()
+    active_users = Profile.objects.filter(organization=organization, user__last_login__gte=now()-timedelta(days=7)).count()
+    new_users_this_month = Profile.objects.filter(organization=organization, user__date_joined__month=now().month).count()
+    role_breakdown = Profile.objects.filter(organization=organization).values('is_admin', 'is_manager', 'is_employee').annotate(count=Count('id'))
+    
+    # Invitation Insights
+    total_invitations = EmailInvitation.objects.filter(organization=organization).count()
+    pending_invitations = EmailInvitation.objects.filter(organization=organization, status='pending').count()
+    accepted_invitations = EmailInvitation.objects.filter(organization=organization, status='accepted').count()
+    rejected_invitations = EmailInvitation.objects.filter(organization=organization, status='rejected').count()
+    
+    # Meeting Insights
+    total_meetings = MeetingOrganization.objects.filter(organization=organization).count()
+    completed_meetings = MeetingOrganization.objects.filter(organization=organization, status='completed').count()
+    canceled_meetings = MeetingOrganization.objects.filter(organization=organization, status='canceled').count()
+    popular_meeting_types = MeetingOrganization.objects.filter(organization=organization).values('meeting_type').annotate(count=Count('id')).order_by('-count')
+    popular_meeting_platforms = MeetingOrganization.objects.filter(organization=organization).values('meeting_location').annotate(count=Count('id')).order_by('-count')
+    
+    # Messaging & Channels Insights
+    total_messages = Message.objects.filter(channel__organization=organization).count()
+    total_channels = Channel.objects.filter(organization=organization).count()
+    
+    context = {
+        "total_users": total_users,
+        "active_users": active_users,
+        "new_users_this_month": new_users_this_month,
+        "role_breakdown": role_breakdown,
+        "total_invitations": total_invitations,
+        "pending_invitations": pending_invitations,
+        "accepted_invitations": accepted_invitations,
+        "rejected_invitations": rejected_invitations,
+        "total_meetings": total_meetings,
+        "completed_meetings": completed_meetings,
+        "canceled_meetings": canceled_meetings,
+        "popular_meeting_types": popular_meeting_types,
+        "popular_meeting_platforms": popular_meeting_platforms,
+        "total_messages": total_messages,
+        "total_channels": total_channels,
+    }
+    
+    return render(request, "organizations/dashboards/admin_dashboard.html", context)

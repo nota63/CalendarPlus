@@ -53,7 +53,8 @@ urlpatterns=[
     path('get_protection_settings/<int:org_id>/',get_protection_settings, name='get_protection_settings'),
     path('update_protection_settings/<int:org_id>/',update_protection_settings, name='update_protection_settings'),
     path('brand_guidelines/<int:org_id>/',brand_guidelines, name='brand_guidelines'),
-    path('gateways/<int:org_id>/',gateways, name='gateways')
+    path('gateways/<int:org_id>/',gateways, name='gateways'),
+    path('workspace_admin_dashboard/<int:org_id>/',workspace_admin_dashboard, name='workspace_admin_dashboard')
     
 ]
 
