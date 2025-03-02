@@ -43,7 +43,36 @@
         <main class="flex-1 p-8">
             <!-- Header -->
             <div class="flex justify-between items-center mb-8">
-                <h1 class="text-3xl font-bold text-gray-800">Workspace Dashboard</h1>
+                
+
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
+                    <div class="flex items-start gap-4">
+                      <div class="shrink-0 p-3 bg-blue-100 rounded-lg text-blue-600">
+                        <heroicon-outline-sparkles class="w-6 h-6" />
+                      </div>
+                      
+                      <div class="flex-1">
+                        <div class="mb-2">
+                          <h3 class="text-lg font-semibold text-gray-800">
+                            Dashboard in Read-Only Mode
+                          </h3>
+                          <p class="text-gray-600 text-sm">
+                            Currently viewing limited datasets of {{organization.name}} • 
+                            Enable write mode for full access
+                          </p>
+                        </div>
+                        
+                        <a href="#" class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg 
+                                          hover:from-blue-700 hover:to-indigo-700 transition-all shadow-sm hover:shadow-md">
+                          <heroicon-outline-arrow-up class="w-5 h-5" />
+                          <span class="font-medium">Pro</span>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+
+
                 <div class="flex items-center space-x-4">
                     <span class="text-gray-600">Welcome back, Admin</span>
                     <div class="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white">A</div>
