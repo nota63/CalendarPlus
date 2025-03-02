@@ -2214,7 +2214,7 @@ def gateways(request,org_id):
 # Admin Dashboard 
 from groups.models import Group
 from group_tasks.models import GroupEvent,Task
-
+from organization_channels.models import AbusedMessage
 
 
 def workspace_admin_dashboard(request, org_id):
@@ -2246,6 +2246,8 @@ def workspace_admin_dashboard(request, org_id):
     # Groups & Tasks
     total_groups=Group.objects.filter(organization=organization).count()
     total_group_events=GroupEvent.objects.filter(organization=organization).count()
+    # Abused Messages
+    abused_messages=AbusedMessage.objects.filter(organization=organization).count()
 
     
     context = {
@@ -2267,6 +2269,7 @@ def workspace_admin_dashboard(request, org_id):
         "total_channels": total_channels,
         'total_groups':total_groups,
         "total_group_events":total_group_events,
+        'abused_messages':abused_messages
     }
     
     return render(request, "organizations/dashboards/admin_dashboard.html", context)
