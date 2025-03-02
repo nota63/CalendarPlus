@@ -52,7 +52,8 @@ urlpatterns=[
     path('fetch_access_logs/<int:org_id>/',fetch_activity_logs, name='fetch_access_logs'),
     path('get_protection_settings/<int:org_id>/',get_protection_settings, name='get_protection_settings'),
     path('update_protection_settings/<int:org_id>/',update_protection_settings, name='update_protection_settings'),
-    path('brand_guidelines/<int:org_id>/',brand_guidelines, name='brand_guidelines')
+    path('brand_guidelines/<int:org_id>/',brand_guidelines, name='brand_guidelines'),
+    path('gateways/<int:org_id>/',gateways, name='gateways')
     
 ]
 

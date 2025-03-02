@@ -1,0 +1,147 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar Plus Updates</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Material+Icons+Round&display=swap" rel="stylesheet">
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .gradient-header {
+            background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+        }
+        .timeline-dot {
+            @apply w-3 h-3 rounded-full bg-blue-500 border-2 border-white;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 to-blue-50 min-h-screen">
+    <!-- Header Section -->
+    <header class="gradient-header text-white py-20 px-6">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-4xl font-bold mb-4 font-['Inter']">Calendar Plus Updates</h1>
+            <p class="text-xl opacity-90">Stay informed about important changes and improvements</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-6 -mt-16 space-y-8">
+        <!-- Gateways Section -->
+        <section class="glass-card rounded-2xl p-8 shadow-lg">
+            <div class="flex items-center gap-4 mb-6">
+                <span class="material-icons-round text-3xl text-red-500">warning</span>
+                <h2 class="text-2xl font-bold text-gray-800">Legacy Integrations Phase Out</h2>
+            </div>
+            
+            <div class="space-y-6">
+                <p class="text-gray-600 leading-relaxed">
+                    We're modernizing our integration platform to enhance security and performance. 
+                    <span class="font-medium text-blue-600">Your current setup will remain functional until May 15, 2025.</span>
+                </p>
+
+                <div class="bg-blue-50 rounded-xl p-6">
+                    <h3 class="font-semibold text-lg mb-4 text-blue-800">Closure Timeline</h3>
+                    <div class="flex flex-col md:flex-row items-center gap-8">
+                        <div class="text-center">
+                            <div class="timeline-dot"></div>
+                            <p class="font-medium mt-2">Mar 6, 2025</p>
+                            <p class="text-sm text-gray-600">New workspace limit</p>
+                        </div>
+                        <div class="h-px bg-gray-200 w-16 md:w-auto md:h-16 md:flex-1 hidden md:block"></div>
+                        <div class="text-center">
+                            <div class="timeline-dot"></div>
+                            <p class="font-medium mt-2">Apr 3, 2025</p>
+                            <p class="text-sm text-gray-600">Inactive removal</p>
+                        </div>
+                        <div class="h-px bg-gray-200 w-16 md:w-auto md:h-16 md:flex-1 hidden md:block"></div>
+                        <div class="text-center">
+                            <div class="timeline-dot"></div>
+                            <p class="font-medium mt-2">May 15, 2025</p>
+                            <p class="text-sm text-gray-600">Full deprecation</p>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="#" class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors">
+                    <span class="material-icons-round">support_agent</span>
+                    Contact Support
+                </a>
+            </div>
+        </section>
+
+        <!-- Accessibility Section -->
+        <section class="glass-card rounded-2xl p-8 shadow-lg">
+            <div class="flex items-center gap-4 mb-6">
+                <span class="material-icons-round text-3xl text-green-500">accessibility_new</span>
+                <h2 class="text-2xl font-bold text-gray-800">Enhanced Accessibility</h2>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-xl">
+                    <span class="material-icons-round text-blue-500 text-3xl mb-4">keyboard</span>
+                    <h3 class="font-semibold mb-2">Keyboard Navigation</h3>
+                    <p class="text-gray-600 text-sm">Improved shortcut support and focus states</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl">
+                    <span class="material-icons-round text-blue-500 text-3xl mb-4">hearing</span>
+                    <h3 class="font-semibold mb-2">Screen Reader Ready</h3>
+                    <p class="text-gray-600 text-sm">ARIA landmarks and semantic HTML</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl">
+                    <span class="material-icons-round text-blue-500 text-3xl mb-4">label</span>
+                    <h3 class="font-semibold mb-2">Clear Labeling</h3>
+                    <p class="text-gray-600 text-sm">Enhanced form labels and instructions</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Alternatives Section -->
+        <section class="glass-card rounded-2xl p-8 shadow-lg">
+            <div class="flex items-center gap-4 mb-6">
+                <span class="material-icons-round text-3xl text-purple-500">swap_horiz</span>
+                <h2 class="text-2xl font-bold text-gray-800">Migration Solutions</h2>
+            </div>
+
+            <div class="space-y-6">
+                <div class="bg-white rounded-xl p-6 hover:shadow-md transition-shadow">
+                    <h3 class="font-semibold text-lg mb-2">Modern API Suite</h3>
+                    <p class="text-gray-600 mb-4">Explore our real-time REST APIs with enhanced capabilities</p>
+                    <a href="#" class="text-blue-600 inline-flex items-center gap-1">
+                        API Documentation
+                        <span class="material-icons-round text-sm">arrow_forward</span>
+                    </a>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 hover:shadow-md transition-shadow">
+                    <h3 class="font-semibold text-lg mb-2">Community Tools</h3>
+                    <p class="text-gray-600 mb-4">Discover community-built integrations in our marketplace</p>
+                    <a href="#" class="text-blue-600 inline-flex items-center gap-1">
+                        Explore Marketplace
+                        <span class="material-icons-round text-sm">arrow_forward</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="glass-card rounded-2xl p-8 shadow-lg text-center mb-12">
+            <span class="material-icons-round text-4xl text-blue-500 mb-4">support_agent</span>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Need Assistance?</h2>
+            <p class="text-gray-600 mb-6">Our team is ready to help with migration and upgrades</p>
+            <a href="mailto:support@calendarplus.com" class="inline-block bg-blue-600 text-white px-8 py-3 rounded-full hover:bg-blue-700 transition-colors">
+                Contact Support
+            </a>
+        </section>
+    </main>
+</body>
+</html>
+
+{% endblock %}
