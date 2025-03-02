@@ -41,6 +41,12 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.hashers import check_password
 import base64
 import os
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.hashers import make_password
+from .models import Organization, OrganizationProtection
 from django.utils.timezone import localtime
 # Load the same SECRET_KEY used in models
 from django.conf import settings
@@ -1762,6 +1768,12 @@ class LaunchRoom(View,LoginRequiredMixin):
 def start_meeting(request,org_id):
     username=request.user.username
     organization = get_object_or_404(Organization, id=org_id)
+    organization = get_object_or_404(Organization, id=org_id)
+
+    profile = get_object_or_404(Profile, user=request.user,organization=organization)
+    if not profile:
+        return HttpResponseForbidden("You are not Authorized to perform this action!")
+
     user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
     if not user_profile:
         return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
@@ -1773,6 +1785,12 @@ def start_meeting(request,org_id):
 @login_required
 def support_transport_layer(request, org_id):
     organization = get_object_or_404(Organization, id=org_id)
+
+
+    profile = get_object_or_404(Profile, user=request.user,organization=organization)
+    if not profile:
+        return HttpResponseForbidden("You are not Authorized to perform this action!")
+
     
     try:
         profile = Profile.objects.get(user=request.user, organization=organization)
@@ -1791,6 +1809,13 @@ def user_help_queries(request, org_id):
     """Fetches all help queries raised by the user in the given organization."""
     organization = get_object_or_404(Organization, id=org_id)
     helps = Help.objects.filter(user=request.user, organization=organization).order_by("-created_at")
+
+   
+
+    profile = get_object_or_404(Profile, user=request.user,organization=organization)
+    if not profile:
+        return HttpResponseForbidden("You are not Authorized to perform this action!")
+
 
     # Send only required fields
     data = [
@@ -1834,6 +1859,11 @@ def help_query_details(request, help_id):
 def raise_help_request(request, org_id):
     """Handles user help requests."""
     organization = get_object_or_404(Organization, id=org_id)
+   
+    profile = get_object_or_404(Profile, user=request.user,organization=organization)
+    if not profile:
+            return HttpResponseForbidden("You are not Authorized to perform this action!")
+
     user = request.user
 
     if request.method == "POST":
@@ -1896,12 +1926,7 @@ def organization_password_settings(request, org_id):
 
 
 # Set Password AES Protection
-import json
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth.hashers import make_password
-from .models import Organization, OrganizationProtection
+
 
 # 💖 Set Organization Password (Securely)
 @csrf_exempt
@@ -1980,6 +2005,11 @@ def validate_org_password(request, org_id):
     organization = get_object_or_404(Organization, id=org_id)
     logger.info(f"🔹 Received request for org_id: {org_id}")
 
+    profile = get_object_or_404(Profile, user=request.user,organization=organization)
+    if not profile:
+            return HttpResponseForbidden("You are not Authorized to perform this action!")
+
+
     org_protection = get_object_or_404(OrganizationProtection, organization_id=org_id)
 
     ip_address = get_client_ip(request)
@@ -2050,6 +2080,12 @@ def remove_org_password(request, org_id):
     if request.method == "POST":
         try:
             org_protection = get_object_or_404(OrganizationProtection, organization_id=org_id)
+            organization = get_object_or_404(Organization, id=org_id)
+
+            profile = get_object_or_404(Profile, user=request.user,organization=organization)
+            if not profile:
+               return HttpResponseForbidden("You are not Authorized to perform this action!")
+
 
             # Check if user is an admin or authorized
             profile = get_object_or_404(Profile, user=request.user, organization_id=org_id)
@@ -2073,6 +2109,11 @@ def fetch_activity_logs(request, org_id):
     """Fetch all access activities for a workspace with security enhancements"""
     
     organization = get_object_or_404(Organization, id=org_id)
+
+    profile = get_object_or_404(Profile, user=request.user,organization=organization)
+    if not profile:
+            return HttpResponseForbidden("You are not Authorized to perform this action!")
+
 
     profile = get_object_or_404(Profile, organization=organization)
 
@@ -2103,6 +2144,12 @@ def fetch_activity_logs(request, org_id):
 def get_protection_settings(request, org_id):
     """Fetch current protection settings for an organization."""
     org_protection = get_object_or_404(OrganizationProtection, organization_id=org_id)
+
+    organization = get_object_or_404(Organization, id=org_id)
+    profile = get_object_or_404(Profile, user=request.user,organization=organization)
+    if not profile:
+            return HttpResponseForbidden("You are not Authorized to perform this action!")
+
 
     return JsonResponse({
         "protect_channels": org_protection.protect_channels,
