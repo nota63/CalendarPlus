@@ -2187,3 +2187,7 @@ def update_protection_settings(request, org_id):
         return JsonResponse({"success": True, "message": "Protection settings updated!"})
 
     return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
+
+
+# SECURITY PART ENDS --------------------------------------------------------------------------------------------------------------------
+
