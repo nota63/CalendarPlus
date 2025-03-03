@@ -35,5 +35,5 @@ class MiniApp(models.Model):
 
 # Images of miniapp
 class MiniAppImage(models.Model):
-    mini_app = models.ForeignKey(MiniApp, on_delete=models.CASCADE, related_name="related_images")
+    mini_app = models.ForeignKey(MiniApp, on_delete=models.CASCADE, related_name="related_imagess")
     image = models.ImageField(upload_to="mini_apps/images/")

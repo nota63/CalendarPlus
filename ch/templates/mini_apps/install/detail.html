@@ -55,14 +55,15 @@
     </div>
 
     <div class="related-images">
-        {% if app.related_images %}
+        {% if app.related_imagess.all %}
             <ul>
-                {% for image in app.related_images %}
-                    <li><a href="{{ image.url }}">{{ image.url }}</a></li>
+                {% for image in app.related_imagess.all %}
+                    <li><a href="{{ image.image.url }}"><img src="{{ image.image.url }}" alt="Mini App Image" width="100"></a></li>
                 {% endfor %}
             </ul>
         {% endif %}
     </div>
+    
     
 </div>
 {% endblock %}
