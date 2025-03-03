@@ -41,7 +41,7 @@ def mini_app_detail(request, app_id, org_id):
     return render(request, "mini_apps/install/detail.html", {
         "app": app,
         "organization": organization,
-        "is_installed": is_installed  # Pass this to disable the install button in the frontend
+        "is_installed": is_installed  
     })
 
 
@@ -66,6 +66,8 @@ def install_mini_app(request):
 
         # Install the app
         InstalledMiniApp.objects.create(user=user, organization=organization, mini_app=mini_app)
+        mini_app.install_count+=1
+        mini_app.save()
         return JsonResponse({"success": True, "message": "App installed successfully"})
 
     return JsonResponse({"success": False, "message": "Invalid request"}, status=400)
