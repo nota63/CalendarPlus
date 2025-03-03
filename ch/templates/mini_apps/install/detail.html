@@ -188,16 +188,19 @@
             </div>
 
             <!-- Install Button -->
-          <!-- Install Button -->
-<button id="installBtn" class="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold 
-shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]" 
-{% if is_installed %} disabled class="bg-gray-400 cursor-not-allowed" {% endif %}>
+        <!-- Install Button -->
+<button class="w-3/4 py-3 text-white rounded-lg font-semibold shadow-lg transition-all 
+{% if is_installed %} bg-gray-500 cursor-not-allowed {% else %}
+bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-xl hover:scale-[1.02] {% endif %}" 
+{% if is_installed %} disabled {% else %} data-bs-toggle="modal" data-bs-target="#installModal" {% endif %}>
 {% if is_installed %}
-Installed ✅
+✅ Installed
 {% else %}
 Install Now
 {% endif %}
 </button>
+
+
 
         </div>
     </div>
