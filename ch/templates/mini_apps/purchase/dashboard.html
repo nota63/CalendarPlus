@@ -20,23 +20,21 @@
 
     <!-- Apps Grid -->
     <div id="appsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for category, apps in categories.items %}
-            {% for app in apps %}
-                <div class="app-card bg-white p-4 rounded-lg shadow-md flex flex-col items-center border border-gray-200" 
-                    data-category="{{ app.category }}" data-name="{{ app.name|lower }}">
+        {% for app in categories.All %}  {# Show only "All" category apps to avoid duplication #}
+            <div class="app-card bg-white p-4 rounded-lg shadow-md flex flex-col items-center border border-gray-200" 
+                data-category="{{ app.category }}" data-name="{{ app.name|lower }}">
 
-                    <img src="{{ app.icon.url }}" alt="{{ app.name }}" class="w-16 h-16 rounded-md">
-                    <h3 class="text-lg font-semibold mt-2">{{ app.name }}</h3>
-                    <p class="text-sm text-gray-600">{{ app.size }}</p>
+                <img src="{{ app.icon.url }}" alt="{{ app.name }}" class="w-16 h-16 rounded-md">
+                <h3 class="text-lg font-semibold mt-2">{{ app.name }}</h3>
+                <p class="text-sm text-gray-600">{{ app.size }}</p>
 
-                    <!-- Premium Badge -->
-                    {% if app.is_premium %}
-                        <span class="mt-2 px-3 py-1 bg-yellow-500 text-white text-xs rounded-full">Premium</span>
-                    {% endif %}
+                <!-- Premium Badge -->
+                {% if app.is_premium %}
+                    <span class="mt-2 px-3 py-1 bg-yellow-500 text-white text-xs rounded-full">Premium</span>
+                {% endif %}
 
-                    <button class="install-btn bg-blue-600 text-white px-4 py-2 rounded-md mt-3">Install</button>
-                </div>
-            {% endfor %}
+                <button class="install-btn bg-blue-600 text-white px-4 py-2 rounded-md mt-3">Install</button>
+            </div>
         {% endfor %}
     </div>
 </div>

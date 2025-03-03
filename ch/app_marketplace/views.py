@@ -5,23 +5,24 @@ from accounts.models import Organization, Profile
 # Create your views here.
 
 # Display Miniapps 
+def mini_apps_list(request, org_id):
+    organization = get_object_or_404(Organization, id=org_id)
+    
+    # Fetch all apps once
+    apps_queryset = MiniApp.objects.order_by('-install_count')
 
-def mini_apps_list(request,org_id):
-    organization=get_object_or_404(Organization, id=org_id)
-    apps = MiniApp.objects.all().order_by('-install_count')  # Fetch all apps
-
+    # Explicitly create separate querysets to avoid duplicates
     categories = {
-        "All": apps,
-        "Productivity": apps.filter(category="productivity"),
-        "Communication": apps.filter(category="communication"),
-        "Task Management": apps.filter(category="task_management"),
-        "Entertainment": apps.filter(category="entertainment"),
-        "Utility": apps.filter(category="utility"),
-        "Other": apps.filter(category="other"),
+        "All": list(apps_queryset),  # Convert to list to prevent shared references
+        "Productivity": list(apps_queryset.filter(category="productivity")),
+        "Communication": list(apps_queryset.filter(category="communication")),
+        "Task Management": list(apps_queryset.filter(category="task_management")),
+        "Entertainment": list(apps_queryset.filter(category="entertainment")),
+        "Utility": list(apps_queryset.filter(category="utility")),
+        "Other": list(apps_queryset.filter(category="other")),
     }
 
-    return render(request, "mini_apps/purchase/dashboard.html", {"categories": categories,'organization':organization})
-
-
-
-
+    return render(request, "mini_apps/purchase/dashboard.html", {
+        "categories": categories,
+        "organization": organization
+    })
