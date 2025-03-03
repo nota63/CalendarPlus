@@ -57,3 +57,31 @@ class InstalledMiniApp(models.Model):
     def __str__(self):
         return f"{self.user} installed {self.mini_app} in {self.organization}"
 
+
+
+# APPS MODELS 
+# TASK MANAGER (KANBAN BOARD)
+
+class TaskManager(models.Model):
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="tasks")
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    status = models.CharField(
+        max_length=20,
+        choices=[("todo", "To Do"), ("in_progress", "In Progress"), ("done", "Done")],
+        default="todo"
+    )
+    priority = models.CharField(
+        max_length=10,
+        choices=[("low", "Low"), ("medium", "Medium"), ("high", "High")],
+        default="medium"
+    )
+    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="tasks")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.title} - {self.get_status_display()}"
