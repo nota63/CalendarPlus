@@ -93,3 +93,49 @@ def launch_app(request,org_id,app_id):
     
     return render(request,'mini_apps/launch/launch.html',context)
 
+# ------------------------------------------------------------------------------------------------------------------------------
+# APPS (TASK MANAGER - KANBAN BOARD)
+from .models import TaskManager
+
+# Add task 
+@login_required
+@csrf_exempt
+def add_task_view(request, org_id, app_id):
+    """Handles task creation via AJAX."""
+    if request.method == "POST":
+        organization = get_object_or_404(Organization, id=org_id)
+        mini_app = get_object_or_404(MiniApp, id=app_id, organization=organization)
+
+        # Check if the app supports '/add task'
+        if "/add task" not in mini_app.commands:
+            return JsonResponse({"error": "This app does not support adding tasks!"}, status=400)
+
+        # Get task details from AJAX request
+        task_title = request.POST.get("title", "").strip()
+        task_description = request.POST.get("description", "").strip()
+        task_status = request.POST.get("status", "todo")  # Default status: 'To Do'
+
+        if not task_title:
+            return JsonResponse({"error": "Task title is required!"}, status=400)
+
+        # Create the task
+        task = TaskManager.objects.create(
+            organization=organization,
+            title=task_title,
+            description=task_description,
+            status=task_status,
+            assigned_to=request.user
+        )
+
+        # Return success response with task data
+        return JsonResponse({
+            "success": True,
+            "task": {
+                "id": task.id,
+                "title": task.title,
+                "description": task.description,
+                "status": task.status
+            }
+        })
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
