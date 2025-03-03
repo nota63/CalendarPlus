@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +8,8 @@
     <title>Launch {{ app.mini_app.name }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'apps/launch.css'%}">
+
     <style>
         .glass-card {
             background: rgba(255, 255, 255, 0.1);
@@ -116,7 +120,40 @@
         </div>
     </div>
 
-    <script>
+<!-- APP MODALS WILL BE APPEAR HERE------------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- SCRIPTS-------------------------------------------------------------------------------------------------- -->
+<!-- /Commands and automations -->
+<script type="text/javascript">
+    // Inject Django variables into the window object
+    window.djangoData = {
+        orgId: "{{ organization.id }}",
+        appId: "{{ app.id }}",
+      
+    };
+</script>
+
+
+ <!-- Link your JS file -->
+<script src="{% static 'apps/launch.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script>
         function openTerminal() {
             document.getElementById('terminalModal').classList.remove('hidden');
             document.getElementById('cmdInput').focus();
