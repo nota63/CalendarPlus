@@ -6,6 +6,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Launch {{ app.mini_app.name }}</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'apps/launch.css'%}">
@@ -122,6 +127,56 @@
 
 <!-- APP MODALS WILL BE APPEAR HERE------------------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
 
+<!-- TASK MANAGER (KANBAN BOARD) - ADD TASK -->
+<!-- Add Task Modal -->
+<div id="addTaskModal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title">Add Task</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addTaskForm">
+                    <div class="mb-3">
+                        <label for="taskTitle" class="form-label">Task Title</label>
+                        <input type="text" id="taskTitle" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="taskDescription" class="form-label">Task Description</label>
+                        <textarea id="taskDescription" class="form-control"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="taskStatus" class="form-label">Status</label>
+                        <select id="taskStatus" class="form-select">
+                            <option value="todo">To Do</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="done">Done</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Add Task</button>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Kanban Board -->
+ <!-- Kanban Modal -->
+<div class="modal fade" id="kanbanModal" tabindex="-1" aria-labelledby="kanbanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">📝 Kanban Board</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="kanban-board"></div> <!-- Kanban UI Here -->
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -149,6 +204,8 @@
 
 
  <!-- Link your JS file -->
+ 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{% static 'apps/launch.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 

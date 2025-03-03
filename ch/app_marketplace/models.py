@@ -63,7 +63,7 @@ class InstalledMiniApp(models.Model):
 # TASK MANAGER (KANBAN BOARD)
 
 class TaskManager(models.Model):
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="tasks")
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="task_manager_tasks")
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     status = models.CharField(
@@ -76,7 +76,7 @@ class TaskManager(models.Model):
         choices=[("low", "Low"), ("medium", "Medium"), ("high", "High")],
         default="medium"
     )
-    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="tasks")
+    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="tasksss")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -84,4 +84,4 @@ class TaskManager(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.title} - {self.get_status_display()}"
+        return f"{self.title}"

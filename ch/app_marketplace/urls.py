@@ -6,5 +6,8 @@ urlpatterns=[
     path('install/<int:app_id>/<int:org_id>/',mini_app_detail, name='install'),
     path('install-mini-app/',install_mini_app, name='install_mini_app'),
     path('launch_app/<int:org_id>/<int:app_id>/',launch_app, name='launch_app'),
-    path('add_task_workspace/<int:org_id>/<int:app_id>/',add_task_view, name='add_task_workspace')
+    path("add_task_workspace/<int:org_id>/<int:app_id>/", add_task_view_workspace, name="add_task"),
+    path("kanban/tasks/<int:org_id>/<int:app_id>/", get_tasks_kanban, name="kanban-tasks"),
+    path("kanban/update-task/", update_task_status, name="update-task-status"),
+
 ]
