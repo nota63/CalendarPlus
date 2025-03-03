@@ -236,66 +236,72 @@ Install Now
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-
 document.addEventListener("DOMContentLoaded", function () {
-            const progressBar = document.getElementById("progress-bar");
-            const installBtn = document.getElementById("installBtn");
-            
-            // When modal opens, start fake download progress
-            document.getElementById("installModal").addEventListener("shown.bs.modal", function () {
-                let progress = 0;
+    const progressBar = document.getElementById("progress-bar");
+    const installBtn = document.getElementById("installBtn");
+
+    // When modal opens, start fake download progress
+    document.getElementById("installModal").addEventListener("shown.bs.modal", function () {
+        let progress = 0;
+        installBtn.disabled = true;
+        progressBar.style.width = "0%";
+        progressBar.setAttribute("aria-valuenow", "0");
+
+        let interval = setInterval(() => {
+            if (progress >= 100) {
+                clearInterval(interval);
+                installBtn.textContent = "Installing...";
+                installBtn.disabled = false;
+                installApp();  // Call install function after progress reaches 100%
+            } else {
+                progress += 10;
+                progressBar.style.width = progress + "%";
+                progressBar.setAttribute("aria-valuenow", progress);
+            }
+        }, 300);
+    });
+
+    function installApp() {
+        const orgId = "{{organization.id}}";  // Replace with dynamic org ID
+        const appId = "{{app.id}}";  // Replace with dynamic app ID
+
+        fetch("/apps/install-mini-app/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": getCSRFToken()  // Include CSRF token if needed
+            },
+            body: `org_id=${orgId}&app_id=${appId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                installBtn.textContent = "Installed ✅";
+                installBtn.classList.replace("btn-primary", "btn-success");
                 installBtn.disabled = true;
-                progressBar.style.width = "0%";
-                progressBar.setAttribute("aria-valuenow", "0");
-
-                let interval = setInterval(() => {
-                    if (progress >= 100) {
-                        clearInterval(interval);
-                        installBtn.textContent = "Installing...";
-                        installBtn.disabled = false;
-                        installApp();  // Call install function after progress reaches 100%
-                    } else {
-                        progress += 10;
-                        progressBar.style.width = progress + "%";
-                        progressBar.setAttribute("aria-valuenow", progress);
-                    }
-                }, 300);
-            });
-
-            function installApp() {
-                const orgId = "{{organization.id}}";  // Replace with dynamic org ID
-                const appId = "{{app.id}}";  // Replace with dynamic app ID
                 
-                fetch("/apps/install-mini-app/", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                        "X-CSRFToken": getCSRFToken()  // Include CSRF token if needed
-                    },
-                    body: `org_id=${orgId}&app_id=${appId}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        installBtn.textContent = "Installed ✅";
-                        installBtn.classList.replace("btn-primary", "btn-success");
-                    } else {
-                        installBtn.textContent = "Failed ❌";
-                        installBtn.classList.replace("btn-primary", "btn-danger");
-                    }
-                    installBtn.disabled = true;
-                })
-                .catch(error => {
-                    installBtn.textContent = "Error ❌";
-                    installBtn.classList.replace("btn-primary", "btn-danger");
-                    installBtn.disabled = true;
-                });
+                // Reload the page after 1 second to reflect changes
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            } else {
+                installBtn.textContent = "Failed ❌";
+                installBtn.classList.replace("btn-primary", "btn-danger");
             }
-
-            function getCSRFToken() {
-                return document.cookie.split("; ").find(row => row.startsWith("csrftoken="))?.split("=")[1];
-            }
+            installBtn.disabled = true;
+        })
+        .catch(error => {
+            installBtn.textContent = "Error ❌";
+            installBtn.classList.replace("btn-primary", "btn-danger");
+            installBtn.disabled = true;
         });
+    }
+
+    function getCSRFToken() {
+        return document.cookie.split("; ").find(row => row.startsWith("csrftoken="))?.split("=")[1];
+    }
+});
+
 </script>
 
 
