@@ -26,10 +26,14 @@ class MiniApp(models.Model):
     install_count = models.PositiveIntegerField(default=0)  # Number of times installed
     commands = models.JSONField(default=list)  # Store available commands for the app
     requirements=models.CharField(max_length=255,default="Windows 10 + Higher")
-    related_images=models.ImageField(upload_to="mini_apps/images/",null=True, blank=True)
-
+   
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.name} - {self.version}"
+
+# Images of miniapp
+class MiniAppImage(models.Model):
+    mini_app = models.ForeignKey(MiniApp, on_delete=models.CASCADE, related_name="related_images")
+    image = models.ImageField(upload_to="mini_apps/images/")
