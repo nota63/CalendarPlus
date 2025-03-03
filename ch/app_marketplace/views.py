@@ -78,7 +78,7 @@ def install_mini_app(request):
 @login_required
 def launch_app(request,org_id,app_id):
     organization = get_object_or_404(Organization,id=org_id)
-    app=get_object_or_404(MiniApp,id=app_id,organization=organization)
+    app=get_object_or_404(InstalledMiniApp,id=app_id)
     if not app:
         return JsonResponse({'error:':'App not Found!'},status=401)
     
