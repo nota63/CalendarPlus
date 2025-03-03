@@ -26,3 +26,11 @@ def mini_apps_list(request, org_id):
         "categories": categories,
         "organization": organization
     })
+
+
+# INSTALLATION PAGE
+
+def mini_app_detail(request, app_id,org_id):
+    organization=get_object_or_404(Organization,id=org_id)
+    app = get_object_or_404(MiniApp, id=app_id)  
+    return render(request, "mini_apps/install/detail.html", {"app": app,'organization':organization})

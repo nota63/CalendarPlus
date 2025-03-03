@@ -21,7 +21,7 @@
     <!-- Apps Grid -->
     <div id="appsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for app in categories.All %}  {# Show only "All" category apps to avoid duplication #}
-            <div class="app-card bg-white p-4 rounded-lg shadow-md flex flex-col items-center border border-gray-200" 
+            <a href="{% url 'install' app.id organization.id %}" class="app-card bg-white p-4 rounded-lg shadow-md flex flex-col items-center border border-gray-200 transition hover:shadow-lg cursor-pointer" 
                 data-category="{{ app.category }}" data-name="{{ app.name|lower }}">
 
                 <img src="{{ app.icon.url }}" alt="{{ app.name }}" class="w-16 h-16 rounded-md">
@@ -32,9 +32,7 @@
                 {% if app.is_premium %}
                     <span class="mt-2 px-3 py-1 bg-yellow-500 text-white text-xs rounded-full">Premium</span>
                 {% endif %}
-
-                <button class="install-btn bg-blue-600 text-white px-4 py-2 rounded-md mt-3">Install</button>
-            </div>
+            </a>
         {% endfor %}
     </div>
 </div>
