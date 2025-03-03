@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-// HANDLE KANBAN BOARD
+
 // HANDLE KANBAN BOARD
 document.addEventListener("DOMContentLoaded", function () {
     const cmdInput = document.getElementById("cmdInput");
@@ -139,8 +139,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 { id: "in_progress", title: "🚀 In Progress", item: [] },
                 { id: "done", title: "✅ Done", item: [] }
             ],
-            dragendEl: function (el, source) {
-                updateTaskStatus(el.dataset.eid, source.parentElement.dataset.id);
+            dragendEl: function (el) {
+                console.log("Dragged element:", el);
+
+                // Get the new status using `closest("[data-id]")`
+                const boardElement = el.parentElement.closest("[data-id]");
+                if (!boardElement) {
+                    console.error("Error: Cannot determine new status. Parent board not found!");
+                    return;
+                }
+
+                const newStatus = boardElement.dataset.id;
+                console.log(`Updating task ${el.dataset.eid} to ${newStatus}`); // ✅ DEBUG TASK UPDATE
+                updateTaskStatus(el.dataset.eid, newStatus);
             }
         });
 

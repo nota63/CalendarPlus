@@ -176,6 +176,7 @@ def get_tasks_kanban(request, org_id, app_id):
     return JsonResponse({"tasks": tasks_list}, safe=False)
 
 
+@csrf_exempt
 @login_required
 def update_task_status(request):
     """ Update task status when user moves task in Kanban """
