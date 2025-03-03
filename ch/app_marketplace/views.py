@@ -156,16 +156,24 @@ def add_task_view_workspace(request, org_id, app_id):
     return JsonResponse({"error": "Invalid request"}, status=400)
 
 # KANBAN BOARD HANDLING
-
 @login_required
 def get_tasks_kanban(request, org_id, app_id):
-    """ Fetch all tasks where request.user is assigned_to """
-    tasks = TaskManager.objects.filter(organization_id=org_id, assigned_to=request.user)
-    task_data = [
-        {"id": task.id, "title": task.title, "status": task.status}
-        for task in tasks
-    ]
-    return JsonResponse({"tasks": task_data}, safe=False)
+    organization= get_object_or_404(Organization, id=org_id)
+    """ Fetch all tasks where request.user is assigned_to and the task belongs to the given app_id """
+    
+    # Fetch tasks ensuring they belong to the correct org and assigned user
+    tasks = TaskManager.objects.filter(
+        organization=organization,
+        assigned_to=request.user
+    ).values("id", "title", "status")  # Optimized query
+    print("TASKS FOUND:",tasks)
+
+    tasks_list = list(tasks)  # Convert QuerySet to a list
+
+    if not tasks_list:
+        print(f"No tasks found for user {request.user} in org {organization.name} and app {app_id}")  # Debugging
+
+    return JsonResponse({"tasks": tasks_list}, safe=False)
 
 
 @login_required
