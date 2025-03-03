@@ -2285,3 +2285,4 @@ def workspace_admin_dashboard(request, org_id):
 }
     
     return render(request, "organizations/dashboards/admin_dashboard.html", context)
+
