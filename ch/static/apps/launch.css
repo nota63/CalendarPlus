@@ -1,3 +1,120 @@
 #addTaskModal {
     display: none; /* Ensures the modal is hidden initially */
 }
+
+
+/* KANBAN MODAL  */
+/* Kanban Modal Styles */
+#kanbanModal .modal-content {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+#kanbanModal .modal-header {
+    background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px 20px 0 0;
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#kanbanModal .modal-title {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Kanban Board Layout */
+#kanban-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    padding: 1rem;
+    min-height: 60vh;
+}
+
+.kanban-column {
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    padding: 1.5rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.kanban-column:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.kanban-column h3 {
+    color: #4a5568;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+}
+
+.kanban-task {
+    background: white;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    cursor: move;
+    transition: all 0.2s ease;
+    border-left: 4px solid #667eea;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.kanban-task:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.kanban-task.dragging {
+    opacity: 0.5;
+    transform: rotate(3deg);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Status Colors */
+.kanban-column.todo h3 { border-color: #667eea; }
+.kanban-column.in-progress h3 { border-color: #48bb78; }
+.kanban-column.done h3 { border-color: #f56565; }
+
+/* Add Task Button */
+.add-task-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+    position: absolute;
+    right: 2rem;
+    bottom: -20px;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+}
+
+.add-task-btn:hover {
+    transform: scale(1.1) rotate(90deg);
+    background: #764ba2;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #kanban-board {
+        grid-template-columns: 1fr;
+    }
+    
+    .kanban-column {
+        margin-bottom: 1.5rem;
+    }
+}
