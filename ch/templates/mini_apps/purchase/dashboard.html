@@ -1,68 +1,153 @@
-{% extends "custom.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Apps Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <!-- Header Section -->
+        <div class="mb-12 text-center">
+            <h2 class="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                🚀 Mini Apps Store
+            </h2>
+            
+            <!-- Search Input -->
+            <div class="max-w-2xl mx-auto relative">
+                <span class="material-icons absolute left-4 top-3 text-gray-500">search</span>
+                <input type="text" id="searchInput" placeholder="Search apps..." 
+                    class="w-full px-12 py-4 rounded-xl bg-white/30 backdrop-blur-sm border border-white/50 shadow-lg focus:outline-none focus:ring-4 focus:ring-purple-300/30 transition-all">
+            </div>
+        </div>
 
-{% block content %}
-<div class="container mx-auto mt-8">
-    <h2 class="text-2xl font-bold mb-4">🚀 Mini Apps Store</h2>
+        <!-- Category Filters -->
+        <div class="flex flex-wrap gap-3 mb-8 justify-center">
+            <button class="filter-btn px-5 py-2.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-all flex items-center gap-2 shadow-sm hover:shadow-md active:scale-95" data-category="all">
+                <span class="material-icons text-blue-600">apps</span>
+                <span class="text-gray-700 font-medium">All</span>
+            </button>
+            <button class="filter-btn px-5 py-2.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-all flex items-center gap-2 shadow-sm hover:shadow-md active:scale-95" data-category="productivity">
+                <span class="material-icons text-green-600">work</span>
+                <span class="text-gray-700 font-medium">Productivity</span>
+            </button>
+            <button class="filter-btn px-5 py-2.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-all flex items-center gap-2 shadow-sm hover:shadow-md active:scale-95" data-category="communication">
+                <span class="material-icons text-purple-600">forum</span>
+                <span class="text-gray-700 font-medium">Communication</span>
+            </button>
+            <!-- Add other categories similarly -->
+            <button class="filter-btn px-5 py-2.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-all flex items-center gap-2 shadow-sm hover:shadow-md active:scale-95" data-category="task_management">
+                <span class="material-icons text-purple-600">forum</span>
+                <span class="text-gray-700 font-medium">Task Management</span>
+            </button>
 
-    <!-- Search Input -->
-    <input type="text" id="searchInput" placeholder="🔍 Search apps..." 
-        class="w-full px-4 py-2 border rounded-md shadow-sm mb-4 focus:ring focus:ring-blue-300">
+            <button class="filter-btn px-5 py-2.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-all flex items-center gap-2 shadow-sm hover:shadow-md active:scale-95" data-category="entertainment">
+                <span class="material-icons text-purple-600">forum</span>
+                <span class="text-gray-700 font-medium">Entertainment</span>
+            </button>
 
-    <!-- Category Filters -->
-    <div class="flex space-x-3 mb-6">
-        <button class="filter-btn bg-blue-500 text-white px-4 py-2 rounded-md" data-category="all">All</button>
-        <button class="filter-btn bg-gray-500 text-white px-4 py-2 rounded-md" data-category="productivity">Productivity</button>
-        <button class="filter-btn bg-green-500 text-white px-4 py-2 rounded-md" data-category="communication">Communication</button>
-        <button class="filter-btn bg-purple-500 text-white px-4 py-2 rounded-md" data-category="task_management">Task Management</button>
-        <button class="filter-btn bg-red-500 text-white px-4 py-2 rounded-md" data-category="entertainment">Entertainment</button>
-        <button class="filter-btn bg-yellow-500 text-white px-4 py-2 rounded-md" data-category="utility">Utility</button>
+            <button class="filter-btn px-5 py-2.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-all flex items-center gap-2 shadow-sm hover:shadow-md active:scale-95" data-category="utility">
+                <span class="material-icons text-purple-600">forum</span>
+                <span class="text-gray-700 font-medium">Utility</span>
+            </button>
+        </div>
+
+        <!-- Apps Grid -->
+        <div id="appsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for app in categories.All %}
+                <a href="{% url 'install' app.id organization.id %}" 
+                    class="app-card group relative bg-white/20 backdrop-blur-sm p-6 rounded-2xl border border-white/30 hover:border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1.5"
+                    data-category="{{ app.category }}" data-name="{{ app.name|lower }}">
+                    
+                    <!-- Premium Badge -->
+                    {% if app.is_premium %}
+                    <div class="absolute top-4 right-4 bg-amber-400/90 px-3 py-1 rounded-full text-xs font-bold text-gray-800 flex items-center gap-1">
+                        <span class="material-icons text-sm">star</span>
+                        Premium
+                    </div>
+                    {% endif %}
+
+                    <div class="flex flex-col items-center">
+                        <div class="w-20 h-20 rounded-2xl bg-white/50 p-4 mb-4 shadow-inner">
+                            <img src="{{ app.icon.url }}" alt="{{ app.name }}" class="w-full h-full object-contain">
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-1">{{ app.name }}</h3>
+                        <div class="flex items-center gap-2 text-gray-600">
+                            <span class="material-icons text-sm">storage</span>
+                            <span class="text-sm">{{ app.size }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Hover Install Button -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity duration-300 flex items-center justify-center">
+                        <button class="px-6 py-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center gap-2 transform scale-0 group-hover:scale-100 transition-transform duration-300">
+                            <span class="material-icons text-blue-600">download</span>
+                            <span class="font-medium text-gray-700">Install</span>
+                        </button>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
     </div>
 
-    <!-- Apps Grid -->
-    <div id="appsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for app in categories.All %}  {# Show only "All" category apps to avoid duplication #}
-            <a href="{% url 'install' app.id organization.id %}" class="app-card bg-white p-4 rounded-lg shadow-md flex flex-col items-center border border-gray-200 transition hover:shadow-lg cursor-pointer" 
-                data-category="{{ app.category }}" data-name="{{ app.name|lower }}">
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const searchInput = document.getElementById("searchInput");
+        const filterButtons = document.querySelectorAll(".filter-btn");
+        const apps = document.querySelectorAll(".app-card");
 
-                <img src="{{ app.icon.url }}" alt="{{ app.name }}" class="w-16 h-16 rounded-md">
-                <h3 class="text-lg font-semibold mt-2">{{ app.name }}</h3>
-                <p class="text-sm text-gray-600">{{ app.size }}</p>
-
-                <!-- Premium Badge -->
-                {% if app.is_premium %}
-                    <span class="mt-2 px-3 py-1 bg-yellow-500 text-white text-xs rounded-full">Premium</span>
-                {% endif %}
-            </a>
-        {% endfor %}
-    </div>
-</div>
-
-<!-- JavaScript -->
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const searchInput = document.getElementById("searchInput");
-    const filterButtons = document.querySelectorAll(".filter-btn");
-    const apps = document.querySelectorAll(".app-card");
-
-    // Real-time Search
-    searchInput.addEventListener("input", function() {
-        const searchTerm = this.value.toLowerCase();
-        apps.forEach(app => {
-            const appName = app.getAttribute("data-name");
-            app.style.display = appName.includes(searchTerm) ? "block" : "none";
+        // Enhanced Search with Debounce
+        let searchTimeout;
+        searchInput.addEventListener("input", function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const searchTerm = this.value.toLowerCase();
+                apps.forEach(app => {
+                    const appName = app.getAttribute("data-name");
+                    app.style.display = appName.includes(searchTerm) ? "block" : "none";
+                });
+            }, 300);
         });
-    });
 
-    // Category Filtering
-    filterButtons.forEach(button => {
-        button.addEventListener("click", function() {
-            const category = this.getAttribute("data-category");
-            apps.forEach(app => {
-                app.style.display = (category === "all" || app.getAttribute("data-category") === category) ? "block" : "none";
+        // Animated Category Filtering
+        filterButtons.forEach(button => {
+            button.addEventListener("click", function() {
+                // Remove active state from all buttons
+                filterButtons.forEach(btn => {
+                    btn.classList.remove('bg-white/50', 'border-white/70', 'shadow-md');
+                });
+                
+                // Add active state to clicked button
+                this.classList.add('bg-white/50', 'border-white/70', 'shadow-md');
+                
+                const category = this.getAttribute("data-category");
+                apps.forEach(app => {
+                    const shouldShow = category === "all" || 
+                                    app.getAttribute("data-category") === category;
+                    app.style.display = shouldShow ? "block" : "none";
+                    
+                    // Add animation
+                    if(shouldShow) {
+                        app.classList.add('animate-fade-in-up');
+                        setTimeout(() => app.classList.remove('animate-fade-in-up'), 300);
+                    }
+                });
             });
         });
     });
-});
-</script>
+    </script>
 
-{% endblock %}
+    <style>
+    @keyframes fade-in-up {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up {
+        animation: fade-in-up 0.3s ease-out;
+    }
+    </style>
+</body>
+</html>
+
