@@ -916,14 +916,25 @@ My Calendar
                 </div>
                 <div class="p-4 h-80 overflow-y-auto material-scroll">
                     <!-- Activity content -->
-                     {% for app in installed_apps%}
-                         <img src="{{ app.mini_app.icon.url }}" alt="{{ app.mini_app.name }}" class="w-12 h-12 rounded-lg">
-                         <p>{{app.mini_app.name}}</p>
-                         <a href="{% url 'launch_app' org_id=organization.id app_id=app.id%}">
-                            Launch
-                         </a>
-
-                     {% endfor %}   
+                    {% for app in installed_apps %}
+                    <div class="flex flex-col items-center bg-white shadow-md rounded-xl p-4 transition-all hover:shadow-lg">
+                        <!-- App Icon -->
+                        <img src="{{ app.mini_app.icon.url }}" alt="{{ app.mini_app.name }}" 
+                             class="w-16 h-16 rounded-lg shadow-md object-cover">
+            
+                        <!-- App Name -->
+                        <p class="mt-2 text-sm font-semibold text-gray-700 text-center">
+                            {{ app.mini_app.name }}
+                        </p>
+            
+                        <!-- Launch Button -->
+                        <a href="{% url 'launch_app' org_id=organization.id app_id=app.id %}" 
+                           class="mt-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 
+                                  rounded-lg text-xs font-medium transition-all hover:scale-105">
+                            🚀 Launch
+                        </a>
+                    </div>
+                {% endfor %}
                 </div>
              </div>
             {% endif %}  
