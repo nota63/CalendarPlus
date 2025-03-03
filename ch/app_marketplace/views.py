@@ -72,3 +72,23 @@ def install_mini_app(request):
 
     return JsonResponse({"success": False, "message": "Invalid request"}, status=400)
 
+
+
+# LAUNCH APP
+@login_required
+def launch_app(request,org_id,app_id):
+    organization = get_object_or_404(Organization,id=org_id)
+    app=get_object_or_404(MiniApp,id=app_id,organization=organization)
+    if not app:
+        return JsonResponse({'error:':'App not Found!'},status=401)
+    
+    profile = get_object_or_404(Profile,organization=organization,user=request.user)
+    if not profile:
+        return JsonResponse({'error:':'You are not authorized to launch the app'},status=400)
+    
+    context = {
+        "app":app,
+        "organization":organization
+    }
+    
+    return render(request,'mini_apps/launch/launch.html',context)

@@ -908,15 +908,25 @@ My Calendar
             </div>
 
             <!-- Recent Activity Card -->
-            <div class="material-card">
+            {% if installed_apps%}
+             <div class="material-card">
                 <div class="material-header flex items-center gap-3">
                     <span class="material-icons-round text-xl">notifications</span>
-                    <h3 class="text-lg font-medium">Recent Activity</h3>
+                    <h3 class="text-lg font-medium">Installed Apps</h3>
                 </div>
                 <div class="p-4 h-80 overflow-y-auto material-scroll">
                     <!-- Activity content -->
+                     {% for app in installed_apps%}
+                         <img src="{{ app.mini_app.icon.url }}" alt="{{ app.mini_app.name }}" class="w-12 h-12 rounded-lg">
+                         <p>{{app.mini_app.name}}</p>
+                         <a href="{% url 'launch_app' org_id=organization.id app_id=app.id%}">
+                            Launch
+                         </a>
+
+                     {% endfor %}   
                 </div>
-            </div>
+             </div>
+            {% endif %}  
         </div>
     </div>
 
