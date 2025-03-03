@@ -25,6 +25,8 @@ class MiniApp(models.Model):
     is_premium = models.BooleanField(default=False)  # If the app requires a premium subscription
     install_count = models.PositiveIntegerField(default=0)  # Number of times installed
     commands = models.JSONField(default=list)  # Store available commands for the app
+    requirements=models.CharField(max_length=255,default="Windows 10 + Higher")
+    related_images=models.ImageField(upload_to="mini_apps/images/",null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

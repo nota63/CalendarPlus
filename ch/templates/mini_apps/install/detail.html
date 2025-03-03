@@ -27,6 +27,14 @@
         <div><strong>🔥 Installs:</strong> {{ app.install_count }}</div>
         <div><strong>🕒 Created:</strong> {{ app.created_at|date:"M d, Y" }}</div>
         <div><strong>🔄 Updated:</strong> {{ app.updated_at|date:"M d, Y" }}</div>
+        <div class="alert">
+            <strong>Note : This App Requires {{app.requirements}} To Run</strong>
+        </div>
+        
+        <div class="install-location">
+            <strong>It will be installed in {{organization.name}}</strong>
+        </div>
+
     </div>
 
     <!-- Commands Section -->
@@ -45,5 +53,16 @@
     <div class="mt-6">
         <button class="bg-blue-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-blue-700">Install</button>
     </div>
+
+    <div class="related-images">
+        {% if app.related_images %}
+            <ul>
+                {% for image in app.related_images %}
+                    <li><a href="{{ image.url }}">{{ image.url }}</a></li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    
 </div>
 {% endblock %}
