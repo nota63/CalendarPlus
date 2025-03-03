@@ -1,6 +1,6 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from .models import (MiniApp,MiniAppImage)
+from .models import (MiniApp,MiniAppImage,InstalledMiniApp)
 from django.utils.html import format_html
 
 # Register your models here.
@@ -14,3 +14,9 @@ class MiniAppAdmin(ModelAdmin):
 @admin.register(MiniAppImage)
 class MiniAppImageAdmin(ModelAdmin):
     list_display = [field.name for field in MiniAppImage._meta.fields]
+
+
+
+@admin.register(InstalledMiniApp)
+class InstalledMiniAppAdmin(ModelAdmin):
+    list_display = [field.name for field in InstalledMiniApp._meta.fields]

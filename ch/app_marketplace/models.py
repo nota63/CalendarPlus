@@ -52,7 +52,7 @@ class InstalledMiniApp(models.Model):
     installed_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        unique_together = ("user", "mini_app", "organization")  # Prevent duplicate installations
+        unique_together = ("user", "mini_app", "organization") 
 
     def __str__(self):
         return f"{self.user} installed {self.mini_app} in {self.organization}"
