@@ -10,5 +10,6 @@ urlpatterns=[
     path("kanban/tasks/<int:org_id>/<int:app_id>/", get_tasks_kanban, name="kanban-tasks"),
     path("kanban/update-task/", update_task_status, name="update-task-status"),
     path("kanban/delete-task/", delete_task, name="delete_task"),
+    path("kanban/task-details/<int:task_id>/", task_details, name="task_details"),
 
 ]

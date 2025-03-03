@@ -210,3 +210,16 @@ def delete_task(request):
     
     return JsonResponse({"success": False, "error": "Invalid request method!"})
 
+# Get task details
+def task_details(request, task_id):
+    """Fetch and return task details as JSON."""
+    task = get_object_or_404(TaskManager, id=task_id)
+
+    data = {
+        "success": True,
+        "title": task.title,
+        "description": task.description or "No description provided",
+        "created_by": task.assigned_to.username if task.assigned_to else "Unknown",
+        "due_date": "Nothing To Display",
+    }
+    return JsonResponse(data)

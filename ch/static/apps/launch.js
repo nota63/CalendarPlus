@@ -86,6 +86,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // HANDLE KANBAN BOARD
+
 document.addEventListener("DOMContentLoaded", function () {
     const cmdInput = document.getElementById("cmdInput");
 
@@ -117,7 +118,7 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch(`/apps/kanban/tasks/${orgId}/${appId}/`)
             .then(response => response.json())
             .then(data => {
-                console.log("Fetched Tasks:", data); // ✅ DEBUG API RESPONSE
+                console.log("Fetched Tasks:", data);
                 if (data.tasks && Array.isArray(data.tasks)) {
                     renderKanbanBoard(data.tasks);
                 } else {
@@ -128,7 +129,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function renderKanbanBoard(tasks) {
-        console.log("Rendering tasks:", tasks); // ✅ DEBUG TASKS
+        console.log("Rendering tasks:", tasks);
 
         const kanban = new jKanban({
             element: "#kanban-board",
@@ -138,7 +139,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 { id: "todo", title: "📝 To Do", item: [] },
                 { id: "in_progress", title: "🚀 In Progress", item: [] },
                 { id: "done", title: "✅ Done", item: [] },
-                { id: "delete", title: "🗑️ Delete", item: [] } // Added Delete column
+                { id: "details", title: "ℹ️ Details", item: [] }, // Added Details column
+                { id: "delete", title: "🗑️ Delete", item: [] }
             ],
             dragendEl: function (el) {
                 console.log("Dragged element:", el);
@@ -150,10 +152,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
                 const newStatus = boardElement.dataset.id;
-                console.log(`Updating task ${el.dataset.eid} to ${newStatus}`); // ✅ DEBUG TASK UPDATE
-                
+                console.log(`Updating task ${el.dataset.eid} to ${newStatus}`);
+
                 if (newStatus === "delete") {
                     deleteTask(el.dataset.eid, el);
+                } else if (newStatus === "details") {
+                    showTaskDetails(el.dataset.eid);
                 } else {
                     updateTaskStatus(el.dataset.eid, newStatus);
                 }
@@ -171,7 +175,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            console.log(`Adding task: ${task.title} in ${task.status}`); // ✅ DEBUG TASK ADDITION
+            console.log(`Adding task: ${task.title} in ${task.status}`);
             kanban.addElement(task.status, {
                 id: task.id,
                 title: `<strong>${task.title}</strong>`,
@@ -179,8 +183,28 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    function showTaskDetails(taskId) {
+        console.log(`Fetching details for task ${taskId}...`);
+
+        fetch(`/apps/kanban/task_details/${taskId}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById("task-details-content").innerHTML = `
+                        <h4>${data.title}</h4>
+                        <p><strong>Description:</strong> ${data.description}</p>
+                        <p><strong>Created By:</strong> ${data.created_by}</p>
+                        <p><strong>Due Date:</strong> ${data.due_date || "No due date"}</p>
+                    `;
+                } else {
+                    console.error("Error fetching task details:", data);
+                }
+            })
+            .catch(error => console.error("Error fetching task details:", error));
+    }
+
     function updateTaskStatus(taskId, newStatus) {
-        console.log(`Updating task ${taskId} to ${newStatus}`); // ✅ DEBUG TASK UPDATE
+        console.log(`Updating task ${taskId} to ${newStatus}`);
 
         fetch("/apps/kanban/update-task/", {
             method: "POST",
@@ -192,7 +216,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!data.success) {
                 alert("Error updating task!");
             } else {
-                console.log(`Task ${taskId} updated successfully!`); // ✅ DEBUG SUCCESS
+                console.log(`Task ${taskId} updated successfully!`);
             }
         })
         .catch(error => console.error("Error updating task:", error));
@@ -215,7 +239,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 alert("Error deleting task!");
             } else {
                 console.log(`Task ${taskId} deleted successfully!`);
-                element.remove(); // Remove from UI
+                element.remove();
             }
         })
         .catch(error => console.error("Error deleting task:", error));
@@ -226,4 +250,3 @@ document.addEventListener("DOMContentLoaded", function () {
         return csrfToken ? csrfToken.value : "";
     }
 });
-// 
