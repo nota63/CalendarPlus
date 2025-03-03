@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import User
+from accounts.models import Organization, Profile
 
 # Create your models here.
 
@@ -27,7 +29,7 @@ class MiniApp(models.Model):
     commands = models.JSONField(default=list)  # Store available commands for the app
     requirements=models.CharField(max_length=255,default="Windows 10 + Higher")
     ratings=models.IntegerField(default=0, null=True, blank=True)
-    
+
    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -39,3 +41,19 @@ class MiniApp(models.Model):
 class MiniAppImage(models.Model):
     mini_app = models.ForeignKey(MiniApp, on_delete=models.CASCADE, related_name="related_imagess")
     image = models.ImageField(upload_to="mini_apps/images/")
+
+
+
+# INSTALL MINI-APP
+class InstalledMiniApp(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="installed_apps")
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="installed_apps")
+    mini_app = models.ForeignKey(MiniApp, on_delete=models.CASCADE, related_name="installations")
+    installed_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ("user", "mini_app", "organization")  # Prevent duplicate installations
+
+    def __str__(self):
+        return f"{self.user} installed {self.mini_app} in {self.organization}"
+
