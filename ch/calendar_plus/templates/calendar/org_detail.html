@@ -223,6 +223,17 @@
         Workspace Channels
       </span>
     </a>
+
+    <!-- Miniapps -->
+    <a href="{% url 'purchase_apps' organization.id %}" 
+    class="flex items-center gap-2 text-gray-700 hover:text-indigo-600 
+    font-medium px-3 py-2 rounded-lg transition duration-300">
+    <span class="material-icons text-indigo-500 transition duration-300">schedule</span> 
+    <span class="font-medium text-[14px]" style="font-family: 'Inter', sans-serif;">
+      App Marketplace
+    </span>
+  
+ </a>
    
             {% if connected_apps %}
             <a href="{% url 'google_calendar_view' %}" 
