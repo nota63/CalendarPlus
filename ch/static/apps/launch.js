@@ -226,3 +226,4 @@ document.addEventListener("DOMContentLoaded", function () {
         return csrfToken ? csrfToken.value : "";
     }
 });
+// 
