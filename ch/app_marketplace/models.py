@@ -26,6 +26,8 @@ class MiniApp(models.Model):
     install_count = models.PositiveIntegerField(default=0)  # Number of times installed
     commands = models.JSONField(default=list)  # Store available commands for the app
     requirements=models.CharField(max_length=255,default="Windows 10 + Higher")
+    ratings=models.IntegerField(default=0, null=True, blank=True)
+    
    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
