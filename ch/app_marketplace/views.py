@@ -92,3 +92,4 @@ def launch_app(request,org_id,app_id):
     }
     
     return render(request,'mini_apps/launch/launch.html',context)
+

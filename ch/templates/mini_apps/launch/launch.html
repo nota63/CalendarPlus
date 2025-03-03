@@ -1,15 +1,161 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>Page Title</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Launch {{ app.mini_app.name }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .cmd-output {
+            scrollbar-width: thin;
+            scrollbar-color: #4F46E5 rgba(255, 255, 255, 0.1);
+        }
+        .cmd-output::-webkit-scrollbar {
+            width: 6px;
+        }
+        .cmd-output::-webkit-scrollbar-thumb {
+            background-color: #4F46E5;
+            border-radius: 3px;
+        }
+    </style>
 </head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-900 to-purple-800 font-['Inter'] text-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header Section -->
+        <div class="flex items-center justify-between mb-8">
+            <h1 class="text-3xl font-bold">Welcome back, <span class="text-indigo-300">{{ request.user.username }}</span></h1>
+            <div class="flex items-center space-x-4">
+                <button class="flex items-center space-x-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                    </svg>
+                    <span>Profile</span>
+                </button>
+            </div>
+        </div>
 
-<body>
-    <h2>Welcome back,</h2>
-    <p>
-       {{app.mini_app.name}}
-    </p>
+        <!-- App Card -->
+        <div class="glass-card p-6 mb-8">
+            <div class="flex items-center space-x-6">
+                <img src="{{ app.mini_app.icon.url }}" class="w-20 h-20 rounded-2xl shadow-lg">
+                <div>
+                    <h2 class="text-4xl font-bold mb-1">{{ app.mini_app.name }}</h2>
+                    <p class="text-indigo-200 text-lg">Version {{ app.mini_app.version }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Commands Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="glass-card p-6">
+                <h3 class="text-xl font-semibold mb-4">Available Commands</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    {% for command in app.mini_app.commands %}
+                    <div class="bg-white/5 hover:bg-white/10 p-3 rounded-lg transition-colors">
+                        <span class="font-mono text-indigo-300">$</span>
+                        <span class="ml-2">{{ command }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="glass-card p-6">
+                <h3 class="text-xl font-semibold mb-4">Quick Actions</h3>
+                <button onclick="openTerminal()" class="w-full flex items-center justify-center space-x-3 bg-indigo-600 hover:bg-indigo-700 px-6 py-4 rounded-xl transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <span class="text-lg">Open Terminal</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terminal Modal -->
+    <div id="terminalModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="glass-card w-full max-w-3xl rounded-xl overflow-hidden">
+            <div class="flex items-center justify-between p-4 border-b border-white/10">
+                <div class="flex items-center space-x-3">
+                    <div class="flex space-x-2">
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                    </div>
+                    <span class="font-mono text-sm">{{ app.mini_app.name }} Terminal</span>
+                </div>
+                <button onclick="closeTerminal()" class="p-1 hover:bg-white/10 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="p-4 h-96">
+                <div id="cmdOutput" class="h-[calc(100%-40px)] overflow-y-auto cmd-output bg-gray-900 rounded-lg p-4 font-mono text-sm text-green-400">
+                    <p>> Welcome to {{ app.mini_app.name }} terminal</p>
+                    <p>> Type 'help' for available commands</p>
+                    <p class="mt-4 text-white/60">Available Commands:</p>
+                    {% for command in app.mini_app.commands %}
+                    <p class="text-indigo-300">- {{ command }}</p>
+                    {% endfor %}
+                </div>
+                <div class="mt-4 flex items-center">
+                    <span class="text-green-400 mr-2">$</span>
+                    <input id="cmdInput" type="text" class="flex-1 bg-transparent outline-none text-green-400 font-mono" autofocus>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openTerminal() {
+            document.getElementById('terminalModal').classList.remove('hidden');
+            document.getElementById('cmdInput').focus();
+        }
+
+        function closeTerminal() {
+            document.getElementById('terminalModal').classList.add('hidden');
+        }
+
+        document.getElementById('cmdInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const command = e.target.value.trim();
+                e.target.value = '';
+                handleCommand(command);
+            }
+        });
+
+        function handleCommand(command) {
+            const output = document.getElementById('cmdOutput');
+            output.innerHTML += `<p class="text-white">$ ${command}</p>`;
+            
+            if (command === 'help') {
+                output.innerHTML += `<p class="text-indigo-300">Available commands:</p>
+                    ${[...document.querySelectorAll('.glass-card li')].map(li => `<p class="text-indigo-300">- ${li.textContent}</p>`).join('')}`;
+            } else if (command === 'clear') {
+                output.innerHTML = '';
+            } else {
+                output.innerHTML += `<p class="text-amber-300">Executing: ${command}...</p>`;
+            }
+
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Close modal on outside click
+        document.getElementById('terminalModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('terminalModal')) {
+                closeTerminal();
+            }
+        });
+    </script>
 </body>
-
 </html>
