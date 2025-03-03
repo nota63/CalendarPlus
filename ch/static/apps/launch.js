@@ -111,8 +111,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function fetchKanbanData() {
-        const orgId = window.djangoData.orgId;  
-        const appId = window.djangoData.appId;  
+        const orgId = window.djangoData.orgId;
+        const appId = window.djangoData.appId;
 
         fetch(`/apps/kanban/tasks/${orgId}/${appId}/`)
             .then(response => response.json())
@@ -137,12 +137,12 @@ document.addEventListener("DOMContentLoaded", function () {
             boards: [
                 { id: "todo", title: "📝 To Do", item: [] },
                 { id: "in_progress", title: "🚀 In Progress", item: [] },
-                { id: "done", title: "✅ Done", item: [] }
+                { id: "done", title: "✅ Done", item: [] },
+                { id: "delete", title: "🗑️ Delete", item: [] } // Added Delete column
             ],
             dragendEl: function (el) {
                 console.log("Dragged element:", el);
 
-                // Get the new status using `closest("[data-id]")`
                 const boardElement = el.parentElement.closest("[data-id]");
                 if (!boardElement) {
                     console.error("Error: Cannot determine new status. Parent board not found!");
@@ -151,7 +151,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 const newStatus = boardElement.dataset.id;
                 console.log(`Updating task ${el.dataset.eid} to ${newStatus}`); // ✅ DEBUG TASK UPDATE
-                updateTaskStatus(el.dataset.eid, newStatus);
+                
+                if (newStatus === "delete") {
+                    deleteTask(el.dataset.eid, el);
+                } else {
+                    updateTaskStatus(el.dataset.eid, newStatus);
+                }
             }
         });
 
@@ -176,6 +181,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function updateTaskStatus(taskId, newStatus) {
         console.log(`Updating task ${taskId} to ${newStatus}`); // ✅ DEBUG TASK UPDATE
+
         fetch("/apps/kanban/update-task/", {
             method: "POST",
             body: new URLSearchParams({ task_id: taskId, status: newStatus }),
@@ -190,5 +196,33 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         })
         .catch(error => console.error("Error updating task:", error));
+    }
+
+    function deleteTask(taskId, element) {
+        console.log(`Deleting task ${taskId}...`);
+
+        fetch("/apps/kanban/delete-task/", {
+            method: "POST",
+            body: new URLSearchParams({ task_id: taskId }),
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": getCSRFToken()
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                alert("Error deleting task!");
+            } else {
+                console.log(`Task ${taskId} deleted successfully!`);
+                element.remove(); // Remove from UI
+            }
+        })
+        .catch(error => console.error("Error deleting task:", error));
+    }
+
+    function getCSRFToken() {
+        const csrfToken = document.querySelector("input[name=csrfmiddlewaretoken]");
+        return csrfToken ? csrfToken.value : "";
     }
 });

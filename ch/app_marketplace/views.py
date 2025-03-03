@@ -176,6 +176,7 @@ def get_tasks_kanban(request, org_id, app_id):
     return JsonResponse({"tasks": tasks_list}, safe=False)
 
 
+# Update tasks in kanban
 @csrf_exempt
 @login_required
 def update_task_status(request):
@@ -192,5 +193,20 @@ def update_task_status(request):
 
     return JsonResponse({"success": False, "message": "Invalid request!"})
 
-
+# DELETE THE TASK
+@csrf_exempt
+def delete_task(request):
+    if request.method == "POST":
+        task_id = request.POST.get("task_id")
+        if not task_id:
+            return JsonResponse({"success": False, "error": "Task ID missing!"})
+        
+        try:
+            task = TaskManager.objects.get(id=task_id)
+            task.delete()  # Delete the task
+            return JsonResponse({"success": True})
+        except TaskManager.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Task not found!"})
+    
+    return JsonResponse({"success": False, "error": "Invalid request method!"})
 
