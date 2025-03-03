@@ -437,7 +437,7 @@ class OrganizationListView(LoginRequiredMixin, ListView):
 
 
 # org detail
-
+from app_marketplace.models import InstalledMiniApp, MiniApp
 # PREVENT HIDDEN WORKSPACE ACCESS AND DISPLAY DETAILS 
 
 class OrgDetailView(LoginRequiredMixin, View):
@@ -483,10 +483,8 @@ class OrgDetailView(LoginRequiredMixin, View):
            return JsonResponse({"status": "error", "message": "Access denied. You are suspended!"}, status=403)
 
 
-        
-
-    
-
+        # Display Installed APPS
+        installed_apps=InstalledMiniApp.objects.filter(organization=organization,user=request.user).order_by('-installed_at')
 
         now = timezone.now()
         print(f"Current time: {now}")
@@ -538,6 +536,7 @@ class OrgDetailView(LoginRequiredMixin, View):
             'recent_meetings':recent_meetings,
             'recent_events':recent_events,
             'members':members,
+            'installed_apps':installed_apps,
         }
 
         return render(request, self.template_name, context)
