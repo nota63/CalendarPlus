@@ -120,6 +120,12 @@ def add_task_view_workspace(request, org_id, app_id):
         organization = get_object_or_404(Organization,id=org_id)
         app = get_object_or_404(InstalledMiniApp, id=int(app_id))
 
+        organization=get_object_or_404(Organization, id=org_id)
+        profile=get_object_or_404(Profile,organization=organization,user=request.user)
+        if not profile:
+          return JsonResponse({'error:':'You are not authorized to perform this action!'})
+
+
         if not app:
           return HttpResponseBadRequest("Invalid app ID")
 
@@ -168,6 +174,12 @@ def add_task_view_workspace(request, org_id, app_id):
 def get_tasks_kanban(request, org_id, app_id):
     organization= get_object_or_404(Organization, id=org_id)
     print(f"Received app_id: {app_id}")
+
+    organization=get_object_or_404(Organization, id=org_id)
+    profile=get_object_or_404(Profile,organization=organization,user=request.user)
+    if not profile:
+        return JsonResponse({'error:':'You are not authorized to perform this action!'})
+
 
 
     app = get_object_or_404(InstalledMiniApp, id=int(app_id))
@@ -266,6 +278,12 @@ def get_workspace_channels(request):
     org_id = request.GET.get("org_id")
     app_id = request.GET.get("app_id")
 
+    organization=get_object_or_404(Organization, id=org_id)
+    profile=get_object_or_404(Profile,organization=organization,user=request.user)
+    if not profile:
+        return JsonResponse({'error:':'You are not authorized to perform this action!'})
+
+
     if not org_id or not app_id:
         return JsonResponse({"success": False, "error": "Missing org_id or app_id"})
 
@@ -285,6 +303,9 @@ def delete_all_messages(request):
     org_id = request.GET.get("org_id")
 
     organization=get_object_or_404(Organization, id=org_id)
+    profile=get_object_or_404(Profile,organization=organization,user=request.user)
+    if not profile:
+        return JsonResponse({'error:':'You are not authorized to perform this action!'})
 
     if not channel_id or not org_id:
         return JsonResponse({"success": False, "error": "Missing channel_id or org_id"}, status=400)
