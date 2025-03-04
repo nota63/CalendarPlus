@@ -87,6 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // HANDLE KANBAN BOARD
 
+
 document.addEventListener("DOMContentLoaded", function () {
     const cmdInput = document.getElementById("cmdInput");
 
@@ -142,6 +143,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 { id: "details", title: "ℹ️ Details", item: [] }, // Added Details column
                 { id: "delete", title: "🗑️ Delete", item: [] }
             ],
+
+
             dragendEl: function (el) {
                 console.log("Dragged element:", el);
 

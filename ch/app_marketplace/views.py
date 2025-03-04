@@ -253,3 +253,6 @@ def task_details(request, task_id):
         "due_date": "Nothing To Display",
     }
     return JsonResponse(data)
+# ------------------------------------------------------------------------------------------------------------------------------
+
+

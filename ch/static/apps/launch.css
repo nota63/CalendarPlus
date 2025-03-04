@@ -1,3 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap');
+
+:root {
+    --bg-gradient: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    --glass-bg: rgba(30, 30, 30, 0.25);
+    --text-primary: rgba(255, 255, 255, 0.9);
+    --text-secondary: rgba(255, 255, 255, 0.7);
+}
+
+body {
+    background: var(--bg-gradient);
+    min-height: 100vh;
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 20px;
+    color: var(--text-primary);
+}
+
+#kanban-board {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding: 20px 0;
+}
+
+/* Dark Glass Columns */
+.kanban-board {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px) saturate(180%);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    min-width: 280px;
+    padding: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.kanban-board:hover {
+    transform: translateY(-5px);
+    background: rgba(40, 40, 40, 0.3);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Neon Accent Titles */
+.kanban-title {
+    font-weight: 500;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-primary);
+}
+
+#todo .kanban-title { border-color: #4dabf5; color: #4dabf5; }
+#in_progress .kanban-title { border-color: #ffc107; color: #ffc107; }
+#done .kanban-title { border-color: #69db7c; color: #69db7c; }
+#details .kanban-title { border-color: #be4bdb; color: #be4bdb; }
+#delete .kanban-title { border-color: #ff6b6b; color: #ff6b6b; }
+
+/* Dark Cards with Glow */
+.kanban-item {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    cursor: move;
+    transition: all 0.2s ease;
+    border-left: 4px solid;
+    color: var(--text-secondary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.kanban-item:hover {
+    background: rgba(0, 0, 0, 0.4);
+    transform: translateX(5px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* Item Accent Borders */
+#todo .kanban-item { border-color: #4dabf5; }
+#in_progress .kanban-item { border-color: #ffc107; }
+#done .kanban-item { border-color: #69db7c; }
+#details .kanban-item { border-color: #be4bdb; }
+#delete .kanban-item { 
+    border-color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.08);
+}
+
+/* Dark Add Button */
+.kanban-add-button {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: var(--text-secondary) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px !important;
+    padding: 8px 16px !important;
+    margin-top: 15px !important;
+    transition: all 0.3s ease !important;
+}
+
+.kanban-add-button:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Drag Effects */
+.gu-mirror {
+    transform: rotate(3deg) scale(1.02);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6) !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Dark Scrollbar */
+::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+
+
+
+
+
+
 #addTaskModal {
     display: none; /* Ensures the modal is hidden initially */
 }
