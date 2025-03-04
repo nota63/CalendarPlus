@@ -164,6 +164,14 @@
 
 
 /* KANBAN MODAL  */
+
+#kanbanModal .modal-dialog {
+    max-width: 90%;
+    width: 1400px; /* Set custom width */
+}
+
+
+
 /* Kanban Modal Styles */
 #kanbanModal .modal-content {
     background: rgba(255, 255, 255, 0.9);
