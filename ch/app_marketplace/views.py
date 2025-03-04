@@ -118,15 +118,19 @@ def add_task_view_workspace(request, org_id, app_id):
 
         # Fetch Organization and MiniApp
         organization = get_object_or_404(Organization,id=org_id)
-        mini_app = get_object_or_404(MiniApp,id=app_id)
+        app = get_object_or_404(InstalledMiniApp, id=int(app_id))
+
+        if not app:
+          return HttpResponseBadRequest("Invalid app ID")
+
+
+        if not app.mini_app.commands or "/add task" not in app.mini_app.commands:
+           return HttpResponseBadRequest("Error")
 
         # Debug: Print if organization and mini_app are found
-        print(f"Found Organization: {organization.name}, Found MiniApp: {mini_app.name}")
+        print(f"Found Organization: {organization.name}, Found MiniApp: {app.mini_app.name}")
 
-        # Check if the app supports '/add task'
-        if "/add task" not in mini_app.commands:
-            return JsonResponse({"error": "This app does not support adding tasks!"}, status=400)
-
+      
         # Get task details from JSON
         task_title = data.get("title", "").strip()
         task_description = data.get("description", "").strip()
@@ -163,6 +167,20 @@ def add_task_view_workspace(request, org_id, app_id):
 @login_required
 def get_tasks_kanban(request, org_id, app_id):
     organization= get_object_or_404(Organization, id=org_id)
+    print(f"Received app_id: {app_id}")
+
+
+    app = get_object_or_404(InstalledMiniApp, id=int(app_id))
+
+    if not app:
+       return HttpResponseBadRequest("Invalid app ID")
+
+
+    if not app.mini_app.commands or "/open kanban" not in app.mini_app.commands:
+        return HttpResponseBadRequest("Error")
+
+
+    
     """ Fetch all tasks where request.user is assigned_to and the task belongs to the given app_id """
     
     # Fetch tasks ensuring they belong to the correct org and assigned user
@@ -178,6 +196,11 @@ def get_tasks_kanban(request, org_id, app_id):
         print(f"No tasks found for user {request.user} in org {organization.name} and app {app_id}")  # Debugging
 
     return JsonResponse({"tasks": tasks_list}, safe=False)
+
+
+
+
+
 
 
 # Update tasks in kanban
