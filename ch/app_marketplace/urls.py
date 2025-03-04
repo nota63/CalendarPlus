@@ -11,5 +11,7 @@ urlpatterns=[
     path("kanban/update-task/", update_task_status, name="update-task-status"),
     path("kanban/delete-task/", delete_task, name="delete_task"),
     path("kanban/task-details/<int:task_id>/", task_details, name="task_details"),
+    # channels
+    path('get-workspace-channels/',get_workspace_channels, name='get_workspace_channels')
 
 ]

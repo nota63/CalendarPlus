@@ -256,3 +256,22 @@ def task_details(request, task_id):
 # ------------------------------------------------------------------------------------------------------------------------------
 
 
+# CHANNELS -------
+from organization_channels.models import Channel
+
+
+# FETCH CHANNELS 
+@login_required
+def get_workspace_channels(request):
+    org_id = request.GET.get("org_id")
+    app_id = request.GET.get("app_id")
+
+    if not org_id or not app_id:
+        return JsonResponse({"success": False, "error": "Missing org_id or app_id"})
+
+    channels = Channel.objects.filter(organization_id=org_id).values("id", "name")
+
+    if channels.exists():
+        return JsonResponse({"success": True, "channels": list(channels)})
+    else:
+        return JsonResponse({"success": False, "channels": []})

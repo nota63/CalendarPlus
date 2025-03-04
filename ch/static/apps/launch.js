@@ -264,3 +264,84 @@ document.addEventListener("DOMContentLoaded", function () {
         return csrfToken ? csrfToken.value : "";
     }
 });
+
+// --------------------------------------------------------------------------------------------------------------------------------------------
+// CHANNELS --- DISPLAY CHANNELS
+document.addEventListener("DOMContentLoaded", function () {
+    const cmdInput = document.getElementById("cmdInput"); // Your input field
+
+    // Get available commands from the HTML template
+    let availableCommands = [];
+    document.querySelectorAll(".bg-white\\/5 span.ml-2").forEach(span => {
+        availableCommands.push(span.textContent.trim());
+    });
+
+    cmdInput.addEventListener("keyup", function (event) {
+        if (event.key === "Enter") {
+            let command = cmdInput.value.trim();
+
+            if (command === "/channels") {
+                checkAndFetchChannels();
+            }
+        }
+    });
+
+    function checkAndFetchChannels() {
+        // Check if `/channels` exists in available commands
+        if (!availableCommands.includes("/channels")) {
+            alert("Error: /channels command is not available in this app.");
+            return;
+        }
+
+        // Fetch Organization ID & App ID (Modify as needed)
+        let orgId = window.djangoData.orgId; // Set dynamically
+        let appId = window.djangoData.appId; // Set dynamically
+
+        fetch(`/apps/get-workspace-channels/?org_id=${orgId}&app_id=${appId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    populateChannelsModal(data.channels);
+                } else {
+                    alert("Error fetching channels!");
+                }
+            })
+            .catch(error => {
+                console.error("Fetch error:", error);
+                alert("Something went wrong.");
+            });
+    }
+
+    function populateChannelsModal(channels) {
+        const channelsList = document.getElementById("channelsList");
+        channelsList.innerHTML = "";
+
+        if (channels.length === 0) {
+            channelsList.innerHTML = "<li class='list-group-item'>No channels available.</li>";
+        } else {
+            channels.forEach(channel => {
+                let listItem = document.createElement("li");
+                listItem.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
+
+                listItem.innerHTML = `
+                    ${channel.name}
+                    <button class="btn btn-primary btn-sm open-channel" data-id="${channel.id}">Open Channel</button>
+                `;
+
+                channelsList.appendChild(listItem);
+            });
+
+            // Add event listeners to buttons
+            document.querySelectorAll(".open-channel").forEach(button => {
+                button.addEventListener("click", function () {
+                    let channelId = this.getAttribute("data-id");
+                    window.location.href = `http://127.0.0.1:8000/channels/channel/${channelId}/chat/`;
+                });
+            });
+        }
+
+        // Show the Bootstrap modal
+        let channelsModal = new bootstrap.Modal(document.getElementById("channelsModal"));
+        channelsModal.show();
+    }
+});
