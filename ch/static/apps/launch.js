@@ -695,4 +695,60 @@ document.addEventListener("DOMContentLoaded", function () {
 });    
 
 // SET CHANNEL MESSAGES  EXPIRY
+document.addEventListener("DOMContentLoaded", function () {
+    let cmdInput = document.getElementById("cmdInput");
+    let expiryModal = new bootstrap.Modal(document.getElementById("expiryModal"));
+    let saveExpiryBtn = document.getElementById("saveExpiryBtn");
 
+    if (!cmdInput || !expiryModal || !saveExpiryBtn) {
+        console.error("❌ Required elements not found!");
+        return;
+    }
+
+    // Open modal when user types /expiry
+    cmdInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" && cmdInput.value.trim() === "/expiry") {
+            event.preventDefault();
+            cmdInput.value = "";
+            expiryModal.show();
+        }
+    });
+
+    // Save expiry selection via AJAX
+    saveExpiryBtn.addEventListener("click", function () {
+        let expiry = document.getElementById("expirySelect").value;
+        let orgId = window.djangoData?.orgId;
+
+        if (!orgId) {
+            console.error("❌ Organization ID not found!");
+            return;
+        }
+
+        fetch(`/apps/set-org-expiry/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": getCSRFToken(),
+            },
+            body: `org_id=${orgId}&expiry=${expiry}`,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`✅ ${data.success}`);
+                expiryModal.hide();
+            } else {
+                alert(`❌ ${data.error}`);
+            }
+        })
+        .catch(error => {
+            console.error("❌ Error setting expiry:", error);
+        });
+    });
+
+    // CSRF Token helper function
+    function getCSRFToken() {
+        let csrfToken = document.querySelector("input[name='csrfmiddlewaretoken']");
+        return csrfToken ? csrfToken.value : "";
+    }
+});

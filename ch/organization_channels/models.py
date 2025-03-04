@@ -105,13 +105,6 @@ class Message(models.Model):
         super().save(*args, **kwargs)
 
     # message expiry for channels app
-    def set_expiry(self, duration):
-        """Sets expiry time based on duration (e.g., '12h', '1d')."""
-        units = {"h": "hours", "d": "days"}
-        value, unit = int(duration[:-1]), duration[-1]
-        if unit in units:
-            self.expires_at = now() + timedelta(**{units[unit]: value})
-            self.save()
     
  
 

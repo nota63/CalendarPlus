@@ -15,7 +15,7 @@ from django.utils.crypto import get_random_string
 from django.core.mail import send_mail
 from django.conf import settings
 from tinymce.models import HTMLField
-
+from django.utils.timezone import now
 
 # Models 
 
@@ -52,6 +52,15 @@ class Organization(models.Model):
 
     def __str__(self):
         return self.name
+    # for channels app
+    def set_expiry(self, duration):
+        """Sets expiry time based on duration (e.g., '12h', '1d')."""
+        units = {"h": "hours", "d": "days"}
+        value, unit = int(duration[:-1]), duration[-1]
+        if unit in units:
+            self.expires_at = now() + timedelta(**{units[unit]: value})
+            self.save()
+    
 
 # profile
 class Profile(models.Model):

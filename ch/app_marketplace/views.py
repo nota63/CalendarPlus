@@ -452,4 +452,25 @@ def get_channels_analytics(request, org_id):
 
 
 # SET CHANNEL MESSAGES EXPIRY
+@csrf_exempt
+@login_required
+def set_org_expiry(request):
+    """Sets expiry time for messages in all channels of an organization."""
+    if request.method == "POST":
+        org_id = request.POST.get("org_id")
+        duration = request.POST.get("expiry")
+        valid_durations = {"12h": 12, "24h": 24, "7d": 7 * 24}
 
+        if not org_id:
+            return JsonResponse({"error": "Organization ID is missing"}, status=400)
+        
+        if duration not in valid_durations:
+            return JsonResponse({"error": "Invalid expiry selection"}, status=400)
+
+        org = get_object_or_404(Organization, id=org_id)
+        org.set_expiry = duration  # Save selected expiry for the entire org
+        org.save()
+
+        return JsonResponse({"success": f"Auto-expiry set to {duration} for all channels!"})
+    
+    return JsonResponse({"error": "Invalid request"}, status=400)
