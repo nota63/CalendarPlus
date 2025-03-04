@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.http import HttpResponseBadRequest
-
+from django.utils.timezone import localtime
 # Create your views here.
 
 # Display Miniapps 
@@ -494,3 +494,30 @@ def disable_org_expiry(request):
         return JsonResponse({"success": "✅ Auto-expiry disabled for all channels!"})
 
     return JsonResponse({"error": "Invalid request"}, status=400)
+
+# GET EXPIRY STATUS
+@csrf_exempt
+@login_required
+def get_expiry_status(request):
+    """Fetches expiry settings for an organization."""
+    if request.method == "GET":
+        org_id = request.GET.get("org_id")
+
+        if not org_id:
+            return JsonResponse({"error": "Organization ID is missing"}, status=400)
+
+        org = get_object_or_404(Organization, id=org_id)
+
+        # Check if expiry is set
+        expiry_status = org.expires_at  # Assuming 'expires_at' field stores expiry
+
+        if expiry_status:
+            formatted_expiry = localtime(expiry_status).strftime("%Y-%m-%d %H:%M:%S")
+            message = f"✅ Auto Expiry Enabled: {formatted_expiry}"
+        else:
+            message = "❌ Expiry is OFF"
+
+        return JsonResponse({"expiry_status": message})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+

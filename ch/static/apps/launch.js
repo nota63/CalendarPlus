@@ -804,3 +804,51 @@ document.addEventListener("DOMContentLoaded", function () {
         return csrfToken ? csrfToken.value : "";
     }
 });
+
+// GET EXPIRY STATUS
+document.addEventListener("DOMContentLoaded", function () {
+    let cmdInput = document.getElementById("cmdInput");
+    let expiryStatusModal = document.getElementById("expiryStatusModal");
+    let expiryStatusText = document.getElementById("expiryStatusText");
+
+    if (!cmdInput || !expiryStatusModal || !expiryStatusText) {
+        console.error("❌ Required elements not found!");
+        return;
+    }
+
+    // Listen for "/expiry status"
+    cmdInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" && cmdInput.value.trim() === "/expiry status") {
+            event.preventDefault();
+            cmdInput.value = "";
+            fetchExpiryStatus();
+        }
+    });
+
+    function fetchExpiryStatus() {
+        let orgId = window.djangoData?.orgId;
+
+        if (!orgId) {
+            console.error("❌ Organization ID not found!");
+            return;
+        }
+
+        expiryStatusText.innerHTML = `<div class="spinner-border text-primary"></div>`;
+
+        fetch(`/apps/get-expiry-status/?org_id=${orgId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.expiry_status) {
+                    expiryStatusText.innerHTML = `<strong>${data.expiry_status}</strong>`;
+                } else {
+                    expiryStatusText.innerHTML = `<span class="text-danger">❌ Error fetching expiry status!</span>`;
+                }
+                let modal = new bootstrap.Modal(expiryStatusModal);
+                modal.show();
+            })
+            .catch(error => {
+                expiryStatusText.innerHTML = `<span class="text-danger">❌ Error loading expiry status!</span>`;
+                console.error("❌ Error fetching expiry status:", error);
+            });
+    }
+});
