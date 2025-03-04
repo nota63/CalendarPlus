@@ -257,7 +257,7 @@ def task_details(request, task_id):
 
 
 # CHANNELS -------
-from organization_channels.models import Channel
+from organization_channels.models import Channel, Message
 
 
 # FETCH CHANNELS 
@@ -275,3 +275,25 @@ def get_workspace_channels(request):
         return JsonResponse({"success": True, "channels": list(channels)})
     else:
         return JsonResponse({"success": False, "channels": []})
+    
+
+# CLEAR ALL CHANNEL MESSAGES 
+
+@login_required
+def delete_all_messages(request):
+    channel_id = request.GET.get("channel_id")
+    org_id = request.GET.get("org_id")
+
+    organization=get_object_or_404(Organization, id=org_id)
+
+    if not channel_id or not org_id:
+        return JsonResponse({"success": False, "error": "Missing channel_id or org_id"}, status=400)
+
+    # Get the channel and organization
+    channel = get_object_or_404(Channel, id=channel_id, organization_id=org_id)
+
+
+    # Delete all messages in the channel
+    Message.objects.filter(channel=channel,organization=organization,user=request.user).delete()
+
+    return JsonResponse({"success": True, "message": "All messages deleted successfully!"})

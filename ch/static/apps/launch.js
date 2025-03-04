@@ -1,4 +1,5 @@
-// CHECK FOR COMMANDS 
+// PREVENT UNAUTHORIZED COMMANDS    
+
 document.addEventListener("DOMContentLoaded", function () {
     const cmdInput = document.getElementById("cmdInput");
 
@@ -8,25 +9,43 @@ document.addEventListener("DOMContentLoaded", function () {
         appCommands.add(span.textContent.trim());
     });
 
-    // Function to check if user-entered command exists in appCommands
+    // Function to check if command is valid and prevent all operations if not
     function checkCommand(command) {
         if (!appCommands.has(command)) {
-            alert(`Error: '${command}' is not available in this app.`);
+            // Remove all event listeners to **STOP** further operations 🔥
+            document.body.innerHTML = ""; // **Instantly wipes out the page!**  
+            
+            // Show full-screen error message (no user interaction)
+            let errorDiv = document.createElement("div");
+            errorDiv.innerHTML = `
+                <div style="
+                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                    background: red; color: white; display: flex; align-items: center;
+                    justify-content: center; font-size: 24px; font-weight: bold;
+                    z-index: 99999;">
+                    ❌ ERROR: '${command}' is not available in this app. ❌
+                </div>
+            `;
+            document.body.appendChild(errorDiv);
+
+            // **Hard reload IMMEDIATELY (no waiting, no execution of any command)**
             setTimeout(() => {
-                location.reload(); // Reload the page to stop all operations
-            }, 0000); // Delay for smooth UX
+                location.reload(true);
+            }, 10); // **💥💥 BOOM! INSTANT RELOAD 💥💥**
+
             return false;
         }
         return true;
     }
 
-    // Automatically listen for user input and validate commands
-    cmdInput.addEventListener("keyup", function (event) {
+    // Listen for user input and check command BEFORE executing anything
+    cmdInput.addEventListener("keydown", function (event) {
         if (event.key === "Enter") {
             let command = cmdInput.value.trim();
 
             if (!checkCommand(command)) {
-                return; // Stop everything if command is invalid
+                event.preventDefault(); // **Prevent further execution instantly!**
+                return;
             }
 
             // If command is valid, trigger a custom event
@@ -35,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-
+// --------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -367,18 +386,29 @@ document.addEventListener("DOMContentLoaded", function () {
                 listItem.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
 
                 listItem.innerHTML = `
-                    ${channel.name}
-                    <button class="btn btn-primary btn-sm open-channel" data-id="${channel.id}">Open Channel</button>
+                    <span>${channel.name}</span>
+                    <div>
+                        <button class="btn btn-primary btn-sm open-channel" data-id="${channel.id}">Open</button>
+                        <button class="btn btn-danger btn-sm delete-messages" data-id="${channel.id}">🗑 Delete My Messages</button>
+                    </div>
                 `;
 
                 channelsList.appendChild(listItem);
             });
 
-            // Add event listeners to buttons
+            // Add event listeners to open channel buttons
             document.querySelectorAll(".open-channel").forEach(button => {
                 button.addEventListener("click", function () {
                     let channelId = this.getAttribute("data-id");
                     window.location.href = `http://127.0.0.1:8000/channels/channel/${channelId}/chat/`;
+                });
+            });
+
+            // Add event listeners to delete messages buttons
+            document.querySelectorAll(".delete-messages").forEach(button => {
+                button.addEventListener("click", function () {
+                    let channelId = this.getAttribute("data-id");
+                    deleteMyMessages(channelId);
                 });
             });
         }
@@ -386,5 +416,35 @@ document.addEventListener("DOMContentLoaded", function () {
         // Show the Bootstrap modal
         let channelsModal = new bootstrap.Modal(document.getElementById("channelsModal"));
         channelsModal.show();
+    }
+
+    function deleteMyMessages(channelId) {
+        let orgId = window.djangoData.orgId;
+        let csrfToken = getCSRFToken(); // GET CSRF FROM META TAG
+
+        fetch(`/apps/delete-all-messages-channels/?channel_id=${channelId}&org_id=${orgId}`, {
+            method: "DELETE",
+            headers: {
+                "X-CSRFToken": csrfToken,
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Your messages have been deleted!");
+            } else {
+                alert("Error: " + data.error);
+            }
+        })
+        .catch(error => {
+            console.error("Delete error:", error);
+            alert("Something went wrong.");
+        });
+    }
+
+    // 💖 FUNCTION TO GET CSRF TOKEN FROM META TAG 💖
+    function getCSRFToken() {
+        return document.querySelector("meta[name='csrf-token']").getAttribute("content");
     }
 });
