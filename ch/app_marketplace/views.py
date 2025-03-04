@@ -498,26 +498,36 @@ def disable_org_expiry(request):
 # GET EXPIRY STATUS
 @csrf_exempt
 @login_required
-def get_expiry_status(request):
-    """Fetches expiry settings for an organization."""
-    if request.method == "GET":
-        org_id = request.GET.get("org_id")
+def get_user_activities(request):
+    """Fetches user activities filtered by organization and channel (if provided)."""
+    org_id = request.GET.get("org_id")
+    channel_id = request.GET.get("channel_id")
+   
+    if not org_id:
+        return JsonResponse({"error": "Organization ID is required"}, status=400)
 
-        if not org_id:
-            return JsonResponse({"error": "Organization ID is missing"}, status=400)
+    # Get organization
+    org = get_object_or_404(Organization, id=org_id)
+    channel=get_object_or_404(Channel,id=channel_id,organization=org)
 
-        org = get_object_or_404(Organization, id=org_id)
 
-        # Check if expiry is set
-        expiry_status = org.expires_at  # Assuming 'expires_at' field stores expiry
+    # Filter activities by organization and user
+    activities = ActivityChannel.objects.filter(user=request.user, organization=org,channel=channel)
 
-        if expiry_status:
-            formatted_expiry = localtime(expiry_status).strftime("%Y-%m-%d %H:%M:%S")
-            message = f"✅ Auto Expiry Enabled: {formatted_expiry}"
-        else:
-            message = "❌ Expiry is OFF"
+    # If channel_id is provided, filter further
+    if channel_id:
+        channel = get_object_or_404(Channel, id=channel_id, organization=org)
+        activities = activities.filter(channel=channel)
+    
+    # Serialize activity data
+    activity_list = [
+        {
+            "action": activity.get_action_type_display(),
+            "content": activity.content,
+            "timestamp": activity.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            "channel": activity.channel.name if activity.channel else "Organization-wide"
+        }
+        for activity in activities
+    ]
 
-        return JsonResponse({"expiry_status": message})
-
-    return JsonResponse({"error": "Invalid request"}, status=400)
-
+    return JsonResponse({"activities": activity_list}, safe=False)

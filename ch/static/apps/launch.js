@@ -349,13 +349,11 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function checkAndFetchChannels() {
-        // Check if `/channels` exists in available commands
         if (!availableCommands.includes("/channels")) {
             alert("Error: /channels command is not available in this app.");
             return;
         }
 
-        // Fetch Organization ID & App ID (Modify as needed)
         let orgId = window.djangoData.orgId; // Set dynamically
         let appId = window.djangoData.appId; // Set dynamically
 
@@ -390,6 +388,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <div>
                         <button class="btn btn-primary btn-sm open-channel" data-id="${channel.id}">Open</button>
                         <button class="btn btn-danger btn-sm delete-messages" data-id="${channel.id}">🗑 Delete My Messages</button>
+                        <button class="btn btn-info btn-sm view-activities" data-id="${channel.id}">📜 View Activities</button>
                     </div>
                 `;
 
@@ -411,16 +410,23 @@ document.addEventListener("DOMContentLoaded", function () {
                     deleteMyMessages(channelId);
                 });
             });
+
+            // Add event listeners to view activities buttons
+            document.querySelectorAll(".view-activities").forEach(button => {
+                button.addEventListener("click", function () {
+                    let channelId = this.getAttribute("data-id");
+                    fetchActivities(channelId);
+                });
+            });
         }
 
-        // Show the Bootstrap modal
         let channelsModal = new bootstrap.Modal(document.getElementById("channelsModal"));
         channelsModal.show();
     }
 
     function deleteMyMessages(channelId) {
         let orgId = window.djangoData.orgId;
-        let csrfToken = getCSRFToken(); // GET CSRF FROM META TAG
+        let csrfToken = getCSRFToken();
 
         fetch(`/apps/delete-all-messages-channels/?channel_id=${channelId}&org_id=${orgId}`, {
             method: "DELETE",
@@ -443,11 +449,55 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // 💖 FUNCTION TO GET CSRF TOKEN FROM META TAG 💖
+    function fetchActivities(channelId) {
+        let orgId = window.djangoData.orgId;
+
+        fetch(`/apps/get-user-activities/?org_id=${orgId}&channel_id=${channelId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.activities) {
+                    showActivitiesModal(data.activities);
+                } else {
+                    alert("No activities found.");
+                }
+            })
+            .catch(error => {
+                console.error("Activities fetch error:", error);
+                alert("Error fetching activities.");
+            });
+    }
+
+    function showActivitiesModal(activities) {
+        const activitiesList = document.getElementById("activitiesList");
+        activitiesList.innerHTML = "";
+
+        if (activities.length === 0) {
+            activitiesList.innerHTML = "<li class='list-group-item'>No activities found.</li>";
+        } else {
+            activities.forEach(activity => {
+                let listItem = document.createElement("li");
+                listItem.classList.add("list-group-item");
+
+                listItem.innerHTML = `
+                    <strong>Action:</strong> ${activity.action} <br>
+                    <strong>Content:</strong> ${activity.content || "N/A"} <br>
+                    <strong>Timestamp:</strong> ${activity.timestamp} <br>
+                    <strong>Channel:</strong> ${activity.channel}
+                `;
+
+                activitiesList.appendChild(listItem);
+            });
+        }
+
+        let activitiesModal = new bootstrap.Modal(document.getElementById("activitiesModal"));
+        activitiesModal.show();
+    }
+
     function getCSRFToken() {
         return document.querySelector("meta[name='csrf-token']").getAttribute("content");
     }
 });
+
 
 
 // /DOWNLOAD -- DOWNLOAD CHANNEL DATA
