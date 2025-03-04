@@ -7,7 +7,7 @@ from django.utils.html import format_html
 
 @admin.register(MiniApp)
 class MiniAppAdmin(ModelAdmin):
-    list_display = [field.name for field in MiniApp._meta.fields]
+  list_display = ["name", "category", "developer", "version", "install_count", "is_premium"]
 
 
 
