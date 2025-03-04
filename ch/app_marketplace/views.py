@@ -328,6 +328,7 @@ def delete_all_messages(request):
 
 
 # DOWNLOAD CHANNEL DATA
+@check_org_membership
 def export_channels(request, org_id):
     if request.method != "POST":
         return JsonResponse({"error": "Invalid request method."}, status=400)
