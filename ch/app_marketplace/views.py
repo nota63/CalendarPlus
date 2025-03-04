@@ -422,3 +422,28 @@ def export_channels(request, org_id):
 
     except json.JSONDecodeError:
         return JsonResponse({"error": "Invalid JSON data."}, status=400)
+    
+
+# CHANNEL ANALYSIS & OVERVIEW - /overview
+def get_channels_analytics(request, org_id):
+    org = get_object_or_404(Organization, id=org_id)
+    channels = Channel.objects.filter(organization=org)
+
+    analytics_data = []
+
+    for channel in channels:
+        messages_count = Message.objects.filter(channel=channel).count()
+        events_count = ChannelEvents.objects.filter(channel=channel).count()
+        active_members = ChannelAccess.objects.filter(channel=channel).count()
+        channel_access = "Private" if channel.visibility == "PRIVATE" else "Public"
+
+        analytics_data.append({
+            "channel_name": channel.name,
+            "messages": messages_count,
+            "events": events_count,
+            "active_members": active_members,
+            "access_type": channel_access,
+        })
+
+    return JsonResponse({"analytics": analytics_data})
+

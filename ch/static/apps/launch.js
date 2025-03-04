@@ -451,6 +451,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // /DOWNLOAD -- DOWNLOAD CHANNEL DATA
+
 document.addEventListener("DOMContentLoaded", function () {
     let cmdInput = document.getElementById("cmdInput");
 
@@ -543,5 +544,94 @@ document.addEventListener("DOMContentLoaded", function () {
     // Get CSRF token function
     function getCSRFToken() {
         return document.querySelector('meta[name="csrf-token"]').getAttribute("content");
+    }
+});
+
+
+// /ANALYTICS -- CHANNEL ANALYTICS
+document.addEventListener("DOMContentLoaded", function () {
+    let cmdInput = document.getElementById("cmdInput");
+
+    cmdInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" && cmdInput.value.trim() === "/analytics") {
+            event.preventDefault();
+            cmdInput.value = ""; // Clear input
+            fetchAnalytics();
+        }
+    });
+
+    function fetchAnalytics() {
+        let orgId = window.djangoData.orgId;
+
+        let modal = new bootstrap.Modal(document.getElementById("analyticsModal"));
+        let analyticsBody = document.getElementById("analyticsBody");
+
+        analyticsBody.innerHTML = `<div class="text-center"><div class="spinner-border" role="status"></div></div>`;
+
+        fetch(`/apps/analytics/${orgId}/`)
+            .then(response => response.json())
+            .then(data => {
+                analyticsBody.innerHTML = ""; // Clear loading spinner
+
+                if (data.analytics.length === 0) {
+                    analyticsBody.innerHTML = `<p class="text-center text-muted">No analytics available.</p>`;
+                    return;
+                }
+
+                let chartData = {
+                    labels: [],
+                    messages: [],
+                    events: [],
+                    members: [],
+                };
+
+                data.analytics.forEach(channel => {
+                    chartData.labels.push(channel.channel_name);
+                    chartData.messages.push(channel.messages);
+                    chartData.events.push(channel.events);
+                    chartData.members.push(channel.active_members);
+                });
+
+                renderChart(chartData);
+                modal.show();
+            })
+            .catch(error => {
+                analyticsBody.innerHTML = `<p class="text-danger text-center">Error loading analytics.</p>`;
+                console.error("Error:", error);
+            });
+    }
+
+    function renderChart(chartData) {
+        let ctx = document.getElementById("analyticsChart").getContext("2d");
+
+        new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: chartData.labels,
+                datasets: [
+                    {
+                        label: "Messages",
+                        backgroundColor: "#007bff",
+                        data: chartData.messages
+                    },
+                    {
+                        label: "Events",
+                        backgroundColor: "#28a745",
+                        data: chartData.events
+                    },
+                    {
+                        label: "Active Members",
+                        backgroundColor: "#ffc107",
+                        data: chartData.members
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
     }
 });

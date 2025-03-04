@@ -14,6 +14,7 @@ urlpatterns=[
     # channels
     path('get-workspace-channels/',get_workspace_channels, name='get_workspace_channels'),
     path('delete-all-messages-channels/',delete_all_messages, name='delete_all_messages_channels'),
-    path('export-channels/<int:org_id>/',export_channels, name='export_channels')
+    path('export-channels/<int:org_id>/',export_channels, name='export_channels'),
+    path("analytics/<int:org_id>/", get_channels_analytics, name="get_channels_analytics"),
 
 ]
