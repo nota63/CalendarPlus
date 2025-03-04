@@ -195,13 +195,13 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                document.getElementById("task-details-content").innerHTML = `
-                    <h4>${data.title}</h4>
-                    <p><strong>Description:</strong> ${data.description}</p>
-                    <p><strong>Created By:</strong> ${data.created_by}</p>
-                    <p><strong>Due Date:</strong> ${data.due_date || "No due date"}</p>
-                `;
-    
+              
+ document.getElementById("task-details-content").innerHTML = `
+ <h4>${data.title}</h4>
+ <p><strong>Description:</strong> ${data.description}</p>
+ <p><strong>Created By:</strong> ${data.created_by}</p>
+ <p><strong>Due Date:</strong> ${data.due_date || "No due date"}</p>
+`;
                 // Show the Bootstrap 5 modal
                 const taskDetailsModal = new bootstrap.Modal(document.getElementById("taskDetailsModal"));
                 taskDetailsModal.show();
