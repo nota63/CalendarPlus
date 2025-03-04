@@ -1,3 +1,46 @@
+// CHECK FOR COMMANDS 
+document.addEventListener("DOMContentLoaded", function () {
+    const cmdInput = document.getElementById("cmdInput");
+
+    // Get all commands dynamically from app.mini_app.commands
+    let appCommands = new Set();
+    document.querySelectorAll(".bg-white\\/5 span.ml-2").forEach(span => {
+        appCommands.add(span.textContent.trim());
+    });
+
+    // Function to check if user-entered command exists in appCommands
+    function checkCommand(command) {
+        if (!appCommands.has(command)) {
+            alert(`Error: '${command}' is not available in this app.`);
+            setTimeout(() => {
+                location.reload(); // Reload the page to stop all operations
+            }, 0000); // Delay for smooth UX
+            return false;
+        }
+        return true;
+    }
+
+    // Automatically listen for user input and validate commands
+    cmdInput.addEventListener("keyup", function (event) {
+        if (event.key === "Enter") {
+            let command = cmdInput.value.trim();
+
+            if (!checkCommand(command)) {
+                return; // Stop everything if command is invalid
+            }
+
+            // If command is valid, trigger a custom event
+            document.dispatchEvent(new CustomEvent("commandEntered", { detail: { command } }));
+        }
+    });
+});
+
+
+
+
+
+
+
 // TASK MANAGER (KANBAN-BOARD) - ADD TASKS
 document.addEventListener("DOMContentLoaded", function () {
     const cmdInput = document.getElementById("cmdInput");
