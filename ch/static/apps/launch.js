@@ -451,10 +451,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // /DOWNLOAD -- DOWNLOAD CHANNEL DATA
-
 document.addEventListener("DOMContentLoaded", function () {
     let cmdInput = document.getElementById("cmdInput");
-    
+
     // Show modal when user types /download
     cmdInput.addEventListener("keydown", function (event) {
         if (event.key === "Enter" && cmdInput.value.trim() === "/download") {
@@ -470,8 +469,9 @@ document.addEventListener("DOMContentLoaded", function () {
     let emailInputDiv = document.getElementById("emailInputDiv");
     let emailInput = document.getElementById("emailInput");
     let confirmEmailBtn = document.getElementById("confirmEmailBtn");
+    let loadingSpinner = document.getElementById("loadingSpinner");
 
-    let orgId =window.djangoData.orgId; // Replace with actual organization ID
+    let orgId = window.djangoData.orgId; // Get org ID from Django context
 
     // Handle PDF Download
     downloadPdfBtn.addEventListener("click", function () {
@@ -498,6 +498,9 @@ document.addEventListener("DOMContentLoaded", function () {
         let requestData = { action: action };
         if (email) requestData.email = email;
 
+        // Show loading spinner
+        loadingSpinner.classList.remove("d-none");
+
         fetch(`/apps/export-channels/${orgId}/`, {
             method: "POST",
             headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
@@ -511,6 +514,9 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         })
         .then(data => {
+            // Hide loading spinner
+            loadingSpinner.classList.add("d-none");
+
             if (action === "download") {
                 let url = window.URL.createObjectURL(data);
                 let a = document.createElement("a");
@@ -523,7 +529,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 alert(data.success || data.error);
             }
         })
-        .catch(error => console.error("Error:", error));
+        .catch(error => {
+            console.error("Error:", error);
+            loadingSpinner.classList.add("d-none"); // Hide spinner on error
+        });
     }
 
     // Function to validate email
