@@ -510,6 +510,10 @@ def get_user_activities(request):
     org = get_object_or_404(Organization, id=org_id)
     channel=get_object_or_404(Channel,id=channel_id,organization=org)
 
+    profile=get_object_or_404(Profile,organization=org,user=request.user)
+    if not profile:
+        return JsonResponse({'error:':'you are not authorized!'})
+
 
     # Filter activities by organization and user
     activities = ActivityChannel.objects.filter(user=request.user, organization=org,channel=channel)
