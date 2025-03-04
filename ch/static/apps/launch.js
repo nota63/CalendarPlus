@@ -187,7 +187,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log(`Fetching details for task ${taskId}...`);
     
         fetch(`/apps/kanban/task-details/${taskId}/`, {
-            method: "GET", // Explicitly setting GET method
+            method: "GET",
             headers: {
                 "Content-Type": "application/json",
             }
@@ -201,6 +201,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     <p><strong>Created By:</strong> ${data.created_by}</p>
                     <p><strong>Due Date:</strong> ${data.due_date || "No due date"}</p>
                 `;
+    
+                // Show the Bootstrap 5 modal
+                const taskDetailsModal = new bootstrap.Modal(document.getElementById("taskDetailsModal"));
+                taskDetailsModal.show();
             } else {
                 console.error("Error fetching task details:", data);
             }
@@ -208,6 +212,9 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error("Error fetching task details:", error));
     }
     
+    
+
+
     function updateTaskStatus(taskId, newStatus) {
         console.log(`Updating task ${taskId} to ${newStatus}`);
 
