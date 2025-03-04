@@ -449,3 +449,7 @@ def get_channels_analytics(request, org_id):
         analytics_data["retention_policy"].append(1 if RetentionPolicy.objects.filter(channel=channel) else 0)  # 1 if enabled, 0 if not
 
     return JsonResponse({"analytics": analytics_data})
+
+
+# SET CHANNEL MESSAGES EXPIRY
+
