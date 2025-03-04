@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.http import HttpResponseBadRequest
 from django.utils.timezone import localtime
+from .check_org_membership import check_org_membership
+
 # Create your views here.
 
 # Display Miniapps 
@@ -425,6 +427,7 @@ def export_channels(request, org_id):
     
 
 # CHANNEL ANALYSIS & OVERVIEW - /overview
+@check_org_membership
 def get_channels_analytics(request, org_id):
     org = get_object_or_404(Organization, id=org_id)
     channels = Channel.objects.filter(organization=org)
@@ -468,6 +471,10 @@ def set_org_expiry(request):
             return JsonResponse({"error": "Invalid expiry selection"}, status=400)
 
         org = get_object_or_404(Organization, id=org_id)
+        profile=get_object_or_404(Profile,organization=org,user=request.user)
+        if not profile:
+            return JsonResponse({'error:':'you are not authorized person!'})
+        
         org.set_expiry = duration  # Save selected expiry for the entire org
         org.save()
 
@@ -488,6 +495,10 @@ def disable_org_expiry(request):
             return JsonResponse({"error": "Organization ID is missing"}, status=400)
 
         org = get_object_or_404(Organization, id=org_id)
+        profile=get_object_or_404(Profile,organization=org,user=request.user)
+        if not profile:
+            return JsonResponse({'error:':'you are not authorized!'})
+
         org.set_expiry = None  
         org.save()
 
