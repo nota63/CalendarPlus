@@ -551,87 +551,145 @@ document.addEventListener("DOMContentLoaded", function () {
 // /ANALYTICS -- CHANNEL ANALYTICS
 document.addEventListener("DOMContentLoaded", function () {
     let cmdInput = document.getElementById("cmdInput");
+    let analyticsModal = document.getElementById("analyticsModal");
+    let analyticsBody = document.querySelector("#analyticsModal .modal-body");
+
+    // Ensure required elements exist
+    if (!cmdInput || !analyticsModal || !analyticsBody) {
+        console.error("❌ Required elements not found! Check modal and input field.");
+        return;
+    }
 
     cmdInput.addEventListener("keydown", function (event) {
         if (event.key === "Enter" && cmdInput.value.trim() === "/analytics") {
             event.preventDefault();
-            cmdInput.value = ""; // Clear input
+            cmdInput.value = "";
             fetchAnalytics();
         }
     });
 
     function fetchAnalytics() {
-        let orgId = window.djangoData.orgId;
-
-        let modal = new bootstrap.Modal(document.getElementById("analyticsModal"));
-        let analyticsBody = document.getElementById("analyticsBody");
-
+        let orgId = window.djangoData?.orgId;
+        if (!orgId) {
+            console.error("❌ Organization ID not found!");
+            return;
+        }
+    
+        let modal = new bootstrap.Modal(analyticsModal);
         analyticsBody.innerHTML = `<div class="text-center"><div class="spinner-border" role="status"></div></div>`;
-
+    
         fetch(`/apps/analytics/${orgId}/`)
             .then(response => response.json())
             .then(data => {
-                analyticsBody.innerHTML = ""; // Clear loading spinner
-
-                if (data.analytics.length === 0) {
+                console.log("Analytics Response:", data); // Debugging step
+    
+                if (!data || !data.analytics || !Array.isArray(data.analytics.labels)) {
+                    console.error("❌ Invalid data format! Expected an object with arrays:", data);
+                    analyticsBody.innerHTML = `<p class="text-center text-danger">Invalid analytics data.</p>`;
+                    return;
+                }
+    
+                if (data.analytics.labels.length === 0) {
                     analyticsBody.innerHTML = `<p class="text-center text-muted">No analytics available.</p>`;
                     return;
                 }
-
-                let chartData = {
-                    labels: [],
-                    messages: [],
-                    events: [],
-                    members: [],
-                };
-
-                data.analytics.forEach(channel => {
-                    chartData.labels.push(channel.channel_name);
-                    chartData.messages.push(channel.messages);
-                    chartData.events.push(channel.events);
-                    chartData.members.push(channel.active_members);
-                });
-
-                renderChart(chartData);
-                modal.show();
+    
+                // Ensure modal content is correctly set BEFORE accessing canvas elements
+                analyticsBody.innerHTML = `
+                    <canvas id="messagesChart"></canvas>
+                    <hr>
+                    <canvas id="eventsChart"></canvas>
+                    <hr>
+                    <canvas id="membersChart"></canvas>
+                    <hr>
+                    <canvas id="bannedChart"></canvas>
+                    <hr>
+                    <canvas id="linksChart"></canvas>
+                `;
+    
+                setTimeout(() => {
+                    renderCharts(data.analytics);
+                    modal.show();
+                }, 200); // Small delay to ensure DOM is updated
             })
             .catch(error => {
                 analyticsBody.innerHTML = `<p class="text-danger text-center">Error loading analytics.</p>`;
-                console.error("Error:", error);
+                console.error("Error fetching analytics:", error);
             });
     }
-
-    function renderChart(chartData) {
-        let ctx = document.getElementById("analyticsChart").getContext("2d");
-
-        new Chart(ctx, {
+    
+    function renderCharts(analytics) {
+        let ctxMessages = document.getElementById("messagesChart").getContext("2d");
+        let ctxEvents = document.getElementById("eventsChart").getContext("2d");
+        let ctxMembers = document.getElementById("membersChart").getContext("2d");
+        let ctxBanned = document.getElementById("bannedChart").getContext("2d");
+        let ctxLinks = document.getElementById("linksChart").getContext("2d");
+    
+        let labels = analytics.labels;
+    
+        new Chart(ctxMessages, {
             type: "bar",
             data: {
-                labels: chartData.labels,
-                datasets: [
-                    {
-                        label: "Messages",
-                        backgroundColor: "#007bff",
-                        data: chartData.messages
-                    },
-                    {
-                        label: "Events",
-                        backgroundColor: "#28a745",
-                        data: chartData.events
-                    },
-                    {
-                        label: "Active Members",
-                        backgroundColor: "#ffc107",
-                        data: chartData.members
-                    }
-                ]
+                labels: labels,
+                datasets: [{
+                    label: "Messages",
+                    backgroundColor: "#007bff",
+                    data: analytics.messages
+                }]
             },
-            options: {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            }
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+    
+        new Chart(ctxEvents, {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Events",
+                    backgroundColor: "#28a745",
+                    data: analytics.events
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+    
+        new Chart(ctxMembers, {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Active Members",
+                    backgroundColor: "#ffc107",
+                    data: analytics.members
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+    
+        new Chart(ctxBanned, {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Banned Users",
+                    backgroundColor: "#dc3545",
+                    data: analytics.banned_users
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+    
+        new Chart(ctxLinks, {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Links Shared",
+                    backgroundColor: "#17a2b8",
+                    data: analytics.links_shared
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
         });
     }
-});
+});    

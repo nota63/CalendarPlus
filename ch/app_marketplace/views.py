@@ -269,7 +269,7 @@ def task_details(request, task_id):
 
 
 # CHANNELS -------
-from organization_channels.models import Channel, Message,ActivityChannel,Link,ChannelAccess,ChannelEvents
+from organization_channels.models import Channel, Message,ActivityChannel,Link,ChannelAccess,ChannelEvents,Ban,RetentionPolicy
 from django.core.mail import EmailMessage
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
@@ -429,21 +429,23 @@ def get_channels_analytics(request, org_id):
     org = get_object_or_404(Organization, id=org_id)
     channels = Channel.objects.filter(organization=org)
 
-    analytics_data = []
+    analytics_data = {
+        "labels": [],
+        "messages": [],
+        "events": [],
+        "members": [],
+        "banned_users": [],
+        "links_shared": [],
+        "retention_policy": [],
+    }
 
     for channel in channels:
-        messages_count = Message.objects.filter(channel=channel).count()
-        events_count = ChannelEvents.objects.filter(channel=channel).count()
-        active_members = ChannelAccess.objects.filter(channel=channel).count()
-        channel_access = "Private" if channel.visibility == "PRIVATE" else "Public"
-
-        analytics_data.append({
-            "channel_name": channel.name,
-            "messages": messages_count,
-            "events": events_count,
-            "active_members": active_members,
-            "access_type": channel_access,
-        })
+        analytics_data["labels"].append(channel.name)
+        analytics_data["messages"].append(Message.objects.filter(channel=channel).count())
+        analytics_data["events"].append(ChannelEvents.objects.filter(channel=channel).count())
+        analytics_data["members"].append(ChannelAccess.objects.filter(channel=channel).count())
+        analytics_data["banned_users"].append(Ban.objects.filter(channel=channel).count())
+        analytics_data["links_shared"].append(Link.objects.filter(channel=channel).count())
+        analytics_data["retention_policy"].append(1 if RetentionPolicy.objects.filter(channel=channel) else 0)  # 1 if enabled, 0 if not
 
     return JsonResponse({"analytics": analytics_data})
-
