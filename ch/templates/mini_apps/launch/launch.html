@@ -228,6 +228,29 @@
     </div>
   </div>
   
+<!-- DOWNLOAD CHANNELS DATA CHOICES -->
+ <!-- Modal -->
+<div class="modal fade" id="downloadModal" tabindex="-1" aria-labelledby="downloadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="downloadModalLabel">Export Channels</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>How would you like to export the channels?</p>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" id="downloadPdfBtn">Download as PDF</button>
+                    <button class="btn btn-secondary" id="emailPdfBtn">Send via Email</button>
+                </div>
+                <div id="emailInputDiv" class="mt-3 d-none">
+                    <input type="email" id="emailInput" class="form-control" placeholder="Enter your email">
+                    <button class="btn btn-success mt-2" id="confirmEmailBtn">Send PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 

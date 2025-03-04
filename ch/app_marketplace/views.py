@@ -269,8 +269,12 @@ def task_details(request, task_id):
 
 
 # CHANNELS -------
-from organization_channels.models import Channel, Message
-
+from organization_channels.models import Channel, Message,ActivityChannel,Link,ChannelAccess,ChannelEvents
+from django.core.mail import EmailMessage
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from io import BytesIO
+from django.http import HttpResponse
 
 # FETCH CHANNELS 
 @login_required
@@ -318,3 +322,103 @@ def delete_all_messages(request):
     Message.objects.filter(channel=channel,organization=organization,user=request.user).delete()
 
     return JsonResponse({"success": True, "message": "All messages deleted successfully!"})
+
+
+
+# DOWNLOAD CHANNEL DATA
+def export_channels(request, org_id):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request method."}, status=400)
+
+    try:
+        data = json.loads(request.body)
+        action = data.get("action")  # "download" or "email"
+        user_email = data.get("email")  # Email if the user chooses to send it
+
+        channels = Channel.objects.filter(organization_id=org_id)
+        if not channels.exists():
+            return JsonResponse({"error": "No channels found in this organization."}, status=400)
+
+        # Generate PDF
+        buffer = BytesIO()
+        pdf = canvas.Canvas(buffer, pagesize=A4)
+        pdf.setTitle("Organization Channels Report")
+
+        y_position = 800  # Start position for content
+        pdf.setFont("Helvetica-Bold", 16)
+        pdf.drawString(200, y_position, "Organization Channels Report")
+        y_position -= 30
+
+        for channel in channels:
+            pdf.setFont("Helvetica-Bold", 14)
+            pdf.drawString(50, y_position, f"Channel: {channel.name} ({channel.get_visibility_display()})")
+            y_position -= 20
+            pdf.setFont("Helvetica", 12)
+
+            # Messages
+            messages = Message.objects.filter(channel=channel)
+            pdf.drawString(50, y_position, f"Total Messages: {messages.count()}")
+            y_position -= 20
+            for message in messages[:5]:  # Show only 5 messages for readability
+                pdf.drawString(70, y_position, f"- {message.user.username}: {message.content[:50]}...")
+                y_position -= 15
+
+            # Links
+            links = Link.objects.filter(channel=channel)
+            pdf.drawString(50, y_position, f"Total Links: {links.count()}")
+            y_position -= 20
+            for link in links[:5]:
+                pdf.drawString(70, y_position, f"- {link.text}: {link.link}")
+                y_position -= 15
+
+            # Activities
+            activities = ActivityChannel.objects.filter(channel=channel)
+            pdf.drawString(50, y_position, f"Total Activities: {activities.count()}")
+            y_position -= 20
+            for activity in activities[:5]:
+                pdf.drawString(70, y_position, f"- {activity.action_type}: {activity.content[:50]}...")
+                y_position -= 15
+
+            # Events
+            events = ChannelEvents.objects.filter(channel=channel)
+            pdf.drawString(50, y_position, f"Total Events: {events.count()}")
+            y_position -= 20
+            for event in events[:3]:
+                pdf.drawString(70, y_position, f"- {event.event_name}: {event.event_details[:50]}...")
+                y_position -= 15
+
+            y_position -= 30  # Space before next channel
+            if y_position < 100:  # Prevent writing out of bounds
+                pdf.showPage()
+                y_position = 800
+
+        pdf.save()
+        buffer.seek(0)
+
+        # If the user wants to download
+        if action == "download":
+            response = HttpResponse(buffer, content_type="application/pdf")
+            response["Content-Disposition"] = 'attachment; filename="channels_report.pdf"'
+            return response
+
+        # If the user wants to send via email
+        elif action == "email":
+            if not user_email:
+                return JsonResponse({"error": "Email address is required."}, status=400)
+
+            email = EmailMessage(
+                "Organization Channels Report",
+                "Attached is your requested report.",
+                "no-reply@calendarplus.com",
+                [user_email]
+            )
+            email.attach("channels_report.pdf", buffer.getvalue(), "application/pdf")
+            email.send()
+
+            return JsonResponse({"success": "PDF sent successfully to your email."})
+
+        else:
+            return JsonResponse({"error": "Invalid action."}, status=400)
+
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON data."}, status=400)

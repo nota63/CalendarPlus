@@ -448,3 +448,91 @@ document.addEventListener("DOMContentLoaded", function () {
         return document.querySelector("meta[name='csrf-token']").getAttribute("content");
     }
 });
+
+
+// /DOWNLOAD -- DOWNLOAD CHANNEL DATA
+
+document.addEventListener("DOMContentLoaded", function () {
+    let cmdInput = document.getElementById("cmdInput");
+    
+    // Show modal when user types /download
+    cmdInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" && cmdInput.value.trim() === "/download") {
+            event.preventDefault();
+            cmdInput.value = ""; // Clear input
+            let modal = new bootstrap.Modal(document.getElementById("downloadModal"));
+            modal.show();
+        }
+    });
+
+    let downloadPdfBtn = document.getElementById("downloadPdfBtn");
+    let emailPdfBtn = document.getElementById("emailPdfBtn");
+    let emailInputDiv = document.getElementById("emailInputDiv");
+    let emailInput = document.getElementById("emailInput");
+    let confirmEmailBtn = document.getElementById("confirmEmailBtn");
+
+    let orgId =window.djangoData.orgId; // Replace with actual organization ID
+
+    // Handle PDF Download
+    downloadPdfBtn.addEventListener("click", function () {
+        sendExportRequest("download");
+    });
+
+    // Handle Email Option
+    emailPdfBtn.addEventListener("click", function () {
+        emailInputDiv.classList.remove("d-none");
+    });
+
+    // Handle Confirm Email
+    confirmEmailBtn.addEventListener("click", function () {
+        let email = emailInput.value.trim();
+        if (!email || !validateEmail(email)) {
+            alert("Please enter a valid email address.");
+            return;
+        }
+        sendExportRequest("email", email);
+    });
+
+    // Function to send AJAX request
+    function sendExportRequest(action, email = null) {
+        let requestData = { action: action };
+        if (email) requestData.email = email;
+
+        fetch(`/apps/export-channels/${orgId}/`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
+            body: JSON.stringify(requestData)
+        })
+        .then(response => {
+            if (action === "download") {
+                return response.blob();
+            } else {
+                return response.json();
+            }
+        })
+        .then(data => {
+            if (action === "download") {
+                let url = window.URL.createObjectURL(data);
+                let a = document.createElement("a");
+                a.href = url;
+                a.download = "channels_report.pdf";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } else {
+                alert(data.success || data.error);
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    }
+
+    // Function to validate email
+    function validateEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    // Get CSRF token function
+    function getCSRFToken() {
+        return document.querySelector('meta[name="csrf-token"]').getAttribute("content");
+    }
+});
