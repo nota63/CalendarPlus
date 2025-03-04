@@ -7,6 +7,7 @@ from better_profanity import profanity
 from django.core.mail import send_mail
 from .utils import send_abusive_message_notification 
 from tinymce.models import HTMLField  
+from django.utils.timezone import now
 # Create your models here.
 
 
@@ -102,6 +103,15 @@ class Message(models.Model):
             send_abusive_message_notification(self.user, self.content, self.channel.name, abused_message.message_content,self.organization)
 
         super().save(*args, **kwargs)
+
+    # message expiry for channels app
+    def set_expiry(self, duration):
+        """Sets expiry time based on duration (e.g., '12h', '1d')."""
+        units = {"h": "hours", "d": "days"}
+        value, unit = int(duration[:-1]), duration[-1]
+        if unit in units:
+            self.expires_at = now() + timedelta(**{units[unit]: value})
+            self.save()
     
  
 
