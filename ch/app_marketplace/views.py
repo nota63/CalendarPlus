@@ -157,6 +157,8 @@ def add_task_view_workspace(request, org_id, app_id):
 
     return JsonResponse({"error": "Invalid request"}, status=400)
 
+
+
 # KANBAN BOARD HANDLING
 @login_required
 def get_tasks_kanban(request, org_id, app_id):

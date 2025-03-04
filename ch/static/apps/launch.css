@@ -247,3 +247,119 @@
     background-color: rgba(189, 203, 219, 0.3) !important;
     backdrop-filter: blur(3px);
 }
+
+
+/* ADD TASK MODAL */
+/* Import Premium Font (Poppins) */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+/* Modal Container Styling */
+.modal-content {
+    font-family: 'Poppins', sans-serif;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Input Field Styling with Icons */
+.form-label {
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 0.5rem;
+    color: #fff;
+}
+
+.form-label::before {
+    font-family: "Font Awesome 5 Free";
+    position: absolute;
+    left: 0;
+    top: 2px;
+    font-size: 1.1rem;
+}
+
+#taskTitle + .form-label::before {
+    content: "\f02b";
+    font-weight: 900;
+}
+
+#taskDescription + .form-label::before {
+    content: "\f15c";
+    font-weight: 400;
+}
+
+#taskStatus + .form-label::before {
+    content: "\f013";
+    font-weight: 900;
+}
+
+.form-control, .form-select {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    padding: 12px 15px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.form-control:focus, .form-select:focus {
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: none;
+    outline: none;
+}
+
+/* Input Animation Effects */
+.form-control {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.form-control:focus {
+    border-bottom: 2px solid #00bfa5;
+}
+
+/* Custom Select Dropdown */
+.form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+}
+
+/* Button Styling */
+.btn-success {
+    background: #00bfa5;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 0;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+    background: #009688;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 191, 165, 0.3);
+}
+
+/* Status Options Styling */
+#taskStatus option {
+    background: rgba(0, 0, 0, 0.9);
+    color: #fff;
+}
+
+#taskStatus option[value="todo"] { background: #ff5252; }
+#taskStatus option[value="in-progress"] { background: #ffc107; }
+#taskStatus option[value="done"] { background: #4caf50; }
+
+/* Textarea Styling */
+textarea {
+    resize: none;
+    min-height: 100px;
+}

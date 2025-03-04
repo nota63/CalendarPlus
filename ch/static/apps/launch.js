@@ -52,10 +52,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const requestData = { title, description, status };
 
         console.log("📤 Sending task data:", requestData);
-        console.log(`📡 Fetching URL: /apps/add_task_workspace/${orgId}/${appId}/`);
+        console.log(`📡 Fetching URL: /apps/taskify-workspace/${orgId}/${appId}/`);
         console.log("🛡️ CSRF Token:", csrfToken);
 
-        fetch(`/apps/add_task_workspace/${orgId}/${appId}/`, {
+        fetch(`/apps/kanban/taskify-workspace/${orgId}/${appId}/`, {
             method: "POST",
             headers: { 
                 "Content-Type": "application/json",
@@ -183,6 +183,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // show task details
     function showTaskDetails(taskId) {
         console.log(`Fetching details for task ${taskId}...`);
     
@@ -212,9 +213,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error("Error fetching task details:", error));
     }
     
-    
-
-
+    // Update task status
     function updateTaskStatus(taskId, newStatus) {
         console.log(`Updating task ${taskId} to ${newStatus}`);
 
