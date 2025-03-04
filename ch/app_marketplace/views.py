@@ -4,6 +4,8 @@ from accounts.models import Organization, Profile
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.http import HttpResponseBadRequest
+
 # Create your views here.
 
 # Display Miniapps 
@@ -212,7 +214,10 @@ def delete_task(request):
 
 # Get task details
 def task_details(request, task_id):
-    """Fetch and return task details as JSON."""
+    """Fetch and return task details as JSON (GET request only)."""
+    if request.method != "GET":
+        return HttpResponseBadRequest("Invalid request method. Only GET is allowed.")
+
     task = get_object_or_404(TaskManager, id=task_id)
 
     data = {

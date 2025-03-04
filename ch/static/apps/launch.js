@@ -185,24 +185,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function showTaskDetails(taskId) {
         console.log(`Fetching details for task ${taskId}...`);
-
-        fetch(`/apps/kanban/task_details/${taskId}/`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById("task-details-content").innerHTML = `
-                        <h4>${data.title}</h4>
-                        <p><strong>Description:</strong> ${data.description}</p>
-                        <p><strong>Created By:</strong> ${data.created_by}</p>
-                        <p><strong>Due Date:</strong> ${data.due_date || "No due date"}</p>
-                    `;
-                } else {
-                    console.error("Error fetching task details:", data);
-                }
-            })
-            .catch(error => console.error("Error fetching task details:", error));
+    
+        fetch(`/apps/kanban/task-details/${taskId}/`, {
+            method: "GET", // Explicitly setting GET method
+            headers: {
+                "Content-Type": "application/json",
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById("task-details-content").innerHTML = `
+                    <h4>${data.title}</h4>
+                    <p><strong>Description:</strong> ${data.description}</p>
+                    <p><strong>Created By:</strong> ${data.created_by}</p>
+                    <p><strong>Due Date:</strong> ${data.due_date || "No due date"}</p>
+                `;
+            } else {
+                console.error("Error fetching task details:", data);
+            }
+        })
+        .catch(error => console.error("Error fetching task details:", error));
     }
-
+    
     function updateTaskStatus(taskId, newStatus) {
         console.log(`Updating task ${taskId} to ${newStatus}`);
 
