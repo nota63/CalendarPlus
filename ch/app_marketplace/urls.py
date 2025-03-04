@@ -16,6 +16,7 @@ urlpatterns=[
     path('delete-all-messages-channels/',delete_all_messages, name='delete_all_messages_channels'),
     path('export-channels/<int:org_id>/',export_channels, name='export_channels'),
     path("analytics/<int:org_id>/", get_channels_analytics, name="get_channels_analytics"),
-    path('set-org-expiry/',set_org_expiry,name='set_org_expiry')
+    path('set-org-expiry/',set_org_expiry,name='set_org_expiry'),
+    path('disable-org-expiry/',disable_org_expiry, name='disable_org_expiry')
 
 ]

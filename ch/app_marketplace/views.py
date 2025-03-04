@@ -474,3 +474,23 @@ def set_org_expiry(request):
         return JsonResponse({"success": f"Auto-expiry set to {duration} for all channels!"})
     
     return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+# OFF CHANNEL EXPIRY
+@csrf_exempt
+@login_required
+def disable_org_expiry(request):
+    """Disables expiry for messages in all channels of an organization."""
+    if request.method == "POST":
+        org_id = request.POST.get("org_id")
+
+        if not org_id:
+            return JsonResponse({"error": "Organization ID is missing"}, status=400)
+
+        org = get_object_or_404(Organization, id=org_id)
+        org.set_expiry = None  
+        org.save()
+
+        return JsonResponse({"success": "✅ Auto-expiry disabled for all channels!"})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)

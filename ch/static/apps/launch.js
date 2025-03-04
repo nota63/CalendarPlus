@@ -752,3 +752,55 @@ document.addEventListener("DOMContentLoaded", function () {
         return csrfToken ? csrfToken.value : "";
     }
 });
+
+
+// TURN OF EXPIRY
+document.addEventListener("DOMContentLoaded", function () {
+    let cmdInput = document.getElementById("cmdInput");
+
+    if (!cmdInput) {
+        console.error("❌ Command input field not found!");
+        return;
+    }
+
+    // Listen for "/expiry off" command
+    cmdInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" && cmdInput.value.trim() === "/expiry off") {
+            event.preventDefault();
+            cmdInput.value = "";
+
+            let orgId = window.djangoData?.orgId;
+
+            if (!orgId) {
+                console.error("❌ Organization ID not found!");
+                return;
+            }
+
+            fetch(`/apps/disable-org-expiry/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": getCSRFToken(),
+                },
+                body: `org_id=${orgId}`,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`✅ ${data.success}`);
+                } else {
+                    alert(`❌ ${data.error}`);
+                }
+            })
+            .catch(error => {
+                console.error("❌ Error disabling expiry:", error);
+            });
+        }
+    });
+
+    // CSRF Token helper function
+    function getCSRFToken() {
+        let csrfToken = document.querySelector("input[name='csrfmiddlewaretoken']");
+        return csrfToken ? csrfToken.value : "";
+    }
+});
