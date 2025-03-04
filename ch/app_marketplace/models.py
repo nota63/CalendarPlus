@@ -29,6 +29,7 @@ class MiniApp(models.Model):
     commands = models.JSONField(default=list)  # Store available commands for the app
     requirements=models.CharField(max_length=255,default="Windows 10 + Higher")
     ratings=models.IntegerField(default=0, null=True, blank=True)
+    docs=models.TextField(null=True, blank=True)
 
    
     created_at = models.DateTimeField(auto_now_add=True)
