@@ -1382,3 +1382,78 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+// BOOKMARKS - /manage-bookmarks
+
+document.addEventListener("DOMContentLoaded", function () {
+    let cmdInput = document.getElementById("cmdInput");
+    let manageBookmarksModal = new bootstrap.Modal(document.getElementById("manageBookmarksModal"));
+    let addBookmarkModal = new bootstrap.Modal(document.getElementById("addBookmarkModal"));
+    let bookmarkList = document.getElementById("bookmarkList");
+    let addBookmarkForm = document.getElementById("addBookmarkForm");
+   
+
+    const ORG_ID = window.djangoData.orgId; // Make sure ORG_ID is set dynamically
+
+    cmdInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" && cmdInput.value.trim() === "/manage-bookmarks") {
+            event.preventDefault();
+            cmdInput.value = "";
+            fetchBookmarks();
+            manageBookmarksModal.show();
+        }
+    });
+
+    function fetchBookmarks() {
+        fetch(`/apps/bookmarks/fetch/${ORG_ID}/`)
+            .then(response => response.json())
+            .then(data => {
+                bookmarkList.innerHTML = "";
+                data.bookmarks.forEach(bookmark => {
+                    let bookmarkItem = document.createElement("div");
+                    bookmarkItem.classList.add("d-flex", "justify-content-between", "align-items-center", "p-2", "border-bottom");
+                    bookmarkItem.innerHTML = `
+                        <div>
+                            ${bookmark.app_logo ? `<img src="${bookmark.app_logo}" width="30" class="me-2">` : ""}
+                            <a href="${bookmark.url}" target="_blank">${bookmark.title}</a>
+                        </div>
+                        <button class="btn btn-danger btn-sm delete-bookmark" data-id="${bookmark.id}">Delete</button>
+                    `;
+                    bookmarkList.appendChild(bookmarkItem);
+                });
+
+                document.querySelectorAll(".delete-bookmark").forEach(btn => {
+                    btn.addEventListener("click", function () {
+                        deleteBookmark(this.dataset.id);
+                    });
+                });
+            })
+            .catch(error => console.error("Error fetching bookmarks:", error));
+    }
+
+    function deleteBookmark(bookmarkId) {
+        fetch(`/apps/bookmarks/delete/${ORG_ID}/${bookmarkId}/`, { method: "DELETE" })
+            .then(response => response.json())
+            .then(() => fetchBookmarks())  // Refresh after deletion
+            .catch(error => console.error("Error deleting bookmark:", error));
+    }
+
+    document.getElementById("openAddBookmarkModal").addEventListener("click", function () {
+        addBookmarkModal.show();
+    });
+
+    addBookmarkForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        let formData = new FormData(addBookmarkForm);
+
+        fetch(`/apps/bookmarks/add/${ORG_ID}/`, {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(() => {
+            addBookmarkModal.hide();
+            fetchBookmarks();
+        })
+        .catch(error => console.error("Error adding bookmark:", error));
+    });
+});

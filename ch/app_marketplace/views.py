@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect,get_list_or_404,get_object_or_404
-from .models import MiniApp,InstalledMiniApp
+from .models import (MiniApp,InstalledMiniApp,Bookmark)
 from accounts.models import (Organization, Profile,MeetingOrganization,MeetingNotes)
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
@@ -754,3 +754,66 @@ def delete_meeting_note(request, note_id):
     return JsonResponse({"error": "Invalid request method."}, status=400)
 
 # ------------------------------------------------------------------------------------------------------------------------------------
+
+# BOOKMARK MANAGER /manage-bookmarks
+@check_org_membership
+@login_required
+def fetch_bookmarks(request, org_id):
+    """Fetch all bookmarks for the given organization."""
+    organization = get_object_or_404(Organization, id=org_id)
+    bookmarks = Bookmark.objects.filter(organization=organization, created_by=request.user)
+    
+    data = [
+        {
+            "id": bookmark.id,
+            "title": bookmark.title,
+            "url": bookmark.url,
+            "description": bookmark.description,
+            "category": bookmark.category,
+            "app_logo": bookmark.app_logo.url if bookmark.app_logo else None,
+        }
+        for bookmark in bookmarks
+    ]
+    return JsonResponse({"bookmarks": data})
+
+
+@check_org_membership
+@csrf_exempt
+@login_required
+def delete_bookmark(request, org_id, bookmark_id):
+    """Delete a bookmark only if it belongs to the correct organization."""
+    organization = get_object_or_404(Organization, id=org_id)
+    bookmark = get_object_or_404(Bookmark, id=bookmark_id, organization=organization, created_by=request.user)
+    
+    bookmark.delete()
+    return JsonResponse({"message": "Bookmark deleted successfully!"})
+
+@check_org_membership
+@csrf_exempt
+@login_required
+def add_bookmark(request, org_id):
+    """Add a new bookmark under the specified organization."""
+    organization = get_object_or_404(Organization, id=org_id)
+
+    if request.method == "POST":
+        title = request.POST.get("title")
+        url = request.POST.get("url")
+        description = request.POST.get("description", "")
+        category = request.POST.get("category", "")
+        app_logo = request.FILES.get("app_logo")
+
+        if not title or not url:
+            return JsonResponse({"error": "Title and URL are required."}, status=400)
+
+        Bookmark.objects.create(
+            organization=organization,
+            created_by=request.user,
+            title=title,
+            url=url,
+            description=description,
+            category=category,
+            app_logo=app_logo,
+        )
+        return JsonResponse({"message": "Bookmark added successfully!"})
+    
+    return JsonResponse({"error": "Invalid request"}, status=400)

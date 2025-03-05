@@ -430,8 +430,60 @@
       </div>
     </div>
   </div>
-  <!--------------------------------------------------------------------------------------------------------------------------------------  -->
-  
+<!--------------------------------------------------------------------------------------------------------------------------------------  -->
+<!--BOOKMARKS -- /manage-bookmarks  -->
+<!-- Manage Bookmarks Modal -->
+<div class="modal fade" id="manageBookmarksModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Manage Bookmarks</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="bookmarkList"></div>
+                <button class="btn btn-primary mt-3" id="openAddBookmarkModal">Add Bookmark</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Bookmark Modal -->
+<div class="modal fade" id="addBookmarkModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Bookmark</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addBookmarkForm">
+                    <div class="mb-3">
+                        <label class="form-label">Title</label>
+                        <input type="text" class="form-control" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">URL</label>
+                        <input type="url" class="form-control" name="url" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <input type="text" class="form-control" name="category">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">App Logo</label>
+                        <input type="file" class="form-control" name="app_logo">
+                    </div>
+                    <button type="submit" class="btn btn-success">Save Bookmark</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 

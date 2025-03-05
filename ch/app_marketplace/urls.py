@@ -26,5 +26,9 @@ urlpatterns=[
     path('add-meeting-note/',add_meeting_note, name='add_meeting_note'),
     path("get-meeting-notes/<int:meeting_id>/", get_meeting_notes, name="get_meeting_notes"),
     path("delete-meeting-note/<int:note_id>/", delete_meeting_note, name="delete_meeting_note"),
+    # bookmarks
+    path("bookmarks/fetch/<int:org_id>/", fetch_bookmarks, name="fetch_bookmarks"),
+    path("bookmarks/delete/<int:org_id>/<int:bookmark_id>/", delete_bookmark, name="delete_bookmark"),
+    path("bookmarks/add/<int:org_id>/", add_bookmark, name="add_bookmark"),
 
 ]
