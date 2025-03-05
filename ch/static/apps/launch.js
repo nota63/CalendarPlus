@@ -1189,6 +1189,7 @@ document.addEventListener("DOMContentLoaded", function () {
 // ----------------------------------------------------------------------------------------------------------------------------
 // MEETING NOTES - /add notes 
 // MEETING NOTES - /add notes 
+// MEETING NOTES - /add notes 
 document.addEventListener("DOMContentLoaded", function () {
     const cmdInput = document.getElementById("cmdInput");
     const meetingListDiv = document.getElementById("meetingList");
@@ -1303,29 +1304,30 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error("Error saving note:", error));
     });
 
-    // Fetch notes for a specific meeting
+    // Fetch notes for a specific meeting and display them in the modal
     function fetchNotes(meetingId) {
         fetch(`/apps/get-meeting-notes/${meetingId}/`)
             .then(response => response.json())
             .then(data => {
                 notesContainer.innerHTML = ""; // Clear previous notes
+
                 if (data.notes.length === 0) {
                     notesContainer.innerHTML = `<p class="text-muted">No notes available for this meeting.</p>`;
-                    return;
+                } else {
+                    data.notes.forEach(note => {
+                        const noteDiv = document.createElement("div");
+                        noteDiv.className = "alert alert-light d-flex justify-content-between align-items-center";
+
+                        noteDiv.innerHTML = `
+                            <span>${note.content}</span>
+                            <button class="btn btn-sm btn-danger" onclick="deleteNote(${note.id})">Delete</button>
+                        `;
+
+                        notesContainer.appendChild(noteDiv);
+                    });
                 }
 
-                data.notes.forEach(note => {
-                    const noteDiv = document.createElement("div");
-                    noteDiv.className = "alert alert-light d-flex justify-content-between align-items-center";
-
-                    noteDiv.innerHTML = `
-                        <span>${note.content}</span>
-                        <button class="btn btn-sm btn-danger" onclick="deleteNote(${note.id})">Delete</button>
-                    `;
-
-                    notesContainer.appendChild(noteDiv);
-                });
-
+                // Open the viewNotesModal after populating notes
                 new bootstrap.Modal(document.getElementById("viewNotesModal")).show();
             })
             .catch(error => console.error("Error fetching notes:", error));

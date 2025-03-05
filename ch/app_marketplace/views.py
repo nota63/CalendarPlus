@@ -710,9 +710,7 @@ def add_meeting_note(request):
             if not meeting_id or not org_id or not user_id or not content:
                 return JsonResponse({"error": "All fields are required!"}, status=400)
             
-            profile = get_object_or_404(Profile,organization=organization,user=request.user)
-            if not profile:
-                return JsonResponse({'error':'you are not authorized!'}, status=400)
+            
 
             meeting = MeetingOrganization.objects.get(id=meeting_id, organization_id=org_id)
             organization = Organization.objects.get(id=org_id)

@@ -398,25 +398,22 @@
 
 <!-- fetch notes -->
  <!-- Fetch Notes Modal -->
-<div class="modal fade" id="fetchNotesModal" tabindex="-1" aria-labelledby="fetchNotesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+<!-- Modal to View Notes -->
+<div class="modal fade" id="viewNotesModal" tabindex="-1" aria-labelledby="viewNotesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="fetchNotesModalLabel">Meeting Notes</h5>
+                <h5 class="modal-title" id="viewNotesModalLabel">Meeting Notes</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <h6 id="notesMeetingTitle" class="text-primary"></h6>
-                <ul id="notesList" class="list-group">
-                    <!-- Notes will be dynamically added here -->
-                </ul>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <div id="notesContainer"></div>
             </div>
         </div>
     </div>
 </div>
+
+
 
 
 
