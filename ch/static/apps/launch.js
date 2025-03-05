@@ -1189,7 +1189,6 @@ document.addEventListener("DOMContentLoaded", function () {
 // ----------------------------------------------------------------------------------------------------------------------------
 // MEETING NOTES - /add notes 
 // MEETING NOTES - /add notes 
-// MEETING NOTES - /add notes 
 document.addEventListener("DOMContentLoaded", function () {
     const cmdInput = document.getElementById("cmdInput");
     const meetingListDiv = document.getElementById("meetingList");
@@ -1197,21 +1196,18 @@ document.addEventListener("DOMContentLoaded", function () {
     const selectedMeetingId = document.getElementById("selectedMeetingId");
     const noteContent = document.getElementById("noteContent");
     const saveNoteBtn = document.getElementById("saveNoteBtn");
-    const viewNotesBtn = document.getElementById("viewNotesBtn"); // New button to view notes
-    const notesContainer = document.getElementById("notesContainer"); // Div to display notes
-    const deleteNoteBtn = document.getElementById("deleteNoteBtn"); // Button to delete note
+    const viewNotesBtn = document.getElementById("viewNotesBtn");
+    const notesContainer = document.getElementById("notesContainer");
     const csrfToken = getCSRFToken(); // Fetch CSRF token from meta tag
 
-    // Open modal when user types "/add notes"
     cmdInput.addEventListener("keyup", function (event) {
         if (event.key === "Enter" && cmdInput.value.trim().toLowerCase() === "/add notes") {
-            cmdInput.value = ""; // Clear input
+            cmdInput.value = "";
             fetchMeetings();
             new bootstrap.Modal(document.getElementById("selectMeetingModal")).show();
         }
     });
 
-    // Fetch meetings and display in modal
     function fetchMeetings() {
         const orgId = window.djangoData.orgId;
         const userId = window.djangoData.userId;
@@ -1226,7 +1222,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     return;
                 }
 
-                // Create sections for meetings
                 createMeetingSection("Upcoming Meetings", data.upcoming_meetings);
                 createMeetingSection("Future Meetings", data.future_meetings);
                 createMeetingSection("Past Meetings", data.past_meetings);
@@ -1234,7 +1229,6 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(error => console.error("Error fetching meetings:", error));
     }
 
-    // Create a section for meetings
     function createMeetingSection(title, meetings) {
         if (!meetings.length) return;
 
@@ -1244,12 +1238,12 @@ document.addEventListener("DOMContentLoaded", function () {
         meetings.forEach(meeting => {
             const meetingDiv = document.createElement("div");
             meetingDiv.className = "d-flex justify-content-between align-items-center list-group-item";
-            
+
             const button = document.createElement("button");
             button.className = "btn btn-sm btn-outline-primary me-2";
             button.innerHTML = `${meeting.meeting_title} <span class="badge bg-secondary">${meeting.status}</span>`;
             button.onclick = () => openAddNotesModal(meeting.id, meeting.meeting_title);
-            
+
             const viewNotesButton = document.createElement("button");
             viewNotesButton.className = "btn btn-sm btn-outline-info";
             viewNotesButton.innerText = "View Notes";
@@ -1264,15 +1258,13 @@ document.addEventListener("DOMContentLoaded", function () {
         meetingListDiv.appendChild(section);
     }
 
-    // Open notes modal with selected meeting
     function openAddNotesModal(meetingId, meetingTitle) {
         selectedMeetingId.value = meetingId;
         selectedMeetingTitle.innerText = meetingTitle;
-        noteContent.value = ""; // Clear previous notes
+        noteContent.value = "";
         new bootstrap.Modal(document.getElementById("addNotesModal")).show();
     }
 
-    // Save notes
     saveNoteBtn.addEventListener("click", function () {
         const meetingId = selectedMeetingId.value;
         const content = noteContent.value.trim();
@@ -1304,12 +1296,11 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error("Error saving note:", error));
     });
 
-    // Fetch notes for a specific meeting and display them in the modal
     function fetchNotes(meetingId) {
         fetch(`/apps/get-meeting-notes/${meetingId}/`)
             .then(response => response.json())
             .then(data => {
-                notesContainer.innerHTML = ""; // Clear previous notes
+                notesContainer.innerHTML = "";
 
                 if (data.notes.length === 0) {
                     notesContainer.innerHTML = `<p class="text-muted">No notes available for this meeting.</p>`;
@@ -1320,38 +1311,43 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         noteDiv.innerHTML = `
                             <span>${note.content}</span>
-                            <button class="btn btn-sm btn-danger" onclick="deleteNote(${note.id})">Delete</button>
+                            <button class="btn btn-sm btn-danger delete-note-btn" data-note-id="${note.id}">Delete</button>
                         `;
 
                         notesContainer.appendChild(noteDiv);
                     });
+
+                    // Attach delete event to buttons inside fetchNotes
+                    document.querySelectorAll(".delete-note-btn").forEach(button => {
+                        button.addEventListener("click", function () {
+                            const noteId = this.getAttribute("data-note-id");
+                            deleteNote(noteId);
+                        });
+                    });
                 }
 
-                // Open the viewNotesModal after populating notes
                 new bootstrap.Modal(document.getElementById("viewNotesModal")).show();
             })
             .catch(error => console.error("Error fetching notes:", error));
     }
 
-    // Delete note
-    function deleteNote(noteId) {
+    window.deleteNote = function (noteId) {
         fetch(`/apps/delete-meeting-note/${noteId}/`, {
-            method: "DELETE",
+            method: "POST",  // Changed from DELETE to POST for better compatibility
             headers: { "X-CSRFToken": csrfToken }
         })
         .then(response => response.json())
         .then(data => {
             if (data.message) {
                 alert("Note deleted successfully!");
-                fetchNotes(selectedMeetingId.value); // Refresh notes after deletion
+                fetchNotes(selectedMeetingId.value);
             } else {
                 alert("Error: " + data.error);
             }
         })
         .catch(error => console.error("Error deleting note:", error));
-    }
+    };
 
-    // Get CSRF token from meta tag
     function getCSRFToken() {
         return document.querySelector("meta[name='csrf-token']").getAttribute("content");
     }

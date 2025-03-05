@@ -746,7 +746,7 @@ def get_meeting_notes(request, meeting_id):
 
 # DELETE MEETING NOTES
 def delete_meeting_note(request, note_id):
-    if request.method == "DELETE":
+    if request.method == "POST":
         note = get_object_or_404(MeetingNotes, id=note_id)
         note.delete()
         return JsonResponse({"message": "Note deleted successfully!"})
