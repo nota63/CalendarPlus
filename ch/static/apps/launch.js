@@ -939,7 +939,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(data => {
                 if (data) {
-                    displayDashboardData(data);
+                    displayDashboardData(data, orgId);
                 } else {
                     dashboardContent.innerHTML = `<span class="text-danger">❌ Error fetching dashboard data!</span>`;
                 }
@@ -952,7 +952,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
-    function displayDashboardData(data) {
+    function displayDashboardData(data, orgId) {
         dashboardContent.innerHTML = `
             <h5>📅 Upcoming Meetings</h5>
             ${data.upcoming_meetings.length > 0 ? data.upcoming_meetings.map(meeting => `
@@ -960,6 +960,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     <strong>${meeting.meeting_title}</strong><br>
                     Date: ${meeting.meeting_date} | Time: ${meeting.start_time} - ${meeting.end_time}<br>
                     <a href="${meeting.meeting_link}" target="_blank" class="btn btn-sm btn-primary">Join</a>
+                    <a href="http://127.0.0.1:8000/calendar/meeting_detail_view/${orgId}/${meeting.id}/"
+                       class="btn btn-sm btn-info">Explore</a>
                 </div>
             `).join('') : '<p>No upcoming meetings.</p>'}
 
@@ -967,7 +969,9 @@ document.addEventListener("DOMContentLoaded", function () {
             ${data.all_meetings.length > 0 ? data.all_meetings.map(meeting => `
                 <div class="border p-2 mb-2">
                     <strong>${meeting.meeting_title}</strong><br>
-                    Date: ${meeting.meeting_date} | Time: ${meeting.start_time} - ${meeting.end_time}
+                    Date: ${meeting.meeting_date} | Time: ${meeting.start_time} - ${meeting.end_time}<br>
+                    <a href="http://127.0.0.1:8000/calendar/meeting_detail_view/${orgId}/${meeting.id}/"
+                       class="btn btn-sm btn-info">Explore</a>
                 </div>
             `).join('') : '<p>No meetings found.</p>'}
 
@@ -975,7 +979,9 @@ document.addEventListener("DOMContentLoaded", function () {
             ${data.events.length > 0 ? data.events.map(event => `
                 <div class="border p-2 mb-2">
                     <strong>${event.title}</strong><br>
-                    Type: ${event.event_type} | Location: ${event.location}
+                    Type: ${event.event_type} | Location: ${event.location}<br>
+                    <a href="http://127.0.0.1:8000/accounts/events/${orgId}/${event.id}/view-bookings/"
+                       class="btn btn-sm btn-warning">Check Bookings</a>
                 </div>
             `).join('') : '<p>No events found.</p>'}
 
