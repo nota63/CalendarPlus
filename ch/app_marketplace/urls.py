@@ -23,6 +23,8 @@ urlpatterns=[
     path('get-dashboard-data/<int:org_id>/',get_dashboard_data, name='get_dashboard_data'),
     # Meeting Notes
     path('show-user-meetings/<int:org_id>/<int:user_id>/',fetch_user_meetings, name='show-user-meetings'),
-    path('add-meeting-note/',add_meeting_note, name='add_meeting_note')
+    path('add-meeting-note/',add_meeting_note, name='add_meeting_note'),
+    path("get-meeting-notes/<int:meeting_id>/", get_meeting_notes, name="get_meeting_notes"),
+    path("delete-meeting-note/<int:note_id>/", delete_meeting_note, name="delete_meeting_note"),
 
 ]

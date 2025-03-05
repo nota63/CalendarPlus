@@ -736,3 +736,21 @@ def add_meeting_note(request):
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON data!"}, status=400)
     return JsonResponse({"error": "Invalid request!"}, status=405)
+
+# GET MEETING NOTES
+def get_meeting_notes(request, meeting_id):
+    if request.method == "GET":
+        notes = MeetingNotes.objects.filter(meeting_id=meeting_id).values("id", "content", "created_at")
+        return JsonResponse({"notes": list(notes)}, safe=False)
+
+    return JsonResponse({"error": "Invalid request method."}, status=400)
+
+
+# DELETE MEETING NOTES
+def delete_meeting_note(request, note_id):
+    if request.method == "DELETE":
+        note = get_object_or_404(MeetingNotes, id=note_id)
+        note.delete()
+        return JsonResponse({"message": "Note deleted successfully!"})
+
+    return JsonResponse({"error": "Invalid request method."}, status=400)
