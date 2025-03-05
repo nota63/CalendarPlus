@@ -1118,8 +1118,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         </div>
                     </div>
 
-
-                    // ORGANIZATION USERS 
+ 
                     <!-- Your team-->
 <div class="bg-white/10 backdrop-blur-lg rounded-xl p-4 shadow-sm border border-white/20">
     <div class="flex items-center mb-4 space-x-2">
