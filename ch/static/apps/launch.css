@@ -10,7 +10,57 @@
     --transition-speed: 0.3s;
     --dark-bg: linear-gradient(215deg, #0f172a 0%, #1e293b 100%);
   }
-  
+
+/*DASHBOARD MODAL STYLES  */
+/* Increase the modal width */
+#dashboardModal .modal-dialog {
+    max-width: 80vw; /* 80% of viewport width for a wider modal */
+}
+
+/* Make the backdrop transparent to allow glassmorphism to blur page content */
+.modal-backdrop {
+    background-color: transparent;
+}
+
+/* Apply glassmorphism and rounded corners to the modal content */
+#dashboardModal .modal-content {
+    background: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+    backdrop-filter: blur(10px); /* Blur effect for glassmorphism */
+    border-radius: 16px; /* Rounded corners */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Subtle border for glass effect */
+}
+
+/* Style the header for a clean, transparent look */
+#dashboardModal .modal-header {
+    background: transparent; /* Blends with the modal content */
+    border-bottom: none; /* Removes the default border */
+}
+
+/* Enhance the modal title for a fresh, bold appearance */
+#dashboardModal .modal-title {
+    font-size: 1.5rem; /* Slightly larger text */
+    font-weight: 500; /* Medium weight for modern feel */
+    color: #333; /* Dark gray for readability */
+}
+
+/* Customize the close button */
+#dashboardModal .btn-close {
+    font-size: 1.2rem; /* Larger button */
+    opacity: 0.8; /* Slightly faded by default */
+}
+
+#dashboardModal .btn-close:hover {
+    opacity: 1; /* Full opacity on hover */
+}
+
+/* Ensure body text is readable */
+#dashboardModal .modal-body {
+    color: #333; /* Dark gray for contrast */
+}
+
+
+
+
   #kanban-board {
     display: flex;
     gap: 1.5rem;
