@@ -1383,16 +1383,15 @@ document.addEventListener("DOMContentLoaded", function () {
 // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 // BOOKMARKS - /manage-bookmarks
-
 document.addEventListener("DOMContentLoaded", function () {
     let cmdInput = document.getElementById("cmdInput");
     let manageBookmarksModal = new bootstrap.Modal(document.getElementById("manageBookmarksModal"));
     let addBookmarkModal = new bootstrap.Modal(document.getElementById("addBookmarkModal"));
     let bookmarkList = document.getElementById("bookmarkList");
     let addBookmarkForm = document.getElementById("addBookmarkForm");
-   
+    let searchInput = document.getElementById("bookmarkSearch"); // Search bar input field
 
-    const ORG_ID = window.djangoData.orgId; // Make sure ORG_ID is set dynamically
+    const ORG_ID = window.djangoData.orgId; // Ensure ORG_ID is set dynamically
 
     cmdInput.addEventListener("keydown", function (event) {
         if (event.key === "Enter" && cmdInput.value.trim() === "/manage-bookmarks") {
@@ -1408,32 +1407,35 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(data => {
                 bookmarkList.innerHTML = "";
-                data.bookmarks.forEach(bookmark => {
-                    let bookmarkItem = document.createElement("div");
-                    bookmarkItem.classList.add("d-flex", "justify-content-between", "align-items-center", "p-2", "border-bottom");
-                    bookmarkItem.innerHTML = `
-                        <div>
-                            ${bookmark.app_logo ? `<img src="${bookmark.app_logo}" width="30" class="me-2">` : ""}
-                            <a href="${bookmark.url}" target="_blank">${bookmark.title}</a>
-                        </div>
-                        <button class="btn btn-danger btn-sm delete-bookmark" data-id="${bookmark.id}">Delete</button>
-                    `;
-                    bookmarkList.appendChild(bookmarkItem);
-                });
-
-                document.querySelectorAll(".delete-bookmark").forEach(btn => {
-                    btn.addEventListener("click", function () {
-                        deleteBookmark(this.dataset.id);
-                    });
-                });
+                data.bookmarks.forEach(bookmark => appendBookmark(bookmark));
             })
             .catch(error => console.error("Error fetching bookmarks:", error));
+    }
+
+    function appendBookmark(bookmark) {
+        let bookmarkItem = document.createElement("div");
+        bookmarkItem.classList.add("bookmark-item", "d-flex", "justify-content-between", "align-items-center", "p-2", "border-bottom");
+        bookmarkItem.setAttribute("data-title", bookmark.title.toLowerCase()); // Store title for searching
+
+        bookmarkItem.innerHTML = `
+            <div>
+                ${bookmark.app_logo ? `<img src="${bookmark.app_logo}" width="30" class="me-2">` : ""}
+                <a href="${bookmark.url}" target="_blank">${bookmark.title}</a>
+            </div>
+            <button class="btn btn-danger btn-sm delete-bookmark" data-id="${bookmark.id}">Delete</button>
+        `;
+
+        bookmarkList.appendChild(bookmarkItem);
+
+        bookmarkItem.querySelector(".delete-bookmark").addEventListener("click", function () {
+            deleteBookmark(bookmark.id);
+        });
     }
 
     function deleteBookmark(bookmarkId) {
         fetch(`/apps/bookmarks/delete/${ORG_ID}/${bookmarkId}/`, { method: "DELETE" })
             .then(response => response.json())
-            .then(() => fetchBookmarks())  // Refresh after deletion
+            .then(() => fetchBookmarks()) // Refresh after deletion
             .catch(error => console.error("Error deleting bookmark:", error));
     }
 
@@ -1455,5 +1457,14 @@ document.addEventListener("DOMContentLoaded", function () {
             fetchBookmarks();
         })
         .catch(error => console.error("Error adding bookmark:", error));
+    });
+
+    // ⭐ SEARCH FUNCTIONALITY ⭐
+    searchInput.addEventListener("input", function () {
+        let searchQuery = searchInput.value.toLowerCase();
+        document.querySelectorAll(".bookmark-item").forEach(item => {
+            let title = item.getAttribute("data-title");
+            item.style.display = title.includes(searchQuery) ? "flex" : "none"; // Show/hide based on match
+        });
     });
 });
