@@ -554,6 +554,9 @@ def get_user_activities(request):
 # /open dashboard -- launch the dashboard
 from accounts.models import MeetingOrganization, EventOrganization,BookingOrganization
 from django.utils import timezone
+from conversation.models import Conversation,Message
+from django.db.models import Count, Q
+
 
 @check_org_membership
 @login_required
@@ -597,13 +600,26 @@ def get_dashboard_data(request, org_id):
     ).values(
         'id', 'group__name', 'role', 'joined_at'
     )
+
+    # conversations 
+    # Fetch conversations where request.user is user1 or user2
+    conversations = Conversation.objects.filter(
+    organization_id=org_id
+      ).filter(Q(user1=user) | Q(user2=user)).annotate(
+    unread_count=Count("messages", filter=Q(messages__is_read=False) & ~Q(messages__sender=user))
+     ).values(
+    "id", "user1__username", "user2__username", "unread_count","user1",
+    )
     
+
+
     data = {
         'upcoming_meetings': list(upcoming_meetings),
         'all_meetings': list(all_meetings),
         'events': list(events),
         'bookings': list(bookings),
-        'groups': list(groups)
+        'groups': list(groups),
+        'conversations':list(conversations)
     }
     
     return JsonResponse(data, safe=False)
