@@ -8,6 +8,7 @@ from django.http import HttpResponseBadRequest
 from django.utils.timezone import localtime
 from .check_org_membership import check_org_membership
 from groups.models import (GroupMember)
+from django.utils.timezone import now
 # Create your views here.
 
 # Display Miniapps 
@@ -660,7 +661,7 @@ def get_dashboard_data(request, org_id):
 # -----------------------------------------------------------------------------------------------------------------------------------
 
 # MEETING NOTES - /add notes 
-from django.utils.timezone import now
+
 
 @check_org_membership
 @csrf_exempt
@@ -708,6 +709,10 @@ def add_meeting_note(request):
 
             if not meeting_id or not org_id or not user_id or not content:
                 return JsonResponse({"error": "All fields are required!"}, status=400)
+            
+            profile = get_object_or_404(Profile,organization=organization,user=request.user)
+            if not profile:
+                return JsonResponse({'error':'you are not authorized!'}, status=400)
 
             meeting = MeetingOrganization.objects.get(id=meeting_id, organization_id=org_id)
             organization = Organization.objects.get(id=org_id)
