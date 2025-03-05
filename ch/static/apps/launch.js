@@ -1005,8 +1005,8 @@ ${data.conversations.length > 0 ? data.conversations.map(convo => {
     const chatUsername = convo.user1__username === window.djangoData.username ? convo.user2__username : convo.user1__username;
 
     // Assign profile pictures
-    const user1Pic = convo.user1_picture.url || "https://via.placeholder.com/40";  // Default image if missing
-    const user2Pic = convo.user2_picture.url || "https://via.placeholder.com/40";
+    const user1Pic = convo.user1_picture || "https://via.placeholder.com/40";  // Default image if missing
+    const user2Pic = convo.user2_picture || "https://via.placeholder.com/40";
 
     return `
         <div class="border p-2 mb-2 d-flex align-items-center">

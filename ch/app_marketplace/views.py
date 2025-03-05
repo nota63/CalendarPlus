@@ -555,7 +555,9 @@ def get_user_activities(request):
 from accounts.models import MeetingOrganization, EventOrganization,BookingOrganization
 from django.utils import timezone
 from conversation.models import Conversation,Message
-from django.db.models import OuterRef, Subquery, F, Q, Count
+from django.db.models import OuterRef, Subquery, F, Q, Count,Value,CharField
+from django.db.models.functions import Concat
+from django.conf import settings
 
 
 @check_org_membership
@@ -603,27 +605,26 @@ def get_dashboard_data(request, org_id):
 
     # conversations 
     # Fetch conversations where request.user is user1 or user2
-    # Subquery to fetch profile picture for user1
     user1_profile_subquery = Profile.objects.filter(
-      user=OuterRef('user1'), organization_id=org_id
-     ).values('profile_picture')[:1]  
-    
-   
-    # Subquery to fetch profile picture for user2
+    user=OuterRef('user1'), organization_id=org_id
+    ).values('profile_picture')[:1]  
+
+# Subquery to fetch profile picture for user2
     user2_profile_subquery = Profile.objects.filter(
-      user=OuterRef('user2'), organization_id=org_id
-   ).values('profile_picture')[:1]  
-    
-   
+    user=OuterRef('user2'), organization_id=org_id
+    ).values('profile_picture')[:1]  
+
     # Fetch conversations where request.user is user1 or user2
     conversations = Conversation.objects.filter(
     organization_id=org_id
-   ).filter(Q(user1=user) | Q(user2=user)).annotate(
+    ).filter(Q(user1=user) | Q(user2=user)).annotate(
     unread_count=Count("messages", filter=Q(messages__is_read=False) & ~Q(messages__sender=user)),
-    user1_picture=Subquery(user1_profile_subquery),  # Profile pic for user1
-    user2_picture=Subquery(user2_profile_subquery)   # Profile pic for user2
+    
+    # Build full profile picture URL
+    user1_picture=Concat(Value(settings.MEDIA_URL), Subquery(user1_profile_subquery), output_field=CharField()),
+    user2_picture=Concat(Value(settings.MEDIA_URL), Subquery(user2_profile_subquery), output_field=CharField()),
     ).values(
-      "id", "user1__username", "user2__username", "unread_count", "user1", "user2", "user1_picture", "user2_picture"
+    "id", "user1__username", "user2__username", "unread_count", "user1", "user2", "user1_picture", "user2_picture"
     )
 
 
