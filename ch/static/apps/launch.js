@@ -1001,6 +1001,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     Role: ${group.role} | Joined: ${group.joined_at}
                     <a href="http://127.0.0.1:8000/groups/group/${orgId}/${group.id}/"
                        class="btn btn-sm btn-warning">Get In</a>
+                    
+                    <a href="http://127.0.0.1:8000/groups/group-event-calendar/${orgId}/${group.id}/"
+                       class="btn btn-sm btn-warning">Calendar</a>  
+
+                    <a href="http://127.0.0.1:8000/tasks/task-calendar/${orgId}/${group.id}/"
+                       class="btn btn-sm btn-warning">Tasks</a>   
                 </div>
             `).join('') : '<p>No groups found.</p>'}
         `;
