@@ -569,31 +569,31 @@ def get_dashboard_data(request, org_id):
     
     # Upcoming Meetings
     upcoming_meetings = MeetingOrganization.objects.filter(
-        organization_id=org_id,user=request.user,invitee=request.user,
-        meeting_date__gte=timezone.now().date()
+      Q(organization_id=org_id) & 
+      (Q(user=request.user) | Q(invitee=request.user)) & 
+      Q(meeting_date__gte=timezone.now().date())
     ).order_by('meeting_date', 'start_time').values(
-        'id', 'meeting_title', 'meeting_date', 'start_time', 'end_time', 'meeting_link', 'status'
+    'id', 'meeting_title', 'meeting_date', 'start_time', 'end_time', 'meeting_link', 'status'
     )
     
     # All Meetings
     all_meetings = MeetingOrganization.objects.filter(
-        organization_id=org_id,user=request.user,invitee=request.user,
-    ).order_by('-meeting_date', '-start_time').values(
-        'id', 'meeting_title', 'meeting_date', 'start_time', 'end_time', 'meeting_link', 'status'
+      Q(organization_id=org_id) & 
+      (Q(user=request.user) | Q(invitee=request.user))
+     ).order_by('-meeting_date', '-start_time').values(
+      'id', 'meeting_title', 'meeting_date', 'start_time', 'end_time', 'meeting_link', 'status'
     )
-    
     # Events
     events = EventOrganization.objects.filter(
-        organization_id=org_id,user=request.user,
-    ).order_by('-created_at').values(
-        'id', 'title', 'event_type', 'location', 'is_recurring', 'created_at'
-    )
-    
+       Q(organization_id=org_id) & Q(user=request.user)
+     ).order_by('-created_at').values(
+       'id', 'title', 'event_type', 'location', 'is_recurring', 'created_at'
+   )
     # Bookings
     bookings = BookingOrganization.objects.filter(
-        organization_id=org_id,invitee=request.user,event_host=request.user,
+    Q(organization_id=org_id) & (Q(invitee=request.user) | Q(event_host=request.user))
     ).order_by('-created_at').values(
-        'id', 'event__title', 'invitee__username', 'start_time', 'end_time', 'status'
+    'id', 'event__title', 'invitee__username', 'start_time', 'end_time', 'status'
     )
     
     # Groups
@@ -660,10 +660,11 @@ def get_dashboard_data(request, org_id):
 # -----------------------------------------------------------------------------------------------------------------------------------
 
 # MEETING NOTES - /add notes 
-from django.http import JsonResponse
 from django.utils.timezone import now
-from .models import MeetingOrganization
 
+@check_org_membership
+@csrf_exempt
+@login_required
 def fetch_meetings(request, org_id):
     """Fetch meetings for the organization and categorize them."""
     
