@@ -752,3 +752,5 @@ def delete_meeting_note(request, note_id):
         return JsonResponse({"message": "Note deleted successfully!"})
 
     return JsonResponse({"error": "Invalid request method."}, status=400)
+
+# ------------------------------------------------------------------------------------------------------------------------------------
