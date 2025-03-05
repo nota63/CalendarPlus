@@ -817,3 +817,6 @@ def add_bookmark(request, org_id):
         return JsonResponse({"message": "Bookmark added successfully!"})
     
     return JsonResponse({"error": "Invalid request"}, status=400)
+
+# --------------------------------------------------------------------------------------------------------------------------------------------------
+
