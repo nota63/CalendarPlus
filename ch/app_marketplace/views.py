@@ -558,7 +558,7 @@ from conversation.models import Conversation,Message
 from django.db.models import OuterRef, Subquery, F, Q, Count,Value,CharField
 from django.db.models.functions import Concat
 from django.conf import settings
-
+from django.contrib.auth.models import User
 
 @check_org_membership
 @login_required
@@ -609,7 +609,7 @@ def get_dashboard_data(request, org_id):
     user=OuterRef('user1'), organization_id=org_id
     ).values('profile_picture')[:1]  
 
-# Subquery to fetch profile picture for user2
+   # Subquery to fetch profile picture for user2
     user2_profile_subquery = Profile.objects.filter(
     user=OuterRef('user2'), organization_id=org_id
     ).values('profile_picture')[:1]  
@@ -627,6 +627,22 @@ def get_dashboard_data(request, org_id):
     "id", "user1__username", "user2__username", "unread_count", "user1", "user2", "user1_picture", "user2_picture"
     )
 
+    # users 
+   # Subquery to get profile picture for each user
+    user_profile_pic_subquery = Profile.objects.filter(
+    user=OuterRef('id'), organization_id=org_id
+   ).values('profile_picture')[:1]
+
+    # Fetch all users within the same organization along with their profile pictures
+    org_users = User.objects.filter(
+    profiles__organization_id=org_id
+    ).annotate(
+    user_profile_pic=Subquery(user_profile_pic_subquery)  # Assigning profile pic to user
+    ).values('id', 'username', 'user_profile_pic')
+
+    # Print to check
+    for user in org_users:
+      print(f"User: {user['username']} | Profile Pic: {user['user_profile_pic']}")
 
     data = {
         'upcoming_meetings': list(upcoming_meetings),
@@ -634,7 +650,8 @@ def get_dashboard_data(request, org_id):
         'events': list(events),
         'bookings': list(bookings),
         'groups': list(groups),
-        'conversations':list(conversations)
+        'conversations':list(conversations),
+        "org_users":list(org_users)
     }
     
     return JsonResponse(data, safe=False)

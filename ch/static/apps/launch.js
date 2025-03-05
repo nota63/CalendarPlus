@@ -1118,6 +1118,34 @@ document.addEventListener("DOMContentLoaded", function () {
                         </div>
                     </div>
 
+
+                    // ORGANIZATION USERS 
+                    <!-- Your team-->
+<div class="bg-white/10 backdrop-blur-lg rounded-xl p-4 shadow-sm border border-white/20">
+    <div class="flex items-center mb-4 space-x-2">
+        <span class="material-icons text-blue-600">group</span>
+        <h3 class="text-lg font-semibold text-gray-700">Your Team - Tap to schedule a meeting</h3>
+    </div>
+    <div class="space-y-3 max-h-64 overflow-y-auto">
+        ${data.org_users.length > 0 ? data.org_users.map(user => {
+            const userProfilePic = user.user_profile_pic.url || `https://avatar.vercel.sh/${user.username}`;
+            return `
+                <div class="group p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all border border-white/20 flex items-center space-x-3">
+                    <a href="http://127.0.0.1:8000/calendar/user/${user.id}/organization/${orgId}/calendar/">
+                        <img src="${userProfilePic}" class="w-10 h-10 rounded-full border-2 border-white cursor-pointer">
+                    </a>
+                    <div class="flex-1">
+                        <p class="font-medium text-gray-700">${user.username}</p>
+                    </div>
+                </div>
+            `;
+        }).join('') : '<p class="text-gray-500 text-center py-4">No members found</p>'}
+    </div>
+</div>
+
+
+
+
                     <!-- Groups -->
                     <div class="bg-white/10 backdrop-blur-lg rounded-xl p-4 shadow-sm border border-white/20">
                         <div class="flex items-center mb-4 space-x-2">
