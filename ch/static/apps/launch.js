@@ -905,7 +905,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 // DASHBOARD - /OPEN DASHBOARD
-// DASHBOARD - /OPEN DASHBOARD
 document.addEventListener("DOMContentLoaded", function () {
     let cmdInput = document.getElementById("cmdInput");
     let dashboardModal = document.getElementById("dashboardModal");
@@ -955,89 +954,196 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
+    // ... [Previous initialization code remains the same] ...
+
     function displayDashboardData(data, orgId) {
-        
-
         dashboardContent.innerHTML = `
-            <h5>📅 Upcoming Meetings</h5>
-            ${data.upcoming_meetings.length > 0 ? data.upcoming_meetings.map(meeting => `
-                <div class="border p-2 mb-2">
-                    <strong>${meeting.meeting_title}</strong><br>
-                    Date: ${meeting.meeting_date} | Time: ${meeting.start_time} - ${meeting.end_time}<br>
-                    <a href="${meeting.meeting_link}" target="_blank" class="btn btn-sm btn-primary">Join</a>
-                    <a href="http://127.0.0.1:8000/calendar/meeting_detail_view/${orgId}/${meeting.id}/"
-                       class="btn btn-sm btn-info">Explore</a>
+            <div class="h-screen p-6 space-y-6 bg-gradient-to-br from-blue-50 to-purple-50">
+                <!-- Header -->
+                <div class="flex items-center justify-between p-4 bg-white/80 backdrop-blur-lg rounded-xl shadow-sm border border-white/20">
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        📊  Dashboard
+                    </h1>
+                    <span class="material-icons text-blue-600 cursor-pointer hover:text-purple-600" onclick="refreshDashboard()">
+                        refresh
+                    </span>
                 </div>
-            `).join('') : '<p>No upcoming meetings.</p>'}
-    
-            <h5>📋 All Meetings</h5>
-            ${data.all_meetings.length > 0 ? data.all_meetings.map(meeting => `
-                <div class="border p-2 mb-2">
-                    <strong>${meeting.meeting_title}</strong><br>
-                    Date: ${meeting.meeting_date} | Time: ${meeting.start_time} - ${meeting.end_time}<br>
-                    <a href="http://127.0.0.1:8000/calendar/meeting_detail_view/${orgId}/${meeting.id}/"
-                       class="btn btn-sm btn-info">Explore</a>
-                </div>
-            `).join('') : '<p>No meetings found.</p>'}
-    
-            <h5>🎉 Events</h5>
-            ${data.events.length > 0 ? data.events.map(event => `
-                <div class="border p-2 mb-2">
-                    <strong>${event.title}</strong><br>
-                    Type: ${event.event_type} | Location: ${event.location}<br>
-                    <a href="http://127.0.0.1:8000/accounts/events/${orgId}/${event.id}/view-bookings/"
-                       class="btn btn-sm btn-warning">Check Bookings</a>
-                </div>
-            `).join('') : '<p>No events found.</p>'}
-    
-            <h5>📌 Bookings</h5>
-            ${data.bookings.length > 0 ? data.bookings.map(booking => `
-                <div class="border p-2 mb-2">
-                    <strong>${booking.event__title}</strong><br>
-                    Host: ${booking.invitee__username} | Time: ${booking.start_time} - ${booking.end_time}<br>
-                    Status: <span class="badge bg-${booking.status === 'confirmed' ? 'success' : 'warning'}">${booking.status}</span>
-                </div>
-            `).join('') : '<p>No bookings found.</p>'}
-    
-          <h5>💬 Conversations</h5>
-${data.conversations.length > 0 ? data.conversations.map(convo => {
-    const chatUser = convo.user1 === window.djangoData.user_id ? convo.user2 : convo.user1;
-    const chatUsername = convo.user1__username === window.djangoData.username ? convo.user2__username : convo.user1__username;
 
-    // Assign profile pictures
-    const user1Pic = convo.user1_picture || "https://via.placeholder.com/40";  // Default image if missing
-    const user2Pic = convo.user2_picture || "https://via.placeholder.com/40";
+                <!-- Grid Layout -->
+                <div class="grid lg:grid-cols-2 gap-6 h-[calc(100vh-180px)] overflow-y-auto">
+                    <!-- Upcoming Meetings -->
+                    <div class="bg-white/10 backdrop-blur-lg rounded-xl p-4 shadow-sm border border-white/20">
+                        <div class="flex items-center mb-4 space-x-2">
+                            <span class="material-icons text-blue-600">event</span>
+                            <h3 class="text-lg font-semibold text-gray-700">Upcoming Meetings</h3>
+                        </div>
+                        <div class="space-y-3 max-h-64 overflow-y-auto">
+                            ${data.upcoming_meetings.length > 0 ? data.upcoming_meetings.map(meeting => `
+                                <div class="group p-4 rounded-lg bg-white/50 hover:bg-white/80 transition-all border border-white/20">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="font-medium text-gray-700">${meeting.meeting_title}</p>
+                                            <p class="text-sm text-gray-500">
+                                                ${meeting.meeting_date} | ${meeting.start_time} - ${meeting.end_time}
+                                            </p>
+                                        </div>
+                                        <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <a href="${meeting.meeting_link}" target="_blank" 
+                                               class="p-2 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600">
+                                                <span class="material-icons text-sm">videocam</span>
+                                            </a>
+                                            <a href="/calendar/meeting_detail_view/${orgId}/${meeting.id}/"
+                                               class="p-2 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-600">
+                                                <span class="material-icons text-sm">info</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('') : '<p class="text-gray-500 text-center py-4">No upcoming meetings</p>'}
+                        </div>
+                    </div>
 
-    return `
-        <div class="border p-2 mb-2 d-flex align-items-center">
-            <img src="${user1Pic}" class="rounded-circle me-2" width="40" height="40" alt="User1 Profile">
-            <img src="${user2Pic}" class="rounded-circle me-2" width="40" height="40" alt="User2 Profile">
-            <div>
-                <strong>${chatUsername}</strong><br>
-                <span class="text-muted">Unread Messages: ${convo.unread_count}</span><br>
-                <a href="http://127.0.0.1:8000/dm/dm/${chatUser}/${orgId}/" class="btn btn-sm btn-primary">
-                    Open Chat
-                </a>
+                    <!-- All Meetings -->
+                    <div class="bg-white/10 backdrop-blur-lg rounded-xl p-4 shadow-sm border border-white/20">
+                        <div class="flex items-center mb-4 space-x-2">
+                            <span class="material-icons text-purple-600">list_alt</span>
+                            <h3 class="text-lg font-semibold text-gray-700">All Meetings</h3>
+                        </div>
+                        <div class="space-y-3 max-h-64 overflow-y-auto">
+                            ${data.all_meetings.length > 0 ? data.all_meetings.map(meeting => `
+                                <div class="group p-4 rounded-lg bg-white/50 hover:bg-white/80 transition-all border border-white/20">
+                                    <p class="font-medium text-gray-700">${meeting.meeting_title}</p>
+                                    <p class="text-sm text-gray-500">
+                                        ${meeting.meeting_date} | ${meeting.start_time} - ${meeting.end_time}
+                                    </p>
+                                    <div class="mt-2 flex space-x-2">
+                                        <a href="/calendar/meeting_detail_view/${orgId}/${meeting.id}/"
+                                           class="px-3 py-1 text-sm flex items-center space-x-1 bg-gray-100 hover:bg-gray-200 rounded-full">
+                                            <span class="material-icons text-sm text-gray-600">open_in_new</span>
+                                            <span class="text-gray-600">Details</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            `).join('') : '<p class="text-gray-500 text-center py-4">No meetings found</p>'}
+                        </div>
+                    </div>
+
+                    <!-- Events & Bookings -->
+                    <div class="bg-white/10 backdrop-blur-lg rounded-xl p-4 shadow-sm border border-white/20">
+                        <div class="flex items-center mb-4 space-x-2">
+                            <span class="material-icons text-orange-600">celebration</span>
+                            <h3 class="text-lg font-semibold text-gray-700">Events & Bookings</h3>
+                        </div>
+                        <div class="grid gap-4 max-h-96 overflow-y-auto">
+                            ${data.events.length > 0 ? data.events.map(event => `
+                                <div class="p-4 rounded-lg bg-white/50 hover:bg-white/80 transition-all border border-white/20">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <p class="font-medium text-gray-700">${event.title}</p>
+                                            <p class="text-sm text-gray-500">
+                                                ${event.event_type} • ${event.location}
+                                            </p>
+                                        </div>
+                                        <a href="/accounts/events/${orgId}/${event.id}/view-bookings/"
+                                           class="p-2 rounded-full bg-orange-100 hover:bg-orange-200 text-orange-600">
+                                            <span class="material-icons text-sm">bookmark</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            `).join('') : ''}
+                            ${data.bookings.length > 0 ? data.bookings.map(booking => `
+                                <div class="p-4 rounded-lg bg-white/50 hover:bg-white/80 transition-all border border-white/20">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <p class="font-medium text-gray-700">${booking.event__title}</p>
+                                            <p class="text-sm text-gray-500">
+                                                ${booking.start_time} - ${booking.end_time}
+                                            </p>
+                                        </div>
+                                        <span class="px-2 py-1 text-sm rounded-full 
+                                            ${booking.status === 'confirmed' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'}">
+                                            ${booking.status}
+                                        </span>
+                                    </div>
+                                </div>
+                            `).join('') : ''}
+                        </div>
+                    </div>
+
+                    <!-- Conversations -->
+                    <div class="bg-white/10 backdrop-blur-lg rounded-xl p-4 shadow-sm border border-white/20">
+                        <div class="flex items-center mb-4 space-x-2">
+                            <span class="material-icons text-green-600">forum</span>
+                            <h3 class="text-lg font-semibold text-gray-700">Conversations</h3>
+                        </div>
+                        <div class="space-y-3 max-h-64 overflow-y-auto">
+                            ${data.conversations.length > 0 ? data.conversations.map(convo => {
+                                const chatUser = convo.user1 === window.djangoData.user_id ? convo.user2 : convo.user1;
+                                const chatUsername = convo.user1__username === window.djangoData.username ? convo.user2__username : convo.user1__username;
+                                const user1Pic = convo.user1_picture || "https://avatar.vercel.sh/${convo.user1__username}";
+                                const user2Pic = convo.user2_picture || "https://avatar.vercel.sh/${convo.user2__username}";
+
+                                return `
+                                    <div class="group p-3 rounded-lg bg-white/50 hover:bg-white/80 transition-all border border-white/20">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="relative">
+                                                <img src="${user1Pic}" class="w-10 h-10 rounded-full border-2 border-white">
+                                                <img src="${user2Pic}" class="w-10 h-10 rounded-full border-2 border-white -ml-4">
+                                            </div>
+                                            <div class="flex-1">
+                                                <p class="font-medium text-gray-700">${chatUsername}</p>
+                                                <p class="text-sm text-gray-500">
+                                                    ${convo.unread_count} unread messages
+                                                </p>
+                                            </div>
+                                            <a href="/dm/dm/${chatUser}/${orgId}/"
+                                               class="p-2 rounded-full bg-green-100 hover:bg-green-200 text-green-600">
+                                                <span class="material-icons text-sm">send</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('') : '<p class="text-gray-500 text-center py-4">No conversations</p>'}
+                        </div>
+                    </div>
+
+                    <!-- Groups -->
+                    <div class="bg-white/10 backdrop-blur-lg rounded-xl p-4 shadow-sm border border-white/20">
+                        <div class="flex items-center mb-4 space-x-2">
+                            <span class="material-icons text-red-600">groups</span>
+                            <h3 class="text-lg font-semibold text-gray-700">Groups</h3>
+                        </div>
+                        <div class="grid gap-3 max-h-64 overflow-y-auto">
+                            ${data.groups.length > 0 ? data.groups.map(group => `
+                                <div class="p-4 rounded-lg bg-white/50 hover:bg-white/80 transition-all border border-white/20">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <p class="font-medium text-gray-700">${group.group__name}</p>
+                                            <p class="text-sm text-gray-500">
+                                                ${group.role} • Joined ${group.joined_at}
+                                            </p>
+                                        </div>
+                                        <div class="flex space-x-2">
+                                            <a href="/groups/group/${orgId}/${group.id}/"
+                                               class="p-2 rounded-full bg-red-100 hover:bg-red-200 text-red-600">
+                                                <span class="material-icons text-sm">group</span>
+                                            </a>
+                                            <a href="/groups/group-event-calendar/${orgId}/${group.id}/"
+                                               class="p-2 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600">
+                                                <span class="material-icons text-sm">calendar_today</span>
+                                            </a>
+                                            <a href="/tasks/task-calendar/${orgId}/${group.id}/"
+                                               class="p-2 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-600">
+                                                <span class="material-icons text-sm">task</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('') : '<p class="text-gray-500 text-center py-4">No groups found</p>'}
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-    `;
-}).join('') : '<p>No conversations found.</p>'}
-
-            <h5>👥 Groups</h5>
-            ${data.groups.length > 0 ? data.groups.map(group => `
-                <div class="border p-2 mb-2">
-                    <strong>${group.group__name}</strong><br>
-                    Role: ${group.role} | Joined: ${group.joined_at}
-                    <a href="http://127.0.0.1:8000/groups/group/${orgId}/${group.id}/"
-                       class="btn btn-sm btn-warning">Get In</a>
-                    
-                    <a href="http://127.0.0.1:8000/groups/group-event-calendar/${orgId}/${group.id}/"
-                       class="btn btn-sm btn-warning">Calendar</a>  
-    
-                    <a href="http://127.0.0.1:8000/tasks/task-calendar/${orgId}/${group.id}/"
-                       class="btn btn-sm btn-warning">Tasks</a>   
-                </div>
-            `).join('') : '<p>No groups found.</p>'}
         `;
     }
-});    
+});
