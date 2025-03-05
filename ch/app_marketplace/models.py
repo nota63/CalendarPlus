@@ -89,5 +89,22 @@ class TaskManager(models.Model):
     
 
 # ----------------------------------------------------------------------------------------------------------------------------
-# MEETING NOTES /---------------------------------
+# BookMarks Manager /---------------------------------
+
+class Bookmark(models.Model):
+    organization = models.ForeignKey(
+        Organization, on_delete=models.CASCADE, related_name="bookmarks"
+    )
+    title = models.CharField(max_length=255)
+    url = models.URLField()
+    description = models.TextField(blank=True, null=True)
+    category = models.CharField(max_length=100, blank=True, null=True)  # Optional category
+    app_logo = models.ImageField(upload_to="bookmark_logos/", blank=True, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bookmarks")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.title} - {self.organization.name}"
+
 
