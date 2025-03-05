@@ -996,6 +996,11 @@ document.addEventListener("DOMContentLoaded", function () {
                                                class="p-2 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-600">
                                                 <span class="material-icons text-sm">info</span>
                                             </a>
+
+                                             <a href="/calendar/remove-myself/${orgId}/${meeting.id}/"
+                                               class="p-2 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-600">
+                                                <span class="material-icons text-sm">exit</span>
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -1021,6 +1026,12 @@ document.addEventListener("DOMContentLoaded", function () {
                                            class="px-3 py-1 text-sm flex items-center space-x-1 bg-gray-100 hover:bg-gray-200 rounded-full">
                                             <span class="material-icons text-sm text-gray-600">open_in_new</span>
                                             <span class="text-gray-600">Details</span>
+                                        </a>
+
+                                        <a href="/calendar/remove_myself/${orgId}/${meeting.id}/"
+                                           class="px-3 py-1 text-sm flex items-center space-x-1 bg-gray-100 hover:bg-gray-200 rounded-full">
+                                            <span class="material-icons text-sm text-gray-600">open_in_new</span>
+                                            <span class="text-gray-600">Exit</span>
                                         </a>
                                     </div>
                                 </div>
