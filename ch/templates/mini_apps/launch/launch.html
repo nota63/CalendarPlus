@@ -360,6 +360,41 @@
 <!-- -------------------------------------------------------------------------------------------------------------------------------------------------- -->
 <!-- MEETING NOTES - /add notes -->
 
+<!-- First Modal: Select Meeting -->
+<div class="modal fade" id="selectMeetingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select a Meeting</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="meetingList" class="list-group">
+                    <!-- Meetings will be loaded here dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Second Modal: Add/Edit Notes -->
+<div class="modal fade" id="addNotesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Notes for <span id="selectedMeetingTitle"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <textarea id="noteContent" class="form-control" rows="5" placeholder="Write your notes here..."></textarea>
+                <input type="hidden" id="selectedMeetingId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="saveNoteBtn">Save Note</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -372,6 +407,7 @@
 <script type="text/javascript">
     // Inject Django variables into the window object
     window.djangoData = {
+        userId:"{{request.user.id}}",
         orgId: "{{ organization.id }}",
         appId: "{{ app.id }}",
       

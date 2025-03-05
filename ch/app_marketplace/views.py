@@ -665,29 +665,69 @@ from django.utils.timezone import now
 @check_org_membership
 @csrf_exempt
 @login_required
-def fetch_meetings(request, org_id):
-    """Fetch meetings for the organization and categorize them."""
-    
-    current_time = now()  # Get current timestamp
+def fetch_user_meetings(request, org_id, user_id):
+    """Fetch all meetings where the user is a host, invitee, or participant and categorize them."""
+    now = timezone.now().date()
 
-    # Categorizing meetings
-    upcoming_meetings = MeetingOrganization.objects.filter(
-        organization_id=org_id, scheduled_time__gte=current_time
-    ).order_by('scheduled_time').values('id', 'meeting_title', 'scheduled_time', 'status')
+    user_meetings = MeetingOrganization.objects.filter(
+        Q(organization_id=org_id) & (
+            Q(user_id=user_id) | Q(invitee_id=user_id) | Q(participants__id=user_id)
+        )
+    ).distinct()
 
-    future_meetings = MeetingOrganization.objects.filter(
-        organization_id=org_id, scheduled_time__gte=current_time
-    ).order_by('scheduled_time')[7:].values('id', 'meeting_title', 'scheduled_time', 'status')  # Beyond 7 days
+    upcoming_meetings = user_meetings.filter(meeting_date=now, status="scheduled").values(
+        'id', 'meeting_title', 'meeting_date', 'start_time', 'end_time', 'status'
+    )
+    future_meetings = user_meetings.filter(meeting_date__gt=now, status="scheduled").values(
+        'id', 'meeting_title', 'meeting_date', 'start_time', 'end_time', 'status'
+    )
+    past_meetings = user_meetings.filter(meeting_date__lt=now).values(
+        'id', 'meeting_title', 'meeting_date', 'start_time', 'end_time', 'status'
+    )
 
-    past_meetings = MeetingOrganization.objects.filter(
-        organization_id=org_id, scheduled_time__lt=current_time
-    ).order_by('-scheduled_time').values('id', 'meeting_title', 'scheduled_time', 'status')
-
-    # Prepare response data
     data = {
         "upcoming_meetings": list(upcoming_meetings),
         "future_meetings": list(future_meetings),
         "past_meetings": list(past_meetings),
     }
-
     return JsonResponse(data, safe=False)
+
+# HANDLE NOTE TAKING 
+@csrf_exempt
+def add_meeting_note(request):
+    """Handles adding and updating notes for a specific meeting."""
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            meeting_id = data.get("meeting_id")
+            org_id = data.get("org_id")
+            user_id = data.get("user_id")
+            content = data.get("content", "").strip()
+
+            print("RECIEVED ORG_ID:",org_id)
+
+            if not meeting_id or not org_id or not user_id or not content:
+                return JsonResponse({"error": "All fields are required!"}, status=400)
+
+            meeting = MeetingOrganization.objects.get(id=meeting_id, organization_id=org_id)
+            organization = Organization.objects.get(id=org_id)
+            user = User.objects.get(id=user_id)
+
+            # Check if a note already exists for this meeting
+            note, created = MeetingNotes.objects.get_or_create(
+                organization=organization, meeting=meeting
+            )
+            note.content = content  # Update content
+            note.save()
+
+            return JsonResponse({"message": "Note saved successfully!", "note_id": note.id})
+        
+        except MeetingOrganization.DoesNotExist:
+            return JsonResponse({"error": "Meeting not found!"}, status=404)
+        except Organization.DoesNotExist:
+            return JsonResponse({"error": "Organization not found!"}, status=404)
+        except User.DoesNotExist:
+            return JsonResponse({"error": "User not found!"}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON data!"}, status=400)
+    return JsonResponse({"error": "Invalid request!"}, status=405)

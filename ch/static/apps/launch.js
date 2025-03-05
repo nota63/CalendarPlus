@@ -1188,3 +1188,107 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // ----------------------------------------------------------------------------------------------------------------------------
 // MEETING NOTES - /add notes 
+document.addEventListener("DOMContentLoaded", function () {
+    const cmdInput = document.getElementById("cmdInput");
+    const meetingListDiv = document.getElementById("meetingList");
+    const selectedMeetingTitle = document.getElementById("selectedMeetingTitle");
+    const selectedMeetingId = document.getElementById("selectedMeetingId");
+    const noteContent = document.getElementById("noteContent");
+    const saveNoteBtn = document.getElementById("saveNoteBtn");
+
+    // Open modal when user types "/add notes"
+    cmdInput.addEventListener("keyup", function (event) {
+        if (event.key === "Enter" && cmdInput.value.trim().toLowerCase() === "/add notes") {
+            cmdInput.value = ""; // Clear input
+            fetchMeetings();
+            new bootstrap.Modal(document.getElementById("selectMeetingModal")).show();
+        }
+    });
+
+    // Fetch meetings and display in modal
+    function fetchMeetings() {
+        const orgId = window.djangoData.orgId;
+        const userId = window.djangoData.userId;
+
+        fetch(`/apps/show-user-meetings/${orgId}/${userId}/`)
+            .then(response => response.json())
+            .then(data => {
+                meetingListDiv.innerHTML = "";
+
+                if (!data.upcoming_meetings.length && !data.future_meetings.length && !data.past_meetings.length) {
+                    meetingListDiv.innerHTML = `<p class="text-center text-muted">No meetings found.</p>`;
+                    return;
+                }
+
+                // Create sections for meetings
+                createMeetingSection("Upcoming Meetings", data.upcoming_meetings);
+                createMeetingSection("Future Meetings", data.future_meetings);
+                createMeetingSection("Past Meetings", data.past_meetings);
+            })
+            .catch(error => console.error("Error fetching meetings:", error));
+    }
+
+    // Create a section for meetings
+    function createMeetingSection(title, meetings) {
+        if (!meetings.length) return;
+
+        const section = document.createElement("div");
+        section.innerHTML = `<h6 class="mt-3">${title}</h6>`;
+        
+        meetings.forEach(meeting => {
+            const button = document.createElement("button");
+            button.className = "list-group-item list-group-item-action";
+            button.innerHTML = `${meeting.meeting_title} <span class="badge bg-secondary">${meeting.status}</span>`;
+            button.onclick = () => openAddNotesModal(meeting.id, meeting.meeting_title);
+            section.appendChild(button);
+        });
+
+        meetingListDiv.appendChild(section);
+    }
+
+    // Open notes modal with selected meeting
+    function openAddNotesModal(meetingId, meetingTitle) {
+        selectedMeetingId.value = meetingId;
+        selectedMeetingTitle.innerText = meetingTitle;
+        noteContent.value = ""; // Clear previous notes
+        new bootstrap.Modal(document.getElementById("addNotesModal")).show();
+    }
+
+    // Save notes
+    saveNoteBtn.addEventListener("click", function () {
+        const meetingId = selectedMeetingId.value;
+        const content = noteContent.value.trim();
+        const orgId = window.djangoData.orgId;
+        const userId = window.djangoData.userId;
+        const csrfToken = getCSRFToken();
+
+        if (!meetingId || !content) {
+            alert("Please select a meeting and enter notes.");
+            return;
+        }
+
+        fetch("/apps/add-meeting-note/", {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json", 
+                "X-CSRFToken": csrfToken 
+            },
+            body: JSON.stringify({ meeting_id: meetingId, org_id: orgId, user_id: userId, content })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert("Note saved successfully!");
+                bootstrap.Modal.getInstance(document.getElementById("addNotesModal")).hide();
+            } else {
+                alert("Error: " + data.error);
+            }
+        })
+        .catch(error => console.error("Error saving note:", error));
+    });
+
+    // Get CSRF token from meta tag
+    function getCSRFToken() {
+        return document.querySelector("meta[name='csrf-token']").getAttribute("content");
+    }
+});

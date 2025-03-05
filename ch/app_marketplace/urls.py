@@ -20,6 +20,9 @@ urlpatterns=[
     path('disable-org-expiry/',disable_org_expiry, name='disable_org_expiry'),
     path('get-user-activities/',get_user_activities, name='get_user_activities'),
     # dashboard
-    path('get-dashboard-data/<int:org_id>/',get_dashboard_data, name='get_dashboard_data')
+    path('get-dashboard-data/<int:org_id>/',get_dashboard_data, name='get_dashboard_data'),
+    # Meeting Notes
+    path('show-user-meetings/<int:org_id>/<int:user_id>/',fetch_user_meetings, name='show-user-meetings'),
+    path('add-meeting-note/',add_meeting_note, name='add_meeting_note')
 
 ]
