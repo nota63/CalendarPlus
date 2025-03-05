@@ -933,7 +933,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         // Show loader while fetching data
-        dashboardContent.innerHTML = `<div class="spinner-border text-primary"></div>`;
+        dashboardContent.innerHTML = `
+            <div class="h-96 flex justify-center items-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500"></div>
+            </div>
+        `;
 
         fetch(`/apps/get-dashboard-data/${orgId}/`)
             .then(response => response.json())
@@ -941,74 +945,183 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (data) {
                     displayDashboardData(data, orgId);
                 } else {
-                    dashboardContent.innerHTML = `<span class="text-danger">❌ Error fetching dashboard data!</span>`;
+                    dashboardContent.innerHTML = `
+                        <div class="p-6 bg-red-500/20 rounded-xl text-red-400">
+                            ❌ Error fetching dashboard data!
+                        </div>
+                    `;
                 }
                 let modal = new bootstrap.Modal(dashboardModal);
                 modal.show();
             })
             .catch(error => {
-                dashboardContent.innerHTML = `<span class="text-danger">❌ Error loading dashboard data!</span>`;
+                dashboardContent.innerHTML = `
+                    <div class="p-6 bg-red-500/20 rounded-xl text-red-400">
+                        ❌ Error loading dashboard data!
+                    </div>
+                `;
                 console.error("❌ Error fetching dashboard data:", error);
             });
     }
 
     function displayDashboardData(data, orgId) {
         dashboardContent.innerHTML = `
-            <h5>📅 Upcoming Meetings</h5>
-            ${data.upcoming_meetings.length > 0 ? data.upcoming_meetings.map(meeting => `
-                <div class="border p-2 mb-2">
-                    <strong>${meeting.meeting_title}</strong><br>
-                    Date: ${meeting.meeting_date} | Time: ${meeting.start_time} - ${meeting.end_time}<br>
-                    <a href="${meeting.meeting_link}" target="_blank" class="btn btn-sm btn-primary">Join</a>
-                    <a href="http://127.0.0.1:8000/calendar/meeting_detail_view/${orgId}/${meeting.id}/"
-                       class="btn btn-sm btn-info">Explore</a>
+            <div class="space-y-8 p-6">
+                <!-- Header -->
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">📊 Organization Dashboard</h2>
+                    <p class="text-white/60">Manage your meetings, events, and groups in one place</p>
                 </div>
-            `).join('') : '<p>No upcoming meetings.</p>'}
 
-            <h5>📋 All Meetings</h5>
-            ${data.all_meetings.length > 0 ? data.all_meetings.map(meeting => `
-                <div class="border p-2 mb-2">
-                    <strong>${meeting.meeting_title}</strong><br>
-                    Date: ${meeting.meeting_date} | Time: ${meeting.start_time} - ${meeting.end_time}<br>
-                    <a href="http://127.0.0.1:8000/calendar/meeting_detail_view/${orgId}/${meeting.id}/"
-                       class="btn btn-sm btn-info">Explore</a>
+                <!-- Grid Layout -->
+                <div class="grid lg:grid-cols-2 gap-6">
+                    <!-- Upcoming Meetings -->
+                    <div class="bg-white/5 backdrop-blur-lg rounded-2xl p-6 shadow-xl">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-1 h-8 bg-blue-500 rounded-full"></div>
+                            <h3 class="text-xl font-semibold text-blue-400">📅 Upcoming Meetings</h3>
+                        </div>
+                        <div class="space-y-4">
+                            ${data.upcoming_meetings.length > 0 ? data.upcoming_meetings.map(meeting => `
+                                <div class="bg-white/5 hover:bg-white/10 p-4 rounded-xl transition-all duration-200">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h4 class="font-medium text-white">${meeting.meeting_title}</h4>
+                                            <p class="text-sm text-white/60 mt-1">
+                                                ${meeting.meeting_date} | ${meeting.start_time} - ${meeting.end_time}
+                                            </p>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <a href="${meeting.meeting_link}" target="_blank" 
+                                               class="inline-flex items-center px-3 py-1.5 bg-blue-600/30 text-blue-400 rounded-lg hover:bg-blue-600/40 transition">
+                                                Join
+                                            </a>
+                                            <a href="http://127.0.0.1:8000/calendar/meeting_detail_view/${orgId}/${meeting.id}/"
+                                               class="inline-flex items-center px-3 py-1.5 bg-purple-600/30 text-purple-400 rounded-lg hover:bg-purple-600/40 transition">
+                                                Details
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('') : '<p class="text-white/60">No upcoming meetings</p>'}
+                        </div>
+                    </div>
+
+                    <!-- All Meetings -->
+                    <div class="bg-white/5 backdrop-blur-lg rounded-2xl p-6 shadow-xl">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-1 h-8 bg-purple-500 rounded-full"></div>
+                            <h3 class="text-xl font-semibold text-purple-400">📋 All Meetings</h3>
+                        </div>
+                        <div class="space-y-4">
+                            ${data.all_meetings.length > 0 ? data.all_meetings.map(meeting => `
+                                <div class="bg-white/5 hover:bg-white/10 p-4 rounded-xl transition-all duration-200">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h4 class="font-medium text-white">${meeting.meeting_title}</h4>
+                                            <p class="text-sm text-white/60 mt-1">
+                                                ${meeting.meeting_date} | ${meeting.start_time} - ${meeting.end_time}
+                                            </p>
+                                        </div>
+                                        <a href="http://127.0.0.1:8000/calendar/meeting_detail_view/${orgId}/${meeting.id}/"
+                                           class="inline-flex items-center px-3 py-1.5 bg-gray-600/30 text-gray-300 rounded-lg hover:bg-gray-600/40 transition">
+                                            View
+                                        </a>
+                                    </div>
+                                </div>
+                            `).join('') : '<p class="text-white/60">No meetings found</p>'}
+                        </div>
+                    </div>
+
+                    <!-- Events -->
+                    <div class="bg-white/5 backdrop-blur-lg rounded-2xl p-6 shadow-xl">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-1 h-8 bg-green-500 rounded-full"></div>
+                            <h3 class="text-xl font-semibold text-green-400">🎉 Events</h3>
+                        </div>
+                        <div class="space-y-4">
+                            ${data.events.length > 0 ? data.events.map(event => `
+                                <div class="bg-white/5 hover:bg-white/10 p-4 rounded-xl transition-all duration-200">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h4 class="font-medium text-white">${event.title}</h4>
+                                            <p class="text-sm text-white/60 mt-1">
+                                                ${event.event_type} • ${event.location}
+                                            </p>
+                                        </div>
+                                        <a href="http://127.0.0.1:8000/accounts/events/${orgId}/${event.id}/view-bookings/"
+                                           class="inline-flex items-center px-3 py-1.5 bg-green-600/30 text-green-400 rounded-lg hover:bg-green-600/40 transition">
+                                            Bookings
+                                        </a>
+                                    </div>
+                                </div>
+                            `).join('') : '<p class="text-white/60">No events found</p>'}
+                        </div>
+                    </div>
+
+                    <!-- Bookings -->
+                    <div class="bg-white/5 backdrop-blur-lg rounded-2xl p-6 shadow-xl">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-1 h-8 bg-yellow-500 rounded-full"></div>
+                            <h3 class="text-xl font-semibold text-yellow-400">📌 Bookings</h3>
+                        </div>
+                        <div class="space-y-4">
+                            ${data.bookings.length > 0 ? data.bookings.map(booking => `
+                                <div class="bg-white/5 hover:bg-white/10 p-4 rounded-xl transition-all duration-200">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h4 class="font-medium text-white">${booking.event__title}</h4>
+                                            <p class="text-sm text-white/60 mt-1">
+                                                ${booking.invitee__username} • ${booking.start_time} - ${booking.end_time}
+                                            </p>
+                                        </div>
+                                        <span class="px-2 py-1 rounded-full ${booking.status === 'confirmed' ? 'bg-green-500/30 text-green-400' : 'bg-yellow-500/30 text-yellow-400'} text-sm">
+                                            ${booking.status}
+                                        </span>
+                                    </div>
+                                </div>
+                            `).join('') : '<p class="text-white/60">No bookings found</p>'}
+                        </div>
+                    </div>
+
+                    <!-- Groups -->
+                    <div class="bg-white/5 backdrop-blur-lg rounded-2xl p-6 shadow-xl lg:col-span-2">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-1 h-8 bg-pink-500 rounded-full"></div>
+                            <h3 class="text-xl font-semibold text-pink-400">👥 Groups</h3>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            ${data.groups.length > 0 ? data.groups.map(group => `
+                                <div class="bg-white/5 hover:bg-white/10 p-4 rounded-xl transition-all duration-200">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h4 class="font-medium text-white">${group.group__name}</h4>
+                                            <p class="text-sm text-white/60 mt-1">
+                                                ${group.role} • Joined ${group.joined_at}
+                                            </p>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <a href="http://127.0.0.1:8000/groups/group/${orgId}/${group.id}/"
+                                               class="inline-flex items-center px-3 py-1.5 bg-pink-600/30 text-pink-300 rounded-lg hover:bg-pink-600/40 transition">
+                                                Access
+                                            </a>
+                                            <a href="http://127.0.0.1:8000/groups/group-event-calendar/${orgId}/${group.id}/"
+                                               class="inline-flex items-center px-3 py-1.5 bg-blue-600/30 text-blue-300 rounded-lg hover:bg-blue-600/40 transition">
+                                                Calendar
+                                            </a>
+
+                                            <a href="http://127.0.0.1:8000/tasks/task-calendar/${orgId}/${group.id}/"
+                                               class="inline-flex items-center px-3 py-1.5 bg-blue-600/30 text-blue-300 rounded-lg hover:bg-blue-600/40 transition">
+                                                Tasks & More
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('') : '<p class="text-white/60 md:col-span-2">No groups found</p>'}
+                        </div>
+                    </div>
                 </div>
-            `).join('') : '<p>No meetings found.</p>'}
-
-            <h5>🎉 Events</h5>
-            ${data.events.length > 0 ? data.events.map(event => `
-                <div class="border p-2 mb-2">
-                    <strong>${event.title}</strong><br>
-                    Type: ${event.event_type} | Location: ${event.location}<br>
-                    <a href="http://127.0.0.1:8000/accounts/events/${orgId}/${event.id}/view-bookings/"
-                       class="btn btn-sm btn-warning">Check Bookings</a>
-                </div>
-            `).join('') : '<p>No events found.</p>'}
-
-            <h5>📌 Bookings</h5>
-            ${data.bookings.length > 0 ? data.bookings.map(booking => `
-                <div class="border p-2 mb-2">
-                    <strong>${booking.event__title}</strong><br>
-                    Host: ${booking.invitee__username} | Time: ${booking.start_time} - ${booking.end_time}<br>
-                    Status: <span class="badge bg-${booking.status === 'confirmed' ? 'success' : 'warning'}">${booking.status}</span>
-                </div>
-            `).join('') : '<p>No bookings found.</p>'}
-
-            <h5>👥 Groups</h5>
-            ${data.groups.length > 0 ? data.groups.map(group => `
-                <div class="border p-2 mb-2">
-                    <strong>${group.group__name}</strong><br>
-                    Role: ${group.role} | Joined: ${group.joined_at}
-                    <a href="http://127.0.0.1:8000/groups/group/${orgId}/${group.id}/"
-                       class="btn btn-sm btn-warning">Get In</a>
-                    
-                    <a href="http://127.0.0.1:8000/groups/group-event-calendar/${orgId}/${group.id}/"
-                       class="btn btn-sm btn-warning">Calendar</a>  
-
-                    <a href="http://127.0.0.1:8000/tasks/task-calendar/${orgId}/${group.id}/"
-                       class="btn btn-sm btn-warning">Tasks</a>   
-                </div>
-            `).join('') : '<p>No groups found.</p>'}
+            </div>
         `;
     }
 });
