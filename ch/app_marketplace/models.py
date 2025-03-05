@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from accounts.models import Organization, Profile
+from accounts.models import Organization, Profile,MeetingOrganization
 
 # Create your models here.
 
@@ -60,7 +60,7 @@ class InstalledMiniApp(models.Model):
 
 
 
-# APPS MODELS 
+# APPS MODELS -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # TASK MANAGER (KANBAN BOARD)
 
 class TaskManager(models.Model):
@@ -86,3 +86,8 @@ class TaskManager(models.Model):
 
     def __str__(self):
         return f"{self.title}"
+    
+
+# ----------------------------------------------------------------------------------------------------------------------------
+# MEETING NOTES /---------------------------------
+

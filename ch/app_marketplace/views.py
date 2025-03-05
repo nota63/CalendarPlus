@@ -1,13 +1,13 @@
 from django.shortcuts import render,redirect,get_list_or_404,get_object_or_404
 from .models import MiniApp,InstalledMiniApp
-from accounts.models import Organization, Profile
+from accounts.models import (Organization, Profile,MeetingOrganization,MeetingNotes)
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.http import HttpResponseBadRequest
 from django.utils.timezone import localtime
 from .check_org_membership import check_org_membership
-from groups.models import GroupMember
+from groups.models import (GroupMember)
 # Create your views here.
 
 # Display Miniapps 
@@ -569,7 +569,7 @@ def get_dashboard_data(request, org_id):
     
     # Upcoming Meetings
     upcoming_meetings = MeetingOrganization.objects.filter(
-        organization_id=org_id,
+        organization_id=org_id,user=request.user,invitee=request.user,
         meeting_date__gte=timezone.now().date()
     ).order_by('meeting_date', 'start_time').values(
         'id', 'meeting_title', 'meeting_date', 'start_time', 'end_time', 'meeting_link', 'status'
@@ -577,21 +577,21 @@ def get_dashboard_data(request, org_id):
     
     # All Meetings
     all_meetings = MeetingOrganization.objects.filter(
-        organization_id=org_id
+        organization_id=org_id,user=request.user,invitee=request.user,
     ).order_by('-meeting_date', '-start_time').values(
         'id', 'meeting_title', 'meeting_date', 'start_time', 'end_time', 'meeting_link', 'status'
     )
     
     # Events
     events = EventOrganization.objects.filter(
-        organization_id=org_id
+        organization_id=org_id,user=request.user,
     ).order_by('-created_at').values(
         'id', 'title', 'event_type', 'location', 'is_recurring', 'created_at'
     )
     
     # Bookings
     bookings = BookingOrganization.objects.filter(
-        organization_id=org_id
+        organization_id=org_id,invitee=request.user,event_host=request.user,
     ).order_by('-created_at').values(
         'id', 'event__title', 'invitee__username', 'start_time', 'end_time', 'status'
     )
@@ -658,3 +658,35 @@ def get_dashboard_data(request, org_id):
 
 
 # -----------------------------------------------------------------------------------------------------------------------------------
+
+# MEETING NOTES - /add notes 
+from django.http import JsonResponse
+from django.utils.timezone import now
+from .models import MeetingOrganization
+
+def fetch_meetings(request, org_id):
+    """Fetch meetings for the organization and categorize them."""
+    
+    current_time = now()  # Get current timestamp
+
+    # Categorizing meetings
+    upcoming_meetings = MeetingOrganization.objects.filter(
+        organization_id=org_id, scheduled_time__gte=current_time
+    ).order_by('scheduled_time').values('id', 'meeting_title', 'scheduled_time', 'status')
+
+    future_meetings = MeetingOrganization.objects.filter(
+        organization_id=org_id, scheduled_time__gte=current_time
+    ).order_by('scheduled_time')[7:].values('id', 'meeting_title', 'scheduled_time', 'status')  # Beyond 7 days
+
+    past_meetings = MeetingOrganization.objects.filter(
+        organization_id=org_id, scheduled_time__lt=current_time
+    ).order_by('-scheduled_time').values('id', 'meeting_title', 'scheduled_time', 'status')
+
+    # Prepare response data
+    data = {
+        "upcoming_meetings": list(upcoming_meetings),
+        "future_meetings": list(future_meetings),
+        "past_meetings": list(past_meetings),
+    }
+
+    return JsonResponse(data, safe=False)
