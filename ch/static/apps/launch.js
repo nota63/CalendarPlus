@@ -1352,5 +1352,33 @@ document.addEventListener("DOMContentLoaded", function () {
         return document.querySelector("meta[name='csrf-token']").getAttribute("content");
     }
 });
+
 // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// ONLY DOC -- /only-doc
+document.addEventListener("DOMContentLoaded", function () {
+    let cmdInput = document.getElementById("cmdInput");
+    let zohoDocModal = new bootstrap.Modal(document.getElementById("zohoDocModal"));
+    let zohoIframe = document.getElementById("zohoIframe");
+
+    if (!cmdInput || !zohoDocModal || !zohoIframe) {
+        console.error("❌ Required elements not found!");
+        return;
+    }
+
+    cmdInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" && cmdInput.value.trim() === "/only-doc") {
+            event.preventDefault();
+            cmdInput.value = "";
+
+            // Set the iframe URL
+            let zohoDocURL = "https://writer.zoho.in/writer/open/0q10fc1020d8c92504eb7bb25ac2171c98ab6";
+            zohoIframe.src = zohoDocURL;
+
+            // Show the modal
+            zohoDocModal.show();
+        }
+    });
+});
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
