@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.http import HttpResponseBadRequest
 from django.utils.timezone import localtime
 from .check_org_membership import check_org_membership
-
+from groups.models import GroupMember
 # Create your views here.
 
 # Display Miniapps 
@@ -547,3 +547,66 @@ def get_user_activities(request):
     ]
 
     return JsonResponse({"activities": activity_list}, safe=False)
+
+# -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# A MINI DASHBOARD APP --
+# /open dashboard -- launch the dashboard
+from accounts.models import MeetingOrganization, EventOrganization,BookingOrganization
+from django.utils import timezone
+
+@check_org_membership
+@login_required
+@csrf_exempt
+def get_dashboard_data(request, org_id):
+    """Fetch all dashboard-related data for the given organization and user."""
+    user = request.user
+    
+    # Upcoming Meetings
+    upcoming_meetings = MeetingOrganization.objects.filter(
+        organization_id=org_id,
+        meeting_date__gte=timezone.now().date()
+    ).order_by('meeting_date', 'start_time').values(
+        'id', 'meeting_title', 'meeting_date', 'start_time', 'end_time', 'meeting_link', 'status'
+    )
+    
+    # All Meetings
+    all_meetings = MeetingOrganization.objects.filter(
+        organization_id=org_id
+    ).order_by('-meeting_date', '-start_time').values(
+        'id', 'meeting_title', 'meeting_date', 'start_time', 'end_time', 'meeting_link', 'status'
+    )
+    
+    # Events
+    events = EventOrganization.objects.filter(
+        organization_id=org_id
+    ).order_by('-created_at').values(
+        'id', 'title', 'event_type', 'location', 'is_recurring', 'created_at'
+    )
+    
+    # Bookings
+    bookings = BookingOrganization.objects.filter(
+        organization_id=org_id
+    ).order_by('-created_at').values(
+        'id', 'event__title', 'invitee__username', 'start_time', 'end_time', 'status'
+    )
+    
+    # Groups
+    groups = GroupMember.objects.filter(
+        organization_id=org_id, user=user
+    ).values(
+        'id', 'group__name', 'role', 'joined_at'
+    )
+    
+    data = {
+        'upcoming_meetings': list(upcoming_meetings),
+        'all_meetings': list(all_meetings),
+        'events': list(events),
+        'bookings': list(bookings),
+        'groups': list(groups)
+    }
+    
+    return JsonResponse(data, safe=False)
+
+
+

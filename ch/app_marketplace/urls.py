@@ -18,6 +18,8 @@ urlpatterns=[
     path("analytics/<int:org_id>/", get_channels_analytics, name="get_channels_analytics"),
     path('set-org-expiry/',set_org_expiry,name='set_org_expiry'),
     path('disable-org-expiry/',disable_org_expiry, name='disable_org_expiry'),
-    path('get-user-activities/',get_user_activities, name='get_user_activities')
+    path('get-user-activities/',get_user_activities, name='get_user_activities'),
+    # dashboard
+    path('get-dashboard-data/<int:org_id>/',get_dashboard_data, name='get_dashboard_data')
 
 ]

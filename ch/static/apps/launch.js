@@ -902,3 +902,99 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 });
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+// DASHBOARD - /OPEN DASHBOARD
+document.addEventListener("DOMContentLoaded", function () {
+    let cmdInput = document.getElementById("cmdInput");
+    let dashboardModal = document.getElementById("dashboardModal");
+    let dashboardContent = document.getElementById("dashboardContent");
+
+    if (!cmdInput || !dashboardModal || !dashboardContent) {
+        console.error("❌ Required elements not found!");
+        return;
+    }
+
+    // Listen for "/open dashboard"
+    cmdInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" && cmdInput.value.trim() === "/open dashboard") {
+            event.preventDefault();
+            cmdInput.value = "";
+            fetchDashboardData();
+        }
+    });
+
+    function fetchDashboardData() {
+        let orgId = window.djangoData?.orgId;
+
+        if (!orgId) {
+            console.error("❌ Organization ID not found!");
+            return;
+        }
+
+        // Show loader while fetching data
+        dashboardContent.innerHTML = `<div class="spinner-border text-primary"></div>`;
+
+        fetch(`/apps/get-dashboard-data/${orgId}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    displayDashboardData(data);
+                } else {
+                    dashboardContent.innerHTML = `<span class="text-danger">❌ Error fetching dashboard data!</span>`;
+                }
+                let modal = new bootstrap.Modal(dashboardModal);
+                modal.show();
+            })
+            .catch(error => {
+                dashboardContent.innerHTML = `<span class="text-danger">❌ Error loading dashboard data!</span>`;
+                console.error("❌ Error fetching dashboard data:", error);
+            });
+    }
+
+    function displayDashboardData(data) {
+        dashboardContent.innerHTML = `
+            <h5>📅 Upcoming Meetings</h5>
+            ${data.upcoming_meetings.length > 0 ? data.upcoming_meetings.map(meeting => `
+                <div class="border p-2 mb-2">
+                    <strong>${meeting.meeting_title}</strong><br>
+                    Date: ${meeting.meeting_date} | Time: ${meeting.start_time} - ${meeting.end_time}<br>
+                    <a href="${meeting.meeting_link}" target="_blank" class="btn btn-sm btn-primary">Join</a>
+                </div>
+            `).join('') : '<p>No upcoming meetings.</p>'}
+
+            <h5>📋 All Meetings</h5>
+            ${data.all_meetings.length > 0 ? data.all_meetings.map(meeting => `
+                <div class="border p-2 mb-2">
+                    <strong>${meeting.meeting_title}</strong><br>
+                    Date: ${meeting.meeting_date} | Time: ${meeting.start_time} - ${meeting.end_time}
+                </div>
+            `).join('') : '<p>No meetings found.</p>'}
+
+            <h5>🎉 Events</h5>
+            ${data.events.length > 0 ? data.events.map(event => `
+                <div class="border p-2 mb-2">
+                    <strong>${event.title}</strong><br>
+                    Type: ${event.event_type} | Location: ${event.location}
+                </div>
+            `).join('') : '<p>No events found.</p>'}
+
+            <h5>📌 Bookings</h5>
+            ${data.bookings.length > 0 ? data.bookings.map(booking => `
+                <div class="border p-2 mb-2">
+                    <strong>${booking.event__title}</strong><br>
+                    Host: ${booking.invitee__username} | Time: ${booking.start_time} - ${booking.end_time}<br>
+                    Status: <span class="badge bg-${booking.status === 'confirmed' ? 'success' : 'warning'}">${booking.status}</span>
+                </div>
+            `).join('') : '<p>No bookings found.</p>'}
+
+            <h5>👥 Groups</h5>
+            ${data.groups.length > 0 ? data.groups.map(group => `
+                <div class="border p-2 mb-2">
+                    <strong>${group.group__name}</strong><br>
+                    Role: ${group.role} | Joined: ${group.joined_at}
+                </div>
+            `).join('') : '<p>No groups found.</p>'}
+        `;
+    }
+});
