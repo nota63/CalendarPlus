@@ -999,21 +999,30 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>
             `).join('') : '<p>No bookings found.</p>'}
     
-            <h5>💬 Conversations</h5>
-            ${data.conversations.length > 0 ? data.conversations.map(convo => `
-                <div class="border p-2 mb-2">
-                    <strong>Chat with: ${
-                        convo.user1__username === window.djangoData.username ? convo.user2__username : convo.user1__username
-                    }</strong><br>
-                    <span class="text-muted">Unread Messages: ${convo.unread_count}</span><br>
-                    <a href="http://127.0.0.1:8000/dm/dm/${
-            convo.user1 === window.djangoData.user_id ? convo.user2 : convo.user1
-        }/${orgId}/" class="btn btn-sm btn-primary">
-            Open Chat
-        </a>
-                </div>
-            `).join('') : '<p>No conversations found.</p>'}
-    
+          <h5>💬 Conversations</h5>
+${data.conversations.length > 0 ? data.conversations.map(convo => {
+    const chatUser = convo.user1 === window.djangoData.user_id ? convo.user2 : convo.user1;
+    const chatUsername = convo.user1__username === window.djangoData.username ? convo.user2__username : convo.user1__username;
+
+    // Assign profile pictures
+    const user1Pic = convo.user1_picture.url || "https://via.placeholder.com/40";  // Default image if missing
+    const user2Pic = convo.user2_picture.url || "https://via.placeholder.com/40";
+
+    return `
+        <div class="border p-2 mb-2 d-flex align-items-center">
+            <img src="${user1Pic}" class="rounded-circle me-2" width="40" height="40" alt="User1 Profile">
+            <img src="${user2Pic}" class="rounded-circle me-2" width="40" height="40" alt="User2 Profile">
+            <div>
+                <strong>${chatUsername}</strong><br>
+                <span class="text-muted">Unread Messages: ${convo.unread_count}</span><br>
+                <a href="http://127.0.0.1:8000/dm/dm/${chatUser}/${orgId}/" class="btn btn-sm btn-primary">
+                    Open Chat
+                </a>
+            </div>
+        </div>
+    `;
+}).join('') : '<p>No conversations found.</p>'}
+
             <h5>👥 Groups</h5>
             ${data.groups.length > 0 ? data.groups.map(group => `
                 <div class="border p-2 mb-2">
