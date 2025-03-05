@@ -999,6 +999,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 <div class="border p-2 mb-2">
                     <strong>${group.group__name}</strong><br>
                     Role: ${group.role} | Joined: ${group.joined_at}
+                    <a href="http://127.0.0.1:8000/groups/group/${orgId}/${group.id}/"
+                       class="btn btn-sm btn-warning">Get In</a>
                 </div>
             `).join('') : '<p>No groups found.</p>'}
         `;
