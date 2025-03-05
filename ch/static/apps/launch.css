@@ -241,6 +241,108 @@
 
 
 
+/* MANAGE BOOKMARKS  */
+#manageBookmarksModal .modal-content {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+#manageBookmarksModal .modal-header {
+    background: rgba(169, 220, 255, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1.2rem;
+}
+
+#manageBookmarksModal .modal-title {
+    color: #1A73E8;
+    font-weight: 600;
+    font-size: 1.4rem;
+}
+
+#manageBookmarksModal .modal-body {
+    padding: 1.5rem;
+    background: rgba(245, 248, 250, 0.6);
+}
+
+#bookmarkSearch {
+    border-radius: 8px;
+    padding: 12px 20px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+}
+
+#bookmarkSearch:focus {
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 2px 8px rgba(26, 115, 232, 0.2);
+    border-color: #1A73E8;
+}
+
+#bookmarkList {
+    max-height: 400px;
+    overflow-y: auto;
+    margin: 15px 0;
+    padding-right: 10px;
+}
+
+/* Bookmark item styling */
+.bookmark-item {
+    background: hsla(90, 29%, 88%, 0.902);
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.bookmark-item:hover {
+    transform: translateX(4px);
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+#openAddBookmarkModal {
+    background: #1A73E8;
+    color: white;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+}
+
+#openAddBookmarkModal:hover {
+    background: #1557B0;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+}
+
+/* Scrollbar styling */
+#bookmarkList::-webkit-scrollbar {
+    width: 6px;
+}
+
+#bookmarkList::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+}
+
+#bookmarkList::-webkit-scrollbar-thumb {
+    background: #1A73E8;
+    border-radius: 4px;
+}
+
+/* ADD BOOKMARKS MODAL */
+
 
 
 
