@@ -58,6 +58,263 @@
     color: #333; /* Dark gray for contrast */
 }
 
+/* select meeting modal */
+#selectMeetingModal {
+    --primary-color: #2196F3; /* Material Blue */
+    --secondary-color: #4CAF50; /* Material Green */
+    --glass-background: rgba(255, 255, 255, 0.9);
+    --blur-intensity: blur(16px);
+    --shadow-light: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#selectMeetingModal .modal-dialog {
+    max-width: 800px;
+}
+
+#selectMeetingModal .modal-content {
+    background: var(--glass-background);
+    backdrop-filter: var(--blur-intensity);
+    -webkit-backdrop-filter: var(--blur-intensity);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: var(--shadow-light);
+    overflow: hidden;
+}
+
+#selectMeetingModal .modal-header {
+    background: linear-gradient(120deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1.5rem;
+    border-radius: 16px 16px 0 0;
+}
+
+#selectMeetingModal .modal-title {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    font-size: 1.5rem;
+}
+
+#selectMeetingModal .btn-close {
+    filter: invert(1);
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+#selectMeetingModal .btn-close:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+}
+
+#meetingList {
+    gap: 12px;
+    padding: 1rem;
+}
+
+#meetingList .list-group-item {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+#meetingList .list-group-item:hover {
+    background: rgba(var(--primary-color), 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+}
+
+#meetingList .list-group-item:active {
+    transform: translateY(0);
+}
+
+/* Custom scrollbar */
+#meetingList::-webkit-scrollbar {
+    width: 6px;
+}
+
+#meetingList::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+#meetingList::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+/* add notes modal */
+#addNotesModal .modal-dialog {
+    margin-top: 10vh;
+}
+
+#addNotesModal .modal-content {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px) saturate(180%);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+#addNotesModal .modal-header {
+    background: rgba(255, 255, 255, 0.6);
+    border-bottom: 1px solid rgba(203, 213, 225, 0.3);
+    padding: 1.2rem 2rem;
+}
+
+#addNotesModal .modal-title {
+    color: #0f766e;
+    font-weight: 600;
+    font-size: 1.4rem;
+    letter-spacing: -0.02em;
+}
+
+#addNotesModal .modal-body {
+    padding: 2rem;
+    background: transparent;
+}
+
+#addNotesModal textarea {
+    background: rgba(255, 255, 255, 0.7);
+    border: 2px solid rgba(203, 213, 225, 0.4);
+    border-radius: 8px;
+    padding: 1.2rem;
+    font-size: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: #334155;
+}
+
+#addNotesModal textarea:focus {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: #2dd4bf;
+    box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.1);
+    outline: none;
+}
+
+#addNotesModal .modal-footer {
+    border-top: 1px solid rgba(203, 213, 225, 0.3);
+    padding: 1.2rem 2rem;
+    background: rgba(255, 255, 255, 0.6);
+}
+
+#saveNoteBtn {
+    background: #2dd4bf;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(45, 212, 191, 0.2);
+}
+
+#saveNoteBtn:hover {
+    background: #14b8a6;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(45, 212, 191, 0.3);
+}
+
+/* Optional: Add animation on modal appearance */
+@keyframes modalEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+#addNotesModal .modal-content {
+    animation: modalEntrance 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
