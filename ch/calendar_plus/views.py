@@ -93,6 +93,9 @@ from django.template.loader import render_to_string
 from outh.models import GoogleAuth
 from django.db import models
 from accounts.models import EventOrganization
+from django.utils.timezone import make_aware
+from datetime import datetime, time, timedelta
+import dateutil.parser
 
 
 
@@ -3506,42 +3509,60 @@ def schedule_next_step(request, org_id, user_id):
 
 # finally schedule the meeting
 
+# WORKING - FIXED
 def schedule_meeting(request, org_id, user_id):
+    print("🟢 DEBUG: schedule_meeting() called")  
 
-    selected_date = request.POST.get('selected_date')  
+    selected_date_str = request.POST.get('selected_date')  
     selected_slot = request.POST.get('selected_slot') 
     meeting_title = request.POST.get('meeting_title')
     meeting_description = request.POST.get('meeting_description')
     meeting_type = request.POST.get('meeting_type')
     meeting_location = request.POST.get('meeting_location')
-    meeting_link=request.POST.get('meeting_link')
+    meeting_link = request.POST.get('meeting_link')
 
-    # Convert selected_date to the correct format (YYYY-MM-DD)
+    print(f"🔵 DEBUG: Raw selected_date from POST: {selected_date_str}")
+    print(f"🔵 DEBUG: Raw selected_slot from POST: {selected_slot}")
+
+    # ✅ Fix: Use `dateutil.parser` to handle ANY date format!
     try:
-        # Parse the date from string format like "Dec. 3, 2024" into a date object
-        selected_date = datetime.strptime(selected_date, "%b. %d, %Y").date()
-    except ValueError:
-        messages.error(request, "Invalid date format. Please provide the date in 'Dec. 3, 2024' format.")
+        selected_date = dateutil.parser.parse(selected_date_str).date()
+        print(f"🟢 DEBUG: Parsed selected_date: {selected_date}")
+    except (ValueError, TypeError):
+        messages.error(request, "Invalid date format. Please use a valid date format (e.g., 'March 6, 2025').")
+        print("🔴 ERROR: Date parsing failed!")
         return redirect('schedule_next_step', org_id=org_id, user_id=user_id)
 
-    
+    # Ensure future dates are allowed
+    today = datetime.today().date()
+    if selected_date < today:
+        messages.error(request, "Meeting date cannot be in the past!")
+        print(f"🔴 ERROR: Selected date {selected_date} is in the past!")
+        return redirect('schedule_next_step', org_id=org_id, user_id=user_id)
+
+    # Convert time slot
     try:
-        start_time, end_time = selected_slot.split(' - ')
-        start_time = datetime.strptime(start_time, "%H:%M").time()
-        end_time = datetime.strptime(end_time, "%H:%M").time()
+        start_time_str, end_time_str = selected_slot.split(' - ')
+        start_time = datetime.strptime(start_time_str, "%H:%M").time()
+        end_time = datetime.strptime(end_time_str, "%H:%M").time()
+        print(f"🟢 DEBUG: Parsed start_time: {start_time}, end_time: {end_time}")
     except ValueError:
         messages.error(request, "Invalid time slot format. Please try again.")
+        print("🔴 ERROR: Time parsing failed!")
         return redirect('schedule_next_step', org_id=org_id, user_id=user_id)
 
-  
+    # Fetch organization and user details
     try:
         organization = Organization.objects.get(id=org_id)
         user = User.objects.get(id=user_id)
         invitee = request.user  
+        print(f"🟢 DEBUG: Organization found: {organization}, User found: {user}")
     except (Organization.DoesNotExist, User.DoesNotExist):
         messages.error(request, "Organization or user not found.")
+        print("🔴 ERROR: Organization or user not found!")
         return redirect('user_availability_view_org', org_id=org_id, user_id=user_id, date=selected_date)
 
+    # Save meeting details
     meeting = MeetingOrganization.objects.create(
         organization=organization,
         user=user,
@@ -3556,10 +3577,10 @@ def schedule_meeting(request, org_id, user_id):
         meeting_location=meeting_location,
     )
 
+    print(f"✅ SUCCESS: Meeting scheduled for {selected_date} from {start_time} to {end_time}")
 
     messages.success(request, "Meeting scheduled successfully!")
-    return redirect('user_calendar',org_id=org_id,user_id=user_id)
-
+    return redirect('user_calendar', org_id=org_id, user_id=user_id)
 
 '--------------------------------------------------------------------------------------------------'
 # Find Meetings
