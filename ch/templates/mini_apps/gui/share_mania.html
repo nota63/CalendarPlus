@@ -124,35 +124,90 @@
 
 <!-- MODALS -->
 <!-- 2️⃣ FILE UPLOAD MODAL -->
+<!-- File Upload Modal -->
 <div class="modal fade" id="fileUploadModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Share File</h5>
-                <p>Team-mates will be able to download the shared file even if they have'nt installed share-mania!</p>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable max-w-md mx-auto">
+        <div class="modal-content rounded-xl border-0 shadow-xl overflow-hidden">
+            <!-- Modal Header -->
+            <div class="modal-header bg-gradient-to-r from-blue-50 to-indigo-50 p-6 border-b border-gray-200">
+                <div class="w-full">
+                    <h5 class="modal-title text-lg font-semibold text-gray-800 mb-1">Share File with Team</h5>
+                    <p class="text-sm text-gray-500 font-normal">
+                        Team members can download files directly without installing ShareMania
+                    </p>
+                </div>
+                <button type="button" 
+                        class="btn-close p-2 rounded-full hover:bg-gray-100 transition-colors"
+                        data-bs-dismiss="modal" 
+                        aria-label="Close">
+                </button>
             </div>
-            <div class="modal-body">
-                <form id="fileUploadForm">
+
+            <!-- Modal Body -->
+            <div class="modal-body p-6">
+                <form id="fileUploadForm" class="space-y-5">
                     <input type="hidden" name="org_id" id="org_id" value="YOUR_ORG_ID_HERE">
-                    <div class="mb-3">
-                        <label class="form-label">Select File</label>
-                        <input type="file" class="form-control" name="file" id="fileInput" required>
+                    
+                    <!-- File Upload Input -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-700">Select File</label>
+                        <div class="relative group">
+                            <input type="file" 
+                                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                   name="file" 
+                                   id="fileInput" 
+                                   required>
+                            <div class="p-4 border-2 border-dashed border-gray-300 rounded-lg group-hover:border-blue-500 transition-colors bg-gray-50">
+                                <div class="text-center space-y-2">
+                                    <span class="material-icons-round text-3xl text-blue-600">cloud_upload</span>
+                                    <p class="text-sm text-gray-600">
+                                        <span class="text-blue-600 font-medium">Click to upload</span> 
+                                        or drag and drop
+                                    </p>
+                                    <p class="text-xs text-gray-400">Max file size: 20GB</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">File Name</label>
-                        <input type="text" class="form-control" name="file_name" id="fileNameInput" required>
+
+                    <!-- File Name Input -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-700">File Name</label>
+                        <input type="text" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400"
+                               name="file_name" 
+                               id="fileNameInput" 
+                               required>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Expires In (Days)</label>
-                        <input type="number" class="form-control" name="expires_in_days" id="expiresInput" value="7">
+
+                    <!-- Expiration Input -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-700">Expiration Days</label>
+                        <div class="relative">
+                            <input type="number" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                                   name="expires_in_days" 
+                                   id="expiresInput" 
+                                   value="7"
+                                   min="1">
+                            <span class="absolute right-3 top-2.5 text-gray-400 text-sm">days</span>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-success">Upload</button>
+
+                    <!-- Submit Button -->
+                    <button type="submit" 
+                            class="w-full py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
+                        <span class="material-icons-round text-lg">cloud_upload</span>
+                        Upload & Share File
+                    </button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+
+
 
 <!-- 3️⃣ USER SELECTION MODAL -->
 <div class="modal fade" id="userSelectionModal" tabindex="-1" aria-hidden="true">
