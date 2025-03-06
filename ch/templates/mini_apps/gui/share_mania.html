@@ -26,6 +26,39 @@
             border: 1px solid rgba(255, 255, 255, 0.9);
             box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.08);
         }
+
+         /* Custom Scrollbar Styling */
+    .scrollbar-thin::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    .scrollbar-track-transparent::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 4px;
+    }
+
+    .hover\:scrollbar-thumb-gray-400::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+    }
+
+    .scrollbar-rounded-full::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+    }
+
+    /* Firefox support */
+    @supports (scrollbar-color: auto) {
+        .scrollbar-thin {
+            scrollbar-width: thin;
+        }
+        .scrollbar-track-transparent {
+            scrollbar-color: #d1d5db transparent;
+        }
+    }
     </style>
 </head>
 <body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen text-slate-800 p-6">
@@ -122,40 +155,7 @@
 </div>
 </div>
 
-<style>
-    /* Custom Scrollbar Styling */
-    .scrollbar-thin::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-    }
 
-    .scrollbar-track-transparent::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
-        background: #d1d5db;
-        border-radius: 4px;
-    }
-
-    .hover\:scrollbar-thumb-gray-400::-webkit-scrollbar-thumb:hover {
-        background: #9ca3af;
-    }
-
-    .scrollbar-rounded-full::-webkit-scrollbar-thumb {
-        border-radius: 4px;
-    }
-
-    /* Firefox support */
-    @supports (scrollbar-color: auto) {
-        .scrollbar-thin {
-            scrollbar-width: thin;
-        }
-        .scrollbar-track-transparent {
-            scrollbar-color: #d1d5db transparent;
-        }
-    }
-</style>
 
     <!-- CTA Section -->
     <div class="glass-card rounded-2xl p-6 bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-100">
