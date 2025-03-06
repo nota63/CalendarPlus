@@ -165,43 +165,58 @@ def upload_file(request, org_id):
     
     return JsonResponse({"success": False, "error": "Invalid request"})
 
+
+# fetch team and send the mail
 @csrf_exempt
 def fetch_members_and_send_email(request, org_id):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        file_id = data.get("file_id")
-        selected_users = data.get("selected_users", [])
+    organization = get_object_or_404(Organization, id=org_id)
 
-        organization = get_object_or_404(Organization, id=org_id)
-        file_upload = get_object_or_404(FileUpload, id=file_id)
+    if request.method == "GET":
+        # ✅ Handle GET request: Fetch organization members
+        members = Profile.objects.filter(organization=organization).values("id", "full_name", "profile_picture","user",)
+        print("✅ MEMBERS FOUND:", members)
+        return JsonResponse({"members": list(members)}, status=200)
 
-        if not selected_users:
-            # Fetch organization members to display in frontend
-            members =Profile.objects.filter(organization=organization).values('id','full_name','profile_picture')
-            print("MEMBERS FOUND:",members)
-            return JsonResponse({"members": list(members)})
-        
+    elif request.method == "POST":
+        # ✅ Handle POST request: Send file link
+        try:
+            data = json.loads(request.body)
+            file_id = data.get("file_id")
+            selected_users = data.get("selected_users", [])
 
-        # ✅ Use file_upload.unique_link directly instead of reverse()
-        file_link = file_upload.unique_link  # This should be the actual file URL stored in DB
+            print("SELECTED USERS:",selected_users)
 
-        # Sending emails to selected users
-        for user_id in selected_users:
-            user = get_object_or_404(User, id=user_id)
-            send_mail(
-                subject="Shared File Access",
-                message=f"Hello {user.full_name},\n\nA file has been shared with you. Access it here: {file_link}\n\nBest,\nCalendar Plus Team",
-                from_email="noreply@calendarplus.com",
-                recipient_list=[user.email],
-                fail_silently=True,
-            )
+            if not file_id:
+                return JsonResponse({"success": False, "error": "Missing file_id"}, status=400)
 
-        return JsonResponse({"success": True, "message": "File link sent successfully!"})
+            file_upload = get_object_or_404(FileUpload, id=file_id)
+            file_link = file_upload.unique_link  # ✅ Directly use stored URL
 
-    return JsonResponse({"success": False, "error": "Invalid request"})
+            if not selected_users:
+                return JsonResponse({"success": False, "error": "No users selected"}, status=400)
+            
 
 
+            # ✅ Sending emails to selected users
+            for user_id in selected_users:
+                user = get_object_or_404(User, id=user_id)
+                send_mail(
+                    subject="Shared File Access",
+                    message=f"Hello {user.full_name},\n\nA file has been shared with you. Access it here: {file_link}\n\nBest,\nCalendar Plus Team",
+                    from_email="noreply@calendarplus.com",
+                    recipient_list=[user.email],
+                    fail_silently=True,
+                )
 
+            return JsonResponse({"success": True, "message": "File link sent successfully!"}, status=200)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "error": "Invalid JSON format"}, status=400)
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+    # ❌ Invalid request method
+    return JsonResponse({"success": False, "error": "Method Not Allowed"}, status=405)
 
 
 

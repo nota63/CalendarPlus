@@ -145,7 +145,7 @@
     const sendFileLinkBtn = document.getElementById("sendFileLink");
     const userSelectionModalEl = document.getElementById("userSelectionModal");
     const fileUploadModalEl = document.getElementById("fileUploadModal");
-    const orgId = "{{organization.id}}"; // Ensure this is passed correctly in your template
+    const orgId = "{{ organization.id }}"; // Ensure this is passed correctly in your template
 
     let uploadedFileId = null;
     let selectedUsers = [];
@@ -178,11 +178,10 @@
                 console.log("✅ File uploaded successfully. File ID:", uploadedFileId);
 
                 // Close file upload modal
-                const fileUploadModal = bootstrap.Modal.getOrCreateInstance(fileUploadModalEl);
-                fileUploadModal.hide();
+                bootstrap.Modal.getOrCreateInstance(fileUploadModalEl).hide();
 
                 // Fetch members and open selection modal
-                fetchMembersAndSendLink();
+                fetchMembers();
             } else {
                 console.error("❌ File upload failed:", data.error);
                 alert("File upload failed. Please try again.");
@@ -194,67 +193,43 @@
         });
     });
 
-    // 📌 Fetch Members and Open Selection Modal
-    function fetchMembersAndSendLink(selectedUsers = []) {
-        console.log("🔄 Fetching members & preparing to send file link...");
+    // 📌 Fetch Members (GET Request)
+    function fetchMembers() {
+        console.log("🔄 Fetching members...");
 
         fetch(`/apps/fetch-members-workspace/${orgId}/`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": getCSRFToken(),
-            },
-            body: JSON.stringify({
-                file_id: uploadedFileId,
-                selected_users: selectedUsers,
-            }),
+            method: "GET",
+            headers: { "X-CSRFToken": getCSRFToken() },
         })
         .then(response => response.json())
         .then(data => {
-            if (!selectedUsers.length) {
-                // First request: Fetch members
-                if (data.members && data.members.length > 0) {
-                    userList.innerHTML = ""; // Clear previous list
-                    data.members.forEach(user => {
-                        let listItem = document.createElement("li");
-                        listItem.className = "list-group-item";
-                        listItem.innerHTML = `
-                            <input type="checkbox" class="form-check-input user-checkbox" value="${user.id}"> 
-                            <img src="${user.profile_picture}" alt="Profile" class="rounded-circle" width="30"> 
-                            ${user.full_name}
-                        `;
-                        userList.appendChild(listItem);
-                    });
+            if (data.members && data.members.length > 0) {
+                userList.innerHTML = ""; // Clear previous list
+                data.members.forEach(user => {
+                    let listItem = document.createElement("li");
+                    listItem.className = "list-group-item";
+                    listItem.innerHTML = `
+                        <input type="checkbox" class="form-check-input user-checkbox" value="${user.id}"> 
+                        <img src="${user.profile_picture}" alt="Profile" class="rounded-circle" width="30"> 
+                        ${user.full_name}
+                    `;
+                    userList.appendChild(listItem);
+                });
 
-                    console.log("✅ Members fetched successfully. Opening selection modal...");
-                    const userSelectionModal = bootstrap.Modal.getOrCreateInstance(userSelectionModalEl);
-                    userSelectionModal.show();
-                } else {
-                    console.warn("⚠️ No members found in the workspace.");
-                    alert("No members found in the workspace.");
-                }
+                console.log("✅ Members fetched successfully. Opening selection modal...");
+                bootstrap.Modal.getOrCreateInstance(userSelectionModalEl).show();
             } else {
-                // Second request: Sending file link
-                if (data.success) {
-                    console.log("✅ File link sent successfully!");
-                    alert("File link sent successfully!");
-
-                    // Close user selection modal
-                    const userSelectionModal = bootstrap.Modal.getOrCreateInstance(userSelectionModalEl);
-                    userSelectionModal.hide();
-                } else {
-                    console.error("❌ Failed to send file link:", data.error);
-                    alert("Failed to send file link.");
-                }
+                console.warn("⚠️ No members found in the workspace.");
+                alert("No members found in the workspace.");
             }
         })
         .catch(error => {
-            console.error("❌ Error fetching members or sending file link:", error);
-            alert("An error occurred. Please try again.");
+            console.error("❌ Error fetching members:", error);
+            alert("An error occurred while fetching members.");
         });
     }
 
-    // 📌 Send File Link to Selected Users
+    // 📌 Send File Link to Selected Users (POST Request)
     sendFileLinkBtn.addEventListener("click", function () {
         selectedUsers = Array.from(document.querySelectorAll(".user-checkbox:checked"))
                             .map(checkbox => checkbox.value);
@@ -270,8 +245,32 @@
 
         console.log("📤 Sending file link to selected users:", selectedUsers);
 
-        // Call the function again, now with selected users
-        fetchMembersAndSendLink(selectedUsers);
+        fetch(`/apps/fetch-members-workspace/${orgId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken(),
+            },
+            body: JSON.stringify({
+                file_id: uploadedFileId,
+                selected_users: selectedUsers,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log("✅ File link sent successfully!");
+                alert("File link sent successfully!");
+                bootstrap.Modal.getOrCreateInstance(userSelectionModalEl).hide();
+            } else {
+                console.error("❌ Failed to send file link:", data.error);
+                alert("Failed to send file link.");
+            }
+        })
+        .catch(error => {
+            console.error("❌ Error sending file link:", error);
+            alert("An error occurred. Please try again.");
+        });
     });
 
     // 📌 Get CSRF Token Function
