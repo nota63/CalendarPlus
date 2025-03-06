@@ -175,7 +175,7 @@ def fetch_members_and_send_email(request, org_id):
     if request.method == "GET":
         # ✅ Handle GET request: Fetch organization members
         members = Profile.objects.filter(organization=organization).values("id", "full_name", "profile_picture","user",)
-        
+
         print("✅ MEMBERS FOUND:", members)
         return JsonResponse({"members": list(members)}, status=200)
 
