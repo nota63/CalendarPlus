@@ -205,6 +205,9 @@ def fetch_members_and_send_email(request, org_id):
             # ✅ Sending emails to selected users
             for user_id in selected_users:
                 user = get_object_or_404(User, id=user_id)
+                file_upload.shared_with.add(user)
+                file_upload.save()
+                
                 send_mail(
                     subject="Shared File Access",
                     message=f"Hello {user.username},\n\nA file has been shared with you. Access it here: {file_link}\n\nBest,\nCalendar Plus Team",
@@ -275,7 +278,9 @@ def fetch_file_details(request, unique_link):
         "file_url": file.file.url,
         "is_expired": file.is_expired(),
     }
+    print("DATA:",data)
     return JsonResponse(data)
+
 
 
 
