@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 from accounts.models import Organization, Profile,MeetingOrganization
+import uuid
+import os 
+from django.utils.timezone import now, timedelta
 
 # Create your models here.
 
@@ -108,3 +111,42 @@ class Bookmark(models.Model):
         return f"{self.title} - {self.organization.name}"
 
 
+# ----------------------------------------------------------------------------------------------------------------------------------------------------
+
+# SHARE MANIA -- SHARE FILES UPTO 10 GB TO YOUR WORKSPACE MEMBERS
+
+class FileUpload(models.Model):
+    organization = models.ForeignKey(
+        Organization, on_delete=models.CASCADE, related_name="files"
+    )
+    uploaded_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="uploaded_files"
+    )
+    file = models.FileField(upload_to="shared_files/")
+    file_name = models.CharField(max_length=255)
+    file_size = models.PositiveBigIntegerField(editable=False)  # Auto-calculated
+    shared_with = models.ManyToManyField(User, related_name="received_files", blank=True)
+    unique_link = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    expires_in_days = models.PositiveIntegerField(default=7)  # User-defined expiry
+    expires_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        # Auto-set expiration date
+        if self.expires_in_days:
+            self.expires_at = now() + timedelta(days=self.expires_in_days)
+
+        # Auto-calculate file size
+        if self.file and not self.file_size:
+            self.file_size = self.file.size  # Get file size in bytes
+
+        super().save(*args, **kwargs)
+
+    def is_expired(self):
+        return now() > self.expires_at if self.expires_at else False
+
+    def get_download_url(self):
+        return f"/share-file/{self.unique_link}/"
+
+    def __str__(self):
+        return f"{self.file_name} ({self.organization.name})"
