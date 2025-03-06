@@ -1,31 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Download | Share Mania</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
+    <style>
+        .app-mania {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
 
 <div class="container mt-5">
     <div class="card shadow">
         <div class="card-body">
-            <strong>New file Received from, {{file.uploaded_by}}</strong>
+            <strong>New file Received from, {{ file.uploaded_by }}</strong>
             <h2 class="card-title">File Shared with You</h2>
             <p><strong>File Name:</strong> {{ file.file_name }}</p>
             <p><strong>File Size:</strong> {{ file.file_size|filesizeformat }}</p>
-            <p><strong>Shared At</strong> {{ file.created_at }}</p>
+            <p><strong>Shared At:</strong> {{ file.created_at }}</p>
             <p><strong>Expires At:</strong> {{ file.expires_at }}</p>
-            <a href="{{file.file.url}}">Peview</a>
+            <a href="{{ file.file.url }}" target="_blank" class="btn btn-primary">🔍 Preview</a>
 
             {% if file.is_expired %}
-                <p class="text-danger">❌ This file has expired and is no longer available.</p>
+                <p class="text-danger mt-3">❌ This file has expired and is no longer available.</p>
             {% else %}
-                <a href="{% url 'download_file' file.unique_link %}" class="btn btn-success">
+                <button class="btn btn-success mt-3" id="downloadFileBtn" 
+                        data-file-url="{% url 'download_file' file.unique_link %}">
                     📥 Download File
-                </a>
+                </button>
             {% endif %}
         </div>
     </div>
 </div>
 
+<!-- Download Progress Modal -->
+<div class="modal fade" id="downloadModal" tabindex="-1" aria-labelledby="downloadModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="downloadModalLabel">Downloading File...</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Please wait while your file is being downloaded.</p>
+                <div class="progress">
+                    <div id="downloadProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                         role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    </div>
+                </div>
+                <p id="downloadStatus" class="mt-2 text-center"></p>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="app-mania">
-    <p>Powered by Share Mania</p>
-    <p>You can still use share mania for download the shared files only without installing|</p>
-    <p>But if you want to share files upto 10 GB to your workspace members you can download the share-mania</p>
-    <a href="#">Get Share Mania</a>
+    <p>Powered by <strong>Share Mania</strong></p>
+    <p>You can still use Share Mania to download shared files without installing.</p>
+    <p>But if you want to share files up to 10GB with your workspace members, you can download Share Mania.</p>
+    <a href="#" class="btn btn-info">Get Share Mania</a>
 </div>
+
+<!-- Bootstrap 5 & JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.getElementById("downloadFileBtn")?.addEventListener("click", function() {
+    let fileUrl = this.getAttribute("data-file-url");
+
+    // Show the download modal
+    let downloadModal = new bootstrap.Modal(document.getElementById('downloadModal'));
+    downloadModal.show();
+
+    fetch(fileUrl)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("File download failed.");
+        }
+
+        // Get total file size from response headers (if available)
+        const totalSize = response.headers.get("Content-Length");
+
+        let receivedSize = 0;
+        const reader = response.body.getReader();
+        let chunks = [];
+
+        function updateProgressBar() {
+            let percentComplete = totalSize ? (receivedSize / totalSize) * 100 : 50;
+            document.getElementById("downloadProgressBar").style.width = percentComplete + "%";
+            document.getElementById("downloadStatus").innerText = `Downloaded: ${Math.round(percentComplete)}%`;
+        }
+
+        function readChunk() {
+            return reader.read().then(({ done, value }) => {
+                if (done) {
+                    return;
+                }
+
+                chunks.push(value);
+                receivedSize += value.length;
+                updateProgressBar();
+                return readChunk();
+            });
+        }
+
+        return readChunk().then(() => {
+            // Convert downloaded data to a Blob and create a download link
+            let blob = new Blob(chunks);
+            let url = window.URL.createObjectURL(blob);
+            let a = document.createElement("a");
+            a.href = url;
+            a.download = "{{ file.file_name }}";  // Set the correct filename
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+            // Update modal message
+            document.getElementById("downloadProgressBar").classList.add("bg-success");
+            document.getElementById("downloadStatus").innerHTML = "✅ Download Completed!";
+            setTimeout(() => downloadModal.hide(), 2000);
+        });
+    })
+    .catch(error => {
+        document.getElementById("downloadStatus").innerHTML = "❌ Download failed!";
+        console.error("Download error:", error);
+    });
+});
+</script>
+
+</body>
+</html>
