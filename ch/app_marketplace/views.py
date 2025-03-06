@@ -18,9 +18,12 @@ from django.views.decorators.http import require_POST
 from django.core.mail import send_mail
 from django.urls import reverse_lazy
 from django.http import FileResponse, Http404
+from django.conf import settings
+from django.urls import reverse
 # Create your views here.
 
 # Display Miniapps 
+@check_org_membership
 def mini_apps_list(request, org_id):
     organization = get_object_or_404(Organization, id=org_id)
     
@@ -45,6 +48,7 @@ def mini_apps_list(request, org_id):
 
 
 # INSTALLATION PAGE
+@check_org_membership
 def mini_app_detail(request, app_id, org_id):
     organization = get_object_or_404(Organization, id=org_id)
     app = get_object_or_404(MiniApp, id=app_id)
@@ -92,6 +96,7 @@ def install_mini_app(request):
 
 # LAUNCH APP
 @login_required
+@check_org_membership
 def launch_app(request,org_id,app_id):
     organization = get_object_or_404(Organization,id=org_id)
     app=get_object_or_404(InstalledMiniApp,id=app_id)
@@ -123,7 +128,7 @@ def share_mania(request,org_id,app_id):
     if not app:
         return JsonResponse({'error:':'App not Found!'},status=401)
     
-    user_check=get_object_or_404(InstalledMiniApp,id=app_id)
+    user_check=get_object_or_404(InstalledMiniApp,id=app_id,user=request.user)
     if not user_check.mini_app.name == "Share Mania":
         return HttpResponseBadRequest("Bad request or app is not installed")
     
@@ -140,8 +145,9 @@ def share_mania(request,org_id,app_id):
 
 
 # SHARE THE FILE 
-from django.urls import reverse
+
 @csrf_exempt
+@check_org_membership
 def upload_file(request, org_id):
     if request.method == "POST" and request.FILES.get("file"):
         file = request.FILES["file"]
@@ -168,8 +174,8 @@ def upload_file(request, org_id):
 
 
 # fetch team and send the mail
-from django.conf import settings
 
+@check_org_membership
 @csrf_exempt
 def fetch_members_and_send_email(request, org_id):
     organization = get_object_or_404(Organization, id=org_id)
