@@ -1,96 +1,124 @@
-
 {% load static %}
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShareMania - {{ organization.name }}</title>
+    
+    <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> */
-
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jkanban@1.2.0/dist/jkanban.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/jkanban@1.2.0/dist/jkanban.min.js"></script>
-
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <meta name="csrf-token" content="{{ csrf_token }}">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'apps/launch.css'%}">
-
-<title>ShareMania</title>
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.08);
+        }
+    </style>
 </head>
-<body>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen text-slate-800 p-6">
 
-   <!-- App Card -->
-   <div class="glass-card p-6 mb-8">
-    <div class="flex items-center space-x-6">
-        <img src="{{ app.mini_app.icon.url }}" class="w-20 h-20 rounded-2xl shadow-lg">
-        <div>
-            <h2 class="text-4xl font-bold mb-1">{{ app.mini_app.name }}</h2>
-            <p class="text-indigo-200 text-lg">Version {{ app.mini_app.version }}</p>
+<div class="max-w-7xl mx-auto space-y-8">
+    <!-- App Header -->
+    <div class="glass-card rounded-2xl p-6 shadow-sm">
+        <div class="flex items-center gap-6">
+            <img src="{{ app.mini_app.icon.url }}" class="w-24 h-24 rounded-xl shadow-md border border-white">
+            <div>
+                <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">
+                    {{ app.mini_app.name }}
+                </h1>
+                <p class="text-slate-500 mt-2">Version {{ app.mini_app.version }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid lg:grid-cols-2 gap-8">
+        <!-- Commands Section -->
+        <div class="glass-card rounded-2xl p-6">
+            <h2 class="text-2xl font-semibold mb-6 text-blue-700">Available Commands</h2>
+            <div class="grid grid-cols-2 gap-3">
+                {% for command in app.mini_app.commands %}
+                <div class="group bg-white hover:bg-blue-50 p-4 rounded-xl transition-all duration-200 cursor-pointer border border-gray-200 hover:border-blue-300">
+                    <span class="text-blue-600 font-mono">$</span>
+                    <span class="ml-2 text-slate-700 group-hover:text-blue-900">{{ command }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Shared Files Section -->
+        <div class="glass-card rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-semibold text-slate-800">Shared Files</h2>
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-all flex items-center gap-2 shadow-sm"
+                        data-bs-toggle="modal" data-bs-target="#fileUploadModal">
+                    <span class="material-icons-round text-sm">cloud_upload</span>
+                    New Upload
+                </button>
+            </div>
+
+            {% if shared_files %}
+            <div class="space-y-4">
+                {% for file in shared_files %}
+                <div class="bg-white hover:bg-gray-50 p-4 rounded-xl border border-gray-200 transition-all shadow-sm">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-blue-100 p-3 rounded-lg">
+                            <span class="material-icons-round text-blue-600">description</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-medium text-slate-800">{{ file.file_name }}</h3>
+                            <p class="text-sm text-slate-500">{{ file.file_size }} • Expires {{ file.expires_at|date:"M d" }}</p>
+                        </div>
+                        <button class="text-blue-600 hover:text-blue-700 p-2 rounded-lg"
+                                data-bs-toggle="modal" data-bs-target="#fileDetailsModal"
+                                onclick="loadFileDetails('{{ file.unique_link }}')">
+                            <span class="material-icons-round">info</span>
+                        </button>
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-gray-100">
+                        <p class="text-sm text-slate-500">
+                            Shared with: {% for user in file.shared_with.all %}{{ user.username }}{% if not forloop.last %}, {% endif %}{% empty %}No one{% endfor %}
+                        </p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-12">
+                <div class="max-w-xs mx-auto mb-6 opacity-75">
+                    <img src="https://www.svgrepo.com/show/450139/files.svg" class="w-full h-auto filter invert-[20%]">
+                </div>
+                <p class="text-slate-500">No files shared yet. Upload your first file!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="glass-card rounded-2xl p-6 bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-100">
+        <div class="flex items-center gap-6">
+            <div class="flex-1">
+                <h3 class="text-xl font-semibold mb-2 text-slate-800">🚀 Supercharged File Sharing</h3>
+                <p class="text-slate-600">Experience blazing-fast transfers up to 20GB with {{ organization.name }}'s secure platform.</p>
+            </div>
+            <div class="flex gap-3">
+                <button class="bg-white text-slate-700 hover:bg-gray-50 px-6 py-3 rounded-xl flex items-center gap-2 transition-all border border-gray-200 shadow-sm">
+                    <span class="material-icons-round text-blue-600">help</span>
+                    Documentation
+                </button>
+            </div>
         </div>
     </div>
 </div>
-
-<!-- Commands Section -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-    <div class="glass-card p-6">
-        <h3 class="text-xl font-semibold mb-4">Available Commands</h3>
-        <div class="grid grid-cols-2 gap-3">
-            {% for command in app.mini_app.commands %}
-            <div class="bg-white/5 hover:bg-white/10 p-3 rounded-lg transition-colors">
-                <span class="font-mono text-indigo-300">$</span>
-                <span class="ml-2">{{ command }}</span>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    <!-- fetch already shared files  -->
-
-    <div class="shared-files">
-        {% if shared_files %}
-           <p>Recent shared files</p>
-             {% for file in shared_files %}
-                <strong>{{file.file_name}}</strong>
-                <p>{{file.file_size}}</p>
-                <p>Will expire on {{file.expires_at}}</p>
-                <p><strong>Sent To:</strong> 
-                    {% if file.shared_with.all %}
-                        {% for user in file.shared_with.all %}
-                            {{ user.username }}{% if not forloop.last %}, {% endif %}
-                        {% endfor %}
-                    {% else %}
-                        No one
-                    {% endif %}
-                </p>
-                
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#fileDetailsModal" 
-                onclick="loadFileDetails('{{ file.unique_link }}')">
-                     📂 Details
-                 </button>
-             {% endfor %}  
-            {% else %}
-             <img src="https://www.svgrepo.com/show/450139/files.svg" alt="No files shared yet">
-             <p>No Files Shared Yet</p>   
-              
-        {% endif %}      
-    </div>
-
-
-<!-- 1️⃣ BUTTON TO TRIGGER FILE UPLOAD MODAL -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#fileUploadModal">
-    <i class="material-icons">cloud_upload</i> Upload File
-</button>
-
 
 
 
@@ -100,7 +128,8 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Upload File</h5>
+                <h5 class="modal-title">Share File</h5>
+                <p>Team-mates will be able to download the shared file even if they have'nt installed share-mania!</p>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
