@@ -37,6 +37,7 @@ urlpatterns=[
     path("share-file/<uuid:unique_link>/", file_details_view, name="file_details"),
     path("download-file/<uuid:unique_link>/", download_file, name="download_file"),
     path('download-file-preview/<uuid:unique_link>/',file_details_view,name='download_file_preview'),
-    path('download-file/<uuid:uinique_link>/',download_file,name='download_file')
+    path('download-file/<uuid:uinique_link>/',download_file,name='download_file'),
+    path('fetch-file-details/<uuid:unique_link>/',fetch_file_details,name='fetch_file_details')
 
 ]

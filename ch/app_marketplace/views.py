@@ -259,6 +259,25 @@ def download_file(request, unique_link):
     return response
 
 
+# FETCH FILE DETAILS 
+@login_required
+@csrf_exempt
+def fetch_file_details(request, unique_link):
+    file = get_object_or_404(FileUploadMania, unique_link=unique_link)
+    
+    data = {
+        "file_name": file.file_name,
+        "file_size": f"{file.file_size / (1024 * 1024):.2f} MB",
+        "uploaded_by": file.uploaded_by.username,
+        "shared_with": ", ".join([user.username for user in file.shared_with.all()]) or "No one",
+        "downloaded_by": ", ".join([user.username for user in file.downloaded_by.all()]) or "Not downloaded yet",
+        "expires_at": file.expires_at.strftime("%Y-%m-%d %H:%M:%S"),
+        "file_url": file.file.url,
+        "is_expired": file.is_expired(),
+    }
+    return JsonResponse(data)
+
+
 
 
 
