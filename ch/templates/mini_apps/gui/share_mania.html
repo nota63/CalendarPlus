@@ -455,22 +455,100 @@ function loadFileDetails(uniqueLink) {
     fetch(`/apps/fetch-file-details/${uniqueLink}/`)
         .then(response => response.json())
         .then(data => {
-            let content = `
-                <p><strong>File Name:</strong> ${data.file_name}</p>
-                <p><strong>File Size:</strong> ${data.file_size}</p>
-                <p><strong>Uploaded By:</strong> ${data.uploaded_by}</p>
-                <p><strong>Shared With:</strong> ${data.shared_with}</p>
-                <p><strong>Downloaded By:</strong> ${data.downloaded_by}</p>
-                <p><strong>Expires At:</strong> ${data.expires_at}</p>
-                <a href="${data.file_url}" class="btn btn-success">📥 Download</a>
-                ${data.is_expired ? '<p class="text-danger">❌ This file has expired.</p>' : ''}
+            // Convert data to proper arrays with fallbacks
+            const sharedUsers = Array.isArray(data.shared_with) 
+                ? data.shared_with 
+                : (data.shared_with || '').split(',').map(u => u.trim()).filter(Boolean);
+            
+            const downloadedUsers = Array.isArray(data.downloaded_by)
+                ? data.downloaded_by
+                : (data.downloaded_by || '').split(',').map(u => u.trim()).filter(Boolean);
+
+            // User avatar generator
+            const userAvatar = (name) => `
+                <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-600">
+                    ${name.charAt(0).toUpperCase()}
+                </div>
             `;
+
+            let content = `
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                            <span class="material-icons-round text-blue-600 text-2xl">description</span>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-800">${data.file_name}</h2>
+                            <p class="text-sm text-gray-500">${data.file_size}</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${[
+                            {icon: 'info', color: 'blue', label: 'File Name', value: data.file_name},
+                            {icon: 'storage', color: 'purple', label: 'File Size', value: data.file_size},
+                            {icon: 'person', color: 'green', label: 'Uploaded By', value: data.uploaded_by},
+                            {icon: 'schedule', color: 'yellow', label: 'Expires At', value: data.expires_at}
+                        ].map(item => `
+                            <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                                <span class="material-icons-round text-${item.color}-600">${item.icon}</span>
+                                <div>
+                                    <p class="text-sm text-gray-500">${item.label}</p>
+                                    <p class="font-medium">${item.value}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    ${['Shared', 'Downloaded'].map(type => `
+                        <div class="p-4 bg-blue-50 rounded-lg">
+                            <h3 class="flex items-center gap-2 text-sm font-semibold text-blue-800 mb-2">
+                                <span class="material-icons-round">${type === 'Shared' ? 'group' : 'download'}</span>
+                                ${type} With
+                            </h3>
+                            <div class="flex flex-wrap gap-2">
+                                ${(type === 'Shared' ? sharedUsers : downloadedUsers).map(user => `
+                                    <div class="flex items-center gap-2 px-3 py-1 bg-white rounded-full shadow-sm">
+                                        ${userAvatar(user)}
+                                        <span class="text-sm">${user}</span>
+                                    </div>
+                                `).join('')}
+                                ${(type === 'Shared' ? sharedUsers : downloadedUsers).length === 0 
+                                    ? `<p class="text-gray-500 text-sm">Not ${type.toLowerCase()} yet</p>`
+                                    : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+
+                    <div class="mt-6 flex items-center gap-4">
+                        <a href="${data.file_url}" 
+                           class="flex items-center gap-2 px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
+                            <span class="material-icons-round">download</span>
+                            Download File
+                        </a>
+
+                        ${data.is_expired ? `
+                            <div class="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg">
+                                <span class="material-icons-round">error</span>
+                                File Expired
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+
             document.getElementById('fileDetailsContent').innerHTML = content;
+        })
+        .catch(error => {
+            console.error('Error loading file details:', error);
+            document.getElementById('fileDetailsContent').innerHTML = `
+                <div class="text-center py-6 text-red-600">
+                    <span class="material-icons-round text-4xl mb-2">error</span>
+                    <p>Failed to load file details. Please try again.</p>
+                </div>
+            `;
         });
 }
-
-
-
 </script>
 
 
