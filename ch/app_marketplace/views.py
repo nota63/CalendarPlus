@@ -17,6 +17,7 @@ from django.core.files.base import ContentFile
 from django.views.decorators.http import require_POST
 from django.core.mail import send_mail
 from django.urls import reverse_lazy
+from django.http import FileResponse, Http404
 # Create your views here.
 
 # Display Miniapps 
@@ -190,7 +191,11 @@ def fetch_members_and_send_email(request, org_id):
                 return JsonResponse({"success": False, "error": "Missing file_id"}, status=400)
 
             file_upload = get_object_or_404(FileUpload, id=file_id)
-            file_link = file_upload.unique_link  # ✅ Directly use stored URL
+            # file_link = file_upload.unique_link  # ✅ Directly use stored URL
+            # file_link = request.build_absolute_uri(file_upload.unique_link)  # ✅ Converts to full URL
+            file_link = request.build_absolute_uri(f"/apps/download-file/{file_upload.unique_link}/")  # ✅ Correct link to download
+
+
 
             if not selected_users:
                 return JsonResponse({"success": False, "error": "No users selected"}, status=400)
@@ -219,6 +224,27 @@ def fetch_members_and_send_email(request, org_id):
     return JsonResponse({"success": False, "error": "Method Not Allowed"}, status=405)
 
 
+
+
+# DOWNLOAD THE FILE
+def file_details_view(request, unique_link):
+    file_upload = get_object_or_404(FileUpload, unique_link=unique_link)
+
+    # Check if the file is expired
+    if file_upload.is_expired():
+        return render(request, "files/file_expired.html", {"file": file_upload})
+
+    return render(request, "files/file_details.html", {"file": file_upload})
+
+# DOWNLOAD THE FILE 
+def download_file(request, unique_link):
+    file_upload = get_object_or_404(FileUpload, unique_link=unique_link)
+
+    if file_upload.is_expired():
+        raise Http404("File has expired.")
+
+    response = FileResponse(file_upload.file.open("rb"), as_attachment=True, filename=file_upload.file_name)
+    return response
 
 
 
