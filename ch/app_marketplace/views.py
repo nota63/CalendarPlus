@@ -177,8 +177,10 @@ def fetch_members_and_send_email(request, org_id):
 
         if not selected_users:
             # Fetch organization members to display in frontend
-            members = User.objects.filter(profile__organization=organization).values("id", "full_name", "email", "profile__profile_picture")
+            members =Profile.objects.filter(organization=organization).values('id','full_name','profile_picture')
+            print("MEMBERS FOUND:",members)
             return JsonResponse({"members": list(members)})
+        
 
         # ✅ Use file_upload.unique_link directly instead of reverse()
         file_link = file_upload.unique_link  # This should be the actual file URL stored in DB
