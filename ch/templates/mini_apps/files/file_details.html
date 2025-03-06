@@ -120,7 +120,7 @@ document.getElementById("downloadFileBtn")?.addEventListener("click", function()
             let url = window.URL.createObjectURL(blob);
             let a = document.createElement("a");
             a.href = url;
-            a.download = "{{ file.file_name }}";  // Set the correct filename
+            a.download = "{{ file.file }}";  // Set the correct filename
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
