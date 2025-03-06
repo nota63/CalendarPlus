@@ -3,11 +3,13 @@
 <div class="container mt-5">
     <div class="card shadow">
         <div class="card-body">
+            <strong>New file Received from, {{file.uploaded_by}}</strong>
             <h2 class="card-title">File Shared with You</h2>
             <p><strong>File Name:</strong> {{ file.file_name }}</p>
             <p><strong>File Size:</strong> {{ file.file_size|filesizeformat }}</p>
-            <p><strong>Uploaded By:</strong> {{ file.uploaded_by.full_name }}</p>
+            <p><strong>Shared At</strong> {{ file.created_at }}</p>
             <p><strong>Expires At:</strong> {{ file.expires_at }}</p>
+            <a href="{{file.file.url}}">Peview</a>
 
             {% if file.is_expired %}
                 <p class="text-danger">❌ This file has expired and is no longer available.</p>
@@ -20,3 +22,10 @@
     </div>
 </div>
 
+
+<div class="app-mania">
+    <p>Powered by Share Mania</p>
+    <p>You can still use share mania for download the shared files only without installing|</p>
+    <p>But if you want to share files upto 10 GB to your workspace members you can download the share-mania</p>
+    <a href="#">Get Share Mania</a>
+</div>
