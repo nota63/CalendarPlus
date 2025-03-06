@@ -63,7 +63,16 @@
                 <strong>{{file.file_name}}</strong>
                 <p>{{file.file_size}}</p>
                 <p>Will expire on {{file.expires_at}}</p>
-                <p>{{file.shared_with.all}}</p>
+                <p><strong>Sent To:</strong> 
+                    {% if file.shared_with.all %}
+                        {% for user in file.shared_with.all %}
+                            {{ user.username }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        No one
+                    {% endif %}
+                </p>
+                
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#fileDetailsModal" 
                 onclick="loadFileDetails('{{ file.unique_link }}')">
                      📂 Details
