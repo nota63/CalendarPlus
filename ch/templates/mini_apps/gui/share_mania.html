@@ -267,22 +267,37 @@
         </div>
     </div>
 </div>
+
 <!-- FILE DETAILS MODAL -->
- <!-- Bootstrap Modal -->
+ <!-- File Details Modal -->
 <div class="modal fade" id="fileDetailsModal" tabindex="-1" aria-labelledby="fileDetailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="fileDetailsModalLabel">File Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content rounded-xl border-0 shadow-xl overflow-hidden">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 border-b border-gray-200">
+                <h5 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    <span class="material-icons-round text-blue-600 text-3xl">description</span>
+                    File Details
+                </h5>
+                <button type="button" 
+                        class="btn-close p-2 rounded-full hover:bg-gray-100 transition-colors absolute top-4 right-4"
+                        data-bs-dismiss="modal" 
+                        aria-label="Close">
+                </button>
             </div>
-            <div class="modal-body" id="fileDetailsContent">
-                <p>Loading file details...</p>
+
+            <!-- Modal Body -->
+            <div class="modal-body p-6">
+                <div id="fileDetailsContent" class="space-y-6">
+                    <!-- Loading State -->
+                    <p class="text-gray-500 text-center py-4">Loading file details...</p>
+                    
+                    <!-- Content Structure (maintain your existing dynamic content structure here) -->
+                </div>
             </div>
         </div>
     </div>
 </div>
-
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
