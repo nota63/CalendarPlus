@@ -115,7 +115,7 @@ class Bookmark(models.Model):
 
 # SHARE MANIA -- SHARE FILES UPTO 10 GB TO YOUR WORKSPACE MEMBERS
 
-class FileUpload(models.Model):
+class FileUploadMania(models.Model):
     organization = models.ForeignKey(
         Organization, on_delete=models.CASCADE, related_name="files"
     )
@@ -126,8 +126,8 @@ class FileUpload(models.Model):
     file_name = models.CharField(max_length=255)
     file_size = models.PositiveBigIntegerField(editable=False)  
     shared_with = models.ManyToManyField(User, related_name="received_files", blank=True)
-    
     unique_link = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    downloaded_by=models.ManyToManyField(User,related_name='downloaded_files',null=True, blank=True)
     expires_in_days = models.PositiveIntegerField(default=7)  
     expires_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

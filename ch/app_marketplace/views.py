@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect,get_list_or_404,get_object_or_404
-from .models import (MiniApp,InstalledMiniApp,Bookmark,FileUpload)
+from .models import (MiniApp,InstalledMiniApp,Bookmark,FileUploadMania)
 from accounts.models import (Organization, Profile,MeetingOrganization,MeetingNotes)
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
@@ -128,7 +128,7 @@ def share_mania(request,org_id,app_id):
         return HttpResponseBadRequest("Bad request or app is not installed")
     
     # FETCH SHARED FILES 
-    shared_files = FileUpload.objects.filter(organization=organization,uploaded_by=request.user)
+    shared_files = FileUploadMania.objects.filter(organization=organization,uploaded_by=request.user)
     
     context = {
         'organization':organization,
@@ -151,7 +151,7 @@ def upload_file(request, org_id):
         organization = get_object_or_404(Organization, id=org_id)
         uploaded_by = request.user
 
-        file_upload = FileUpload.objects.create(
+        file_upload = FileUploadMania.objects.create(
             organization=organization,
             uploaded_by=uploaded_by,
             file=file,
@@ -190,7 +190,7 @@ def fetch_members_and_send_email(request, org_id):
             if not file_id:
                 return JsonResponse({"success": False, "error": "Missing file_id"}, status=400)
 
-            file_upload = get_object_or_404(FileUpload, id=file_id)
+            file_upload = get_object_or_404(FileUploadMania, id=file_id)
             # file_link = file_upload.unique_link  # ✅ Directly use stored URL
             # file_link = request.build_absolute_uri(file_upload.unique_link)  # ✅ Converts to full URL
             file_link = request.build_absolute_uri(f"/apps/download-file-preview/{file_upload.unique_link}/") 
@@ -228,7 +228,7 @@ def fetch_members_and_send_email(request, org_id):
 
 # DOWNLOAD THE FILE
 def file_details_view(request, unique_link):
-    file_upload = get_object_or_404(FileUpload, unique_link=unique_link)
+    file_upload = get_object_or_404(FileUploadMania, unique_link=unique_link)
 
     organization=file_upload.organization
     print("file organization:",organization.name)
@@ -237,9 +237,6 @@ def file_details_view(request, unique_link):
     print("User organization:",profile.organization.name)
     if not profile:
         return HttpResponseBadRequest("You are not authorized to view this file")
-
-
-  
 
     # Check if the file is expired
     if file_upload.is_expired():
@@ -250,10 +247,13 @@ def file_details_view(request, unique_link):
 
 # DOWNLOAD THE FILE 
 def download_file(request, unique_link):
-    file_upload = get_object_or_404(FileUpload, unique_link=unique_link)
+    file_upload = get_object_or_404(FileUploadMania, unique_link=unique_link)
 
     if file_upload.is_expired():
         raise Http404("File has expired.")
+    
+    file_upload.downloaded_by.add(request.user)
+    file_upload.save()
 
     response = FileResponse(file_upload.file.open("rb"), as_attachment=True, filename=file_upload.file_name)
     return response
