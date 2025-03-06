@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect,get_list_or_404,get_object_or_404
-from .models import (MiniApp,InstalledMiniApp,Bookmark)
+from .models import (MiniApp,InstalledMiniApp,Bookmark,FileUpload)
 from accounts.models import (Organization, Profile,MeetingOrganization,MeetingNotes)
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
@@ -9,6 +9,14 @@ from django.utils.timezone import localtime
 from .check_org_membership import check_org_membership
 from groups.models import (GroupMember)
 from django.utils.timezone import now
+import os
+import uuid
+from django.utils.timezone import now, timedelta
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.views.decorators.http import require_POST
+from django.core.mail import send_mail
+from django.urls import reverse_lazy
 # Create your views here.
 
 # Display Miniapps 
@@ -42,6 +50,8 @@ def mini_app_detail(request, app_id, org_id):
 
     # Check if the app is already installed for this organization
     is_installed = InstalledMiniApp.objects.filter(organization=organization, mini_app=app).exists()
+
+    
 
     return render(request, "mini_apps/install/detail.html", {
         "app": app,
@@ -91,12 +101,36 @@ def launch_app(request,org_id,app_id):
     if not profile:
         return JsonResponse({'error:':'You are not authorized to launch the app'},status=400)
     
+    # GUI APP
+    if "Share Mania" in app.mini_app.name:
+        return redirect('share_mania_app/',org_id=organization.id,app_id=app.id)
+    
     context = {
         "app":app,
         "organization":organization
     }
     
     return render(request,'mini_apps/launch/launch.html',context)
+
+
+@login_required
+@check_org_membership
+def share_mania(request,org_id,app_id):
+    organization = get_object_or_404(Organization,id=org_id)
+    app=get_object_or_404(InstalledMiniApp,id=app_id)
+    if not app:
+        return JsonResponse({'error:':'App not Found!'},status=401)
+    
+    context = {
+        'organization':organization,
+        'app':app,
+    }
+    return render(request,'mini_apps/gui/share_mania.html',context)
+
+
+
+
+
 
 # ------------------------------------------------------------------------------------------------------------------------------
 # APPS (TASK MANAGER - KANBAN BOARD)
@@ -820,3 +854,70 @@ def add_bookmark(request, org_id):
 
 # --------------------------------------------------------------------------------------------------------------------------------------------------
 
+# SHARE - MANIA -- share files upto 10 GB to your workspace members
+
+# Upload the file and generate sharable link 
+@csrf_exempt
+def upload_file(request):
+    if request.method == "POST":
+        org_id = request.POST.get("org_id")
+        file = request.FILES.get("file")
+        file_name = request.POST.get("file_name")
+        expires_in_days = int(request.POST.get("expires_in_days", 7))
+
+        if not org_id or not file:
+            return JsonResponse({"error": "Organization ID and file are required."}, status=400)
+
+        organization = get_object_or_404(Organization, id=org_id)
+        file_upload = FileUpload.objects.create(
+            organization=organization,
+            uploaded_by=request.user,
+            file=file,
+            file_name=file_name,
+            expires_in_days=expires_in_days
+        )
+
+        return JsonResponse({
+            "message": "File uploaded successfully!",
+            "file_id": file_upload.id,
+            "unique_link": file_upload.get_download_url(),
+        })
+
+
+@csrf_exempt
+def fetch_members_and_send_email(request):
+    if request.method == "POST":
+        org_id = request.POST.get("org_id")
+        file_id = request.POST.get("file_id")
+        selected_users = request.POST.getlist("selected_users[]")  # List of user IDs
+
+        if not org_id or not file_id:
+            return JsonResponse({"error": "Organization ID and File ID are required."}, status=400)
+
+        organization = get_object_or_404(Organization, id=org_id)
+        file_upload = get_object_or_404(FileUpload, id=file_id)
+        members = Profile.objects.filter(organization=organization).select_related("user")
+
+        if not selected_users:
+            # Return members list if no users are selected yet
+            members_data = [
+                {"id": profile.user.id, "name": profile.full_name, "profile_picture": profile.profile_picture.url if profile.profile_picture else None}
+                for profile in members
+            ]
+            return JsonResponse({"members": members_data})
+
+        # If users are selected, send emails
+        selected_users = User.objects.filter(id__in=selected_users)
+        file_link = file_upload.get_download_url()
+        
+        for user in selected_users:
+            send_mail(
+                subject="You've received a shared file",
+                message=f"Hello {user.username},\n\n{request.user.username} has shared a file with you. Click the link below to access it:\n\n{file_link}\n\nThis link will expire in {file_upload.expires_in_days} days.",
+                from_email="no-reply@calendarplus.com",
+                recipient_list=[user.email],
+                fail_silently=True,
+            )
+            file_upload.shared_with.add(user)
+
+        return JsonResponse({"message": "File shared successfully and email sent!"})

@@ -30,5 +30,7 @@ urlpatterns=[
     path("bookmarks/fetch/<int:org_id>/", fetch_bookmarks, name="fetch_bookmarks"),
     path("bookmarks/delete/<int:org_id>/<int:bookmark_id>/", delete_bookmark, name="delete_bookmark"),
     path("bookmarks/add/<int:org_id>/", add_bookmark, name="add_bookmark"),
+    # share-mania
+    path('share_mania_app/<int:org_id>/<int:app_id>/',share_mania,name='share_mania_app'),
 
 ]
