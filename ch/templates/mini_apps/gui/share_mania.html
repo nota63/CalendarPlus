@@ -65,6 +65,7 @@
                 <p>{{file.unique_link}}</p>
                 <p>{{file.file_size}}</p>
                 <p>Will expire on {{file.expires_at}}</p>
+                <p>{{file.shared_with.all}}</p>
              {% endfor %}  
             {% else %}
              <img src="https://www.svgrepo.com/show/450139/files.svg" alt="No files shared yet">
