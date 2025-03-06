@@ -113,6 +113,7 @@ def launch_app(request,org_id,app_id):
     return render(request,'mini_apps/launch/launch.html',context)
 
 
+# SHARE MANIA GRAPHICAL USER INTERFACE
 @login_required
 @check_org_membership
 def share_mania(request,org_id,app_id):
@@ -120,6 +121,12 @@ def share_mania(request,org_id,app_id):
     app=get_object_or_404(InstalledMiniApp,id=app_id)
     if not app:
         return JsonResponse({'error:':'App not Found!'},status=401)
+    
+    user_check=get_object_or_404(InstalledMiniApp,id=app_id)
+    if not user_check.mini_app.name == "Share Mania":
+        return HttpResponseBadRequest("Bad request or app is not installed")
+    
+
     
     context = {
         'organization':organization,
