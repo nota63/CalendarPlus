@@ -193,7 +193,7 @@ def fetch_members_and_send_email(request, org_id):
             file_upload = get_object_or_404(FileUpload, id=file_id)
             # file_link = file_upload.unique_link  # ✅ Directly use stored URL
             # file_link = request.build_absolute_uri(file_upload.unique_link)  # ✅ Converts to full URL
-            file_link = request.build_absolute_uri(f"/apps/download-file/{file_upload.unique_link}/")  # ✅ Correct link to download
+            file_link = request.build_absolute_uri(f"/apps/download-file-preview/{file_upload.unique_link}/")  # ✅ Correct link to download
 
 
 
@@ -234,7 +234,8 @@ def file_details_view(request, unique_link):
     if file_upload.is_expired():
         return render(request, "files/file_expired.html", {"file": file_upload})
 
-    return render(request, "files/file_details.html", {"file": file_upload})
+    return render(request, "mini_apps/files/file_details.html", {"file": file_upload})
+
 
 # DOWNLOAD THE FILE 
 def download_file(request, unique_link):

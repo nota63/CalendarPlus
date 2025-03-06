@@ -1,0 +1,22 @@
+
+
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-body">
+            <h2 class="card-title">File Shared with You</h2>
+            <p><strong>File Name:</strong> {{ file.file_name }}</p>
+            <p><strong>File Size:</strong> {{ file.file_size|filesizeformat }}</p>
+            <p><strong>Uploaded By:</strong> {{ file.uploaded_by.full_name }}</p>
+            <p><strong>Expires At:</strong> {{ file.expires_at }}</p>
+
+            {% if file.is_expired %}
+                <p class="text-danger">❌ This file has expired and is no longer available.</p>
+            {% else %}
+                <a href="{% url 'download_file' file.unique_link %}" class="btn btn-success">
+                    📥 Download File
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+

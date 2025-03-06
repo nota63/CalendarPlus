@@ -34,6 +34,9 @@ urlpatterns=[
     path('share_mania_app/<int:org_id>/<int:app_id>/',share_mania,name='share_mania_app'),
     path('upload-file/<int:org_id>/',upload_file,name='upload_file'),
     path('fetch-members-workspace/<int:org_id>/',fetch_members_and_send_email,name='fetch_members_workspace'),
-    
+    path("share-file/<uuid:unique_link>/", file_details_view, name="file_details"),
+    path("download-file/<uuid:unique_link>/", download_file, name="download_file"),
+    path('download-file-preview/<uuid:unique_link>/',file_details_view,name='download_file_preview'),
+    path('download-file/<uuid:uinique_link>/',download_file,name='download_file')
 
 ]
