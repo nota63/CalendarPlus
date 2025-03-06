@@ -375,11 +375,34 @@
                 data.members.forEach(user => {
                     let listItem = document.createElement("li");
                     listItem.className = "list-group-item";
+
+
                     listItem.innerHTML = `
-                        <input type="checkbox" class="form-check-input user-checkbox" value="${user.user}"> 
-                        <img src="${user.profile_picture}" alt="Profile" class="rounded-circle" width="30"> 
-                        ${user.full_name}
-                    `;
+    <label class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">
+        <input type="checkbox" 
+               class="h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 user-checkbox"
+               value="${user.user}">
+        
+        <div class="flex items-center gap-3 flex-1">
+            ${user.profile_picture ? `
+                <img src="${user.profile_picture}" 
+                     alt="${user.full_name}" 
+                     class="w-8 h-8 rounded-full object-cover">
+            ` : `
+                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                    <span class="material-icons-round text-blue-600 text-xl">person</span>
+                </div>
+            `}
+            
+            <div>
+                <p class="font-medium text-gray-800">${user.full_name}</p>
+                ${user.username ? `<p class="text-sm text-gray-500">@${user.username}</p>` : ''}
+            </div>
+        </div>
+    </label>
+`;
+
+
                     userList.appendChild(listItem);
                 });
 
