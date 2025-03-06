@@ -4,7 +4,7 @@ from accounts.models import Organization, Profile,MeetingOrganization
 import uuid
 import os 
 from django.utils.timezone import now, timedelta
-
+from django.urls import reverse
 # Create your models here.
 
 
@@ -148,6 +148,6 @@ class FileUpload(models.Model):
 
     def get_download_url(self):
         return f"/share-file/{self.unique_link}/"
-
+    
     def __str__(self):
         return f"{self.file_name} ({self.organization.name})"

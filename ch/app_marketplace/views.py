@@ -138,6 +138,74 @@ def share_mania(request,org_id,app_id):
 
 
 
+# SHARE THE FILE 
+from django.urls import reverse
+@csrf_exempt
+def upload_file(request, org_id):
+    if request.method == "POST" and request.FILES.get("file"):
+        file = request.FILES["file"]
+        file_name = request.POST.get("file_name")
+        expires_in_days = int(request.POST.get("expires_in_days", 7))  # Default 7 days
+
+        organization = get_object_or_404(Organization, id=org_id)
+        uploaded_by = request.user
+
+        file_upload = FileUpload.objects.create(
+            organization=organization,
+            uploaded_by=uploaded_by,
+            file=file,
+            file_name=file_name,
+            expires_in_days=expires_in_days,
+        )
+
+        # ✅ Use unique_link directly
+        file_link = file_upload.unique_link  # Make sure this contains the full URL
+
+        return JsonResponse({"success": True, "file_id": file_upload.id, "file_link": file_link})
+    
+    return JsonResponse({"success": False, "error": "Invalid request"})
+
+@csrf_exempt
+def fetch_members_and_send_email(request, org_id):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        file_id = data.get("file_id")
+        selected_users = data.get("selected_users", [])
+
+        organization = get_object_or_404(Organization, id=org_id)
+        file_upload = get_object_or_404(FileUpload, id=file_id)
+
+        if not selected_users:
+            # Fetch organization members to display in frontend
+            members = User.objects.filter(profile__organization=organization).values("id", "full_name", "email", "profile__profile_picture")
+            return JsonResponse({"members": list(members)})
+
+        # ✅ Use file_upload.unique_link directly instead of reverse()
+        file_link = file_upload.unique_link  # This should be the actual file URL stored in DB
+
+        # Sending emails to selected users
+        for user_id in selected_users:
+            user = get_object_or_404(User, id=user_id)
+            send_mail(
+                subject="Shared File Access",
+                message=f"Hello {user.full_name},\n\nA file has been shared with you. Access it here: {file_link}\n\nBest,\nCalendar Plus Team",
+                from_email="noreply@calendarplus.com",
+                recipient_list=[user.email],
+                fail_silently=True,
+            )
+
+        return JsonResponse({"success": True, "message": "File link sent successfully!"})
+
+    return JsonResponse({"success": False, "error": "Invalid request"})
+
+
+
+
+
+
+
+
+
 
 
 
@@ -864,69 +932,3 @@ def add_bookmark(request, org_id):
 # --------------------------------------------------------------------------------------------------------------------------------------------------
 
 # SHARE - MANIA -- share files upto 10 GB to your workspace members
-
-# Upload the file and generate sharable link 
-@csrf_exempt
-def upload_file(request):
-    if request.method == "POST":
-        org_id = request.POST.get("org_id")
-        file = request.FILES.get("file")
-        file_name = request.POST.get("file_name")
-        expires_in_days = int(request.POST.get("expires_in_days", 7))
-
-        if not org_id or not file:
-            return JsonResponse({"error": "Organization ID and file are required."}, status=400)
-
-        organization = get_object_or_404(Organization, id=org_id)
-        file_upload = FileUpload.objects.create(
-            organization=organization,
-            uploaded_by=request.user,
-            file=file,
-            file_name=file_name,
-            expires_in_days=expires_in_days
-        )
-
-        return JsonResponse({
-            "message": "File uploaded successfully!",
-            "file_id": file_upload.id,
-            "unique_link": file_upload.get_download_url(),
-        })
-
-
-@csrf_exempt
-def fetch_members_and_send_email(request):
-    if request.method == "POST":
-        org_id = request.POST.get("org_id")
-        file_id = request.POST.get("file_id")
-        selected_users = request.POST.getlist("selected_users[]")  # List of user IDs
-
-        if not org_id or not file_id:
-            return JsonResponse({"error": "Organization ID and File ID are required."}, status=400)
-
-        organization = get_object_or_404(Organization, id=org_id)
-        file_upload = get_object_or_404(FileUpload, id=file_id)
-        members = Profile.objects.filter(organization=organization).select_related("user")
-
-        if not selected_users:
-            # Return members list if no users are selected yet
-            members_data = [
-                {"id": profile.user.id, "name": profile.full_name, "profile_picture": profile.profile_picture.url if profile.profile_picture else None}
-                for profile in members
-            ]
-            return JsonResponse({"members": members_data})
-
-        # If users are selected, send emails
-        selected_users = User.objects.filter(id__in=selected_users)
-        file_link = file_upload.get_download_url()
-        
-        for user in selected_users:
-            send_mail(
-                subject="You've received a shared file",
-                message=f"Hello {user.username},\n\n{request.user.username} has shared a file with you. Click the link below to access it:\n\n{file_link}\n\nThis link will expire in {file_upload.expires_in_days} days.",
-                from_email="no-reply@calendarplus.com",
-                recipient_list=[user.email],
-                fail_silently=True,
-            )
-            file_upload.shared_with.add(user)
-
-        return JsonResponse({"message": "File shared successfully and email sent!"})

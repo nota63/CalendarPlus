@@ -75,9 +75,185 @@
     </div>
 
 
+<!-- 1️⃣ BUTTON TO TRIGGER FILE UPLOAD MODAL -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#fileUploadModal">
+    <i class="material-icons">cloud_upload</i> Upload File
+</button>
 
 
 
+
+<!-- MODALS -->
+<!-- 2️⃣ FILE UPLOAD MODAL -->
+<div class="modal fade" id="fileUploadModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload File</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="fileUploadForm">
+                    <input type="hidden" name="org_id" id="org_id" value="YOUR_ORG_ID_HERE">
+                    <div class="mb-3">
+                        <label class="form-label">Select File</label>
+                        <input type="file" class="form-control" name="file" id="fileInput" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">File Name</label>
+                        <input type="text" class="form-control" name="file_name" id="fileNameInput" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Expires In (Days)</label>
+                        <input type="number" class="form-control" name="expires_in_days" id="expiresInput" value="7">
+                    </div>
+                    <button type="submit" class="btn btn-success">Upload</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 3️⃣ USER SELECTION MODAL -->
+<div class="modal fade" id="userSelectionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select Users to Share</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="userList" class="list-group"></ul>
+            </div>
+            <div class="modal-footer">
+                <button id="sendFileLink" class="btn btn-primary">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    
+document.addEventListener("DOMContentLoaded", function () {
+    const fileUploadForm = document.getElementById("fileUploadForm");
+    const fileInput = document.getElementById("fileInput");
+    const fileNameInput = document.getElementById("fileNameInput");
+    const expiresInput = document.getElementById("expiresInput");
+    const userList = document.getElementById("userList");
+    const sendFileLinkBtn = document.getElementById("sendFileLink");
+    const orgId = "{{organization.id}}"; // Ensure this is set correctly in the template
+
+    let uploadedFileId = null;
+
+    fileUploadForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        if (!fileInput.files.length) {
+            alert("Please select a file to upload.");
+            return;
+        }
+
+        let formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+        formData.append("file_name", fileNameInput.value);
+        formData.append("expires_in_days", expiresInput.value);
+
+        fetch(`/apps/upload-file/${orgId}/`, {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-CSRFToken": getCSRFToken(),
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                uploadedFileId = data.file_id;
+                const fileUploadModal = bootstrap.Modal.getOrCreateInstance(document.getElementById("fileUploadModal"));
+                fileUploadModal.hide();
+                fetchUsers();
+            } else {
+                console.error("File upload failed:", data.error);
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+
+    function fetchUsers() {
+        fetch(`/apps/fetch-members-workspace/${orgId}/`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken(),
+            },
+            body: JSON.stringify({}),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.members) {
+                userList.innerHTML = "";
+                data.members.forEach(user => {
+                    let listItem = document.createElement("li");
+                    listItem.className = "list-group-item";
+                    listItem.innerHTML = `
+                        <input type="checkbox" class="form-check-input user-checkbox" value="${user.id}"> 
+                        ${user.full_name} (${user.email})
+                    `;
+                    userList.appendChild(listItem);
+                });
+
+                const userSelectionModal = bootstrap.Modal.getOrCreateInstance(document.getElementById("userSelectionModal"));
+                userSelectionModal.show();
+            }
+        })
+        .catch(error => console.error("Error fetching users:", error));
+    }
+
+    sendFileLinkBtn.addEventListener("click", function () {
+        let selectedUsers = Array.from(document.querySelectorAll(".user-checkbox:checked"))
+                                .map(checkbox => checkbox.value);
+
+        if (!uploadedFileId) {
+            alert("No file uploaded.");
+            return;
+        }
+
+        fetch(`/apps/fetch-members-workspace/${orgId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken(),
+            },
+            body: JSON.stringify({
+                file_id: uploadedFileId,
+                selected_users: selectedUsers,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("File link sent successfully!");
+                const userSelectionModal = bootstrap.Modal.getOrCreateInstance(document.getElementById("userSelectionModal"));
+                userSelectionModal.hide();
+            }
+        })
+        .catch(error => console.error("Error sending file link:", error));
+    });
+
+    function getCSRFToken() {
+        const cookieValue = document.cookie
+            .split("; ")
+            .find(row => row.startsWith("csrftoken="))
+            ?.split("=")[1];
+        return cookieValue || "";
+    }
+});
+
+
+</script>
 
 
 </body>
