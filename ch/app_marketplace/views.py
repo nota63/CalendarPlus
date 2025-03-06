@@ -175,6 +175,7 @@ def fetch_members_and_send_email(request, org_id):
     if request.method == "GET":
         # ✅ Handle GET request: Fetch organization members
         members = Profile.objects.filter(organization=organization).values("id", "full_name", "profile_picture","user",)
+        
         print("✅ MEMBERS FOUND:", members)
         return JsonResponse({"members": list(members)}, status=200)
 
@@ -207,7 +208,7 @@ def fetch_members_and_send_email(request, org_id):
                 user = get_object_or_404(User, id=user_id)
                 file_upload.shared_with.add(user)
                 file_upload.save()
-                
+
                 send_mail(
                     subject="Shared File Access",
                     message=f"Hello {user.username},\n\nA file has been shared with you. Access it here: {file_link}\n\nBest,\nCalendar Plus Team",
