@@ -103,8 +103,8 @@ def launch_app(request,org_id,app_id):
     
     # GUI APP
     if "Share Mania" in app.mini_app.name:
-        return redirect('share_mania_app/',org_id=organization.id,app_id=app.id)
-    
+       return redirect(reverse_lazy('share_mania_app', kwargs={'org_id': organization.id, 'app_id': app.id}))
+
     context = {
         "app":app,
         "organization":organization
