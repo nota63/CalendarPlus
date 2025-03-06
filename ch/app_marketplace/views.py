@@ -127,11 +127,12 @@ def share_mania(request,org_id,app_id):
         return HttpResponseBadRequest("Bad request or app is not installed")
     
     # FETCH SHARED FILES 
-    shared_files = FileUpload.objects.filter(organization=organization,)
+    shared_files = FileUpload.objects.filter(organization=organization,uploaded_by=request.user)
     
     context = {
         'organization':organization,
         'app':app,
+        'shared_files':shared_files,
     }
     return render(request,'mini_apps/gui/share_mania.html',context)
 

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from .models import (MiniApp,MiniAppImage,InstalledMiniApp,TaskManager)
+from .models import (MiniApp,MiniAppImage,InstalledMiniApp,TaskManager,FileUpload)
 from django.utils.html import format_html
 
 # Register your models here.
@@ -26,4 +26,10 @@ class InstalledMiniAppAdmin(ModelAdmin):
 @admin.register(TaskManager)
 class TaskManagerAdmin(ModelAdmin):
     list_display = [field.name for field in TaskManager._meta.fields]
+
+
+
+@admin.register(FileUpload)
+class FileUploadAdmin(ModelAdmin):
+    list_display = [field.name for field in FileUpload._meta.fields]
 

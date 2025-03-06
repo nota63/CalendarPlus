@@ -124,11 +124,11 @@ class FileUpload(models.Model):
     )
     file = models.FileField(upload_to="shared_files/")
     file_name = models.CharField(max_length=255)
-    file_size = models.PositiveBigIntegerField(editable=False)  # Auto-calculated
+    file_size = models.PositiveBigIntegerField(editable=False)  
     shared_with = models.ManyToManyField(User, related_name="received_files", blank=True)
-    shared_by=models.ForeignKey(User,on_delete=models.CASCADE, null=True,blank=True)
+    
     unique_link = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
-    expires_in_days = models.PositiveIntegerField(default=7)  # User-defined expiry
+    expires_in_days = models.PositiveIntegerField(default=7)  
     expires_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

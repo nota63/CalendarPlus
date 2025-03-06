@@ -54,6 +54,25 @@
         </div>
     </div>
 
+    <!-- fetch already shared files  -->
+
+    <div class="shared-files">
+        {% if shared_files %}
+           <p>Recent shared files</p>
+             {% for file in shared_files %}
+                <strong>{{file.file_name}}</strong>
+                <a href="{{file.file.url}}">Download</a>
+                <p>{{file.unique_link}}</p>
+                <p>{{file.file_size}}</p>
+                <p>Will expire on {{file.expires_at}}</p>
+             {% endfor %}  
+            {% else %}
+             <img src="https://www.svgrepo.com/show/450139/files.svg" alt="No files shared yet">
+             <p>No Files Shared Yet</p>   
+              
+        {% endif %}      
+    </div>
+
 
 
 
