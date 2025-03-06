@@ -126,7 +126,8 @@ def share_mania(request,org_id,app_id):
     if not user_check.mini_app.name == "Share Mania":
         return HttpResponseBadRequest("Bad request or app is not installed")
     
-
+    # FETCH SHARED FILES 
+    shared_files = FileUpload.objects.filter(organization=organization,)
     
     context = {
         'organization':organization,
