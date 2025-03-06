@@ -168,17 +168,30 @@ def upload_file(request, org_id):
 
 
 # fetch team and send the mail
+from django.conf import settings
+
 @csrf_exempt
 def fetch_members_and_send_email(request, org_id):
     organization = get_object_or_404(Organization, id=org_id)
 
     if request.method == "GET":
         # ✅ Handle GET request: Fetch organization members
-        members = Profile.objects.filter(organization=organization).values("id", "full_name", "profile_picture","user",)
+        # ✅ Handle GET request: Fetch organization members
+      members = Profile.objects.filter(organization=organization).values(
+         "id", "full_name", "user"
+        )
+
+     # ✅ Manually add full profile picture URL
+      for member in members:
+        profile = Profile.objects.get(id=member["id"])  # Get full Profile object
+        member["profile_picture"] = (
+          settings.MEDIA_URL + str(profile.profile_picture)
+        if profile.profile_picture
+        else settings.STATIC_URL + "default-profile.png"
+     )
 
         print("✅ MEMBERS FOUND:", members)
-        return JsonResponse({"members": list(members)}, status=200)
-
+      return JsonResponse({"members": list(members)}, status=200)
     elif request.method == "POST":
         # ✅ Handle POST request: Send file link
         try:
