@@ -193,6 +193,14 @@
                         Remind me & Team mate before meeting
                     </label>
                 </div>
+
+                <!-- Retry-->
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="retryMecheck">
+                    <label class="form-check-label" for="retryMecheck">
+                        Retry if system fail to schedule the meet because users availability
+                    </label>
+                </div>
             </div>
 
             <div class="modal-footer">
@@ -240,6 +248,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const customDateContainer = document.getElementById("customDateContainer");
     const skipBusyCheck = document.getElementById("skipBusyCheck");
     const remindMecheck = document.getElementById("remindMecheck"); // ✅ Correctly declared once
+    const retryMecheck = document.getElementById("retryMecheck");
 
     let selectedTime = null;
 
@@ -292,6 +301,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const customDate = recurrence === "custom" ? customDateInput.value : null;
         const skipIfBusy = skipBusyCheck.checked;
         const remindMe = remindMecheck.checked; // ✅ Fix: Access .checked correctly
+        const retryChecked=retryMecheck.checked;
         const ORG_ID = "{{organization.id}}";
 
         // Ensure required fields are filled
@@ -320,6 +330,7 @@ document.addEventListener("DOMContentLoaded", function () {
             custom_date: customDate,
             skip_if_busy: skipIfBusy,
             remind_check: remindMe, // ✅ Fix: Correctly passed to data object
+            retry_check:retryChecked,
         };
 
         // Send the request

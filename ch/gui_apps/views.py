@@ -58,6 +58,7 @@ def schedule_meeting(request, org_id):
         skip_if_busy = data.get("skip_if_busy", False)
         meeting_title = data.get("meeting_title")
         remind_check=data.get('remind_check',False)
+        retry_if_failed=data.get('retry_check',False)
 
         print(f"📌 Extracted fields: emails={emails}, time={time}, recurrence={recurrence}, "
               f"custom_date={custom_date}, skip_if_busy={skip_if_busy}, meeting_title={meeting_title}")
@@ -122,6 +123,7 @@ def schedule_meeting(request, org_id):
             status=AutoSchedule.StatusChoices.PENDING,
             conflict_detected=False,
             remind_check=remind_check,
+            retry_if_failed=retry_if_failed,
         )
         print(f"✅ AutoSchedule entry created: ID={auto_schedule.id}")
 

@@ -68,6 +68,11 @@ class AutoSchedule(models.Model):
         help_text="If checked, we will remind both creator and scheduler before meeting.",
     )
 
+    retry_if_failed= models.BooleanField(
+        default=False,
+        help_text="If checked,CalendarPlus will retry the meeting to schedule if failed!.",
+    )
+
 
     status = models.CharField(
         max_length=10,
