@@ -72,14 +72,16 @@ def schedule_meeting(request, org_id):
         creator = request.user  # Assuming user is authenticated
         print(f"✅ Organization found: {organization.name} | Creator: {creator}")
 
-        # Match emails with users in the organization
+        # Match emails with users in the organization via Profile model
         print("🔍 Finding users in the organization for provided emails...")
-        users = User.objects.filter(email__in=emails, profile__organization=organization)
-        print(f"✅ Found {users.count()} valid users.")
+        profiles = Profile.objects.filter(user__email__in=emails, organization=organization)
 
-        if not users.exists():
-            print("❌ No valid users found!")
+        if not profiles.exists():
+            print("❌ No valid profiles found!")
             return JsonResponse({"error": "No valid users found for the provided emails"}, status=400)
+
+        users = [profile.user for profile in profiles]  # Extract user instances from profiles
+        print(f"✅ Found {len(users)} valid users.")
 
         # Validate time format (HH:MM)
         try:
@@ -109,6 +111,7 @@ def schedule_meeting(request, org_id):
         # Create the AutoSchedule entry
         print("📝 Creating AutoSchedule entry...")
         auto_schedule = AutoSchedule.objects.create(
+            meeting_title=meeting_title,
             organization=organization,
             creator=creator,
             time=meeting_time,
@@ -122,7 +125,7 @@ def schedule_meeting(request, org_id):
 
         auto_schedule.scheduled_with.set(users)  # Associate matched users
         auto_schedule.save()
-        print(f"✅ Associated {users.count()} users with the meeting.")
+        print(f"✅ Associated {len(users)} users with the meeting.")
 
         return JsonResponse({
             "success": "Meeting scheduled successfully!",
