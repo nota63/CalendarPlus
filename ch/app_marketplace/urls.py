@@ -39,6 +39,7 @@ urlpatterns=[
     path('download-file-preview/<uuid:unique_link>/',file_details_view,name='download_file_preview'),
     path('download-file/<uuid:uinique_link>/',download_file,name='download_file'),
     path('fetch-file-details/<uuid:unique_link>/',fetch_file_details,name='fetch_file_details'),
+    path('delete_file/<int:org_id>/<int:file_id>/<int:app_id>/',delete_file_upload, name='delete_file'),
     # 
     
 

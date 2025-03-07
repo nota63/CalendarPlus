@@ -306,6 +306,19 @@ def fetch_file_details(request, unique_link):
     return JsonResponse(data)
 
 
+# DELETE THE FILE 
+@check_org_membership
+def delete_file_upload(request,org_id,file_id,app_id):
+    organization = get_object_or_404(Organization, id=org_id)
+    file = get_object_or_404(FileUploadMania,id=file_id,organization=organization,uploaded_by=request.user)
+    app=get_object_or_404(InstalledMiniApp,id=app_id)
+    if not app:
+        return HttpResponseBadRequest("App Not Found!")
+    
+    if not file:
+        return HttpResponseBadRequest("Bad Request! you doesnt own this file!")
+    file.delete()
+    return redirect('share_mania_app',org_id=organization.id,app_id=app.id)
 
 
 

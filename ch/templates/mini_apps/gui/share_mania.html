@@ -121,6 +121,12 @@
                             onclick="loadFileDetails('{{ file.unique_link }}')">
                         <span class="material-icons-round">info</span>
                     </button>
+
+                    <a href="{% url 'delete_file' org_id=organization.id file_id=file.id app_id=app.id %}">
+                        <button class="text-red-600 hover:text-red-700 p-2 rounded-lg">
+                            <span class="material-icons-round">delete</span>
+                        </button>
+                    </a>
                 </div>
 
                 <div class="mt-3 pt-3 border-t border-gray-100">
