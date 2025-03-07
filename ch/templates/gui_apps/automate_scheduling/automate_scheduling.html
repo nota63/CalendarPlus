@@ -185,6 +185,14 @@
                         Skip Scheduling if Busy
                     </label>
                 </div>
+
+                 <!-- Reminder-->
+                 <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="remindMecheck">
+                    <label class="form-check-label" for="remindMecheck">
+                        Remind me & Team mate before meeting
+                    </label>
+                </div>
             </div>
 
             <div class="modal-footer">
@@ -231,6 +239,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const customDateInput = document.getElementById("customDateInput");
     const customDateContainer = document.getElementById("customDateContainer");
     const skipBusyCheck = document.getElementById("skipBusyCheck");
+
+    const remindMecheck = document.getElementById("remindMecheck");
 
     let selectedTime = null;
 
@@ -288,6 +298,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const recurrence = recurrenceSelect.value;
         const customDate = recurrence === "custom" ? customDateInput.value : null;
         const skipIfBusy = skipBusyCheck.checked;
+        const remindMecheck = remindMecheck.checked;
         const ORG_ID = "{{organization.id}}";
 
         // Ensure required fields are filled
@@ -315,6 +326,7 @@ document.addEventListener("DOMContentLoaded", function () {
             recurrence: recurrence,
             custom_date: customDate,
             skip_if_busy: skipIfBusy,
+            remind_check:remindMecheck,
         };
 
         // Send the request

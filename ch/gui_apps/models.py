@@ -62,12 +62,20 @@ class AutoSchedule(models.Model):
         default=False,
         help_text="If checked, meeting will be skipped if participants are busy.",
     )
+
+    remind_check= models.BooleanField(
+        default=False,
+        help_text="If checked, we will remind both creator and scheduler before meeting.",
+    )
+
+
     status = models.CharField(
         max_length=10,
         choices=StatusChoices.choices,
         default=StatusChoices.PENDING,
         db_index=True,
     )
+
     conflict_detected = models.BooleanField(
         default=False,
         help_text="System will set this to True if scheduling conflicts are found.",
