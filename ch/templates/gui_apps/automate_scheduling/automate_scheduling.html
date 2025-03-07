@@ -118,14 +118,26 @@
         {% if scheduled_meets%}
           {% for meet in scheduled_meets %}
             <strong>{{meet.meeting_title}}</strong>
+            <strong>{{meet.recurrence}}</strong>
             {% if meet.scheduled_with %}
               {% for user in meet.scheduled_with.all%}
                 <strong>{{user.username}}</strong>
               {% endfor %}
             {% endif %}
+            <a href="{% url 'delete_automation' org_id=organization.id automation_id=meet.id app_id=app.id%}">
+                <span class="material-icons-round">
+                   delete
+                </span>
+                <button type="submit">Delete</button>
+            </a>
           {% endfor %}
-        {% endif %}        
+        {% else %}
+          <img src="https://www.dotvvm.com/wwwroot/images/basket/basket-empty.svg">
+          
+        {% endif %}          
     </div>
+
+
 
 <!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  -->
 <!-- MODALS -->

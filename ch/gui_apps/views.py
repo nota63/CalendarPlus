@@ -153,3 +153,15 @@ def schedule_meeting(request, org_id):
         return JsonResponse({"error": "An unexpected error occurred", "details": str(e)}, status=500)
 
 
+# delete the entry
+@check_org_membership
+@login_required
+def delete_automation(request,org_id,automation_id,app_id):
+    organization = get_object_or_404(Organization, id=org_id)
+    automation=get_object_or_404(AutoSchedule,id=automation_id,organization=organization)
+    app=get_object_or_404(InstalledMiniApp,id=app_id)
+    if not app:
+        return JsonResponse({'error:':'App not found!'},status=400)
+    automation.delete()
+    return redirect('automate_scheduling',org_id=organization.id,app_id=app.id)
+
