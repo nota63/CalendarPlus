@@ -165,3 +165,76 @@ def delete_automation(request,org_id,automation_id,app_id):
     automation.delete()
     return redirect('automate_scheduling',org_id=organization.id,app_id=app.id)
 
+# CONFIGURE THE AUTOMATION
+@check_org_membership
+def get_automation(request, org_id, automation_id):
+    """Fetches automation schedule details."""
+    schedule = get_object_or_404(AutoSchedule, id=automation_id, organization_id=org_id)
+
+    data = {
+        "meeting_title": schedule.meeting_title,
+        "time": schedule.time.strftime("%H:%M"),
+        "recurrence": schedule.recurrence,
+        "custom_date": schedule.custom_date.strftime("%Y-%m-%d") if schedule.custom_date else "",
+        "skip_if_busy": schedule.skip_if_busy,
+        "remind_check": schedule.remind_check,
+        "retry_if_failed": schedule.retry_if_failed,
+    }
+    return JsonResponse(data)
+
+
+def update_automation(request, org_id, automation_id):
+    """Updates the automation schedule."""
+    if request.method == "POST":
+        print("🔹 Received POST request for updating automation.")  # Debugging
+
+        try:
+            schedule = get_object_or_404(AutoSchedule, id=automation_id, organization_id=org_id)
+            print(f"✅ Found Schedule: {schedule}")
+
+            # Debugging: Print received data
+            print("🔹 Request POST Data:", request.POST)
+
+            meeting_title = request.POST.get("meeting_title", "").strip()
+            time = request.POST.get("time")
+            recurrence = request.POST.get("recurrence")
+            custom_date = request.POST.get("custom_date") or None
+            skip_if_busy = request.POST.get("skip_if_busy") == "on"
+            remind_check = request.POST.get("remind_check") == "on"
+            retry_if_failed = request.POST.get("retry_if_failed") == "on"
+
+            # Debugging: Print extracted values
+            print(f"🔹 Extracted Values: \n"
+                  f"   - Meeting Title: {meeting_title}\n"
+                  f"   - Time: {time}\n"
+                  f"   - Recurrence: {recurrence}\n"
+                  f"   - Custom Date: {custom_date}\n"
+                  f"   - Skip If Busy: {skip_if_busy}\n"
+                  f"   - Remind Check: {remind_check}\n"
+                  f"   - Retry If Failed: {retry_if_failed}")
+
+            # Ensure meeting_title is not empty
+            if not meeting_title:
+                print("❌ Error: Meeting title is missing!")
+                return JsonResponse({"success": False, "error": "Meeting title is required"}, status=400)
+
+            # Update only if valid
+            AutoSchedule.objects.filter(id=automation_id, organization_id=org_id).update(
+                meeting_title=meeting_title,
+                time=time,
+                recurrence=recurrence,
+                custom_date=custom_date,
+                skip_if_busy=skip_if_busy,
+                remind_check=remind_check,
+                retry_if_failed=retry_if_failed,
+            )
+
+            print("✅ Successfully updated schedule!")
+            return JsonResponse({"success": True})
+
+        except Exception as e:
+            print(f"❌ Exception Occurred: {e}")
+            return JsonResponse({"success": False, "error": str(e)}, status=400)
+
+    print("❌ Error: Request method is not POST!")
+    return JsonResponse({"success": False, "error": "Invalid request method"}, status=400)
