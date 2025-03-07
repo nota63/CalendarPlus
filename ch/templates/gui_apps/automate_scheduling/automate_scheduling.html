@@ -8,6 +8,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Automate Scheduling - {{ organization.name }}</title>
+
+    <!-- Add this in the <head> section for Flatpickr -->
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
     
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
@@ -167,10 +172,10 @@
                     </select>
                 </div>
 
-                <!-- Custom Date Field (Hidden Initially) -->
+                <!-- Custom Date Picker (Hidden Initially) -->
                 <div id="customDateContainer" class="mb-3" style="display: none;">
                     <label for="customDateInput" class="form-label">Custom Date</label>
-                    <input type="date" class="form-control" id="customDateInput">
+                    <input type="text" class="form-control" id="customDateInput" placeholder="Pick a Date">
                 </div>
 
                 <!-- Skip If Busy -->
@@ -229,6 +234,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let selectedTime = null;
 
+    // Initialize Flatpickr for custom date selection
+    flatpickr("#customDateInput", {
+        enableTime: false,
+        dateFormat: "Y-m-d",
+        minDate: "today", // Prevent past date selection
+        disableMobile: true, // Prevents mobile native date picker
+    });
+
     // Handle time selection
     timeButtons.forEach((button) => {
         button.addEventListener("click", function () {
@@ -275,15 +288,23 @@ document.addEventListener("DOMContentLoaded", function () {
         const recurrence = recurrenceSelect.value;
         const customDate = recurrence === "custom" ? customDateInput.value : null;
         const skipIfBusy = skipBusyCheck.checked;
-        const ORG_ID="{{organization.id}}";
+        const ORG_ID = "{{organization.id}}";
 
+        // Ensure required fields are filled
         if (!meetingTitle || emails.length === 0 || !selectedTime || !recurrence) {
             alert("⚠️ Please fill in all required fields.");
             return;
         }
 
+        // Ensure valid email format
         if (!validateEmails(emailInput.value)) {
             alert("⚠️ Invalid email format detected!");
+            return;
+        }
+
+        // Ensure custom date is selected if recurrence is 'custom'
+        if (recurrence === "custom" && !customDate) {
+            alert("⚠️ Please select a valid custom date.");
             return;
         }
 
