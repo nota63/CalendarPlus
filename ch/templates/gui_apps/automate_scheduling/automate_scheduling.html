@@ -213,103 +213,130 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-  const modal = document.getElementById("scheduleModal");
-  const openBtn = document.getElementById("openScheduleModal");
-  const closeBtn = document.getElementById("closeModal");
-  const recurrenceSelect = document.getElementById("recurrenceSelect");
-  const customDateContainer = document.getElementById("customDateContainer");
-  let selectedTime = null;
+    const modal = new bootstrap.Modal(document.getElementById("scheduleModal"));
+    const closeModal = document.getElementById("closeModal");
+    const submitButton = document.getElementById("submitSchedule");
 
-  // Open Modal
-  openBtn.onclick = function () {
-    modal.style.display = "block";
-  };
+    const emailInput = document.getElementById("emailInput");
+    const emailError = document.getElementById("emailError");
 
-  // Close Modal
-  closeBtn.onclick = function () {
-    modal.style.display = "none";
-  };
+    const meetingTitleInput = document.getElementById("meetingTitle");
+    const timeButtons = document.querySelectorAll(".time-btn");
+    const recurrenceSelect = document.getElementById("recurrenceSelect");
+    const customDateInput = document.getElementById("customDateInput");
+    const customDateContainer = document.getElementById("customDateContainer");
+    const skipBusyCheck = document.getElementById("skipBusyCheck");
 
-  // Close Modal on Outside Click
-  window.onclick = function (event) {
-    if (event.target === modal) {
-      modal.style.display = "none";
-    }
-  };
+    let selectedTime = null;
 
-  // Show Custom Date Field Only If "Custom" is Selected
-  recurrenceSelect.addEventListener("change", function () {
-    customDateContainer.style.display = (recurrenceSelect.value === "custom") ? "block" : "none";
-  });
-
-  // Time Selection Handling
-  document.querySelectorAll(".time-btn").forEach(btn => {
-    btn.addEventListener("click", function () {
-      document.querySelectorAll(".time-btn").forEach(b => b.classList.remove("selected"));
-      btn.classList.add("selected");
-      selectedTime = btn.dataset.time;
+    // Handle time selection
+    timeButtons.forEach((button) => {
+        button.addEventListener("click", function () {
+            timeButtons.forEach((btn) => btn.classList.remove("selected"));
+            this.classList.add("selected");
+            selectedTime = this.dataset.time;
+        });
     });
-  });
 
-  // Email Validation
-  document.getElementById("emailInput").addEventListener("input", function () {
-    const emails = this.value.split(",").map(e => e.trim());
-    const validEmailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const invalidEmails = emails.filter(email => email && !validEmailPattern.test(email));
-    document.getElementById("emailError").style.display = invalidEmails.length > 0 ? "block" : "none";
-  });
+    // Show/hide custom date input based on recurrence selection
+    recurrenceSelect.addEventListener("change", function () {
+        if (this.value === "custom") {
+            customDateContainer.style.display = "block";
+        } else {
+            customDateContainer.style.display = "none";
+        }
+    });
 
-  // Handle Form Submission (AJAX)
-  document.getElementById("submitSchedule").addEventListener("click", function () {
-    const title = document.getElementById("meetingTitle").value.trim();
-    const emails = document.getElementById("emailInput").value.split(",").map(e => e.trim());
-    const recurrence = document.getElementById("recurrenceSelect").value;
-    const customDate = document.getElementById("customDateInput").value;
-    const skipIfBusy = document.getElementById("skipBusyCheck").checked;
-
-    if (!title || !selectedTime) {
-      alert("All fields are required!");
-      return;
+    // Validate email format
+    function validateEmails(emailStr) {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailStr
+            .split(",")
+            .map((email) => email.trim())
+            .every((email) => emailPattern.test(email));
     }
 
-    // Validate Emails Again Before Sending
-    const validEmailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (emails.some(email => email && !validEmailPattern.test(email))) {
-      alert("⚠️ Some emails are invalid. Please check again.");
-      return;
+    emailInput.addEventListener("input", function () {
+        if (!validateEmails(emailInput.value) && emailInput.value.trim() !== "") {
+            emailError.style.display = "block";
+        } else {
+            emailError.style.display = "none";
+        }
+    });
+
+    // Handle form submission
+    submitButton.addEventListener("click", function () {
+        const meetingTitle = meetingTitleInput.value.trim();
+        const emails = emailInput.value
+            .split(",")
+            .map((email) => email.trim())
+            .filter((email) => email !== "");
+
+        const recurrence = recurrenceSelect.value;
+        const customDate = recurrence === "custom" ? customDateInput.value : null;
+        const skipIfBusy = skipBusyCheck.checked;
+        const ORG_ID="{{organization.id}}";
+
+        if (!meetingTitle || emails.length === 0 || !selectedTime || !recurrence) {
+            alert("⚠️ Please fill in all required fields.");
+            return;
+        }
+
+        if (!validateEmails(emailInput.value)) {
+            alert("⚠️ Invalid email format detected!");
+            return;
+        }
+
+        const data = {
+            meeting_title: meetingTitle,
+            emails: emails,
+            time: selectedTime,
+            recurrence: recurrence,
+            custom_date: customDate,
+            skip_if_busy: skipIfBusy,
+        };
+
+        // Send the request
+        fetch(`/gui_apps/schedule-meeting/${ORG_ID}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken(), // Ensure CSRF token is included
+            },
+            body: JSON.stringify(data),
+        })
+            .then((response) => response.json())
+            .then((result) => {
+                if (result.success) {
+                    alert("✅ Meeting scheduled successfully!");
+                    modal.hide();
+                } else {
+                    alert(`❌ Error: ${result.error}`);
+                }
+            })
+            .catch((error) => {
+                alert("❌ An unexpected error occurred. Please try again.");
+                console.error("Error:", error);
+            });
+    });
+
+    // Function to get CSRF token from cookies
+    function getCSRFToken() {
+        const name = "csrftoken";
+        const cookies = document.cookie.split("; ");
+        for (let i = 0; i < cookies.length; i++) {
+            const parts = cookies[i].split("=");
+            if (parts[0] === name) return parts[1];
+        }
+        return "";
     }
 
-    // Prepare Data
-    const requestData = {
-      title: title,
-      emails: emails,
-      time: selectedTime,
-      recurrence: recurrence,
-      custom_date: customDate || null,
-      skip_if_busy: skipIfBusy
-    };
-
-    // AJAX Request
-    fetch("/gui_apps/schedule-meeting/{{organization.id}}", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": getCSRFToken()
-      },
-      body: JSON.stringify(requestData)
-    })
-    .then(response => response.json())
-    .then(data => {
-      alert(data.success ? "Meeting scheduled!" : "Error: " + data.error);
-      modal.style.display = "none";
-    })
-    .catch(error => console.error("Error:", error));
-  });
-
-  function getCSRFToken() {
-    return document.cookie.split("; ").find(row => row.startsWith("csrftoken="))?.split("=")[1];
-  }
+    // Close modal on clicking close button
+    closeModal.addEventListener("click", function () {
+        modal.hide();
+    });
 });
+
 </script>
 
 </body>
