@@ -110,108 +110,239 @@
 <!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  -->
 <!-- MODALS -->
  <!-- schedule the meet modal -->
-<!-- Bootstrap 5 Modal -->
+<!-- Include Material Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<!-- Schedule Meeting Modal -->
+<!-- Add this in your head section -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+<!-- Schedule Meeting Modal -->
 <div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="scheduleModalLabel">📅 Auto Meeting Scheduler</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content overflow-hidden" style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.3);">
+            <div class="modal-header bg-gradient-to-r from-blue-500 to-purple-600 p-6">
+                <div class="flex items-center justify-between w-full">
+                    <div>
+                        <h5 class="modal-title text-white text-2xl font-semibold" id="scheduleModalLabel">
+                            <span class="material-icons-round align-middle text-3xl mr-2">calendar_today</span>
+                            Auto Meeting Scheduler
+                        </h5>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
             </div>
 
-            <div class="modal-body">
+            <div class="modal-body p-6">
                 <!-- Meeting Title -->
-                <div class="mb-3">
-                    <label for="meetingTitle" class="form-label">Meeting Title</label>
-                    <input type="text" class="form-control" id="meetingTitle" placeholder="Enter Meeting Title">
-                </div>
-
-                <!-- Emails Input -->
-                <div class="mb-3">
-                    <label for="emailInput" class="form-label">Enter Emails (Comma-Separated)</label>
-                    <input type="text" class="form-control" id="emailInput" placeholder="e.g. user1@example.com, user2@example.com">
-                    <div id="emailError" class="text-danger" style="display: none;">⚠️ Invalid email format detected!</div>
-                </div>
-
-                <!-- Time Selection -->
-                <div class="mb-3">
-                    <label class="form-label">Select Time Slot</label>
-                    <div class="d-flex flex-wrap gap-2">
-                        <button class="btn btn-outline-primary time-btn" data-time="09:30">09:30 - 10:00</button>
-                        <button class="btn btn-outline-primary time-btn" data-time="10:00">10:00 - 10:30</button>
-                        <button class="btn btn-outline-primary time-btn" data-time="10:30">10:30 - 11:00</button>
-                        <button class="btn btn-outline-primary time-btn" data-time="11:00">11:00 - 11:30</button>
-                        <button class="btn btn-outline-primary time-btn" data-time="11:30">11:30 - 12:00</button>
-                        <button class="btn btn-secondary" disabled>12:00 - 13:00 (Lunch Break) 🥪</button>
-                        <button class="btn btn-outline-primary time-btn" data-time="13:00">13:00 - 13:30</button>
-                        <button class="btn btn-outline-primary time-btn" data-time="13:30">13:30 - 14:00</button>
-                        <button class="btn btn-secondary" disabled>14:00 - 14:30 (Coffee Break) ☕</button>
-                        <button class="btn btn-outline-primary time-btn" data-time="14:30">14:30 - 15:00</button>
-                        <button class="btn btn-outline-primary time-btn" data-time="15:00">15:00 - 15:30</button>
-                        <button class="btn btn-outline-primary time-btn" data-time="15:30">15:30 - 16:00</button>
-                        <button class="btn btn-outline-primary time-btn" data-time="16:00">16:00 - 16:30</button>
-                        <button class="btn btn-outline-primary time-btn" data-time="16:30">16:30 - 17:00</button>
+                <div class="mb-6 relative">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <span class="material-icons-round text-blue-500 align-middle mr-1">title</span>
+                        Meeting Title
+                    </label>
+                    <p class="text-sm text-gray-500 mb-2 ml-7">This will be the title of the meeting</p>
+                    <div class="flex items-center">
+                        <span class="material-icons-round text-gray-400 absolute left-3">edit</span>
+                        <input type="text" 
+                               class="pl-10 pr-4 py-3 w-full rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                               id="meetingTitle" 
+                               placeholder="Team Sync Discussion">
                     </div>
                 </div>
 
-                <!-- Recurrence -->
-                <div class="mb-3">
-                    <label for="recurrenceSelect" class="form-label">Recurrence</label>
-                    <select class="form-select" id="recurrenceSelect">
-                        <option value="none">None</option>
-                        <option value="daily">Every Day</option>
-                        <option value="weekly">Every Week</option>
-                        <option value="biweekly">Every 2 Weeks</option>
-                        <option value="monthly">Every Month</option>
-                        <option value="monday">Every Monday</option>
-                        <option value="tuesday">Every Tuesday</option>
-                        <option value="wednesday">Every Wednesday</option>
-                        <option value="thursday">Every Thursday</option>
-                        <option value="friday">Every Friday</option>
-                        <option value="custom">Custom Date</option>
-                    </select>
-                </div>
-
-                <!-- Custom Date Picker (Hidden Initially) -->
-                <div id="customDateContainer" class="mb-3" style="display: none;">
-                    <label for="customDateInput" class="form-label">Custom Date</label>
-                    <input type="text" class="form-control" id="customDateInput" placeholder="Pick a Date">
-                </div>
-
-                <!-- Skip If Busy -->
-                <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" id="skipBusyCheck">
-                    <label class="form-check-label" for="skipBusyCheck">
-                        Skip Scheduling if Busy
+                <!-- Emails Input -->
+                <div class="mb-6 relative">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <span class="material-icons-round text-purple-500 align-middle mr-1">group</span>
+                        Participant Emails
                     </label>
+                    <p class="text-sm text-gray-500 mb-2 ml-7">We'll verify emails against {{organization.name}} members</p>
+                    <div class="flex items-center">
+                        <span class="material-icons-round text-gray-400 absolute left-3">email</span>
+                        <input type="text" 
+                               class="pl-10 pr-4 py-3 w-full rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                               id="emailInput" 
+                               placeholder="jane@company.com, john@company.com">
+                    </div>
+                    <div id="emailError" class="mt-2 text-red-500 text-sm flex items-center hidden">
+                        <span class="material-icons-round text-red-500 mr-1">error</span>
+                        Invalid email format detected!
+                    </div>
                 </div>
 
-                 <!-- Reminder-->
-                 <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" id="remindMecheck">
-                    <label class="form-check-label" for="remindMecheck">
-                        Remind me & Team mate before meeting
+                <!-- Time Selection -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <span class="material-icons-round text-green-500 align-middle mr-1">access_time</span>
+                        Select Time Slot
                     </label>
+                    <p class="text-sm text-gray-500 mb-4 ml-7">Pick the most convenient time slot</p>
+                    <div class="grid grid-cols-3 gap-3">
+                        <!-- Time Buttons -->
+                        <button class="time-btn h-14 flex items-center justify-center rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all group" data-time="09:30">
+                            <span class="text-gray-700 group-[.active]:text-white">09:30 - 10:00</span>
+                        </button>
+
+
+                        <button class="time-btn h-14 flex items-center justify-center rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all group" data-time="10:00"><span class="text-gray-700 group-[.active]:text-white">10:00 - 10:30</span></button>
+                        <button class="time-btn h-14 flex items-center justify-center rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all group" data-time="10:30"><span class="text-gray-700 group-[.active]:text-white">10:30 - 11:00</span></button>
+                        <button class="time-btn h-14 flex items-center justify-center rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all group" data-time="11:00">11:00 - 11:30</button>
+                        <button class="time-btn h-14 flex items-center justify-center rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all group" data-time="11:30">11:30 - 12:00</button>
+                      
+                        <button class="time-btn h-14 flex items-center justify-center rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all group" data-time="13:00">13:00 - 13:30</button>
+                        <button class="time-btn h-14 flex items-center justify-center rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all group" data-time="13:30">13:30 - 14:00</button>
+    
+                        <button class="time-btn h-14 flex items-center justify-center rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all group" data-time="14:30">14:30 - 15:00</button>
+                        <button class="time-btn h-14 flex items-center justify-center rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all group" data-time="15:00">15:00 - 15:30</button>
+                        <button class="time-btn h-14 flex items-center justify-center rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all group" data-time="15:30">15:30 - 16:00</button>
+                        <button class="time-btn h-14 flex items-center justify-center rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all group" data-time="16:00">16:00 - 16:30</button>
+                        <button class="time-btn h-14 flex items-center justify-center rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all group" data-time="16:30">16:30 - 17:00</button>
+
+
+
+
+                        <!-- Repeat for other time buttons -->
+                        <!-- Lunch Break -->
+                        <div class="col-span-3 p-3 bg-orange-50 border border-orange-200 rounded-lg flex items-center justify-center mt-2">
+                            <span class="material-icons-round text-orange-500 mr-2">lunch_dining</span>
+                            <span class="text-orange-600 text-sm">12:00 - 13:00 Lunch Break</span>
+                        </div>
+                        <!-- Coffee Break -->
+                        <div class="col-span-3 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center justify-center mt-2">
+                            <span class="material-icons-round text-amber-600 mr-2">coffee</span>
+                            <span class="text-amber-700 text-sm">14:00 - 14:30 Coffee Break</span>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Retry-->
-                <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" id="retryMecheck">
-                    <label class="form-check-label" for="retryMecheck">
-                        Retry if system fail to schedule the meet because users availability
-                    </label>
+                <!-- Recurrence & Custom Date -->
+                <div class="grid grid-cols-2 gap-6 mb-6">
+                    <div class="relative">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="material-icons-round text-red-500 align-middle mr-1">repeat</span>
+                            Recurrence
+                        </label>
+                        <select class="pl-10 pr-4 py-3 w-full rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-red-500 appearance-none bg-no-repeat bg-right-4"
+                                id="recurrenceSelect">
+                            <option value="none">No Recurrence</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="biweekly">Bi-weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="monday">Every Monday</option>
+                            <option value="tuesday">Every Tuesday</option>
+                            <option value="wednesday">Every Wednesday</option>
+                            <option value="thursday">Every Thursday</option>
+                            <option value="friday">Every Friday</option>
+    
+                            <option value="custom">Custom Date</option>
+                        </select>
+                        <span class="material-icons-round text-gray-400 absolute left-3 bottom-3">calendar_month</span>
+                    </div>
+
+                    <!-- Custom Date -->
+                    <div id="customDateContainer" class="relative hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <span class="material-icons-round text-cyan-500 align-middle mr-1">event_available</span>
+                            Custom Date
+                        </label>
+                        <input type="date" 
+                               class="pl-10 pr-4 py-3 w-full rounded-lg border border-gray-300 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+                               id="customDateInput">
+                        <span class="material-icons-round text-gray-400 absolute left-3 bottom-3">date_range</span>
+                    </div>
+                </div>
+
+                <!-- Checkbox Options -->
+                <div class="space-y-4 mb-6">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="skipBusyCheck" class="w-5 h-5 text-blue-600 border-2 border-gray-300 rounded focus:ring-blue-500">
+                        <label class="ml-3 text-sm text-gray-600">
+                            <span class="material-icons-round align-middle mr-1 text-lg text-blue-500">block</span>
+                            Skip Scheduling if Busy
+                        </label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="remindMecheck" class="w-5 h-5 text-purple-600 border-2 border-gray-300 rounded focus:ring-purple-500">
+                        <label class="ml-3 text-sm text-gray-600">
+                            <span class="material-icons-round align-middle mr-1 text-lg text-purple-500">notifications</span>
+                            Send Reminders to Team
+                        </label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="retryMecheck" class="w-5 h-5 text-green-600 border-2 border-gray-300 rounded focus:ring-green-500">
+                        <label class="ml-3 text-sm text-gray-600">
+                            <span class="material-icons-round align-middle mr-1 text-lg text-green-500">autorenew</span>
+                            Auto-retry Scheduling
+                        </label>
+                    </div>
                 </div>
             </div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">❌ Close</button>
-                <button type="button" class="btn btn-success" id="submitSchedule">✅ Schedule Meeting</button>
+            <div class="modal-footer bg-gray-50 px-6 py-4 border-t border-gray-200">
+                <div class="flex justify-end space-x-3">
+                    <button type="button" 
+                            class="px-6 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600 transition-colors"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="button" 
+                            class="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-lg transition-all flex items-center"
+                            id="submitSchedule">
+                        <span class="material-icons-round mr-2">schedule</span>
+                        Schedule Meeting
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+<style>
+/* Custom Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+}
 
+.modal-content {
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.time-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.time-btn::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: rgba(59, 130, 246, 0.1);
+    transform: scale(0);
+    transition: transform 0.3s ease;
+    border-radius: 50%;
+}
+
+.time-btn.active {
+    background: #3B82F6;
+    border-color: #3B82F6;
+    color: white;
+}
+
+.time-btn.active::after {
+    transform: scale(1);
+}
+
+input:checked {
+    background-color: currentColor;
+}
+</style>
 
 
 
@@ -230,6 +361,8 @@
 
 <!-- Bootstrap 5 JS (Bundle includes Popper) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
 
 
 <script>
