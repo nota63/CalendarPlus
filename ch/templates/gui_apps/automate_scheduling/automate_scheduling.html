@@ -8,6 +8,7 @@
     <title>Automate Scheduling - {{ organization.name }}</title>
 
     <!-- Add this in the <head> section for Flatpickr -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <!-- schedule the meet modal -->
@@ -373,72 +374,129 @@
 </div>
 
 <!-- EDIT AUTOMATION MODAL -->
-<div id="editAutomationModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-        <h2 class="text-lg font-semibold mb-4">Edit Automation Schedule</h2>
-
-        <form id="editAutomationForm">
-            {% csrf_token %}
-            <input type="hidden" id="edit_automation_id">
-            <input type="hidden" id="edit_org_id">
-            <input type="hidden" id="edit_app_id">
-
-            <label class="block text-sm font-medium">Meeting Title</label>
-            <input type="text" id="edit_meeting_title" class="w-full p-2 border rounded mt-1">
-
-            <label class="block text-sm font-medium mt-2">Time</label>
-            <input type="time" id="edit_meeting_time" class="w-full p-2 border rounded mt-1">
-
-            <label class="block text-sm font-medium mt-2">Recurrence</label>
-            <select id="edit_recurrence" class="w-full p-2 border rounded mt-1">
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="biweekly">Biweekly</option>
-                <option value="monthly">Monthly</option>
-                <option value="monday">Monday</option>
-                <option value="tuesday">Tuesday</option>
-                <option value="wednesday">Wednesday</option>
-                <option value="thursday">Thursday</option>
-                <option value="friday">Friday</option>
-                <option value="custom">Custom</option>
-            </select>
-
-            <label class="block text-sm font-medium mt-2">Custom Date (If Applicable)</label>
-            <input type="date" id="edit_custom_date" class="w-full p-2 border rounded mt-1">
-
-            <div class="flex items-center mt-2">
-                <input type="checkbox" id="edit_skip_if_busy" class="mr-2">
-                <label for="edit_skip_if_busy" class="text-sm">Skip If Busy</label>
+<!-- Edit Automation Modal -->
+<div id="editAutomationModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white/80 backdrop-blur-lg rounded-2xl shadow-2xl w-full max-w-2xl border border-white/20">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">
+                    <span class="material-icons text-indigo-600 mr-2">auto_fix_high</span>
+                    Configure Automation
+                </h2>
+                <button id="closeEditModal" class="text-gray-500 hover:text-gray-700">
+                    <span class="material-icons">close</span>
+                </button>
             </div>
 
-            <div class="flex items-center mt-2">
-                <input type="checkbox" id="edit_remind_check" class="mr-2">
-                <label for="edit_remind_check" class="text-sm">Remind Before Meeting</label>
-            </div>
+            <form id="editAutomationForm" class="space-y-6">
+                {% csrf_token %}
+                <input type="hidden" id="edit_automation_id">
+                <input type="hidden" id="edit_org_id">
+                <input type="hidden" id="edit_app_id">
 
-            <div class="flex items-center mt-2">
-                <input type="checkbox" id="edit_retry_if_failed" class="mr-2">
-                <label for="edit_retry_if_failed" class="text-sm">Retry If Failed</label>
-            </div>
+                <!-- Meeting Title Field -->
+                <div class="flex items-start gap-3">
+                    <span class="material-icons text-indigo-600 mt-3">title</span>
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Meeting Title</label>
+                        <input type="text" id="edit_meeting_title" 
+                               class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all outline-none">
+                    </div>
+                </div>
 
-            <div class="flex justify-end mt-4">
-                <button type="button" class="bg-gray-300 px-4 py-2 rounded mr-2" id="closeEditModal">Cancel</button>
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Save</button>
-            </div>
-        </form>
+                <!-- Time & Recurrence Row -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Time Field -->
+                    <div class="flex items-start gap-3">
+                        <span class="material-icons text-indigo-600 mt-3">access_time</span>
+                        <div class="flex-1">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Time</label>
+                            <input type="time" id="edit_meeting_time" 
+                                   class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Recurrence Field -->
+                    <div class="flex items-start gap-3">
+                        <span class="material-icons text-indigo-600 mt-3">repeat</span>
+                        <div class="flex-1">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Recurrence</label>
+                            <select id="edit_recurrence" 
+                                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all outline-none">
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="biweekly">Biweekly</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="monday">Monday</option>
+                                <option value="tuesday">Tuesday</option>
+                                <option value="wednesday">Wednesday</option>
+                                <option value="thursday">Thursday</option>
+                                <option value="friday">Friday</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Date Field -->
+                <div class="flex items-start gap-3">
+                    <span class="material-icons text-indigo-600 mt-3">event</span>
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Custom Date</label>
+                        <input type="date" id="edit_custom_date" 
+                               class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all outline-none">
+                    </div>
+                </div>
+
+                <!-- Checkbox Group -->
+                <div class="grid grid-cols-1 gap-3 ml-9">
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" id="edit_skip_if_busy" 
+                               class="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <label for="edit_skip_if_busy" class="text-sm text-gray-700">Skip If Busy</label>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" id="edit_remind_check" 
+                               class="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <label for="edit_remind_check" class="text-sm text-gray-700">Remind Before Meeting</label>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" id="edit_retry_if_failed" 
+                               class="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <label for="edit_retry_if_failed" class="text-sm text-gray-700">Retry If Failed</label>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end gap-3 pt-6">
+                    <button type="button" id="closeEditModal" 
+                            class="px-6 py-2.5 rounded-lg font-medium text-gray-700 hover:bg-gray-100/80 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                            class="px-6 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-sm">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
 
 
-
-
-
-
-
-
-
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+input:focus, select:focus {
+    outline: none;
+    ring: none;
+}
+
 /* Custom Styles */
 body {
     font-family: 'Poppins', sans-serif;
