@@ -239,8 +239,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const customDateInput = document.getElementById("customDateInput");
     const customDateContainer = document.getElementById("customDateContainer");
     const skipBusyCheck = document.getElementById("skipBusyCheck");
-
-    const remindMecheck = document.getElementById("remindMecheck");
+    const remindMecheck = document.getElementById("remindMecheck"); // ✅ Correctly declared once
 
     let selectedTime = null;
 
@@ -263,11 +262,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Show/hide custom date input based on recurrence selection
     recurrenceSelect.addEventListener("change", function () {
-        if (this.value === "custom") {
-            customDateContainer.style.display = "block";
-        } else {
-            customDateContainer.style.display = "none";
-        }
+        customDateContainer.style.display = this.value === "custom" ? "block" : "none";
     });
 
     // Validate email format
@@ -280,11 +275,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     emailInput.addEventListener("input", function () {
-        if (!validateEmails(emailInput.value) && emailInput.value.trim() !== "") {
-            emailError.style.display = "block";
-        } else {
-            emailError.style.display = "none";
-        }
+        emailError.style.display = !validateEmails(emailInput.value) && emailInput.value.trim() !== "" 
+            ? "block" 
+            : "none";
     });
 
     // Handle form submission
@@ -298,7 +291,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const recurrence = recurrenceSelect.value;
         const customDate = recurrence === "custom" ? customDateInput.value : null;
         const skipIfBusy = skipBusyCheck.checked;
-        const remindMecheck = remindMecheck.checked;
+        const remindMe = remindMecheck.checked; // ✅ Fix: Access .checked correctly
         const ORG_ID = "{{organization.id}}";
 
         // Ensure required fields are filled
@@ -326,7 +319,7 @@ document.addEventListener("DOMContentLoaded", function () {
             recurrence: recurrence,
             custom_date: customDate,
             skip_if_busy: skipIfBusy,
-            remind_check:remindMecheck,
+            remind_check: remindMe, // ✅ Fix: Correctly passed to data object
         };
 
         // Send the request
@@ -369,6 +362,7 @@ document.addEventListener("DOMContentLoaded", function () {
         modal.hide();
     });
 });
+
 
 </script>
 
