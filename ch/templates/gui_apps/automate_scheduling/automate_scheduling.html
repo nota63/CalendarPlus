@@ -1,5 +1,3 @@
-
-
 {% load static %}
 
 <!DOCTYPE html>
@@ -105,38 +103,80 @@
             {% endfor %}
         </div>
     </div>
-
-    <div class="container mt-5 text-center">
-        <p class="lead">Tap to automate the schedule.</p>
-        <!-- Bootstrap 5 Modal Trigger -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#scheduleModal">
-          📅 Schedule a Meeting
-        </button>
+        <!-- Schedule Section -->
+        <div class="glass-panel rounded-2xl p-8">
+            <div class="flex flex-col items-center justify-center h-full">
+                <div class="text-center space-y-6">
+                    <div class="inline-flex bg-blue-100 p-4 rounded-full">
+                        <span class="material-icons-round text-blue-600 text-4xl">schedule</span>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-slate-800">Automate Your Schedule</h3>
+                    <p class="text-slate-600 max-w-md mx-auto">Create recurring meetings and automate your team's calendar with intelligent scheduling</p>
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-medium transition-all flex items-center gap-2 mx-auto"
+                            data-bs-toggle="modal" data-bs-target="#scheduleModal">
+                        <span class="material-icons-round">add</span>
+                        Schedule Meeting
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="container mt-6 text-center">
-        {% if scheduled_meets%}
-          {% for meet in scheduled_meets %}
-            <strong>{{meet.meeting_title}}</strong>
-            <strong>{{meet.recurrence}}</strong>
-            {% if meet.scheduled_with %}
-              {% for user in meet.scheduled_with.all%}
-                <strong>{{user.username}}</strong>
-              {% endfor %}
-            {% endif %}
-            <a href="{% url 'delete_automation' org_id=organization.id automation_id=meet.id app_id=app.id%}">
-                <span class="material-icons-round">
-                   delete
-                </span>
-                <button type="submit">Delete</button>
-            </a>
-          {% endfor %}
-        {% else %}
-          <img src="https://www.dotvvm.com/wwwroot/images/basket/basket-empty.svg">
-          
-        {% endif %}          
+    <!-- Scheduled Meets Section -->
+    <!-- Scheduled Meets Section -->
+<div class="glass-card rounded-2xl p-6 backdrop-blur-xl bg-white/80">
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-semibold text-slate-800">Active Automations</h2>
+        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+            {{ scheduled_meets|length }} active
+        </span>
     </div>
 
+    {% if scheduled_meets %}
+    <div class="grid gap-4 max-h-[500px] overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-200 hover:scrollbar-thumb-gray-300">
+        {% for meet in scheduled_meets %}
+        <div class="bg-white/50 backdrop-blur-sm p-5 rounded-xl border border-gray-100/60 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-start justify-between">
+                <div class="space-y-2">
+                    <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                        <span class="material-icons-round text-blue-600 text-xl">event_repeat</span>
+                        {{ meet.meeting_title }}
+                    </h3>
+                    
+                    <div class="flex items-center gap-4 text-sm text-slate-600">
+                        <div class="flex items-center gap-1.5">
+                            <span class="material-icons-round text-base">group</span>
+                            {% for user in meet.scheduled_with.all %}
+                            <span class="bg-gray-100 px-2 py-1 rounded-md">{{ user.username }}</span>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="flex items-center gap-1.5">
+                            <span class="material-icons-round text-base">schedule</span>
+                            <span class="font-medium">{{ meet.recurrence|title }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="{% url 'delete_automation' org_id=organization.id automation_id=meet.id app_id=app.id %}" 
+                   class="text-red-500 hover:text-red-700 transition-colors flex items-center gap-1.5">
+                    <span class="material-icons-round">delete</span>
+                    <span class="font-medium text-sm">Remove</span>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-12 space-y-4">
+        <img src="https://www.dotvvm.com/wwwroot/images/basket/basket-empty.svg" 
+             class="w-48 mx-auto opacity-75">
+        <p class="text-gray-500 font-medium">No active automations found</p>
+        <p class="text-sm text-gray-400">Create your first automation using the schedule button above</p>
+    </div>
+    {% endif %}
+</div>
+</div>
 
 
 <!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  -->
