@@ -673,10 +673,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then(data => {
                     console.log("✅ Data received:", data);
 
-                    document.getElementById("edit_automation_id").value = automationId;
-                    document.getElementById("edit_org_id").value = orgId;
-                    document.getElementById("edit_app_id").value = appId;
-
+                    // Populate form fields
                     document.getElementById("edit_meeting_title").value = data.meeting_title || "";
                     document.getElementById("edit_meeting_time").value = data.time || "";
                     document.getElementById("edit_recurrence").value = data.recurrence || "";
@@ -684,7 +681,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     document.getElementById("edit_skip_if_busy").checked = data.skip_if_busy;
                     document.getElementById("edit_remind_check").checked = data.remind_check;
                     document.getElementById("edit_retry_if_failed").checked = data.retry_if_failed;
-                    
+
+                    // Store automation & org ID in hidden fields
+                    document.getElementById("edit_automation_id").value = automationId;
+                    document.getElementById("edit_org_id").value = orgId;
+                    document.getElementById("edit_app_id").value = appId;
+
                     modal.classList.remove("hidden");
                 })
                 .catch(error => console.error("❌ Error loading schedule:", error));
@@ -702,9 +704,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const automationId = document.getElementById("edit_automation_id").value;
         const orgId = document.getElementById("edit_org_id").value;
-        const formData = new FormData(editForm);
 
-        console.log("🔹 Sending Update Request...", { automationId, orgId, formData });
+        // Manually build form data
+        const formData = new FormData();
+        formData.append("csrfmiddlewaretoken", csrfToken);
+        formData.append("meeting_title", document.getElementById("edit_meeting_title").value);
+        formData.append("time", document.getElementById("edit_meeting_time").value);
+        formData.append("recurrence", document.getElementById("edit_recurrence").value);
+        formData.append("custom_date", document.getElementById("edit_custom_date").value);
+        formData.append("skip_if_busy", document.getElementById("edit_skip_if_busy").checked ? "on" : "");
+        formData.append("remind_check", document.getElementById("edit_remind_check").checked ? "on" : "");
+        formData.append("retry_if_failed", document.getElementById("edit_retry_if_failed").checked ? "on" : "");
+
+        console.log("🔹 Sending Update Request with Data:", Object.fromEntries(formData));
 
         fetch(`/gui_apps/update-automation/${orgId}/${automationId}/`, {
             method: "POST",
@@ -727,8 +739,6 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error("❌ Error updating schedule:", error));
     });
 });
-
-
 
 </script>
 
