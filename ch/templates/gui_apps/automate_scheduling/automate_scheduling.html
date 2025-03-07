@@ -90,8 +90,8 @@
         </div>
     </div>
 
-    <!-- Main Content Grid -->
-    <!-- Main Content Grid -->
+
+<!-- Main Content Grid -->
 <div class="grid lg:grid-cols-2 gap-8">
     <!-- Commands Section -->
     <div class="glass-card rounded-2xl p-6">
@@ -107,13 +107,24 @@
     </div>
 
     <div class="container mt-5 text-center">
-    
         <p class="lead">Tap to automate the schedule.</p>
-        <!-- Trigger Button -->
         <!-- Bootstrap 5 Modal Trigger -->
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#scheduleModal">
           📅 Schedule a Meeting
         </button>
+    </div>
+
+    <div class="container mt-6 text-center">
+        {% if scheduled_meets%}
+          {% for meet in scheduled_meets %}
+            <strong>{{meet.meeting_title}}</strong>
+            {% if meet.scheduled_with %}
+              {% for user in meet.scheduled_with.all%}
+                <strong>{{user.username}}</strong>
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}        
     </div>
 
 <!------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  -->

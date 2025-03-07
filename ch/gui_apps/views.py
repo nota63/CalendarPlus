@@ -27,9 +27,13 @@ def automate_scheduling(request,org_id,app_id):
     if not user_check.mini_app.name == "Automate Scheduling":
         return HttpResponseBadRequest("Bad request or app is not installed")
     
+    # check already scheduled meets
+    scheduled_meets=AutoSchedule.objects.filter(organization=organization,creator=request.user)
+    
     context = {
         'organization':organization,
         'app':app,
+        'scheduled_meets':scheduled_meets,
     }
     
     return render(request,'gui_apps/automate_scheduling/automate_scheduling.html',context)
@@ -147,3 +151,5 @@ def schedule_meeting(request, org_id):
     except Exception as e:
         print("❌ Unexpected error:", str(e))
         return JsonResponse({"error": "An unexpected error occurred", "details": str(e)}, status=500)
+
+
