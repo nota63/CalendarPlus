@@ -98,7 +98,7 @@ def install_mini_app(request):
 
 
 
-# LAUNCH APP
+# LAUNCH APP------------------------------------------------------------------------------------------------------MAIN ---------
 @login_required
 @check_org_membership
 def launch_app(request,org_id,app_id):
@@ -111,9 +111,14 @@ def launch_app(request,org_id,app_id):
     if not profile:
         return JsonResponse({'error:':'You are not authorized to launch the app'},status=400)
     
-    # GUI APP
+    # GUI APP share mania
     if "Share Mania" in app.mini_app.name:
        return redirect(reverse_lazy('share_mania_app', kwargs={'org_id': organization.id, 'app_id': app.id}))
+    
+    # automate scheduling
+    elif "Automate Scheduling" in app.mini_app.name:
+        return redirect(reverse_lazy('automate_scheduling',kwargs={'org_id':organization.id,'app_id':app.id}))
+
 
     context = {
         "app":app,
@@ -123,6 +128,7 @@ def launch_app(request,org_id,app_id):
     return render(request,'mini_apps/launch/launch.html',context)
 
 
+# -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # SHARE MANIA GRAPHICAL USER INTERFACE
 @login_required
 @check_org_membership
@@ -320,13 +326,14 @@ def delete_file_upload(request,org_id,file_id,app_id):
     file.delete()
     return redirect('share_mania_app',org_id=organization.id,app_id=app.id)
 
-
+# SHARE-MANIA APP - COMPLETED --------------------------------------------------------------------------------------------
 
 
 
 
 # ------------------------------------------------------------------------------------------------------------------------------
 # APPS (TASK MANAGER - KANBAN BOARD)
+# (CLI APPS)
 from .models import TaskManager
 import json 
 
