@@ -29,7 +29,7 @@ class AutoSchedule(models.Model):
         FAILED = "failed", _("Failed")
 
     organization = models.ForeignKey(
-        "yourapp.Organization",
+        Organization,
         on_delete=models.CASCADE,
         related_name="auto_schedules",
         db_index=True,
@@ -44,6 +44,7 @@ class AutoSchedule(models.Model):
         User,
         related_name="auto_schedules",
     )
+    meeting_title=models.CharField(max_length=100)
     time = models.TimeField(help_text="Time of the meeting")
     recurrence = models.CharField(
         max_length=20,

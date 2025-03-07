@@ -45,6 +45,7 @@ urlpatterns = [
     path('dm/',include('conversation.urls')),
     path('taskify/',include('workspace_tasks.urls')),
     path('apps/',include('app_marketplace.urls')),
+    path('gui_apps/',include('gui_apps.urls')),
     # ui components
     path('index/', views.styles, name= 'index'),
     path('weather/',views.weather, name='weather'),

@@ -5,7 +5,7 @@ from django.http import JsonResponse, HttpResponse, HttpRequest,HttpResponseBadR
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from app_marketplace.check_org_membership import check_org_membership
-
+from .models import AutoSchedule
 
 
 
