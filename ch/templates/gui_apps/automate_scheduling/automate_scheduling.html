@@ -128,7 +128,7 @@
     <div class="flex items-center justify-between mb-6">
         <h2 class="text-2xl font-semibold text-slate-800">Active Automations</h2>
         <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-            {{ scheduled_meets|length }} active
+            {{ scheduled_meets|length }} Running
         </span>
     </div>
 
@@ -161,8 +161,18 @@
                 <a href="{% url 'delete_automation' org_id=organization.id automation_id=meet.id app_id=app.id %}" 
                    class="text-red-500 hover:text-red-700 transition-colors flex items-center gap-1.5">
                     <span class="material-icons-round">delete</span>
-                    <span class="font-medium text-sm">Remove</span>
+                    <span class="font-medium text-sm">Stop</span>
                 </a>
+
+                <a href="#" 
+                 class="text-blue-500 hover:text-blue-700 transition-colors flex items-center gap-1.5 edit-automation-btn" 
+                 data-org-id="{{ organization.id }}" 
+                 data-automation-id="{{ meet.id }}" 
+                 data-app-id="{{ app.id }}">
+                
+              <span class="font-medium text-sm">Configure</span>
+            </a>
+
             </div>
         </div>
         {% endfor %}
