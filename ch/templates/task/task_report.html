@@ -20,6 +20,20 @@
     </div>
 
     <div class="section">
+        {% if time %}
+           {% for time in time %}
+             <p>Time Spent on the task</p>
+                <p>{{time.time_spent}}</p>
+                <p>{{time.start_time}}</p>
+                <p>{{time.end_time}}</p>
+            {% endfor %}
+        {% else %}
+          <p>No time Spent Yet</p>
+        {% endif %}          
+    </div>
+
+
+    <div class="section">
         <h2>SubTasks</h2>
         <p>See what are the subtasks for the task</p>
         {% for subtask in subtasks %}
@@ -40,9 +54,13 @@
 
     <div class="section">
         <h2>Problems</h2>
-        {% for problem in problems %}
+        {% if problems %}
+          {% for problem in problems %}
             <p class="problem">- {{ problem.description }} (Resolved: {{ problem.is_resolved|yesno:"Yes,No" }})</p>
-        {% endfor %}
+          {% endfor %}
+        {% else %}
+         <p>Have'nt face any problems yet!</p>
+        {% endif %} 
     </div>
 </body>
 </html>

@@ -327,13 +327,15 @@ def export_task_data(request, org_id, group_id, task_id):
     subtasks = SubTask.objects.filter(task=task)
     activity_logs = ActivityLog.objects.filter(task=task)
     problems = Problem.objects.filter(task=task)
+    time=TaskTimeTracking.objects.filter(task=task)
 
     # ✅ Render the HTML template
     html_content = render_to_string('task/task_report.html', {
         'task': task,
         'subtasks': subtasks,
         'activity_logs': activity_logs,
-        'problems': problems
+        'problems': problems,
+        'time':time,
     })
     plain_text = strip_tags(html_content)  # ✅ Remove HTML tags for plain text fallback
 
