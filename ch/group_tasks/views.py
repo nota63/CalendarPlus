@@ -314,36 +314,40 @@ def delete_subtask(request, org_id, group_id, task_id, subtask_id):
 # EXPORT THE TASK DATA
 @check_org_membership
 @login_required
-def generate_task_pdf(org_id, group_id, task_id):
+def generate_task_pdf(request, org_id, group_id, task_id):
     """Generate PDF for Task, SubTasks, Activity Logs, and Problems"""
     buffer = io.BytesIO()
     p = canvas.Canvas(buffer, pagesize=A4)
     p.setFont("Helvetica", 12)
-    
+
     # Fetch the Task
     task = get_object_or_404(Task, id=task_id, organization_id=org_id, group_id=group_id)
-    
+
     # Fetch Related Data
     subtasks = SubTask.objects.filter(task=task)
     activity_logs = ActivityLog.objects.filter(task=task)
     problems = Problem.objects.filter(task=task)
-    
+
     y = 800  # Initial Y position
     p.drawString(100, y, f"Task Report: {task.title}")
     y -= 20
-    
+
     # Task Details
-    p.drawString(100, y, f"Description: {task.description}")
+    p.drawString(100, y, f"Description: {task.description[:100]}")  # Limit to prevent overflow
     y -= 20
     p.drawString(100, y, f"Priority: {task.get_priority_display()} | Status: {task.get_status_display()}")
     y -= 20
-    p.drawString(100, y, f"Progress: {task.progress}% | Deadline: {task.deadline}")
+    p.drawString(100, y, f"Progress: {task.progress}% | Deadline: {task.deadline.strftime('%Y-%m-%d %H:%M')}")
     y -= 40
 
     # SubTasks
     p.drawString(100, y, "SubTasks:")
     y -= 20
     for subtask in subtasks:
+        if y < 50:  # Page Break if near bottom
+            p.showPage()
+            y = 800
+            p.setFont("Helvetica", 12)
         p.drawString(120, y, f"- {subtask.title} (Status: {subtask.get_status_display()}, Progress: {subtask.progress}%)")
         y -= 20
 
@@ -353,7 +357,11 @@ def generate_task_pdf(org_id, group_id, task_id):
     p.drawString(100, y, "Activity Logs:")
     y -= 20
     for log in activity_logs:
-        p.drawString(120, y, f"- {log.user.username} {log.get_action_display()} at {log.timestamp}")
+        if y < 50:
+            p.showPage()
+            y = 800
+            p.setFont("Helvetica", 12)
+        p.drawString(120, y, f"- {log.user.username} {log.get_action_display()} at {log.timestamp.strftime('%Y-%m-%d %H:%M')}")
         y -= 20
 
     y -= 20
@@ -362,13 +370,22 @@ def generate_task_pdf(org_id, group_id, task_id):
     p.drawString(100, y, "Problems Raised:")
     y -= 20
     for problem in problems:
-        p.drawString(120, y, f"- {problem.description} (Resolved: {'Yes' if problem.is_resolved else 'No'})")
+        if y < 50:
+            p.showPage()
+            y = 800
+            p.setFont("Helvetica", 12)
+        p.drawString(120, y, f"- {problem.description[:100]} (Resolved: {'Yes' if problem.is_resolved else 'No'})")  # Truncated
         y -= 20
 
     p.showPage()
     p.save()
     buffer.seek(0)
-    return buffer
+
+    # Return as PDF response
+    response = HttpResponse(buffer, content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="task_report_{task.id}.pdf"'
+    return response
+
 
 @check_org_membership
 @csrf_exempt
