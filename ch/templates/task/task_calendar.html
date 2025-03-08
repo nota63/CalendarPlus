@@ -198,10 +198,17 @@
                             <button class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-blue-600" 
                             data-bs-toggle="modal" data-bs-target="#subTaskModal" 
                              onclick="setSubTaskData('{{ organization.id }}', '{{ group.id }}', '{{ task.id }}')">
-                          <i class="material-icons-round">add_task</i>
-                          Create SubTask
-                        </button>
-
+                            <i class="material-icons-round">add_task</i>
+                            Create SubTask
+                             </button>
+                         </li>
+                         <li>
+                            <button class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-purple-600"
+                              data-bs-toggle="modal" data-bs-target="#manageSubTaskModal"
+                             onclick="loadSubTasks('{{ organization.id }}', '{{ group.id }}', '{{ task.id }}')">
+                           <i class="material-icons-round">playlist_add_check</i>
+                         Manage SubTasks
+                       </button>
 
                          </li>
                         {% endif %} 
@@ -493,6 +500,29 @@
 </div>
 
 
+<!-- MANAGE SUBTASK MODAL  -->
+ <!-- Manage SubTask Modal -->
+<div class="modal fade" id="manageSubTaskModal" tabindex="-1" aria-labelledby="manageSubTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="manageSubTaskModalLabel">Manage SubTasks</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          
+          <!-- SubTasks List -->
+          <h5 class="mb-3">Existing SubTasks</h5>
+          <div id="subtaskList">
+            <p class="text-muted">Loading...</p>
+          </div>
+  
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
 
 
 
@@ -705,6 +735,94 @@ document.addEventListener("DOMContentLoaded", function () {
         return document.cookie.split("; ").find(row => row.startsWith("csrftoken="))?.split("=")[1];
     }
 });
+
+
+// MANAGE SUBTASKS 
+// Load SubTasks when opening the modal
+function loadSubTasks(orgId, groupId, taskId) {
+    fetch(`/tasks/subtasks/${orgId}/${groupId}/${taskId}/`)
+        .then(response => response.json())
+        .then(data => {
+            let subtaskList = document.getElementById("subtaskList");
+            subtaskList.innerHTML = "";
+
+            if (data.subtasks.length === 0) {
+                subtaskList.innerHTML = "<p class='text-muted'>No subtasks available.</p>";
+                return;
+            }
+
+            data.subtasks.forEach(subtask => {
+                subtaskList.innerHTML += `
+                    <div class="d-flex justify-content-between align-items-center border p-2 rounded mb-2">
+                        <div>
+                            <strong>${subtask.title}</strong> <br>
+                            <small>Status: <span id="status-${subtask.id}">${subtask.status}</span> | Progress: <span id="progress-${subtask.id}">${subtask.progress}</span>%</small>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-outline-primary" onclick="changeSubTaskStatus('${orgId}', '${groupId}', '${taskId}', '${subtask.id}')">🔄 Status</button>
+                            <button class="btn btn-sm btn-outline-success" onclick="updateSubTask('${orgId}', '${groupId}', '${taskId}', '${subtask.id}', 'increase')"> + </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="updateSubTask('${orgId}', '${groupId}', '${taskId}', '${subtask.id}', 'decrease')"> - </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteSubTask('${orgId}', '${groupId}', '${taskId}', '${subtask.id}')"> 🗑️ </button>
+                        </div>
+                    </div>
+                `;
+            });
+        })
+        .catch(error => console.error("Error fetching subtasks:", error));
+}
+
+// Update SubTask Progress
+function updateSubTask(orgId, groupId, taskId, subtaskId, action) {
+    fetch(`/tasks/subtasks/update/${orgId}/${groupId}/${taskId}/${subtaskId}/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken()
+        },
+        body: JSON.stringify({ progress: action === "increase" ? 10 : -10 })
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById(`progress-${subtaskId}`).innerText = data.new_progress;
+    })
+    .catch(error => console.error("Error updating subtask:", error));
+}
+
+// Change SubTask Status
+function changeSubTaskStatus(orgId, groupId, taskId, subtaskId) {
+    fetch(`/tasks/subtasks/update/${orgId}/${groupId}/${taskId}/${subtaskId}/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken()
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById(`status-${subtaskId}`).innerText = data.new_status;
+    })
+    .catch(error => console.error("Error updating status:", error));
+}
+
+// Delete SubTask
+function deleteSubTask(orgId, groupId, taskId, subtaskId) {
+    fetch(`/tasks/subtasks/delete/${orgId}/${groupId}/${taskId}/${subtaskId}/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken()
+        }
+    })
+    .then(() => loadSubTasks(orgId, groupId, taskId)) // Refresh after delete
+    .catch(error => console.error("Error deleting subtask:", error));
+}
+
+// Get CSRF Token - Fixed
+function getCSRFToken() {
+    let csrfToken = document.querySelector("[name=csrfmiddlewaretoken]");
+    return csrfToken ? csrfToken.value : ""; // Ensure CSRF token exists
+}
+
 
 </script>
 </body>

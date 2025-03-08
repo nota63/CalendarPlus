@@ -264,6 +264,8 @@ def create_subtask(request, org_id, group_id, task_id):
     return JsonResponse({"error": "Invalid request method."}, status=405)
 
 # MANAGE SUBTASKS
+@csrf_exempt
+@check_org_membership
 def fetch_subtasks(request, org_id, group_id, task_id):
     task = get_object_or_404(Task, id=task_id, group_id=group_id, organization_id=org_id)
     subtasks = SubTask.objects.filter(task=task).values("id", "title", "status", "progress")
