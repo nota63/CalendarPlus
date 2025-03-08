@@ -452,3 +452,52 @@ class SubTask(models.Model):
     def __str__(self):
         return f"{self.title} - {self.get_status_display()}"
 
+
+
+# ATTACH ATTACHMENTS TO THE TASK  (PREMIUM)
+from django.utils.translation import gettext_lazy as _
+
+class AttachmentsTasksApp(models.Model):
+    """Model for Managing Attachments in Tasks"""
+    
+    class FileCategory(models.TextChoices):
+        DOCUMENT = "document", _("Document")
+        IMAGE = "image", _("Image")
+        CODE = "code", _("Code File")
+        AUDIO = "audio", _("Audio File")
+        VIDEO = "video", _("Video File")
+        OTHER = "other", _("Other")
+    
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="attachments")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="attachments_uploaded")
+
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)  # ✅ Optional file description
+    category = models.CharField(max_length=20, choices=FileCategory.choices, default=FileCategory.DOCUMENT)  # ✅ File type category
+    attachment = models.FileField(upload_to='attachments/%Y/%m/%d/')
+    
+    version = models.PositiveIntegerField(default=1)  # ✅ Tracks versions of the same file
+    tags = models.CharField(max_length=255, blank=True, null=True)  # ✅ Optional tags for filtering
+
+    attached_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    send_copy_to_manager = models.BooleanField(default=False)
+    is_private = models.BooleanField(default=False)  # ✅ Control file visibility
+    download_count = models.PositiveIntegerField(default=0)  # ✅ Tracks downloads
+
+    is_deleted = models.BooleanField(default=False)  # ✅ Soft delete
+
+    class Meta:
+        ordering = ["-attached_at"]
+        verbose_name = "Task Attachment"
+        verbose_name_plural = "Task Attachments"
+
+    def __str__(self):
+        return f"{self.name} ({self.get_category_display()})"
+
+    def delete(self, *args, **kwargs):
+        """Soft delete instead of hard delete"""
+        self.is_deleted = True
+        self.save()

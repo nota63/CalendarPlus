@@ -321,7 +321,7 @@ def delete_subtask(request, org_id, group_id, task_id, subtask_id):
 @login_required
 def export_task_data(request, org_id, group_id, task_id):
     """Send Task Report as a Styled HTML Email"""
-    action = request.GET.get("action")  # "export" or "email"
+    action = request.GET.get("action") 
     user_email = request.user.email
 
     # ✅ Fetch Task Data
@@ -331,7 +331,7 @@ def export_task_data(request, org_id, group_id, task_id):
     problems = Problem.objects.filter(task=task)
     time = TaskTimeTracking.objects.filter(task=task)
 
-    # ✅ Render the HTML template
+
     html_content = render_to_string('task/task_report.html', {
         'task': task,
         'subtasks': subtasks,
@@ -340,19 +340,19 @@ def export_task_data(request, org_id, group_id, task_id):
         'time': time,
     })
 
-    # ✅ Transform CSS to Inline Styles
-    html_content = transform(html_content)  # ✅ Auto-inline all CSS
+    
+    html_content = transform(html_content)  
 
     # ✅ Plain Text Fallback
     plain_text = strip_tags(html_content)
 
-    # ✅ Send Email with Styled HTML
+
     send_mail(
         subject="Your Task Report",
-        message=plain_text,  # Plain text fallback
+        message=plain_text, 
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[user_email],
-        html_message=html_content,  # ✅ Now properly styled!
+        html_message=html_content,  
     )
 
     return JsonResponse({"message": "Task report sent to your email with proper styling!"})
