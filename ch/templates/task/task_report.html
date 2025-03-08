@@ -2,118 +2,265 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Task Report</title>
+    <title>Task Report - {{ task.title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        h1 { color: #333; }
-        .section { margin-bottom: 20px; }
-        .subtask, .log, .problem { margin-left: 20px; }
+        :root {
+            --primary-color: #1976d2;
+            --secondary-color: #9c27b0;
+            --success-color: #2e7d32;
+            --error-color: #d32f2f;
+            --warning-color: #ed6c02;
+            --text-primary: #1a237e;
+            --text-secondary: #5f5f5f;
+            --background-glass: rgba(255, 255, 255, 0.9);
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 24px;
+            background: #f5f5f5;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .glass-card {
+            background: var(--background-glass);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px var(--shadow-color);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .section-header {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #eee;
+        }
+
+        .grid-container {
+            display: grid;
+            gap: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .subtask-card {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 4px var(--shadow-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .priority-high { background-color: #ffebee; color: var(--error-color); }
+        .priority-medium { background-color: #fff3e0; color: var(--warning-color); }
+        .priority-low { background-color: #e8f5e9; color: var(--success-color); }
+
+        .status-active { background-color: #e3f2fd; color: var(--primary-color); }
+        .status-completed { background-color: #e8f5e9; color: var(--success-color); }
+
+        .time-entry {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 16px;
+            background-color: #f3e5f5;
+            color: var(--secondary-color);
+            margin: 4px;
+            font-size: 0.875rem;
+        }
+
+        .activity-log {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .comment-box, .note-box {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .problem-card {
+            background: white;
+            border-left: 4px solid;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+
+        .problem-resolved { border-color: var(--success-color); }
+        .problem-pending { border-color: var(--error-color); }
+
+        @media (min-width: 768px) {
+            .main-grid {
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 24px;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>Task Report: {{ task.title }}</h1>
-    <div class="section">
-        <p><strong>Description:</strong> {{ task.description }}</p>
-        <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>
-        <p><strong>Status:</strong> {{ task.get_status_display }}</p>
-        <p><strong>Deadline:</strong> {{ task.deadline }}</p>
-    </div>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="glass-card">
+            <h1>{{ task.title }}</h1>
+            <div class="grid-container">
+                <div>
+                    <p class="text-secondary">Priority</p>
+                    <span class="badge priority-{{ task.priority }}">
+                        {{ task.get_priority_display }}
+                    </span>
+                </div>
+                <div>
+                    <p class="text-secondary">Status</p>
+                    <span class="badge status-{{ task.status }}">
+                        {{ task.get_status_display }}
+                    </span>
+                </div>
+                <div>
+                    <p class="text-secondary">Deadline</p>
+                    <p>{{ task.deadline }}</p>
+                </div>
+            </div>
+        </div>
 
-    <div class="notes">
-        {% if task.notes.all%}
-         <p>Notes</p>
-          {% for note in task.notes.all%}
-            <strong>{{ note.user.username }}:</strong> 
-            <span class="note-content">{{ note.note }}</span> 
-            ({{ note.created_at|date:"F j, Y, g:i a" }})
-          {% endfor %}
-        {% else %}
-          <p>No Notes Available!</p>
-        {% endif %}    
-    </div>
+        <!-- Main Content -->
+        <div class="main-grid">
+            <!-- Left Column -->
+            <div>
+                <!-- Description -->
+                <div class="glass-card">
+                    <h2 class="section-header">Description</h2>
+                    <p>{{ task.description }}</p>
+                </div>
 
-    <div class="comments">
-        {% if task.comments.all%}
-        <p>Comments</p>
-          {% for comment in task.comments.all%}
-           <strong>{{ comment.user.username }}:</strong> 
-           <span class="comment-text">{{ comment.comment }}</span> 
-           ({{ comment.created_at|date:"F j, Y, g:i a" }})
-          {% endfor %}
-        {% else %}
-          <p>No Comments Yet!</p>
-        {% endif %}     
-    </div>
+                <!-- Subtasks -->
+                <div class="glass-card">
+                    <h2 class="section-header">Subtasks</h2>
+                    {% for subtask in subtasks %}
+                    <div class="subtask-card">
+                        <div class="subtask-header">
+                            <h3>{{ subtask.title }}</h3>
+                            <span class="badge status-{{ subtask.status }}">
+                                {{ subtask.get_status_display }}
+                            </span>
+                        </div>
+                        <p>{{ subtask.description }}</p>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: {{ subtask.progress }}%"></div>
+                        </div>
+                        <div class="subtask-meta">
+                            <span>Priority: {{ subtask.get_priority_display }}</span>
+                            <span>Deadline: {{ subtask.deadline }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
 
-    <div class="tags">
-        {% if task.tags.all%}
-        <p>Tags</p>
-          {% for tag in task.tags.all %}
-             <p>{{tag.name}}</p>
-          {% endfor %}
-        {% else %}
-          <p>No Tags Attached!</p>
-        {% endif %}       
-    </div>
+            <!-- Right Column -->
+            <div>
+                <!-- Time Tracking -->
+                <div class="glass-card">
+                    <h2 class="section-header">Time Spent</h2>
+                    {% if time %}
+                        {% for t in time %}
+                        <div class="time-entry">
+                            <p>{{ t.time_spent }}</p>
+                            <small>{{ t.start_time }} - {{ t.end_time }}</small>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>No time tracked yet</p>
+                    {% endif %}
+                </div>
 
+                <!-- Tags -->
+                <div class="glass-card">
+                    <h2 class="section-header">Tags</h2>
+                    {% for tag in task.tags.all %}
+                        <span class="tag">{{ tag.name }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
 
+        <!-- Bottom Sections -->
+        <div class="grid-container">
+            <!-- Notes -->
+            <div class="glass-card">
+                <h2 class="section-header">Notes</h2>
+                {% for note in task.notes.all %}
+                <div class="note-box">
+                    <div class="note-header">
+                        <strong>{{ note.user.username }}</strong>
+                        <small>{{ note.created_at|date:"M j, Y" }}</small>
+                    </div>
+                    <p>{{ note.note }}</p>
+                </div>
+                {% endfor %}
+            </div>
 
+            <!-- Comments -->
+            <div class="glass-card">
+                <h2 class="section-header">Comments</h2>
+                {% for comment in task.comments.all %}
+                <div class="comment-box">
+                    <div class="comment-header">
+                        <strong>{{ comment.user.username }}</strong>
+                        <small>{{ comment.created_at|date:"M j, Y" }}</small>
+                    </div>
+                    <p>{{ comment.comment }}</p>
+                </div>
+                {% endfor %}
+            </div>
 
-
-
-
-    <div class="section">
-        {% if time %}
-           {% for time in time %}
-             <p>Time Spent on the task</p>
-                <p>{{time.time_spent}}</p>
-                <p>{{time.start_time}}</p>
-                <p>{{time.end_time}}</p>
-            {% endfor %}
-        {% else %}
-          <p>No time Spent Yet</p>
-        {% endif %}          
-    </div>
-
-
-    <div class="section">
-        <h2>SubTasks</h2>
-        <p>See what are the subtasks for the task</p>
-        {% for subtask in subtasks %}
-            <p class="subtask">- {{ subtask.title }} ({{ subtask.get_status_display }}, Progress: {{ subtask.progress }}%)</p>
-            <P>{{subtask.description}}</P>
-            <p>{{subtask.priority}}</p>
-            <p>{{subtask.deadline}}</p>
-            <p>{{subtask.update_at}}</p>
-        {% endfor %}
-    </div>
-
-  
-
-    
-
-    <div class="section">
-        <h2>Activity Logs</h2>
-        {% for log in activity_logs %}
-            <p class="log">- {{ log.user.username }} {{ log.get_action_display }} at {{ log.timestamp }}</p>
-        {% endfor %}
-    </div>
-
-    <div class="section">
-        <h2>Problems</h2>
-        {% if problems %}
-          {% for problem in problems %}
-
-           <strong>{{ problem.reported_by.username }}:</strong>
-             {{ problem.description }}
-            ({{ problem.created_at|date:"F j, Y, g:i a" }}) 
-           <strong>Is Resolved: {{ problem.is_resolved }}</strong>
-          {% endfor %}
-        
-        {% else %}
-         <p>Have'nt face any problems yet!</p>
-        {% endif %} 
+            <!-- Problems -->
+            <div class="glass-card">
+                <h2 class="section-header">Problems</h2>
+                {% for problem in problems %}
+                <div class="problem-card {% if problem.is_resolved %}problem-resolved{% else %}problem-pending{% endif %}">
+                    <div class="problem-header">
+                        <strong>{{ problem.reported_by.username }}</strong>
+                        <small>{{ problem.created_at|date:"M j, Y" }}</small>
+                    </div>
+                    <p>{{ problem.description }}</p>
+                    <span class="status">
+                        {% if problem.is_resolved %}✅ Resolved{% else %}⚠️ Pending{% endif %}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 </body>
 </html>
-
