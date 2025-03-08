@@ -403,14 +403,14 @@ def attach_task_file(request, org_id, group_id, task_id):
 
     # ✅ If send_copy_to_manager is True, send email to the task creator
     if send_copy_to_manager and task.created_by:
-        subject = f"New Attachment Added to Task: {task.name}"
+        subject = f"New Attachment Added to Task: {task.title}"
         body = f"""
         Hi {task.created_by.get_full_name()},
 
-        A new attachment has been added to your task: **{task.name}**.
+        A new attachment has been added to your task: **{task.title}**.
 
         **Attachment Name:** {attachment.name}  
-        **Attached By:** {request.user.get_full_name()}  
+        **Attached By:** {request.user}  
         **Category:** {attachment.get_category_display()}  
         **Tags:** {attachment.tags or 'None'}  
         **Task Details:** {task.description or 'No description provided.'}  
@@ -428,7 +428,7 @@ def attach_task_file(request, org_id, group_id, task_id):
             to=[task.created_by.email],
         )
 
-        email.attach(attachment.name, attachment.attachment.read(), attachment.attachment.file.content_type)
+        email.attach(attachment.name, attachment.attachment.read(), attachment.attachment)
         email.send()
 
     return JsonResponse({

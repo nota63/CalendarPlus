@@ -236,11 +236,15 @@
 
                         <li>
                             <button class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-purple-600" 
-                              data-bs-toggle="modal" data-bs-target="#attachFileModal" 
-                             onclick="attachFile('{{ organization.id }}', '{{ group.id }}', '{{ task.id }}')"> 
+                             data-bs-toggle="modal" 
+                             data-bs-target="#attachFileModal"
+                             data-org-id="{{ organization.id }}"
+                             data-group-id="{{ group.id }}"
+                             data-task-id="{{ task.id }}">
                             <i class="material-icons-round">playlist_add_check</i>
                             Attach Files
-                         </button>
+                        </button>
+
                         </li>
                         {% endif %} 
                     </ul>
@@ -1198,6 +1202,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const progressBar = document.getElementById("progressBar");
     const uploadBtn = document.getElementById("uploadBtn");
 
+    let selectedOrgId = null;
+    let selectedGroupId = null;
+    let selectedTaskId = null;
+
+    // 📌 Open Modal and Store Task ID
+    document.body.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-bs-target='#attachFileModal']");
+        if (button) {
+            selectedOrgId = button.getAttribute("data-org-id");
+            selectedGroupId = button.getAttribute("data-group-id");
+            selectedTaskId = button.getAttribute("data-task-id");
+        }
+    });
+
     // 📌 Drag & Drop Handling
     ["dragover", "dragenter"].forEach(event => {
         dropArea.addEventListener(event, (e) => {
@@ -1258,6 +1276,11 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        if (!selectedTaskId || !selectedOrgId || !selectedGroupId) {
+            alert("Task ID is missing. Please try again.");
+            return;
+        }
+
         const formData = new FormData();
         formData.append("attachment", file);
         formData.append("name", document.getElementById("fileName").value);
@@ -1266,11 +1289,9 @@ document.addEventListener("DOMContentLoaded", () => {
         formData.append("is_private", document.getElementById("isPrivate").checked);
         formData.append("send_copy_to_manager", document.getElementById("sendCopyToManager").checked);
 
-        const orgId = "{{ organization.id }}";
-        const groupId = "{{ group.id }}";
-        const taskId = "{{ task.id }}";
+        const uploadUrl = `/tasks/attach-task-file/${selectedOrgId}/${selectedGroupId}/${selectedTaskId}/`;
 
-        fetch(`/tasks/attach-task-file/${orgId}/${groupId}/${taskId}/`, {
+        fetch(uploadUrl, {
             method: "POST",
             headers: {
                 "X-CSRFToken": getCSRFToken(),
