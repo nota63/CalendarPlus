@@ -238,3 +238,6 @@ def update_automation(request, org_id, automation_id):
 
     print("❌ Error: Request method is not POST!")
     return JsonResponse({"success": False, "error": "Invalid request method"}, status=400)
+
+# --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
