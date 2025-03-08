@@ -756,10 +756,18 @@ function loadSubTasks(orgId, groupId, taskId) {
                     <div class="d-flex justify-content-between align-items-center border p-2 rounded mb-2">
                         <div>
                             <strong>${subtask.title}</strong> <br>
-                            <small>Status: <span id="status-${subtask.id}">${subtask.status}</span> | Progress: <span id="progress-${subtask.id}">${subtask.progress}</span>%</small>
+                            <small>Status: 
+                                <select id="status-${subtask.id}" class="form-select form-select-sm" onchange="changeSubTaskStatus('${orgId}', '${groupId}', '${taskId}', '${subtask.id}')">
+                                    <option value="Pending" ${subtask.status === "Pending" ? "selected" : ""}>Pending</option>
+                                    <option value="In Progress" ${subtask.status === "In Progress" ? "selected" : ""}>In Progress</option>
+                                    <option value="Completed" ${subtask.status === "Completed" ? "selected" : ""}>Completed</option>
+                                    <option value="Cancelled" ${subtask.status === "Cancelled" ? "selected" : ""}>Cancelled</option>
+                                    <option value="Overdue" ${subtask.status === "Overdue" ? "selected" : ""}>Overdue</option>
+                                </select>
+                            </small> | 
+                            <small>Progress: <span id="progress-${subtask.id}">${subtask.progress}</span>%</small>
                         </div>
                         <div>
-                            <button class="btn btn-sm btn-outline-primary" onclick="changeSubTaskStatus('${orgId}', '${groupId}', '${taskId}', '${subtask.id}')">🔄 Status</button>
                             <button class="btn btn-sm btn-outline-success" onclick="updateSubTask('${orgId}', '${groupId}', '${taskId}', '${subtask.id}', 'increase')"> + </button>
                             <button class="btn btn-sm btn-outline-secondary" onclick="updateSubTask('${orgId}', '${groupId}', '${taskId}', '${subtask.id}', 'decrease')"> - </button>
                             <button class="btn btn-sm btn-outline-danger" onclick="deleteSubTask('${orgId}', '${groupId}', '${taskId}', '${subtask.id}')"> 🗑️ </button>
@@ -788,18 +796,21 @@ function updateSubTask(orgId, groupId, taskId, subtaskId, action) {
     .catch(error => console.error("Error updating subtask:", error));
 }
 
-// Change SubTask Status
+// Change SubTask Status (Dropdown)
 function changeSubTaskStatus(orgId, groupId, taskId, subtaskId) {
+    let newStatus = document.getElementById(`status-${subtaskId}`).value;
+    
     fetch(`/tasks/subtasks/update/${orgId}/${groupId}/${taskId}/${subtaskId}/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             "X-CSRFToken": getCSRFToken()
-        }
+        },
+        body: JSON.stringify({ status: newStatus })
     })
     .then(response => response.json())
     .then(data => {
-        document.getElementById(`status-${subtaskId}`).innerText = data.new_status;
+        console.log("Status updated:", data);
     })
     .catch(error => console.error("Error updating status:", error));
 }
@@ -822,7 +833,6 @@ function getCSRFToken() {
     let csrfToken = document.querySelector("[name=csrfmiddlewaretoken]");
     return csrfToken ? csrfToken.value : ""; // Ensure CSRF token exists
 }
-
 
 </script>
 </body>
