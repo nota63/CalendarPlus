@@ -182,7 +182,7 @@ def get_automation(request, org_id, automation_id):
     }
     return JsonResponse(data)
 
-
+@check_org_membership
 def update_automation(request, org_id, automation_id):
     """Updates the automation schedule."""
     if request.method == "POST":
