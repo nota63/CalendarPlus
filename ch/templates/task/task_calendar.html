@@ -402,39 +402,88 @@
 <!-- CREATE SUBTASK -->
 <!-- SubTask Modal -->
 <div class="modal fade" id="subTaskModal" tabindex="-1" aria-labelledby="subTaskModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="subTaskModalLabel">Create a New SubTask</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered max-w-3xl">
+        <div class="modal-content rounded-xl shadow-lg">
+            <!-- Modal Header -->
+            <div class="modal-header bg-blue-50 rounded-t-xl p-6 border-b border-blue-100">
+                <div class="w-full">
+                    <h5 class="modal-title text-2xl font-bold text-blue-600 mb-1" id="subTaskModalLabel">
+                        Create New SubTask
+                    </h5>
+                    <p class="text-sm text-blue-700 opacity-90">
+                        Add detailed information for the subtask
+                    </p>
+                </div>
+                <button type="button" class="btn-close opacity-70 hover:opacity-100" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <form id="subTaskForm">
-                    <div class="mb-3">
-                        <label for="subTaskTitle" class="form-label">SubTask Title</label>
-                        <input type="text" class="form-control" id="subTaskTitle" required>
+
+            <!-- Modal Body -->
+            <div class="modal-body p-6 space-y-6">
+                <form id="subTaskForm" class="space-y-4">
+                    <!-- Title Input -->
+                    <div class="space-y-2">
+                        <label for="subTaskTitle" class="block text-base font-medium text-gray-700">
+                            SubTask Title <span class="text-red-500">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="subTaskTitle" 
+                            required
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
+                        >
                     </div>
-                    <div class="mb-3">
-                        <label for="subTaskDescription" class="form-label">Description (Optional)</label>
-                        <textarea class="form-control" id="subTaskDescription" rows="3"></textarea>
+
+                    <!-- Description Input -->
+                    <div class="space-y-2">
+                        <label for="subTaskDescription" class="block text-base font-medium text-gray-700">
+                            Description (Optional)
+                        </label>
+                        <textarea 
+                            id="subTaskDescription" 
+                            rows="3"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
+                        ></textarea>
                     </div>
-                    <div class="mb-3">
-                        <label for="subTaskPriority" class="form-label">Priority</label>
-                        <select class="form-select" id="subTaskPriority">
-                            <option value="low">Low</option>
-                            <option value="medium" selected>Medium</option>
-                            <option value="high">High</option>
-                            <option value="urgent">Urgent</option>
+
+                    <!-- Priority Select -->
+                    <div class="space-y-2">
+                        <label for="subTaskPriority" class="block text-base font-medium text-gray-700">
+                            Priority Level
+                        </label>
+                        <select 
+                            id="subTaskPriority" 
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                        >
+                            <option value="low" class="text-green-600">Low</option>
+                            <option value="medium" selected class="text-yellow-600">Medium</option>
+                            <option value="high" class="text-orange-600">High</option>
+                            <option value="urgent" class="text-red-600">Urgent</option>
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label for="subTaskDeadline" class="form-label">Deadline</label>
-                        <input type="datetime-local" class="form-control" id="subTaskDeadline" required>
+
+                    <!-- Deadline Input -->
+                    <div class="space-y-2">
+                        <label for="subTaskDeadline" class="block text-base font-medium text-gray-700">
+                            Deadline <span class="text-red-500">*</span>
+                        </label>
+                        <input 
+                            type="datetime-local" 
+                            id="subTaskDeadline" 
+                            required
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                        >
                     </div>
-                    <div class="text-center">
-                        <button type="submit" class="btn btn-success">
+
+                    <!-- Submit Button -->
+                    <div class="pt-4">
+                        <button 
+                            type="submit" 
+                            class="w-full btn btn-success px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+                        >
                             <span id="submitText">Create SubTask</span>
-                            <span id="loadingSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                            <span id="loadingSpinner" class="hidden">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </span>
                         </button>
                     </div>
                 </form>
@@ -442,8 +491,6 @@
         </div>
     </div>
 </div>
-
-
 
 
 
