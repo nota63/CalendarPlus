@@ -33,7 +33,8 @@ urlpatterns = [
     path("subtasks/<int:org_id>/<int:group_id>/<int:task_id>/", fetch_subtasks, name="fetch_subtasks"),
     path("subtasks/update/<int:org_id>/<int:group_id>/<int:task_id>/<int:subtask_id>/", update_subtask, name="update_subtask"),
     path("subtasks/delete/<int:org_id>/<int:group_id>/<int:task_id>/<int:subtask_id>/", delete_subtask, name="delete_subtask"),
-    path('export-task-data/<int:org_id>/<int:group_id>/<int:task_id>/',export_task_data,name='export_task_data')
+    path('export-task-data/<int:org_id>/<int:group_id>/<int:task_id>/',export_task_data,name='export_task_data'),
+    path('attach-task-file/<int:org_id>/<int:group_id>/<int:task_id>/',attach_task_file,name='attach_task_file')
   
   
   

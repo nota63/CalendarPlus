@@ -125,7 +125,7 @@ def create_task(request, org_id, group_id):
 
 
 # Display the tasks in calendar
-from .models import AddDay,SubTask
+from .models import AddDay,SubTask,AttachmentsTasksApp
 from app_marketplace.models import InstalledMiniApp
 
 
@@ -358,6 +358,85 @@ def export_task_data(request, org_id, group_id, task_id):
     return JsonResponse({"message": "Task report sent to your email with proper styling!"})
 
 
+# ATTACHE THE ATTACHEMENT TO THE TASK (PREMIUM)
+@csrf_exempt
+@login_required
+def attach_task_file(request, org_id, group_id, task_id):
+    """Attach a file to a task and optionally send it to the manager"""
+
+    if request.method != "POST":
+        return JsonResponse({"error": "Only POST requests allowed!"}, status=400)
+
+    task = get_object_or_404(Task, id=task_id, organization_id=org_id, group_id=group_id)
+
+    # ✅ Get uploaded file
+    uploaded_file = request.FILES.get("attachment")
+    name = request.POST.get("name", uploaded_file.name)  # Default to file name
+    description = request.POST.get("description", "")
+    category = request.POST.get("category", AttachmentsTasksApp.FileCategory.OTHER)  
+    tags = request.POST.get("tags", "")
+    is_private = request.POST.get("is_private") == "true"
+    send_copy_to_manager = request.POST.get("send_copy_to_manager") == "true"
+
+    if not uploaded_file:
+        return JsonResponse({"error": "No file uploaded!"}, status=400)
+
+    # ✅ Handle file versioning
+    existing_attachment = AttachmentsTasksApp.objects.filter(task=task, name=name).order_by("-version").first()
+    new_version = existing_attachment.version + 1 if existing_attachment else 1
+
+    # ✅ Save attachment
+    attachment = AttachmentsTasksApp.objects.create(
+        organization=task.organization,
+        group=task.group,
+        task=task,
+        user=request.user,
+        name=name,
+        description=description,
+        category=category,
+        attachment=uploaded_file,
+        version=new_version,
+        tags=tags,
+        is_private=is_private,
+        send_copy_to_manager=send_copy_to_manager,
+    )
+
+    # ✅ If send_copy_to_manager is True, send email to the task creator
+    if send_copy_to_manager and task.created_by:
+        subject = f"New Attachment Added to Task: {task.name}"
+        body = f"""
+        Hi {task.created_by.get_full_name()},
+
+        A new attachment has been added to your task: **{task.name}**.
+
+        **Attachment Name:** {attachment.name}  
+        **Attached By:** {request.user.get_full_name()}  
+        **Category:** {attachment.get_category_display()}  
+        **Tags:** {attachment.tags or 'None'}  
+        **Task Details:** {task.description or 'No description provided.'}  
+
+        You can view the task in your dashboard.
+
+        Best,  
+        Calendar Plus Team
+        """
+
+        email = EmailMessage(
+            subject=subject,
+            body=body,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[task.created_by.email],
+        )
+
+        email.attach(attachment.name, attachment.attachment.read(), attachment.attachment.file.content_type)
+        email.send()
+
+    return JsonResponse({
+        "message": "Attachment added successfully!",
+        "attachment_id": attachment.id,
+        "version": attachment.version,
+        "download_count": attachment.download_count,
+    })
 
 
 
