@@ -118,6 +118,8 @@ def create_task(request, org_id, group_id):
 
 # Display the tasks in calendar
 from .models import AddDay
+from app_marketplace.models import InstalledMiniApp
+
 
 @login_required
 def task_calendar(request, org_id, group_id):
@@ -155,6 +157,15 @@ def task_calendar(request, org_id, group_id):
             'id': task.id,
             'in_my_day': task_in_my_day  
         })
+
+    # check for app extend tasks app installed
+   # Check if "Extend Tasks" app is installed
+    extend_tasks = InstalledMiniApp.objects.filter(organization=organization, user=request.user, mini_app__name="Extend Tasks")
+
+    if extend_tasks.exists():
+       print("EXTEND TASKS FOUND::")
+    else:
+       print("NOT FOUND!")
 
     return render(request, 'task/task_calendar.html', {
         'tasks': task_data,
