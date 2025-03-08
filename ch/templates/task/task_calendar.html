@@ -1040,17 +1040,34 @@ function getProgressColor(progress) {
     return 'bg-green-500';
 }
 
+
+
 // EXPORT TASKS
 function exportTask(orgId, groupId, taskId) {
     // Store IDs for export
     window.exportTaskData = { orgId, groupId, taskId };
 }
 
+// Utility function to show/hide loader
+function toggleLoader(button, show) {
+    if (show) {
+        button.dataset.originalText = button.innerHTML; // Store original text
+        button.innerHTML = `<span class="loader"></span> Processing...`;
+        button.disabled = true;
+    } else {
+        button.innerHTML = button.dataset.originalText;
+        button.disabled = false;
+    }
+}
+
 // Handle Export Now
 document.getElementById("export-now-btn").addEventListener("click", function () {
     let { orgId, groupId, taskId } = window.exportTaskData;
+    let button = this;
+    
+    toggleLoader(button, true); // Show loader
 
-    fetch(`/tasks/export-task-data/${orgId}/${groupId}/${taskId}&action=export`)
+    fetch(`/tasks/export-task-data/${orgId}/${groupId}/${taskId}?action=export`)
         .then(response => response.blob())
         .then(blob => {
             let a = document.createElement("a");
@@ -1060,19 +1077,25 @@ document.getElementById("export-now-btn").addEventListener("click", function () 
             a.click();
             document.body.removeChild(a);
         })
-        .catch(error => console.error("Error exporting:", error));
+        .catch(error => console.error("Error exporting:", error))
+        .finally(() => toggleLoader(button, false)); // Hide loader
 });
 
 // Handle Send to Email
+// Handle Send to Email
 document.getElementById("export-email-btn").addEventListener("click", function () {
     let { orgId, groupId, taskId } = window.exportTaskData;
+    let button = this;
 
-    fetch(`/tasks/export-task-data/${orgId}/${groupId}/${taskId}&action=email`)
+    toggleLoader(button, true); // Show loader
+
+    fetch(`/tasks/export-task-data/${orgId}/${groupId}/${taskId}/?action=email`)  // ✅ FIXED: Correct query param format
         .then(response => response.json())
         .then(data => {
             alert(data.message);
         })
-        .catch(error => console.error("Error sending email:", error));
+        .catch(error => console.error("Error sending email:", error))
+        .finally(() => toggleLoader(button, false)); // Hide loader
 });
 
 </script>
