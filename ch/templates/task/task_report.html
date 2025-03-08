@@ -45,6 +45,12 @@
         {% endfor %}
     </div>
 
+    <div class="notes">
+        {% for note in subtasks.task_notes.all%}
+           {{note}}
+        {% endfor %}   
+    </div>
+
     <div class="section">
         <h2>Activity Logs</h2>
         {% for log in activity_logs %}
