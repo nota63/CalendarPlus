@@ -31,6 +31,8 @@ from django.core.mail import EmailMessage
 from django.shortcuts import get_object_or_404
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
+from django.template.loader import render_to_string
+from premailer import transform  
 # Create your views here.
 
 # Task creation
@@ -312,13 +314,13 @@ def delete_subtask(request, org_id, group_id, task_id, subtask_id):
 
 
 # EXPORT THE TASK DATA
-from django.template.loader import render_to_string
+
 
 @check_org_membership
 @csrf_exempt
 @login_required
 def export_task_data(request, org_id, group_id, task_id):
-    """Send Task Report as an HTML Email (No PDFs!)"""
+    """Send Task Report as a Styled HTML Email"""
     action = request.GET.get("action")  # "export" or "email"
     user_email = request.user.email
 
@@ -327,7 +329,7 @@ def export_task_data(request, org_id, group_id, task_id):
     subtasks = SubTask.objects.filter(task=task)
     activity_logs = ActivityLog.objects.filter(task=task)
     problems = Problem.objects.filter(task=task)
-    time=TaskTimeTracking.objects.filter(task=task)
+    time = TaskTimeTracking.objects.filter(task=task)
 
     # ✅ Render the HTML template
     html_content = render_to_string('task/task_report.html', {
@@ -335,20 +337,25 @@ def export_task_data(request, org_id, group_id, task_id):
         'subtasks': subtasks,
         'activity_logs': activity_logs,
         'problems': problems,
-        'time':time,
+        'time': time,
     })
-    plain_text = strip_tags(html_content)  # ✅ Remove HTML tags for plain text fallback
 
-    # ✅ Send Email with HTML Content
+    # ✅ Transform CSS to Inline Styles
+    html_content = transform(html_content)  # ✅ Auto-inline all CSS
+
+    # ✅ Plain Text Fallback
+    plain_text = strip_tags(html_content)
+
+    # ✅ Send Email with Styled HTML
     send_mail(
         subject="Your Task Report",
-        message=plain_text,  # Plain text version (fallback)
+        message=plain_text,  # Plain text fallback
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[user_email],
-        html_message=html_content,  # ✅ HTML content as email body
+        html_message=html_content,  # ✅ Now properly styled!
     )
 
-    return JsonResponse({"message": "Task report sent to your email!"})
+    return JsonResponse({"message": "Task report sent to your email with proper styling!"})
 
 
 
@@ -417,7 +424,7 @@ def my_day_task_detail(request, org_id, group_id, task_id):
 
     task = get_object_or_404(Task, id=task_id, group=group)
     problems = Problem.objects.filter(task=task,organization=organization,group=group)
-    
+
 
     if not AddDay.objects.filter(task=task, user=request.user).exists():
         raise Http404("This task is not added to My Day for you please add it first!")
