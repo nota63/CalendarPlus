@@ -377,3 +377,78 @@ class Problem(models.Model):
         return f"Problem in Task: {self.task.title} by {self.reported_by.username}"
 
 
+# ------------------------------------------------------------------------------------------------------------------------------
+# EXTEND TASKS APP 
+# SUBTASK FOR TASK
+
+class SubTask(models.Model):
+    organization = models.ForeignKey(
+        Organization,
+        on_delete=models.CASCADE,
+        related_name='subtasks',
+        help_text="The organization under which this subtask is created."
+    )
+    group = models.ForeignKey(
+        Group,
+        on_delete=models.CASCADE,
+        related_name='subtasks',
+        help_text="The group this subtask belongs to."
+    )
+    task = models.ForeignKey(
+        Task,
+        on_delete=models.CASCADE,
+        related_name='subtasks',
+        help_text="The parent task this subtask belongs to."
+    )
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='created_subtasks',
+        help_text="The user who created this subtask."
+    )
+
+    title = models.CharField(
+        max_length=255,
+        help_text="A short and descriptive title for the subtask."
+    )
+    description = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Detailed description of the subtask."
+    )
+    priority = models.CharField(
+        max_length=20,
+        choices=[
+            ('low', 'Low'),
+            ('medium', 'Medium'),
+            ('high', 'High'),
+            ('urgent', 'Urgent')
+        ],
+        default='medium',
+        help_text="The priority level of the subtask."
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ('pending', 'Pending'),
+            ('in_progress', 'In Progress'),
+            ('completed', 'Completed'),
+            ('cancelled', 'Cancelled'),
+            ('overdue', 'Overdue')
+        ],
+        default='pending',
+        help_text="The current status of the subtask."
+    )
+    deadline = models.DateTimeField(
+        help_text="The deadline for completing the subtask."
+    )
+    progress = models.PositiveIntegerField(
+        default=0,
+        help_text="Progress percentage (0-100) of subtask completion."
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.title} - {self.get_status_display()}"
+
