@@ -273,9 +273,9 @@ def fetch_subtasks(request, org_id, group_id, task_id):
     return JsonResponse({"subtasks": list(subtasks)}, safe=False)
 
 # Update the subtask
+@csrf_exempt
 @login_required
 @check_org_membership
-@csrf_exempt
 def update_subtask(request, org_id, group_id, task_id, subtask_id):
     if request.method == "POST":
         data = json.loads(request.body)
@@ -283,11 +283,12 @@ def update_subtask(request, org_id, group_id, task_id, subtask_id):
 
         if "status" in data:
             subtask.status = data["status"]
-        if "progress" in data:
-            subtask.progress = max(0, min(100, data["progress"]))  # Ensure 0-100 range
         
+        if "progress" in data:
+            subtask.progress = max(0, min(100, subtask.progress + data["progress"]))  # Increment/Decrement
+
         subtask.save()
-        return JsonResponse({"message": "SubTask updated successfully!"})
+        return JsonResponse({"message": "SubTask updated successfully!", "new_progress": subtask.progress})
 
     return JsonResponse({"error": "Invalid request"}, status=400)
 
