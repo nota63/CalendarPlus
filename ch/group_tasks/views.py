@@ -117,7 +117,7 @@ def create_task(request, org_id, group_id):
 
 
 # Display the tasks in calendar
-from .models import AddDay
+from .models import AddDay,SubTask
 from app_marketplace.models import InstalledMiniApp
 
 
@@ -214,6 +214,52 @@ def cancel_task(request, org_id, group_id, task_id):
         return JsonResponse({"success": True})
     return JsonResponse({"success": False}, status=400)
 
+
+
+# CREATE SUBTASK FOR THE TASK
+@csrf_exempt
+def create_subtask(request, org_id, group_id, task_id):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+
+            # Fetch organization, group, and task
+            organization = get_object_or_404(Organization, id=org_id)
+            group = get_object_or_404(Group, id=group_id, organization=organization)
+            task = get_object_or_404(Task, id=task_id, group=group, organization=organization)
+
+            # Extract subtask details
+            title = data.get("title")
+            description = data.get("description", "")
+            priority = data.get("priority", "medium")
+            deadline = data.get("deadline")
+
+            if not title or not deadline:
+                return JsonResponse({"error": "Title and deadline are required."}, status=400)
+
+            # Create subtask
+            subtask = SubTask.objects.create(
+                organization=organization,
+                group=group,
+                task=task,
+                created_by=request.user,
+                title=title,
+                description=description,
+                priority=priority,
+                deadline=deadline
+            )
+
+            return JsonResponse({
+                "message": "Subtask created successfully!",
+                "subtask_id": subtask.id,
+                "title": subtask.title,
+                "priority": subtask.priority
+            }, status=201)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON data."}, status=400)
+
+    return JsonResponse({"error": "Invalid request method."}, status=405)
 
 
 

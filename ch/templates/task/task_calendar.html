@@ -186,12 +186,23 @@
                         {% endif %}
                         {% if extend_tasks %}
                           <li>
-                            <button class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-red-600" 
-                            data-bs-toggle="modal" data-bs-target="#cancelTaskModal" 
-                            onclick="setCancelTaskData('{{ organization.id }}', '{{ group.id }}', '{{ task.id }}', '{{ task.title }}')">
-                            <i class="material-icons-round">cancel</i>
-                            Cancel Task
-                           </button>
+                              <button class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-red-600" 
+                               data-bs-toggle="modal" data-bs-target="#cancelTaskModal" 
+                               onclick="setCancelTaskData('{{ organization.id }}', '{{ group.id }}', '{{ task.id }}', '{{ task.title }}')">
+                               <i class="material-icons-round">cancel</i>
+                                Cancel Task
+                             </button>
+                         </li>
+
+                         <li>
+                            <button class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-blue-600" 
+                            data-bs-toggle="modal" data-bs-target="#subTaskModal" 
+                             onclick="setSubTaskData('{{ organization.id }}', '{{ group.id }}', '{{ task.id }}')">
+                          <i class="material-icons-round">add_task</i>
+                          Create SubTask
+                        </button>
+
+
                          </li>
                         {% endif %} 
                     </ul>
@@ -388,6 +399,50 @@
     </div>
 </div>
 
+<!-- CREATE SUBTASK -->
+<!-- SubTask Modal -->
+<div class="modal fade" id="subTaskModal" tabindex="-1" aria-labelledby="subTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="subTaskModalLabel">Create a New SubTask</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="subTaskForm">
+                    <div class="mb-3">
+                        <label for="subTaskTitle" class="form-label">SubTask Title</label>
+                        <input type="text" class="form-control" id="subTaskTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subTaskDescription" class="form-label">Description (Optional)</label>
+                        <textarea class="form-control" id="subTaskDescription" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subTaskPriority" class="form-label">Priority</label>
+                        <select class="form-select" id="subTaskPriority">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subTaskDeadline" class="form-label">Deadline</label>
+                        <input type="datetime-local" class="form-control" id="subTaskDeadline" required>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-success">
+                            <span id="submitText">Create SubTask</span>
+                            <span id="loadingSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 
@@ -523,6 +578,86 @@ let selectedOrgId = null;
         }
     }
 
+
+
+
+// CREATE SUBTASK
+// Variables to store captured IDs
+let orgId, groupId, taskId;
+
+// Function to set task data when button is clicked
+function setSubTaskData(org, group, task) {
+    orgId = org;
+    groupId = group;
+    taskId = task;
+}
+
+// Run this only when the modal form is submitted
+document.addEventListener("DOMContentLoaded", function () {
+    const subTaskForm = document.getElementById("subTaskForm");
+    const submitText = document.getElementById("submitText");
+    const loadingSpinner = document.getElementById("loadingSpinner");
+
+    subTaskForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        // Get input values
+        const title = document.getElementById("subTaskTitle").value.trim();
+        const description = document.getElementById("subTaskDescription").value.trim();
+        const priority = document.getElementById("subTaskPriority").value;
+        const deadline = document.getElementById("subTaskDeadline").value;
+
+        if (!title || !deadline) {
+            alert("Title and Deadline are required!");
+            return;
+        }
+
+        // Show loading spinner
+        submitText.classList.add("d-none");
+        loadingSpinner.classList.remove("d-none");
+
+        // CSRF Token
+        const csrftoken = getCSRFToken();
+
+        // AJAX Request
+        fetch(`/tasks/create-subtask/${orgId}/${groupId}/${taskId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrftoken,
+            },
+            body: JSON.stringify({
+                title: title,
+                description: description,
+                priority: priority,
+                deadline: deadline,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert("Error: " + data.error);
+            } else {
+                alert("SubTask Created Successfully!");
+                window.location.reload();
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Something went wrong!");
+        })
+        .finally(() => {
+            // Hide spinner and show button text
+            submitText.classList.remove("d-none");
+            loadingSpinner.classList.add("d-none");
+        });
+    });
+
+    // Function to get CSRF Token
+    function getCSRFToken() {
+        return document.cookie.split("; ").find(row => row.startsWith("csrftoken="))?.split("=")[1];
+    }
+});
 
 </script>
 </body>
