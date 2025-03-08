@@ -263,9 +263,42 @@ def create_subtask(request, org_id, group_id, task_id):
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
 
+# MANAGE SUBTASKS
+def fetch_subtasks(request, org_id, group_id, task_id):
+    task = get_object_or_404(Task, id=task_id, group_id=group_id, organization_id=org_id)
+    subtasks = SubTask.objects.filter(task=task).values("id", "title", "status", "progress")
+
+    return JsonResponse({"subtasks": list(subtasks)}, safe=False)
+
+# Update the subtask
+@login_required
+@check_org_membership
+@csrf_exempt
+def update_subtask(request, org_id, group_id, task_id, subtask_id):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        subtask = get_object_or_404(SubTask, id=subtask_id, task_id=task_id)
+
+        if "status" in data:
+            subtask.status = data["status"]
+        if "progress" in data:
+            subtask.progress = max(0, min(100, data["progress"]))  # Ensure 0-100 range
+        
+        subtask.save()
+        return JsonResponse({"message": "SubTask updated successfully!"})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 
+# delete the subtask
+@csrf_exempt
+def delete_subtask(request, org_id, group_id, task_id, subtask_id):
+    if request.method == "POST":
+        subtask = get_object_or_404(SubTask, id=subtask_id, task_id=task_id)
+        subtask.delete()
+        return JsonResponse({"message": "SubTask deleted successfully!"})
 
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 
 

@@ -29,7 +29,10 @@ urlpatterns = [
     path('tasks/<int:org_id>/<int:group_id>/<int:task_id>/add_comment/',add_task_comment, name='add_comment'),
     # extend tasks app
     path('cancel-task/<int:org_id>/<int:group_id>/<int:task_id>/',cancel_task, name='cancel_task'),
-    path('create-subtask/<int:org_id>/<int:group_id>/<int:task_id>/',create_subtask,name='create_subtask')
+    path('create-subtask/<int:org_id>/<int:group_id>/<int:task_id>/',create_subtask,name='create_subtask'),
+    path("subtasks/<int:org_id>/<int:group_id>/<int:task_id>/", fetch_subtasks, name="fetch_subtasks"),
+    path("subtasks/update/<int:org_id>/<int:group_id>/<int:task_id>/<int:subtask_id>/", update_subtask, name="update_subtask"),
+    path("subtasks/delete/<int:org_id>/<int:group_id>/<int:task_id>/<int:subtask_id>/", delete_subtask, name="delete_subtask"),
   
   
   
