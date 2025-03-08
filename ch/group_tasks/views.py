@@ -176,10 +176,43 @@ def task_calendar(request, org_id, group_id):
     })
 
 # EXTENDED TASKS CONTROLS APP ------------------------------------------------------------------------------------------------------------------
+from app_marketplace.check_org_membership import check_org_membership
 
 # Cancel the task
 
+@check_org_membership
+@csrf_exempt
+def cancel_task(request, org_id, group_id, task_id):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        reason = data.get("reason", "").strip()
+        
+        task = get_object_or_404(Task, id=task_id, organization_id=org_id, group_id=group_id)
+        
+        if task.assigned_to != request.user:
+            return JsonResponse({"success": False, "message": "You are not authorized to cancel this task."}, status=403)
 
+        created_by_email = task.created_by.email
+        task_title = task.title
+        organization = task.organization.name
+        group = task.group.name
+
+        # Send email notification
+        send_mail(
+            subject=f"Task '{task_title}' Canceled",
+            message=f"Hello {task.created_by.get_full_name()},\n\n"
+                    f"The task '{task_title}' in the group '{group}' under '{organization}' has been canceled by {request.user.get_full_name()}.\n"
+                    f"Reason for cancellation: {reason}\n\n"
+                    f"Best,\nCalendar Plus Team",
+            from_email="no-reply@calendarplus.com",
+            recipient_list=[created_by_email]
+        )
+
+        # Delete task
+        task.delete()
+
+        return JsonResponse({"success": True})
+    return JsonResponse({"success": False}, status=400)
 
 
 
