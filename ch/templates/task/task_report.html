@@ -19,6 +19,49 @@
         <p><strong>Deadline:</strong> {{ task.deadline }}</p>
     </div>
 
+    <div class="notes">
+        {% if task.notes.all%}
+         <p>Notes</p>
+          {% for note in task.notes.all%}
+            <strong>{{ note.user.username }}:</strong> 
+            <span class="note-content">{{ note.note }}</span> 
+            ({{ note.created_at|date:"F j, Y, g:i a" }})
+          {% endfor %}
+        {% else %}
+          <p>No Notes Available!</p>
+        {% endif %}    
+    </div>
+
+    <div class="comments">
+        {% if task.comments.all%}
+        <p>Comments</p>
+          {% for comment in task.comments.all%}
+           <strong>{{ comment.user.username }}:</strong> 
+           <span class="comment-text">{{ comment.comment }}</span> 
+           ({{ comment.created_at|date:"F j, Y, g:i a" }})
+          {% endfor %}
+        {% else %}
+          <p>No Comments Yet!</p>
+        {% endif %}     
+    </div>
+
+    <div class="tags">
+        {% if task.tags.all%}
+        <p>Tags</p>
+          {% for tag in task.tags.all %}
+             <p>{{tag.name}}</p>
+          {% endfor %}
+        {% else %}
+          <p>No Tags Attached!</p>
+        {% endif %}       
+    </div>
+
+
+
+
+
+
+
     <div class="section">
         {% if time %}
            {% for time in time %}
@@ -45,11 +88,9 @@
         {% endfor %}
     </div>
 
-    <div class="notes">
-        {% for note in subtasks.task_notes.all%}
-           {{note}}
-        {% endfor %}   
-    </div>
+  
+
+    
 
     <div class="section">
         <h2>Activity Logs</h2>
@@ -62,8 +103,13 @@
         <h2>Problems</h2>
         {% if problems %}
           {% for problem in problems %}
-            <p class="problem">- {{ problem.description }} (Resolved: {{ problem.is_resolved|yesno:"Yes,No" }})</p>
+
+           <strong>{{ problem.reported_by.username }}:</strong>
+             {{ problem.description }}
+            ({{ problem.created_at|date:"F j, Y, g:i a" }}) 
+           <strong>Is Resolved: {{ problem.is_resolved }}</strong>
           {% endfor %}
+        
         {% else %}
          <p>Have'nt face any problems yet!</p>
         {% endif %} 

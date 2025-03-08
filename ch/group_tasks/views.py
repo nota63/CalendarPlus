@@ -417,6 +417,7 @@ def my_day_task_detail(request, org_id, group_id, task_id):
 
     task = get_object_or_404(Task, id=task_id, group=group)
     problems = Problem.objects.filter(task=task,organization=organization,group=group)
+    
 
     if not AddDay.objects.filter(task=task, user=request.user).exists():
         raise Http404("This task is not added to My Day for you please add it first!")
