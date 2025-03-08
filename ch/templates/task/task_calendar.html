@@ -1268,7 +1268,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fileReader.readAsDataURL(file);
     }
 
-    // 📌 Upload File via AJAX with Progress Bar
+    // 📌 Upload File via AJAX with Progress Bar & Loading Spinner
     uploadBtn.addEventListener("click", () => {
         const file = fileInput.files[0];
         if (!file) {
@@ -1291,6 +1291,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const uploadUrl = `/tasks/attach-task-file/${selectedOrgId}/${selectedGroupId}/${selectedTaskId}/`;
 
+        // ✅ Add Spinner Before Request
+        uploadBtn.innerHTML = `<div class="flex items-center gap-2">
+                                    <div class="animate-spin h-5 w-5 border-4 border-white border-t-transparent rounded-full"></div>
+                                    Uploading...
+                               </div>`;
+        uploadBtn.disabled = true;
+
         fetch(uploadUrl, {
             method: "POST",
             headers: {
@@ -1306,13 +1313,19 @@ document.addEventListener("DOMContentLoaded", () => {
                   alert("Upload failed: " + data.error);
               }
           })
-          .catch(error => console.error("Upload Error:", error));
+          .catch(error => console.error("Upload Error:", error))
+          .finally(() => {
+              // ✅ Remove Spinner After Request Completes
+              uploadBtn.innerHTML = "Upload File";
+              uploadBtn.disabled = false;
+          });
     });
 
     function getCSRFToken() {
         return document.cookie.split("; ").find(row => row.startsWith("csrftoken"))?.split("=")[1] || "";
     }
 });
+
 
 </script>
 </body>
