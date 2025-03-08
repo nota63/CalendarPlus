@@ -158,8 +158,8 @@ def task_calendar(request, org_id, group_id):
             'in_my_day': task_in_my_day  
         })
 
-    # check for app extend tasks app installed
-   # Check if "Extend Tasks" app is installed
+    
+    # Check if "Extend Tasks" app is installed
     extend_tasks = InstalledMiniApp.objects.filter(organization=organization, user=request.user, mini_app__name="Extend Tasks")
 
     if extend_tasks.exists():
@@ -172,9 +172,14 @@ def task_calendar(request, org_id, group_id):
         'group': group,
         'organization': organization,
         'page_obj': page_obj,
+        'extend_tasks':extend_tasks,
     })
 
 # EXTENDED TASKS CONTROLS APP ------------------------------------------------------------------------------------------------------------------
+
+# view task details 
+
+
 
 
 
