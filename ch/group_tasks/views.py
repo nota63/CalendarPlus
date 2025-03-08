@@ -362,6 +362,7 @@ def export_task_data(request, org_id, group_id, task_id):
 # ATTACHE THE ATTACHEMENT TO THE TASK (PREMIUM)
 @csrf_exempt
 @login_required
+@check_org_membership
 def attach_task_file(request, org_id, group_id, task_id):
     """Attach a file to a task and optionally send it to the manager"""
 
@@ -408,7 +409,7 @@ def attach_task_file(request, org_id, group_id, task_id):
         body = f"""
         Hi {task.created_by.get_full_name()},
 
-        A new attachment has been added to your task: **{task.title}**.
+        A new attachment has been added by {request.user.username} to the task: **{task.title}**.
 
         **Attachment Name:** {attachment.name}  
         **Attached By:** {request.user}  
