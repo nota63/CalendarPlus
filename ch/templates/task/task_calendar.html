@@ -659,6 +659,7 @@
 
 <!-- ATTACH THE FILE TO THE TASK(PREMIUM) -->
 <!-- 📌 Attach File Modal -->
+<!-- 📌 Attach File Modal -->
 <div id="attachFileModal" class="modal fade" tabindex="-1" aria-labelledby="attachFileLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -730,8 +731,8 @@
 
             <!-- Modal Footer -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-purple-600 text-white" onclick="uploadAttachment()">Upload File</button>
+               
+                <button type="button" id="uploadBtn" class="btn btn-secondary">Upload File</button>
             </div>
         </div>
     </div>
@@ -1187,121 +1188,110 @@ document.getElementById("export-email-btn").addEventListener("click", function (
         .finally(() => toggleLoader(button, false)); // Hide loader
 });
 
+
+
 // attach files to the task (PREMIUM)
-const fileInput = document.getElementById("fileInput");
-const dropArea = document.getElementById("dropArea");
-const previewContainer = document.getElementById("filePreview");
-const progressBar = document.getElementById("progressBar");
+document.addEventListener("DOMContentLoaded", () => {
+    const fileInput = document.getElementById("fileInput");
+    const dropArea = document.getElementById("dropArea");
+    const previewContainer = document.getElementById("filePreview");
+    const progressBar = document.getElementById("progressBar");
+    const uploadBtn = document.getElementById("uploadBtn");
 
-// 📌 Drag & Drop Handling
-dropArea.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    dropArea.classList.add("bg-gray-200");
-});
+    // 📌 Drag & Drop Handling
+    ["dragover", "dragenter"].forEach(event => {
+        dropArea.addEventListener(event, (e) => {
+            e.preventDefault();
+            dropArea.classList.add("bg-gray-200");
+        });
+    });
 
-dropArea.addEventListener("dragleave", () => {
-    dropArea.classList.remove("bg-gray-200");
-});
+    ["dragleave", "drop"].forEach(event => {
+        dropArea.addEventListener(event, (e) => {
+            e.preventDefault();
+            dropArea.classList.remove("bg-gray-200");
+        });
+    });
 
-dropArea.addEventListener("drop", (e) => {
-    e.preventDefault();
-    dropArea.classList.remove("bg-gray-200");
+    dropArea.addEventListener("drop", (e) => {
+        const file = e.dataTransfer.files[0];
+        handleFileSelection(file);
+    });
 
-    const file = e.dataTransfer.files[0];
-    handleFileSelection(file);
-});
+    // 📌 File Input Change Handling
+    fileInput.addEventListener("change", () => {
+        handleFileSelection(fileInput.files[0]);
+    });
 
-// 📌 File Input Change Handling
-fileInput.addEventListener("change", function () {
-    handleFileSelection(this.files[0]);
-});
+    // 📌 Handle File Selection & Preview
+    function handleFileSelection(file) {
+        if (!file) {
+            previewContainer.innerHTML = `<p class="text-gray-500">No file selected</p>`;
+            return;
+        }
 
-// 📌 Handle File Selection & Preview
-function handleFileSelection(file) {
-    if (!file) {
-        previewContainer.innerHTML = `<p class="text-gray-500">No file selected</p>`;
-        return;
+        document.getElementById("fileName").value = file.name;
+        const fileReader = new FileReader();
+
+        fileReader.onload = (e) => {
+            const fileType = file.type.split("/")[0];
+
+            if (fileType === "image") {
+                previewContainer.innerHTML = `<img src="${e.target.result}" class="max-w-full max-h-40 mx-auto rounded">`;
+            } else if (fileType === "video") {
+                previewContainer.innerHTML = `<video controls class="max-w-full max-h-40 mx-auto rounded">
+                                                <source src="${e.target.result}" type="${file.type}">
+                                              </video>`;
+            } else {
+                previewContainer.innerHTML = `<p class="text-gray-800"><i class="material-icons-round">insert_drive_file</i> ${file.name}</p>`;
+            }
+        };
+
+        fileReader.readAsDataURL(file);
     }
 
-    // Set file name automatically
-    document.getElementById("fileName").value = file.name;
-
-    const fileReader = new FileReader();
-
-    fileReader.onload = function (e) {
-        let fileType = file.type.split("/")[0]; // Get file type (image, video, etc.)
-
-        if (fileType === "image") {
-            previewContainer.innerHTML = `<img src="${e.target.result}" class="max-w-full max-h-40 mx-auto rounded">`;
-        } else if (fileType === "video") {
-            previewContainer.innerHTML = `<video controls class="max-w-full max-h-40 mx-auto rounded">
-                                            <source src="${e.target.result}" type="${file.type}">
-                                            Your browser does not support the video tag.
-                                         </video>`;
-        } else if (fileType === "audio") {
-            previewContainer.innerHTML = `<audio controls class="w-full">
-                                            <source src="${e.target.result}" type="${file.type}">
-                                            Your browser does not support the audio tag.
-                                         </audio>`;
-        } else {
-            previewContainer.innerHTML = `<p class="text-gray-800"><i class="material-icons-round">insert_drive_file</i> ${file.name}</p>`;
+    // 📌 Upload File via AJAX with Progress Bar
+    uploadBtn.addEventListener("click", () => {
+        const file = fileInput.files[0];
+        if (!file) {
+            alert("Please select a file to upload!");
+            return;
         }
-    };
 
-    fileReader.readAsDataURL(file);
-}
+        const formData = new FormData();
+        formData.append("attachment", file);
+        formData.append("name", document.getElementById("fileName").value);
+        formData.append("description", document.getElementById("fileDescription").value);
+        formData.append("category", document.getElementById("fileCategory").value);
+        formData.append("is_private", document.getElementById("isPrivate").checked);
+        formData.append("send_copy_to_manager", document.getElementById("sendCopyToManager").checked);
 
-// 📌 Upload File via AJAX with Progress Bar
-function uploadAttachment() {
-    const file = fileInput.files[0];
-    if (!file) {
-        alert("Please select a file to upload!");
-        return;
+        const orgId = "{{ organization.id }}";
+        const groupId = "{{ group.id }}";
+        const taskId = "{{ task.id }}";
+
+        fetch(`/tasks/attach-task-file/${orgId}/${groupId}/${taskId}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCSRFToken(),
+            },
+            body: formData,
+        }).then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  alert("File uploaded successfully!");
+                  location.reload();
+              } else {
+                  alert("Upload failed: " + data.error);
+              }
+          })
+          .catch(error => console.error("Upload Error:", error));
+    });
+
+    function getCSRFToken() {
+        return document.cookie.split("; ").find(row => row.startsWith("csrftoken"))?.split("=")[1] || "";
     }
-
-    const formData = new FormData();
-    formData.append("attachment", file);
-    formData.append("name", document.getElementById("fileName").value);
-    formData.append("description", document.getElementById("fileDescription").value);
-    formData.append("category", document.getElementById("fileCategory").value);
-    formData.append("is_private", document.getElementById("isPrivate").checked);
-    formData.append("send_copy_to_manager", document.getElementById("sendCopyToManager").checked);
-
-    const orgId = "{{ organization.id }}";
-    const groupId = "{{ group.id }}";
-    const taskId = "{{ task.id }}";
-
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", `/tasks/attach-task-file/${orgId}/${groupId}/${taskId}/`, true);
-    xhr.setRequestHeader("X-CSRFToken", getCSRFToken());
-
-    // 📌 Progress Bar Update
-    xhr.upload.onprogress = function (e) {
-        if (e.lengthComputable) {
-            let percent = Math.round((e.loaded / e.total) * 100);
-            progressBar.style.width = percent + "%";
-            progressBar.innerText = percent + "%";
-        }
-    };
-
-    xhr.onload = function () {
-        if (xhr.status === 200) {
-            alert("File uploaded successfully!");
-            location.reload();
-        } else {
-            alert("Upload failed!");
-        }
-    };
-
-    xhr.send(formData);
-}
-
-function getCSRFToken() {
-    return document.cookie.split("; ").find(row => row.startsWith("csrftoken"))?.split("=")[1] || "";
-}
-
-
-
+});
 
 </script>
 </body>
