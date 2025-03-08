@@ -181,6 +181,16 @@
                                 </button>
                             </li>
                         {% endif %}
+                        {% if extend_tasks %}
+                          <li>
+                             <button class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-red-600" 
+                                    data-bs-toggle="modal" data-bs-target="#cancelTaskModal" 
+                                    onclick="setCancelTaskData('{{ task.id }}', '{{ task.title }}')">
+                                <i class="material-icons-round">cancel</i>
+                                Cancel Task
+                            </button>
+                         </li>
+                        {% endif %} 
                     </ul>
 
                 </div>
@@ -319,8 +329,18 @@
             </div>
         </div>
     </div>
+<!-- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- Extend Tasks APP modals -->
 
-    <script>
+
+
+
+
+
+
+
+
+<script>
         // Sidebar Toggle
         function toggleSidebar() {
             document.getElementById('learnMoreOverlay').classList.toggle('hidden');

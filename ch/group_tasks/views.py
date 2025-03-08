@@ -177,7 +177,9 @@ def task_calendar(request, org_id, group_id):
 
 # EXTENDED TASKS CONTROLS APP ------------------------------------------------------------------------------------------------------------------
 
-# view task details 
+# Cancel the task
+
+
 
 
 
