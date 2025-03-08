@@ -201,7 +201,7 @@ def cancel_task(request, org_id, group_id, task_id):
         send_mail(
             subject=f"Task '{task_title}' Canceled",
             message=f"Hello {task.created_by.get_full_name()},\n\n"
-                    f"The task '{task_title}' in the group '{group}' under '{organization}' has been canceled by {request.user.get_full_name()}.\n"
+                    f"The task '{task_title}' in the group '{group}' under '{organization}' has been canceled by {task.assigned_to.username}.\n"
                     f"Reason for cancellation: {reason}\n\n"
                     f"Best,\nCalendar Plus Team",
             from_email="no-reply@calendarplus.com",
