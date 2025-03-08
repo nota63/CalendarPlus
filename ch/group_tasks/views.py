@@ -217,7 +217,9 @@ def cancel_task(request, org_id, group_id, task_id):
 
 
 # CREATE SUBTASK FOR THE TASK
+@check_org_membership
 @csrf_exempt
+@login_required
 def create_subtask(request, org_id, group_id, task_id):
     if request.method == "POST":
         try:
