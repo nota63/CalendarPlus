@@ -24,7 +24,13 @@ from django.utils.timezone import now
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from decimal import Decimal
-from .models import TaskTimeTracking, Problem
+from .models import TaskTimeTracking, Problem,ActivityLog
+import io
+from django.http import FileResponse, JsonResponse
+from django.core.mail import EmailMessage
+from django.shortcuts import get_object_or_404
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
 # Create your views here.
 
 # Task creation
@@ -294,6 +300,7 @@ def update_subtask(request, org_id, group_id, task_id, subtask_id):
 
 
 # delete the subtask
+@check_org_membership
 @csrf_exempt
 def delete_subtask(request, org_id, group_id, task_id, subtask_id):
     if request.method == "POST":
@@ -304,7 +311,92 @@ def delete_subtask(request, org_id, group_id, task_id, subtask_id):
     return JsonResponse({"error": "Invalid request"}, status=400)
 
 
+# EXPORT THE TASK DATA
+@check_org_membership
+@login_required
+def generate_task_pdf(org_id, group_id, task_id):
+    """Generate PDF for Task, SubTasks, Activity Logs, and Problems"""
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer, pagesize=A4)
+    p.setFont("Helvetica", 12)
+    
+    # Fetch the Task
+    task = get_object_or_404(Task, id=task_id, organization_id=org_id, group_id=group_id)
+    
+    # Fetch Related Data
+    subtasks = SubTask.objects.filter(task=task)
+    activity_logs = ActivityLog.objects.filter(task=task)
+    problems = Problem.objects.filter(task=task)
+    
+    y = 800  # Initial Y position
+    p.drawString(100, y, f"Task Report: {task.title}")
+    y -= 20
+    
+    # Task Details
+    p.drawString(100, y, f"Description: {task.description}")
+    y -= 20
+    p.drawString(100, y, f"Priority: {task.get_priority_display()} | Status: {task.get_status_display()}")
+    y -= 20
+    p.drawString(100, y, f"Progress: {task.progress}% | Deadline: {task.deadline}")
+    y -= 40
 
+    # SubTasks
+    p.drawString(100, y, "SubTasks:")
+    y -= 20
+    for subtask in subtasks:
+        p.drawString(120, y, f"- {subtask.title} (Status: {subtask.get_status_display()}, Progress: {subtask.progress}%)")
+        y -= 20
+
+    y -= 20
+
+    # Activity Logs
+    p.drawString(100, y, "Activity Logs:")
+    y -= 20
+    for log in activity_logs:
+        p.drawString(120, y, f"- {log.user.username} {log.get_action_display()} at {log.timestamp}")
+        y -= 20
+
+    y -= 20
+
+    # Problems
+    p.drawString(100, y, "Problems Raised:")
+    y -= 20
+    for problem in problems:
+        p.drawString(120, y, f"- {problem.description} (Resolved: {'Yes' if problem.is_resolved else 'No'})")
+        y -= 20
+
+    p.showPage()
+    p.save()
+    buffer.seek(0)
+    return buffer
+
+@check_org_membership
+@csrf_exempt
+@login_required
+def export_task_data(request, org_id, group_id, task_id):
+    """Export Task Data as PDF or Send to Email"""
+    action = request.GET.get("action")  # "export" or "email"
+    user_email = request.user.email
+
+    pdf_buffer = generate_task_pdf(org_id, group_id, task_id)
+
+    if action == "export":
+        # Return PDF as a file response
+        return FileResponse(pdf_buffer, as_attachment=True, filename="task_report.pdf")
+
+    elif action == "email":
+        # Send Email with PDF Attachment
+        email = EmailMessage(
+            subject="Your Task Report",
+            body="Attached is your task report.",
+            to=[user_email]
+        )
+        email.attach("task_report.pdf", pdf_buffer.getvalue(), "application/pdf")
+        email.send()
+
+        return JsonResponse({"message": "PDF sent to your email!"})
+
+    return JsonResponse({"error": "Invalid action!"}, status=400)
 
 
 

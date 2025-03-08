@@ -208,9 +208,16 @@
                              onclick="loadSubTasks('{{ organization.id }}', '{{ group.id }}', '{{ task.id }}')">
                            <i class="material-icons-round">playlist_add_check</i>
                            Manage SubTasks
+                          </button>
+                        </li>
+                        <li>
+                            <button class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-purple-600" 
+                              data-bs-toggle="modal" data-bs-target="#exportTaskModal" 
+                             onclick="exportTask('{{ organization.id }}', '{{ group.id }}', '{{ task.id }}')"> 
+                           <i class="material-icons-round">playlist_add_check</i>
+                           Export 
                        </button>
-
-                         </li>
+                        </li>
                         {% endif %} 
                     </ul>
 
@@ -605,6 +612,40 @@
     }
   </style>
 
+<!-- EXPORT TASKS -->
+ <!-- Export Task Modal -->
+<div id="exportTaskModal" class="modal fade" tabindex="-1" aria-labelledby="exportTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-4">
+            <!-- Modal Header -->
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-semibold">Export Task</h2>
+                <button type="button" class="close text-gray-500 hover:text-gray-700" data-bs-dismiss="modal">
+                    &times;
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="mt-4">
+                <p class="text-gray-600">Choose how you want to export this task:</p>
+                <div class="flex flex-col gap-3 mt-3">
+                    <!-- Export via Email -->
+                    <button id="export-email-btn"
+                        class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2">
+                        <i class="material-icons-round">email</i> Send to Email
+                    </button>
+
+                    <!-- Export Now -->
+                    <button id="export-now-btn"
+                        class="w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 flex items-center gap-2">
+                        <i class="material-icons-round">download</i> Export Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 
@@ -998,6 +1039,42 @@ function getProgressColor(progress) {
     if (progress < 70) return 'bg-yellow-500';
     return 'bg-green-500';
 }
+
+// EXPORT TASKS
+function exportTask(orgId, groupId, taskId) {
+    // Store IDs for export
+    window.exportTaskData = { orgId, groupId, taskId };
+}
+
+// Handle Export Now
+document.getElementById("export-now-btn").addEventListener("click", function () {
+    let { orgId, groupId, taskId } = window.exportTaskData;
+
+    fetch(`/tasks/export-task-data/${orgId}/${groupId}/${taskId}&action=export`)
+        .then(response => response.blob())
+        .then(blob => {
+            let a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "task_report.pdf";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        })
+        .catch(error => console.error("Error exporting:", error));
+});
+
+// Handle Send to Email
+document.getElementById("export-email-btn").addEventListener("click", function () {
+    let { orgId, groupId, taskId } = window.exportTaskData;
+
+    fetch(`/tasks/export-task-data/${orgId}/${groupId}/${taskId}&action=email`)
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+        })
+        .catch(error => console.error("Error sending email:", error));
+});
+
 </script>
 </body>
 </html>
