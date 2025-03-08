@@ -7,7 +7,7 @@
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -738,51 +738,104 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // MANAGE SUBTASKS 
-// Load SubTasks when opening the modal
+// MANAGE SUBTASKS 
+// MANAGE SUBTASKS - Full Material UI Implementation
 function loadSubTasks(orgId, groupId, taskId) {
     fetch(`/tasks/subtasks/${orgId}/${groupId}/${taskId}/`)
         .then(response => response.json())
         .then(data => {
-            let subtaskList = document.getElementById("subtaskList");
-            subtaskList.innerHTML = "";
+            const subtaskList = document.getElementById("subtaskList");
+            subtaskList.innerHTML = '';
 
             if (data.subtasks.length === 0) {
-                subtaskList.innerHTML = "<p class='text-muted'>No subtasks available.</p>";
+                subtaskList.innerHTML = `
+                    <div class="flex flex-col items-center justify-center p-8 rounded-xl bg-white/30 backdrop-blur-sm border border-gray-200/50">
+                        <svg class="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <p class="text-gray-500 font-medium">No subtasks created yet</p>
+                        <p class="text-sm text-gray-400 mt-1">Click the '+' button to add new subtasks</p>
+                    </div>
+                `;
                 return;
             }
 
             data.subtasks.forEach(subtask => {
                 subtaskList.innerHTML += `
-                    <div class="d-flex justify-content-between align-items-center border p-2 rounded mb-2">
-                        <div>
-                            <strong>${subtask.title}</strong> <br>
-                            <small>Status: 
-                                <select id="status-${subtask.id}" class="form-select form-select-sm" onchange="changeSubTaskStatus('${orgId}', '${groupId}', '${taskId}', '${subtask.id}')">
-                                    <option value="Pending" ${subtask.status === "Pending" ? "selected" : ""}>Pending</option>
-                                    <option value="In Progress" ${subtask.status === "In Progress" ? "selected" : ""}>In Progress</option>
-                                    <option value="Completed" ${subtask.status === "Completed" ? "selected" : ""}>Completed</option>
-                                    <option value="Cancelled" ${subtask.status === "Cancelled" ? "selected" : ""}>Cancelled</option>
-                                    <option value="Overdue" ${subtask.status === "Overdue" ? "selected" : ""}>Overdue</option>
-                                </select>
-                            </small> 
-                            
-                            <!-- Progress Bar -->
-                            <div class="progress mt-2" style="height: 8px;">
-                                <div id="progress-bar-${subtask.id}" 
-                                    class="progress-bar ${getProgressColor(subtask.progress)}" 
-                                    role="progressbar" 
-                                    style="width: ${subtask.progress}%" 
-                                    aria-valuenow="${subtask.progress}" 
-                                    aria-valuemin="0" 
-                                    aria-valuemax="100">
+                    <div class="group relative mb-4 p-5 rounded-xl bg-white/70 backdrop-blur-sm border border-gray-200/60 shadow-sm hover:shadow-md transition-all duration-200 ease-out">
+                        <div class="flex gap-4 items-start">
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-gray-800 font-semibold text-base mb-2 truncate">${subtask.title}</h3>
+                                
+                                <div class="flex flex-wrap items-center gap-4 mb-4">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm text-gray-500">Status:</span>
+                                        <select 
+                                            id="status-${subtask.id}"
+                                            class="min-w-[120px] px-3 py-1.5 text-sm rounded-lg border border-gray-300/80 bg-white/90 shadow-xs focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
+                                            onchange="changeSubTaskStatus('${orgId}', '${groupId}', '${taskId}', '${subtask.id}')">
+                                            <option value="Pending" ${subtask.status === "Pending" ? "selected" : ""}>🟡 Pending</option>
+                                            <option value="In Progress" ${subtask.status === "In Progress" ? "selected" : ""}>🔵 In Progress</option>
+                                            <option value="Completed" ${subtask.status === "Completed" ? "selected" : ""}>🟢 Completed</option>
+                                            <option value="Cancelled" ${subtask.status === "Cancelled" ? "selected" : ""}>⚪ Cancelled</option>
+                                            <option value="Overdue" ${subtask.status === "Overdue" ? "selected" : ""}>🔴 Overdue</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm text-gray-500">Priority:</span>
+                                        <div class="flex items-center gap-1 px-2 py-1 rounded-full bg-blue-50/80 text-blue-600 text-xs font-medium">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd"/>
+                                            </svg>
+                                            High
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-gray-500">Progress</span>
+                                        <span id="progress-${subtask.id}" class="text-sm font-semibold text-blue-600">${subtask.progress}%</span>
+                                    </div>
+                                    <div class="relative">
+                                        <div class="h-2.5 bg-gray-200/80 rounded-full overflow-hidden">
+                                            <div 
+                                                id="progress-bar-${subtask.id}"
+                                                class="h-full rounded-full ${getProgressColor(subtask.progress)} transition-all duration-300 ease-out"
+                                                style="width: ${subtask.progress}%">
+                                                <div class="absolute inset-0 bg-white/30 animate-pulse"></div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <small><span id="progress-${subtask.id}">${subtask.progress}</span>%</small>
-                        </div>
-                        <div>
-                            <button class="btn btn-sm btn-outline-success" onclick="updateSubTask('${orgId}', '${groupId}', '${taskId}', '${subtask.id}', 'increase')"> + </button>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="updateSubTask('${orgId}', '${groupId}', '${taskId}', '${subtask.id}', 'decrease')"> - </button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteSubTask('${orgId}', '${groupId}', '${taskId}', '${subtask.id}')"> 🗑️ </button>
+
+                            <div class="flex flex-col gap-2">
+                                <button 
+                                    onclick="updateSubTask('${orgId}', '${groupId}', '${taskId}', '${subtask.id}', 'increase')"
+                                    class="p-2 rounded-full bg-blue-50/80 hover:bg-blue-100 text-blue-600 shadow-xs hover:shadow-sm transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                    </svg>
+                                </button>
+                                
+                                <button 
+                                    onclick="updateSubTask('${orgId}', '${groupId}', '${taskId}', '${subtask.id}', 'decrease')"
+                                    class="p-2 rounded-full bg-gray-100/80 hover:bg-gray-200 text-gray-600 shadow-xs hover:shadow-sm transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 12H6"/>
+                                    </svg>
+                                </button>
+                                
+                                <button 
+                                    onclick="deleteSubTask('${orgId}', '${groupId}', '${taskId}', '${subtask.id}')"
+                                    class="p-2 rounded-full bg-red-50/80 hover:bg-red-100 text-red-500 shadow-xs hover:shadow-sm transition-all duration-150 ease-in-out transform hover:scale-105 active:scale-95">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -791,7 +844,6 @@ function loadSubTasks(orgId, groupId, taskId) {
         .catch(error => console.error("Error fetching subtasks:", error));
 }
 
-// Update SubTask Progress with Progress Bar
 function updateSubTask(orgId, groupId, taskId, subtaskId, action) {
     fetch(`/tasks/subtasks/update/${orgId}/${groupId}/${taskId}/${subtaskId}/`, {
         method: "POST",
@@ -803,19 +855,18 @@ function updateSubTask(orgId, groupId, taskId, subtaskId, action) {
     })
     .then(response => response.json())
     .then(data => {
-        let progressBar = document.getElementById(`progress-bar-${subtaskId}`);
-        let progressText = document.getElementById(`progress-${subtaskId}`);
+        const progressBar = document.getElementById(`progress-bar-${subtaskId}`);
+        const progressText = document.getElementById(`progress-${subtaskId}`);
         
         progressBar.style.width = `${data.new_progress}%`;
-        progressBar.className = `progress-bar ${getProgressColor(data.new_progress)}`;
+        progressBar.className = `h-full rounded-full ${getProgressColor(data.new_progress)} transition-all duration-300 ease-out`;
         progressText.innerText = data.new_progress;
     })
     .catch(error => console.error("Error updating subtask:", error));
 }
 
-// Change SubTask Status (Dropdown)
 function changeSubTaskStatus(orgId, groupId, taskId, subtaskId) {
-    let newStatus = document.getElementById(`status-${subtaskId}`).value;
+    const newStatus = document.getElementById(`status-${subtaskId}`).value;
     
     fetch(`/tasks/subtasks/update/${orgId}/${groupId}/${taskId}/${subtaskId}/`, {
         method: "POST",
@@ -827,13 +878,16 @@ function changeSubTaskStatus(orgId, groupId, taskId, subtaskId) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log("Status updated:", data);
+        const statusSelect = document.getElementById(`status-${subtaskId}`);
+        statusSelect.classList.add('animate-pulse');
+        setTimeout(() => statusSelect.classList.remove('animate-pulse'), 500);
     })
     .catch(error => console.error("Error updating status:", error));
 }
 
-// Delete SubTask
 function deleteSubTask(orgId, groupId, taskId, subtaskId) {
+    if (!confirm('Are you sure you want to delete this subtask?')) return;
+    
     fetch(`/tasks/subtasks/delete/${orgId}/${groupId}/${taskId}/${subtaskId}/`, {
         method: "POST",
         headers: {
@@ -841,7 +895,13 @@ function deleteSubTask(orgId, groupId, taskId, subtaskId) {
             "X-CSRFToken": getCSRFToken()
         }
     })
-    .then(() => loadSubTasks(orgId, groupId, taskId)) // Refresh after delete
+    .then(() => {
+        const subtaskElement = document.getElementById(`subtask-${subtaskId}`);
+        if (subtaskElement) {
+            subtaskElement.classList.add('opacity-0', 'translate-x-10');
+            setTimeout(() => loadSubTasks(orgId, groupId, taskId), 300);
+        }
+    })
     .catch(error => console.error("Error deleting subtask:", error));
 }
 
@@ -851,17 +911,12 @@ function getCSRFToken() {
     return csrfToken ? csrfToken.value : ""; // Ensure CSRF token exists
 }
 
-// Get Progress Bar Color Based on Progress Percentage
-function getProgressColor(progress) {
-    if (progress < 30) {
-        return "bg-danger"; // Red for low progress
-    } else if (progress < 70) {
-        return "bg-warning"; // Yellow for medium progress
-    } else {
-        return "bg-success"; // Green for high progress
-    }
-}
 
+function getProgressColor(progress) {
+    if (progress < 30) return 'bg-red-500';
+    if (progress < 70) return 'bg-yellow-500';
+    return 'bg-green-500';
+}
 </script>
 </body>
 </html>
