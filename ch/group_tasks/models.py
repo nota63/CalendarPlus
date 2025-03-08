@@ -469,8 +469,9 @@ class AttachmentsTasksApp(models.Model):
         OTHER = "other", _("Other")
     
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="attachments")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="attachments_uploaded")
+    group=models.ForeignKey(Group,on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="attachmentss")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="attachmentss_uploaded")
 
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)  # ✅ Optional file description
