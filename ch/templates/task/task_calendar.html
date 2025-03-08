@@ -764,8 +764,20 @@ function loadSubTasks(orgId, groupId, taskId) {
                                     <option value="Cancelled" ${subtask.status === "Cancelled" ? "selected" : ""}>Cancelled</option>
                                     <option value="Overdue" ${subtask.status === "Overdue" ? "selected" : ""}>Overdue</option>
                                 </select>
-                            </small> | 
-                            <small>Progress: <span id="progress-${subtask.id}">${subtask.progress}</span>%</small>
+                            </small> 
+                            
+                            <!-- Progress Bar -->
+                            <div class="progress mt-2" style="height: 8px;">
+                                <div id="progress-bar-${subtask.id}" 
+                                    class="progress-bar ${getProgressColor(subtask.progress)}" 
+                                    role="progressbar" 
+                                    style="width: ${subtask.progress}%" 
+                                    aria-valuenow="${subtask.progress}" 
+                                    aria-valuemin="0" 
+                                    aria-valuemax="100">
+                                </div>
+                            </div>
+                            <small><span id="progress-${subtask.id}">${subtask.progress}</span>%</small>
                         </div>
                         <div>
                             <button class="btn btn-sm btn-outline-success" onclick="updateSubTask('${orgId}', '${groupId}', '${taskId}', '${subtask.id}', 'increase')"> + </button>
@@ -779,7 +791,7 @@ function loadSubTasks(orgId, groupId, taskId) {
         .catch(error => console.error("Error fetching subtasks:", error));
 }
 
-// Update SubTask Progress
+// Update SubTask Progress with Progress Bar
 function updateSubTask(orgId, groupId, taskId, subtaskId, action) {
     fetch(`/tasks/subtasks/update/${orgId}/${groupId}/${taskId}/${subtaskId}/`, {
         method: "POST",
@@ -791,7 +803,12 @@ function updateSubTask(orgId, groupId, taskId, subtaskId, action) {
     })
     .then(response => response.json())
     .then(data => {
-        document.getElementById(`progress-${subtaskId}`).innerText = data.new_progress;
+        let progressBar = document.getElementById(`progress-bar-${subtaskId}`);
+        let progressText = document.getElementById(`progress-${subtaskId}`);
+        
+        progressBar.style.width = `${data.new_progress}%`;
+        progressBar.className = `progress-bar ${getProgressColor(data.new_progress)}`;
+        progressText.innerText = data.new_progress;
     })
     .catch(error => console.error("Error updating subtask:", error));
 }
@@ -832,6 +849,17 @@ function deleteSubTask(orgId, groupId, taskId, subtaskId) {
 function getCSRFToken() {
     let csrfToken = document.querySelector("[name=csrfmiddlewaretoken]");
     return csrfToken ? csrfToken.value : ""; // Ensure CSRF token exists
+}
+
+// Get Progress Bar Color Based on Progress Percentage
+function getProgressColor(progress) {
+    if (progress < 30) {
+        return "bg-danger"; // Red for low progress
+    } else if (progress < 70) {
+        return "bg-warning"; // Yellow for medium progress
+    } else {
+        return "bg-success"; // Green for high progress
+    }
 }
 
 </script>
