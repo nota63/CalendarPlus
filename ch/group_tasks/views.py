@@ -33,6 +33,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from django.template.loader import render_to_string
 from premailer import transform  
+import mimetypes
 # Create your views here.
 
 # Task creation
@@ -428,7 +429,7 @@ def attach_task_file(request, org_id, group_id, task_id):
             to=[task.created_by.email],
         )
 
-        email.attach(attachment.name, attachment.attachment.read(), attachment.attachment)
+        email.attach(attachment.name, attachment.attachment.read(), mimetypes.guess_type(attachment.attachment.name)[0] or "application/octet-stream")
         email.send()
 
     return JsonResponse({
