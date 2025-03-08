@@ -1,6 +1,6 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from .models import Task, AddDay, TaskComment, TaskNote, TaskTag, TaskTimer, ActivityLog, TaskTimeTracking, Problem
+from .models import Task, AddDay, TaskComment, TaskNote, TaskTag, TaskTimer, ActivityLog, TaskTimeTracking, Problem,AttachmentsTasksApp
 
 @admin.register(Task)
 class TaskAdmin(ModelAdmin):
@@ -37,4 +37,10 @@ class TaskTimeTrackingAdmin(ModelAdmin):
 @admin.register(Problem)
 class ProblemAdmin(ModelAdmin):
     list_display = [field.name for field in Problem._meta.fields]
+
+
+
+@admin.register(AttachmentsTasksApp)
+class TaskAttachmentsAdmin(ModelAdmin):
+    list_display = [field.name for field in AttachmentsTasksApp._meta.fields]
 

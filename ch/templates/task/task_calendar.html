@@ -51,6 +51,49 @@
     .btn-icon-close {
       @apply p-2 rounded-full text-gray-500 hover:bg-gray-100 transition-colors;
     }
+
+    .animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+ /* Custom Styles */
+ #dropArea:hover {
+        background: rgba(255, 255, 255, 0.7) !important;
+        border-color: rgba(156, 39, 176, 0.5) !important;
+    }
+
+    .checkbox-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .form-check-input:checked + .form-check-label .checkbox-icon {
+        display: block !important;
+    }
+
+    .form-check-input:checked + .form-check-label .checkbox-icon-outline {
+        display: none !important;
+    }
+
+    .bg-primary-gradient {
+        background: linear-gradient(45deg, #9c27b0, #673ab7);
+    }
+
+    .file-preview-content {
+        transition: transform 0.3s ease;
+    }
+
+    #filePreview:hover .file-preview-content {
+        transform: translateY(-3px);
+    }
+
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50/50 to-purple-50/50 min-h-screen">
@@ -663,80 +706,157 @@
 
 <!-- ATTACH THE FILE TO THE TASK(PREMIUM) -->
 <!-- 📌 Attach File Modal -->
-<!-- 📌 Attach File Modal -->
+<!-- Material Icons CDN -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+<!-- Material Icons CDN -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
 <div id="attachFileModal" class="modal fade" tabindex="-1" aria-labelledby="attachFileLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 overflow-hidden" 
+             style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px);">
+            
             <!-- Modal Header -->
-            <div class="modal-header bg-purple-600 text-white">
-                <h5 class="modal-title flex items-center gap-2">
-                    <i class="material-icons-round">attach_file</i> Attach File to Task
+            <div class="modal-header border-bottom-0 py-4 px-5">
+                <h5 class="modal-title text-primary fw-600 d-flex align-items-center gap-2">
+                    <i class="material-icons-round fs-5">attach_file</i>
+                    <span class="fs-5">Attach File</span>
                 </h5>
-                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="material-icons-round text-muted">close</i>
+                </button>
             </div>
 
             <!-- Modal Body -->
-            <div class="modal-body flex">
-                <!-- 📂 Drag & Drop Upload Area (Left) -->
-                <div class="w-1/2 pr-4">
-                    <label class="block text-gray-700 font-medium">Upload File:</label>
-                    <div id="dropArea" class="border-2 border-dashed rounded p-6 text-center cursor-pointer bg-gray-100">
-                        <p class="text-gray-500">Drag & Drop a file here</p>
-                        <p class="text-gray-500">or</p>
-                        <input type="file" id="fileInput" class="hidden" accept="*/*">
-                        <button type="button" class="bg-purple-600 text-white px-3 py-1 rounded mt-2"
-                                onclick="document.getElementById('fileInput').click();">
-                            Select File
-                        </button>
+            <div class="modal-body px-5 pt-0 d-flex gap-4">
+                <!-- Left Column -->
+                <div class="w-50 pe-3">
+                    <!-- Drag & Drop Area -->
+                    <div id="dropArea" 
+                         class="border-2 border-dashed rounded-3 p-5 text-center cursor-pointer position-relative bg-white bg-opacity-50 transition-all"
+                         style="border-color: rgba(156, 39, 176, 0.3);">
+                        <div class="position-absolute top-50 start-50 translate-middle">
+                            <i class="material-icons-round text-primary fs-1 mb-2">cloud_upload</i>
+                            <p class="text-muted mb-1 fw-500">Drag & Drop files</p>
+                            <p class="text-muted fs-7 mb-2">or</p>
+                            <input type="file" id="fileInput" class="d-none">
+                            <button type="button" 
+                                    class="btn btn-sm btn-primary rounded-pill px-4 shadow-sm"
+                                    onclick="document.getElementById('fileInput').click();">
+                                <i class="material-icons-round me-2 fs-6">upload</i>
+                                Browse Files
+                            </button>
+                        </div>
                     </div>
 
-                    <label class="block mt-3 text-gray-700 font-medium">File Name:</label>
-                    <input type="text" id="fileName" class="w-full border p-2 rounded" placeholder="Enter file name">
+                    <br><br>
 
-                    <label class="block mt-3 text-gray-700 font-medium">Description:</label>
-                    <textarea id="fileDescription" class="w-full border p-2 rounded" rows="2" placeholder="Enter description"></textarea>
+                    <!-- File Details -->
+                    <div class="mt-4">
+                        <!-- File Name -->
+                        <div class="form-floating mb-3">
+                            <input type="text" id="fileName" class="form-control border-0 bg-white bg-opacity-50" 
+                                   placeholder=" " style="height: 56px;">
+                            <label class="text-muted d-flex align-items-center gap-2">
+                                <i class="material-icons-round fs-6">drive_file_rename_outline</i>
+                                File Name
+                            </label>
+                        </div>
 
-                    <label class="block mt-3 text-gray-700 font-medium">Category:</label>
-                    <select id="fileCategory" class="w-full border p-2 rounded">
-                        <option value="document">Document</option>
-                        <option value="image">Image</option>
-                        <option value="code">Code File</option>
-                        <option value="audio">Audio File</option>
-                        <option value="video">Video File</option>
-                        <option value="other">Other</option>
-                    </select>
+                        <!-- Description -->
+                        <div class="form-floating mb-3">
+                            <textarea id="fileDescription" class="form-control border-0 bg-white bg-opacity-50" 
+                                      placeholder=" " style="height: 100px;"></textarea>
+                            <label class="text-muted d-flex align-items-center gap-2">
+                                <i class="material-icons-round fs-6">description</i>
+                                Description
+                            </label>
+                        </div>
 
-                    <label class="block mt-3 text-gray-700 font-medium flex items-center">
-                        <input type="checkbox" id="isPrivate" class="mr-2"> Mark as Private
-                    </label>
+                        <!-- Category Select -->
+                        <div class="mb-3 position-relative">
+                            <i class="material-icons-round position-absolute start-0 top-50 translate-middle-y ms-3 text-muted">category</i>
+                            <select id="fileCategory" class="form-select border-0 bg-white bg-opacity-50 ps-5" style="height: 56px;">
+                                <option value="document">Document</option>
+                                <option value="image">Image</option>
+                                <option value="code">Code File</option>
+                                <option value="audio">Audio File</option>
+                                <option value="video">Video File</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
 
-                    <label class="block mt-3 text-gray-700 font-medium flex items-center">
-                        <input type="checkbox" id="sendCopyToManager" class="mr-2"> Send Copy to Manager
-                    </label>
+                        <!-- Checkboxes -->
+                        <div class="d-flex flex-column gap-3">
+                            <div class="form-check ps-0">
+                                <input class="form-check-input d-none" type="checkbox" id="isPrivate">
+                                <label class="form-check-label d-flex align-items-center gap-2 cursor-pointer" for="isPrivate">
+                                    <div class="checkbox-container bg-white bg-opacity-50 rounded-2" style="width: 24px; height: 24px;">
+                                        <i class="material-icons-round checkbox-icon text-primary fs-6" style="display: none;">check_box</i>
+                                        <i class="material-icons-round checkbox-icon-outline text-muted fs-6">check_box_outline_blank</i>
+                                    </div>
+                                    <span class="text-muted">Mark as Private</span>
+                                </label>
+                            </div>
+
+                            <div class="form-check ps-0">
+                                <input class="form-check-input d-none" type="checkbox" id="sendCopyToManager">
+                                <label class="form-check-label d-flex align-items-center gap-2 cursor-pointer" for="sendCopyToManager">
+                                    <div class="checkbox-container bg-white bg-opacity-50 rounded-2" style="width: 24px; height: 24px;">
+                                        <i class="material-icons-round checkbox-icon text-primary fs-6" style="display: none;">check_box</i>
+                                        <i class="material-icons-round checkbox-icon-outline text-muted fs-6">check_box_outline_blank</i>
+                                    </div>
+                                    <span class="text-muted">Send Copy to Manager</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- 📌 Real-Time File Preview (Right) -->
-                <div class="w-1/2 border-l pl-4">
-                    <h6 class="text-gray-700 font-medium">File Preview:</h6>
-                    <div id="filePreview" class="border rounded p-2 mt-2 text-center bg-gray-100">
-                        <p class="text-gray-500">No file selected</p>
+                <!-- Right Column -->
+                <div class="w-50 ps-3 border-start">
+                    <!-- File Preview -->
+                    <div class="mb-4">
+                        <h6 class="text-muted fw-600 mb-3 d-flex align-items-center gap-2">
+                            <i class="material-icons-round fs-6">preview</i>
+                            File Preview
+                        </h6>
+                        <div id="filePreview" class="border-0 rounded-3 bg-white bg-opacity-50 p-4 text-center transition-all"
+                             style="min-height: 200px;">
+                            <div class="file-preview-content">
+                                <i class="material-icons-round text-muted fs-1">insert_drive_file</i>
+                                <p class="text-muted mt-2 mb-0">No file selected</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- 🔥 Upload Progress Bar -->
-                    <div class="mt-3">
-                        <h6 class="text-gray-700 font-medium">Upload Progress:</h6>
-                        <div class="w-full bg-gray-200 rounded">
-                            <div id="progressBar" class="bg-purple-600 text-white text-center p-1 rounded"
-                                style="width: 0%">0%</div>
+                    <!-- Progress Bar -->
+                    <div class="mt-4">
+                        <h6 class="text-muted fw-600 mb-3 d-flex align-items-center gap-2">
+                            <i class="material-icons-round fs-6">pending_actions</i>
+                            Upload Progress
+                        </h6>
+                        <div class="progress rounded-pill" style="height: 8px; background: rgba(156, 39, 176, 0.1);">
+                            <div id="progressBar" class="progress-bar rounded-pill bg-primary-gradient" 
+                                 role="progressbar" style="width: 0%; transition: width 0.3s ease;">
+                            </div>
                         </div>
+                        <p class="text-end text-muted fs-7 mt-2 mb-0"><span id="progressPercent">0</span>% Complete</p>
                     </div>
                 </div>
             </div>
 
             <!-- Modal Footer -->
-            <div class="modal-footer">
-               
-                <button type="button" id="uploadBtn" class="btn btn-secondary">Upload File</button>
+            <div class="modal-footer border-top-0 px-5 pb-4 pt-0">
+                <button type="button" class="btn btn-link text-muted text-decoration-none" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <button type="button" id="uploadBtn" 
+                        class="btn btn-primary rounded-pill px-5 shadow-sm d-flex align-items-center gap-2">
+                    <i class="material-icons-round fs-6">cloud_upload</i>
+                    Upload File
+                </button>
             </div>
         </div>
     </div>
