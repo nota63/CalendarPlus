@@ -163,6 +163,51 @@ def task_calendar(request, org_id, group_id):
         'page_obj': page_obj,
     })
 
+# EXTENDED TASKS CONTROLS APP ------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # Add the task to my day 
