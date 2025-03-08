@@ -312,119 +312,41 @@ def delete_subtask(request, org_id, group_id, task_id, subtask_id):
 
 
 # EXPORT THE TASK DATA
-@check_org_membership
-@login_required
-def generate_task_pdf(request, org_id, group_id, task_id):
-    """Generate PDF for Task, SubTasks, Activity Logs, and Problems"""
-    buffer = io.BytesIO()
-    p = canvas.Canvas(buffer, pagesize=A4)
-    p.setFont("Helvetica", 12)
-
-    # Fetch the Task
-    task = get_object_or_404(Task, id=task_id, organization_id=org_id, group_id=group_id)
-
-    # Fetch Related Data
-    subtasks = SubTask.objects.filter(task=task)
-    activity_logs = ActivityLog.objects.filter(task=task)
-    problems = Problem.objects.filter(task=task)
-
-    y = 800  # Initial Y position
-    p.drawString(100, y, f"Task Report: {task.title}")
-    y -= 20
-
-    # Task Details
-    p.drawString(100, y, f"Description: {task.description[:100]}")  # Limit to prevent overflow
-    y -= 20
-    p.drawString(100, y, f"Priority: {task.get_priority_display()} | Status: {task.get_status_display()}")
-    y -= 20
-    p.drawString(100, y, f"Progress: {task.progress}% | Deadline: {task.deadline.strftime('%Y-%m-%d %H:%M')}")
-    y -= 40
-
-    # SubTasks
-    p.drawString(100, y, "SubTasks:")
-    y -= 20
-    for subtask in subtasks:
-        if y < 50:  # Page Break if near bottom
-            p.showPage()
-            y = 800
-            p.setFont("Helvetica", 12)
-        p.drawString(120, y, f"- {subtask.title} (Status: {subtask.get_status_display()}, Progress: {subtask.progress}%)")
-        y -= 20
-
-    y -= 20
-
-    # Activity Logs
-    p.drawString(100, y, "Activity Logs:")
-    y -= 20
-    for log in activity_logs:
-        if y < 50:
-            p.showPage()
-            y = 800
-            p.setFont("Helvetica", 12)
-        p.drawString(120, y, f"- {log.user.username} {log.get_action_display()} at {log.timestamp.strftime('%Y-%m-%d %H:%M')}")
-        y -= 20
-
-    y -= 20
-
-    # Problems
-    p.drawString(100, y, "Problems Raised:")
-    y -= 20
-    for problem in problems:
-        if y < 50:
-            p.showPage()
-            y = 800
-            p.setFont("Helvetica", 12)
-        p.drawString(120, y, f"- {problem.description[:100]} (Resolved: {'Yes' if problem.is_resolved else 'No'})")  # Truncated
-        y -= 20
-
-    p.showPage()
-    p.save()
-    buffer.seek(0)
-
-    # Return as PDF response
-    response = HttpResponse(buffer, content_type="application/pdf")
-    response["Content-Disposition"] = f'attachment; filename="task_report_{task.id}.pdf"'
-    return response
-
+from django.template.loader import render_to_string
 
 @check_org_membership
 @csrf_exempt
 @login_required
 def export_task_data(request, org_id, group_id, task_id):
-    """Export Task Data as PDF or Send to Email"""
+    """Send Task Report as an HTML Email (No PDFs!)"""
     action = request.GET.get("action")  # "export" or "email"
     user_email = request.user.email
 
-    pdf_buffer = generate_task_pdf(org_id, group_id, task_id)
+    # ✅ Fetch Task Data
+    task = get_object_or_404(Task, id=task_id, organization_id=org_id, group_id=group_id)
+    subtasks = SubTask.objects.filter(task=task)
+    activity_logs = ActivityLog.objects.filter(task=task)
+    problems = Problem.objects.filter(task=task)
 
-    if action == "export":
-        # Return PDF as a file response
-        return FileResponse(pdf_buffer, as_attachment=True, filename="task_report.pdf")
+    # ✅ Render the HTML template
+    html_content = render_to_string('task/task_report.html', {
+        'task': task,
+        'subtasks': subtasks,
+        'activity_logs': activity_logs,
+        'problems': problems
+    })
+    plain_text = strip_tags(html_content)  # ✅ Remove HTML tags for plain text fallback
 
-    elif action == "email":
-        # Send Email with PDF Attachment
-        email = EmailMessage(
-            subject="Your Task Report",
-            body="Attached is your task report.",
-            to=[user_email]
-        )
-        email.attach("task_report.pdf", pdf_buffer.getvalue(), "application/pdf")
-        email.send()
+    # ✅ Send Email with HTML Content
+    send_mail(
+        subject="Your Task Report",
+        message=plain_text,  # Plain text version (fallback)
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[user_email],
+        html_message=html_content,  # ✅ HTML content as email body
+    )
 
-        return JsonResponse({"message": "PDF sent to your email!"})
-
-    return JsonResponse({"error": "Invalid action!"}, status=400)
-
-
-
-
-
-
-
-
-
-
-
+    return JsonResponse({"message": "Task report sent to your email!"})
 
 
 

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Task Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        h1 { color: #333; }
+        .section { margin-bottom: 20px; }
+        .subtask, .log, .problem { margin-left: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Task Report: {{ task.title }}</h1>
+    <div class="section">
+        <p><strong>Description:</strong> {{ task.description }}</p>
+        <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>
+        <p><strong>Status:</strong> {{ task.get_status_display }}</p>
+        <p><strong>Deadline:</strong> {{ task.deadline }}</p>
+    </div>
+
+    <div class="section">
+        <h2>SubTasks</h2>
+        {% for subtask in subtasks %}
+            <p class="subtask">- {{ subtask.title }} ({{ subtask.get_status_display }}, Progress: {{ subtask.progress }}%)</p>
+            <P>{{subtask.description}}</P>
+        {% endfor %}
+    </div>
+
+    <div class="section">
+        <h2>Activity Logs</h2>
+        {% for log in activity_logs %}
+            <p class="log">- {{ log.user.username }} {{ log.get_action_display }} at {{ log.timestamp }}</p>
+        {% endfor %}
+    </div>
+
+    <div class="section">
+        <h2>Problems</h2>
+        {% for problem in problems %}
+            <p class="problem">- {{ problem.description }} (Resolved: {{ problem.is_resolved|yesno:"Yes,No" }})</p>
+        {% endfor %}
+    </div>
+</body>
+</html>
+
