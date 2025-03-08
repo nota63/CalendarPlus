@@ -336,26 +336,52 @@
 <!-- Extend Tasks APP modals -->
 <!-- Cancel Task Modal -->
 <div class="modal fade" id="cancelTaskModal" tabindex="-1" aria-labelledby="cancelTaskModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-red-600 font-bold" id="cancelTaskModalLabel">
-                    Cancel Task: <span id="cancelTaskTitle"></span>
-                </h5>
-                <p>We will send the reason to your manager!</p>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered max-w-2xl">
+        <div class="modal-content rounded-xl shadow-lg">
+            <!-- Modal Header -->
+            <div class="modal-header bg-red-50 rounded-t-xl p-6 border-b border-red-100">
+                <div class="w-full">
+                    <h5 class="modal-title text-2xl font-bold text-red-600 mb-2" id="cancelTaskModalLabel">
+                        Cancel Task: <span id="cancelTaskTitle" class="break-words"></span>
+                    </h5>
+                    <p class="text-sm text-red-700 opacity-90">
+                        We will notify your manager about this cancellation
+                    </p>
+                </div>
+                <button type="button" class="btn-close opacity-70 hover:opacity-100" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <p class="text-gray-700">Why are you canceling this task?</p>
-                <textarea id="cancelReason" class="form-control mt-2" rows="3" placeholder="Enter reason..."></textarea>
+
+            <!-- Modal Body -->
+            <div class="modal-body p-6 space-y-4">
+                <label for="cancelReason" class="block text-base font-medium text-gray-700">
+                    Please provide the reason for cancellation
+                </label>
+                <textarea 
+                    id="cancelReason" 
+                    class="form-control w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 placeholder-gray-400" 
+                    rows="4"
+                    placeholder="Describe the reason for canceling this task..."
+                ></textarea>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button id="cancelTaskButton" class="btn btn-danger flex items-center gap-2" onclick="submitTaskCancellation()">
+
+            <!-- Modal Footer -->
+            <div class="modal-footer bg-gray-50 rounded-b-xl p-6 border-t border-gray-100">
+                <button 
+                    type="button" 
+                    class="btn btn-secondary px-5 py-2.5 hover:bg-gray-200 transition-colors"
+                    data-bs-dismiss="modal"
+                >
+                    Close
+                </button>
+                <button 
+                    id="cancelTaskButton" 
+                    class="btn btn-danger px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white transition-colors flex items-center justify-center gap-2"
+                    onclick="submitTaskCancellation()"
+                >
                     <span id="loadingSpinner" class="hidden">
                         <i class="fas fa-spinner fa-spin"></i>
                     </span>
-                    Cancel Task
+                    Confirm Cancellation
                 </button>
             </div>
         </div>
