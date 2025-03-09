@@ -39,7 +39,7 @@ urlpatterns = [
     path('clear-recent-tabs/',clear_recent_tabs,name='clear_recent_tabs'),
     path("fetch-task-attachments/<int:org_id>/<int:group_id>/<int:task_id>/", fetch_task_attachments, name="fetch_task_attachments"),
     path("delete-task-attachment/<int:org_id>/<int:group_id>/<int:task_id>/<int:attachment_id>/", delete_task_attachment, name="delete_task_attachment"),
-    path('tasks/retry-task-attachment/<int:org_id>/<int:group_id>/<int:task_id>/<int:attachment_id>/', retry_task_attachment, name="retry_task_attachment"),
+    path('retry-task-attachment/<int:org_id>/<int:group_id>/<int:task_id>/<int:attachment_id>/', retry_task_attachment, name="retry_task_attachment"),
   
   
   

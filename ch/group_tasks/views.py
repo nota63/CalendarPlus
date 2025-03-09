@@ -494,7 +494,65 @@ def delete_task_attachment(request, org_id, group_id, task_id, attachment_id):
     return JsonResponse({"message": "Attachment deleted successfully!"})
 
 
+# RETRY THE ATTACHMENT
+@csrf_exempt
+@login_required
+@check_org_membership
+def retry_task_attachment(request, org_id, group_id, task_id, attachment_id):
+    """Send the task attachment to the task creator via email without reassigning it."""
+    
+    # ✅ Fetch the attachment
+    attachment = get_object_or_404(
+        AttachmentsTasksApp,
+        id=attachment_id,
+        organization_id=org_id,
+        group_id=group_id,
+        task_id=task_id,
+        is_deleted=False
+    )
 
+    # ✅ Fetch related models
+    task = get_object_or_404(Task, id=task_id, organization_id=org_id, group_id=group_id)
+    organization = get_object_or_404(Organization, id=org_id)
+    group = get_object_or_404(Group, id=group_id)
+
+    # ✅ Ensure task creator exists
+    task_creator = task.created_by  
+    if not task_creator or not task_creator.email:
+        return JsonResponse({"error": "Task creator not found or email missing!"}, status=400)
+
+    # ✅ Prepare email details
+    subject = f"📌 New Task Attachment for '{task.title}'"
+    message = f"""
+    Hello {task_creator.get_full_name()},
+
+    You have received a new attachment for your task **{task.title}**.
+
+    🔹 **Organization:** {organization.name}  
+    🔹 **Group:** {group.name}  
+    🔹 **Task:** {task.title}  
+    🔹 **Attachment Name:** {attachment.name}  
+    🔹 **Category:** {attachment.get_category_display()}  
+
+    Click the link below to download the attachment:  
+    {request.build_absolute_uri(attachment.attachment.url)}
+
+    Best Regards,  
+    Calendar Plus Team
+    """
+
+    # ✅ Send email without reassigning the attachment
+    email = EmailMessage(
+        subject,
+        message,
+        settings.DEFAULT_FROM_EMAIL,
+        [task_creator.email],
+    )
+
+    # ✅ No file attachment, just send the email
+    email.send()
+
+    return JsonResponse({"message": "Attachment successfully sent to task creator via email!"})
 
 
 
