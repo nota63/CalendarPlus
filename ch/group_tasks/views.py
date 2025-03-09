@@ -443,8 +443,55 @@ def attach_task_file(request, org_id, group_id, task_id):
 
 
 # FETCH FILES ATTACHED TO THE TASK
+@csrf_exempt
+@check_org_membership
+def fetch_task_attachments(request, org_id, group_id, task_id):
+    """Fetch all attachments for a specific task"""
+    attachments = AttachmentsTasksApp.objects.filter(
+        organization_id=org_id,
+        group_id=group_id,
+        task_id=task_id,
+        is_deleted=False  
+    ).order_by("-attached_at")
 
+    attachment_data = []
+    for attachment in attachments:
+        attachment_data.append({
+            "id": attachment.id,
+            "name": attachment.name,
+            "description": attachment.description,
+            "category": attachment.get_category_display(),
+            "file_url": attachment.attachment.url,
+            "uploaded_by": attachment.user.get_full_name(),
+            "attached_at": attachment.attached_at.strftime("%Y-%m-%d %H:%M"),
+            "download_count": attachment.download_count,
+        })
 
+    return JsonResponse({"attachments": attachment_data}, safe=False)
+
+# DELETE THE ATTACHMENTS
+@csrf_exempt
+@login_required
+@check_org_membership
+def delete_task_attachment(request, org_id, group_id, task_id, attachment_id):
+    """Soft delete a task attachment"""
+    attachment = get_object_or_404(
+        AttachmentsTasksApp,
+        id=attachment_id,
+        organization_id=org_id,
+        group_id=group_id,
+        task_id=task_id,
+        is_deleted=False  # ✅ Ensure it's not already deleted
+    )
+
+    # ✅ Only allow the uploader or an admin to delete
+    if request.user != attachment.user and not request.user.is_superuser:
+        return JsonResponse({"error": "Permission denied!"}, status=403)
+
+    attachment.is_deleted = True
+    attachment.save()
+
+    return JsonResponse({"message": "Attachment deleted successfully!"})
 
 
 

@@ -36,7 +36,9 @@ urlpatterns = [
     path('export-task-data/<int:org_id>/<int:group_id>/<int:task_id>/',export_task_data,name='export_task_data'),
     path('attach-task-file/<int:org_id>/<int:group_id>/<int:task_id>/',attach_task_file,name='attach_task_file'),
     path('fetch-recent-tabs/',fetch_recent_tabs,name='fetch_recent_tabs'),
-    path('clear-recent-tabs/',clear_recent_tabs,name='clear_recent_tabs')
+    path('clear-recent-tabs/',clear_recent_tabs,name='clear_recent_tabs'),
+    path("tasks/<int:org_id>/<int:group_id>/<int:task_id>/attachments/", fetch_task_attachments, name="fetch_task_attachments"),
+    path("attachments/delete/<int:attachment_id>/", delete_task_attachment, name="delete_task_attachment"),
   
   
   
