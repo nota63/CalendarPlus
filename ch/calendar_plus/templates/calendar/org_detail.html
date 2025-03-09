@@ -10,8 +10,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
     
     <!-- Recent Tabs Modal -->
+     <!-- Add these CDN links in your head section -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@material-design-icons/font@latest/outlined.css" rel="stylesheet">
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
       <!-- FullCalendar CSS -->
@@ -37,17 +42,30 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-
-      <!-- CometChat SDK -->
-      <script src="https://unpkg.com/@cometchat-pro/chat@latest/CometChat.js"></script>
-    
-
 </head>
 
 <style>
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+    }
 
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 4px;
+    }
 
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.15);
+    }
+
+    .font-roboto {
+        font-family: 'Roboto', sans-serif;
+    }
 </style>
 
 
@@ -2020,52 +2038,46 @@ My Calendar
 
 <!-- RECENT TABS -->
 <!-- Recent Tabs Modal -->
-<div class="modal fade" id="recentTabsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content border-0 bg-white/90 backdrop-blur-sm rounded-xl shadow-xl">
-            <!-- Modal Header -->
-            <div class="modal-header px-6 py-4 border-b border-gray-100">
-                <div class="flex items-center space-x-2">
-                    <span class="material-icons text-gray-600">tab</span>
-                    <h3 class="modal-title text-xl font-semibold text-gray-700">Recent Tabs</h3>
-                </div>
-                <button type="button" class="btn-close opacity-70 hover:opacity-100 transition-opacity" 
-                        data-bs-dismiss="modal" aria-label="Close">
-                </button>
+<div class="modal fade" id="recentTabsModal" tabindex="-1" aria-labelledby="recentTabsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content rounded-2xl overflow-hidden bg-white/70 backdrop-blur-md border border-white/30 shadow-xl">
+            <div class="modal-header p-6 border-b border-white/20">
+                <h5 class="modal-title text-2xl font-semibold text-gray-800 font-roboto">📂 Recent Tabs</h5>
+                <button type="button" class="btn-close p-2 rounded-full hover:bg-gray-100/50 transition-colors" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-
-            <!-- Modal Body -->
-            <div class="modal-body p-4 overflow-y-auto" style="max-height: 60vh;">
-                <div id="recentTabsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <!-- Fallback content -->
-                    <div class="col-span-full text-center py-8">
-                        <span class="material-icons text-gray-400 text-4xl mb-2">tab_unselected</span>
-                        <p class="text-gray-400 text-sm">No recent tabs available</p>
+            
+            <div class="modal-body p-0">
+                <div class="overflow-y-auto max-h-[60vh] custom-scrollbar">
+                    <div id="recentTabsContainer" class="grid grid-cols-1 gap-3 p-4">
+                        <!-- Recent Tab Item Example -->
+                        <div class="group flex items-center p-3 bg-white/80 backdrop-blur-sm rounded-xl border border-white/30 shadow-sm hover:shadow-md transition-all cursor-pointer hover:bg-gray-50/50">
+                            <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                                <span class="material-icons-outlined text-blue-600 text-lg">description</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h6 class="text-sm font-medium text-gray-900 truncate">Document Title</h6>
+                                <p class="text-xs text-gray-500 truncate">https://example.com/document</p>
+                            </div>
+                            <span class="material-icons-outlined text-gray-400 text-lg ml-4 group-hover:text-gray-600">chevron_right</span>
+                        </div>
+                        <!-- Repeat similar structure for other tabs -->
                     </div>
                 </div>
             </div>
 
-            <!-- Modal Footer -->
-            <div class="modal-footer px-6 py-4 bg-gray-50/80 border-t border-gray-100">
-                <div class="flex justify-end space-x-3 w-full">
-                    <button type="button" 
-                            class="flex items-center px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 
-                                   transition-colors duration-200"
-                            id="clearRecentTabs">
-                        <span class="material-icons text-base mr-2">delete_sweep</span>
-                        Clear All
-                    </button>
-                    <button type="button" 
-                            class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 
-                                   transition-colors duration-200"
-                            data-bs-dismiss="modal">
-                        Close
-                    </button>
-                </div>
+            <div class="modal-footer flex justify-between items-center p-4 border-t border-white/20">
+                <button type="button" class="flex items-center text-red-600 hover:text-red-700 transition-colors" id="clearRecentTabs">
+                    <span class="material-icons-outlined mr-2">delete_forever</span>
+                    <span class="text-sm font-medium">Clear All</span>
+                </button>
+                <button type="button" class="px-4 py-2 bg-gray-900/5 hover:bg-gray-900/10 text-gray-900 rounded-lg font-medium text-sm transition-colors" data-bs-dismiss="modal">
+                    Close
+                </button>
             </div>
         </div>
     </div>
 </div>
+
 
 
 
