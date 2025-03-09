@@ -871,8 +871,57 @@ body {
 
     
 
-<!-- Modal to add notes  -->
+<!-- PREMIUM MODALS TASKS EXTEND APP  ----------------------------------------------------------------------------------------------->
+<!-- FETCH AND MANAGE THE ATTACHMENTS  -->
+<!-- 🚀 Premium Attachments Modal -->
+<div class="modal fade" id="premiumAttachmentsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">📂 Task Attachments</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="attachmentsContainer">
+                    <p class="text-muted">Fetching files...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- -------------------------------------------------------------------------------------------------------------------------- -->
 <!-- Modal to add note -->
 <div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -1141,7 +1190,17 @@ body {
                     Activity Logs
                 </button>
 
-                
+                <!-- MANAGE ATTACHEMENTS (PREMIUM) -->
+                <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2" 
+                   data-bs-toggle="modal" 
+                   data-bs-target="#premiumAttachmentsModal" 
+                  data-org-id="{{ org_id }}" 
+                   data-group-id="{{ group.id }}" 
+                   data-task-id="{{ task.id }}">
+                   Manage Attachments
+                   <i class="bi bi-bug"></i>
+                </button>
+
 
                 <div class="flex items-center gap-2 ml-auto">
                     <div class="form-check form-switch">
@@ -2453,6 +2512,112 @@ document.addEventListener("DOMContentLoaded", function () {
         const currentDateElement = document.getElementById("current-date");
         currentDateElement.innerHTML = formattedDate;
     });
+
+
+
+
+// FETCH AND MANAGE THE TASKS ATTACHMENTS
+document.addEventListener("DOMContentLoaded", () => {
+    const modal = document.getElementById("premiumAttachmentsModal");
+    const attachmentsContainer = document.getElementById("attachmentsContainer");
+
+    let selectedOrgId = null;
+    let selectedGroupId = null;
+    let selectedTaskId = null;
+
+    // 📌 Open Modal & Fetch Attachments
+    modal.addEventListener("show.bs.modal", (event) => {
+        const button = event.relatedTarget;
+        selectedOrgId = button.getAttribute("data-org-id");
+        selectedGroupId = button.getAttribute("data-group-id");
+        selectedTaskId = button.getAttribute("data-task-id");
+
+        fetchAttachments();
+    });
+
+    // 📌 Fetch Attachments via AJAX
+    function fetchAttachments() {
+        attachmentsContainer.innerHTML = `<p class="text-muted">Loading files...</p>`;
+
+        fetch(`/tasks/fetch-task-attachments/${selectedOrgId}/${selectedGroupId}/${selectedTaskId}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.attachments.length === 0) {
+                    attachmentsContainer.innerHTML = `<p class="text-muted">No attachments found.</p>`;
+                    return;
+                }
+
+                let html = `<table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Category</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>`;
+
+                data.attachments.forEach(file => {
+                    html += `<tr>
+                                <td>${file.name}</td>
+                                <td>${file.category}</td>
+                                <td>
+                                    <button class="btn btn-info btn-sm" onclick="previewFile('${file.file_url}', '${file.category}')">👁 Preview</button>
+                                    <a href="${file.file_url}" download class="btn btn-success btn-sm">⬇ Download</a>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteAttachment(${file.id})">❌ Delete</button>
+                                </td>
+                            </tr>`;
+                });
+
+                html += `</tbody></table>`;
+                attachmentsContainer.innerHTML = html;
+            })
+            .catch(error => {
+                console.error("Error fetching attachments:", error);
+                attachmentsContainer.innerHTML = `<p class="text-danger">Failed to load files.</p>`;
+            });
+    }
+
+    // 📌 Preview File
+    window.previewFile = (fileUrl, category) => {
+        if (category.toLowerCase().includes("image")) {
+            window.open(fileUrl, "_blank");
+        } else if (category.toLowerCase().includes("video")) {
+            const videoPlayer = `<video controls class="w-100"><source src="${fileUrl}" type="video/mp4"></video>`;
+            attachmentsContainer.innerHTML = videoPlayer;
+        } else {
+            alert("Preview is not available for this file type.");
+        }
+    };
+
+    // 📌 Delete Attachment via AJAX
+    window.deleteAttachment = (attachmentId) => {
+        if (!confirm("Are you sure you want to delete this file?")) return;
+
+        fetch(`/tasks/delete-task-attachment/${selectedOrgId}/${selectedGroupId}/${selectedTaskId}/${attachmentId}/`, {
+            method: "POST",
+            headers: { "X-CSRFToken": getCSRFToken() }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert("File deleted successfully!");
+                fetchAttachments();  // Refresh list after deletion
+            } else {
+                alert("Failed to delete file.");
+            }
+        })
+        .catch(error => console.error("Delete Error:", error));
+    };
+
+    // 📌 Get CSRF Token
+    function getCSRFToken() {
+        return document.cookie.split("; ").find(row => row.startsWith("csrftoken"))?.split("=")[1] || "";
+    }
+});
+
+
+
 
 
 

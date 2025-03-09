@@ -443,7 +443,7 @@ def attach_task_file(request, org_id, group_id, task_id):
 
 
 # FETCH FILES ATTACHED TO THE TASK
-@csrf_exempt
+
 @check_org_membership
 def fetch_task_attachments(request, org_id, group_id, task_id):
     """Fetch all attachments for a specific task"""
