@@ -2,6 +2,7 @@ from django.utils.deprecation import MiddlewareMixin
 from django.core.files.base import ContentFile
 from django.utils.timezone import now
 import os
+import time
 import pyautogui
 from PIL import Image
 from io import BytesIO
@@ -30,8 +31,11 @@ class RecentActivityMiddleware(MiddlewareMixin):
             print(f"✅ Saving new visit entry...")
             visit = RecentVisit.objects.create(user=request.user, url=url)
 
+            # ✅ **Wait for the page to fully load before capturing screenshot**
+            time.sleep(1.5)  # 🔥 Adjust this delay if needed
+
             # Capture screenshot using PyAutoGUI
-            print(f"📸 Capturing full-screen screenshot...")
+            print(f"📸 Capturing full-screen screenshot for: {url}")
             screenshot_data = self.capture_screenshot()
 
             if screenshot_data:
