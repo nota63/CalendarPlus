@@ -678,13 +678,16 @@ def add_to_my_day(request, org_id , group_id, task_id):
 
 
 # Bring the task to perform the actions
-
+@check_org_membership
 def my_day_task_detail(request, org_id, group_id, task_id):
     organization = get_object_or_404(Organization, id=org_id)
     group=get_object_or_404(Group, id=group_id, organization=organization)
 
-    task = get_object_or_404(Task, id=task_id, group=group)
+    task = get_object_or_404(Task, id=task_id, group=group,assigned_to=request.user)
     problems = Problem.objects.filter(task=task,organization=organization,group=group)
+
+    # remained queries
+    queries=task.queries_sent
 
 
     if not AddDay.objects.filter(task=task, user=request.user).exists():
@@ -714,6 +717,7 @@ def my_day_task_detail(request, org_id, group_id, task_id):
         'formatted_time':formatted_time,
         'problems':problems,
         'extend_tasks':extend_tasks,
+        'queries':queries,
     })
 
 
