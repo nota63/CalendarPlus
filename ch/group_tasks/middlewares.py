@@ -7,7 +7,6 @@ import asyncio
 from pyppeteer import launch
 from .models import RecentVisit
 
-
 class RecentActivityMiddleware(MiddlewareMixin):
     def process_request(self, request):
         if request.user.is_authenticated:
@@ -30,12 +29,15 @@ class RecentActivityMiddleware(MiddlewareMixin):
                 buffer = BytesIO()
                 image.save(buffer, format="PNG")
                 file_content = ContentFile(buffer.getvalue())
-                visit.screenshot.save(f"{request.user.id}_{visit.id}.png", file_content)
+                visit.screenshot.save(f"{request.user.id}_{now().timestamp()}.png", file_content)
 
             visit.save()
 
-            # Keep only last 20 recent visits
-            RecentVisit.objects.filter(user=request.user).order_by('-visited_at')[20:].delete()
+            # 🔥 Fix: Delete only extra records properly
+            extra_visits = RecentVisit.objects.filter(user=request.user).order_by('-visited_at')
+            if extra_visits.count() > 20:
+                extra_ids = extra_visits[20:].values_list('id', flat=True)  # Get IDs of extra records
+                RecentVisit.objects.filter(id__in=extra_ids).delete()  # Now delete them safely
 
     async def capture_screenshot(self, url):
         """ Captures a screenshot of the given URL """

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect , get_list_or_404
-from .models import Task, TaskNote, TaskComment , TaskTag, ActivityLog
+from .models import Task, TaskNote, TaskComment , TaskTag, ActivityLog,RecentVisit
 from accounts.models import Organization, Profile
 from groups.models import Group
 from django.views import View
@@ -442,6 +442,7 @@ def attach_task_file(request, org_id, group_id, task_id):
 
 
 
+# FETCH RECENT TABS!
 
 
 
@@ -1447,3 +1448,32 @@ def add_task_comment(request, org_id, group_id, task_id):
 
 
 
+# FETCH RECENT TABS!
+
+@login_required
+def fetch_recent_tabs(request):
+    """ Fetch all recent tabs for the authenticated user """
+    recent_tabs = RecentVisit.objects.filter(user=request.user).order_by('-visited_at')[:20]
+
+    # Serialize data
+    data = [
+        {
+            "id": tab.id,
+            "url": tab.url,
+            "visited_at": tab.visited_at.strftime("%Y-%m-%d %H:%M:%S"),
+            "screenshot": tab.screenshot.url if tab.screenshot else None
+        }
+        for tab in recent_tabs
+    ]
+    
+    return JsonResponse({"status": "success", "recent_tabs": data})
+
+@csrf_exempt  # Remove this if you're using CSRF token in AJAX
+@login_required
+def clear_recent_tabs(request):
+    """ Clear all recent tabs for the authenticated user """
+    if request.method == "POST":
+        RecentVisit.objects.filter(user=request.user).delete()
+        return JsonResponse({"status": "success", "message": "Recent tabs cleared!"})
+    
+    return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)

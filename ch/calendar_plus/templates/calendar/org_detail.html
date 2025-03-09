@@ -70,8 +70,16 @@
            </span>
          </a>
 
+        <!-- RECENT APPS -->
+        <button class="btn btn-primary" id="openRecentTabsModal">
+            📂 Manage Recent Tabs
+        </button>
+        
 
-              <a href="#"
+
+
+
+        <a href="#"
                  class="flex items-center space-x-2 text-gray-800 transition duration-300 hover:text-blue-500">
                  <span class="material-icons text-blue-500">person</span>
                  <span class="font-medium text-[14px]" style="font-family: 'Inter', sans-serif;">
@@ -391,7 +399,16 @@ font-medium px-3 py-2 rounded-lg transition duration-300">
 My Calendar
 </span>
 </a>
+ <!-- Miniapps -->
+ <a href="{% url 'purchase_apps' organization.id %}" 
+ class="flex items-center gap-2 text-gray-700 hover:text-indigo-600 
+ font-medium px-3 py-2 rounded-lg transition duration-300">
+ <span class="material-icons text-indigo-500 transition duration-300">schedule</span> 
+ <span class="font-medium text-[14px]" style="font-family: 'Inter', sans-serif;">
+   App Marketplace
+ </span>
 
+</a>
 
 
 
@@ -541,7 +558,16 @@ font-medium px-3 py-2 rounded-lg transition duration-300">
 My Calendar
 </span>
 </a>
+ <!-- Miniapps -->
+ <a href="{% url 'purchase_apps' organization.id %}" 
+ class="flex items-center gap-2 text-gray-700 hover:text-indigo-600 
+ font-medium px-3 py-2 rounded-lg transition duration-300">
+ <span class="material-icons text-indigo-500 transition duration-300">schedule</span> 
+ <span class="font-medium text-[14px]" style="font-family: 'Inter', sans-serif;">
+   App Marketplace
+ </span>
 
+</a>
             {% if connected_apps %}
               <a href="{% url 'google_calendar_view' %}" 
                 class="flex items-center gap-2 text-gray-700 hover:text-blue-600 
@@ -1976,6 +2002,27 @@ My Calendar
     </div>
 </div>
 
+<!-- RECENT TABS -->
+ <!-- Recent Tabs Modal -->
+<div class="modal fade" id="recentTabsModal" tabindex="-1" aria-labelledby="recentTabsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="recentTabsLabel">📂 Recent Tabs</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="recentTabsContainer" class="row">
+                    <!-- Recent tabs will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="clearRecentTabs">🗑 Clear All</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -3116,6 +3163,59 @@ document.body.appendChild(container);
 
 document.getElementById("reload-btn").addEventListener("click", function() {
     location.reload(); // Reloads the page
+});
+
+
+// MANAGE RECENT TABS
+document.addEventListener("DOMContentLoaded", function () {
+    const openModalBtn = document.getElementById("openRecentTabsModal");
+    const modal = new bootstrap.Modal(document.getElementById("recentTabsModal"));
+    const recentTabsContainer = document.getElementById("recentTabsContainer");
+    const clearRecentTabsBtn = document.getElementById("clearRecentTabs");
+
+    // 🔥 Open modal and load recent tabs
+    openModalBtn.addEventListener("click", function () {
+        modal.show();
+        fetchRecentTabs();
+    });
+
+    // 🔥 Fetch recent tabs via AJAX
+    function fetchRecentTabs() {
+        fetch("/tasks/fetch-recent-tabs/")
+            .then(response => response.json())
+            .then(data => {
+                recentTabsContainer.innerHTML = "";
+                if (data.recent_tabs.length === 0) {
+                    recentTabsContainer.innerHTML = `<p class="text-muted text-center">No recent tabs found.</p>`;
+                    return;
+                }
+                data.recent_tabs.forEach(tab => {
+                    recentTabsContainer.innerHTML += `
+                        <div class="col-md-6 mb-3">
+                            <div class="card shadow-sm">
+                                <img src="${tab.screenshot || '/static/default.png'}" class="card-img-top" alt="Screenshot">
+                                <div class="card-body">
+                                    <p class="card-text">${tab.url}</p>
+                                    <a href="${tab.url}" class="btn btn-primary btn-sm" target="_blank">Open</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            })
+            .catch(error => console.error("Error fetching recent tabs:", error));
+    }
+
+    // 🔥 Clear all recent tabs
+    clearRecentTabsBtn.addEventListener("click", function () {
+        fetch("/tasks/clear-recent-tabs/", { method: "POST" })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                fetchRecentTabs(); // Refresh list after clearing
+            })
+            .catch(error => console.error("Error clearing tabs:", error));
+    });
 });
 
 </script>
