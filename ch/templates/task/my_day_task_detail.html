@@ -2517,7 +2517,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // FETCH AND MANAGE THE TASKS ATTACHMENTS
-
 document.addEventListener("DOMContentLoaded", () => {
     const modal = document.getElementById("premiumAttachmentsModal");
     const attachmentsContainer = document.getElementById("attachmentsContainer");
@@ -2565,7 +2564,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <td>
                                     <button class="btn btn-info btn-sm" onclick="previewFile('${file.file_url}', '${file.category}')">👁 Preview</button>
                                     <a href="${file.file_url}" download class="btn btn-success btn-sm">⬇ Download</a>
-                                    <button class="btn btn-warning btn-sm" onclick="retryAttachment(${file.id})">🔄 Retry</button>
+                                    <button class="btn btn-warning btn-sm retry-btn" data-id="${file.id}">🔄 Retry</button>
                                     <button class="btn btn-danger btn-sm" onclick="deleteAttachment(${file.id})">❌ Delete</button>
                                 </td>
                             </tr>`;
@@ -2573,6 +2572,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 html += `</tbody></table>`;
                 attachmentsContainer.innerHTML = html;
+
+                // Attach event listeners for Retry buttons
+                document.querySelectorAll(".retry-btn").forEach(button => {
+                    button.addEventListener("click", function () {
+                        retryAttachment(this);
+                    });
+                });
             })
             .catch(error => {
                 console.error("Error fetching attachments:", error);
@@ -2629,8 +2635,17 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch(error => console.error("Delete Error:", error));
     };
 
-    // 📌 Retry Attachment (Send to Task Creator)
-    window.retryAttachment = (attachmentId) => {
+    // 📌 Retry Attachment (Send to Task Creator) with Loading Spinner
+    function retryAttachment(button) {
+        const attachmentId = button.getAttribute("data-id");
+
+        // ✅ Save original button text
+        const originalText = button.innerHTML;
+
+        // ✅ Add loading spinner
+        button.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...`;
+        button.disabled = true;
+
         fetch(`/tasks/retry-task-attachment/${selectedOrgId}/${selectedGroupId}/${selectedTaskId}/${attachmentId}/`, {
             method: "POST",
             headers: { "X-CSRFToken": getCSRFToken() }
@@ -2643,8 +2658,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert("Retry failed. Please try again.");
             }
         })
-        .catch(error => console.error("Retry Error:", error));
-    };
+        .catch(error => {
+            console.error("Retry Error:", error);
+            alert("An error occurred while sending the attachment.");
+        })
+        .finally(() => {
+            // ✅ Restore button text after request completes
+            button.innerHTML = originalText;
+            button.disabled = false;
+        });
+    }
 
     // 📌 Get CSRF Token
     function getCSRFToken() {
