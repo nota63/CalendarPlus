@@ -8,9 +8,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Recent Tabs Modal -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
       <!-- FullCalendar CSS -->
-      <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
-      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
       <!-- Bootstrap (For Modal) -->
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -273,6 +279,11 @@
         {% elif is_manager %}
             <h3 class="font-semibold text-lg text-white mb-6">Manager Controls</h3>
 
+            <!-- RECENT APPS -->
+            <button class="btn btn-primary" id="openRecentTabsModal">
+              📂 Recent Tabs
+            </button>
+
              <!-- NLp meeting creation button  -->
              <a href="{% url 'meeting_list' org_id=organization.id %}"
              id="meetingBtn" 
@@ -438,6 +449,10 @@ My Calendar
 
         {% else %}
             <h3 class="font-semibold text-lg text-white mb-6">Employee Controls</h3>
+
+            <button class="btn btn-primary" id="openRecentTabsModal">
+                📂 Recent Tabs
+            </button>
 
              <!-- NLp meeting creation button  -->
              <a href="{% url 'meeting_list' org_id=organization.id %}"
@@ -2004,13 +2019,6 @@ My Calendar
 </div>
 
 <!-- RECENT TABS -->
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-<!-- Recent Tabs Modal -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
 <!-- Recent Tabs Modal -->
 <div class="modal fade" id="recentTabsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl">
