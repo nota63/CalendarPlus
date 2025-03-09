@@ -2004,27 +2004,60 @@ My Calendar
 </div>
 
 <!-- RECENT TABS -->
- <!-- Recent Tabs Modal -->
-<div class="modal fade" id="recentTabsModal" tabindex="-1" aria-labelledby="recentTabsLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="recentTabsLabel">📂 Recent Tabs</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<!-- Recent Tabs Modal -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<!-- Recent Tabs Modal -->
+<div class="modal fade" id="recentTabsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content border-0 bg-white/90 backdrop-blur-sm rounded-xl shadow-xl">
+            <!-- Modal Header -->
+            <div class="modal-header px-6 py-4 border-b border-gray-100">
+                <div class="flex items-center space-x-2">
+                    <span class="material-icons text-gray-600">tab</span>
+                    <h3 class="modal-title text-xl font-semibold text-gray-700">Recent Tabs</h3>
+                </div>
+                <button type="button" class="btn-close opacity-70 hover:opacity-100 transition-opacity" 
+                        data-bs-dismiss="modal" aria-label="Close">
+                </button>
             </div>
-            <div class="modal-body">
-                <div id="recentTabsContainer" class="row">
-                    <!-- Recent tabs will be loaded here -->
+
+            <!-- Modal Body -->
+            <div class="modal-body p-4 overflow-y-auto" style="max-height: 60vh;">
+                <div id="recentTabsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <!-- Fallback content -->
+                    <div class="col-span-full text-center py-8">
+                        <span class="material-icons text-gray-400 text-4xl mb-2">tab_unselected</span>
+                        <p class="text-gray-400 text-sm">No recent tabs available</p>
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" id="clearRecentTabs">🗑 Clear All</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer px-6 py-4 bg-gray-50/80 border-t border-gray-100">
+                <div class="flex justify-end space-x-3 w-full">
+                    <button type="button" 
+                            class="flex items-center px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 
+                                   transition-colors duration-200"
+                            id="clearRecentTabs">
+                        <span class="material-icons text-base mr-2">delete_sweep</span>
+                        Clear All
+                    </button>
+                    <button type="button" 
+                            class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 
+                                   transition-colors duration-200"
+                            data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
 
 
 
