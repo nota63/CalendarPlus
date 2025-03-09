@@ -593,7 +593,7 @@ def send_task_email(request, org_id, group_id, task_id):
     
     # limit on queries
     if task.queries_sent >= 45:
-        return JsonResponse({'error':'you can send only 50 queries in free plan!'}, status=400)
+        return JsonResponse({'error':'you can send only 45 queries in free plan!'}, status=400)
 
 
     # ✅ Email Content
