@@ -552,7 +552,7 @@ def retry_task_attachment(request, org_id, group_id, task_id, attachment_id):
     # ✅ No file attachment, just send the email
     email.send()
 
-    return JsonResponse({"message": "Attachment successfully sent to task creator via email!"})
+    return JsonResponse({"message": "Attachment successfully sent again to the manager!"})
 
 
 
@@ -621,6 +621,16 @@ def my_day_task_detail(request, org_id, group_id, task_id):
     time_spent = task_timer.accumulated_time if task_timer else timedelta()
     formatted_time = str(time_spent)
 
+    # check if user installed the Extend Tasks app
+    # Check if "Extend Tasks" app is installed
+    extend_tasks = InstalledMiniApp.objects.filter(organization=organization, user=request.user, mini_app__name="Extend Tasks")
+
+    if extend_tasks.exists():
+       print("EXTEND TASKS FOUND::")
+    else:
+       print("NOT FOUND!")
+
+
     print('Time Fetched formatted:', formatted_time)
     return render(request, 'task/my_day_task_detail.html', {
         'organization': organization,
@@ -630,6 +640,7 @@ def my_day_task_detail(request, org_id, group_id, task_id):
         'task': task,
         'formatted_time':formatted_time,
         'problems':problems,
+        'extend_tasks':extend_tasks,
     })
 
 
