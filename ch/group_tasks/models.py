@@ -516,3 +516,41 @@ class RecentVisit(models.Model):
 
     class Meta:
         ordering = ['-visited_at']
+
+
+# MEETING FOR THE SPECIFIC TASK (PREMIUM)
+
+class MeetingTaskQuery(models.Model):
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("confirmed", "Confirmed"),
+        ("cancelled", "Cancelled"),
+    ]
+
+    REASON_CHOICES = [
+        ("task_query", "Task Queries"),
+        ("facing_bug", "Facing Bugs"),
+        ("urgent_issue", "Urgent Issue"),
+        ("need_clarification", "Need Clarification"),
+        ("other", "Other"),
+    ]
+
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+
+    scheduled_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="meetings_scheduled")
+    task_creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="meetings_received")
+
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    reason = models.CharField(max_length=50, choices=REASON_CHOICES, default="task_query")  
+
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Meeting for Task {self.task.name} - {self.get_reason_display()} - {self.get_status_display()}"
+
+
