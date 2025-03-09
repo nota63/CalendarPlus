@@ -3239,37 +3239,40 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
                 
                 recentTabsContainer.innerHTML = `
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
-        ${data.recent_tabs.map(tab => `
-            <div class="relative group bg-white rounded-xl shadow-md hover:shadow-lg 
-                      transition-all duration-300 ease-easeOutCubic border border-gray-100
-                      hover:border-gray-200 overflow-hidden">
-                <div class="relative overflow-hidden">
-                    <img src="${tab.screenshot || '/static/default.png'}" 
-                         class="w-full h-56 object-cover transition-transform 
-                                duration-300 group-hover:scale-105">
-                    <div class="absolute inset-0 bg-gradient-to-t from-gray-900/20 via-transparent"></div>
-                </div>
-                
-                <div class="p-5">
-                    <div class="flex items-start justify-between">
-                        
-                        <a href="${tab.url}" 
-                           class="flex items-center px-3 py-2 text-blue-600 hover:text-blue-700 
-                                  hover:bg-blue-50 rounded-lg transition-all duration-200
-                                  group-open-btn"
-                           target="_blank">
-                            <span class="material-icons text-sm">open_in_new</span>
-                        </a>
+    <div class="flex justify-center w-full px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl w-full">
+            ${data.recent_tabs.map(tab => `
+                <div class="relative group bg-white/80 backdrop-blur-sm rounded-xl shadow-sm 
+                          transition-all duration-300 hover:shadow-md border border-gray-200/50
+                          hover:border-gray-300/70 overflow-hidden hover:bg-white/90">
+                    <div class="relative aspect-video overflow-hidden">
+                        <img src="${tab.screenshot || '/static/default.png'}" 
+                             class="w-full h-full object-cover transition-transform 
+                                    duration-300 group-hover:scale-105">
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900/10 via-transparent"></div>
                     </div>
                     
-                    <div class="flex items-center text-gray-500 text-xs">
-                        <span class="material-icons text-sm mr-1">schedule</span>
-                        <span>${tab.last_accessed || 'Recently visited'}</span>
+                    <div class="p-4 flex items-start justify-between">
+                        <div class="pr-4 flex-1 min-w-0">
+                            <p class="text-[13px] font-medium text-gray-800 truncate mb-1">
+                                ${tab.title || 'Untitled Document'}
+                            </p>
+                            <p class="text-[11px] text-gray-500 font-light truncate">
+                                ${new URL(tab.url).hostname}
+                            </p>
+                        </div>
+                        
+                        <a href="${tab.url}" 
+                           class="flex items-center justify-center w-8 h-8 rounded-lg 
+                                  bg-gray-100/50 hover:bg-gray-200/60 backdrop-blur-sm
+                                  transition-colors duration-200 shadow-sm
+                                  absolute right-3 top-3">
+                            <span class="material-icons text-[18px] text-gray-600">open_in_new</span>
+                        </a>
                     </div>
                 </div>
-            </div>
-        `).join('')}
+            `).join('')}
+        </div>
     </div>`;
             })
             .catch(error => console.error("Error fetching recent tabs:", error));
