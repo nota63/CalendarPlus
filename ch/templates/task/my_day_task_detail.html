@@ -10,6 +10,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ task.title }} - Task Details</title>
     <link rel="stylesheet" href="{% static 'assets/css/my_tasks.css' %}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
      
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -2547,31 +2549,68 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
-                let html = `<table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Category</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>`;
+                let html = `
+<div class="max-w-6xl mx-auto p-6 font-['Inter']">
+    <div class="bg-white/30 backdrop-blur-lg rounded-2xl shadow-xl overflow-hidden border border-white/20">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-black/10">
+                    <tr class="text-left text-gray-700">
+                        <th class="px-6 py-4 font-semibold uppercase text-sm tracking-wider">Name</th>
+                        <th class="px-6 py-4 font-semibold uppercase text-sm tracking-wider">Category</th>
+                        <th class="px-6 py-4 font-semibold uppercase text-sm tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/20">`;
 
-                data.attachments.forEach(file => {
-                    html += `<tr>
-                                <td>${file.name}</td>
-                                <td>${file.category}</td>
-                                <td>
-                                    <button class="btn btn-info btn-sm" onclick="previewFile('${file.file_url}', '${file.category}')">👁 Preview</button>
-                                    <a href="${file.file_url}" download class="btn btn-success btn-sm">⬇ Download</a>
-                                    <button class="btn btn-warning btn-sm retry-btn" data-id="${file.id}">🔄 Retry</button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteAttachment(${file.id})">❌ Delete</button>
-                                </td>
-                            </tr>`;
-                });
+data.attachments.forEach((file, index) => {
+    html += `
+                    <tr class="${index % 2 === 0 ? 'bg-white/5' : 'bg-black/5'} hover:bg-white/10 transition-colors duration-200">
+                        <td class="px-6 py-4 text-gray-200 font-medium">${file.name}</td>
+                        <td class="px-6 py-4">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-indigo-100/30 text-indigo-400">
+                                ${file.category}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center space-x-3">
+                                <button onclick="previewFile('${file.file_url}', '${file.category}')" 
+                                    class="p-2 hover:bg-white/20 rounded-lg transition-all duration-200 group"
+                                    title="Preview">
+                                    <span class="material-icons text-blue-400 group-hover:text-blue-300">visibility</span>
+                                </button>
+                                
+                                <a href="${file.file_url}" download
+                                    class="p-2 hover:bg-white/20 rounded-lg transition-all duration-200 group"
+                                    title="Download">
+                                    <span class="material-icons text-green-400 group-hover:text-green-300">download</span>
+                                </a>
+                                
+                                <button class="retry-btn p-2 hover:bg-white/20 rounded-lg transition-all duration-200 group"
+                                    data-id="${file.id}"
+                                    title="Retry">
+                                    <span class="material-icons text-yellow-400 group-hover:text-yellow-300">autorenew</span>
+                                </button>
+                                
+                                <button onclick="deleteAttachment(${file.id})" 
+                                    class="p-2 hover:bg-white/20 rounded-lg transition-all duration-200 group"
+                                    title="Delete">
+                                    <span class="material-icons text-red-400 group-hover:text-red-300">delete</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>`;
+});
 
-                html += `</tbody></table>`;
-                attachmentsContainer.innerHTML = html;
+html += `
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>`;
+
+attachmentsContainer.innerHTML = html;
+
 
                 // Attach event listeners for Retry buttons
                 document.querySelectorAll(".retry-btn").forEach(button => {
