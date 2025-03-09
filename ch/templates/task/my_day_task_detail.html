@@ -1362,19 +1362,17 @@ body {
     </div>
 
     <!-- Activity Logs Sidebar -->
-    <div id="activityLogsSidebar" class="activity-logs-sidebar fixed top-0 right-0 h-full w-80 bg-white shadow-2xl transform translate-x-full transition-transform">
-        <div class="p-6 h-full flex flex-col">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-gray-800">Activity Logs</h3>
-                <button id="closeSidebarButton" class="p-2 hover:bg-gray-100 rounded-full">
-                    <i class="bi bi-x-lg text-gray-600"></i>
-                </button>
-            </div>
-            <div id="activityLogsContainer" class="flex-1 overflow-y-auto">
-                <!-- Activity logs content -->
-            </div>
+     <!-- Sidebar for Activity Logs -->
+<div id="activityLogsSidebar" class="activity-logs-sidebar">
+    <div class="sidebar-content">
+        <button id="closeSidebarButton" class="btn btn-light">Close</button>
+        <h3>Activity Logs</h3>
+        <div id="activityLogsContainer" class="activity-logs-container">
+            <!-- Activity logs will be loaded here -->
         </div>
     </div>
+</div>
+
 <!-- ---------------------------------------------------------------working on ui------------------------------------- -->
 
 
