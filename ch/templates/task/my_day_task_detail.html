@@ -10,6 +10,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ task.title }} - Task Details</title>
     <link rel="stylesheet" href="{% static 'assets/css/my_tasks.css' %}">
+     
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
    
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -1030,277 +1039,343 @@ body {
     </div>
 </div>
 
+
+
 <!-- --------------------------------------------------------------------------------------------------------------------------------------------------- -->
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body {
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .glass-card {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .progress-bar {
+        transition: width 0.3s ease-in-out;
+    }
+
+    .activity-logs-sidebar {
+        transform: translateX(100%);
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .activity-logs-sidebar.active {
+        transform: translateX(0);
+    }
+</style>
+</head>
+
+<body class="bg-gray-50 min-h-screen p-6 font-['Roboto']">
+    <!-- Notification -->
+    <div id="notification" class="notification hidden fixed top-4 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-3 rounded-lg shadow-md border border-gray-200">
+        <span id="notification-text" class="text-sm font-medium text-gray-700"></span>
+        <button onclick="closeNotification()" class="material-icons-round text-gray-500 hover:text-gray-700 text-lg">close</button>
+    </div>
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Main Task Card -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6 border border-gray-200">
+            <!-- Task Header -->
+            <div class="flex items-center gap-3 mb-6">
+                <i class="bi bi-list-task text-2xl text-blue-600"></i>
+                <h1 class="text-2xl font-bold text-gray-800">{{ task.title }}</h1>
+            </div>
+
+            <!-- Task Details -->
+            <div class="grid gap-4 mb-6">
+                <div>
+                    <p class="font-medium text-gray-700 mb-1">Description</p>
+                    <p class="text-gray-600">{{ task.description }}</p>
+                </div>
+                
+                <div>
+                    <p class="font-medium text-gray-700 mb-1">Priority</p>
+                    <span class="inline-block px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm">{{ task.priority }}</span>
+                </div>
+                
+                <div>
+                    <p class="font-medium text-gray-700 mb-1">Deadline</p>
+                    <p class="text-gray-600">{{ task.deadline }}</p>
+                </div>
+            </div>
+
+            <!-- Progress Section -->
+              <!-- Progress Section -->
+            <div class="mb-8">
+                <div class="flex items-center justify-between mb-2">
+                    <p class="text-sm font-medium text-gray-500">Progress</p>
+                    <span class="text-sm font-medium text-blue-600">{{ task.progress }}%</span>
+                </div>
+                <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                    <div id="progressBar" class="h-full bg-blue-500 progress-bar" style="width: {{ task.progress }}%"
+                    aria-valuenow="{{ task.progress }}" 
+                    aria-valuemin="0" 
+                    aria-valuemax="100">{{ task.progress }}%></div>
+                </div>
+                <div class="flex items-center gap-2 mt-3" id="progress-controls">
+                    <button id="decreaseProgress" class="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center">
+                        <span class="material-icons-round text-gray-600">remove</span>
+                    </button>
+                    <button id="increaseProgress" class="w-8 h-8 rounded-lg bg-blue-500 hover:bg-blue-600 flex items-center justify-center">
+                        <span class="material-icons-round text-white">add</span>
+                    </button>
+                </div>
+            </div>
 
 
-<div id="notification" class="notification">
-    <span id="notification-text"></span>
-    <button class="close-btn" onclick="closeNotification()">
-</div>
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap gap-3 mb-6">
+                <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                        data-bs-toggle="offcanvas" data-bs-target="#problemsSidebar" aria-controls="problemsSidebar">
+                    <i class="bi bi-bug"></i>
+                    View Problems
+                </button>
 
+                <button id="activityLogsButton" class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 flex items-center gap-2">
+                    <i class="bi bi-list-check"></i>
+                    Activity Logs
+                </button>
 
+                <div class="flex items-center gap-2 ml-auto">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input w-10 -ml-10 h-5 align-top rounded-full shadow-sm checked:bg-blue-600 bg-no-repeat bg-contain float-left cursor-pointer"
+                               type="checkbox" role="switch" id="toggleTaskStatus" 
+                               data-task-id="{{ task.id }}" 
+                               data-org-id="{{ org_id }}" 
+                               data-group-id="{{ group_id }}" 
+                               {% if task.status == 'completed' %} checked {% endif %}>
+                    </div>
+                    <label class="form-check-label inline-block text-gray-700" for="toggleTaskStatus">
+                        {% if task.status == 'completed' %}
+                            Mark as Pending
+                        {% else %}
+                            Mark as Completed
+                        {% endif %}
+                    </label>
+                </div>
+            </div>
 
+            <!-- Tags Section -->
+            <div class="mb-6">
+                <p class="font-medium text-gray-700 mb-2">Tags</p>
+                <div class="flex flex-wrap gap-2">
+                    {% if task.tags.all %}
+                        {% for tag in task.tags.all %}
+                            <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full flex items-center gap-2 text-sm"
+                                  id="tag-{{ tag.id }}" 
+                                  data-task-id="{{ task.id }}"
+                                  data-org-id="{{ org_id }}"
+                                  data-group-id="{{ group_id }}">
+                                {{ tag.name }}
+                                <button class="text-yellow-800 hover:text-yellow-900 text-sm remove-tag"
+                                        data-tag="{{ tag.name }}" 
+                                        data-tag-id="{{ tag.id }}"
+                                        data-task-id="{{ task.id }}"
+                                        data-org-id="{{ org_id }}"
+                                        data-group-id="{{ group_id }}">
+                                    ×
+                                </button>
+                            </span>
+                        {% endfor %}
+                        <button class="w-8 h-8 rounded-full bg-green-100 text-green-600 hover:bg-green-200 flex items-center justify-center"
+                                id="add-tag-btn"
+                                data-task-id="{{ task.id }}"
+                                data-org-id="{{ org_id }}"
+                                data-group-id="{{ group_id }}">
+                            +
+                        </button>
+                    {% else %}
+                        <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">No tags</span>
+                        <button class="w-8 h-8 rounded-full bg-green-100 text-green-600 hover:bg-green-200 flex items-center justify-center"
+                                id="add-tag-btn"
+                                data-task-id="{{ task.id }}"
+                                data-org-id="{{ org_id }}"
+                                data-group-id="{{ group_id }}">
+                            +
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
 
-     
-    <div class="container">
-        <div class="task-container">
-            <h1 class="mb-4"><i class="bi bi-list-task task-icon"></i> {{ task.title }}</h1>
-            <p><strong>Description:</strong> {{ task.description }}</p>
-            <p><strong>Priority:</strong> <span class="badge bg-danger">{{ task.priority }}</span></p>
-            <p><strong>Deadline:</strong> {{ task.deadline }}</p>
-            <p><strong>Progress:</strong></p>
-<div class="progress mb-3">
-    <div id="progressBar" class="progress-bar bg-success" role="progressbar" 
-         style="width: {{ task.progress }}%" 
-         aria-valuenow="{{ task.progress }}" 
-         aria-valuemin="0" 
-         aria-valuemax="100">{{ task.progress }}%</div>
-</div>
+            <!-- Time Tracking -->
+            <div class="mb-6">
+                <p class="font-medium text-gray-700 mb-2">Time Tracking</p>
+                <div class="flex flex-wrap gap-2">
+                    {% if task.time_tracking.all %}
+                        {% for time_entry in task.time_tracking.all %}
+                            <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                                  id="time-entry-{{ time_entry.id }}" 
+                                  data-task-id="{{ task.id }}"
+                                  data-org-id="{{ org_id }}"
+                                  data-group-id="{{ group_id }}">
+                                {{ time_entry.user.username }}: {{ time_entry.time_spent }}h
+                            </span>
+                        {% endfor %}
+                    {% else %}
+                        <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">No time tracked</span>
+                    {% endif %}
+                </div>
+                
+                <!-- Stopwatch -->
+                <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <p class="font-medium text-gray-700 mb-2">Stopwatch</p>
+                    <div class="flex items-center gap-4">
+                        <p id="time-display" class="text-2xl font-bold text-gray-800">00:00:00</p>
+                        <button id="start-stop-btn" 
+                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                data-task-id="{{ task.id }}" 
+                                data-org-id="{{ org_id }}" 
+                                data-group-id="{{ group_id }}">
+                            Start
+                        </button>
+                        <button id="save-time-btn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700" style="display: none;">
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-<div class="progress-controls">
-    <button id="decreaseProgress" class="btn btn-secondary btn-sm">-</button>
-    <button id="increaseProgress" class="btn btn-primary btn-sm">+</button>
-</div>
-<br>
-
-
-
- <!-- View Problems Button -->
- <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#problemsSidebar" aria-controls="problemsSidebar">
-    View Problems
-</button>
-
-
-
-<!-- Activity log  -->
-
-<!-- Activity Logs Icon -->
-<button id="activityLogsButton" class="btn btn-dark">
-    <i class="bi bi-list-check"></i> Activity Logs
-</button>
-
-<!-- mark as completed  -->
-<div class="form-check form-switch">
-    <input 
-        class="form-check-input" 
-        type="checkbox" 
-        role="switch" 
-        id="toggleTaskStatus" 
-        data-task-id="{{ task.id }}" 
-        data-org-id="{{ org_id }}" 
-        data-group-id="{{ group_id }}" 
-        {% if task.status == 'completed' %} checked {% endif %}>
-    <label class="form-check-label" for="toggleTaskStatus">
-        {% if task.status == 'completed' %}
-            Mark as Pending
-        {% else %}
-            Mark as Completed
-        {% endif %}
-    </label>
-</div>
-
-<!-- Additional features  -->
-            <hr>
-            <h4>Additional Features</h4>
-
-            <!-- Displaying tags -->
-       <!-- Displaying tags -->
-<p><strong>Tags:</strong>
-    {% if task.tags.all %}
-        {% for tag in task.tags.all %}
-            <span class="badge bg-warning" 
-                  id="tag-{{ tag.id }}" 
-                  data-task-id="{{ task.id }}"
-                  data-org-id="{{ org_id }}"
-                  data-group-id="{{ group_id }}">
-                {{ tag.name }}
-                <button class="btn btn-sm btn-danger remove-tag" 
-                        data-tag="{{ tag.name }}" 
-                        data-tag-id="{{ tag.id }}"
-                        data-task-id="{{ task.id }}"
-                        data-org-id="{{ org_id }}"
-                        data-group-id="{{ group_id }}">-</button>
-            </span>
-        {% endfor %}
-        <button class="btn btn-sm btn-success" 
-                id="add-tag-btn"
-                data-task-id="{{ task.id }}"
-                data-org-id="{{ org_id }}"
-                data-group-id="{{ group_id }}">+</button>
-    {% else %}
-        <span class="badge bg-secondary">No tags</span>
-        <button class="btn btn-sm btn-success" 
-                id="add-tag-btn"
-                data-task-id="{{ task.id }}"
-                data-org-id="{{ org_id }}"
-                data-group-id="{{ group_id }}">+</button>
-    {% endif %}
-</p>
-
-
-
-
-<!-- Displaying Time Tracking -->
- <!-- Displaying Time Tracking -->
-<p><strong>Time Tracking:</strong>
-    {% if task.time_tracking.all %}
-        {% for time_entry in task.time_tracking.all %}
-            <span class="badge bg-info" 
-                  id="time-entry-{{ time_entry.id }}" 
-                  data-task-id="{{ task.id }}"
-                  data-org-id="{{ org_id }}"
-                  data-group-id="{{ group_id }}">
-                {{ time_entry.user.username }}: {{ time_entry.time_spent }} hours
-            </span>
-        {% endfor %}
-    {% else %}
-        <span class="badge bg-secondary">No time tracked</span>
-    {% endif %}
-</p>
-
-<!-- Stopwatch Display -->
-<!-- Stopwatch Display -->
-<div id="stopwatch-container">
-    <p><strong>Stopwatch:</strong></p>
-    <p id="time-display">00:00:00</p>
-    <button id="start-stop-btn" 
-            class="btn btn-sm btn-primary"
-            data-task-id="{{ task.id }}" 
-            data-org-id="{{ org_id }}" 
-            data-group-id="{{ group_id }}">
-        Start
-    </button>
-    <button id="save-time-btn" class="btn btn-sm btn-success" style="display: none;">Save Time</button>
-</div>
-
-
-            
-            <!-- Displaying notes -->
-            <p><strong>Notes:</strong>
+            <!-- Notes Section -->
+            <div class="mb-6">
+                <p class="font-medium text-gray-700 mb-2">Notes</p>
                 {% if task.notes.all %}
-                <ul id="taskNotesList">
-                    {% for note in task.notes.all %}
-                    <li id="note-{{ note.id }}">
-                        <strong>{{ note.user.username }}:</strong> 
-                        <span class="note-content">{{ note.note }}</span> 
-                        ({{ note.created_at|date:"F j, Y, g:i a" }})
-                        
-                        <!-- 3-dot menu -->
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                &#x22EE; <!-- Ellipsis (three dots) -->
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <li><button class="dropdown-item delete-note" 
-                                        data-note-id="{{ note.id }}" 
-                                        data-task-id="{{ task.id }}" 
-                                        data-group-id="{{ task.group.id }}" 
-                                        data-org-id="{{ task.group.organization.id }}">
-                                    Delete
-                                </button></li>
-                                <li><button class="dropdown-item edit-note" 
-                                    data-note-id="{{ note.id }}" 
-                                    data-task-id="{{ task.id }}" 
-                                    data-group-id="{{ task.group.id }}" 
-                                    data-org-id="{{ task.group.organization.id }}" 
-                                    data-note-content="{{ note.note }}">
-                                Edit
-                            </button></li>
-                            </ul>
-                        </div>
-                    </li>
-                    {% endfor %}
-                </ul>
+                    <ul id="taskNotesList" class="space-y-3">
+                        {% for note in task.notes.all %}
+                            <li id="note-{{ note.id }}" class="p-4 bg-gray-50 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <span class="font-medium text-gray-700">{{ note.user.username }}</span>
+                                        <span class="text-sm text-gray-500 ml-2">{{ note.created_at|date:"F j, Y, g:i a" }}</span>
+                                    </div>
+                                    <div class="dropdown relative">
+                                        <button class="dropdown-toggle p-1 hover:bg-gray-200 rounded-lg"
+                                                type="button" 
+                                                id="dropdownMenuButton"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                            <i class="bi bi-three-dots-vertical text-gray-600"></i>
+                                        </button>
+                                        <ul class="dropdown-menu absolute right-0 hidden bg-white shadow-lg rounded-md py-1 z-10">
+                                            <li>
+                                                <button class="delete-note w-full px-4 py-2 text-left hover:bg-gray-100 text-red-600"
+                                                        data-note-id="{{ note.id }}" 
+                                                        data-task-id="{{ task.id }}" 
+                                                        data-group-id="{{ task.group.id }}" 
+                                                        data-org-id="{{ task.group.organization.id }}">
+                                                    Delete
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button class="edit-note w-full px-4 py-2 text-left hover:bg-gray-100"
+                                                        data-note-id="{{ note.id }}" 
+                                                        data-task-id="{{ task.id }}" 
+                                                        data-group-id="{{ task.group.id }}" 
+                                                        data-org-id="{{ task.group.organization.id }}" 
+                                                        data-note-content="{{ note.note }}">
+                                                    Edit
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <p class="note-content text-gray-600">{{ note.note }}</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
                 {% else %}
-                <span>No notes yet.</span>
+                    <p class="text-gray-500">No notes yet.</p>
                 {% endif %}
-                <!-- Button to open the modal -->
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">
+                <button class="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        data-bs-toggle="modal" data-bs-target="#addNoteModal">
                     Add Note
                 </button>
-            </p>
-            
-
-
-            <!-- Displaying comments -->
-
-
-            <p><strong>Comments:</strong>
-    {% if task.comments.all %}
-        <ul id="comments-list">
-            {% for comment in task.comments.all %}
-                <li id="comment-{{ comment.id }}">
-                    <strong>{{ comment.user.username }}:</strong> 
-                    <span class="comment-text">{{ comment.comment }}</span> 
-                    ({{ comment.created_at|date:"F j, Y, g:i a" }})
-
-                    <!-- Three-dot menu -->
-                    <div class="dropdown d-inline-block">
-                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" 
-                                id="dropdownMenuButton{{ comment.id }}" 
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                            ...
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ comment.id }}">
-                            <li>
-                                <button class="dropdown-item edit-comment" 
-                                        data-comment-id="{{ comment.id }}" 
-                                        data-org-id="{{ org_id }}" 
-                                        data-group-id="{{ group_id }}" 
-                                        data-task-id="{{ task.id }}" 
-                                        data-comment-content="{{ comment.comment }}">
-                                    Edit
-                                </button>
-                            </li>
-                            <li>
-                                <button class="dropdown-item delete-comment" 
-                                        data-comment-id="{{ comment.id }}" 
-                                        data-org-id="{{ org_id }}" 
-                                        data-group-id="{{ group_id }}" 
-                                        data-task-id="{{ task.id }}">
-                                    Delete
-                                </button>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <span>No comments yet.</span>
-    {% endif %}
-</p>
-
-            <!-- Comment Input -->
-            <div class="form-group">
-                <textarea id="comment-text" class="form-control" rows="3" placeholder="Add your comment..."></textarea>
             </div>
-            <button id="submit-comment" class="btn btn-primary mt-2" 
-                    data-org-id="{{ org_id }}" data-group-id="{{ group_id }}" data-task-id="{{ task.id }}">
-                Add Comment
-            </button>
 
+            <!-- Comments Section -->
+            <div>
+                <p class="font-medium text-gray-700 mb-2">Comments</p>
+                {% if task.comments.all %}
+                    <ul id="comments-list" class="space-y-4">
+                        {% for comment in task.comments.all %}
+                            <li id="comment-{{ comment.id }}" class="p-4 bg-gray-50 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <span class="font-medium text-gray-700">{{ comment.user.username }}</span>
+                                        <span class="text-sm text-gray-500 ml-2">{{ comment.created_at|date:"F j, Y, g:i a" }}</span>
+                                    </div>
+                                    <div class="dropdown relative">
+                                        <button class="dropdown-toggle p-1 hover:bg-gray-200 rounded-lg"
+                                                type="button"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                            <i class="bi bi-three-dots-vertical text-gray-600"></i>
+                                        </button>
+                                        <ul class="dropdown-menu absolute right-0 hidden bg-white shadow-lg rounded-md py-1 z-10">
+                                            <li>
+                                                <button class="edit-comment w-full px-4 py-2 text-left hover:bg-gray-100"
+                                                        data-comment-id="{{ comment.id }}" 
+                                                        data-org-id="{{ org_id }}" 
+                                                        data-group-id="{{ group_id }}" 
+                                                        data-task-id="{{ task.id }}" 
+                                                        data-comment-content="{{ comment.comment }}">
+                                                    Edit
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button class="delete-comment w-full px-4 py-2 text-left hover:bg-gray-100 text-red-600"
+                                                        data-comment-id="{{ comment.id }}" 
+                                                        data-org-id="{{ org_id }}" 
+                                                        data-group-id="{{ group_id }}" 
+                                                        data-task-id="{{ task.id }}">
+                                                    Delete
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <p class="comment-text text-gray-600">{{ comment.comment }}</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-gray-500">No comments yet.</p>
+                {% endif %}
+                
+                <div class="mt-4">
+                    <textarea id="comment-text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" 
+                              rows="3" placeholder="Add your comment..."></textarea>
+                    <button id="submit-comment" 
+                            class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                            data-org-id="{{ org_id }}" 
+                            data-group-id="{{ group_id }}" 
+                            data-task-id="{{ task.id }}">
+                        Add Comment
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
-
-
-    <!-- Modal for activity logs  -->
-
-    <!-- Sidebar for Activity Logs -->
-<div id="activityLogsSidebar" class="activity-logs-sidebar">
-    <div class="sidebar-content">
-        <button id="closeSidebarButton" class="btn btn-light">Close</button>
-        <h3>Activity Logs</h3>
-        <div id="activityLogsContainer" class="activity-logs-container">
-            <!-- Activity logs will be loaded here -->
+    <!-- Activity Logs Sidebar -->
+    <div id="activityLogsSidebar" class="activity-logs-sidebar fixed top-0 right-0 h-full w-80 bg-white shadow-2xl transform translate-x-full transition-transform">
+        <div class="p-6 h-full flex flex-col">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">Activity Logs</h3>
+                <button id="closeSidebarButton" class="p-2 hover:bg-gray-100 rounded-full">
+                    <i class="bi bi-x-lg text-gray-600"></i>
+                </button>
+            </div>
+            <div id="activityLogsContainer" class="flex-1 overflow-y-auto">
+                <!-- Activity logs content -->
+            </div>
         </div>
     </div>
-</div>
-
-
-
-
+<!-- ---------------------------------------------------------------working on ui------------------------------------- -->
 
 
 

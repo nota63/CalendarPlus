@@ -985,12 +985,13 @@ My Calendar
                     
                     <div class="grid grid-cols-2 gap-3">
                         {% for app in installed_apps %}
-                        <a href="{% url 'launch_app' org_id=organization.id app_id=app.id %}" class="block">
-                            <div class="bg-white p-4 rounded-lg border border-gray-100 text-center hover:border-indigo-100 transition-colors cursor-pointer">
-                                <div class="w-10 h-10 bg-indigo-50 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                        <a href="{% url 'launch_app' org_id=organization.id app_id=app.id %}" class="block group">
+                            <div class="bg-white p-4 rounded-lg border border-gray-100 text-center hover:border-indigo-100 transition-colors cursor-pointer hover:bg-gray-50 active:bg-gray-100">
+                                <div class="w-10 h-10 bg-indigo-50 rounded-lg mx-auto mb-2 flex items-center justify-center transition-colors group-hover:bg-indigo-100">
                                     <img src="{{ app.mini_app.icon.url }}" alt="{{ app.mini_app.name }}" class="w-6 h-6">
                                 </div>
                                 <h3 class="text-xs font-medium text-gray-800 mb-1">{{ app.mini_app.name }}</h3>
+                                
                             </div>
                         </a>
                         
@@ -2102,7 +2103,6 @@ My Calendar
         </div>
     </div>
 </div>
-
 
 
 

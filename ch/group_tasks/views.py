@@ -1468,7 +1468,8 @@ def fetch_recent_tabs(request):
     
     return JsonResponse({"status": "success", "recent_tabs": data})
 
-@csrf_exempt  # Remove this if you're using CSRF token in AJAX
+# clear recent tabs
+@csrf_exempt  
 @login_required
 def clear_recent_tabs(request):
     """ Clear all recent tabs for the authenticated user """
