@@ -590,6 +590,11 @@ def send_task_email(request, org_id, group_id, task_id):
     task_creator = task.created_by
     if not task_creator or not task_creator.email:
         return JsonResponse({"error": "Task creator email not found!"}, status=400)
+    
+    # limit on queries
+    if task.queries_sent >= 45:
+        return JsonResponse({'error':'you can send only 50 queries in free plan!'}, status=400)
+
 
     # ✅ Email Content
     email_message = f"""
@@ -619,9 +624,6 @@ def send_task_email(request, org_id, group_id, task_id):
     )
     # increment the count of queries
     task.queries_sent+=1
-    if task.queries_sent > 50:
-        return JsonResponse({'error':'you can send only 50 queries in free plan!'})
-
     task.save()
 
     
