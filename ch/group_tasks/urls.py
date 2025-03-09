@@ -40,6 +40,7 @@ urlpatterns = [
     path("fetch-task-attachments/<int:org_id>/<int:group_id>/<int:task_id>/", fetch_task_attachments, name="fetch_task_attachments"),
     path("delete-task-attachment/<int:org_id>/<int:group_id>/<int:task_id>/<int:attachment_id>/", delete_task_attachment, name="delete_task_attachment"),
     path('retry-task-attachment/<int:org_id>/<int:group_id>/<int:task_id>/<int:attachment_id>/', retry_task_attachment, name="retry_task_attachment"),
+    path('send-task-query/<int:org_id>/<int:group_id>/<int:task_id>/',send_task_email, name='send_task_query')
   
   
   

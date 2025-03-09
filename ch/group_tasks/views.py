@@ -556,6 +556,69 @@ def retry_task_attachment(request, org_id, group_id, task_id, attachment_id):
 
 
 
+# SEND CUSTOM QUERY ABOUT THE TASK TO THE MANAGER
+@csrf_exempt
+@login_required
+def send_task_email(request, org_id, group_id, task_id):
+    """Allows the assigned user to send a custom email to the task creator."""
+    
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request method"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        email_subject = data.get("subject", "").strip()
+        email_body = data.get("message", "").strip()
+    except (json.JSONDecodeError, KeyError):
+        return JsonResponse({"error": "Invalid JSON data"}, status=400)
+
+    if not email_subject or not email_body:
+        return JsonResponse({"error": "Subject and message cannot be empty"}, status=400)
+
+    # ✅ Fetch Task, Organization, and Group
+    task = get_object_or_404(Task, id=task_id, organization_id=org_id, group_id=group_id)
+    organization = get_object_or_404(Organization, id=org_id)
+    group = get_object_or_404(Group, id=group_id)
+
+    # ✅ Ensure the current user is assigned to the task
+    current_user = request.user
+    if current_user != task.assigned_to:
+        return JsonResponse({"error": "You are not assigned to this task!"}, status=403)
+
+    # ✅ Get Task Creator
+    task_creator = task.created_by
+    if not task_creator or not task_creator.email:
+        return JsonResponse({"error": "Task creator email not found!"}, status=400)
+
+    # ✅ Email Content
+    email_message = f"""
+    Hello {task_creator.get_full_name()},
+
+    The user **{current_user.username}** working on your task **"{task.title}"** has sent you a message.
+
+    📌 **Task Details:**
+    - **Organization:** {organization.name}
+    - **Group:** {group.name}
+    - **Task:** {task.title}
+
+    📩 **Message from {current_user.username}:**  
+    {email_body}
+
+    Best Regards,  
+    Calendar Plus Team
+    """
+
+    # ✅ Send Email
+    send_mail(
+        subject=email_subject,
+        message=email_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[task_creator.email],
+        fail_silently=False,
+    )
+
+    return JsonResponse({"message": "Email successfully sent to the task creator!"})
+
 
 
 
