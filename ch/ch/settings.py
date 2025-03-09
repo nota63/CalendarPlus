@@ -129,7 +129,7 @@ MIDDLEWARE = [
     'ch.middlewares.FirstTimeGuideMiddleware',
     'ch.middlewares.OrgGuideMiddleware',
     # 'axes.middleware.AxesMiddleware',
-    'group_tasks.middlewares.RecentActivityMiddleware',
+    # 'group_tasks.middlewares.RecentActivityMiddleware',
 
 ]
 
