@@ -442,7 +442,8 @@ def attach_task_file(request, org_id, group_id, task_id):
 
 
 
-# FETCH RECENT TABS!
+# FETCH FILES ATTACHED TO THE TASK
+
 
 
 

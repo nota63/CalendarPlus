@@ -1141,6 +1141,8 @@ body {
                     Activity Logs
                 </button>
 
+                
+
                 <div class="flex items-center gap-2 ml-auto">
                     <div class="form-check form-switch">
                         <input class="form-check-input w-10 -ml-10 h-5 align-top rounded-full shadow-sm checked:bg-blue-600 bg-no-repeat bg-contain float-left cursor-pointer"
@@ -1173,13 +1175,13 @@ body {
                                   data-group-id="{{ group_id }}">
                                 {{ tag.name }}
                                 <button class="text-yellow-800 hover:text-yellow-900 text-sm remove-tag"
-                                        data-tag="{{ tag.name }}" 
-                                        data-tag-id="{{ tag.id }}"
-                                        data-task-id="{{ task.id }}"
-                                        data-org-id="{{ org_id }}"
-                                        data-group-id="{{ group_id }}">
-                                    ×
-                                </button>
+                                data-tag="{{ tag.name }}" 
+                                data-tag-id="{{ tag.id }}"
+                                data-task-id="{{ task.id }}"
+                                data-org-id="{{ org_id }}"
+                                data-group-id="{{ group_id }}">
+                            ×
+                        </button>
                             </span>
                         {% endfor %}
                         <button class="w-8 h-8 rounded-full bg-green-100 text-green-600 hover:bg-green-200 flex items-center justify-center"
