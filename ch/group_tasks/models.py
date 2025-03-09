@@ -502,3 +502,16 @@ class AttachmentsTasksApp(models.Model):
         """Soft delete instead of hard delete"""
         self.is_deleted = True
         self.save()
+
+
+# MODEL (RECENT VISIT TABS)
+
+class RecentVisit(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    url = models.URLField()  
+    title = models.CharField(max_length=255, blank=True, null=True)  
+    screenshot = models.ImageField(upload_to="recent_tabs_screenshots/", blank=True, null=True)
+    visited_at = models.DateTimeField(auto_now=True)  
+
+    class Meta:
+        ordering = ['-visited_at']
