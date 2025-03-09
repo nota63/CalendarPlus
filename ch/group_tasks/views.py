@@ -558,6 +558,7 @@ def retry_task_attachment(request, org_id, group_id, task_id, attachment_id):
 
 # SEND CUSTOM QUERY ABOUT THE TASK TO THE MANAGER
 @csrf_exempt
+@check_org_membership
 @login_required
 def send_task_email(request, org_id, group_id, task_id):
     """Allows the assigned user to send a custom email to the task creator."""
