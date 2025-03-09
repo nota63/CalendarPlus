@@ -2517,6 +2517,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // FETCH AND MANAGE THE TASKS ATTACHMENTS
+
 document.addEventListener("DOMContentLoaded", () => {
     const modal = document.getElementById("premiumAttachmentsModal");
     const attachmentsContainer = document.getElementById("attachmentsContainer");
@@ -2564,6 +2565,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <td>
                                     <button class="btn btn-info btn-sm" onclick="previewFile('${file.file_url}', '${file.category}')">👁 Preview</button>
                                     <a href="${file.file_url}" download class="btn btn-success btn-sm">⬇ Download</a>
+                                    <button class="btn btn-warning btn-sm" onclick="retryAttachment(${file.id})">🔄 Retry</button>
                                     <button class="btn btn-danger btn-sm" onclick="deleteAttachment(${file.id})">❌ Delete</button>
                                 </td>
                             </tr>`;
@@ -2580,14 +2582,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 📌 Preview File
     window.previewFile = (fileUrl, category) => {
+        let previewHTML = `<p class="text-muted">Preview not available.</p>`;
+
         if (category.toLowerCase().includes("image")) {
-            window.open(fileUrl, "_blank");
+            previewHTML = `<img src="${fileUrl}" class="img-fluid rounded">`;
         } else if (category.toLowerCase().includes("video")) {
-            const videoPlayer = `<video controls class="w-100"><source src="${fileUrl}" type="video/mp4"></video>`;
-            attachmentsContainer.innerHTML = videoPlayer;
-        } else {
-            alert("Preview is not available for this file type.");
+            previewHTML = `<video controls class="w-100"><source src="${fileUrl}" type="video/mp4"></video>`;
+        } else if (category.toLowerCase().includes("audio")) {
+            previewHTML = `<audio controls class="w-100"><source src="${fileUrl}" type="audio/mpeg"></audio>`;
+        } else if (category.toLowerCase().includes("document") || category.toLowerCase().includes("pdf")) {
+            previewHTML = `<iframe src="${fileUrl}" width="100%" height="500px"></iframe>`;
+        } else if (category.toLowerCase().includes("code") || category.toLowerCase().includes("text")) {
+            fetch(fileUrl)
+                .then(response => response.text())
+                .then(text => {
+                    previewHTML = `<pre class="bg-light p-3 rounded">${text}</pre>`;
+                    attachmentsContainer.innerHTML = previewHTML;
+                })
+                .catch(() => {
+                    previewHTML = `<p class="text-danger">Error loading file preview.</p>`;
+                    attachmentsContainer.innerHTML = previewHTML;
+                });
+            return;
         }
+
+        attachmentsContainer.innerHTML = previewHTML;
     };
 
     // 📌 Delete Attachment via AJAX
@@ -2608,6 +2627,23 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         })
         .catch(error => console.error("Delete Error:", error));
+    };
+
+    // 📌 Retry Attachment (Send to Task Creator)
+    window.retryAttachment = (attachmentId) => {
+        fetch(`/tasks/retry-task-attachment/${selectedOrgId}/${selectedGroupId}/${selectedTaskId}/${attachmentId}/`, {
+            method: "POST",
+            headers: { "X-CSRFToken": getCSRFToken() }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert("File successfully sent to task creator!");
+            } else {
+                alert("Retry failed. Please try again.");
+            }
+        })
+        .catch(error => console.error("Retry Error:", error));
     };
 
     // 📌 Get CSRF Token
