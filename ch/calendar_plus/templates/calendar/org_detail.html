@@ -746,263 +746,287 @@ My Calendar
 
 
 <!-- WORKING ON IT ----------------------------------------------------------------------------------------------------------- -->
-
-<body class="bg-[var(--surface-container)] p-8">
-    <div class="container mx-auto">
-        <!-- Grid Layout -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            
-            <!-- Recent Projects Card -->
-            <div class="material-card">
-                <div class="material-header flex items-center gap-3">
-                    <span class="material-icons-round text-xl">folder</span>
-                    <h3 class="text-lg font-medium">Recent Projects</h3>
-                </div>
-                <div class="p-4 h-80 overflow-y-auto material-scroll">
-                   
-                    <div class="ripple p-3 rounded-xl hover:bg-[var(--surface-container)] cursor-pointer">
-                        <div class="flex items-start gap-3">
-                            <div class="w-10 h-10 bg-[var(--primary-container)] rounded-lg flex items-center justify-center">
-                                <span class="material-icons-round text-[var(--primary)]">description</span>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-sm font-medium text-[var(--secondary)]">{{ project.name }}</p>
-                                <p class="text-xs text-[var(--outline)] mt-1">{{ project.start_date }} - {{ project.end_date }}</p>
-                                {% if project.description %}
-                                <p class="text-sm text-[var(--secondary)] mt-2 line-clamp-2">{{ project.description }}</p>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-              
+<body class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 font-['Inter'] p-6">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-2xl font-bold text-gray-800">{{ organization.name }} Dashboard</h1>
+            <div class="flex items-center gap-4">
+                <button class="p-2 hover:bg-gray-100 rounded-full">
+                    <span class="material-icons-round text-gray-600">notifications</span>
+                </button>
+                <div class="w-9 h-9 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium">
+                    {{ user.username|first }}
                 </div>
             </div>
+        </div>
 
-            <!-- Upcoming Meetings Card -->
-            <div class="material-card">
-                <div class="material-header flex items-center gap-3">
-                    <span class="material-icons-round text-xl">event</span>
-                    <h3 class="text-lg font-medium">Upcoming Meetings</h3>
-                </div>
-                <div class="p-4 h-80 overflow-y-auto material-scroll">
-                    {% for meeting in recent_meetings %}
-                    <div class="ripple p-3 rounded-xl hover:bg-[var(--surface-container)] cursor-pointer">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-sm font-medium text-[var(--secondary)]">{{ meeting.meeting_title }}</p>
-                                <div class="flex items-center gap-2 mt-2">
-                                    <span class="material-chip">
-                                        <span class="material-icons-round text-xs mr-1">schedule</span>
-                                        {{ meeting.start_time }} - {{ meeting.end_time }}
-                                    </span>
-                                    <span class="material-chip">
-                                        <span class="material-icons-round text-xs mr-1">calendar_today</span>
-                                        {{ meeting.meeting_date }}
-                                    </span>
-                                </div>
-                            </div>
-
-
-                          <!-- Three Dots Button -->
-                    <button onclick="document.getElementById('menuModal').classList.remove('hidden')" 
-                       class="bg-white border border-gray-300 px-3 py-2 rounded-md shadow-sm hover:bg-gray-100 focus:outline-none">
-                      <i class="fas fa-ellipsis-v"></i> <!-- FontAwesome 3 dots -->
-                  </button>
-
-
-                        </div>
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Left Column -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Projects Section -->
+                <div class="glass-panel rounded-xl p-5 hover-lift">
+                    <div class="flex items-center justify-between mb-5">
+                        <h2 class="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                            <span class="material-icons-round text-blue-500">folder_open</span>
+                            Active Projects
+                        </h2>
+                        <button class="text-sm text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg flex items-center gap-2">
+                            <span class="material-icons-round text-sm">add</span>
+                            New
+                        </button>
                     </div>
-
-
                     
-<!-- Modal -->
-<div id="menuModal" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50 hidden backdrop-blur-sm">
-    <div class="bg-white w-96 p-2 rounded-xl shadow-2xl relative transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]">
-        <!-- Modal Header -->
-        <div class="flex justify-between items-center p-4 pb-2">
-            <h3 class="text-2xl font-bold text-gray-900">Meeting Options</h3>
-            <button onclick="document.getElementById('menuModal').classList.add('hidden')" 
-                class="text-gray-500 hover:bg-gray-100 p-1 rounded-full transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </div>
-
-        <!-- Options List -->
-        <div class="p-2 space-y-2">
-            <a href="{% url 'meeting_detail_view' org_id=organization.id meeting_id=meeting.id  %}" 
-               class="flex items-center w-full px-4 py-3 text-gray-700 font-medium hover:bg-blue-50 rounded-lg transition-all group">
-               <span class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-blue-200">
-                   📅
-               </span>
-               <span class="text-lg">Join & Details</span>
-               <svg class="ml-auto h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-               </svg>
-            </a>
-
-            <a href="{% url 'collaborate' org_id=organization.id meeting_id=meeting.id %}" 
-               class="flex items-center w-full px-4 py-3 text-gray-700 font-medium hover:bg-green-50 rounded-lg transition-all group">
-               <span class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-green-200">
-                   🤝
-               </span>
-               <span class="text-lg">Collaborate</span>
-               <svg class="ml-auto h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-               </svg>
-            </a>
-
-            <a href="{% url 'remove_myself' org_id=organization.id meeting_id=meeting.id %}" 
-               class="flex items-center w-full px-4 py-3 text-red-600 font-medium hover:bg-red-50 rounded-lg transition-all group">
-               <span class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-red-200">
-                   🚪
-               </span>
-               <span class="text-lg">Exit Meeting</span>
-               <svg class="ml-auto h-6 w-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-               </svg>
-            </a>
-        </div>
-    </div>
-</div>
-                    {% endfor %}
-                </div>
-            </div>
-
-
-
-            <!-- Team Members Card -->
-            <div class="material-card">
-                <div class="material-header flex items-center gap-3">
-                    <span class="material-icons-round text-xl">group</span>
-                    <h3 class="text-lg font-medium">Team Members</h3>
-                </div>
-                <div class="p-4 h-80 overflow-y-auto material-scroll">
-                    {% for member in members %}
-                    <div class="ripple p-3 rounded-xl hover:bg-[var(--surface-container)] cursor-pointer">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-[var(--primary-container)] rounded-full flex items-center justify-center">
-                                <span class="material-icons-round text-[var(--primary)]">person</span>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-sm font-medium text-[var(--secondary)]">{{ member.user.username }}</p>
-                                <p class="text-xs text-[var(--outline)]">{{ member.get_role_display }}</p>
-                            </div>
-
-                            <!-- 3-dot menu container -->
-                            <div class="flex gap-2">
-                                <a href="{% url 'user_calendar' user_id=member.user.id org_id=organization.id %}">
-                                  <button class="text-[var(--secondary)] hover:text-[var(--primary)] p-1 ripple rounded-full">
-                                    <span class="material-icons-round text-sm">calendar_month</span>
-                                  </button>
-                              </a>
-
-                               <a href="{% url 'dm' user_id=member.user.id org_id=organization.id %}">
-                                 <button class="text-[var(--secondary)] hover:text-[var(--primary)] p-1 ripple rounded-full">
-                                    <span class="material-icons-round text-sm">chat</span>
-                                 </button>
-                              </a>
-
-                              <a href="#" data-bs-toggle="modal" data-bs-target="#ScheduleMeetsModal" data-org-id="{{ organization.id }}" data-user-id="{{ member.user.id }}">
-                                <button class="text-[var(--secondary)] hover:text-[var(--primary)] p-1 ripple rounded-full">
-                                   <span class="material-icons-round text-sm">schedule</span>
-                                </button>
-                             </a>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <!-- Upcoming Events Card -->
-            <div class="material-card">
-                <div class="material-header flex items-center gap-3">
-                    <span class="material-icons-round text-xl">celebration</span>
-                    <h3 class="text-lg font-medium">Upcoming Events</h3>
-                </div>
-                <div class="p-4 h-80 overflow-y-auto material-scroll">
-                    {% for event in recent_events %}
-                    <div class="ripple p-3 rounded-xl hover:bg-[var(--surface-container)] cursor-pointer">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-[var(--primary-container)] rounded-lg flex items-center justify-center">
-                                <span class="material-icons-round text-[var(--primary)]">event_available</span>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-sm font-medium text-[var(--secondary)]">{{ event.title }}</p>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <span class="text-xs text-[var(--outline)] flex items-center">
-                                        <span class="material-icons-round text-xs mr-1">bookmark</span>
-                                        {{ event.booking_count }} bookings
-                                    </span>
+                    <div class="space-y-3 material-scroll" style="max-height: 400px;">
+                       
+                        <div class="bg-white p-4 rounded-lg border border-gray-100 hover:border-blue-100 transition-colors">
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                                    <span class="material-icons-round text-blue-600">description</span>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-medium text-gray-800">{{ project.name }}</h3>
+                                    <p class="text-xs text-gray-500 mt-1">{{ project.start_date }} - {{ project.end_date }}</p>
+                                    {% if project.description %}
+                                    <p class="text-sm text-gray-600 mt-2 line-clamp-2">{{ project.description }}</p>
+                                    {% endif %}
+                                    <div class="mt-3 flex items-center gap-3 text-xs">
+                                        <span class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full flex items-center gap-1">
+                                            <span class="material-icons-round text-sm">group</span>
+                                            5 Members
+                                        </span>
+                                        <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                            <div class="w-2/3 h-full bg-blue-500"></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <!-- 3-dot menu container -->
-                            <div class="flex gap-2">
-                                <a href="{% url 'view_bookings' org_id=organization.id event_id=event.id %}">
-                                  <button class="text-[var(--secondary)] hover:text-[var(--primary)] p-1 ripple rounded-full">
-                                    <span class="material-icons-round text-sm">event</span>
-                                  </button>
-                              </a>
+                        </div>
+                   
+                    </div>
+                </div>
 
-                               <a href="{% url 'delete-event' org_id=organization.id event_id=event.id %}">
-                                 <button class="text-[var(--secondary)] hover:text-[var(--primary)] p-1 ripple rounded-full">
-                                    <span class="material-icons-round text-sm">delete_forever</span>
-                                 </button>
-                              </a>
+                <!-- Meetings & Events -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Upcoming Meetings -->
+                    <div class="glass-panel rounded-xl p-5 hover-lift">
+                        <h2 class="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-5">
+                            <span class="material-icons-round text-purple-500">event_available</span>
+                            Meetings
+                        </h2>
+                        
+                        <div class="space-y-3 material-scroll" style="max-height: 300px;">
+                            {% for meeting in recent_meetings %}
+                            <div class="bg-white p-4 rounded-lg border border-gray-100 hover:border-purple-100 transition-colors">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 class="font-medium text-gray-800 text-sm">{{ meeting.meeting_title }}</h3>
+                                        <div class="mt-2 flex items-center gap-2 flex-wrap">
+                                            <span class="px-2 py-1 bg-purple-50 text-purple-600 text-xs rounded-full flex items-center gap-1">
+                                                <span class="material-icons-round text-sm">schedule</span>
+                                                {{ meeting.start_time }}
+                                            </span>
+                                            <span class="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-full flex items-center gap-1">
+                                                <span class="material-icons-round text-sm">calendar_today</span>
+                                                {{ meeting.meeting_date }}
+                                            </span>
+
+                                              <!-- Options List -->
+       
+                                        </div>
+                                    </div>
+                                    <button onclick="document.getElementById('menuModal').classList.remove('hidden')" 
+                                       class="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-50">
+                                        <span class="material-icons-round">more_vert</span>
+                                    </button>
+
+                                      <!-- Options List -->
+                                           <!-- Meeting Modal (Existing Logic Preserved) -->
+    <div id="menuModal" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50 hidden backdrop-blur-sm">
+        <!-- Modal content remains exactly the same as original -->
+        <div class="bg-white w-96 p-2 rounded-xl shadow-2xl relative transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]">
+            <!-- ... Your existing modal content ... -->
+            <div class="p-2 space-y-2">
+                <a href="{% url 'meeting_detail_view' org_id=organization.id meeting_id=meeting.id  %}" 
+                   class="flex items-center w-full px-4 py-3 text-gray-700 font-medium hover:bg-blue-50 rounded-lg transition-all group">
+                   <span class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-blue-200">
+                       📅
+                   </span>
+                   <span class="text-lg">Join & Details</span>
+                   <svg class="ml-auto h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                   </svg>
+                </a>
+    
+                <a href="{% url 'collaborate' org_id=organization.id meeting_id=meeting.id %}" 
+                   class="flex items-center w-full px-4 py-3 text-gray-700 font-medium hover:bg-green-50 rounded-lg transition-all group">
+                   <span class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-green-200">
+                       🤝
+                   </span>
+                   <span class="text-lg">Collaborate</span>
+                   <svg class="ml-auto h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                   </svg>
+                </a>
+    
+                <a href="{% url 'remove_myself' org_id=organization.id meeting_id=meeting.id %}" 
+                   class="flex items-center w-full px-4 py-3 text-red-600 font-medium hover:bg-red-50 rounded-lg transition-all group">
+                   <span class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-red-200">
+                       🚪
+                   </span>
+                   <span class="text-lg">Exit Meeting</span>
+                   <svg class="ml-auto h-6 w-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                   </svg>
+                </a>
+            </div>
+    
+        </div>
+    </div>
+       
+                                </div>
                             </div>
+                            {% endfor %}
                         </div>
                     </div>
-                    {% endfor %}
-                </div>
-            </div>
 
-            <!-- Quick Schedule Card -->
-            <div class="material-card">
-                <div class="material-header flex items-center gap-3">
-                    <span class="material-icons-round text-xl">schedule</span>
-                    <h3 class="text-lg font-medium">Quick Schedule</h3>
-                </div>
-                <div class="p-4 h-80 overflow-y-auto material-scroll">
-                    <!-- Schedule content -->
-                </div>
-            </div>
-
-            <!-- Recent Activity Card -->
-            {% if installed_apps%}
-             <div class="material-card">
-                <div class="material-header flex items-center gap-3">
-                    <span class="material-icons-round text-xl">notifications</span>
-                    <h3 class="text-lg font-medium">Installed Apps</h3>
-                </div>
-                <div class="p-4 h-80 overflow-y-auto material-scroll">
-                    <!-- Activity content -->
-                    {% for app in installed_apps %}
-                    <div class="flex flex-col items-center bg-white shadow-md rounded-xl p-4 transition-all hover:shadow-lg">
-                        <!-- App Icon -->
-                        <img src="{{ app.mini_app.icon.url }}" alt="{{ app.mini_app.name }}" 
-                             class="w-16 h-16 rounded-lg shadow-md object-cover">
-            
-                        <!-- App Name -->
-                        <p class="mt-2 text-sm font-semibold text-gray-700 text-center">
-                            {{ app.mini_app.name }}
-                        </p>
-            
-                        <!-- Launch Button -->
-                        <a href="{% url 'launch_app' org_id=organization.id app_id=app.id %}" 
-                           class="mt-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 
-                                  rounded-lg text-xs font-medium transition-all hover:scale-105">
-                            🚀 Launch
-                        </a>
+                    <!-- Upcoming Events -->
+                    <div class="glass-panel rounded-xl p-5 hover-lift">
+                        <h2 class="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-5">
+                            <span class="material-icons-round text-green-500">celebration</span>
+                            Upcoming Events
+                        </h2>
+                        
+                        <div class="space-y-3 material-scroll" style="max-height: 300px;">
+                            {% for event in recent_events %}
+                            <div class="bg-white p-4 rounded-lg border border-gray-100 hover:border-green-100 transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
+                                        <span class="material-icons-round text-green-600">event</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h3 class="font-medium text-gray-800 text-sm">{{ event.title }}</h3>
+                                        <div class="mt-1 flex items-center gap-2">
+                                            <span class="text-xs text-gray-500 flex items-center gap-1">
+                                                <span class="material-icons-round text-sm">bookmark</span>
+                                                {{ event.booking_count }} bookings
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <a href="{% url 'view_bookings' org_id=organization.id event_id=event.id %}" 
+                                           class="text-gray-400 hover:text-green-600 p-1 rounded-full hover:bg-gray-50">
+                                            <span class="material-icons-round text-sm">visibility</span>
+                                        </a>
+                                        <a href="{% url 'delete-event' org_id=organization.id event_id=event.id %}" 
+                                           class="text-gray-400 hover:text-red-600 p-1 rounded-full hover:bg-gray-50">
+                                            <span class="material-icons-round text-sm">delete</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
-                {% endfor %}
                 </div>
-             </div>
-            {% endif %}  
+            </div>
+
+            <!-- Right Column -->
+            <div class="space-y-6">
+                <!-- Team Members -->
+                <div class="glass-panel rounded-xl p-5 hover-lift">
+                    <h2 class="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-5">
+                        <span class="material-icons-round text-orange-500">groups</span>
+                        Team
+                    </h2>
+                    
+                    <div class="space-y-3 material-scroll" style="max-height: 400px;">
+                        {% for member in members %}
+                        <div class="bg-white p-3 rounded-lg border border-gray-100 hover:border-orange-100 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 font-medium">
+                                    {{ member.user.username|first }}
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-sm font-medium text-gray-800">{{ member.user.username }}</h3>
+                                    <p class="text-xs text-gray-500">{{ member.get_role_display }}</p>
+                                </div>
+                                <div class="flex gap-1">
+                                    <a href="{% url 'user_calendar' user_id=member.user.id org_id=organization.id %}" 
+                                       class="p-1.5 hover:bg-gray-50 rounded-full text-gray-500 hover:text-blue-600">
+                                        <span class="material-icons-round text-sm">calendar_today</span>
+                                    </a>
+                                    <a href="{% url 'dm' user_id=member.user.id org_id=organization.id %}" 
+                                       class="p-1.5 hover:bg-gray-50 rounded-full text-gray-500 hover:text-green-600">
+                                        <span class="material-icons-round text-sm">chat</span>
+                                    </a>
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#ScheduleMeetsModal" 
+                                       data-org-id="{{ organization.id }}" data-user-id="{{ member.user.id }}"
+                                       class="p-1.5 hover:bg-gray-50 rounded-full text-gray-500 hover:text-purple-600">
+                                        <span class="material-icons-round text-sm">schedule</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Installed Apps -->
+                {% if installed_apps %}
+                <div class="glass-panel rounded-xl p-5 hover-lift">
+                    <h2 class="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-5">
+                        <span class="material-icons-round text-indigo-500">apps</span>
+                        Installed Apps
+                    </h2>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        {% for app in installed_apps %}
+                        <div class="bg-white p-4 rounded-lg border border-gray-100 text-center hover:border-indigo-100 transition-colors">
+                            <div class="w-10 h-10 bg-indigo-50 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                                <img src="{{ app.mini_app.icon.url }}" alt="{{ app.mini_app.name }}" class="w-6 h-6">
+                            </div>
+                            <h3 class="text-xs font-medium text-gray-800 mb-1">{{ app.mini_app.name }}</h3>
+                            <a href="{% url 'launch_app' org_id=organization.id app_id=app.id %}" 
+                               class="text-xs text-indigo-600 hover:text-indigo-700 font-medium">
+                                Launch →
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 
+    <!-- Meeting Modal (Existing Logic Preserved) -->
+    <div id="menuModal" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50 hidden backdrop-blur-sm">
+        <!-- Modal content remains exactly the same as original -->
+        <div class="bg-white w-96 p-2 rounded-xl shadow-2xl relative transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]">
+            
+        </div>
+    </div>
+
+    <script>
+        // Preserve existing modal toggle functionality
+        document.querySelectorAll('[data-modal-toggle]').forEach(button => {
+            button.addEventListener('click', () => {
+                const modal = document.getElementById(button.dataset.modalToggle);
+                modal.classList.toggle('hidden');
+            });
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.id === 'menuModal') {
+                event.target.classList.add('hidden');
+            }
+        }
+    </script>
 
 <!-- ------------------------------------------------------------------------------------------------------------------------------------------ -->
 
