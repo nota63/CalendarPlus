@@ -577,7 +577,7 @@ def send_task_email(request, org_id, group_id, task_id):
         return JsonResponse({"error": "Subject and message cannot be empty"}, status=400)
 
     # ✅ Fetch Task, Organization, and Group
-    task = get_object_or_404(Task, id=task_id, organization_id=org_id, group_id=group_id)
+    task = get_object_or_404(Task, id=task_id, organization_id=org_id, group_id=group_id,assigned_to=request.user)
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id)
 
@@ -617,7 +617,14 @@ def send_task_email(request, org_id, group_id, task_id):
         recipient_list=[task_creator.email],
         fail_silently=False,
     )
+    # increment the count of queries
+    task.queries_sent+=1
+    if task.queries_sent > 50:
+        return JsonResponse({'error':'you can send only 50 queries in free plan!'})
 
+    task.save()
+
+    
     return JsonResponse({"message": "Email successfully sent to the task creator!"})
 
 

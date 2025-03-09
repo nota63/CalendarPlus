@@ -128,6 +128,7 @@ class Task(models.Model):
         default=False,
         help_text="Tracks if an urgent notification has been sent for this task."
     )
+    queries_sent=models.IntegerField(default=0)
 
   
     created_at = models.DateTimeField(auto_now_add=True, help_text="Task creation timestamp.")
