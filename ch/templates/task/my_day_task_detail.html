@@ -1760,105 +1760,56 @@ $(document).ready(function () {
     let selectedTimeSlot = null;
     let orgId, groupId, taskId;
 
-    // Custom FullCalendar Styling
-    function applyCalendarStyles() {
-        $('.fc-header-toolbar').addClass('bg-white shadow-lg rounded-t-lg p-4 mb-0');
-        $('.fc-button').addClass('bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-full transition-colors duration-200');
-        $('.fc-button-today').addClass('bg-gray-100 hover:bg-gray-200 text-gray-700');
-        $('.fc-view-container').addClass('bg-white/80 backdrop-blur-sm shadow-lg rounded-b-lg');
-        $('.fc-event').addClass('rounded-lg border-transparent shadow-sm hover:shadow-md transition-shadow');
-    }
-
     // Capture Organization, Group, and Task ID
     $("[data-bs-target='#fullCalendarModal']").on("click", function () {
         orgId = $(this).data("org-id");
         groupId = $(this).data("group-id");
         taskId = $(this).data("task-id");
-        fetchExistingMeetings();
-        setTimeout(applyCalendarStyles, 50); // Allow calendar to render first
+        fetchExistingMeetings(); // Fetch existing meetings when opening calendar
     });
 
-    // Initialize FullCalendar with Tailwind-friendly config
+    // Initialize FullCalendar
     $("#calendar").fullCalendar({
         header: {
             left: "prev,next today",
             center: "title",
             right: "month,agendaWeek,agendaDay",
         },
-        themeSystem: 'bootstrap4', // Helps with Tailwind integration
-        eventLimit: true,
         selectable: true,
-        eventRender: function(event, element) {
-            element.addClass(
-                `text-sm ${event.status === 'confirmed' ? 
-                'bg-green-100 border-green-300 text-green-700' : 
-                'bg-yellow-100 border-yellow-300 text-yellow-700'}`
-            );
-        },
-        dayRender: function(date, cell) {
-            cell.addClass('hover:bg-gray-50 transition-colors');
-        },
         dayClick: function (date) {
             selectedDate = date.format("YYYY-MM-DD");
             console.log("Selected Date:", selectedDate);
             fetchAvailableSlots();
         },
-        eventClick: function (event) {
-            console.log("Meeting Clicked:", event);
-            if (event) {
-                $("#meetingDetailsTitle").html(`
-                    <span class="material-icons text-blue-500 mr-2">event</span>
-                    Meeting Details
-                `);
 
-                let meetingLinkHtml = event.meeting_link ? `
-                    <a href="${event.meeting_link}" target="_blank" 
-                        class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors duration-200">
-                        <span class="material-icons mr-2 text-sm">link</span>
-                        Join Meeting
-                    </a>
-                ` : `<span class="text-red-500 text-sm">No meeting link available</span>`;
+       eventClick: function (event) {
+    console.log("Meeting Clicked:", event);
 
-                $("#meetingDetailsBody").html(`
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="bg-gray-50 p-3 rounded-lg">
-                                <p class="text-sm font-medium text-gray-500">Date</p>
-                                <p class="text-gray-700">${event.start.format("YYYY-MM-DD")}</p>
-                            </div>
-                            <div class="bg-gray-50 p-3 rounded-lg">
-                                <p class="text-sm font-medium text-gray-500">Start Time</p>
-                                <p class="text-gray-700">${event.start.format("HH:mm")}</p>
-                            </div>
-                        </div>
-                        
-                        <div class="bg-gray-50 p-3 rounded-lg">
-                            <p class="text-sm font-medium text-gray-500">Meeting Purpose</p>
-                            <p class="text-gray-700">${event.title}</p>
-                        </div>
-                        
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="bg-gray-50 p-3 rounded-lg">
-                                <p class="text-sm font-medium text-gray-500">Status</p>
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm 
-                                    ${event.status === 'confirmed' ? 
-                                    'bg-green-100 text-green-700' : 
-                                    'bg-yellow-100 text-yellow-700'}">
-                                    ${event.status || "Pending"}
-                                </span>
-                            </div>
-                            <div class="bg-gray-50 p-3 rounded-lg">
-                                <p class="text-sm font-medium text-gray-500">Meeting Link</p>
-                                ${meetingLinkHtml}
-                            </div>
-                        </div>
-                    </div>
-                `);
+    if (event) {
+        $("#meetingDetailsTitle").text("Meeting Details");
 
-                $("#meetingDetailsModal").modal("show");
-            }
-        },
-    });
+        let meetingLinkHtml = event.meeting_link
+            ? `<a href="${event.meeting_link}" target="_blank" class="btn btn-primary">
+                🔗 Join Meeting
+              </a>`
+            : `<span class="text-danger">No meeting link available</span>`;
+
+        $("#meetingDetailsBody").html(`
+            <p><strong>Date:</strong> ${event.start.format("YYYY-MM-DD")}</p>
+            <p><strong>Start Time:</strong> ${event.start.format("HH:mm")}</p>
+            <p><strong>End Time:</strong> ${event.end ? event.end.format("HH:mm") : "N/A"}</p>
+            <p><strong>Reason:</strong> ${event.title}</p>
+            <p><strong>Status:</strong> <span class="badge ${event.status === 'confirmed' ? 'bg-success' : 'bg-warning'}">
+                ${event.status || "Pending"}
+            </span></p>
+            <p><strong>Meeting Link:</strong> ${meetingLinkHtml}</p>
+        `);
+
+        $("#meetingDetailsModal").modal("show");
+    }
+},
+});
+
 
     // Fetch Available Time Slots & Meetings
     function fetchAvailableSlots() {
@@ -1869,67 +1820,39 @@ $(document).ready(function () {
             method: "GET",
             dataType: "json",
             success: function (data) {
+                console.log("API Response:", data);
+
                 let slotsDiv = $("#timeSlots");
                 slotsDiv.html("");
 
                 if (!data.available_slots || data.available_slots.length === 0) {
-                    slotsDiv.html(`
-                        <div class="p-4 bg-red-50 rounded-lg">
-                            <p class="text-red-600 text-sm">No available slots for this date.</p>
-                        </div>
-                    `);
+                    slotsDiv.html("<p class='text-danger'>No available slots for this date.</p>");
                     return;
                 }
 
-                slotsDiv.addClass('grid grid-cols-2 md:grid-cols-3 gap-3');
-                // Updated button styling inside the forEach loop
-data.available_slots.forEach((slot) => {
-    let time = slot.start_time;
-    let slotBtn = $(`
-        <button class="w-full py-2.5 px-4 text-sm font-medium rounded-lg border border-gray-200 
-            shadow-sm hover:shadow-md hover:border-blue-500/80 hover:bg-blue-50/50 
-            transition-all duration-300 ease-in-out
-            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-            text-gray-700 hover:text-blue-600 relative group">
-            ${time}
-            <span class="absolute inset-0 bg-blue-500/10 rounded-lg scale-95 opacity-0 
-                group-hover:scale-100 group-hover:opacity-25 transition-all duration-300"></span>
-        </button>
-    `).data("time", time)
-     .on("click", function () {
-        $(".slot-btn").removeClass('border-2 border-blue-500 bg-blue-50/50 text-blue-600 shadow-none')
-                      .addClass('border-gray-200 shadow-sm');
-        $(this).removeClass('border-gray-200 shadow-sm hover:shadow-md')
-               .addClass('border-2 border-blue-500 bg-blue-50/50 text-blue-600 shadow-none');
-        selectedTimeSlot = $(this).data("time");
-        $("#proceedToSchedule")
-            .prop("disabled", false)
-            .removeClass('opacity-50 cursor-not-allowed');
-    });
+                data.available_slots.forEach((slot) => {
+                    let time = slot.start_time;
+                    let slotBtn = $("<button>")
+                        .addClass("btn btn-outline-primary slot-btn")
+                        .text(time)
+                        .data("time", time)
+                        .on("click", function () {
+                            $(".slot-btn").removeClass("btn-primary");
+                            $(this).addClass("btn-primary");
+                            selectedTimeSlot = $(this).data("time");
+                            $("#proceedToSchedule").prop("disabled", false);
+                        });
 
-    slotsDiv.append(slotBtn);
-});
+                    slotsDiv.append(slotBtn);
+                });
+
                 $("#availableSlotsModal").modal("show");
             },
             error: function (xhr, status, error) {
                 console.log("Error fetching slots:", error);
-                showToast('❌ Failed to fetch available slots. Please try again.', 'error');
+                alert("❌ Failed to fetch available slots. Please try again.");
             },
         });
-    }
-
-    // Styled Toast Notifications
-    function showToast(message, type = 'success') {
-        const toast = $(`
-            <div class="fixed bottom-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white 
-                ${type === 'error' ? 'bg-red-500' : 'bg-green-500'} 
-                animate-slide-in">
-                ${message}
-            </div>
-        `);
-        
-        $('body').append(toast);
-        setTimeout(() => toast.remove(), 3000);
     }
 
     // Fetch Existing Meetings for Task
@@ -1939,24 +1862,27 @@ data.available_slots.forEach((slot) => {
             method: "GET",
             dataType: "json",
             success: function (data) {
+                console.log("Existing Meetings:", data);
                 let meetings = data.meetings || [];
+
+                // Remove previous events
                 $("#calendar").fullCalendar("removeEvents");
 
+                // Add new meetings to FullCalendar
                 meetings.forEach((meeting) => {
                     $("#calendar").fullCalendar("renderEvent", {
                         id: meeting.id,
-                        title: meeting.reason.replace("_", " "),
+                        title: meeting.reason.replace("_", " "), // Format reason
                         start: meeting.date + "T" + meeting.start_time,
                         end: meeting.date + "T" + meeting.end_time,
                         status: meeting.status,
-                        meeting_link: meeting.meeting_link,
+                        meeting_link:meeting.meeting_link,
                         allDay: false,
                     });
                 });
             },
             error: function (xhr, status, error) {
                 console.log("Error fetching meetings:", error);
-                showToast('⚠️ Error loading meetings', 'error');
             },
         });
     }
@@ -1970,11 +1896,7 @@ data.available_slots.forEach((slot) => {
 
     // Schedule Meeting AJAX
     $("#scheduleMeeting").on("click", function () {
-        const reason = $("#meetingReason").val();
-        const $button = $(this);
-        
-        $button.prop("disabled", true)
-               .html(`<div class="inline-block animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div> Processing...`);
+        let reason = $("#meetingReason").val();
 
         $.ajax({
             url: "/tasks/schedule-the-meeting/",
@@ -1991,16 +1913,14 @@ data.available_slots.forEach((slot) => {
             }),
             success: function (data) {
                 if (data.success) {
-                    showToast('✅ Meeting Scheduled Successfully!');
-                    setTimeout(() => location.reload(), 1500);
+                    alert("✅ Meeting Scheduled Successfully!");
+                    location.reload();
                 } else {
-                    showToast(`❌ Error: ${data.error}`, 'error');
-                    $button.prop("disabled", false).text('Schedule Meeting');
+                    alert("❌ Error: " + data.error);
                 }
             },
             error: function (xhr) {
-                showToast('❌ Failed to schedule meeting', 'error');
-                $button.prop("disabled", false).text('Schedule Meeting');
+                alert("❌ Failed to schedule meeting.");
             },
         });
     });
@@ -2008,17 +1928,10 @@ data.available_slots.forEach((slot) => {
     function getCSRFToken() {
         return $("[name=csrfmiddlewaretoken]").val();
     }
-
-    // Additional Style Initialization
-    $('.modal-content').addClass('bg-white/90 backdrop-blur-sm rounded-xl border border-white/20 shadow-2xl');
-    $('.modal-header').addClass('border-b border-gray-200/50 px-6 py-4');
-    $('.modal-title').addClass('text-lg font-semibold text-gray-800');
-    $('.modal-body').addClass('px-6 py-4');
-    $('.modal-footer').addClass('border-t border-gray-200/50 px-6 py-4 bg-gray-50/50');
 });
+
 </script>
-<!--  -->
-<!--  -->
+
 
 
 
