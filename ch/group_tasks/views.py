@@ -1036,6 +1036,24 @@ def send_task_message(request):
     return JsonResponse({"success": False, "error": "Invalid request method"}, status=405)
 
 
+# delete the message
+
+@login_required
+@csrf_exempt
+def delete_task_message(request, message_id):
+    if request.method == "DELETE":
+        try:
+            message = CommunicateTask.objects.get(id=message_id, sender=request.user)
+            message.delete()
+            return JsonResponse({"success": True})
+        except CommunicateTask.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Message not found or unauthorized."}, status=403)
+    
+    return JsonResponse({"success": False, "error": "Invalid request method."}, status=400)
+
+
+
+
 
 
 # Add the task to my day 
