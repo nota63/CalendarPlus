@@ -633,11 +633,18 @@ def send_task_email(request, org_id, group_id, task_id):
 # SCHEDULE THE MEETING FOR TASK (PREMIUM)
 from datetime import datetime, timedelta
 from accounts.models import Availability,MeetingOrganization
+
+@login_required
 def get_available_slots(request):
     org_id = request.GET.get("org_id")
     group_id = request.GET.get("group_id")
     task_id = request.GET.get("task_id")
     date_str = request.GET.get("date")  # Expected format: YYYY-MM-DD
+
+    profile = get_object_or_404(Profile, user=request.user, organization_id=org_id)
+    if not profile:
+        return JsonResponse({'error:':'you are not authorized to access this!'},status=400)
+
 
     if not all([org_id, group_id, task_id, date_str]):
         return JsonResponse({"error": "Missing required parameters"}, status=400)
@@ -733,6 +740,10 @@ def schedule_meeting(request):
         start_time_str = data.get("start_time")  # Expected format: HH:MM
         reason = data.get("reason")
 
+        profile = get_object_or_404(Profile, user=request.user, organization_id=org_id)
+        if not profile:
+            return JsonResponse({'error:':'you are not authorized to access this!'},status=400)
+
         if not all([org_id, group_id, task_id, date_str, start_time_str, reason]):
             return JsonResponse({"error": "Missing required fields"}, status=400)
 
@@ -784,6 +795,10 @@ def get_existing_meetings(request):
     group_id = request.GET.get("group_id")
     task_id = request.GET.get("task_id")
 
+    profile = get_object_or_404(Profile, user=request.user, organization_id=org_id)
+    if not profile:
+        return JsonResponse({'error:':'You are not authorized to access this page!'},status=400)
+
     if not all([org_id, group_id, task_id]):
         return JsonResponse({"error": "Missing required parameters"}, status=400)
 
@@ -823,6 +838,8 @@ def fetch_task_meetings(request):
     org_id = request.GET.get("org_id")
     group_id = request.GET.get("group_id")
     task_id = request.GET.get("task_id")
+
+    
 
     if not all([org_id, group_id, task_id]):
         return JsonResponse({"error": "Missing required parameters"}, status=400)
