@@ -581,30 +581,47 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Fetch Messages & Files
     function fetchMessages(orgId, groupId, taskId) {
-        fetch(`/tasks/fetch-task-messages/${orgId}/${groupId}/${taskId}/`)
-            .then(response => response.json())
-            .then(data => {
-                const chatContainer = document.getElementById("chatMessages");
-                chatContainer.innerHTML = "";
+    fetch(`/tasks/fetch-task-messages/${orgId}/${groupId}/${taskId}/`)
+        .then(response => response.json())
+        .then(data => {
+            const chatContainer = document.getElementById("chatMessages");
+            chatContainer.innerHTML = "";
 
-                if (data.messages.length > 0) {
-                    data.messages.forEach(msg => {
-                        const messageElement = document.createElement("div");
-                        messageElement.classList.add("p-2", "border-bottom");
+            if (data.messages.length > 0) {
+                data.messages.forEach(msg => {
+                    const messageElement = document.createElement("div");
+                    messageElement.classList.add("p-2", "border-bottom");
 
-                        messageElement.innerHTML = `
-                            <strong>${msg.sender}</strong>: ${msg.message} <br>
-                            ${msg.file ? `<a href="${msg.file}" target="_blank">📂 View File</a>` : ""}
-                            <small class="text-muted d-block">${msg.created_at}</small>
-                        `;
-                        chatContainer.appendChild(messageElement);
-                    });
-                } else {
-                    chatContainer.innerHTML = `<p class="text-muted">No messages yet.</p>`;
-                }
-            })
-            .catch(err => console.error("Error fetching messages:", err));
-    }
+                    let filePreview = "";
+                    if (msg.file) {
+                        const fileExt = msg.file.split('.').pop().toLowerCase();
+                        
+                        if (["png", "jpg", "jpeg", "gif", "webp"].includes(fileExt)) {
+                            filePreview = `<img src="${msg.file}" class="img-fluid rounded mt-2" style="max-width: 200px;">`;
+                        } else if (["mp4", "webm", "ogg"].includes(fileExt)) {
+                            filePreview = `<video controls class="mt-2" style="max-width: 200px;">
+                                                <source src="${msg.file}" type="video/${fileExt}">
+                                                Your browser does not support the video tag.
+                                            </video>`;
+                        } else {
+                            filePreview = `<a href="${msg.file}" target="_blank" class="btn btn-sm btn-primary mt-2">📂 View File</a>`;
+                        }
+                    }
+
+                    messageElement.innerHTML = `
+                        <strong>${msg.sender}</strong>: ${msg.message} <br>
+                        ${filePreview}
+                        <small class="text-muted d-block">${msg.created_at}</small>
+                    `;
+                    chatContainer.appendChild(messageElement);
+                });
+            } else {
+                chatContainer.innerHTML = `<p class="text-muted">No messages yet.</p>`;
+            }
+        })
+        .catch(err => console.error("Error fetching messages:", err));
+}
+
 
     // Send Message (JSON-based)
     document.getElementById("sendChatMessage").addEventListener("click", function () {
