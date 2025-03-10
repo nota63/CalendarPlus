@@ -940,27 +940,82 @@ def fetch_task_messages(request, org_id, group_id, task_id):
         return JsonResponse({"messages": data}, safe=False)
 
 # send messages 
+# @csrf_exempt
+# @login_required
+# def send_task_message(request):
+#     if request.method == "POST":
+#         try:
+#             data = json.loads(request.body)  # Parse JSON data
+#             file = request.FILES.get("file")
+
+#             task_id = data.get("task_id")
+#             org_id = data.get("org_id")
+#             group_id = data.get("group_id")
+#             message = data.get("message", "")
+
+#             task = get_object_or_404(Task, id=task_id)
+#             organization = get_object_or_404(Organization, id=org_id)
+#             group = get_object_or_404(Group, id=group_id)
+#             sender = request.user
+
+#             communicate_task = CommunicateTask.objects.create(
+#                 task=task, organization=organization, group=group,
+#                 message=message, files=file, sender=sender
+#             )
+
+#             return JsonResponse({
+#                 "success": True,
+#                 "message": "Message sent successfully!",
+#                 "data": {
+#                     "id": communicate_task.id,
+#                     "message": communicate_task.message,
+#                     "file": communicate_task.files.url if communicate_task.files else None,
+#                     "sender": communicate_task.sender.username,
+#                     "created_at": communicate_task.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+#                 }
+#             })
+
+#         except json.JSONDecodeError:
+#             return JsonResponse({"success": False, "error": "Invalid JSON data"}, status=400)
+
+#     return JsonResponse({"success": False, "error": "Invalid request method"}, status=405)
+
+
+import base64
+import json
+import os
+from django.core.files.base import ContentFile
+
+
 @csrf_exempt
 @login_required
 def send_task_message(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)  # Parse JSON data
-            file = request.FILES.get("file")
 
             task_id = data.get("task_id")
             org_id = data.get("org_id")
             group_id = data.get("group_id")
             message = data.get("message", "")
+            file_data = data.get("file", None)  # Base64 file data
+            file_name = data.get("file_name", None)  # File name
 
             task = get_object_or_404(Task, id=task_id)
             organization = get_object_or_404(Organization, id=org_id)
             group = get_object_or_404(Group, id=group_id)
             sender = request.user
 
+            # Handle file saving
+            file_obj = None
+            if file_data and file_name:
+                format, file_str = file_data.split(";base64,")
+                ext = file_name.split(".")[-1]
+                file_obj = ContentFile(base64.b64decode(file_str), name=f"task_files/{file_name}")
+
             communicate_task = CommunicateTask.objects.create(
                 task=task, organization=organization, group=group,
-                message=message, files=file, sender=sender
+                message=message, files=file_obj, sender=sender
             )
 
             return JsonResponse({
@@ -979,12 +1034,6 @@ def send_task_message(request):
             return JsonResponse({"success": False, "error": "Invalid JSON data"}, status=400)
 
     return JsonResponse({"success": False, "error": "Invalid request method"}, status=405)
-
-
-
-
-
-
 
 
 
