@@ -282,7 +282,15 @@
 </div>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+video::-webkit-media-controls-panel {
+    background-image: linear-gradient(transparent, rgba(0,0,0,0.3));
+}
 /*CHAT MODAL  */
     #chatMessages::-webkit-scrollbar {
     width: 6px;
@@ -678,64 +686,82 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Fetch Messages & Files
     function fetchMessages(orgId, groupId, taskId) {
-        fetch(`/tasks/fetch-task-messages/${orgId}/${groupId}/${taskId}/`)
-            .then(response => response.json())
-            .then(data => {
-                const chatContainer = document.getElementById("chatMessages");
-                chatContainer.innerHTML = "";
+    fetch(`/tasks/fetch-task-messages/${orgId}/${groupId}/${taskId}/`)
+        .then(response => response.json())
+        .then(data => {
+            const chatContainer = document.getElementById("chatMessages");
+            chatContainer.innerHTML = "";
 
-                if (data.messages.length > 0) {
-                    data.messages.forEach(msg => {
-                        const messageElement = document.createElement("div");
-                        messageElement.classList.add("p-2", "border-bottom", "d-flex", "justify-content-between", "align-items-start");
+            if (data.messages.length > 0) {
+                data.messages.forEach(msg => {
+                    const messageElement = document.createElement("div");
+                    messageElement.classList.add("flex", "gap-3", "p-3", "hover:bg-gray-50", "transition-colors");
 
-                        let filePreview = "";
-                        if (msg.file) {
-                            const fileExt = msg.file.split('.').pop().toLowerCase();
+                    let filePreview = "";
+                    if (msg.file) {
+                        const fileExt = msg.file.split('.').pop().toLowerCase();
+                        const isImage = ["png", "jpg", "jpeg", "gif", "webp"].includes(fileExt);
+                        const isVideo = ["mp4", "webm", "ogg"].includes(fileExt);
 
-                            if (["png", "jpg", "jpeg", "gif", "webp"].includes(fileExt)) {
-                                filePreview = `<img src="${msg.file}" class="img-fluid rounded mt-2 file-preview" 
-                                                  style="max-width: 200px; cursor: pointer;" data-file="${msg.file}">`;
-                            } else if (["mp4", "webm", "ogg"].includes(fileExt)) {
-                                filePreview = `<video controls class="mt-2 file-preview" style="max-width: 200px; cursor: pointer;" 
-                                                  data-file="${msg.file}">
-                                                  <source src="${msg.file}" type="video/${fileExt}">
-                                                  Your browser does not support the video tag.
-                                               </video>`;
-                            } else {
-                                filePreview = `<a href="${msg.file}" target="_blank" class="btn btn-sm btn-primary mt-2 file-preview" 
-                                                  data-file="${msg.file}">📂 View File</a>`;
-                            }
-                        }
-
-                        messageElement.innerHTML = `
-                        <div class="d-flex align-items-center">
-                            <img src="${msg.profile}" alt="Profile" class="rounded-circle me-2" width="40" height="40">
-                            <div>
-                                <strong>${msg.sender}</strong>: ${msg.message} <br>
-                                  ${filePreview}
-                              <small class="text-muted d-block">${msg.created_at}</small>
+                        filePreview = `
+                            <div class="mt-2 relative group">
+                                ${isImage ? 
+                                    `<img src="${msg.file}" class="rounded-lg shadow-sm max-w-[240px] cursor-zoom-in object-cover h-32" 
+                                       data-file="${msg.file}">` :
+                                 isVideo ?
+                                    `<video class="rounded-lg max-w-[240px] cursor-pointer" data-file="${msg.file}">
+                                        <source src="${msg.file}" type="video/${fileExt}">
+                                     </video>` :
+                                    `<div class="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                                        <span class="text-xl">📎</span>
+                                        <a href="${msg.file}" target="_blank" class="font-medium text-gray-700">
+                                            View File
+                                        </a>
+                                     </div>`
+                                }
+                                <div class="absolute bottom-2 right-2 bg-black/50 text-white rounded-full p-1 backdrop-blur-sm">
+                                    <span class="material-icons text-sm">${isImage ? 'photo' : 'description'}</span>
                                 </div>
-                              </div>
-                            `;
+                            </div>`;
+                    }
 
-                        chatContainer.appendChild(messageElement);
+                    messageElement.innerHTML = `
+                        <div class="shrink-0">
+                            <img src="${msg.profile}" alt="Profile" 
+                                 class="w-10 h-10 rounded-full object-cover ring-2 ring-white shadow-sm">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-baseline gap-2">
+                                <span class="font-semibold text-gray-800">${msg.sender}</span>
+                                <span class="text-sm text-gray-500">${msg.created_at}</span>
+                            </div>
+                            <p class="mt-1 text-gray-700 whitespace-pre-wrap">${msg.message}</p>
+                            ${filePreview}
+                        </div>
+                    `;
+
+                    chatContainer.appendChild(messageElement);
+                });
+
+                // Add event listener for file preview
+                document.querySelectorAll(".cursor-zoom-in, .cursor-pointer").forEach((file) => {
+                    file.addEventListener("click", function() {
+                        openFilePreview(this.dataset.file);
                     });
+                });
 
-                    // Add event listener for file preview
-                    document.querySelectorAll(".file-preview").forEach((file) => {
-                        file.addEventListener("click", function () {
-                            openFilePreview(this.dataset.file);
-                        });
-                    });
-
-                } else {
-                    chatContainer.innerHTML = `<p class="text-muted">No messages yet.</p>`;
-                }
-            })
-            .catch(err => console.error("Error fetching messages:", err));
-    }
-
+            } else {
+                chatContainer.innerHTML = `
+                    <div class="h-full flex items-center justify-center text-gray-400">
+                        <div class="text-center">
+                            <div class="text-2xl">💬</div>
+                            <p class="mt-2 font-medium">No messages yet</p>
+                        </div>
+                    </div>`;
+            }
+        })
+        .catch(err => console.error("Error fetching messages:", err));
+}
 
 
 
