@@ -35,7 +35,13 @@ from django.template.loader import render_to_string
 from premailer import transform  
 import mimetypes
 from reportlab.lib.pagesizes import letter
+import base64
+import json
+import os
+from django.core.files.base import ContentFile
+
 # Create your views here.
+
 
 # Task creation
 @login_required
@@ -917,12 +923,16 @@ def update_meeting_status(request):
 
 
 # SPECIFIC ROOM FOR MANAGER AND THE TASK ACCOMPLISHER
-
+@check_org_membership
+@login_required
 def fetch_task_messages(request, org_id, group_id, task_id):
     if request.method == "GET":
         organization = get_object_or_404(Organization, id=org_id)
-        group = get_object_or_404(Group, id=group_id)
-        task = get_object_or_404(Task, id=task_id)
+        group = get_object_or_404(Group, id=group_id,organization=organization)
+        task = get_object_or_404(Task, id=task_id,group=group,organization=organization)
+
+        if not task and group and organization:
+            return JsonResponse({'error':'something went really wrong!'},status=400)
 
         messages = CommunicateTask.objects.filter(
             organization=organization, group=group, task=task
@@ -941,53 +951,6 @@ def fetch_task_messages(request, org_id, group_id, task_id):
         return JsonResponse({"messages": data}, safe=False)
 
 # send messages 
-# @csrf_exempt
-# @login_required
-# def send_task_message(request):
-#     if request.method == "POST":
-#         try:
-#             data = json.loads(request.body)  # Parse JSON data
-#             file = request.FILES.get("file")
-
-#             task_id = data.get("task_id")
-#             org_id = data.get("org_id")
-#             group_id = data.get("group_id")
-#             message = data.get("message", "")
-
-#             task = get_object_or_404(Task, id=task_id)
-#             organization = get_object_or_404(Organization, id=org_id)
-#             group = get_object_or_404(Group, id=group_id)
-#             sender = request.user
-
-#             communicate_task = CommunicateTask.objects.create(
-#                 task=task, organization=organization, group=group,
-#                 message=message, files=file, sender=sender
-#             )
-
-#             return JsonResponse({
-#                 "success": True,
-#                 "message": "Message sent successfully!",
-#                 "data": {
-#                     "id": communicate_task.id,
-#                     "message": communicate_task.message,
-#                     "file": communicate_task.files.url if communicate_task.files else None,
-#                     "sender": communicate_task.sender.username,
-#                     "created_at": communicate_task.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-#                 }
-#             })
-
-#         except json.JSONDecodeError:
-#             return JsonResponse({"success": False, "error": "Invalid JSON data"}, status=400)
-
-#     return JsonResponse({"success": False, "error": "Invalid request method"}, status=405)
-
-
-import base64
-import json
-import os
-from django.core.files.base import ContentFile
-
-
 @csrf_exempt
 @login_required
 def send_task_message(request):
@@ -1006,6 +969,10 @@ def send_task_message(request):
             organization = get_object_or_404(Organization, id=org_id)
             group = get_object_or_404(Group, id=group_id)
             sender = request.user
+
+            profile=get_object_or_404(Profile,user=request.user,organization=organization)
+            if not profile:
+                return JsonResponse({'error:':'you are not authorized!'},status=400)
 
             # Handle file saving
             file_obj = None
@@ -1040,6 +1007,7 @@ def send_task_message(request):
 # delete the message
 @csrf_exempt
 @login_required
+@check_org_membership
 def delete_all_task_messages(request, org_id, group_id, task_id):
     if request.method == "DELETE":
         try:
