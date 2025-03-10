@@ -841,7 +841,7 @@ def fetch_task_meetings(request):
 
     task=get_object_or_404(Task, id=task_id, organization_id=org_id)
 
-    if not request.user is task.created_by:
+    if request.user != task.created_by:
         return JsonResponse({'error:':'you are the manager ! couldnt process your request!'}, status=400)
 
     profile = get_object_or_404(Profile, user=request.user, organization_id=org_id)
