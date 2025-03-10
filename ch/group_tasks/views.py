@@ -688,6 +688,8 @@ def get_available_slots(request):
     return JsonResponse({"available_slots": available_slots})
 
 
+
+# -------------------------------------------------------------------------------------------------------------------------working on it ------------
 # SCHEDULE THE MEETING
 from django.utils.timezone import make_aware
 from django.db.models import Q
