@@ -34,6 +34,7 @@ from reportlab.lib.pagesizes import A4
 from django.template.loader import render_to_string
 from premailer import transform  
 import mimetypes
+from reportlab.lib.pagesizes import letter
 # Create your views here.
 
 # Task creation
@@ -1051,9 +1052,16 @@ def delete_all_task_messages(request, org_id, group_id, task_id):
     return JsonResponse({"success": False, "error": "Invalid request method."}, status=400)
 
 # EXPORT THE CHAT DATA
-from reportlab.lib.pagesizes import letter
 
+
+@check_org_membership
+@login_required
 def export_task_chat(request, org_id, group_id, task_id):
+
+    organization=get_object_or_404(Organization,id=org_id)
+    group=get_object_or_404(Group, id=group_id)
+    task=get_object_or_404(Task,id=task_id)
+
     # Fetch messages related to the task
     messages = CommunicateTask.objects.filter(task_id=task_id, group_id=group_id, organization_id=org_id).order_by("created_at")
 
@@ -1067,7 +1075,7 @@ def export_task_chat(request, org_id, group_id, task_id):
 
     # PDF Title
     pdf.setFont("Helvetica-Bold", 14)
-    pdf.drawString(200, 750, f"Chat Messages for Task {task_id}")
+    pdf.drawString(200, 750, f"Chat Messages for Task {task.title} - Group: {group.name}")
     
     y_position = 730
     pdf.setFont("Helvetica", 10)
@@ -1082,7 +1090,7 @@ def export_task_chat(request, org_id, group_id, task_id):
 
             # If there is a file, add a reference
             if msg.files:
-                pdf.drawString(50, y_position, f"🔗 File: {msg.file.url}")
+                pdf.drawString(50, y_position, f"🔗 File: {msg.files.url}")
                 y_position -= 20
 
             # Page handling
