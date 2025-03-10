@@ -633,7 +633,6 @@ def send_task_email(request, org_id, group_id, task_id):
 # SCHEDULE THE MEETING FOR TASK (PREMIUM)
 from datetime import datetime, timedelta
 from accounts.models import Availability,MeetingOrganization
-
 def get_available_slots(request):
     org_id = request.GET.get("org_id")
     group_id = request.GET.get("group_id")
@@ -663,14 +662,31 @@ def get_available_slots(request):
         organization_id=org_id, meeting_date=selected_date
     ).filter(user=task_creator) | MeetingOrganization.objects.filter(invitee=task_creator)
 
+    # Fetch `MeetingTaskQuery` bookings for Task Creator
+    task_meetings = MeetingTaskQuery.objects.filter(
+        organization_id=org_id, date=selected_date, task_creator=task_creator
+    )
+
     # Create list of booked time slots
-    booked_slots = []
+    booked_slots = set()  # Use a set for fast lookups
+
+    # Process booked slots from `MeetingOrganization`
     for meeting in meetings:
         start = datetime.combine(selected_date, meeting.start_time)
         end = datetime.combine(selected_date, meeting.end_time)
         while start < end:
-            booked_slots.append(start.time())
+            booked_slots.add(start.time())
             start += timedelta(minutes=30)
+
+    # Process booked slots from `MeetingTaskQuery`
+    for task_meeting in task_meetings:
+        start = task_meeting.start_time.time()  # Convert DateTime to Time
+        end = task_meeting.end_time.time()
+        current_time = datetime.combine(selected_date, start)
+
+        while current_time.time() < end:
+            booked_slots.add(current_time.time())
+            current_time += timedelta(minutes=30)
 
     # Generate 30-minute slots from availability
     available_slots = []
@@ -686,7 +702,6 @@ def get_available_slots(request):
             current_time += timedelta(minutes=30)
 
     return JsonResponse({"available_slots": available_slots})
-
 
 
 # -------------------------------------------------------------------------------------------------------------------------working on it ------------
