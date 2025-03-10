@@ -554,3 +554,56 @@ class MeetingTaskQuery(models.Model):
         return f"Meeting for Task {self.task.title} - {self.get_reason_display()} - {self.get_status_display()}"
 
 
+# COMMUNICATE IN TASK
+class CommunicateTask(models.Model):
+    task = models.ForeignKey(
+        Task, 
+        on_delete=models.CASCADE, 
+        related_name='communications',
+        help_text="The task for which this communication is happening."
+    )
+    organization = models.ForeignKey(
+        Organization, 
+        on_delete=models.CASCADE, 
+        related_name='task_communications',
+        help_text="The organization associated with this task communication."
+    )
+    group = models.ForeignKey(
+        Group, 
+        on_delete=models.CASCADE, 
+        related_name='task_group_communications',
+        help_text="The group associated with this task communication."
+    )
+    sender = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='sent_task_messages',
+        help_text="The user who sent this message."
+    )
+    message = models.TextField(
+        blank=True, 
+        null=True, 
+        help_text="Message content related to the task."
+    )
+    files = models.FileField(
+        upload_to='task_files/', 
+        blank=True, 
+        null=True, 
+        help_text="Optional file attachment for the communication."
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True, 
+        help_text="Timestamp when the message was sent."
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True, 
+        help_text="Timestamp when the message was last updated."
+    )
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Task Communication"
+        verbose_name_plural = "Task Communications"
+
+    def __str__(self):
+        return f"Message by {self.sender} for Task {self.task.id}"
