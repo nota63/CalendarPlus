@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect , get_list_or_404
-from .models import Task, TaskNote, TaskComment , TaskTag, ActivityLog,RecentVisit
+from .models import (Task, TaskNote, TaskComment , TaskTag, ActivityLog,RecentVisit,MeetingTaskQuery)
 from accounts.models import Organization, Profile
 from groups.models import Group
 from django.views import View
@@ -631,11 +631,123 @@ def send_task_email(request, org_id, group_id, task_id):
 
 
 # SCHEDULE THE MEETING FOR TASK (PREMIUM)
+from datetime import datetime, timedelta
+from accounts.models import Availability,MeetingOrganization
+
+def get_available_slots(request):
+    org_id = request.GET.get("org_id")
+    group_id = request.GET.get("group_id")
+    task_id = request.GET.get("task_id")
+    date_str = request.GET.get("date")  # Expected format: YYYY-MM-DD
+
+    if not all([org_id, group_id, task_id, date_str]):
+        return JsonResponse({"error": "Missing required parameters"}, status=400)
+
+    # Parse date
+    try:
+        selected_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        return JsonResponse({"error": "Invalid date format"}, status=400)
+
+    # Get Task & Task Creator
+    task = get_object_or_404(Task, id=task_id)
+    task_creator = task.created_by
+
+    # Fetch Availability for Task Creator (Filtered by Organization)
+    availability = Availability.objects.filter(
+        user=task_creator, organization_id=org_id, day_of_week=selected_date.weekday()
+    )
+
+    # Fetch Meetings where Task Creator is either `user` or `invitee`
+    meetings = MeetingOrganization.objects.filter(
+        organization_id=org_id, meeting_date=selected_date
+    ).filter(user=task_creator) | MeetingOrganization.objects.filter(invitee=task_creator)
+
+    # Create list of booked time slots
+    booked_slots = []
+    for meeting in meetings:
+        start = datetime.combine(selected_date, meeting.start_time)
+        end = datetime.combine(selected_date, meeting.end_time)
+        while start < end:
+            booked_slots.append(start.time())
+            start += timedelta(minutes=30)
+
+    # Generate 30-minute slots from availability
+    available_slots = []
+    for slot in availability:
+        current_time = datetime.combine(selected_date, slot.start_time)
+        end_time = datetime.combine(selected_date, slot.end_time)
+        
+        while current_time + timedelta(minutes=30) <= end_time:
+            if current_time.time() not in booked_slots:
+                available_slots.append(
+                    {"start_time": current_time.time().strftime("%H:%M")}
+                )
+            current_time += timedelta(minutes=30)
+
+    return JsonResponse({"available_slots": available_slots})
 
 
+# SCHEDULE THE MEETING
+from django.utils.timezone import make_aware
+from django.db.models import Q
 
+@csrf_exempt  # Remove if using CSRF token in AJAX
+def schedule_meeting(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request method"}, status=400)
 
+    try:
+        data = json.loads(request.body)
+        org_id = data.get("org_id")
+        group_id = data.get("group_id")
+        task_id = data.get("task_id")
+        date_str = data.get("date")  # Expected format: YYYY-MM-DD
+        start_time_str = data.get("start_time")  # Expected format: HH:MM
+        reason = data.get("reason")
 
+        if not all([org_id, group_id, task_id, date_str, start_time_str, reason]):
+            return JsonResponse({"error": "Missing required fields"}, status=400)
+
+        # Convert date & time
+        selected_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        start_time = datetime.strptime(start_time_str, "%H:%M").time()
+        end_time = (datetime.combine(selected_date, start_time) + timedelta(minutes=30)).time()
+
+        # Get Task & Task Creator
+        task = get_object_or_404(Task, id=task_id)
+        task_creator = task.created_by
+
+        # Check if the selected slot is already booked
+        is_booked = MeetingOrganization.objects.filter(
+            Q(user=task_creator) | Q(invitee=task_creator),
+            organization_id=org_id,
+            meeting_date=selected_date,
+            start_time__lt=end_time,
+            end_time__gt=start_time,
+        ).exists()
+
+        if is_booked:
+            return JsonResponse({"error": "Selected time slot is no longer available"}, status=400)
+
+        # Schedule Meeting
+        meeting = MeetingTaskQuery.objects.create(
+            organization_id=org_id,
+            group_id=group_id,
+            task_id=task_id,
+            scheduled_by=request.user,  # The user scheduling the meeting
+            task_creator=task_creator,
+            date=selected_date,
+            start_time=make_aware(datetime.combine(selected_date, start_time)),
+            end_time=make_aware(datetime.combine(selected_date, end_time)),
+            reason=reason,
+            status="pending",
+        )
+
+        return JsonResponse({"success": "Meeting scheduled successfully", "meeting_id": meeting.id})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 
 
 

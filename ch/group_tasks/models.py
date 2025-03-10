@@ -541,7 +541,7 @@ class MeetingTaskQuery(models.Model):
 
     scheduled_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="meetings_scheduled")
     task_creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="meetings_received")
-
+    date=models.DateField(null=True, blank=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     reason = models.CharField(max_length=50, choices=REASON_CHOICES, default="task_query")  
