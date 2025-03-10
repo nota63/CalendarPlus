@@ -712,7 +712,7 @@ import random
 import string
 
 
-
+# generate google meeting link
 def generate_meet_link():
     """Creates a Google Meet-style link without authentication."""
     random_code = "".join(random.choices(string.ascii_lowercase + string.digits, k=10))
@@ -794,7 +794,7 @@ def get_existing_meetings(request):
         group_id=group_id,
         task_id=task_id
     ).values(
-        "id", "date", "start_time", "end_time", "reason", "status"
+        "id", "date", "start_time", "end_time", "reason", "status",'meeting_link',
     )
 
     # Format the response
@@ -806,7 +806,8 @@ def get_existing_meetings(request):
             "start_time": meeting["start_time"].strftime("%H:%M"),
             "end_time": meeting["end_time"].strftime("%H:%M"),
             "reason": meeting["reason"],
-            "status": meeting["status"]
+            "status": meeting["status"],
+            'meeting_link':meeting['meeting_link'],
         })
 
     return JsonResponse({"meetings": meeting_list})

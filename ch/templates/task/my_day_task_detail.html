@@ -1745,6 +1745,7 @@ body {
                     <p><strong>Status:</strong> <span class="badge ${event.status === 'confirmed' ? 'bg-success' : 'bg-warning'}">
                         ${event.status || "Pending"}
                     </span></p>
+                    <p><strong>Reason:</strong> ${event.meeting_link}</p>
                 `);
                 $("#meetingDetailsModal").modal("show");
             }
@@ -1816,6 +1817,7 @@ body {
                         start: meeting.date + "T" + meeting.start_time,
                         end: meeting.date + "T" + meeting.end_time,
                         status: meeting.status,
+                        meeting_link:meeting.meeting_link,
                         allDay: false,
                     });
                 });
