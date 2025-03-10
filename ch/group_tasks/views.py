@@ -719,7 +719,7 @@ def generate_meet_link():
     return f"https://meet.google.com/{random_code}"
 
 
-@csrf_exempt  # Remove if using CSRF token in AJAX
+@csrf_exempt 
 def schedule_meeting(request):
     if request.method != "POST":
         return JsonResponse({"error": "Invalid request method"}, status=400)
@@ -762,7 +762,7 @@ def schedule_meeting(request):
             organization_id=org_id,
             group_id=group_id,
             task_id=task_id,
-            scheduled_by=request.user,  # The user scheduling the meeting
+            scheduled_by=request.user,  
             task_creator=task_creator,
             date=selected_date,
             start_time=make_aware(datetime.combine(selected_date, start_time)),

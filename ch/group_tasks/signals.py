@@ -4,7 +4,7 @@ from django.dispatch import receiver
 from django.core.mail import send_mail, EmailMessage
 from django.template.loader import render_to_string
 from django.conf import settings
-from .models import Problem, TaskComment
+from .models import Problem, TaskComment,MeetingTaskQuery
 
 @receiver(post_save, sender=Problem)
 def send_problem_report_email(sender, instance, created, **kwargs):
@@ -113,3 +113,42 @@ def send_task_comment_email(sender, instance, created, **kwargs):
             )
 
 
+# NOTIFY THE MANAGER & USER ABOUT THE TASK MEETING CREATED
+@receiver(post_save, sender=MeetingTaskQuery)
+def send_meeting_email(sender, instance, created, **kwargs):
+    """Send an email notification when a new meeting is scheduled."""
+    if created:
+        task_creator_email = instance.task_creator.email
+        requester_email = instance.scheduled_by.email
+        organization_name = instance.organization.name if instance.organization else "Unknown Organization"
+        group_name = instance.group.name if instance.group else "Unknown Group"
+
+        subject = "New Meeting Scheduled 📅"
+        message = f"""
+        Hello,
+
+        A new meeting has been scheduled.
+
+        📌 **Task:** {instance.task.title}
+        🏢 **Organization:** {organization_name}
+        👥 **Group:** {group_name}
+        📅 **Date:** {instance.date}
+        ⏰ **Time:** {instance.start_time.strftime('%H:%M')} - {instance.end_time.strftime('%H:%M')}
+        📝 **Reason:** {instance.reason}
+        🔗 **Meeting Link:** {instance.meeting_link}
+
+        Please be on time.
+
+        Best Regards,
+        Calendar Plus
+        """
+
+        recipient_list = [task_creator_email, requester_email]
+        
+        send_mail(
+            subject, 
+            message, 
+            settings.DEFAULT_FROM_EMAIL, 
+            recipient_list, 
+            fail_silently=False
+        )
