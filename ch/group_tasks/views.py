@@ -778,7 +778,6 @@ def schedule_meeting(request):
         return JsonResponse({"error": str(e)}, status=500)
 
 
-
 # GET EXISTING MEETINGS
 def get_existing_meetings(request):
     org_id = request.GET.get("org_id")

@@ -1105,34 +1105,42 @@ body {
 
 
 <!-- CONFIRM MEET MODAL -->
- <!-- Confirmation Modal -->
+<!-- Confirmation Modal -->
 <div class="modal fade" id="confirmMeetingModal" tabindex="-1" aria-labelledby="confirmMeetingLabel" aria-hidden="true">
     <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Confirm Meeting</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content bg-white rounded-2xl shadow-xl border border-gray-200">
+            <!-- Modal Header -->
+            <div class="modal-header border-b border-gray-200">
+                <h5 class="modal-title text-lg font-semibold text-gray-800">Confirm Meeting</h5>
+                <button type="button" class="btn-close text-gray-500 hover:text-gray-700" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body space-y-4 p-5">
+                <p class="text-sm text-gray-600"><strong>Selected Date:</strong> <span id="selectedDate" class="text-gray-800"></span></p>
+                <p class="text-sm text-gray-600"><strong>Selected Time Slot:</strong> <span id="selectedTime" class="text-gray-800"></span></p>
+
+                <div>
+                    <label for="meetingReason" class="block text-sm font-medium text-gray-700">Reason for Meeting:</label>
+                    <select id="meetingReason" class="mt-1 w-full p-2 border border-gray-300 rounded-lg text-sm text-gray-700 focus:ring-2 focus:ring-indigo-400 focus:outline-none">
+                        <option value="task_query">Task Queries</option>
+                        <option value="facing_bug">Facing Bugs</option>
+                        <option value="urgent_issue">Urgent Issue</option>
+                        <option value="need_clarification">Need Clarification</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer border-t border-gray-200 flex justify-end space-x-3 p-4">
+                <button type="button" class="px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition" data-bs-dismiss="modal">Cancel</button>
+                <button id="scheduleMeeting" class="px-4 py-2 text-sm font-medium bg-green-500 text-white rounded-lg hover:bg-green-600 transition">Schedule Meeting</button>
+            </div>
         </div>
-        <div class="modal-body">
-          <p><strong>Selected Date:</strong> <span id="selectedDate"></span></p>
-          <p><strong>Selected Time Slot:</strong> <span id="selectedTime"></span></p>
-          <label for="meetingReason">Reason for Meeting:</label>
-          <select id="meetingReason" class="form-control">
-            <option value="task_query">Task Queries</option>
-            <option value="facing_bug">Facing Bugs</option>
-            <option value="urgent_issue">Urgent Issue</option>
-            <option value="need_clarification">Need Clarification</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button id="scheduleMeeting" class="btn btn-success">Schedule Meeting</button>
-        </div>
-      </div>
     </div>
-  </div>
-  
+</div>
+
 
 <!-- show meeting details (existing) -->
  <!-- Meeting Details Modal -->
