@@ -1686,120 +1686,168 @@ body {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
 
 <script>
-    $(document).ready(function () {
-        let selectedDate = null;
-        let selectedTimeSlot = null;
-        let orgId, groupId, taskId;
+  $(document).ready(function () {
+    let selectedDate = null;
+    let selectedTimeSlot = null;
+    let orgId, groupId, taskId;
 
-        // Capture Organization, Group, and Task ID
-        $("[data-bs-target='#fullCalendarModal']").on("click", function () {
-            orgId = $(this).data("org-id");
-            groupId = $(this).data("group-id");
-            taskId = $(this).data("task-id");
-        });
+    // Capture Organization, Group, and Task ID
+    $("[data-bs-target='#fullCalendarModal']").on("click", function () {
+        orgId = $(this).data("org-id");
+        groupId = $(this).data("group-id");
+        taskId = $(this).data("task-id");
+        fetchExistingMeetings(); // Fetch existing meetings when opening calendar
+    });
 
-        // Initialize FullCalendar
-        $("#calendar").fullCalendar({
-            header: {
-                left: "prev,next today",
-                center: "title",
-                right: "month,agendaWeek,agendaDay",
+    // Initialize FullCalendar
+    $("#calendar").fullCalendar({
+        header: {
+            left: "prev,next today",
+            center: "title",
+            right: "month,agendaWeek,agendaDay",
+        },
+        selectable: true,
+        dayClick: function (date) {
+            selectedDate = date.format("YYYY-MM-DD");
+            console.log("Selected Date:", selectedDate);
+            fetchAvailableSlots();
+        },
+        eventClick: function (event) {
+            // Open meeting details modal when clicking an existing meeting
+            openMeetingDetails(event);
+        },
+    });
+
+    // Fetch Available Time Slots & Meetings
+    function fetchAvailableSlots() {
+        if (!selectedDate) return;
+
+        $.ajax({
+            url: `/tasks/get-available-slots/?org_id=${orgId}&group_id=${groupId}&task_id=${taskId}&date=${selectedDate}`,
+            method: "GET",
+            dataType: "json",
+            success: function (data) {
+                console.log("API Response:", data);
+
+                let slotsDiv = $("#timeSlots");
+                slotsDiv.html("");
+
+                if (!data.available_slots || data.available_slots.length === 0) {
+                    slotsDiv.html("<p class='text-danger'>No available slots for this date.</p>");
+                    return;
+                }
+
+                data.available_slots.forEach((slot) => {
+                    let time = slot.start_time;
+                    let slotBtn = $("<button>")
+                        .addClass("btn btn-outline-primary slot-btn")
+                        .text(time)
+                        .data("time", time)
+                        .on("click", function () {
+                            $(".slot-btn").removeClass("btn-primary");
+                            $(this).addClass("btn-primary");
+                            selectedTimeSlot = $(this).data("time");
+                            $("#proceedToSchedule").prop("disabled", false);
+                        });
+
+                    slotsDiv.append(slotBtn);
+                });
+
+                $("#availableSlotsModal").modal("show");
             },
-            selectable: true,
-            dayClick: function (date) {
-                selectedDate = date.format("YYYY-MM-DD"); // Ensure proper format
-                console.log("Selected Date:", selectedDate);
-                fetchAvailableSlots(); // Fetch slots when a date is clicked
+            error: function (xhr, status, error) {
+                console.log("Error fetching slots:", error);
+                alert("❌ Failed to fetch available slots. Please try again.");
             },
         });
+    }
 
-        // Fetch Available Time Slots & Meetings
-        function fetchAvailableSlots() {
-    if (!selectedDate) return;
+    // Fetch Existing Meetings for Task
+    function fetchExistingMeetings() {
+        $.ajax({
+            url: `/tasks/get-existing-meetings/?org_id=${orgId}&group_id=${groupId}&task_id=${taskId}`,
+            method: "GET",
+            dataType: "json",
+            success: function (data) {
+                console.log("Existing Meetings:", data);
+                let meetings = data.meetings || [];
 
-    $.ajax({
-        url: `/tasks/get-available-slots/?org_id=${orgId}&group_id=${groupId}&task_id=${taskId}&date=${selectedDate}`,
-        method: "GET",
-        dataType: "json",
-        success: function (data) {
-            console.log("API Response:", data); // Debugging log
+                // Remove previous events
+                $("#calendar").fullCalendar("removeEvents");
 
-            let slotsDiv = $("#timeSlots");
-            slotsDiv.html(""); // Clear previous slots
-
-            if (!data.available_slots || data.available_slots.length === 0) {
-                slotsDiv.html("<p class='text-danger'>No available slots for this date.</p>");
-                return;
-            }
-
-            data.available_slots.forEach((slot) => {
-                let time = slot.start_time; // Fix: Use start_time correctly
-                let slotBtn = $("<button>")
-                    .addClass("btn btn-outline-primary slot-btn")
-                    .text(time)
-                    .data("time", time)
-                    .on("click", function () {
-                        $(".slot-btn").removeClass("btn-primary");
-                        $(this).addClass("btn-primary");
-                        selectedTimeSlot = $(this).data("time");
-                        $("#proceedToSchedule").prop("disabled", false);
+                // Add new meetings to FullCalendar
+                meetings.forEach((meeting) => {
+                    $("#calendar").fullCalendar("renderEvent", {
+                        id: meeting.id,
+                        title: meeting.reason.replace("_", " "), // Format reason
+                        start: meeting.date + "T" + meeting.start_time,
+                        end: meeting.date + "T" + meeting.end_time,
+                        status: meeting.status,
+                        allDay: false,
                     });
-
-                slotsDiv.append(slotBtn);
-            });
-
-            $("#availableSlotsModal").modal("show"); // Show the modal with time slots
-        },
-        error: function (xhr, status, error) {
-            console.log("Error fetching slots:", error);
-            alert("❌ Failed to fetch available slots. Please try again.");
-        },
-    });
-}
-
-
-        // Proceed to Confirm Modal
-        $("#proceedToSchedule").on("click", function () {
-            $("#selectedDate").text(selectedDate);
-            $("#selectedTime").text(selectedTimeSlot);
-            $("#confirmMeetingModal").modal("show");
+                });
+            },
+            error: function (xhr, status, error) {
+                console.log("Error fetching meetings:", error);
+            },
         });
+    }
 
-        // Schedule Meeting AJAX
-        $("#scheduleMeeting").on("click", function () {
-            let reason = $("#meetingReason").val();
+    // Open Meeting Details Modal
+    function openMeetingDetails(event) {
+        $("#meetingDetailsModal .modal-body").html(`
+            <p><strong>Date:</strong> ${event.start.format("YYYY-MM-DD")}</p>
+            <p><strong>Start Time:</strong> ${event.start.format("HH:mm")}</p>
+            <p><strong>End Time:</strong> ${event.end.format("HH:mm")}</p>
+            <p><strong>Reason:</strong> ${event.title}</p>
+            <p><strong>Status:</strong> ${event.status}</p>
+        `);
+        $("#meetingDetailsModal").modal("show");
+    }
 
-            $.ajax({
-                url: "/tasks/schedule-the-meeting/",
-                method: "POST",
-                headers: { "X-CSRFToken": getCSRFToken() },
-                contentType: "application/json",
-                data: JSON.stringify({
-                    org_id: orgId,
-                    group_id: groupId,
-                    task_id: taskId,
-                    date: selectedDate,
-                    start_time: selectedTimeSlot,
-                    reason: reason,
-                }),
-                success: function (data) {
-                    if (data.success) {
-                        alert("✅ Meeting Scheduled Successfully!");
-                        location.reload();
-                    } else {
-                        alert("❌ Error: " + data.error);
-                    }
-                },
-                error: function (xhr) {
-                    alert("❌ Failed to schedule meeting.");
-                },
-            });
-        });
-
-        function getCSRFToken() {
-            return $("[name=csrfmiddlewaretoken]").val();
-        }
+    // Proceed to Confirm Modal
+    $("#proceedToSchedule").on("click", function () {
+        $("#selectedDate").text(selectedDate);
+        $("#selectedTime").text(selectedTimeSlot);
+        $("#confirmMeetingModal").modal("show");
     });
+
+    // Schedule Meeting AJAX
+    $("#scheduleMeeting").on("click", function () {
+        let reason = $("#meetingReason").val();
+
+        $.ajax({
+            url: "/tasks/schedule-the-meeting/",
+            method: "POST",
+            headers: { "X-CSRFToken": getCSRFToken() },
+            contentType: "application/json",
+            data: JSON.stringify({
+                org_id: orgId,
+                group_id: groupId,
+                task_id: taskId,
+                date: selectedDate,
+                start_time: selectedTimeSlot,
+                reason: reason,
+            }),
+            success: function (data) {
+                if (data.success) {
+                    alert("✅ Meeting Scheduled Successfully!");
+                    location.reload();
+                } else {
+                    alert("❌ Error: " + data.error);
+                }
+            },
+            error: function (xhr) {
+                alert("❌ Failed to schedule meeting.");
+            },
+        });
+    });
+
+    function getCSRFToken() {
+        return $("[name=csrfmiddlewaretoken]").val();
+    }
+});
+
 </script>
 
 

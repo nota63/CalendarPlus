@@ -767,6 +767,38 @@ def schedule_meeting(request):
         return JsonResponse({"error": str(e)}, status=500)
 
 
+# GET EXISTING MEETINGS
+
+def get_existing_meetings(request):
+    org_id = request.GET.get("org_id")
+    group_id = request.GET.get("group_id")
+    task_id = request.GET.get("task_id")
+
+    if not all([org_id, group_id, task_id]):
+        return JsonResponse({"error": "Missing required parameters"}, status=400)
+
+    # Fetch existing meetings for the task
+    meetings = MeetingTaskQuery.objects.filter(
+        organization_id=org_id,
+        group_id=group_id,
+        task_id=task_id
+    ).values(
+        "id", "date", "start_time", "end_time", "reason", "status"
+    )
+
+    # Format the response
+    meeting_list = []
+    for meeting in meetings:
+        meeting_list.append({
+            "id": meeting["id"],
+            "date": meeting["date"].strftime("%Y-%m-%d"),
+            "start_time": meeting["start_time"].strftime("%H:%M"),
+            "end_time": meeting["end_time"].strftime("%H:%M"),
+            "reason": meeting["reason"],
+            "status": meeting["status"]
+        })
+
+    return JsonResponse({"meetings": meeting_list})
 
 
 
