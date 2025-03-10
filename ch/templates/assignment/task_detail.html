@@ -636,12 +636,15 @@ document.addEventListener("DOMContentLoaded", function () {
                         }
 
                         messageElement.innerHTML = `
-                            <div>
-                                <strong>${msg.sender}</strong>: ${msg.message} <br>
-                                ${filePreview}
-                                <small class="text-muted d-block">${msg.created_at}</small>
-                            </div>
-                        `;j
+    <div class="d-flex align-items-center">
+        <img src="${msg.profile}" alt="Profile" class="rounded-circle me-2" width="40" height="40">
+        <div>
+            <strong>${msg.sender}</strong>: ${msg.message} <br>
+            ${filePreview}
+            <small class="text-muted d-block">${msg.created_at}</small>
+        </div>
+    </div>
+`;
 
                         chatContainer.appendChild(messageElement);
                     });
