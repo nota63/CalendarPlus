@@ -230,6 +230,8 @@
                     <input type="text" id="chatMessageInput" class="form-control" placeholder="Type a message...">
                     <input type="file" id="chatFileInput" class="form-control">
                     <button class="btn btn-success" id="sendChatMessage">📩 Send</button>
+                    <button id="deleteAllMessages" class="btn btn-danger">Delete All Messages</button>
+
                 </div>
             </div>
         </div>
@@ -249,6 +251,7 @@
             <div class="modal-body text-center">
                 <div id="filePreviewContent"></div>
             </div>
+          
         </div>
     </div>
 </div>
@@ -450,6 +453,11 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const CURRENT_USER_ID="{{request.user.id}}";
+    </script>
+
     <script>
         // Smooth scroll behavior
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -579,7 +587,6 @@
 
 
 // COMMUNICATE BOTH USERS (MANAGER & THE TASK ACCOMPLISHER)
-
 document.addEventListener("DOMContentLoaded", function () {
     let orgId, groupId, taskId;
 
@@ -597,77 +604,80 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Fetch Messages & Files
     function fetchMessages(orgId, groupId, taskId) {
-    fetch(`/tasks/fetch-task-messages/${orgId}/${groupId}/${taskId}/`)
-        .then(response => response.json())
-        .then(data => {
-            const chatContainer = document.getElementById("chatMessages");
-            chatContainer.innerHTML = "";
+        fetch(`/tasks/fetch-task-messages/${orgId}/${groupId}/${taskId}/`)
+            .then(response => response.json())
+            .then(data => {
+                const chatContainer = document.getElementById("chatMessages");
+                chatContainer.innerHTML = "";
 
-            if (data.messages.length > 0) {
-                data.messages.forEach(msg => {
-                    const messageElement = document.createElement("div");
-                    messageElement.classList.add("p-2", "border-bottom");
+                if (data.messages.length > 0) {
+                    data.messages.forEach(msg => {
+                        const messageElement = document.createElement("div");
+                        messageElement.classList.add("p-2", "border-bottom", "d-flex", "justify-content-between", "align-items-start");
 
-                    let filePreview = "";
-                    if (msg.file) {
-                        const fileExt = msg.file.split('.').pop().toLowerCase();
+                        let filePreview = "";
+                        if (msg.file) {
+                            const fileExt = msg.file.split('.').pop().toLowerCase();
 
-                        if (["png", "jpg", "jpeg", "gif", "webp"].includes(fileExt)) {
-                            filePreview = `<img src="${msg.file}" class="img-fluid rounded mt-2 file-preview" 
-                                              style="max-width: 200px; cursor: pointer;" data-file="${msg.file}">`;
-                        } else if (["mp4", "webm", "ogg"].includes(fileExt)) {
-                            filePreview = `<video controls class="mt-2 file-preview" style="max-width: 200px; cursor: pointer;" 
-                                              data-file="${msg.file}">
-                                              <source src="${msg.file}" type="video/${fileExt}">
-                                              Your browser does not support the video tag.
-                                           </video>`;
-                        } else {
-                            filePreview = `<a href="${msg.file}" target="_blank" class="btn btn-sm btn-primary mt-2 file-preview" 
-                                              data-file="${msg.file}">📂 View File</a>`;
+                            if (["png", "jpg", "jpeg", "gif", "webp"].includes(fileExt)) {
+                                filePreview = `<img src="${msg.file}" class="img-fluid rounded mt-2 file-preview" 
+                                                  style="max-width: 200px; cursor: pointer;" data-file="${msg.file}">`;
+                            } else if (["mp4", "webm", "ogg"].includes(fileExt)) {
+                                filePreview = `<video controls class="mt-2 file-preview" style="max-width: 200px; cursor: pointer;" 
+                                                  data-file="${msg.file}">
+                                                  <source src="${msg.file}" type="video/${fileExt}">
+                                                  Your browser does not support the video tag.
+                                               </video>`;
+                            } else {
+                                filePreview = `<a href="${msg.file}" target="_blank" class="btn btn-sm btn-primary mt-2 file-preview" 
+                                                  data-file="${msg.file}">📂 View File</a>`;
+                            }
                         }
-                    }
 
-                    messageElement.innerHTML = `
-                        <strong>${msg.sender}</strong>: ${msg.message} <br>
-                        ${filePreview}
-                        <small class="text-muted d-block">${msg.created_at}</small>
-                    `;
-                    chatContainer.appendChild(messageElement);
-                });
+                        messageElement.innerHTML = `
+                            <div>
+                                <strong>${msg.sender}</strong>: ${msg.message} <br>
+                                ${filePreview}
+                                <small class="text-muted d-block">${msg.created_at}</small>
+                            </div>
+                        `;
 
-                // Add event listeners for file preview
-                document.querySelectorAll(".file-preview").forEach((file) => {
-                    file.addEventListener("click", function () {
-                        openFilePreview(this.dataset.file);
+                        chatContainer.appendChild(messageElement);
                     });
-                });
 
-            } else {
-                chatContainer.innerHTML = `<p class="text-muted">No messages yet.</p>`;
-            }
-        })
-        .catch(err => console.error("Error fetching messages:", err));
-}
+                    // Add event listener for file preview
+                    document.querySelectorAll(".file-preview").forEach((file) => {
+                        file.addEventListener("click", function () {
+                            openFilePreview(this.dataset.file);
+                        });
+                    });
 
-// OPEN FILE PREVIEW
-function openFilePreview(fileUrl) {
-    const fileExt = fileUrl.split('.').pop().toLowerCase();
-    let previewContent = "";
-
-    if (["png", "jpg", "jpeg", "gif", "webp"].includes(fileExt)) {
-        previewContent = `<img src="${fileUrl}" class="img-fluid rounded" style="max-width: 100%;">`;
-    } else if (["mp4", "webm", "ogg"].includes(fileExt)) {
-        previewContent = `<video controls class="w-100">
-                            <source src="${fileUrl}" type="video/${fileExt}">
-                            Your browser does not support the video tag.
-                          </video>`;
-    } else {
-        previewContent = `<iframe src="${fileUrl}" class="w-100" style="height: 500px;"></iframe>`;
+                } else {
+                    chatContainer.innerHTML = `<p class="text-muted">No messages yet.</p>`;
+                }
+            })
+            .catch(err => console.error("Error fetching messages:", err));
     }
 
-    document.getElementById("filePreviewContent").innerHTML = previewContent;
-    new bootstrap.Modal(document.getElementById("filePreviewModal")).show();
-}
+    // OPEN FILE PREVIEW
+    function openFilePreview(fileUrl) {
+        const fileExt = fileUrl.split('.').pop().toLowerCase();
+        let previewContent = "";
+
+        if (["png", "jpg", "jpeg", "gif", "webp"].includes(fileExt)) {
+            previewContent = `<img src="${fileUrl}" class="img-fluid rounded" style="max-width: 100%;">`;
+        } else if (["mp4", "webm", "ogg"].includes(fileExt)) {
+            previewContent = `<video controls class="w-100">
+                                <source src="${fileUrl}" type="video/${fileExt}">
+                                Your browser does not support the video tag.
+                              </video>`;
+        } else {
+            previewContent = `<iframe src="${fileUrl}" class="w-100" style="height: 500px;"></iframe>`;
+        }
+
+        document.getElementById("filePreviewContent").innerHTML = previewContent;
+        new bootstrap.Modal(document.getElementById("filePreviewModal")).show();
+    }
 
     // Send Message (JSON-based)
     document.getElementById("sendChatMessage").addEventListener("click", function () {
@@ -696,7 +706,7 @@ function openFilePreview(fileUrl) {
                     org_id: orgId,
                     group_id: groupId,
                     message: message,
-                    file: base64File,  // Sending file as Base64
+                    file: base64File,
                     file_name: file ? file.name : null,
                 }),
             })
@@ -720,6 +730,27 @@ function openFilePreview(fileUrl) {
         }
     });
 
+    // DELETE ALL MESSAGES
+    document.getElementById("deleteAllMessages").addEventListener("click", function () {
+        if (confirm("Are you sure you want to delete all your messages?")) {
+            fetch(`/tasks/delete-task-messages/${orgId}/${groupId}/${taskId}/`, {
+                method: "DELETE",
+                headers: {
+                    "X-CSRFToken": getCSRFToken(),
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    fetchMessages(orgId, groupId, taskId);
+                } else {
+                    alert("Error deleting messages: " + data.error);
+                }
+            })
+            .catch(err => console.error("Error deleting messages:", err));
+        }
+    });
+
     // Get CSRF Token
     function getCSRFToken() {
         return document.cookie.split("; ")
@@ -727,6 +758,7 @@ function openFilePreview(fileUrl) {
             ?.split("=")[1];
     }
 });
+
 
 
 

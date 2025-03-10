@@ -1037,20 +1037,18 @@ def send_task_message(request):
 
 
 # delete the message
-
-@login_required
 @csrf_exempt
-def delete_task_message(request, message_id):
+@login_required
+def delete_all_task_messages(request, org_id, group_id, task_id):
     if request.method == "DELETE":
         try:
-            message = CommunicateTask.objects.get(id=message_id, sender=request.user)
-            message.delete()
-            return JsonResponse({"success": True})
-        except CommunicateTask.DoesNotExist:
-            return JsonResponse({"success": False, "error": "Message not found or unauthorized."}, status=403)
+            # Delete all messages for the given task
+            CommunicateTask.objects.filter(task_id=task_id, group_id=group_id, organization_id=org_id,sender=request.user).delete()
+            return JsonResponse({"success": True, "message": "All messages deleted successfully."})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
     
     return JsonResponse({"success": False, "error": "Invalid request method."}, status=400)
-
 
 
 

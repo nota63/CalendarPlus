@@ -48,7 +48,7 @@ urlpatterns = [
     path('update-meeting-status/',update_meeting_status, name='update_meeting_status'),
     path('fetch-task-messages/<int:org_id>/<int:group_id>/<int:task_id>/',fetch_task_messages, name='fetch_task_messages'),
     path('send-task-message/',send_task_message, name='send_task_message'),
-    path('delete-task-message/<int:message_id>/',delete_task_message, name='delete_task_message')
+    path('delete-task-messages/<int:org_id>/<int:group_id>/<int:task_id>/',delete_all_task_messages, name='delete_task_message')
   
   
   
