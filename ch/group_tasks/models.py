@@ -544,13 +544,13 @@ class MeetingTaskQuery(models.Model):
     date=models.DateField(null=True, blank=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
-    reason = models.CharField(max_length=50, choices=REASON_CHOICES, default="task_query")  
-
+    reason = models.CharField(max_length=50, choices=REASON_CHOICES, default="task_query")
+    meeting_link = models.URLField(default="https://meet.google.com/new",null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Meeting for Task {self.task.name} - {self.get_reason_display()} - {self.get_status_display()}"
+        return f"Meeting for Task {self.task.title} - {self.get_reason_display()} - {self.get_status_display()}"
 
 

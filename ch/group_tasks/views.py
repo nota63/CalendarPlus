@@ -708,6 +708,16 @@ def get_available_slots(request):
 # SCHEDULE THE MEETING
 from django.utils.timezone import make_aware
 from django.db.models import Q
+import random
+import string
+
+
+
+def generate_meet_link():
+    """Creates a Google Meet-style link without authentication."""
+    random_code = "".join(random.choices(string.ascii_lowercase + string.digits, k=10))
+    return f"https://meet.google.com/{random_code}"
+
 
 @csrf_exempt  # Remove if using CSRF token in AJAX
 def schedule_meeting(request):
@@ -759,6 +769,7 @@ def schedule_meeting(request):
             end_time=make_aware(datetime.combine(selected_date, end_time)),
             reason=reason,
             status="pending",
+            meeting_link=generate_meet_link(),
         )
 
         return JsonResponse({"success": "Meeting scheduled successfully", "meeting_id": meeting.id})
@@ -767,8 +778,8 @@ def schedule_meeting(request):
         return JsonResponse({"error": str(e)}, status=500)
 
 
-# GET EXISTING MEETINGS
 
+# GET EXISTING MEETINGS
 def get_existing_meetings(request):
     org_id = request.GET.get("org_id")
     group_id = request.GET.get("group_id")
