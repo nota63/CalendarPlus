@@ -945,6 +945,10 @@ def fetch_task_messages(request, org_id, group_id, task_id):
                 "file": msg.files.url if msg.files else None,
                 "sender": msg.sender.username,
                 "created_at": msg.id,  # Modify if you want a formatted timestamp
+                 "profile": (
+                    msg.sender.profiles.filter(organization=organization).first().profile_picture.url 
+                    if msg.sender.profiles.filter(organization=organization).exists() and msg.sender.profiles.filter(organization=organization).first().profile_picture 
+                  else "No URL")
             }
             for msg in messages
         ]
