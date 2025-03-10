@@ -1832,27 +1832,33 @@ $(document).ready(function () {
                 }
 
                 slotsDiv.addClass('grid grid-cols-2 md:grid-cols-3 gap-3');
-                data.available_slots.forEach((slot) => {
-                    let time = slot.start_time;
-                    let slotBtn = $(`
-                        <button class="w-full py-2 px-3 text-sm font-medium rounded-xl border 
-                            hover:border-blue-500 hover:bg-blue-50 hover:text-blue-600 
-                            transition-all duration-200 ease-out">
-                            ${time}
-                        </button>
-                    `).data("time", time)
-                     .on("click", function () {
-                        $(".slot-btn").removeClass('border-blue-500 bg-blue-50 text-blue-600');
-                        $(this).addClass('border-blue-500 bg-blue-50 text-blue-600');
-                        selectedTimeSlot = $(this).data("time");
-                        $("#proceedToSchedule")
-                            .prop("disabled", false)
-                            .removeClass('opacity-50 cursor-not-allowed');
-                    });
+                // Updated button styling inside the forEach loop
+data.available_slots.forEach((slot) => {
+    let time = slot.start_time;
+    let slotBtn = $(`
+        <button class="w-full py-2.5 px-4 text-sm font-medium rounded-lg border border-gray-200 
+            shadow-sm hover:shadow-md hover:border-blue-500/80 hover:bg-blue-50/50 
+            transition-all duration-300 ease-in-out
+            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+            text-gray-700 hover:text-blue-600 relative group">
+            ${time}
+            <span class="absolute inset-0 bg-blue-500/10 rounded-lg scale-95 opacity-0 
+                group-hover:scale-100 group-hover:opacity-25 transition-all duration-300"></span>
+        </button>
+    `).data("time", time)
+     .on("click", function () {
+        $(".slot-btn").removeClass('border-2 border-blue-500 bg-blue-50/50 text-blue-600 shadow-none')
+                      .addClass('border-gray-200 shadow-sm');
+        $(this).removeClass('border-gray-200 shadow-sm hover:shadow-md')
+               .addClass('border-2 border-blue-500 bg-blue-50/50 text-blue-600 shadow-none');
+        selectedTimeSlot = $(this).data("time");
+        $("#proceedToSchedule")
+            .prop("disabled", false)
+            .removeClass('opacity-50 cursor-not-allowed');
+    });
 
-                    slotsDiv.append(slotBtn);
-                });
-
+    slotsDiv.append(slotBtn);
+});
                 $("#availableSlotsModal").modal("show");
             },
             error: function (xhr, status, error) {
