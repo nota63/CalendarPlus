@@ -852,6 +852,7 @@ def fetch_task_meetings(request):
 
     return JsonResponse({"meetings": meetings_data}, status=200)
 
+
 # UPDATE THE MEETING STATUS
 @csrf_exempt
 @login_required

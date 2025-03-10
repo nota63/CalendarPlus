@@ -45,6 +45,7 @@ urlpatterns = [
     path('schedule-the-meeting/',schedule_meeting, name='schedule_the_meeting'),
     path('get-existing-meetings/',get_existing_meetings, name='get_existing_meetings'),
     path('fetch-task-meetings/',fetch_task_meetings,name='fetch_task_meetings'),
+    path('update-meeting-status/',update_meeting_status, name='update_meeting_status')
   
   
   
