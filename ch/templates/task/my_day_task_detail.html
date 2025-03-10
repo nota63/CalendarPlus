@@ -1731,26 +1731,35 @@ body {
             console.log("Selected Date:", selectedDate);
             fetchAvailableSlots();
         },
-        eventClick: function (event) {
-            console.log("Meeting Clicked:", event);
 
-            // Display Meeting Details in Bootstrap Modal
-            if (event) {
-                $("#meetingDetailsTitle").text("Meeting Details");
-                $("#meetingDetailsBody").html(`
-                    <p><strong>Date:</strong> ${event.start.format("YYYY-MM-DD")}</p>
-                    <p><strong>Start Time:</strong> ${event.start.format("HH:mm")}</p>
-                    <p><strong>End Time:</strong> ${event.end ? event.end.format("HH:mm") : "N/A"}</p>
-                    <p><strong>Reason:</strong> ${event.title}</p>
-                    <p><strong>Status:</strong> <span class="badge ${event.status === 'confirmed' ? 'bg-success' : 'bg-warning'}">
-                        ${event.status || "Pending"}
-                    </span></p>
-                    <p><strong>Reason:</strong> ${event.meeting_link}</p>
-                `);
-                $("#meetingDetailsModal").modal("show");
-            }
-        },
-    });
+       eventClick: function (event) {
+    console.log("Meeting Clicked:", event);
+
+    if (event) {
+        $("#meetingDetailsTitle").text("Meeting Details");
+
+        let meetingLinkHtml = event.meeting_link
+            ? `<a href="${event.meeting_link}" target="_blank" class="btn btn-primary">
+                🔗 Join Meeting
+              </a>`
+            : `<span class="text-danger">No meeting link available</span>`;
+
+        $("#meetingDetailsBody").html(`
+            <p><strong>Date:</strong> ${event.start.format("YYYY-MM-DD")}</p>
+            <p><strong>Start Time:</strong> ${event.start.format("HH:mm")}</p>
+            <p><strong>End Time:</strong> ${event.end ? event.end.format("HH:mm") : "N/A"}</p>
+            <p><strong>Reason:</strong> ${event.title}</p>
+            <p><strong>Status:</strong> <span class="badge ${event.status === 'confirmed' ? 'bg-success' : 'bg-warning'}">
+                ${event.status || "Pending"}
+            </span></p>
+            <p><strong>Meeting Link:</strong> ${meetingLinkHtml}</p>
+        `);
+
+        $("#meetingDetailsModal").modal("show");
+    }
+},
+});
+
 
     // Fetch Available Time Slots & Meetings
     function fetchAvailableSlots() {
