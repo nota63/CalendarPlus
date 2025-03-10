@@ -895,7 +895,11 @@ def update_meeting_status(request):
             return JsonResponse({"error": "Missing required fields"}, status=400)
 
         # Get the meeting
-        meeting = get_object_or_404(MeetingTaskQuery, id=meeting_id)
+        meeting = get_object_or_404(MeetingTaskQuery, id=meeting_id,task_creator=request.user)
+
+        profile= get_object_or_404(Profile, user=request.user,organization=meeting.organization)
+        if not profile:
+            return JsonResponse({'error:':'you are not authorized to access this page!'}, status=400)
 
         # Check if the requester is the task creator
         if request.user != meeting.task_creator:
