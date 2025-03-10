@@ -300,21 +300,28 @@
 
 <!-- FILE PREVIEW MODAL -->
 <!-- File Preview Modal -->
-<div class="modal fade" id="filePreviewModal" tabindex="-1" aria-labelledby="filePreviewLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">File Preview</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade" id="filePreviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered max-w-7xl h-[95vh]">
+        <div class="modal-content rounded-xl shadow-2xl bg-white h-full">
+            <!-- Close Button -->
+            <button type="button" 
+                    class="absolute right-4 top-4 z-50 p-2 text-gray-500 hover:text-gray-700 transition-colors"
+                    data-bs-dismiss="modal">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+
+            <!-- Preview Content -->
+            <div class="h-full p-6">
+                <div id="filePreviewContent" class="h-full w-full flex items-center justify-center overflow-y-auto">
+                    <!-- Preview content will be injected here -->
+                    <div class="text-gray-400 text-lg">Loading preview...</div>
+                </div>
             </div>
-            <div class="modal-body text-center">
-                <div id="filePreviewContent"></div>
-            </div>
-          
         </div>
     </div>
 </div>
-
 
 
 
