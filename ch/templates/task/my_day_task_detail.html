@@ -44,7 +44,88 @@
 </head>
 
 <style>
-    
+    /* 🌟 Calendar Container - Light Theme */
+#calendar {
+    background: #ffffff; /* Pure White Background */
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 🌟 Toolbar & Buttons */
+.fc-header-toolbar {
+    background: #f5f5f5; /* Light Gray */
+    padding: 8px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fc-button {
+    background-color: #1976d2 !important; /* Material Blue */
+    color: white !important;
+    border-radius: 5px !important;
+    padding: 5px 10px !important;
+    font-size: 14px;
+    transition: 0.2s ease-in-out;
+}
+
+.fc-button:hover {
+    background-color: #1565c0 !important; /* Slightly Darker Blue */
+}
+
+/* 📅 Thinner Calendar Days */
+.fc-daygrid-day {
+    background: #fafafa; /* Very Light Gray */
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    height: 40px; /* Thinner Height */
+}
+
+/* 🌟 Current Day Highlight */
+.fc-day-today {
+    background: rgba(25, 118, 210, 0.15) !important;
+    border: 1px solid #1976d2 !important;
+    font-weight: bold;
+}
+
+/* 📅 Event Styling - Material UI Look */
+.fc-event {
+    background: #42a5f5; /* Material Light Blue */
+    color: white !important;
+    border-radius: 4px;
+    padding: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    transition: 0.2s ease-in-out;
+}
+
+/* 🌟 Hover Effect */
+.fc-event:hover {
+    background: #1e88e5;
+    transform: scale(1.03);
+    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* ⏰ Week View - Thinner Slots */
+.fc-timegrid-slot {
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    height: 30px; /* Thinner Slots */
+}
+
+/* 🌟 Sidebar / Labels */
+.fc-sidebar {
+    background: #eeeeee;
+    color: #424242;
+    padding: 8px;
+    border-radius: 6px;
+}
+
+
+
+
+
 /* Overall body styling */
 body {
     font-family: 'Arial', sans-serif;
