@@ -839,7 +839,7 @@ def fetch_task_meetings(request):
     group_id = request.GET.get("group_id")
     task_id = request.GET.get("task_id")
 
-    task=get_object_or_404(Task, id=task_id, organization_id=org_id)
+    task=get_object_or_404(Task, id=task_id, organization_id=org_id,created_by=request.user)
 
     if request.user != task.created_by:
         return JsonResponse({'error:':'you are the manager ! couldnt process your request!'}, status=400)
