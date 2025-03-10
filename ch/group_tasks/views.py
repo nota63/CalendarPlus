@@ -1050,6 +1050,70 @@ def delete_all_task_messages(request, org_id, group_id, task_id):
     
     return JsonResponse({"success": False, "error": "Invalid request method."}, status=400)
 
+# EXPORT THE CHAT DATA
+from reportlab.lib.pagesizes import letter
+
+def export_task_chat(request, org_id, group_id, task_id):
+    # Fetch messages related to the task
+    messages = CommunicateTask.objects.filter(task_id=task_id, group_id=group_id, organization_id=org_id).order_by("created_at")
+
+    # Create PDF response
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="task_chat_{task_id}.pdf"'
+
+    # Generate PDF using ReportLab
+    pdf = canvas.Canvas(response, pagesize=letter)
+    pdf.setTitle(f"Chat Export - Task {task_id}")
+
+    # PDF Title
+    pdf.setFont("Helvetica-Bold", 14)
+    pdf.drawString(200, 750, f"Chat Messages for Task {task_id}")
+    
+    y_position = 730
+    pdf.setFont("Helvetica", 10)
+
+    if messages.exists():
+        for msg in messages:
+            # Format message content
+            message_text = f"{msg.sender.username}: {msg.message}  ({msg.created_at.strftime('%Y-%m-%d %H:%M')})"
+
+            pdf.drawString(50, y_position, message_text)
+            y_position -= 20
+
+            # If there is a file, add a reference
+            if msg.files:
+                pdf.drawString(50, y_position, f"🔗 File: {msg.file.url}")
+                y_position -= 20
+
+            # Page handling
+            if y_position < 50:
+                pdf.showPage()
+                pdf.setFont("Helvetica", 10)
+                y_position = 750
+    else:
+        pdf.drawString(50, y_position, "No messages available for this task.")
+
+    pdf.save()
+    return response
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

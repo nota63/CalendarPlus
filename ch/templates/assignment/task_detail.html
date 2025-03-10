@@ -231,6 +231,7 @@
                     <input type="file" id="chatFileInput" class="form-control">
                     <button class="btn btn-success" id="sendChatMessage">📩 Send</button>
                     <button id="deleteAllMessages" class="btn btn-danger">Delete All Messages</button>
+                    <button id="exportChat" class="btn btn-danger">Export</button>
 
                 </div>
             </div>
@@ -750,6 +751,35 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(err => console.error("Error deleting messages:", err));
         }
     });
+
+    // export task chat
+    document.getElementById("exportChat").addEventListener("click", function () {
+    const exportUrl = `/tasks/export-task-chat/${orgId}/${groupId}/${taskId}/`;
+
+    fetch(exportUrl, {
+        method: "GET",
+        headers: {
+            "X-CSRFToken": getCSRFToken(),
+        },
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.blob();
+        }
+        throw new Error("Failed to export chat");
+    })
+    .then(blob => {
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = downloadUrl;
+        a.download = `task_chat_${taskId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    })
+    .catch(err => console.error("Error exporting chat:", err));
+});
+
 
     // Get CSRF Token
     function getCSRFToken() {
