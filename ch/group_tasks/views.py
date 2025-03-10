@@ -939,7 +939,7 @@ def fetch_task_messages(request, org_id, group_id, task_id):
         ]
         return JsonResponse({"messages": data}, safe=False)
 
-
+# send messages 
 @csrf_exempt
 @login_required
 def send_task_message(request):
@@ -979,6 +979,8 @@ def send_task_message(request):
             return JsonResponse({"success": False, "error": "Invalid JSON data"}, status=400)
 
     return JsonResponse({"success": False, "error": "Invalid request method"}, status=405)
+
+
 
 
 
