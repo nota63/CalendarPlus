@@ -560,6 +560,8 @@
     });
 });
 
+
+
 // COMMUNICATE BOTH USERS (MANAGER & THE TASK ACCOMPLISHER)
 document.addEventListener("DOMContentLoaded", function () {
     let orgId, groupId, taskId;
@@ -603,34 +605,55 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(err => console.error("Error fetching messages:", err));
     }
 
-    // Send Message & File
+    // Send Message (JSON-based)
     document.getElementById("sendChatMessage").addEventListener("click", function () {
         const messageInput = document.getElementById("chatMessageInput");
         const fileInput = document.getElementById("chatFileInput");
         const message = messageInput.value;
         const file = fileInput.files[0];
 
-        let formData = new FormData();
-        formData.append("task_id", taskId);
-        formData.append("org_id", orgId);
-        formData.append("group_id", groupId);
-        formData.append("message", message);
-        if (file) formData.append("file", file);
+        if (!message && !file) {
+            alert("Please enter a message or select a file.");
+            return;
+        }
 
-        fetch("/tasks/send-task-message/", {
-            method: "POST",
-            body: formData,
-            headers: { "X-CSRFToken": getCSRFToken() }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                fetchMessages(orgId, groupId, taskId);
-                messageInput.value = "";
-                fileInput.value = "";
-            }
-        })
-        .catch(err => console.error("Error sending message:", err));
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            const base64File = file ? event.target.result : null;
+
+            fetch("/tasks/send-task-message/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCSRFToken(),
+                },
+                body: JSON.stringify({
+                    task_id: taskId,
+                    org_id: orgId,
+                    group_id: groupId,
+                    message: message,
+                    file: base64File,  // Sending file as Base64
+                    file_name: file ? file.name : null,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    fetchMessages(orgId, groupId, taskId);
+                    messageInput.value = "";
+                    fileInput.value = "";
+                } else {
+                    alert("Error sending message: " + data.error);
+                }
+            })
+            .catch(err => console.error("Error sending message:", err));
+        };
+
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            reader.onload();
+        }
     });
 
     // Get CSRF Token
