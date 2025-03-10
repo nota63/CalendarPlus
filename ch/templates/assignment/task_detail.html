@@ -237,6 +237,22 @@
 </div>
 
 
+<!-- FILE PREVIEW MODAL -->
+<!-- File Preview Modal -->
+<div class="modal fade" id="filePreviewModal" tabindex="-1" aria-labelledby="filePreviewLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">File Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div id="filePreviewContent"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 
@@ -595,16 +611,19 @@ document.addEventListener("DOMContentLoaded", function () {
                     let filePreview = "";
                     if (msg.file) {
                         const fileExt = msg.file.split('.').pop().toLowerCase();
-                        
+
                         if (["png", "jpg", "jpeg", "gif", "webp"].includes(fileExt)) {
-                            filePreview = `<img src="${msg.file}" class="img-fluid rounded mt-2" style="max-width: 200px;">`;
+                            filePreview = `<img src="${msg.file}" class="img-fluid rounded mt-2 file-preview" 
+                                              style="max-width: 200px; cursor: pointer;" data-file="${msg.file}">`;
                         } else if (["mp4", "webm", "ogg"].includes(fileExt)) {
-                            filePreview = `<video controls class="mt-2" style="max-width: 200px;">
-                                                <source src="${msg.file}" type="video/${fileExt}">
-                                                Your browser does not support the video tag.
-                                            </video>`;
+                            filePreview = `<video controls class="mt-2 file-preview" style="max-width: 200px; cursor: pointer;" 
+                                              data-file="${msg.file}">
+                                              <source src="${msg.file}" type="video/${fileExt}">
+                                              Your browser does not support the video tag.
+                                           </video>`;
                         } else {
-                            filePreview = `<a href="${msg.file}" target="_blank" class="btn btn-sm btn-primary mt-2">📂 View File</a>`;
+                            filePreview = `<a href="${msg.file}" target="_blank" class="btn btn-sm btn-primary mt-2 file-preview" 
+                                              data-file="${msg.file}">📂 View File</a>`;
                         }
                     }
 
@@ -615,12 +634,44 @@ document.addEventListener("DOMContentLoaded", function () {
                     `;
                     chatContainer.appendChild(messageElement);
                 });
+
+                // Add event listeners for file preview
+                document.querySelectorAll(".file-preview").forEach((file) => {
+                    file.addEventListener("click", function () {
+                        openFilePreview(this.dataset.file);
+                    });
+                });
+
             } else {
                 chatContainer.innerHTML = `<p class="text-muted">No messages yet.</p>`;
             }
         })
         .catch(err => console.error("Error fetching messages:", err));
 }
+
+// OPEN FILE PREVIEW
+function openFilePreview(fileUrl) {
+    const fileExt = fileUrl.split('.').pop().toLowerCase();
+    let previewContent = "";
+
+    if (["png", "jpg", "jpeg", "gif", "webp"].includes(fileExt)) {
+        previewContent = `<img src="${fileUrl}" class="img-fluid rounded" style="max-width: 100%;">`;
+    } else if (["mp4", "webm", "ogg"].includes(fileExt)) {
+        previewContent = `<video controls class="w-100">
+                            <source src="${fileUrl}" type="video/${fileExt}">
+                            Your browser does not support the video tag.
+                          </video>`;
+    } else {
+        previewContent = `<iframe src="${fileUrl}" class="w-100" style="height: 500px;"></iframe>`;
+    }
+
+    document.getElementById("filePreviewContent").innerHTML = previewContent;
+    new bootstrap.Modal(document.getElementById("filePreviewModal")).show();
+}
+
+
+
+
 
 
     // Send Message (JSON-based)
