@@ -43,7 +43,8 @@ urlpatterns = [
     path('send-task-query/<int:org_id>/<int:group_id>/<int:task_id>/',send_task_email, name='send_task_query'),
     path('get-available-slots/',get_available_slots, name='get_available_slots'),
     path('schedule-the-meeting/',schedule_meeting, name='schedule_the_meeting'),
-    path('get-existing-meetings/',get_existing_meetings, name='get_existing_meetings')
+    path('get-existing-meetings/',get_existing_meetings, name='get_existing_meetings'),
+    path('fetch-task-meetings/',fetch_task_meetings,name='fetch_task_meetings'),
   
   
   

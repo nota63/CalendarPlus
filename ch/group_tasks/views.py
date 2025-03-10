@@ -812,6 +812,78 @@ def get_existing_meetings(request):
     return JsonResponse({"meetings": meeting_list})
 
 
+# MANAGER SIDE VIEW (FETCH MEETINGS)
+
+@login_required
+def fetch_task_meetings(request):
+    """Fetch all meetings related to a specific Task."""
+    if request.method != "GET":
+        return JsonResponse({"error": "Invalid request method"}, status=400)
+
+    org_id = request.GET.get("org_id")
+    group_id = request.GET.get("group_id")
+    task_id = request.GET.get("task_id")
+
+    if not all([org_id, group_id, task_id]):
+        return JsonResponse({"error": "Missing required parameters"}, status=400)
+
+    # Get all meetings related to the Task
+    meetings = MeetingTaskQuery.objects.filter(
+        organization_id=org_id,
+        group_id=group_id,
+        task_id=task_id,
+    ).select_related("task_creator", "scheduled_by")  # Optimize DB queries
+
+    # Format response
+    meetings_data = [
+        {
+            "id": meeting.id,
+            "date": meeting.date.strftime("%Y-%m-%d"),
+            "start_time": meeting.start_time.strftime("%H:%M"),
+            "end_time": meeting.end_time.strftime("%H:%M"),
+            "reason": meeting.reason,
+            "status": meeting.status,
+            "meeting_link": meeting.meeting_link,
+            "scheduled_by": meeting.scheduled_by.full_name if meeting.scheduled_by else "Unknown",
+            "task_creator": meeting.task_creator.full_name if meeting.task_creator else "Unknown",
+        }
+        for meeting in meetings
+    ]
+
+    return JsonResponse({"meetings": meetings_data}, status=200)
+
+# UPDATE THE MEETING STATUS
+@csrf_exempt
+@login_required
+def update_meeting_status(request):
+    """Allows task.creator to update the status of a meeting."""
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request method"}, status=400)
+
+    try:
+        data = json.loads(request.body)
+        meeting_id = data.get("meeting_id")
+        new_status = data.get("status")
+
+        if not all([meeting_id, new_status]):
+            return JsonResponse({"error": "Missing required fields"}, status=400)
+
+        # Get the meeting
+        meeting = get_object_or_404(MeetingTaskQuery, id=meeting_id)
+
+        # Check if the requester is the task creator
+        if request.user != meeting.task_creator:
+            return JsonResponse({"error": "Unauthorized"}, status=403)
+
+        # Update the status
+        meeting.status = new_status
+        meeting.save()
+
+        return JsonResponse({"success": "Meeting status updated successfully!"}, status=200)
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
 
 
 
@@ -821,7 +893,6 @@ def get_existing_meetings(request):
 
 
 # Add the task to my day 
-
 @login_required
 def add_to_my_day(request, org_id , group_id, task_id):
     if request.method == 'POST':
