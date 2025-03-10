@@ -839,7 +839,15 @@ def fetch_task_meetings(request):
     group_id = request.GET.get("group_id")
     task_id = request.GET.get("task_id")
 
-    
+    task=get_object_or_404(Task, id=task_id, organization_id=org_id)
+
+    if not request.user is task.created_by:
+        return JsonResponse({'error:':'you are the manager ! couldnt process your request!'}, status=400)
+
+    profile = get_object_or_404(Profile, user=request.user, organization_id=org_id)
+    if not profile:
+        return JsonResponse({'error:':'you are not authorized to access this!'},status=400)
+
 
     if not all([org_id, group_id, task_id]):
         return JsonResponse({"error": "Missing required parameters"}, status=400)
