@@ -674,6 +674,8 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    // working on it
+
     // Fetch Messages & Files
     function fetchMessages(orgId, groupId, taskId) {
         fetch(`/tasks/fetch-task-messages/${orgId}/${groupId}/${taskId}/`)
@@ -733,6 +735,9 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(err => console.error("Error fetching messages:", err));
     }
+
+
+
 
     // OPEN FILE PREVIEW
     function openFilePreview(fileUrl) {
