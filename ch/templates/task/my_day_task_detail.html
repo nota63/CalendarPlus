@@ -1083,6 +1083,25 @@ body {
   </div>
   
 
+<!-- show meeting details (existing) -->
+ <!-- Meeting Details Modal -->
+<div class="modal fade" id="meetingDetailsModal" tabindex="-1" aria-labelledby="meetingDetailsTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="meetingDetailsTitle">Meeting Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="meetingDetailsBody">
+                <!-- Meeting details will be inserted dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 
@@ -1686,7 +1705,7 @@ body {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
 
 <script>
-  $(document).ready(function () {
+ $(document).ready(function () {
     let selectedDate = null;
     let selectedTimeSlot = null;
     let orgId, groupId, taskId;
@@ -1713,8 +1732,22 @@ body {
             fetchAvailableSlots();
         },
         eventClick: function (event) {
-            // Open meeting details modal when clicking an existing meeting
-            openMeetingDetails(event);
+            console.log("Meeting Clicked:", event);
+
+            // Display Meeting Details in Bootstrap Modal
+            if (event) {
+                $("#meetingDetailsTitle").text("Meeting Details");
+                $("#meetingDetailsBody").html(`
+                    <p><strong>Date:</strong> ${event.start.format("YYYY-MM-DD")}</p>
+                    <p><strong>Start Time:</strong> ${event.start.format("HH:mm")}</p>
+                    <p><strong>End Time:</strong> ${event.end ? event.end.format("HH:mm") : "N/A"}</p>
+                    <p><strong>Reason:</strong> ${event.title}</p>
+                    <p><strong>Status:</strong> <span class="badge ${event.status === 'confirmed' ? 'bg-success' : 'bg-warning'}">
+                        ${event.status || "Pending"}
+                    </span></p>
+                `);
+                $("#meetingDetailsModal").modal("show");
+            }
         },
     });
 
@@ -1791,18 +1824,6 @@ body {
                 console.log("Error fetching meetings:", error);
             },
         });
-    }
-
-    // Open Meeting Details Modal
-    function openMeetingDetails(event) {
-        $("#meetingDetailsModal .modal-body").html(`
-            <p><strong>Date:</strong> ${event.start.format("YYYY-MM-DD")}</p>
-            <p><strong>Start Time:</strong> ${event.start.format("HH:mm")}</p>
-            <p><strong>End Time:</strong> ${event.end.format("HH:mm")}</p>
-            <p><strong>Reason:</strong> ${event.title}</p>
-            <p><strong>Status:</strong> ${event.status}</p>
-        `);
-        $("#meetingDetailsModal").modal("show");
     }
 
     // Proceed to Confirm Modal
