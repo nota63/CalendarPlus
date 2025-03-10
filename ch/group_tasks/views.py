@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect , get_list_or_404
-from .models import (Task, TaskNote, TaskComment , TaskTag, ActivityLog,RecentVisit,MeetingTaskQuery)
+from .models import (Task, TaskNote, TaskComment , TaskTag, ActivityLog,RecentVisit,MeetingTaskQuery,CommunicateTask)
 from accounts.models import Organization, Profile
 from groups.models import Group
 from django.views import View
@@ -914,6 +914,71 @@ def update_meeting_status(request):
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
 
+
+# SPECIFIC ROOM FOR MANAGER AND THE TASK ACCOMPLISHER
+
+def fetch_task_messages(request, org_id, group_id, task_id):
+    if request.method == "GET":
+        organization = get_object_or_404(Organization, id=org_id)
+        group = get_object_or_404(Group, id=group_id)
+        task = get_object_or_404(Task, id=task_id)
+
+        messages = CommunicateTask.objects.filter(
+            organization=organization, group=group, task=task
+        ).order_by("-id")
+
+        data = [
+            {
+                "id": msg.id,
+                "message": msg.message,
+                "file": msg.files.url if msg.files else None,
+                "sender": msg.sender.username,
+                "created_at": msg.id,  # Modify if you want a formatted timestamp
+            }
+            for msg in messages
+        ]
+        return JsonResponse({"messages": data}, safe=False)
+
+
+@csrf_exempt
+@login_required
+def send_task_message(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)  # Parse JSON data
+            file = request.FILES.get("file")
+
+            task_id = data.get("task_id")
+            org_id = data.get("org_id")
+            group_id = data.get("group_id")
+            message = data.get("message", "")
+
+            task = get_object_or_404(Task, id=task_id)
+            organization = get_object_or_404(Organization, id=org_id)
+            group = get_object_or_404(Group, id=group_id)
+            sender = request.user
+
+            communicate_task = CommunicateTask.objects.create(
+                task=task, organization=organization, group=group,
+                message=message, files=file, sender=sender
+            )
+
+            return JsonResponse({
+                "success": True,
+                "message": "Message sent successfully!",
+                "data": {
+                    "id": communicate_task.id,
+                    "message": communicate_task.message,
+                    "file": communicate_task.files.url if communicate_task.files else None,
+                    "sender": communicate_task.sender.username,
+                    "created_at": communicate_task.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                }
+            })
+
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "error": "Invalid JSON data"}, status=400)
+
+    return JsonResponse({"success": False, "error": "Invalid request method"}, status=405)
 
 
 

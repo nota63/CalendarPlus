@@ -2,7 +2,7 @@ from django.contrib import admin
 from unfold.admin import ModelAdmin
 from .models import (Task, AddDay, TaskComment, TaskNote, TaskTag, TaskTimer, ActivityLog, TaskTimeTracking,
                      
-                      Problem,AttachmentsTasksApp,RecentVisit,MeetingTaskQuery)
+                      Problem,AttachmentsTasksApp,RecentVisit,MeetingTaskQuery,CommunicateTask)
 
 @admin.register(Task)
 class TaskAdmin(ModelAdmin):
@@ -57,4 +57,9 @@ class RecentVisitsAdmin(ModelAdmin):
 @admin.register(MeetingTaskQuery)
 class MeetingTasksAdmin(ModelAdmin):
     list_display = [field.name for field in MeetingTaskQuery._meta.fields]
+
+
+@admin.register(CommunicateTask)
+class CommunicateTaskAdmin(ModelAdmin):
+    list_display = [field.name for field in CommunicateTask._meta.fields]
 
