@@ -222,6 +222,12 @@
                 </svg>
             </button>
 
+            <!-- Search Input for Messages -->
+          <div class="p-4">
+                <input type="text" id="searchMessages" class="w-full p-2 border border-gray-300 rounded-lg" 
+                  placeholder="Search messages..." onkeyup="searchMessages()">
+             </div>
+
             <!-- Messages Container -->
             <div class="p-4">
                 <div id="chatMessages" class="h-[400px] overflow-y-auto space-y-3 pr-2">
@@ -858,8 +864,53 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+// handle messages search input
+function searchMessages() {
+    let input = document.getElementById("searchMessages").value.toLowerCase();
+    let messages = document.querySelectorAll("#chatMessages > div");  
+    let noMessages = document.getElementById("noMessages");
+    let found = false;  
 
+    messages.forEach(msg => {
+        let text = msg.innerText.toLowerCase();
+        if (text.includes(input)) {
+            msg.style.display = "flex";  // Keep flex for alignment
+            found = true;
+        } else {
+            msg.style.display = "none";
+        }
+    });
 
+    noMessages.style.display = found ? "none" : "block";
+}
+
+// Function to Render Messages with Profile Pictures
+function renderMessages(messages) {
+    let chatMessages = document.getElementById("chatMessages");
+    chatMessages.innerHTML = ""; // Clear previous messages
+
+    if (messages.length === 0) {
+        chatMessages.innerHTML = `<p class="text-sm text-gray-500 text-center py-4">No messages found</p>`;
+        return;
+    }
+
+    messages.forEach(msg => {
+        let profilePic = msg.profile !== "No url" ? msg.profile : "default-profile.png"; // Use default if no profile pic
+        let messageElement = document.createElement("div");
+        messageElement.classList.add("flex", "items-start", "gap-3", "p-2", "bg-white", "rounded-lg", "shadow-sm");
+
+        messageElement.innerHTML = `
+            <img src="${profilePic}" alt="Profile" class="w-10 h-10 rounded-full object-cover border border-gray-300">
+            <div>
+                <strong class="block text-gray-800">${msg.sender}</strong>
+                <p class="text-gray-600">${msg.message}</p>
+                <small class="text-muted d-block">${msg.created_at}</small>
+            </div>
+        `;
+
+        chatMessages.appendChild(messageElement);
+    });
+}
 </script>
 </body>
 </html>
