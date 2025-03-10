@@ -212,32 +212,90 @@
 
 <!-- COMMUNICATE MODAL  -->
  <!-- Chat Modal -->
-<div class="modal fade" id="taskChatModal" tabindex="-1" aria-labelledby="taskChatModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Task Communication</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Messages Container -->
-                <div id="chatMessages" class="border p-3 mb-3" style="height: 300px; overflow-y: auto;">
-                    <p class="text-muted">Fetching messages...</p>
+<div class="modal fade" id="taskChatModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered max-w-lg">
+        <div class="modal-content rounded-xl shadow-2xl">
+            <!-- Close Button -->
+            <button type="button" class="absolute right-4 top-4 z-10 text-gray-500 hover:text-gray-700 transition-colors" data-bs-dismiss="modal">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+
+            <!-- Messages Container -->
+            <div class="p-4">
+                <div id="chatMessages" class="h-[400px] overflow-y-auto space-y-3 pr-2">
+                    <!-- Messages will be loaded here -->
+                    <p class="text-sm text-gray-500 text-center py-4">No messages found</p>
                 </div>
 
-                <!-- Message Input & File Upload -->
-                <div class="d-flex gap-2">
-                    <input type="text" id="chatMessageInput" class="form-control" placeholder="Type a message...">
-                    <input type="file" id="chatFileInput" class="form-control">
-                    <button class="btn btn-success" id="sendChatMessage">📩 Send</button>
-                    <button id="deleteAllMessages" class="btn btn-danger">Delete All Messages</button>
-                    <button id="exportChat" class="btn btn-danger">Export</button>
+                <!-- Input Area -->
+                <div class="mt-4 flex gap-2">
+                    <!-- File Input (hidden) -->
+                    <input type="file" id="chatFileInput" class="hidden" />
+                    
+                    <!-- Attach File Button -->
+                    <button onclick="document.getElementById('chatFileInput').click()" class="p-2 text-gray-500 hover:text-blue-600 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
+                        </svg>
+                    </button>
 
+                    <!-- Message Input -->
+                    <input type="text" id="chatMessageInput" 
+                           class="flex-1 px-4 py-2 rounded-full border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                           placeholder="Type a message...">
+
+                    <!-- Send Button -->
+                    <button id="sendChatMessage" class="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="mt-3 flex items-center gap-3">
+                    <button id="deleteAllMessages" class="flex items-center gap-1.5 text-red-500 hover:text-red-600 text-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        <span>Clear History</span>
+                    </button>
+                    
+                    <button id="exportChat" class="flex items-center gap-1.5 text-gray-600 hover:text-gray-800 text-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        <span>Export</span>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+
+/*CHAT MODAL  */
+    #chatMessages::-webkit-scrollbar {
+    width: 6px;
+}
+
+#chatMessages::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+#chatMessages::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+#chatMessages::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+</style>
 
 
 <!-- FILE PREVIEW MODAL -->
@@ -636,15 +694,15 @@ document.addEventListener("DOMContentLoaded", function () {
                         }
 
                         messageElement.innerHTML = `
-    <div class="d-flex align-items-center">
-        <img src="${msg.profile}" alt="Profile" class="rounded-circle me-2" width="40" height="40">
-        <div>
-            <strong>${msg.sender}</strong>: ${msg.message} <br>
-            ${filePreview}
-            <small class="text-muted d-block">${msg.created_at}</small>
-        </div>
-    </div>
-`;
+                        <div class="d-flex align-items-center">
+                            <img src="${msg.profile}" alt="Profile" class="rounded-circle me-2" width="40" height="40">
+                            <div>
+                                <strong>${msg.sender}</strong>: ${msg.message} <br>
+                                  ${filePreview}
+                              <small class="text-muted d-block">${msg.created_at}</small>
+                                </div>
+                              </div>
+                            `;
 
                         chatContainer.appendChild(messageElement);
                     });
