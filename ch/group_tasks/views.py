@@ -844,8 +844,8 @@ def fetch_task_meetings(request):
             "reason": meeting.reason,
             "status": meeting.status,
             "meeting_link": meeting.meeting_link,
-            "scheduled_by": meeting.scheduled_by.full_name if meeting.scheduled_by else "Unknown",
-            "task_creator": meeting.task_creator.full_name if meeting.task_creator else "Unknown",
+            "scheduled_by": meeting.scheduled_by.username if meeting.scheduled_by else "Unknown",
+            "task_creator": meeting.task_creator.username if meeting.task_creator else "Unknown",
         }
         for meeting in meetings
     ]
