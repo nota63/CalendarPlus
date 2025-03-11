@@ -1110,8 +1110,55 @@ def get_task_subtasks(request, org_id, group_id, task_id):
     return JsonResponse(data)
 
 
+# MANAGER (ASSIGN THE SUBTASKS)
+@csrf_exempt  # Disable CSRF for now, but ensure security later
+def assign_subtask(request, org_id, group_id, task_id):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            title = data.get("title")
+            description = data.get("description", "")
+            priority = data.get("priority", "medium")
+            deadline = data.get("deadline")
+            remind_before_due_date = data.get("remind_before_due_date", "never")  # Handle reminder field
 
+            # Validate input
+            if not title or not deadline:
+                return JsonResponse({"error": "Title and deadline are required."}, status=400)
 
+            # Fetch related objects
+            organization = get_object_or_404(Organization, id=org_id)
+            group = get_object_or_404(Group, id=group_id)
+            task = get_object_or_404(Task, id=task_id)
+
+            # Create the subtask
+            subtask = SubTask.objects.create(
+                organization=organization,
+                group=group,
+                task=task,
+                created_by=request.user,  # Manager is creating the subtask
+                title=title,
+                description=description,
+                priority=priority,
+                deadline=deadline,
+                status="pending",
+                progress=0,
+                remind_before_due_date=remind_before_due_date  # Save reminder setting
+            )
+
+            return JsonResponse(
+                {
+                    "message": "Subtask assigned successfully!",
+                    "subtask_id": subtask.id,
+                    "reminder": remind_before_due_date,
+                },
+                status=201
+            )
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON data."}, status=400)
+
+    return JsonResponse({"error": "Invalid request method."}, status=405)
 
 
 

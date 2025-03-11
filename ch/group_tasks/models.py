@@ -464,6 +464,14 @@ class SubTask(models.Model):
         default=0,
         help_text="Progress percentage (0-100) of subtask completion."
     )
+    remind_before_due_date=models.CharField(max_length=300, choices=[
+            ('one_day_before', 'One day before'),
+            ('before_a_week', 'Before a week'),
+            ('before_a_month', 'Before a month'),
+            ('never', 'Never'),
+            ('just_send_me_the_reminder_every_morning_till_task_completes', 'Just send me the reminder every morning till task completes')
+        ],default='never', null=True,blank=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
