@@ -205,6 +205,62 @@
         .hover-scale:hover {
             transform: scale(1.02);
         }
+
+        .chat-fab {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #0d6efd; /* Bootstrap primary color */
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    font-size: 28px;
+    transition: all 0.3s ease-in-out;
+}
+
+.chat-fab:hover {
+    background-color: #0b5ed7; /* Slightly darker blue on hover */
+    transform: scale(1.1); /* Slight enlargement for interaction */
+}
+
+.chat-fab .material-icons {
+    font-size: 32px;
+    color: white;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+video::-webkit-media-controls-panel {
+    background-image: linear-gradient(transparent, rgba(0,0,0,0.3));
+}
+/*CHAT MODAL  */
+    #chatMessages::-webkit-scrollbar {
+    width: 6px;
+}
+
+#chatMessages::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+#chatMessages::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+#chatMessages::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
     </style>
 </head>
 <body>
@@ -281,35 +337,7 @@
     </div>
 </div>
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
-body {
-    font-family: 'Inter', -apple-system, sans-serif;
-}
-
-video::-webkit-media-controls-panel {
-    background-image: linear-gradient(transparent, rgba(0,0,0,0.3));
-}
-/*CHAT MODAL  */
-    #chatMessages::-webkit-scrollbar {
-    width: 6px;
-}
-
-#chatMessages::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-}
-
-#chatMessages::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 4px;
-}
-
-#chatMessages::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-}
-</style>
 
 
 <!-- FILE PREVIEW MODAL -->
@@ -354,12 +382,13 @@ video::-webkit-media-controls-panel {
         <i class="bi bi-pencil" style="font-size: 1.25rem;"></i>
     </div>
 
-    <button class="floating-action start-chat-btn" 
-      data-org="{{ organization.id }}" 
-      data-group="{{ group.id }}" 
-      data-task="{{ task.id }}">
-      💬 Start Chat
-    </button>
+    <button class="chat-fab start-chat-btn" 
+        data-org="{{ organization.id }}" 
+        data-group="{{ group.id }}" 
+        data-task="{{ task.id }}">
+    <span class="material-icons">chat</span>
+</button>
+
 
    
 
