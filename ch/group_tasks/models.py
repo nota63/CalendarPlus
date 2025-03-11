@@ -397,6 +397,7 @@ class Problem(models.Model):
 # ------------------------------------------------------------------------------------------------------------------------------
 # EXTEND TASKS APP 
 # SUBTASK FOR TASK
+from django.db.models import F
 
 class SubTask(models.Model):
     organization = models.ForeignKey(
@@ -468,6 +469,22 @@ class SubTask(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.get_status_display()}"
+    
+
+    # Automate the task progress
+    def save(self, *args, **kwargs):
+     """Force subtask progress to 100% if marked as completed."""
+     print(f"DEBUG: Saving SubTask {self.id} - Status: {self.status}, Current Progress: {self.progress}")  
+
+    # If subtask is marked as completed, force progress to 100%
+     if self.status == 'Completed':
+        self.progress = 100
+        print(f"DEBUG: SubTask {self.id} progress set to 100%")  
+
+    # Save the subtask
+     super().save(*args, **kwargs)
+     print(f"DEBUG: SubTask {self.id} saved successfully!")  
+
 
 
 
