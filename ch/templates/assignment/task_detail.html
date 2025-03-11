@@ -472,14 +472,14 @@ video::-webkit-media-controls-panel {
                 <button class="rounded-lg px-4 py-2 bg-blue-600 text-white font-semibold hover:bg-blue-700 
               transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 
               focus:ring-opacity-50"
-        data-bs-toggle="modal"
-        data-bs-target="#assignSubtaskModal"
-        data-org-id="{{ organization.id }}"
-        data-group-id="{{ group.id }}"
-        data-task-id="{{ task.id }}">
-    Assign Subtask
-</button>
-<br>
+              data-bs-toggle="modal"
+               data-bs-target="#assignSubtaskModal"
+              data-org-id="{{ organization.id }}"
+               data-group-id="{{ group.id }}"
+               data-task-id="{{ task.id }}">
+             Assign Subtask
+          </button>
+                <br>
                
                 <button type="button" class="btn-close opacity-70 hover:opacity-100 transition-all" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -659,22 +659,11 @@ video::-webkit-media-controls-panel {
                 data-task-id="{{ task.id }}">
                 <span class="material-icons-sharp text-blue-600">visibility</span>
                 <span class="bg-gradient-to-r from-blue-600 to-pink-600 bg-clip-text text-transparent font-semibold">
-                    View Subtasks
+                    Manage Subtasks
                 </span>
             </button>
 
             <!-- Additional Menu Items -->
-            <!-- Button to Open Modal -->
-             <button class="btn btn-primary" 
-              data-bs-toggle="modal" 
-             data-bs-target="#assignSubtaskModal" 
-             data-org-id="{{ organization.id }}" 
-             data-group-id="{{ group.id }}" 
-             data-task-id="{{ task.id }}">
-             Assign Subtask
-          </button>
-
-            
             <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-600 hover:bg-white/50 rounded-lg transition-colors">
                 <span class="material-icons-sharp text-gray-500">task</span>
                 My Tasks
