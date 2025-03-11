@@ -1141,7 +1141,7 @@ def assign_subtask(request, org_id, group_id, task_id):
                 organization=organization,
                 group=group,
                 task=task,
-                created_by=request.user,
+                created_by=task.assigned_to,
                 title=title,
                 description=description,
                 priority=priority,
