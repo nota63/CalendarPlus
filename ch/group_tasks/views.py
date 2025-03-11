@@ -1112,6 +1112,8 @@ def get_task_subtasks(request, org_id, group_id, task_id):
 
 # MANAGER (ASSIGN THE SUBTASKS)
 @csrf_exempt
+@check_org_membership
+@login_required
 def assign_subtask(request, org_id, group_id, task_id):
     if request.method == "POST":
         try:
@@ -1154,6 +1156,9 @@ def assign_subtask(request, org_id, group_id, task_id):
                 behaviour=behaviour,
             )
 
+            # notify subtask user
+            notify_subtask_user(org_id=organization.id,group_id=group.id,task_id=task.id,subtask_id=subtask.id)
+
             return JsonResponse(
                 {
                     "message": "Subtask assigned successfully!",
@@ -1172,6 +1177,18 @@ def assign_subtask(request, org_id, group_id, task_id):
     return JsonResponse({"error": "Invalid request method."}, status=405)
 
 
+def notify_subtask_user(org_id,group_id,task_id,subtask_id):
+    organization=get_object_or_404(Organization,id=org_id)
+    group=get_object_or_404(Group, id=group_id,organization=organization)
+    task=get_object_or_404(Task, id=task_id, group=group, organization=organization)
+    subtask = get_object_or_404(SubTask, id=subtask_id, task=task, group=group, organization=organization)
+
+    subject=f"New Subtask Assigned to {task.title}"
+    message=f'Hello {task.assigned_to.username}, {task.created_by.username} assigned a subtask to the {task.title}, Here are the subtask details below!\n Title: {subtask.title}\n Priority: {subtask.priority}\n Deadline: {subtask.deadline}\n Kindly complete the task before {subtask.deadline} to avoid any due issues'
+    from_email=settings.DEFAULT_FROM_EMAIL
+    recipient_list = [task.assigned_to.email]
+
+    send_mail(subject, message, from_email, recipient_list)
 
 
 
