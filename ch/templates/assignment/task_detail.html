@@ -314,6 +314,30 @@ video::-webkit-media-controls-panel {
     -webkit-text-fill-color: transparent;
 }
 
+
+/* fetch subtask enable scrolling */
+#tasksSubtasksModal .modal-content {
+    max-height: 80vh; /* Adjust height */
+    overflow: hidden;
+}
+
+#tasksSubtasksModal .modal-body {
+    max-height: 60vh; /* Adjust based on need */
+    overflow-y: auto;
+    padding-right: 10px; /* Prevent content cut-off */
+}
+
+/* Hide scrollbar */
+#tasksSubtasksModal .modal-body::-webkit-scrollbar {
+    width: 0px;
+    display: none;
+}
+
+#tasksSubtasksModal .modal-body {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
 </style>
 </head>
 <body>
