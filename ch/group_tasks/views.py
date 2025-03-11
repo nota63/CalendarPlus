@@ -1284,18 +1284,88 @@ def clone_task(request):
 
 
 # Notify the cloned task user (task.assigned_to)
-def notify_task_cloned(org_id, group_id,task_id):
-    organization=get_object_or_404(Organization,id=org_id)
-    group=get_object_or_404(Group, id=group_id,organization=organization)
-    task=get_object_or_404(Task, id=task_id, group=group, organization=organization)
+from django.core.mail import send_mail, EmailMultiAlternatives
+import logging
 
-    subject=f'New Task Assigned:{task.title}'
-    message=f'Hey {task.assigned_to.username},\n {task.created_by} Assigned a task to you, Check out the following details\n Workspace & Group - Workspace:{organization.name}\n Group:{group.name}\n Task Details: {task.title}\n Description:{task.description}\n Priority:{task.priority}\n Deadline:{task.deadline}\n Login to your Dashboard to Access and initialize the task!\n Thank you,\n Team CalendarPlus'
-    from_email=settings.DEFAULT_FROM_EMAIL
-    recipient_list=[task.assigned_to.email]
+# Set up logger
+logger = logging.getLogger(__name__)
 
-    send_mail(subject,message,from_email,recipient_list)
+def notify_task_cloned(org_id, group_id, task_id):
+    try:
+        # Fetch required objects
+        organization = get_object_or_404(Organization, id=org_id)
+        group = get_object_or_404(Group, id=group_id, organization=organization)
+        task = get_object_or_404(Task, id=task_id, group=group, organization=organization)
 
+        # Ensure task has an assignee
+        if not task.assigned_to or not task.assigned_to.email:
+            logger.warning(f"Task {task_id} has no valid assignee. Skipping email notification.")
+            return
+        
+        # Email Details
+        subject = f'📌 New Task Assigned: {task.title}'
+        recipient_email = task.assigned_to.email
+
+        # Construct Message
+        message_text = f"""Hey {task.assigned_to.username},
+
+{task.created_by} assigned a new task to you! Check out the details:
+
+📂 **Workspace & Group**  
+- **Workspace**: {organization.name}  
+- **Group**: {group.name}  
+
+📝 **Task Details**  
+- **Title**: {task.title}  
+- **Description**: {task.description or 'No description provided'}  
+- **Priority**: {task.priority}  
+- **Deadline**: {task.deadline.strftime('%Y-%m-%d %H:%M') if task.deadline else 'No deadline set'}  
+
+🔗 **Login to your Dashboard to get started!**  
+
+Best,  
+🚀 Team CalendarPlus  
+        """
+
+        # HTML Email Version
+        message_html = f"""
+        <p>Hey <strong>{task.assigned_to.username}</strong>,</p>
+        <p><strong>{task.created_by}</strong> assigned a new task to you! Check out the details below:</p>
+
+        <h3>📂 Workspace & Group</h3>
+        <ul>
+            <li><strong>Workspace:</strong> {organization.name}</li>
+            <li><strong>Group:</strong> {group.name}</li>
+        </ul>
+
+        <h3>📝 Task Details</h3>
+        <ul>
+            <li><strong>Title:</strong> {task.title}</li>
+            <li><strong>Description:</strong> {task.description or 'No description provided'}</li>
+            <li><strong>Priority:</strong> {task.priority}</li>
+            <li><strong>Deadline:</strong> {task.deadline.strftime('%Y-%m-%d %H:%M') if task.deadline else 'No deadline set'}</li>
+        </ul>
+
+        <p>🔗 <a href="{settings.SITE_URL}/dashboard/">Login to your Dashboard</a> to get started!</p>
+
+        <p>Best,<br>🚀 <strong>Team CalendarPlus</strong></p>
+        """
+
+        # Create email object
+        email = EmailMultiAlternatives(
+            subject=subject,
+            body=strip_tags(message_html),  # Fallback to plain text
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[recipient_email]
+        )
+        email.attach_alternative(message_html, "text/html")  # Attach HTML version
+
+        # Send email asynchronously
+        email.send(fail_silently=False)
+        logger.info(f"✅ Task notification sent successfully to {recipient_email}")
+
+    except Exception as e:
+        logger.error(f"❌ Error in notify_task_cloned: {str(e)}")
 
 
 
