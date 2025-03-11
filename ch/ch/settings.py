@@ -32,6 +32,13 @@ GITHUB_ACCESS_TOKEN = os.getenv("GITHUB_ACCESS_TOKEN")
 client = os.getenv('client')
 
 
+# FILE UPLOAD SIZE LIMIT
+
+# Increase max upload size (e.g., 100MB)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 500 * 1024 * 1024  # 100MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 500 * 1024 * 1024  # 100MB
+
+
 
 # --------------------------------------------------------------------------------------------------------------------
 
