@@ -365,7 +365,6 @@ video::-webkit-media-controls-panel {
 
 
 
-<!-- FILE PREVIEW MODAL -->
 <!-- File Preview Modal -->
 <div class="modal fade" id="filePreviewModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered max-w-7xl h-[95vh]">
@@ -391,6 +390,27 @@ video::-webkit-media-controls-panel {
 </div>
 
 
+<!-- GET TASKS SUBTASKS -->
+<div class="modal fade" id="tasksSubtasksModal" tabindex="-1" aria-labelledby="tasksSubtasksModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tasksSubtasksModalLabel">Task & Subtasks</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h4 id="taskTitle" class="fw-bold"></h4>
+                <p id="taskDescription" class="text-muted"></p>
+                <div class="progress mb-3">
+                    <div id="taskProgress" class="progress-bar bg-success" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+
+                <h5 class="mt-3">Subtasks</h5>
+                <div id="subtasksContainer" class="list-group"></div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -413,6 +433,16 @@ video::-webkit-media-controls-panel {
         data-task="{{ task.id }}">
     <span class="material-icons">chat</span>
 </button>
+
+<button class="btn btn-primary" 
+        data-bs-toggle="modal" 
+        data-bs-target="#tasksSubtasksModal"
+        data-org-id="{{ organization.id }}" 
+        data-group-id="{{ group.id }}" 
+        data-task-id="{{ task.id }}">
+    View Subtasks
+</button>
+
 
 
    
@@ -1000,6 +1030,72 @@ function renderMessages(messages) {
         chatMessages.appendChild(messageElement);
     });
 }
+
+// GET TASKS SUBTASKS
+document.addEventListener("DOMContentLoaded", function () {
+    const tasksSubtasksModal = document.getElementById("tasksSubtasksModal");
+
+    tasksSubtasksModal.addEventListener("show.bs.modal", function (event) {
+        const button = event.relatedTarget;
+        const orgId = button.getAttribute("data-org-id");
+        const groupId = button.getAttribute("data-group-id");
+        const taskId = button.getAttribute("data-task-id");
+
+        // API URL
+        const url = `/tasks/get-subtasks/${orgId}/${groupId}/${taskId}/`;
+
+        // Fetch task & subtasks
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                // Update Task Details
+                document.getElementById("taskTitle").textContent = data.task.title;
+                document.getElementById("taskDescription").textContent = data.task.description;
+                
+                // Update Progress Bar
+                const progressBar = document.getElementById("taskProgress");
+                progressBar.style.width = data.task.progress + "%";
+                progressBar.setAttribute("aria-valuenow", data.task.progress);
+                progressBar.textContent = data.task.progress + "%";
+
+                // Populate Subtasks
+                const subtasksContainer = document.getElementById("subtasksContainer");
+                subtasksContainer.innerHTML = ""; // Clear previous content
+
+                if (data.subtasks.length > 0) {
+                    data.subtasks.forEach(subtask => {
+                        const subtaskItem = document.createElement("div");
+                        subtaskItem.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
+
+                        subtaskItem.innerHTML = `
+                            <div>
+                                <strong>${subtask.title}</strong>
+                                <p class="text-muted mb-0">${subtask.description}</p>
+                                <small class="badge bg-${getStatusBadge(subtask.status)}">${subtask.status}</small>
+                            </div>
+                            <span class="badge bg-primary">${subtask.progress}%</span>
+                        `;
+                        subtasksContainer.appendChild(subtaskItem);
+                    });
+                } else {
+                    subtasksContainer.innerHTML = "<p class='text-muted'>No subtasks found.</p>";
+                }
+            })
+            .catch(error => console.error("Error fetching subtasks:", error));
+    });
+
+    function getStatusBadge(status) {
+        switch (status) {
+            case "pending": return "secondary";
+            case "in_progress": return "warning";
+            case "completed": return "success";
+            case "cancelled": return "danger";
+            case "overdue": return "dark";
+            default: return "light";
+        }
+    }
+});
+
 </script>
 </body>
 </html>

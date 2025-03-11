@@ -1077,6 +1077,37 @@ def export_task_chat(request, org_id, group_id, task_id):
     return response
 
 
+# RETURN TASKS SUBTASKS TO THE MANAGER
+@check_org_membership
+@login_required
+def get_task_subtasks(request, org_id, group_id, task_id):
+    """
+    Retrieves a task's details and its subtasks, ensuring that only the task creator can view them.
+    """
+    task = get_object_or_404(Task, id=task_id, organization_id=org_id, group_id=group_id)
+
+    # Check if the current user is the creator of the task
+    if request.user != task.created_by:
+        return JsonResponse({"error": "Permission denied"}, status=403)
+
+    # Retrieve all subtasks under this task
+    subtasks = SubTask.objects.filter(task=task).values(
+        "id", "title", "description", "priority", "status", "progress", "deadline", "created_at"
+    )
+
+    # Prepare response data
+    data = {
+        "task": {
+            "id": task.id,
+            "title": task.title,
+            "description": task.description,
+            "progress": task.progress,
+            "status": task.status,
+        },
+        "subtasks": list(subtasks)
+    }
+
+    return JsonResponse(data)
 
 
 
