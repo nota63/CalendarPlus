@@ -512,6 +512,96 @@ video::-webkit-media-controls-panel {
     </div>
 </div>
 
+<!-- ASSIGN SUBTASKS TO THE USER -->
+ <!-- Subtask Assignment Modal -->
+<div class="modal fade" id="assignSubtaskModal" tabindex="-1" aria-labelledby="assignSubtaskLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignSubtaskLabel">Assign Subtask</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="assignSubtaskForm">
+                    <div class="mb-3">
+                        <label for="subtaskTitle" class="form-label">Subtask Title</label>
+                        <input type="text" class="form-control" id="subtaskTitle" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="subtaskDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="subtaskDescription"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="subtaskPriority" class="form-label">Priority</label>
+                        <select class="form-select" id="subtaskPriority">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="subtaskDeadline" class="form-label">Deadline</label>
+                        <input type="datetime-local" class="form-control" id="subtaskDeadline" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="reminder" class="form-label">Reminder</label>
+                        <select class="form-select" id="reminder">
+                            <option value="never">Never</option>
+                            <option value="one_day_before">One day before</option>
+                            <option value="before_a_week">Before a week</option>
+                            <option value="before_a_month">Before a month</option>
+                            <option value="just_send_me_the_reminder_every_morning_till_task_completes">
+                                Every morning till task completes
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="deleteAfterCompletion">
+                        <label class="form-check-label" for="deleteAfterCompletion">Delete After Completion</label>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="canEditTask">
+                        <label class="form-check-label" for="canEditTask">Task Accomplisher Can Edit</label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="subtaskBehaviour" class="form-label">Subtask Behaviour</label>
+                        <select class="form-select" id="subtaskBehaviour">
+                            <option value="">None</option>
+                            <option value="prevent_completion_before_main_task">Prevent completion before main task</option>
+                            <option value="autocomplete_if_main_task_completes">Auto complete if main task completes</option>
+                            <option value="shouldn_affect_main_task">Shouldn’t affect main task</option>
+                            <option value="repeat_for_5_times_after_completion">Repeat for 5 times after completion</option>
+                        </select>
+                    </div>
+                </form>
+
+                <!-- Loading Spinner -->
+                <div id="loadingSpinner" class="text-center d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Assigning subtask...</p>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" id="assignSubtaskBtn">Assign Subtask</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 
 
 
@@ -563,10 +653,16 @@ video::-webkit-media-controls-panel {
             </button>
 
             <!-- Additional Menu Items -->
-            <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-600 hover:bg-white/50 rounded-lg transition-colors">
-                <span class="material-icons-sharp text-gray-500">dashboard</span>
-                Dashboard
-            </a>
+            <!-- Button to Open Modal -->
+             <button class="btn btn-primary" 
+              data-bs-toggle="modal" 
+             data-bs-target="#assignSubtaskModal" 
+             data-org-id="{{ organization.id }}" 
+             data-group-id="{{ group.id }}" 
+             data-task-id="{{ task.id }}">
+             Assign Subtask
+          </button>
+
             
             <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-600 hover:bg-white/50 rounded-lg transition-colors">
                 <span class="material-icons-sharp text-gray-500">task</span>
@@ -1274,6 +1370,83 @@ subtasksContainer.appendChild(subtaskItem);
         }
     }
 });
+
+// ASSIGN SUBTASK TO THE USER
+document.addEventListener("DOMContentLoaded", function () {
+    const assignSubtaskModal = document.getElementById("assignSubtaskModal");
+    const assignSubtaskForm = document.getElementById("assignSubtaskForm");
+    const assignSubtaskBtn = document.getElementById("assignSubtaskBtn");
+    const loadingSpinner = document.getElementById("loadingSpinner");
+
+    let orgId, groupId, taskId;
+
+    // Capture button attributes when modal opens
+    assignSubtaskModal.addEventListener("show.bs.modal", function (event) {
+        const button = event.relatedTarget;
+        orgId = button.getAttribute("data-org-id");
+        groupId = button.getAttribute("data-group-id");
+        taskId = button.getAttribute("data-task-id");
+    });
+
+    // Form submission
+    assignSubtaskBtn.addEventListener("click", function (event) {
+        event.preventDefault(); // Prevent form default submission
+
+        // Show loading spinner & disable button
+        loadingSpinner.classList.remove("d-none");
+        assignSubtaskBtn.disabled = true;
+
+        const data = {
+            title: document.getElementById("subtaskTitle").value.trim(),
+            description: document.getElementById("subtaskDescription").value.trim(),
+            priority: document.getElementById("subtaskPriority").value,
+            deadline: document.getElementById("subtaskDeadline").value,
+            remind_before_due_date: document.getElementById("reminder").value,
+            delete_after_completion: document.getElementById("deleteAfterCompletion").checked,
+            can_edit_task: document.getElementById("canEditTask").checked,
+            behaviour: document.getElementById("subtaskBehaviour").value || null,
+        };
+
+        fetch(`/tasks/assign-subtask/${orgId}/${groupId}/${taskId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken(),
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Failed to assign subtask!");
+            }
+            return response.json();
+        })
+        .then(responseData => {
+            alert(responseData.message || "Subtask assigned successfully! ✅");
+
+            // Reset form after submission
+            assignSubtaskForm.reset();
+
+            // Hide modal after success
+            const modal = bootstrap.Modal.getInstance(assignSubtaskModal);
+            modal.hide();
+        })
+        .catch(error => {
+            console.error("Error assigning subtask:", error);
+            alert("⚠️ Failed to assign subtask. Please try again.");
+        })
+        .finally(() => {
+            // Hide spinner & enable button again
+            loadingSpinner.classList.add("d-none");
+            assignSubtaskBtn.disabled = false;
+        });
+    });
+
+    function getCSRFToken() {
+        return document.querySelector("[name=csrfmiddlewaretoken]")?.value;
+    }
+});
+
 
 </script>
 </body>
