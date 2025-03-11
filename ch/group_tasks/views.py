@@ -1192,33 +1192,51 @@ def notify_subtask_user(org_id,group_id,task_id,subtask_id):
 
 
 # CLONE AND ASSIGN THE TASK
+@csrf_exempt
 def clone_task(request):
     if request.method == "POST":
-        org_id = request.POST.get("org_id")
-        group_id = request.POST.get("group_id")
-        task_id = request.POST.get("task_id")
-        email = request.POST.get("email")
-        
-        # Validate required fields
-        if not all([org_id, group_id, task_id, email]):
-            return JsonResponse({"error": "Missing required parameters."}, status=400)
-        
         try:
-            # Get organization
+            # Debugging: Print the raw request body
+            print("🔍 Raw Request Body:", request.body)
+
+            # Parse JSON data
+            data = json.loads(request.body)
+            print("📌 Parsed JSON Data:", data)
+
+            org_id = data.get("org_id")
+            group_id = data.get("group_id")
+            task_id = data.get("task_id")
+            email = data.get("email")
+
+            # Debugging: Print extracted values
+            print(f"✅ Extracted Data - org_id: {org_id}, group_id: {group_id}, task_id: {task_id}, email: {email}")
+
+            # Validate required fields
+            if not all([org_id, group_id, task_id, email]):
+                print("❌ Missing required parameters!")
+                return JsonResponse({"error": "Missing required parameters."}, status=400)
+
+            # Fetch organization & group
             organization = get_object_or_404(Organization, id=org_id)
-            
-            # Get group under the organization
+            print(f"🏢 Organization Found: {organization}")
+
             group = get_object_or_404(Group, id=group_id, organization=organization)
-            
-            # Get the original task
+            print(f"👥 Group Found: {group}")
+
+            # Fetch the original task
             task = get_object_or_404(Task, id=task_id, group=group, organization=organization)
-            
-            # Find user by email in the same organization
-            user = User.objects.filter(email=email, profile__organization=organization).first()
-           
-            if not user:
+            print(f"📋 Original Task Found: {task}")
+
+            # Find user by email inside the same organization
+            profile = Profile.objects.filter(user__email=email, organization=organization).first()
+
+            if not profile:
+                print(f"❌ No profile found for email: {email} in organization {organization}")
                 return JsonResponse({"error": "User with this email not found in the organization."}, status=404)
-            
+
+            user = profile.user  # Get the user from the profile
+            print(f"👤 User Found: {user}")
+
             # Clone the task
             cloned_task = Task.objects.create(
                 organization=organization,
@@ -1240,13 +1258,24 @@ def clone_task(request):
                 is_urgent_notification_sent=False,  # Reset urgent notification flag
                 queries_sent=0  # Reset queries count
             )
-            
-            return JsonResponse({"success": "Task cloned successfully.", "task_id": cloned_task.id})
-        
+
+            print(f"✅ Task Cloned Successfully! New Task ID: {cloned_task.id}")
+
+            return JsonResponse({"success": "Task cloned successfully.", "task_id": cloned_task.id}, status=200)
+
+        except json.JSONDecodeError as e:
+            print(f"❌ JSON Decode Error: {e}")
+            return JsonResponse({"error": "Invalid JSON data."}, status=400)
         except ObjectDoesNotExist as e:
-            return JsonResponse({"error": str(e)}, status=404)
+            print(f"❌ Object Not Found: {e}")
+            return JsonResponse({"error": "Requested resource not found."}, status=404)
         except Exception as e:
-            return JsonResponse({"error": "An error occurred while cloning the task.", "details": str(e)}), 500
+            print(f"❌ Unexpected Error: {e}")
+            return JsonResponse({"error": "An error occurred while cloning the task.", "details": str(e)}, status=500)
+
+    print("❌ Invalid request method (Only POST allowed)")
+    return JsonResponse({"error": "Invalid request method."}, status=405)
+
 
 
 
