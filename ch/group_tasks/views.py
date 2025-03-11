@@ -1215,6 +1215,7 @@ def clone_task(request):
             
             # Find user by email in the same organization
             user = User.objects.filter(email=email, profile__organization=organization).first()
+           
             if not user:
                 return JsonResponse({"error": "User with this email not found in the organization."}, status=404)
             

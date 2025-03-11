@@ -611,6 +611,29 @@ video::-webkit-media-controls-panel {
     </div>
 </div>
 
+<!-- CLONE AND RE-ASSIGN THE TASK -->
+<div class="modal fade" id="cloneTaskModal" tabindex="-1" aria-labelledby="cloneTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cloneTaskModalLabel">Clone Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Enter the email of the user to whom you want to assign the cloned task.</p>
+                <input type="email" id="cloneTaskEmail" class="form-control" placeholder="Enter user email">
+                <input type="hidden" id="cloneOrgId">
+                <input type="hidden" id="cloneGroupId">
+                <input type="hidden" id="cloneTaskId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="cloneTaskBtn" onclick="submitCloneTask()">Clone Task</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 
@@ -1449,6 +1472,73 @@ document.addEventListener("DOMContentLoaded", function () {
     function getCSRFToken() {
         return document.querySelector("[name=csrfmiddlewaretoken]")?.value;
     }
+});
+
+
+// CLONE & RE-ASSIGN THE TASK
+document.addEventListener("DOMContentLoaded", function () {
+    function openCloneTaskModal(orgId, groupId, taskId) {
+        document.getElementById("cloneOrgId").value = orgId;
+        document.getElementById("cloneGroupId").value = groupId;
+        document.getElementById("cloneTaskId").value = taskId;
+    }
+
+    function submitCloneTask() {
+        let orgId = document.getElementById("cloneOrgId").value;
+        let groupId = document.getElementById("cloneGroupId").value;
+        let taskId = document.getElementById("cloneTaskId").value;
+        let userEmail = document.getElementById("cloneTaskEmail").value;
+        let cloneBtn = document.getElementById("cloneTaskBtn");
+
+        if (!userEmail) {
+            alert("Please enter a valid email.");
+            return;
+        }
+
+        // **Check if the button exists before updating it**
+        if (cloneBtn) {
+            cloneBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Cloning...`;
+            cloneBtn.disabled = true;
+        }
+
+        fetch(`/tasks/clone-task/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken(),
+            },
+            body: JSON.stringify({ org_id: orgId, group_id: groupId, task_id: taskId, email: userEmail }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Task successfully cloned!");
+                location.reload();
+            } else {
+                alert("Error: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("An error occurred. Please try again.");
+        })
+        .finally(() => {
+            // **Check if the button exists before restoring it**
+            if (cloneBtn) {
+                cloneBtn.innerHTML = "Clone Task";
+                cloneBtn.disabled = false;
+            }
+        });
+    }
+
+    function getCSRFToken() {
+        let csrfTokenInput = document.querySelector("input[name='csrfmiddlewaretoken']");
+        return csrfTokenInput ? csrfTokenInput.value : "";
+    }
+
+    // **Attach function to global scope**
+    window.openCloneTaskModal = openCloneTaskModal;
+    window.submitCloneTask = submitCloneTask;
 });
 
 
