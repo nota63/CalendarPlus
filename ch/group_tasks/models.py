@@ -472,6 +472,15 @@ class SubTask(models.Model):
             ('just_send_me_the_reminder_every_morning_till_task_completes', 'Just send me the reminder every morning till task completes')
         ],default='never', null=True,blank=True)
     
+    delete_after_completion=models.BooleanField(default=False, null=True, blank=True,help_text="if yes the task will be wiped after completion")
+    can_edit_task=models.BooleanField(default=False,null=True, blank=True,help_text="if yes task accomplisher can edit the subtask")
+    behaviour=models.CharField(max_length=255, choices=[
+            ('prevent_completion_before_main_task', 'Prevent completion before main task'),
+            ('autocomplete_if_main_task_completes', 'Auto complete if main task completes'),
+            ('shouldn_affect_main_task', 'Shouldnt affect main task'),
+            ('repeat_for_5_times_after_completion', 'Repeat for 5 times after completion'),
+    ], null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

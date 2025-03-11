@@ -1111,7 +1111,7 @@ def get_task_subtasks(request, org_id, group_id, task_id):
 
 
 # MANAGER (ASSIGN THE SUBTASKS)
-@csrf_exempt  # Disable CSRF for now, but ensure security later
+@csrf_exempt
 def assign_subtask(request, org_id, group_id, task_id):
     if request.method == "POST":
         try:
@@ -1120,7 +1120,12 @@ def assign_subtask(request, org_id, group_id, task_id):
             description = data.get("description", "")
             priority = data.get("priority", "medium")
             deadline = data.get("deadline")
-            remind_before_due_date = data.get("remind_before_due_date", "never")  # Handle reminder field
+            remind_before_due_date = data.get("remind_before_due_date", "never")
+
+            # New fields
+            delete_after_completion = data.get("delete_after_completion", False)
+            can_edit_task = data.get("can_edit_task", False)
+            behaviour = data.get("behaviour", None)
 
             # Validate input
             if not title or not deadline:
@@ -1136,14 +1141,17 @@ def assign_subtask(request, org_id, group_id, task_id):
                 organization=organization,
                 group=group,
                 task=task,
-                created_by=request.user,  # Manager is creating the subtask
+                created_by=request.user,
                 title=title,
                 description=description,
                 priority=priority,
                 deadline=deadline,
                 status="pending",
                 progress=0,
-                remind_before_due_date=remind_before_due_date  # Save reminder setting
+                remind_before_due_date=remind_before_due_date,
+                delete_after_completion=delete_after_completion,
+                can_edit_task=can_edit_task,
+                behaviour=behaviour,
             )
 
             return JsonResponse(
@@ -1151,6 +1159,9 @@ def assign_subtask(request, org_id, group_id, task_id):
                     "message": "Subtask assigned successfully!",
                     "subtask_id": subtask.id,
                     "reminder": remind_before_due_date,
+                    "delete_after_completion": delete_after_completion,
+                    "can_edit_task": can_edit_task,
+                    "behaviour": behaviour,
                 },
                 status=201
             )
@@ -1159,7 +1170,6 @@ def assign_subtask(request, org_id, group_id, task_id):
             return JsonResponse({"error": "Invalid JSON data."}, status=400)
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
-
 
 
 
