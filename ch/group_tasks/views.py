@@ -39,7 +39,7 @@ import base64
 import json
 import os
 from django.core.files.base import ContentFile
-
+from django.core.exceptions import ObjectDoesNotExist
 # Create your views here.
 
 
@@ -1189,6 +1189,63 @@ def notify_subtask_user(org_id,group_id,task_id,subtask_id):
     recipient_list = [task.assigned_to.email]
 
     send_mail(subject, message, from_email, recipient_list)
+
+
+# CLONE AND ASSIGN THE TASK
+def clone_task(request):
+    if request.method == "POST":
+        org_id = request.POST.get("org_id")
+        group_id = request.POST.get("group_id")
+        task_id = request.POST.get("task_id")
+        email = request.POST.get("email")
+        
+        # Validate required fields
+        if not all([org_id, group_id, task_id, email]):
+            return JsonResponse({"error": "Missing required parameters."}, status=400)
+        
+        try:
+            # Get organization
+            organization = get_object_or_404(Organization, id=org_id)
+            
+            # Get group under the organization
+            group = get_object_or_404(Group, id=group_id, organization=organization)
+            
+            # Get the original task
+            task = get_object_or_404(Task, id=task_id, group=group, organization=organization)
+            
+            # Find user by email in the same organization
+            user = User.objects.filter(email=email, profile__organization=organization).first()
+            if not user:
+                return JsonResponse({"error": "User with this email not found in the organization."}, status=404)
+            
+            # Clone the task
+            cloned_task = Task.objects.create(
+                organization=organization,
+                group=group,
+                created_by=task.created_by,  # Keep the original creator
+                assigned_to=user,  # Assign to new user
+                title=task.title,
+                description=task.description,
+                priority=task.priority,
+                status=task.status,
+                deadline=task.deadline,
+                start_date=task.start_date,
+                end_date=task.end_date,
+                progress=task.progress,
+                is_recurring=task.is_recurring,
+                recurrence_pattern=task.recurrence_pattern,
+                recurrence_end_date=task.recurrence_end_date,
+                notify_assignee=task.notify_assignee,
+                is_urgent_notification_sent=False,  # Reset urgent notification flag
+                queries_sent=0  # Reset queries count
+            )
+            
+            return JsonResponse({"success": "Task cloned successfully.", "task_id": cloned_task.id})
+        
+        except ObjectDoesNotExist as e:
+            return JsonResponse({"error": str(e)}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": "An error occurred while cloning the task.", "details": str(e)}), 500
 
 
 

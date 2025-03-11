@@ -51,7 +51,8 @@ urlpatterns = [
     path('delete-task-messages/<int:org_id>/<int:group_id>/<int:task_id>/',delete_all_task_messages, name='delete_task_message'),
     path('export-task-chat/<int:org_id>/<int:group_id>/<int:task_id>/',export_task_chat, name='export_task_chat'),
     path('get-subtasks/<int:org_id>/<int:group_id>/<int:task_id>/',get_task_subtasks, name='get_subtasks'),
-    path('assign-subtask/<int:org_id>/<int:group_id>/<int:task_id>/',assign_subtask,name='assign_subtask')
+    path('assign-subtask/<int:org_id>/<int:group_id>/<int:task_id>/',assign_subtask,name='assign_subtask'),
+    path('clone-task/',clone_task, name='clone_task')
   
   
   
