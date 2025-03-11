@@ -1262,6 +1262,8 @@ def clone_task(request):
                 is_urgent_notification_sent=False,  # Reset urgent notification flag
                 queries_sent=0  # Reset queries count
             )
+            # notify the task cloned
+            notify_task_cloned(org_id=organization.id, group_id=group.id, task_id=task.id)
 
             print(f"✅ Task Cloned Successfully! New Task ID: {cloned_task.id}")
 
@@ -1280,6 +1282,19 @@ def clone_task(request):
     print("❌ Invalid request method (Only POST allowed)")
     return JsonResponse({"error": "Invalid request method."}, status=405)
 
+
+# Notify the cloned task user (task.assigned_to)
+def notify_task_cloned(org_id, group_id,task_id):
+    organization=get_object_or_404(Organization,id=org_id)
+    group=get_object_or_404(Group, id=group_id,organization=organization)
+    task=get_object_or_404(Task, id=task_id, group=group, organization=organization)
+
+    subject=f'New Task Assigned:{task.title}'
+    message=f'Hey {task.assigned_to.username},\n {task.created_by} Assigned a task to you, Check out the following details\n Workspace & Group - Workspace:{organization.name}\n Group:{group.name}\n Task Details: {task.title}\n Description:{task.description}\n Priority:{task.priority}\n Deadline:{task.deadline}\n Login to your Dashboard to Access and initialize the task!\n Thank you,\n Team CalendarPlus'
+    from_email=settings.DEFAULT_FROM_EMAIL
+    recipient_list=[task.assigned_to.email]
+
+    send_mail(subject,message,from_email,recipient_list)
 
 
 
