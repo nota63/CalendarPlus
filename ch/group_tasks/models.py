@@ -473,7 +473,7 @@ class SubTask(models.Model):
 
     # Automate the task progress
     def save(self, *args, **kwargs):
-     """Increase parent task's progress when a subtask is marked as completed."""
+     """Increase parent task's progress and set subtask progress to 100% when completed."""
      print(f"DEBUG: Saving SubTask {self.id} - Status: {self.status}, Task ID: {self.task.id}")  
 
     # Fetch previous status before saving
@@ -484,6 +484,11 @@ class SubTask(models.Model):
             print(f"DEBUG: Previous status of SubTask {self.id}: {previous_status}")
         except Exception as e:
             print(f"ERROR: Failed to fetch previous subtask status: {e}")
+
+     # If subtask is completed, force progress to 100%
+     if self.status == 'Completed':
+        self.progress = 100
+        print(f"DEBUG: SubTask {self.id} progress set to 100%")  
 
     # Save the subtask first
      try:
@@ -510,6 +515,7 @@ class SubTask(models.Model):
 
         except Exception as e:
             print(f"ERROR: Failed to update Task {self.task.id} progress: {e}")
+
 
 
 

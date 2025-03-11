@@ -261,7 +261,29 @@ video::-webkit-media-controls-panel {
 #chatMessages::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
 }
-    </style>
+
+/* activity scrolling */
+.activity-timeline {
+    max-height: 400px; /* Adjust height as needed */
+    overflow-y: auto;
+    padding-right: 5px; /* Space for scrollbar */
+}
+
+/* Custom scrollbar */
+.activity-timeline::-webkit-scrollbar {
+    width: 6px; /* Thinner scrollbar */
+}
+
+.activity-timeline::-webkit-scrollbar-thumb {
+    background-color: #888; /* Color of scrollbar */
+    border-radius: 10px; /* Rounded edges */
+}
+
+.activity-timeline::-webkit-scrollbar-track {
+    background: transparent; /* Optional: makes track invisible */
+}
+
+</style>
 </head>
 <body>
 <!-- -----------------------------------------MODALS--------------------------------------------------------------------------------------------------------------------- -->
