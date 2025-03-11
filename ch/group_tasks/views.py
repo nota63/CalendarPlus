@@ -1176,7 +1176,7 @@ def assign_subtask(request, org_id, group_id, task_id):
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
 
-
+# notify the task accomplisher
 def notify_subtask_user(org_id,group_id,task_id,subtask_id):
     organization=get_object_or_404(Organization,id=org_id)
     group=get_object_or_404(Group, id=group_id,organization=organization)
@@ -1184,7 +1184,7 @@ def notify_subtask_user(org_id,group_id,task_id,subtask_id):
     subtask = get_object_or_404(SubTask, id=subtask_id, task=task, group=group, organization=organization)
 
     subject=f"New Subtask Assigned to {task.title}"
-    message=f'Hello {task.assigned_to.username}, {task.created_by.username} assigned a subtask to the {task.title}, Here are the subtask details below!\n Title: {subtask.title}\n Priority: {subtask.priority}\n Deadline: {subtask.deadline}\n Kindly complete the task before {subtask.deadline} to avoid any due issues'
+    message=f'Hello {task.assigned_to.username}, {task.created_by.username} assigned a subtask to the {task.title}, Here are the subtask details below!\n Title: {subtask.title}\n Priority: {subtask.priority}\n Deadline: {subtask.deadline}\n Workspace And Group Details: Workspace: {organization.name}\n Group:{group.name}\n Kindly complete the task before {subtask.deadline} to avoid any due issues'
     from_email=settings.DEFAULT_FROM_EMAIL
     recipient_list = [task.assigned_to.email]
 
