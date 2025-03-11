@@ -473,18 +473,43 @@ class SubTask(models.Model):
 
     # Automate the task progress
     def save(self, *args, **kwargs):
-     """Force subtask progress to 100% if marked as completed."""
-     print(f"DEBUG: Saving SubTask {self.id} - Status: {self.status}, Current Progress: {self.progress}")  
+     """Increase parent task's progress when a subtask is marked as completed."""
+     print(f"DEBUG: Saving SubTask {self.id} - Status: {self.status}, Task ID: {self.task.id}")  
 
-    # If subtask is marked as completed, force progress to 100%
-     if self.status == 'Completed':
-        self.progress = 100
-        print(f"DEBUG: SubTask {self.id} progress set to 100%")  
+    # Fetch previous status before saving
+     previous_status = None
+     if self.pk:
+        try:
+            previous_status = SubTask.objects.filter(pk=self.pk).values_list('status', flat=True).first()
+            print(f"DEBUG: Previous status of SubTask {self.id}: {previous_status}")
+        except Exception as e:
+            print(f"ERROR: Failed to fetch previous subtask status: {e}")
 
-    # Save the subtask
-     super().save(*args, **kwargs)
-     print(f"DEBUG: SubTask {self.id} saved successfully!")  
+    # Save the subtask first
+     try:
+        super().save(*args, **kwargs)
+        print(f"DEBUG: SubTask {self.id} saved successfully!")  
+     except Exception as e:
+        print(f"ERROR: SubTask {self.id} failed to save - {e}")
+        return  
 
+    # If subtask is newly completed, update parent task progress
+     if self.status == 'Completed' and previous_status != 'Completed':
+        try:
+            print(f"DEBUG: Updating progress for Task {self.task.id}")  
+
+            # Increment progress using F() expression to avoid race conditions
+            updated_rows = Task.objects.filter(pk=self.task.pk).update(progress=F('progress') + 10)
+            
+            if updated_rows == 0:
+                print(f"ERROR: Task {self.task.id} not found for update!")
+            else:
+                # Fetch new progress value
+                updated_task = Task.objects.get(pk=self.task.pk)
+                print(f"DEBUG: Task {updated_task.id} updated progress: {updated_task.progress}")  
+
+        except Exception as e:
+            print(f"ERROR: Failed to update Task {self.task.id} progress: {e}")
 
 
 
