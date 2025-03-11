@@ -147,6 +147,19 @@ class Task(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.get_status_display()}"
+    
+    def save(self, *args, **kwargs):
+     """Auto-update progress when task is completed (without infinite recursion)."""
+
+     if self.status == 'completed':  
+        print(f"DEBUG: Task {self.id} marked as COMPLETED. Forcing progress to 100%.")
+        self.progress = 100  # Ensure progress is set to 100 if completed
+
+     print(f"DEBUG: Saving Task {self.id} - Status: {self.status}, Progress: {self.progress}")  
+
+     super().save(*args, **kwargs)  # Save without calling update_task_progress() again
+
+     print(f"DEBUG: Task {self.id} saved successfully! - Final Progress: {self.progress}")
 
 
     def mark_as_completed(self):
@@ -170,7 +183,7 @@ class Task(models.Model):
     
         pass
 
-
+    
 
 # Add day to track the task
 class AddDay(models.Model):
@@ -252,6 +265,9 @@ class TaskTag(models.Model):
 
     def __str__(self):
         return self.name
+    
+    
+
 
     class Meta:
         ordering = ['name']
