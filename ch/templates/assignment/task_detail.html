@@ -264,7 +264,7 @@ video::-webkit-media-controls-panel {
 
 /* activity scrolling */
 .activity-timeline {
-    max-height: 400px; /* Adjust height as needed */
+    max-height: 550px; /* Adjust height as needed */
     overflow-y: auto;
     padding-right: 5px; /* Space for scrollbar */
 }
@@ -281,6 +281,30 @@ video::-webkit-media-controls-panel {
 
 .activity-timeline::-webkit-scrollbar-track {
     background: transparent; /* Optional: makes track invisible */
+}
+.task-card {
+    max-height: 550px; /* Adjust height as needed */
+    overflow-y: auto; /* Enable vertical scrolling */
+    padding-right: 8px; /* Space for scrollbar */
+}
+
+/* Custom scrollbar */
+.task-card::-webkit-scrollbar {
+    width: 6px; /* Thin scrollbar */
+}
+
+.task-card::-webkit-scrollbar-track {
+    background: #f0f0f0; /* Light grey background */
+    border-radius: 10px;
+}
+
+.task-card::-webkit-scrollbar-thumb {
+    background: #888; /* Dark grey scrollbar */
+    border-radius: 10px;
+}
+
+.task-card::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Slightly darker on hover */
 }
 
 </style>
