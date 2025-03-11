@@ -1230,6 +1230,10 @@ def clone_task(request):
             # Find user by email inside the same organization
             profile = Profile.objects.filter(user__email=email, organization=organization).first()
 
+            # prevent assign to admin
+            if profile.is_admin:
+                return JsonResponse({'error:':'You cant assign the task to the workspace admin!'}, status=400)
+
             if not profile:
                 print(f"❌ No profile found for email: {email} in organization {organization}")
                 return JsonResponse({"error": "User with this email not found in the organization."}, status=404)
