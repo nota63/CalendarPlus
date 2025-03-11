@@ -469,14 +469,18 @@ video::-webkit-media-controls-panel {
     <div class="modal-dialog modal-lg">
         <div class="modal-content bg-white rounded-xl shadow-xl border border-gray-100">
             <div class="modal-header px-6 pt-5 border-b border-gray-200">
-                <div class="w-full">
-                    <h5 class="modal-title font-poppins text-2xl font-bold bg-gradient-to-r from-blue-600 to-pink-600 bg-clip-text text-transparent" id="tasksSubtasksModalLabel">
-                        Task & Subtasks
-                    </h5>
-                    <p class="text-sm font-bold mt-1 bg-gradient-to-r from-blue-500 to-pink-500 bg-clip-text text-transparent">
-                        Subtasks added by {{task.assigned_to.username}}
-                    </p>
-                </div>
+                <button class="rounded-lg px-4 py-2 bg-blue-600 text-white font-semibold hover:bg-blue-700 
+              transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 
+              focus:ring-opacity-50"
+        data-bs-toggle="modal"
+        data-bs-target="#assignSubtaskModal"
+        data-org-id="{{ organization.id }}"
+        data-group-id="{{ group.id }}"
+        data-task-id="{{ task.id }}">
+    Assign Subtask
+</button>
+<br>
+               
                 <button type="button" class="btn-close opacity-70 hover:opacity-100 transition-all" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             
