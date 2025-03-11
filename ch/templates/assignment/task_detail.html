@@ -7,6 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Inter Font-->
    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
@@ -338,6 +340,26 @@ video::-webkit-media-controls-panel {
     scrollbar-width: none; /* Firefox */
 }
 
+/* SIDEBAR CSS */
+/* Add to your stylesheet */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons+Sharp');
+
+.sidebar-glass {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+/* Gradient text effect */
+.text-gradient {
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+
+
 </style>
 </head>
 <body>
@@ -513,16 +535,62 @@ video::-webkit-media-controls-panel {
 </button>
 
 
-<button class="btn-btn-primary" 
-        data-bs-toggle="modal" 
-        data-bs-target="#tasksSubtasksModal"
-        data-org-id="{{ organization.id }}" 
-        data-group-id="{{ group.id }}" 
-        data-task-id="{{ task.id }}">
-    View Subtasks
-</button>
+<!-- SIDEBAR -->
+ <!-- Sidebar Structure -->
+<div class="fixed left-0 top-0 h-screen w-64 bg-white/80 backdrop-blur-lg border-r border-white/30 shadow-xl z-50">
+    <!-- Sidebar Content -->
+    <div class="p-4 flex flex-col h-full">
+        <!-- Logo Section -->
+        <div class="mb-8 px-2 py-3">
+            <h2 class="font-poppins text-2xl font-bold bg-gradient-to-r from-blue-600 to-pink-500 bg-clip-text text-transparent">
+                TaskFlow
+            </h2>
+        </div>
 
+        <!-- Navigation Items -->
+        <nav class="space-y-2 flex-1">
+            <!-- Your Button -->
+            <button class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-white/50 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md"
+                data-bs-toggle="modal" 
+                data-bs-target="#tasksSubtasksModal"
+                data-org-id="{{ organization.id }}" 
+                data-group-id="{{ group.id }}" 
+                data-task-id="{{ task.id }}">
+                <span class="material-icons-sharp text-blue-600">visibility</span>
+                <span class="bg-gradient-to-r from-blue-600 to-pink-600 bg-clip-text text-transparent font-semibold">
+                    View Subtasks
+                </span>
+            </button>
 
+            <!-- Additional Menu Items -->
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-600 hover:bg-white/50 rounded-lg transition-colors">
+                <span class="material-icons-sharp text-gray-500">dashboard</span>
+                Dashboard
+            </a>
+            
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-600 hover:bg-white/50 rounded-lg transition-colors">
+                <span class="material-icons-sharp text-gray-500">task</span>
+                My Tasks
+            </a>
+            
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-600 hover:bg-white/50 rounded-lg transition-colors">
+                <span class="material-icons-sharp text-gray-500">groups</span>
+                Teams
+            </a>
+        </nav>
+
+        <!-- Footer Section -->
+        <div class="border-t border-white/30 pt-4">
+            <div class="flex items-center gap-3 px-2 py-2 text-sm text-gray-600 hover:bg-white/50 rounded-lg transition-colors">
+                <div class="h-8 w-8 rounded-full bg-gradient-to-r from-blue-400 to-pink-300"></div>
+                <div>
+                    <p class="font-medium text-gray-700">John Doe</p>
+                    <p class="text-xs text-gray-500">Project Manager</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
    
 
