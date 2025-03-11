@@ -465,7 +465,6 @@ video::-webkit-media-controls-panel {
 
 
 <!-- GET TASKS SUBTASKS -->
-<!-- GET TASKS SUBTASKS -->
 <div class="modal fade" id="tasksSubtasksModal" tabindex="-1" aria-labelledby="tasksSubtasksModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content bg-white rounded-xl shadow-xl border border-gray-100">
@@ -571,6 +570,14 @@ video::-webkit-media-controls-panel {
                         <label class="form-check-label" for="canEditTask">Task Accomplisher Can Edit</label>
                     </div>
 
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="authority" checked disabled>
+                        <label class="form-check-label" for="authority">
+                            {{ task.assigned_to.username }} will be author
+                        </label>
+                    </div>
+                    
+
                     <div class="mb-3">
                         <label for="subtaskBehaviour" class="form-label">Subtask Behaviour</label>
                         <select class="form-select" id="subtaskBehaviour">
@@ -588,7 +595,7 @@ video::-webkit-media-controls-panel {
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
-                    <p class="mt-2">Assigning subtask...</p>
+                    <p class="mt-2">Assigning subtask to {{task.assigned_to.username}}...</p>
                 </div>
             </div>
 
