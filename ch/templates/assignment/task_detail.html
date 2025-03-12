@@ -23,6 +23,9 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token }}">
+    <!-- Sortable.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
 
 
     <style>
@@ -665,6 +668,35 @@ video::-webkit-media-controls-panel {
     </div>
 </div>
 
+<!-- MANAGE TASK MEETINGS (SORTABLE.JS) -->
+<!-- Meetings Modal -->
+<div id="meetingsModal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Manage Task Meetings</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Meetings Sections -->
+                    <div class="col-md-3">
+                        <h6>Pending</h6>
+                        <ul id="pending-meetings" class="sortable-list bg-light p-3"></ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>Confirmed</h6>
+                        <ul id="confirmed-meetings" class="sortable-list bg-light p-3"></ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>Cancelled</h6>
+                        <ul id="cancelled-meetings" class="sortable-list bg-light p-3"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -716,16 +748,27 @@ video::-webkit-media-controls-panel {
                 </span>
             </button>
 
-            <!-- Additional Menu Items -->
+            <!-- clone task -->
             <button class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-white/50 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md"
              onclick="openCloneTaskModal('{{ organization.id }}', '{{ group.id }}', '{{ task.id }}')" 
              data-bs-toggle="modal" 
-            data-bs-target="#cloneTaskModal"
+             data-bs-target="#cloneTaskModal"
           
             >
             <span class="material-icons-sharp text-blue-600">content_copy</span>
                 Clone Task
            </button>
+
+           <!-- meeting management -->
+           <button 
+           class="btn btn-primary open-meeting-modal"
+           data-org-id="{{ organization.id }}"
+           data-group-id="{{ group.id }}"
+           data-task-id="{{ task.id }}"
+       >
+           Manage Meetings
+       </button>
+       
 
             
             <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-600 hover:bg-white/50 rounded-lg transition-colors">
@@ -1574,6 +1617,83 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+
+// MEETING MANAGEMENT (SORTABLE.JS)
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = new bootstrap.Modal(document.getElementById("meetingsModal"));
+
+    document.querySelector(".open-meeting-modal").addEventListener("click", function () {
+        let orgId = this.dataset.orgId;
+        let groupId = this.dataset.groupId;
+        let taskId = this.dataset.taskId;
+
+        fetchMeetings(orgId, groupId, taskId);
+        modal.show();
+    });
+
+    function fetchMeetings(orgId, groupId, taskId) {
+        fetch(`/tasks/fetch-meetings-sortable/${orgId}/${groupId}/${taskId}/`)
+            .then(response => response.json())
+            .then(data => {
+                // Clear lists
+                document.getElementById("pending-meetings").innerHTML = "";
+                document.getElementById("confirmed-meetings").innerHTML = "";
+                document.getElementById("cancelled-meetings").innerHTML = "";
+
+                data.meetings.forEach(meeting => {
+                    let li = document.createElement("li");
+                    li.className = "list-group-item";
+                    li.textContent = `${meeting.task_title} - ${meeting.reason} (${meeting.start_time} to ${meeting.end_time})`;
+                    li.dataset.meetingId = meeting.id;
+
+                    // Append to respective section
+                    if (meeting.status === "pending") {
+                        document.getElementById("pending-meetings").appendChild(li);
+                    } else if (meeting.status === "confirmed") {
+                        document.getElementById("confirmed-meetings").appendChild(li);
+                    } else {
+                        document.getElementById("cancelled-meetings").appendChild(li);
+                    }
+                });
+
+                setupSortable();
+            })
+            .catch(error => console.error("Error fetching meetings:", error));
+    }
+
+    function setupSortable() {
+        let statuses = ["pending-meetings", "confirmed-meetings", "cancelled-meetings"];
+        statuses.forEach(statusId => {
+            new Sortable(document.getElementById(statusId), {
+                group: "meetings",
+                animation: 150,
+                onEnd: function (evt) {
+                    let meetingId = evt.item.dataset.meetingId;
+                    let newStatus = evt.to.id.replace("-meetings", ""); // Extract status from ID
+                    updateMeetingStatus(meetingId, newStatus);
+                }
+            });
+        });
+    }
+
+    function updateMeetingStatus(meetingId, newStatus) {
+        fetch(`/tasks/update-meeting-status-sortable/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken()
+            },
+            body: JSON.stringify({ meeting_id: meetingId, status: newStatus })
+        })
+        .then(response => response.json())
+        .then(data => console.log("Meeting status updated:", data))
+        .catch(error => console.error("Error updating meeting status:", error));
+    }
+
+    function getCSRFToken() {
+        return document.querySelector("meta[name='csrf-token']").getAttribute("content");
+    }
+});
 </script>
 </body>
 </html>
