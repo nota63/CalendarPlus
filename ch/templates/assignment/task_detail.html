@@ -385,6 +385,22 @@ video::-webkit-media-controls-panel {
     .modal-content {
         font-family: 'Inter', sans-serif;
     }
+
+/* meeting details modal */
+.glass-card {
+    @apply transition-all duration-200 hover:bg-white/70 hover:shadow-sm;
+}
+
+#details-status {
+    @apply capitalize;
+}
+
+/* Status Color Variations */
+.status-pending { @apply bg-amber-100 text-amber-800; }
+.status-confirmed { @apply bg-emerald-100 text-emerald-800; }
+.status-cancelled { @apply bg-rose-100 text-rose-800; }
+
+
 </style>
 </head>
 <body>
@@ -774,23 +790,84 @@ video::-webkit-media-controls-panel {
 
 <!-- meeting details modal -->
 <div id="meetingDetailsModal" class="modal fade" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Meeting Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content backdrop-blur-lg bg-white/80 rounded-xl border border-white/20 shadow-2xl">
+            <div class="modal-header px-6 py-4 border-b border-white/20">
+                <div class="flex items-center">
+                    <i class="fas fa-calendar-alt text-blue-500 mr-3 text-xl"></i>
+                    <h5 class="modal-title text-2xl font-semibold text-gray-800 font-[Inter]">Meeting Details</h5>
+                </div>
+                <button type="button" class="btn-close p-2 hover:bg-gray-100/50 rounded-full transition-all" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <p><strong>Task:</strong> <span id="details-task-title"></span></p>
-                <p><strong>Reason:</strong> <span id="details-reason"></span></p>
-                <p><strong>Date:</strong> <span id="details-date"></span></p>
-                <p><strong>Time:</strong> <span id="details-time"></span></p>
-                <p><strong>Status:</strong> <span id="details-status"></span></p>
-                <p><strong>Hangout:</strong> <span id="details-meeting_link"></span></p>
+            
+            <div class="modal-body p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Left Column -->
+                    <div class="space-y-4">
+                        <div class="glass-card bg-white/50 p-4 rounded-lg border border-white/30">
+                            <div class="flex items-center mb-3">
+                                <i class="fas fa-tasks text-blue-400 mr-2"></i>
+                                <span class="text-sm font-medium text-gray-600">Task</span>
+                            </div>
+                            <p id="details-task-title" class="text-gray-800 font-medium truncate"></p>
+                        </div>
+
+                        <div class="glass-card bg-white/50 p-4 rounded-lg border border-white/30">
+                            <div class="flex items-center mb-3">
+                                <i class="fas fa-comment-dots text-purple-400 mr-2"></i>
+                                <span class="text-sm font-medium text-gray-600">Reason</span>
+                            </div>
+                            <p id="details-reason" class="text-gray-800"></p>
+                        </div>
+
+                        <div class="glass-card bg-white/50 p-4 rounded-lg border border-white/30">
+                            <div class="flex items-center mb-3">
+                                <i class="fas fa-clock text-emerald-400 mr-2"></i>
+                                <span class="text-sm font-medium text-gray-600">Time</span>
+                            </div>
+                            <p id="details-time" class="text-gray-800 font-medium"></p>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="space-y-4">
+                        <div class="glass-card bg-white/50 p-4 rounded-lg border border-white/30">
+                            <div class="flex items-center mb-3">
+                                <i class="fas fa-calendar-day text-rose-400 mr-2"></i>
+                                <span class="text-sm font-medium text-gray-600">Date</span>
+                            </div>
+                            <p id="details-date" class="text-gray-800 font-medium"></p>
+                        </div>
+
+                        <div class="glass-card bg-white/50 p-4 rounded-lg border border-white/30">
+                            <div class="flex items-center mb-3">
+                                <i class="fas fa-info-circle text-amber-400 mr-2"></i>
+                                <span class="text-sm font-medium text-gray-600">Status</span>
+                            </div>
+                            <span id="details-status" class="inline-block px-3 py-1 rounded-full text-sm font-medium"></span>
+                        </div>
+
+                        <div class="glass-card bg-white/50 p-4 rounded-lg border border-white/30">
+                            <div class="flex items-center mb-3">
+                                <i class="fas fa-video text-sky-400 mr-2"></i>
+                                <span class="text-sm font-medium text-gray-600">Hangout</span>
+                            </div>
+                            <a id="details-meeting_link" 
+                               class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors truncate"
+                               target="_blank" rel="noopener noreferrer">
+                                <i class="fas fa-external-link-alt mr-2 text-sm"></i>
+                                Join Meeting
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+
+
 
 <!-- CUSTOM REPLY MODAL -->
 <div id="customReplyModal" class="modal fade" tabindex="-1" aria-hidden="true">
@@ -1816,7 +1893,6 @@ function formatTime(timeString) {
 
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
 }
-
 
                     // till here
                     li.dataset.meetingId = meeting.id;
