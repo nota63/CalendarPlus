@@ -11,6 +11,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Inter Font-->
    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+   <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Material+Icons+Round" rel="stylesheet">
+
+    <!-- Add in head -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Material+Icons+Round" rel="stylesheet">
+
 
     <!-- new dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -400,7 +409,49 @@ video::-webkit-media-controls-panel {
 .status-confirmed { @apply bg-emerald-100 text-emerald-800; }
 .status-cancelled { @apply bg-rose-100 text-rose-800; }
 
+/* Task reminder modal */
+.modal-content {
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        border: 1px solid rgba(0,0,0,0.05);
+    }
 
+    .form-control:focus, .form-select:focus {
+        border-color: #1a73e8;
+        box-shadow: 0 0 0 2px rgba(26,115,232,0.15);
+    }
+
+    .material-icons-round {
+        font-size: 1.1em;
+        vertical-align: middle;
+    }
+
+    .rounded-lg {
+        border-radius: 10px;
+    }
+
+    .shadow-xs {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .btn-group .btn {
+        transition: all 0.15s ease;
+        border: 1px solid #e0e0e0;
+        padding: 0.35rem 0.75rem;
+    }
+
+    .btn-group .btn.active {
+        border-color: #1a73e8;
+        z-index: 2;
+    }
+
+    .form-check-input:checked {
+        background-color: #1a73e8;
+        border-color: #1a73e8;
+    }
+
+    .hover\:bg-gray-50:hover {
+        background-color: #f8f9fa !important;
+    }
 </style>
 </head>
 <body>
@@ -919,133 +970,220 @@ video::-webkit-media-controls-panel {
 
 
 <!-- SET-UP REMINDERS FOR THE TASK -->
- <!-- Task Reminder Modal -->
+<!-- Task Reminder Modal -->
 <div class="modal fade" id="taskReminderModal" tabindex="-1" aria-labelledby="taskReminderModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="taskReminderModalLabel">Set Task Reminder</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog" style="max-width: 620px;">
+        <div class="modal-content border-0" style="border-radius: 14px; font-family: 'Inter', sans-serif; background: #ffffff;">
+            <div class="modal-header px-4 pt-4 pb-3 border-bottom-0">
+                <div class="w-100">
+                    <h3 class="modal-title fs-5 fw-600" id="taskReminderModalLabel" style="color: #1a73e8;">
+                        <i class="material-icons-round me-2 fs-6" style="color: #1a73e8; vertical-align: -2px;">alarm</i>
+                        Set Task Reminder
+                    </h3>
+                    <p class="text-muted mt-1 mb-0" style="font-size: 0.825rem; color: #5f6368 !important;">
+                        For <span class="fw-500" style="color: #202124;">{{task.title}}</span> · 
+                        <span class="text-secondary">Recipients: {{task.assigned_to.username}} + team</span>
+                    </p>
+                </div>
+                <button type="button" class="btn-close shadow-none p-2" style="font-size: 0.75rem;" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <form id="taskReminderForm">
+
+            <div class="modal-body px-4 pt-2 pb-3">
+                <form id="taskReminderForm" class="space-y-3">
                     <input type="hidden" id="org_id">
                     <input type="hidden" id="group_id">
                     <input type="hidden" id="task_id">
 
-                    <!-- Reminder Time -->
-                    <div class="mb-3">
-                        <label for="reminder_time" class="form-label">Reminder Time</label>
-                        <input type="datetime-local" class="form-control" id="reminder_time">
+                    <!-- Schedule Section -->
+                    <div class="bg-white p-3 rounded-lg shadow-xs" style="border: 1px solid #e0e0e0;">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="material-icons-round me-2 fs-6" style="color: #1a73e8; vertical-align: -2px;">schedule</i>
+                            <h6 class="m-0 fs-6" style="color: #202124; font-weight: 500;">Schedule Settings</h6>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label text-muted d-block mb-1" style="font-size: 0.825rem;">Exact Time</label>
+                            <input type="datetime-local" class="form-control form-control-sm rounded-md py-1 px-2" 
+                                   style="border: 1.5px solid #dadce0; font-size: 0.875rem;" id="reminder_time">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted d-block mb-1" style="font-size: 0.825rem;">Remind Before</label>
+                            <div class="grid grid-cols-5 gap-1">
+                                <div class="relative">
+                                    <input type="number" class="form-control form-control-sm ps-6" placeholder="0" id="remind_x_minutes_before" style="font-size: 0.875rem;">
+                                    <span class="text-muted position-absolute" style="left: 10px; top: 50%; transform: translateY(-50%); font-size: 0.75rem;">M</span>
+                                </div>
+                                <div class="relative">
+                                    <input type="number" class="form-control form-control-sm ps-6" placeholder="0" id="remind_x_hours_before" style="font-size: 0.875rem;">
+                                    <span class="text-muted position-absolute" style="left: 10px; top: 50%; transform: translateY(-50%); font-size: 0.75rem;">H</span>
+                                </div>
+                                <div class="relative">
+                                    <input type="number" class="form-control form-control-sm ps-6" placeholder="0" id="remind_x_days_before" style="font-size: 0.875rem;">
+                                    <span class="text-muted position-absolute" style="left: 10px; top: 50%; transform: translateY(-50%); font-size: 0.75rem;">D</span>
+                                </div>
+                                <div class="relative">
+                                    <input type="number" class="form-control form-control-sm ps-6" placeholder="0" id="remind_x_weeks_before" style="font-size: 0.875rem;">
+                                    <span class="text-muted position-absolute" style="left: 10px; top: 50%; transform: translateY(-50%); font-size: 0.75rem;">W</span>
+                                </div>
+                                <div class="relative">
+                                    <input type="number" class="form-control form-control-sm ps-6" placeholder="0" id="remind_x_months_before" style="font-size: 0.875rem;">
+                                    <span class="text-muted position-absolute" style="left: 10px; top: 50%; transform: translateY(-50%); font-size: 0.75rem;">M</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recurring Section -->
+                        <div class="pt-3 mt-3 border-top">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="material-icons-round me-2 fs-6" style="color: #0b8043; vertical-align: -2px;">loop</i>
+                                <h6 class="m-0 fs-6" style="color: #202124; font-weight: 500;">Recurrence</h6>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-12 col-md-6">
+                                    <div class="form-check p-1 rounded-md hover:bg-gray-50">
+                                        <input class="form-check-input" type="checkbox" id="remind_assignee_every_morning" style="margin-top: 0.2rem;">
+                                        <label class="form-check-label ms-2">
+                                            <span class="d-block fw-500" style="font-size: 0.875rem;">Morning Digest</span>
+                                            <small class="text-muted" style="font-size: 0.75rem;">Every day at 9:00 AM</small>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="form-check p-1 rounded-md hover:bg-gray-50">
+                                        <input class="form-check-input" type="checkbox" id="remind_assignee_every_evening" style="margin-top: 0.2rem;">
+                                        <label class="form-check-label ms-2">
+                                            <span class="d-block fw-500" style="font-size: 0.875rem;">Evening Digest</span>
+                                            <small class="text-muted" style="font-size: 0.75rem;">Every day at 6:00 PM</small>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-transparent border-0 pe-1">
+                                            <i class="material-icons-round text-muted fs-6">calendar_view_day</i>
+                                        </span>
+                                        <input type="number" class="form-control form-control-sm" placeholder="Days" id="remind_every_x_days" style="font-size: 0.875rem;">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-transparent border-0 pe-1">
+                                            <i class="material-icons-round text-muted fs-6">calendar_view_week</i>
+                                        </span>
+                                        <input type="number" class="form-control form-control-sm" placeholder="Weeks" id="remind_every_x_weeks" style="font-size: 0.875rem;">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-transparent border-0 pe-1">
+                                            <i class="material-icons-round text-muted fs-6">calendar_view_month</i>
+                                        </span>
+                                        <input type="number" class="form-control form-control-sm" placeholder="Months" id="remind_every_x_months" style="font-size: 0.875rem;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Reminder Options -->
-                    <div class="mb-3">
-                        <label class="form-label">Remind Before:</label>
+                    <!-- Settings Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <!-- Notification Type -->
+                        <div class="bg-white p-3 rounded-lg shadow-xs" style="border: 1px solid #e0e0e0;">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="material-icons-round me-2 fs-6" style="color: #d93025; vertical-align: -2px;">notifications</i>
+                                <h6 class="m-0 fs-6" style="color: #202124; font-weight: 500;">Channels</h6>
+                            </div>
+                            <div class="btn-group w-100" role="group">
+                                <button type="button" 
+                                        class="btn btn-sm px-2 py-1 d-flex align-items-center active disabled" 
+                                        style="border-radius: 6px 0 0 6px; background: #e8f0fe; color: #1967d2; font-size: 0.8125rem;">
+                                    <i class="material-icons-round me-1 fs-6">mail</i>
+                                    Email
+                                </button>
+                                <button type="button" 
+                                        class="btn btn-sm px-2 py-1 d-flex align-items-center disabled" 
+                                        style="border-radius: 0; background: #f8f9fa; color: #5f6368; font-size: 0.8125rem;">
+                                    <i class="material-icons-round me-1 fs-6">notifications</i>
+                                    In-App
+                                </button>
+                                <button type="button" 
+                                        class="btn btn-sm px-2 py-1 d-flex align-items-center disabled" 
+                                        style="border-radius: 0 6px 6px 0; background: #f8f9fa; color: #5f6368; font-size: 0.8125rem;">
+                                    <i class="material-icons-round me-1 fs-6">phone_iphone</i>
+                                    Push
+                                </button>
+                            </div>
+                            <input type="hidden" id="notification_type" value="email">
+                        </div>
+
+                        <!-- Priority & Snooze -->
+                        <div class="bg-white p-3 rounded-lg shadow-xs" style="border: 1px solid #e0e0e0;">
+                            <div class="row g-2">
+                                <div class="col-12 col-md-6">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="material-icons-round me-2 fs-6" style="color: #e37400; vertical-align: -2px;">priority_high</i>
+                                        <h6 class="m-0 fs-6" style="color: #202124; font-weight: 500;">Priority</h6>
+                                    </div>
+                                    <select class="form-select form-select-sm w-100" id="priority" style="font-size: 0.875rem;">
+                                        <option value="low" class="text-success">Low</option>
+                                        <option value="medium" selected class="text-warning">Medium</option>
+                                        <option value="high" class="text-danger">High</option>
+                                        <option value="urgent" class="text-danger fw-bold">Urgent</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-12 col-md-6">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="material-icons-round me-2 fs-6" style="color: #666; vertical-align: -2px;">snooze</i>
+                                        <h6 class="m-0 fs-6" style="color: #202124; font-weight: 500;">Snooze</h6>
+                                    </div>
+                                    <input type="datetime-local" class="form-control form-control-sm w-100 rounded-md" id="snooze_until" style="font-size: 0.875rem;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Settings -->
+                    <div class="bg-white p-3 rounded-lg shadow-xs" style="border: 1px solid #e0e0e0;">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="material-icons-round me-2 fs-6" style="color: #666; vertical-align: -2px;">tune</i>
+                            <h6 class="m-0 fs-6" style="color: #202124; font-weight: 500;">Advanced</h6>
+                        </div>
                         <div class="row g-2">
-                            <div class="col">
-                                <input type="number" class="form-control" id="remind_x_minutes_before" placeholder="Minutes">
+                            <div class="col-12 col-md-6">
+                                <div class="form-check p-1 rounded-md hover:bg-gray-50">
+                                    <input class="form-check-input" type="checkbox" id="auto_reschedule" checked style="margin-top: 0.2rem;">
+                                    <label class="form-check-label ms-2">
+                                        <span class="d-block fw-500" style="font-size: 0.875rem;">Auto-Reschedule</span>
+                                        <small class="text-muted" style="font-size: 0.75rem;">If task incomplete</small>
+                                    </label>
+                                </div>
                             </div>
-                            <div class="col">
-                                <input type="number" class="form-control" id="remind_x_hours_before" placeholder="Hours">
-                            </div>
-                            <div class="col">
-                                <input type="number" class="form-control" id="remind_x_days_before" placeholder="Days">
-                            </div>
-                            <div class="col">
-                                <input type="number" class="form-control" id="remind_x_weeks_before" placeholder="Weeks">
-                            </div>
-                            <div class="col">
-                                <input type="number" class="form-control" id="remind_x_months_before" placeholder="Months">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Recurring Reminders -->
-                    <div class="mb-3">
-                        <label class="form-label">Recurring Reminders:</label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="remind_assignee_every_morning">
-                            <label class="form-check-label">Every Morning (9 AM)</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="remind_assignee_every_evening">
-                            <label class="form-check-label">Every Evening (6 PM)</label>
-                        </div>
-                        <div class="row g-2 mt-2">
-                            <div class="col">
-                                <label class="form-label">Every X Days:</label>
-                                <input type="number" class="form-control" id="remind_every_x_days" placeholder="Days">
-                            </div>
-                            <div class="col">
-                                <label class="form-label">Every X Weeks:</label>
-                                <input type="number" class="form-control" id="remind_every_x_weeks" placeholder="Weeks">
-                            </div>
-                            <div class="col">
-                                <label class="form-label">Every X Months:</label>
-                                <input type="number" class="form-control" id="remind_every_x_months" placeholder="Months">
+                            <div class="col-12 col-md-6">
+                                <div class="form-check p-1 rounded-md hover:bg-gray-50">
+                                    <input class="form-check-input" type="checkbox" id="is_cancelled" style="margin-top: 0.2rem;">
+                                    <label class="form-check-label ms-2">
+                                        <span class="d-block fw-500" style="font-size: 0.875rem;">Cancel Reminder</span>
+                                        <small class="text-muted" style="font-size: 0.75rem;">Disable schedule</small>
+                                    </label>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Snooze Feature -->
-                    <div class="mb-3">
-                        <label for="snooze_until" class="form-label">Snooze Until</label>
-                        <input type="datetime-local" class="form-control" id="snooze_until">
-                    </div>
-
-                    <!-- Notification Type -->
-                    <!-- Notification Type (Selector) -->
-<div class="mb-3">
-    <label class="form-label">Notification Type:</label>
-    <div class="d-flex gap-2">
-        <button type="button" class="btn btn-primary active" id="email_option" disabled>📧 Email</button>
-        <button type="button" class="btn btn-outline-secondary" disabled>🔔 In-App Notification</button>
-        <button type="button" class="btn btn-outline-secondary" disabled>📱 Push Notification</button>
-        <button type="button" class="btn btn-outline-secondary" disabled>🔗 Webhook (API)</button>
-    </div>
-    <input type="hidden" id="notification_type" value="email">
-</div>
-
-
-                    <!-- Priority -->
-                    <div class="mb-3">
-                        <label for="priority" class="form-label">Priority</label>
-                        <select class="form-select" id="priority">
-                            <option value="low">Low</option>
-                            <option value="medium" selected>Medium</option>
-                            <option value="high">High</option>
-                            <option value="urgent">Urgent</option>
-                        </select>
-                    </div>
-
-                    <!-- Auto-Reschedule -->
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="auto_reschedule" checked>
-                        <label class="form-check-label">Auto-Reschedule if Incomplete</label>
-                    </div>
-
-                    <!-- Status -->
-                    <div class="form-check mt-2">
-                        <input class="form-check-input" type="checkbox" id="is_cancelled">
-                        <label class="form-check-label">Cancel Reminder</label>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="saveReminderBtn">Save Reminder</button>
+
+            <div class="modal-footer px-4 py-3 bg-gray-50 border-top-0">
+                <button type="button" class="btn btn-sm btn-light px-4 rounded-pill" data-bs-dismiss="modal" style="font-size: 0.8125rem;">Cancel</button>
+                <button type="button" class="btn btn-sm btn-primary px-4 rounded-pill shadow-xs" id="saveReminderBtn" style="font-size: 0.8125rem;">
+                    <i class="material-icons-round me-2 fs-6" style="vertical-align: -4px;">save</i>
+                    Save Reminder
+                </button>
             </div>
         </div>
     </div>
 </div>
-
-
-
-
-
-
-
 
 
 
