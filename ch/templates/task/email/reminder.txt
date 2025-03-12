@@ -1,0 +1,15 @@
+{{ task_title }} Reminder ({{ priority }} Priority)
+
+Organization: {{ organization }}
+Group: {{ group }}
+Created by: {{ created_by }}
+Assigned to: {{ assigned_to }}
+Deadline: {{ deadline }}
+Reminder Time: {{ reminder_time }}
+
+Details:
+{{ details }}
+
+---
+
+This is an automated reminder from {{ organization }}.

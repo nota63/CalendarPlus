@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h2>{{ task_title }} Reminder ({{ priority }} Priority)</h2>
+    
+    <dl>
+        <dt>Organization</dt>
+        <dd>{{ organization }}</dd>
+        
+        <dt>Group</dt>
+        <dd>{{ group }}</dd>
+        
+        <dt>Created by</dt>
+        <dd>{{ created_by }}</dd>
+        
+        <dt>Assigned to</dt>
+        <dd>{{ assigned_to }}</dd>
+        
+        <dt>Deadline</dt>
+        <dd>{{ deadline }}</dd>
+        
+        <dt>Reminder Time</dt>
+        <dd>{{ reminder_time }}</dd>
+    </dl>
+
+    <h3>Details</h3>
+    <p>{{ details }}</p>
+
+    <footer>
+        <p>This is an automated reminder from {{ organization }}.</p>
+    </footer>
+</body>
+</html>
