@@ -704,7 +704,6 @@ video::-webkit-media-controls-panel {
 
 
 <!-- meeting details modal -->
-<!-- Meeting Details Modal -->
 <div id="meetingDetailsModal" class="modal fade" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -718,6 +717,7 @@ video::-webkit-media-controls-panel {
                 <p><strong>Date:</strong> <span id="details-date"></span></p>
                 <p><strong>Time:</strong> <span id="details-time"></span></p>
                 <p><strong>Status:</strong> <span id="details-status"></span></p>
+                <p><strong>Hangout:</strong> <span id="details-meeting_link"></span></p>
             </div>
         </div>
     </div>
@@ -1735,6 +1735,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("details-date").textContent = data.date;
                 document.getElementById("details-time").textContent = `${data.start_time} - ${data.end_time}`;
                 document.getElementById("details-status").textContent = data.status;
+                document.getElementById('details-meeting_link').textContent=data.meeting_link;
 
                 detailsModal.show();
             })

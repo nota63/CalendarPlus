@@ -1442,7 +1442,8 @@ def get_meeting_details(request, meeting_id):
         "date": meeting.date.strftime("%Y-%m-%d"),
         "start_time": meeting.start_time.strftime("%H:%M"),
         "end_time": meeting.end_time.strftime("%H:%M"),
-        "status": meeting.status
+        "status": meeting.status,
+        'meeting_link':meeting.meeting_link,
     }
 
     return JsonResponse(data, status=200)
