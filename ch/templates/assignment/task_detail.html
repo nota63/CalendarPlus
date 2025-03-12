@@ -669,58 +669,109 @@ video::-webkit-media-controls-panel {
 </div>
 
 <!-- MANAGE TASK MEETINGS (SORTABLE.JS) -->
-<!-- Meetings Modal -->
+<!-- Add this in your head section for Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <div id="meetingsModal" class="modal fade" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Manage Task Meetings</h5>
+    <div class="modal-dialog modal-lg max-w-7xl">
+        <div class="modal-content backdrop-blur-lg bg-white/50 rounded-xl border border-white/20 shadow-2xl">
+            <div class="modal-header px-6 py-4 border-b border-white/20">
+                <h5 class="modal-title text-xl font-semibold text-gray-800 font-inter">Manage Task Meetings</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div class="row">
-                    <!-- Meetings Sections -->
-                    <div class="col-md-3">
-                        <h6>Pending</h6>
-                        <ul id="pending-meetings" class="sortable-list bg-light p-3"></ul>
-                    </div>
-                    <div class="col-md-3">
-                        <h6>Confirmed</h6>
-                        <ul id="confirmed-meetings" class="sortable-list bg-light p-3"></ul>
-                    </div>
-                    <div class="col-md-3">
-                        <h6>Cancelled</h6>
-                        <ul id="cancelled-meetings" class="sortable-list bg-light p-3"></ul>
-                    </div>
-                    <div class="col-md-3">
-                        <h6>Details</h6>
-                        <ul id="details-meetings" class="sortable-list bg-light p-3"></ul>
+            <div class="modal-body p-4">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <!-- Pending Section -->
+                    <div class="col-span-1">
+                        <div class="bg-white/30 backdrop-blur-sm rounded-lg shadow-sm p-3 border border-white/20">
+                            <h6 class="text-xs font-semibold uppercase tracking-wide text-blue-600 mb-3 pl-2 border-l-4 border-blue-500 font-inter">Pending</h6>
+                            <ul id="pending-meetings" class="sortable-list space-y-2 min-h-[120px]"></ul>
+                        </div>
                     </div>
 
-                    <div class="col-md-3">
-                        <h6>Custom Reply</h6>
-                        <ul id="reply-meetings" class="sortable-list bg-light p-3"></ul>
+                    <!-- Confirmed Section -->
+                    <div class="col-span-1">
+                        <div class="bg-white/30 backdrop-blur-sm rounded-lg shadow-sm p-3 border border-white/20">
+                            <h6 class="text-xs font-semibold uppercase tracking-wide text-green-600 mb-3 pl-2 border-l-4 border-green-500 font-inter">Confirmed</h6>
+                            <ul id="confirmed-meetings" class="sortable-list space-y-2 min-h-[120px]"></ul>
+                        </div>
                     </div>
 
-                    <div class="col-md-3">
-                        <h6>Remind</h6>
-                        <ul id="remind-meetings" class="sortable-list bg-light p-3"></ul>
+                    <!-- Cancelled Section -->
+                    <div class="col-span-1">
+                        <div class="bg-white/30 backdrop-blur-sm rounded-lg shadow-sm p-3 border border-white/20">
+                            <h6 class="text-xs font-semibold uppercase tracking-wide text-red-600 mb-3 pl-2 border-l-4 border-red-500 font-inter">Cancelled</h6>
+                            <ul id="cancelled-meetings" class="sortable-list space-y-2 min-h-[120px]"></ul>
+                        </div>
                     </div>
 
-                    <div class="col-md-3">
-                        <h6>Trash</h6>
-                        <ul id="trash-meetings" class="sortable-list bg-light p-3"></ul>
+                    <!-- Details Section -->
+                    <div class="col-span-1">
+                        <div class="bg-white/30 backdrop-blur-sm rounded-lg shadow-sm p-3 border border-white/20">
+                            <h6 class="text-xs font-semibold uppercase tracking-wide text-purple-600 mb-3 pl-2 border-l-4 border-purple-500 font-inter">Details</h6>
+                            <ul id="details-meetings" class="sortable-list space-y-2 min-h-[120px]"></ul>
+                        </div>
                     </div>
 
-                    <div class="col-md-3">
-                        <h6>Instant Launch</h6>
-                        <ul id="launch-meetings" class="sortable-list bg-light p-3"></ul>
+                    <!-- Custom Reply Section -->
+                    <div class="col-span-1">
+                        <div class="bg-white/30 backdrop-blur-sm rounded-lg shadow-sm p-3 border border-white/20">
+                            <h6 class="text-xs font-semibold uppercase tracking-wide text-amber-600 mb-3 pl-2 border-l-4 border-amber-500 font-inter">Custom Reply</h6>
+                            <ul id="reply-meetings" class="sortable-list space-y-2 min-h-[120px]"></ul>
+                        </div>
+                    </div>
+
+                    <!-- Remind Section -->
+                    <div class="col-span-1">
+                        <div class="bg-white/30 backdrop-blur-sm rounded-lg shadow-sm p-3 border border-white/20">
+                            <h6 class="text-xs font-semibold uppercase tracking-wide text-cyan-600 mb-3 pl-2 border-l-4 border-cyan-500 font-inter">Remind</h6>
+                            <ul id="remind-meetings" class="sortable-list space-y-2 min-h-[120px]"></ul>
+                        </div>
+                    </div>
+
+                    <!-- Trash Section -->
+                    <div class="col-span-1">
+                        <div class="bg-white/30 backdrop-blur-sm rounded-lg shadow-sm p-3 border border-white/20">
+                            <h6 class="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-3 pl-2 border-l-4 border-gray-500 font-inter">Trash</h6>
+                            <ul id="trash-meetings" class="sortable-list space-y-2 min-h-[120px]"></ul>
+                        </div>
+                    </div>
+
+                    <!-- Instant Launch Section -->
+                    <div class="col-span-1">
+                        <div class="bg-white/30 backdrop-blur-sm rounded-lg shadow-sm p-3 border border-white/20">
+                            <h6 class="text-xs font-semibold uppercase tracking-wide text-emerald-600 mb-3 pl-2 border-l-4 border-emerald-500 font-inter">Instant Launch</h6>
+                            <ul id="launch-meetings" class="sortable-list space-y-2 min-h-[120px]"></ul>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .sortable-list {
+        @apply transition-all duration-200;
+    }
+    
+    .sortable-list li {
+        @apply bg-white/60 backdrop-blur-sm p-3 rounded-lg shadow-xs border border-white/30 
+               cursor-move hover:border-blue-200 hover:bg-blue-50/50 
+               transition-colors duration-200 text-sm font-medium text-gray-700
+               font-inter;
+    }
+
+    .sortable-list li:not(:last-child) {
+        @apply mb-2;
+    }
+
+    .modal-content {
+        font-family: 'Inter', sans-serif;
+    }
+</style>
+
+
 
 
 <!-- meeting details modal -->
