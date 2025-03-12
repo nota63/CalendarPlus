@@ -701,6 +701,11 @@ video::-webkit-media-controls-panel {
                         <h6>Custom Reply</h6>
                         <ul id="reply-meetings" class="sortable-list bg-light p-3"></ul>
                     </div>
+
+                    <div class="col-md-3">
+                        <h6>Remind</h6>
+                        <ul id="remind-meetings" class="sortable-list bg-light p-3"></ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -723,8 +728,6 @@ video::-webkit-media-controls-panel {
                 <p><strong>Time:</strong> <span id="details-time"></span></p>
                 <p><strong>Status:</strong> <span id="details-status"></span></p>
                 <p><strong>Hangout:</strong> <span id="details-meeting_link"></span></p>
-
-                
             </div>
         </div>
     </div>
@@ -1718,7 +1721,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function setupSortable() {
-        let statuses = ["pending-meetings", "confirmed-meetings", "cancelled-meetings", "details-meetings", "reply-meetings"];
+        let statuses = ["pending-meetings", "confirmed-meetings", "cancelled-meetings", "details-meetings", "reply-meetings","remind-meetings"];
         
         statuses.forEach(statusId => {
             new Sortable(document.getElementById(statusId), {
