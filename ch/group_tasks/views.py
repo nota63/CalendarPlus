@@ -1400,31 +1400,36 @@ def fetch_meetings_sortable(request, org_id, group_id, task_id):
 # UPDATE THE MEETING STATUS
 # ✅ 2️⃣ Handle Status Update
 @login_required
+@csrf_exempt
 def update_meeting_status_sortable(request):
     if request.method == "POST":
-        meeting_id = request.POST.get("meeting_id")
-        new_status = request.POST.get("new_status")
+        try:
+            data = json.loads(request.body)  # Parse JSON data from request body
+            print("recieved data:",data)
+            meeting_id = data.get("meeting_id")
+            new_status = data.get("new_status")
 
-        # Validate input
-        if not meeting_id or new_status not in ["pending", "confirmed", "cancelled"]:
-            return JsonResponse({"error": "Invalid request data."}, status=400)
+            # Validate input
+            if not meeting_id or new_status not in ["pending", "confirmed", "cancelled"]:
+                return JsonResponse({"error": "Invalid request data."}, status=400)
 
-        # Fetch meeting object
-        meeting = get_object_or_404(MeetingTaskQuery, id=meeting_id)
+            # Fetch meeting object
+            meeting = get_object_or_404(MeetingTaskQuery, id=meeting_id)
 
-        # Check if the user is the task creator
-        if request.user != meeting.task.created_by:
-            return JsonResponse({"error": "Unauthorized action."}, status=403)
+            # Check if the user is the task creator
+            if request.user != meeting.task.created_by:
+                return JsonResponse({"error": "Unauthorized action."}, status=403)
 
-        # Update status
-        meeting.status = new_status
-        meeting.save()
+            # Update status
+            meeting.status = new_status
+            meeting.save()
 
-        return JsonResponse({"success": "Meeting status updated successfully.", "new_status": new_status}, status=200)
+            return JsonResponse({"success": "Meeting status updated successfully.", "new_status": new_status}, status=200)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON data."}, status=400)
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
-
-
 
 
 

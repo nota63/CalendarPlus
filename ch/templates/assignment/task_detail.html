@@ -1683,17 +1683,25 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Content-Type": "application/json",
                 "X-CSRFToken": getCSRFToken()
             },
-            body: JSON.stringify({ meeting_id: meetingId, status: newStatus })
+            body: JSON.stringify({ meeting_id: meetingId, new_status: newStatus }) // ✅ Fixed key
         })
         .then(response => response.json())
-        .then(data => console.log("Meeting status updated:", data))
+        .then(data => {
+            if (data.error) {
+                console.error("Error updating meeting:", data.error);
+            } else {
+                console.log("Meeting status updated:", data);
+            }
+        })
         .catch(error => console.error("Error updating meeting status:", error));
     }
 
     function getCSRFToken() {
-        return document.querySelector("meta[name='csrf-token']").getAttribute("content");
+        let csrfTokenInput = document.querySelector("input[name='csrfmiddlewaretoken']");
+        return csrfTokenInput ? csrfTokenInput.value : "";
     }
 });
+
 </script>
 </body>
 </html>
