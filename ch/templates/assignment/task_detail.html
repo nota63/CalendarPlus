@@ -921,7 +921,7 @@ video::-webkit-media-controls-panel {
 <!-- SET-UP REMINDERS FOR THE TASK -->
  <!-- Task Reminder Modal -->
 <div class="modal fade" id="taskReminderModal" tabindex="-1" aria-labelledby="taskReminderModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="taskReminderModalLabel">Set Task Reminder</h5>
@@ -942,7 +942,7 @@ video::-webkit-media-controls-panel {
                     <!-- Reminder Options -->
                     <div class="mb-3">
                         <label class="form-label">Remind Before:</label>
-                        <div class="row">
+                        <div class="row g-2">
                             <div class="col">
                                 <input type="number" class="form-control" id="remind_x_minutes_before" placeholder="Minutes">
                             </div>
@@ -952,12 +952,18 @@ video::-webkit-media-controls-panel {
                             <div class="col">
                                 <input type="number" class="form-control" id="remind_x_days_before" placeholder="Days">
                             </div>
+                            <div class="col">
+                                <input type="number" class="form-control" id="remind_x_weeks_before" placeholder="Weeks">
+                            </div>
+                            <div class="col">
+                                <input type="number" class="form-control" id="remind_x_months_before" placeholder="Months">
+                            </div>
                         </div>
                     </div>
 
                     <!-- Recurring Reminders -->
                     <div class="mb-3">
-                        <label class="form-label">Recurring Reminder:</label>
+                        <label class="form-label">Recurring Reminders:</label>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="remind_assignee_every_morning">
                             <label class="form-check-label">Every Morning (9 AM)</label>
@@ -966,23 +972,41 @@ video::-webkit-media-controls-panel {
                             <input class="form-check-input" type="checkbox" id="remind_assignee_every_evening">
                             <label class="form-check-label">Every Evening (6 PM)</label>
                         </div>
+                        <div class="row g-2 mt-2">
+                            <div class="col">
+                                <label class="form-label">Every X Days:</label>
+                                <input type="number" class="form-control" id="remind_every_x_days" placeholder="Days">
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Every X Weeks:</label>
+                                <input type="number" class="form-control" id="remind_every_x_weeks" placeholder="Weeks">
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Every X Months:</label>
+                                <input type="number" class="form-control" id="remind_every_x_months" placeholder="Months">
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Snooze Until -->
+                    <!-- Snooze Feature -->
                     <div class="mb-3">
                         <label for="snooze_until" class="form-label">Snooze Until</label>
                         <input type="datetime-local" class="form-control" id="snooze_until">
                     </div>
 
                     <!-- Notification Type -->
-                    <div class="mb-3">
-                        <label class="form-label">Notification Type:</label>
-                        <div class="d-flex">
-                            <button type="button" class="btn btn-secondary me-2" id="emailNotification" disabled>📧 Email</button>
-                            <button type="button" class="btn btn-light text-muted" disabled>🔔 In-App</button>
-                            <button type="button" class="btn btn-light text-muted" disabled>📱 Push</button>
-                        </div>
-                    </div>
+                    <!-- Notification Type (Selector) -->
+<div class="mb-3">
+    <label class="form-label">Notification Type:</label>
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-primary active" id="email_option" disabled>📧 Email</button>
+        <button type="button" class="btn btn-outline-secondary" disabled>🔔 In-App Notification</button>
+        <button type="button" class="btn btn-outline-secondary" disabled>📱 Push Notification</button>
+        <button type="button" class="btn btn-outline-secondary" disabled>🔗 Webhook (API)</button>
+    </div>
+    <input type="hidden" id="notification_type" value="email">
+</div>
+
 
                     <!-- Priority -->
                     <div class="mb-3">
@@ -991,7 +1015,20 @@ video::-webkit-media-controls-panel {
                             <option value="low">Low</option>
                             <option value="medium" selected>Medium</option>
                             <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
                         </select>
+                    </div>
+
+                    <!-- Auto-Reschedule -->
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="auto_reschedule" checked>
+                        <label class="form-check-label">Auto-Reschedule if Incomplete</label>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" id="is_cancelled">
+                        <label class="form-check-label">Cancel Reminder</label>
                     </div>
                 </form>
             </div>
@@ -1002,6 +1039,7 @@ video::-webkit-media-controls-panel {
         </div>
     </div>
 </div>
+
 
 
 
@@ -2267,19 +2305,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const reminderData = {
             reminder_time: document.getElementById("reminder_time").value || null,
-            remind_x_minutes_before: document.getElementById("remind_x_minutes_before").value || null,
-            remind_x_hours_before: document.getElementById("remind_x_hours_before").value || null,
-            remind_x_days_before: document.getElementById("remind_x_days_before").value || null,
+            remind_x_minutes_before: parseInt(document.getElementById("remind_x_minutes_before").value) || null,
+            remind_x_hours_before: parseInt(document.getElementById("remind_x_hours_before").value) || null,
+            remind_x_days_before: parseInt(document.getElementById("remind_x_days_before").value) || null,
+            remind_x_weeks_before: parseInt(document.getElementById("remind_x_weeks_before")?.value) || null,
+            remind_x_months_before: parseInt(document.getElementById("remind_x_months_before")?.value) || null,
+
             remind_assignee_every_morning: document.getElementById("remind_assignee_every_morning").checked,
             remind_assignee_every_evening: document.getElementById("remind_assignee_every_evening").checked,
+            remind_every_x_days: parseInt(document.getElementById("remind_every_x_days")?.value) || null,
+            remind_every_x_weeks: parseInt(document.getElementById("remind_every_x_weeks")?.value) || null,
+            remind_every_x_months: parseInt(document.getElementById("remind_every_x_months")?.value) || null,
+
             snooze_until: document.getElementById("snooze_until").value || null,
-            notification_type: "email",  // Only Email allowed
+            notification_type: document.querySelector(".notification-type-btn.active")?.dataset.type || "email", // Get active button type
             priority: document.getElementById("priority").value
         };
 
         fetch(`/tasks/set-task-reminder/${org_id}/${group_id}/${task_id}/`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
             body: JSON.stringify(reminderData)
         })
         .then(response => response.json())
@@ -2293,12 +2338,20 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .catch(error => alert("Failed to set reminder!"));
     });
+
+    // Handle notification type selection
+    document.querySelectorAll(".notification-type-btn").forEach(btn => {
+        btn.addEventListener("click", function () {
+            document.querySelectorAll(".notification-type-btn").forEach(b => b.classList.remove("active", "btn-secondary"));
+            this.classList.add("active", "btn-secondary");
+        });
+    });
+
+    // CSRF Token helper function
+    function getCSRFToken() {
+        return document.querySelector('meta[name="csrf-token"]').getAttribute("content");
+    }
 });
-
-
-
-
-
 
 
 </script>
