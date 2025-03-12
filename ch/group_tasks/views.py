@@ -1486,6 +1486,7 @@ def send_custom_reply(request):
 
 
 # SET REMINDER MEET
+# logic will be pending
 def set_reminder(request):
     if request.method == "POST":
         data = json.loads(request.body)
@@ -1499,6 +1500,17 @@ def set_reminder(request):
         return JsonResponse({"success": True, "message": "Reminder set successfully!"})
     return JsonResponse({"success": False, "message": "Failed to set reminder."})
 
+# TRASH THE MEETING
+@csrf_exempt
+def delete_meeting(request, meeting_id):
+    if request.method == "POST":
+        try:
+            meeting = MeetingOrganization.objects.get(id=meeting_id)
+            meeting.delete()
+            return JsonResponse({"success": True, "message": "Meeting deleted successfully."})
+        except MeetingOrganization.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Meeting not found."}, status=404)
+    return JsonResponse({"success": False, "error": "Invalid request method."}, status=400)
 
 
 

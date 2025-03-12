@@ -706,6 +706,11 @@ video::-webkit-media-controls-panel {
                         <h6>Remind</h6>
                         <ul id="remind-meetings" class="sortable-list bg-light p-3"></ul>
                     </div>
+
+                    <div class="col-md-3">
+                        <h6>Trash</h6>
+                        <ul id="trash-meetings" class="sortable-list bg-light p-3"></ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1721,7 +1726,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function setupSortable() {
-        let statuses = ["pending-meetings", "confirmed-meetings", "cancelled-meetings", "details-meetings", "reply-meetings","remind-meetings"];
+        let statuses = ["pending-meetings", "confirmed-meetings", "cancelled-meetings", "details-meetings", "reply-meetings","remind-meetings","trash-meetings"];
         
         statuses.forEach(statusId => {
             new Sortable(document.getElementById(statusId), {
@@ -1738,6 +1743,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     } else if (newStatus === "reply") {
                         openReplyModal(meetingId, orgId, taskId);
                     } 
+                    // trash
+                    else if (newStatus ==="trash") {
+                        deleteMeeting(meetingId, evt.item);
+                    }
                     else if (newStatus==='remind'){
                         sendRemindRequest(meetingId, orgId, taskId);
                     }
@@ -1868,6 +1877,28 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     })
     .catch(error => console.error("Error:", error));
+}
+
+
+// TRASH THE MEETING
+function deleteMeeting(meetingId, item) {
+    fetch(`/tasks/delete-meeting-task/${meetingId}/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken()
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            item.remove(); // Remove the meeting from UI
+            console.log("Meeting deleted successfully.");
+        } else {
+            console.error("Error deleting meeting:", data.error);
+        }
+    })
+    .catch(error => console.error("Error deleting meeting:", error));
 }
 
     function getCSRFToken() {
