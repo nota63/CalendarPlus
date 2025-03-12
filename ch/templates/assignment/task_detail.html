@@ -718,6 +718,8 @@ video::-webkit-media-controls-panel {
                 <p><strong>Time:</strong> <span id="details-time"></span></p>
                 <p><strong>Status:</strong> <span id="details-status"></span></p>
                 <p><strong>Hangout:</strong> <span id="details-meeting_link"></span></p>
+
+                
             </div>
         </div>
     </div>
@@ -1726,21 +1728,43 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error("Error updating meeting status:", error));
     }
 
+    // modifying
     function fetchMeetingDetails(meetingId) {
-        fetch(`/tasks/get-meeting-details/${meetingId}/`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("details-task-title").textContent = data.task_title;
-                document.getElementById("details-reason").textContent = data.reason;
-                document.getElementById("details-date").textContent = data.date;
-                document.getElementById("details-time").textContent = `${data.start_time} - ${data.end_time}`;
-                document.getElementById("details-status").textContent = data.status;
-                document.getElementById('details-meeting_link').textContent=data.meeting_link;
+    fetch(`/tasks/get-meeting-details/${meetingId}/`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("details-task-title").textContent = data.task_title;
+            document.getElementById("details-reason").textContent = data.reason;
+            document.getElementById("details-date").textContent = data.date;
+            document.getElementById("details-time").textContent = `${data.start_time} - ${data.end_time}`;
+            document.getElementById("details-status").textContent = data.status;
 
-                detailsModal.show();
-            })
-            .catch(error => console.error("Error fetching meeting details:", error));
-    }
+            // ✅ Get the Hangout (meeting link) container
+            let hangoutContainer = document.getElementById("details-meeting_link");
+            hangoutContainer.innerHTML = ""; // Clear previous content
+
+            // ✅ Add the "Join Meeting" button dynamically if the meeting link exists
+            if (data.meeting_link) {
+                let joinButton = document.createElement("a");
+                joinButton.href = data.meeting_link;
+                joinButton.target = "_blank"; // Opens in a new tab
+                joinButton.className = "btn btn-primary mt-3";
+                joinButton.textContent = "Join Meeting";
+
+                // ✅ Append the button inside the Hangout container
+                hangoutContainer.appendChild(joinButton);
+            } else {
+                hangoutContainer.textContent = "No meeting link available.";
+            }
+
+            // ✅ Show the modal
+            let detailsModal = new bootstrap.Modal(document.getElementById("meetingDetailsModal"));
+            detailsModal.show();
+        })
+        .catch(error => console.error("Error fetching meeting details:", error));
+}
+
+
 
     function getCSRFToken() {
         return document.querySelector("meta[name='csrf-token']").getAttribute("content");
