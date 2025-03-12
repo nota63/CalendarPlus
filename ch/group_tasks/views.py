@@ -1431,6 +1431,31 @@ def update_meeting_status_sortable(request):
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
 
+# GET MEETING DETAILS 
+@login_required
+def get_meeting_details(request, meeting_id):
+    meeting = get_object_or_404(MeetingTaskQuery, id=meeting_id)
+
+    data = {
+        "task_title": meeting.task.title,
+        "reason": meeting.reason,
+        "date": meeting.date.strftime("%Y-%m-%d"),
+        "start_time": meeting.start_time.strftime("%H:%M"),
+        "end_time": meeting.end_time.strftime("%H:%M"),
+        "status": meeting.status
+    }
+
+    return JsonResponse(data, status=200)
+
+
+
+
+
+
+
+
+
+
 
 
 

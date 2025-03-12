@@ -54,7 +54,8 @@ urlpatterns = [
     path('assign-subtask/<int:org_id>/<int:group_id>/<int:task_id>/',assign_subtask,name='assign_subtask'),
     path('clone-task/',clone_task, name='clone_task'),
     path('fetch-meetings-sortable/<int:org_id>/<int:group_id>/<int:task_id>/',fetch_meetings_sortable, name='fetch_meetings_sortable'),
-    path('update-meeting-status-sortable/',update_meeting_status_sortable, name='update_meeting_status_sortable')
+    path('update-meeting-status-sortable/',update_meeting_status_sortable, name='update_meeting_status_sortable'),
+    path('get-meeting-details/<int:meeting_id>/',get_meeting_details,name='get_meeting_details')
   
   
   

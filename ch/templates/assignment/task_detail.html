@@ -692,6 +692,10 @@ video::-webkit-media-controls-panel {
                         <h6>Cancelled</h6>
                         <ul id="cancelled-meetings" class="sortable-list bg-light p-3"></ul>
                     </div>
+                    <div class="col-md-3">
+                        <h6>Details</h6>
+                        <ul id="details-meetings" class="sortable-list bg-light p-3"></ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -699,6 +703,25 @@ video::-webkit-media-controls-panel {
 </div>
 
 
+<!-- meeting details modal -->
+<!-- Meeting Details Modal -->
+<div id="meetingDetailsModal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Meeting Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Task:</strong> <span id="details-task-title"></span></p>
+                <p><strong>Reason:</strong> <span id="details-reason"></span></p>
+                <p><strong>Date:</strong> <span id="details-date"></span></p>
+                <p><strong>Time:</strong> <span id="details-time"></span></p>
+                <p><strong>Status:</strong> <span id="details-status"></span></p>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -1621,6 +1644,7 @@ document.addEventListener("DOMContentLoaded", function () {
 // MEETING MANAGEMENT (SORTABLE.JS)
 document.addEventListener("DOMContentLoaded", function () {
     const modal = new bootstrap.Modal(document.getElementById("meetingsModal"));
+    const detailsModal = new bootstrap.Modal(document.getElementById("meetingDetailsModal"));
 
     document.querySelector(".open-meeting-modal").addEventListener("click", function () {
         let orgId = this.dataset.orgId;
@@ -1639,6 +1663,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("pending-meetings").innerHTML = "";
                 document.getElementById("confirmed-meetings").innerHTML = "";
                 document.getElementById("cancelled-meetings").innerHTML = "";
+                document.getElementById("details-meetings").innerHTML = "";
 
                 data.meetings.forEach(meeting => {
                     let li = document.createElement("li");
@@ -1662,7 +1687,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function setupSortable() {
-        let statuses = ["pending-meetings", "confirmed-meetings", "cancelled-meetings"];
+        let statuses = ["pending-meetings", "confirmed-meetings", "cancelled-meetings", "details-meetings"];
         statuses.forEach(statusId => {
             new Sortable(document.getElementById(statusId), {
                 group: "meetings",
@@ -1670,7 +1695,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 onEnd: function (evt) {
                     let meetingId = evt.item.dataset.meetingId;
                     let newStatus = evt.to.id.replace("-meetings", ""); // Extract status from ID
-                    updateMeetingStatus(meetingId, newStatus);
+
+                    if (newStatus === "details") {
+                        fetchMeetingDetails(meetingId);
+                    } else {
+                        updateMeetingStatus(meetingId, newStatus);
+                    }
                 }
             });
         });
@@ -1683,7 +1713,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Content-Type": "application/json",
                 "X-CSRFToken": getCSRFToken()
             },
-            body: JSON.stringify({ meeting_id: meetingId, new_status: newStatus }) // ✅ Fixed key
+            body: JSON.stringify({ meeting_id: meetingId, new_status: newStatus })
         })
         .then(response => response.json())
         .then(data => {
@@ -1696,11 +1726,26 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error("Error updating meeting status:", error));
     }
 
+    function fetchMeetingDetails(meetingId) {
+        fetch(`/tasks/get-meeting-details/${meetingId}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("details-task-title").textContent = data.task_title;
+                document.getElementById("details-reason").textContent = data.reason;
+                document.getElementById("details-date").textContent = data.date;
+                document.getElementById("details-time").textContent = `${data.start_time} - ${data.end_time}`;
+                document.getElementById("details-status").textContent = data.status;
+
+                detailsModal.show();
+            })
+            .catch(error => console.error("Error fetching meeting details:", error));
+    }
+
     function getCSRFToken() {
-        let csrfTokenInput = document.querySelector("input[name='csrfmiddlewaretoken']");
-        return csrfTokenInput ? csrfTokenInput.value : "";
+        return document.querySelector("meta[name='csrf-token']").getAttribute("content");
     }
 });
+
 
 </script>
 </body>
