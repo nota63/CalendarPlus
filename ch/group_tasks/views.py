@@ -1501,7 +1501,7 @@ def set_reminder(request):
     return JsonResponse({"success": False, "message": "Failed to set reminder."})
 
 # TRASH THE MEETING
-@csrf_exempt
+@login_required
 def delete_meeting(request, meeting_id):
     if request.method == "POST":
         try:

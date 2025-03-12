@@ -711,6 +711,11 @@ video::-webkit-media-controls-panel {
                         <h6>Trash</h6>
                         <ul id="trash-meetings" class="sortable-list bg-light p-3"></ul>
                     </div>
+
+                    <div class="col-md-3">
+                        <h6>Instant Launch</h6>
+                        <ul id="launch-meetings" class="sortable-list bg-light p-3"></ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -847,7 +852,7 @@ video::-webkit-media-controls-panel {
     </div>
 </div>
 
-   
+<!----- ------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
 
 
@@ -1726,7 +1731,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function setupSortable() {
-        let statuses = ["pending-meetings", "confirmed-meetings", "cancelled-meetings", "details-meetings", "reply-meetings","remind-meetings","trash-meetings"];
+        let statuses = ["pending-meetings", "confirmed-meetings", "cancelled-meetings", "details-meetings", "reply-meetings","remind-meetings","trash-meetings","launch-meetings"];
         
         statuses.forEach(statusId => {
             new Sortable(document.getElementById(statusId), {
@@ -1747,6 +1752,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     else if (newStatus ==="trash") {
                         deleteMeeting(meetingId, evt.item);
                     }
+                    // launch instantly
+                    else if (newStatus==="launch"){
+                        launchMeeting(orgId);
+
+                    }
+
                     else if (newStatus==='remind'){
                         sendRemindRequest(meetingId, orgId, taskId);
                     }
@@ -1901,6 +1912,20 @@ function deleteMeeting(meetingId, item) {
     .catch(error => console.error("Error deleting meeting:", error));
 }
 
+
+// LAUNCH THE MEETING
+// 🚀 **Instant Launch Function**
+function launchMeeting(orgId) {
+    if (orgId) {
+        let launchURL = `http://127.0.0.1:8000/organizations/start_meeting/${orgId}/`;
+        window.location.href = launchURL; // Redirects user instantly
+    } else {
+        console.error("Organization ID is missing for Instant Launch.");
+    }
+}
+
+
+// CSRF TOKEN
     function getCSRFToken() {
         return document.querySelector("meta[name='csrf-token']").getAttribute("content");
     }
