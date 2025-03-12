@@ -56,7 +56,8 @@ urlpatterns = [
     path('fetch-meetings-sortable/<int:org_id>/<int:group_id>/<int:task_id>/',fetch_meetings_sortable, name='fetch_meetings_sortable'),
     path('update-meeting-status-sortable/',update_meeting_status_sortable, name='update_meeting_status_sortable'),
     path('get-meeting-details/<int:meeting_id>/',get_meeting_details,name='get_meeting_details'),
-    path('send-custom-reply/',send_custom_reply, name='send_custom_reply')
+    path('send-custom-reply/',send_custom_reply, name='send_custom_reply'),
+    path('set-reminder-meet/',set_reminder, name='set_reminder_meet')
   
   
   

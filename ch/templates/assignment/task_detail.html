@@ -1737,7 +1737,11 @@ document.addEventListener("DOMContentLoaded", function () {
                         fetchMeetingDetails(meetingId);
                     } else if (newStatus === "reply") {
                         openReplyModal(meetingId, orgId, taskId);
-                    } else {
+                    } 
+                    else if (newStatus==='remind'){
+                        sendRemindRequest(meetingId, orgId, taskId);
+                    }
+                    else {
                         updateMeetingStatus(meetingId, newStatus);
                     }
                 }
@@ -1839,6 +1843,32 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .catch(error => console.error("Error sending reply:", error));
     };
+
+    // SEND REMIND REQUEST
+    // Send Remind AJAX Request
+  function sendRemindRequest(meetingId, orgId, taskId) {
+    fetch("/tasks/set-reminder-meet/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken()
+        },
+        body: JSON.stringify({
+            meeting_id: meetingId,
+            org_id: orgId,
+            task_id: taskId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("We will remind you before the meeting!");
+        } else {
+            alert("Error setting reminder.");
+        }
+    })
+    .catch(error => console.error("Error:", error));
+}
 
     function getCSRFToken() {
         return document.querySelector("meta[name='csrf-token']").getAttribute("content");

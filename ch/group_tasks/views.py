@@ -1485,6 +1485,21 @@ def send_custom_reply(request):
     return JsonResponse({"error": "Invalid request"}, status=400)
 
 
+# SET REMINDER MEET
+def set_reminder(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        meeting_id = data.get("meeting_id")
+        org_id = data.get("org_id")
+        task_id = data.get("task_id")
+
+        # Reminder logic (Modify this as needed)
+        print(f"Reminder set for Meeting {meeting_id}")
+
+        return JsonResponse({"success": True, "message": "Reminder set successfully!"})
+    return JsonResponse({"success": False, "message": "Failed to set reminder."})
+
+
 
 
 
