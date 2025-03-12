@@ -1758,8 +1758,67 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 data.meetings.forEach(meeting => {
                     let li = document.createElement("li");
-                    li.className = "list-group-item";
-                    li.textContent = `${meeting.task_title} - ${meeting.reason} (${meeting.start_time} to ${meeting.end_time})`;
+                    // in development
+
+                    li.className = "sortable-item bg-white border border-gray-200 rounded-lg p-4 mb-3 shadow-sm hover:shadow-md transition-shadow duration-200 ease-in-out cursor-move";
+li.innerHTML = `
+  <div class="flex items-start justify-between">
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="w-2 h-2 rounded-full ${getStatusColor(meeting.status)}"></span>
+        <span class="text-sm font-medium text-gray-700 truncate">${meeting.task_title}</span>
+      </div>
+      <p class="text-xs text-gray-500 mb-2">${meeting.reason}</p>
+      <div class="flex items-center gap-3 text-xs text-gray-400">
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          ${meeting.start_time} - ${meeting.end_time}
+
+        </span>
+        <span class="flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+          ${meeting.requester}
+        </span>
+      </div>
+    </div>
+    <button class="p-1 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-600">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+      </svg>
+    </button>
+  </div>
+`;
+
+// Add helper function for status colors
+function getStatusColor(status) {
+  const colors = {
+    pending: 'bg-amber-400',
+    confirmed: 'bg-emerald-400',
+    cancelled: 'bg-red-400',
+    // Add more status colors as needed
+  };
+  return colors[status.toLowerCase()] || 'bg-gray-400';
+}
+
+// Helper function to format time
+function formatTime(timeString) {
+    if (!timeString) return "Invalid Time"; // Handle empty or null input
+
+    const date = new Date(timeString);
+
+    if (isNaN(date.getTime())) {
+        return "Invalid Time"; // Handle invalid date formats
+    }
+
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+}
+
+
+                    // till here
                     li.dataset.meetingId = meeting.id;
                     li.dataset.orgId = orgId;
                     li.dataset.taskId = taskId;
