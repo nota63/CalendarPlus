@@ -974,11 +974,12 @@ video::-webkit-media-controls-panel {
 
            <!-- meeting management -->
            <button 
-           class="btn btn-primary open-meeting-modal"
+           class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-white/50 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md open-meeting-modal"
            data-org-id="{{ organization.id }}"
            data-group-id="{{ group.id }}"
            data-task-id="{{ task.id }}"
        >
+       <span class="material-icons-sharp text-blue-600">event</span>
            Manage Meetings
        </button>
        
