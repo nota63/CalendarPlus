@@ -2401,7 +2401,7 @@ def delete_task_comment(request, org_id, group_id, task_id, comment_id):
 
 # Team leader side features
 
-# Fetch all members to whom he assigned the tasks
+# Fetch all members to whom manager assigned the tasks
 from django.views.generic import ListView
 from django.http import HttpResponseForbidden
 from django.db import models
@@ -2520,7 +2520,8 @@ class TaskDetailView(View):
         if task.created_by != user and not task.group.members.filter(user=user).exists():
             raise Http404("You don't have permission to view this task.")
         
-    
+        profile_pic = get_object_or_404(Profile, user=request.user, organization=organization).profile_picture
+
         comments = TaskComment.objects.filter(task=task).order_by('-created_at')
         notes = TaskNote.objects.filter(task=task).order_by('-created_at')
         time_tracking = TaskTimeTracking.objects.filter(task=task, user=user)
@@ -2539,6 +2540,7 @@ class TaskDetailView(View):
             'problems': problems,
             'tags': tags,
             'user': user,
+            'profile_pic':profile_pic,
         }
 
         return render(request, 'assignment/task_detail.html', context)

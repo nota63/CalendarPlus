@@ -1273,7 +1273,10 @@ video::-webkit-media-controls-panel {
             <div class="flex items-center gap-3 px-2 py-2 text-sm text-gray-600 hover:bg-white/50 rounded-lg transition-colors">
                 <div class="h-8 w-8 rounded-full bg-gradient-to-r from-blue-400 to-pink-300"></div>
                 <div>
-                    <p class="font-medium text-gray-700">John Doe</p>
+                    {% if profile_pic %}
+                       <img src="{{profile_pic.url}}" alt="my-profile">
+                    {% endif %}   
+                    <p class="font-medium text-gray-700">{{request.user.username}}</p>
                     <p class="text-xs text-gray-500">Project Manager</p>
                 </div>
             </div>
