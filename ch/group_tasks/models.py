@@ -688,3 +688,88 @@ class CommunicateTask(models.Model):
 
     def __str__(self):
         return f"Message by {self.sender} for Task {self.task.id}"
+
+
+# TASK REMINDER (PREMIUM)
+class TaskReminder(models.Model):
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="task_reminders")
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="task_reminders", null=True, blank=True)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="reminders")
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="set_reminders")
+
+    # Reminder Timing (Flexible Scheduling)
+    reminder_time = models.DateTimeField(null=True, blank=True)  # Exact reminder time
+    remind_x_minutes_before = models.PositiveIntegerField(null=True, blank=True)  # 30 min before
+    remind_x_hours_before = models.PositiveIntegerField(null=True, blank=True)  # 2 hours before
+    remind_x_days_before = models.PositiveIntegerField(null=True, blank=True)  # 1 day before
+    remind_x_weeks_before = models.PositiveIntegerField(null=True, blank=True)  # 1 week before
+    remind_x_months_before = models.PositiveIntegerField(null=True, blank=True)  # 1 month before
+
+    # Recurring Reminders
+    remind_assignee_every_morning = models.BooleanField(default=False)  # 9 AM daily
+    remind_assignee_every_evening = models.BooleanField(default=False)  # 6 PM daily
+    remind_every_x_days = models.PositiveIntegerField(null=True, blank=True)  # E.g., Every 3 days
+    remind_every_x_weeks = models.PositiveIntegerField(null=True, blank=True)  # E.g., Every 1 week
+    remind_every_x_months = models.PositiveIntegerField(null=True, blank=True)  # E.g., Every month
+
+    # Snooze Feature
+    snooze_until = models.DateTimeField(null=True, blank=True)  # If user snoozes a reminder
+
+    # Notification Type
+    notification_type = models.CharField(
+        max_length=20,
+        choices=[
+            ("email", "Email"),
+            ("in_app", "In-App Notification"),
+            ("push", "Push Notification"),
+            ("webhook", "Webhook (API)"),
+        ],
+        default="in_app",
+    )
+
+    # Priority-Based Reminders
+    priority = models.CharField(
+        max_length=10,
+        choices=[
+            ("low", "Low"),
+            ("medium", "Medium"),
+            ("high", "High"),
+            ("urgent", "Urgent"),
+        ],
+        default="medium",
+    )
+
+    # Status Fields
+    is_sent = models.BooleanField(default=False)  # Mark when reminder is sent
+    is_cancelled = models.BooleanField(default=False)  # Auto-cancel if task is completed
+    auto_reschedule = models.BooleanField(default=True)  # If true, auto-adjust for incomplete tasks
+
+    class Meta:
+        ordering = ["reminder_time"]
+
+    def __str__(self):
+        return f"Reminder for {self.task.title} at {self.reminder_time} (Priority: {self.priority})"
+
+    def save(self, *args, **kwargs):
+        # Prevent reminders in the past
+        if self.reminder_time and self.reminder_time < now():
+            raise ValueError("Reminder time cannot be in the past.")
+
+        # Auto-cancel if task is completed
+        if self.task.is_completed:
+            self.is_cancelled = True
+
+        # Auto-adjust reminders based on due date
+        if self.task.due_date:
+            if self.remind_x_minutes_before:
+                self.reminder_time = self.task.due_date - timedelta(minutes=self.remind_x_minutes_before)
+            if self.remind_x_hours_before:
+                self.reminder_time = self.task.due_date - timedelta(hours=self.remind_x_hours_before)
+            if self.remind_x_days_before:
+                self.reminder_time = self.task.due_date - timedelta(days=self.remind_x_days_before)
+            if self.remind_x_weeks_before:
+                self.reminder_time = self.task.due_date - timedelta(weeks=self.remind_x_weeks_before)
+            if self.remind_x_months_before:
+                self.reminder_time = self.task.due_date - timedelta(days=self.remind_x_months_before * 30)
+
+        super().save(*args, **kwargs)

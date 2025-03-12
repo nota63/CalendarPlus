@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect , get_list_or_404
-from .models import (Task, TaskNote, TaskComment , TaskTag, ActivityLog,RecentVisit,MeetingTaskQuery,CommunicateTask)
+from .models import (Task, TaskNote, TaskComment , TaskTag, ActivityLog,RecentVisit,MeetingTaskQuery,CommunicateTask,TaskReminder)
 from accounts.models import Organization, Profile
 from groups.models import Group
 from django.views import View
@@ -1505,12 +1505,89 @@ def set_reminder(request):
 def delete_meeting(request, meeting_id):
     if request.method == "POST":
         try:
-            meeting = MeetingOrganization.objects.get(id=meeting_id)
+            meeting = MeetingTaskQuery.objects.get(id=meeting_id)
             meeting.delete()
             return JsonResponse({"success": True, "message": "Meeting deleted successfully."})
         except MeetingOrganization.DoesNotExist:
             return JsonResponse({"success": False, "error": "Meeting not found."}, status=404)
     return JsonResponse({"success": False, "error": "Invalid request method."}, status=400)
+
+
+# HANDLE THE REMINDER
+@csrf_exempt  # Remove this if using CSRF token in AJAX
+def set_task_reminder(request, org_id, group_id, task_id):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+
+            # Fetch organization, group, and task
+            organization = get_object_or_404(Organization, id=org_id)
+            group = get_object_or_404(Group, id=group_id) if group_id != "null" else None
+            task = get_object_or_404(Task, id=task_id, organization=organization)
+
+            # Extract Reminder Data
+            reminder_time = data.get("reminder_time")
+            remind_x_minutes_before = data.get("remind_x_minutes_before")
+            remind_x_hours_before = data.get("remind_x_hours_before")
+            remind_x_days_before = data.get("remind_x_days_before")
+            remind_x_weeks_before = data.get("remind_x_weeks_before")
+            remind_x_months_before = data.get("remind_x_months_before")
+            remind_assignee_every_morning = data.get("remind_assignee_every_morning", False)
+            remind_assignee_every_evening = data.get("remind_assignee_every_evening", False)
+            remind_every_x_days = data.get("remind_every_x_days")
+            remind_every_x_weeks = data.get("remind_every_x_weeks")
+            remind_every_x_months = data.get("remind_every_x_months")
+            snooze_until = data.get("snooze_until")
+            notification_type = data.get("notification_type", "in_app")
+            priority = data.get("priority", "medium")
+
+            # Calculate Reminder Time if not provided
+            if not reminder_time and task.due_date:
+                if remind_x_minutes_before:
+                    reminder_time = task.due_date - timedelta(minutes=int(remind_x_minutes_before))
+                elif remind_x_hours_before:
+                    reminder_time = task.due_date - timedelta(hours=int(remind_x_hours_before))
+                elif remind_x_days_before:
+                    reminder_time = task.due_date - timedelta(days=int(remind_x_days_before))
+                elif remind_x_weeks_before:
+                    reminder_time = task.due_date - timedelta(weeks=int(remind_x_weeks_before))
+                elif remind_x_months_before:
+                    reminder_time = task.due_date - timedelta(days=int(remind_x_months_before) * 30)
+
+            # Convert reminder_time & snooze_until to datetime
+            reminder_time = reminder_time and now().strptime(reminder_time, "%Y-%m-%dT%H:%M:%S")
+            snooze_until = snooze_until and now().strptime(snooze_until, "%Y-%m-%dT%H:%M:%S")
+
+            # Create Task Reminder
+            reminder = TaskReminder.objects.create(
+                organization=organization,
+                group=group,
+                task=task,
+                created_by=request.user,
+                reminder_time=reminder_time,
+                remind_x_minutes_before=remind_x_minutes_before,
+                remind_x_hours_before=remind_x_hours_before,
+                remind_x_days_before=remind_x_days_before,
+                remind_x_weeks_before=remind_x_weeks_before,
+                remind_x_months_before=remind_x_months_before,
+                remind_assignee_every_morning=remind_assignee_every_morning,
+                remind_assignee_every_evening=remind_assignee_every_evening,
+                remind_every_x_days=remind_every_x_days,
+                remind_every_x_weeks=remind_every_x_weeks,
+                remind_every_x_months=remind_every_x_months,
+                snooze_until=snooze_until,
+                notification_type=notification_type,
+                priority=priority,
+            )
+
+            return JsonResponse({"status": "success", "message": "Reminder set successfully!", "reminder_id": reminder.id})
+
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)})
+
+    return JsonResponse({"status": "error", "message": "Invalid request method!"})
+
+
 
 
 
