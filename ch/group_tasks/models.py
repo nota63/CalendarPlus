@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import timedelta
 from django.utils.timezone import now
+
+
 # Create your models here.
 
 
@@ -751,25 +753,32 @@ class TaskReminder(models.Model):
         return f"Reminder for {self.task.title} at {self.reminder_time} (Priority: {self.priority})"
 
     def save(self, *args, **kwargs):
-        # Prevent reminders in the past
-        if self.reminder_time and self.reminder_time < now():
-            raise ValueError("Reminder time cannot be in the past.")
+    # Prevent reminders in the past
+      if self.reminder_time and self.reminder_time < now():
+        raise ValueError("Reminder time cannot be in the past.")
 
-        # Auto-cancel if task is completed
-        if self.task.is_completed:
-            self.is_cancelled = True
+      # Auto-cancel if task is completed
+      if self.task.status == "Completed":
+        self.is_cancelled = True
 
-        # Auto-adjust reminders based on due date
-        if self.task.due_date:
-            if self.remind_x_minutes_before:
-                self.reminder_time = self.task.due_date - timedelta(minutes=self.remind_x_minutes_before)
-            if self.remind_x_hours_before:
-                self.reminder_time = self.task.due_date - timedelta(hours=self.remind_x_hours_before)
-            if self.remind_x_days_before:
-                self.reminder_time = self.task.due_date - timedelta(days=self.remind_x_days_before)
-            if self.remind_x_weeks_before:
-                self.reminder_time = self.task.due_date - timedelta(weeks=self.remind_x_weeks_before)
-            if self.remind_x_months_before:
-                self.reminder_time = self.task.due_date - timedelta(days=self.remind_x_months_before * 30)
+      # Ensure values are integers before using timedelta
+      minutes_before = int(self.remind_x_minutes_before) if self.remind_x_minutes_before else 0
+      hours_before = int(self.remind_x_hours_before) if self.remind_x_hours_before else 0
+      days_before = int(self.remind_x_days_before) if self.remind_x_days_before else 0
+      weeks_before = int(self.remind_x_weeks_before) if self.remind_x_weeks_before else 0
+      months_before = int(self.remind_x_months_before) if self.remind_x_months_before else 0  # Months approximated as 30 days
 
-        super().save(*args, **kwargs)
+    # Auto-adjust reminders based on due date
+      if self.task.deadline:
+        if minutes_before:
+            self.reminder_time = self.task.deadline - timedelta(minutes=minutes_before)
+        if hours_before:
+            self.reminder_time = self.task.deadline - timedelta(hours=hours_before)
+        if days_before:
+            self.reminder_time = self.task.deadline - timedelta(days=days_before)
+        if weeks_before:
+            self.reminder_time = self.task.deadline - timedelta(weeks=weeks_before)
+        if months_before:
+            self.reminder_time = self.task.deadline - timedelta(days=months_before * 30)
+
+      super().save(*args, **kwargs)

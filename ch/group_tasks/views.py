@@ -1514,7 +1514,9 @@ def delete_meeting(request, meeting_id):
 
 
 # HANDLE THE REMINDER
-@csrf_exempt  # Remove this if using CSRF token in AJAX
+from django.utils import timezone
+
+@csrf_exempt  
 def set_task_reminder(request, org_id, group_id, task_id):
     if request.method == "POST":
         try:
@@ -1555,9 +1557,13 @@ def set_task_reminder(request, org_id, group_id, task_id):
                     reminder_time = task.due_date - timedelta(days=int(remind_x_months_before) * 30)
 
             # Convert reminder_time & snooze_until to datetime
-            reminder_time = reminder_time and now().strptime(reminder_time, "%Y-%m-%dT%H:%M:%S")
-            snooze_until = snooze_until and now().strptime(snooze_until, "%Y-%m-%dT%H:%M:%S")
+            # Convert reminder_time to datetime and make it timezone-aware
+            if reminder_time:
+               reminder_time = timezone.make_aware(datetime.strptime(reminder_time, "%Y-%m-%dT%H:%M"))
 
+            # Convert snooze_until to datetime and make it timezone-aware
+            if snooze_until:
+                snooze_until = timezone.make_aware(datetime.strptime(snooze_until, "%Y-%m-%dT%H:%M"))
             # Create Task Reminder
             reminder = TaskReminder.objects.create(
                 organization=organization,
@@ -1601,7 +1607,7 @@ def set_task_reminder(request, org_id, group_id, task_id):
 
 
 
-
+# ------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Add the task to my day 
 @login_required
 def add_to_my_day(request, org_id , group_id, task_id):

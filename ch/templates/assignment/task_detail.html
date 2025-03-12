@@ -918,6 +918,97 @@ video::-webkit-media-controls-panel {
 </div>
 
 
+<!-- SET-UP REMINDERS FOR THE TASK -->
+ <!-- Task Reminder Modal -->
+<div class="modal fade" id="taskReminderModal" tabindex="-1" aria-labelledby="taskReminderModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="taskReminderModalLabel">Set Task Reminder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="taskReminderForm">
+                    <input type="hidden" id="org_id">
+                    <input type="hidden" id="group_id">
+                    <input type="hidden" id="task_id">
+
+                    <!-- Reminder Time -->
+                    <div class="mb-3">
+                        <label for="reminder_time" class="form-label">Reminder Time</label>
+                        <input type="datetime-local" class="form-control" id="reminder_time">
+                    </div>
+
+                    <!-- Reminder Options -->
+                    <div class="mb-3">
+                        <label class="form-label">Remind Before:</label>
+                        <div class="row">
+                            <div class="col">
+                                <input type="number" class="form-control" id="remind_x_minutes_before" placeholder="Minutes">
+                            </div>
+                            <div class="col">
+                                <input type="number" class="form-control" id="remind_x_hours_before" placeholder="Hours">
+                            </div>
+                            <div class="col">
+                                <input type="number" class="form-control" id="remind_x_days_before" placeholder="Days">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recurring Reminders -->
+                    <div class="mb-3">
+                        <label class="form-label">Recurring Reminder:</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="remind_assignee_every_morning">
+                            <label class="form-check-label">Every Morning (9 AM)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="remind_assignee_every_evening">
+                            <label class="form-check-label">Every Evening (6 PM)</label>
+                        </div>
+                    </div>
+
+                    <!-- Snooze Until -->
+                    <div class="mb-3">
+                        <label for="snooze_until" class="form-label">Snooze Until</label>
+                        <input type="datetime-local" class="form-control" id="snooze_until">
+                    </div>
+
+                    <!-- Notification Type -->
+                    <div class="mb-3">
+                        <label class="form-label">Notification Type:</label>
+                        <div class="d-flex">
+                            <button type="button" class="btn btn-secondary me-2" id="emailNotification" disabled>📧 Email</button>
+                            <button type="button" class="btn btn-light text-muted" disabled>🔔 In-App</button>
+                            <button type="button" class="btn btn-light text-muted" disabled>📱 Push</button>
+                        </div>
+                    </div>
+
+                    <!-- Priority -->
+                    <div class="mb-3">
+                        <label for="priority" class="form-label">Priority</label>
+                        <select class="form-select" id="priority">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveReminderBtn">Save Reminder</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
 
 
 <!-------------------------------------------------------------------------------------------------------------------------------------------------------  -->
@@ -978,10 +1069,20 @@ video::-webkit-media-controls-panel {
            data-org-id="{{ organization.id }}"
            data-group-id="{{ group.id }}"
            data-task-id="{{ task.id }}"
-       >
-       <span class="material-icons-sharp text-blue-600">event</span>
+         >
+         <span class="material-icons-sharp text-blue-600">event</span>
            Manage Meetings
        </button>
+
+       <!-- Reminders -->
+       <button class="btn btn-primary set-reminder-btn"
+       data-org-id="{{ organization.id }}"
+       data-group-id="{{ group.id }}"
+       data-task-id="{{ task.id }}"
+       data-task-title="{{ task.title }}">
+       Set Reminder
+     </button>
+   
        
 
             
@@ -2140,6 +2241,64 @@ function launchMeeting(orgId) {
         return document.querySelector("meta[name='csrf-token']").getAttribute("content");
     }
 });
+
+
+// SET UP REMINDERS 
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = new bootstrap.Modal(document.getElementById("taskReminderModal"));
+    const form = document.getElementById("taskReminderForm");
+
+    // Open modal and set data
+    document.querySelectorAll(".set-reminder-btn").forEach(btn => {
+        btn.addEventListener("click", function () {
+            document.getElementById("org_id").value = this.dataset.orgId;
+            document.getElementById("group_id").value = this.dataset.groupId;
+            document.getElementById("task_id").value = this.dataset.taskId;
+
+            modal.show();
+        });
+    });
+
+    // Save Reminder
+    document.getElementById("saveReminderBtn").addEventListener("click", function () {
+        const org_id = document.getElementById("org_id").value;
+        const group_id = document.getElementById("group_id").value;
+        const task_id = document.getElementById("task_id").value;
+
+        const reminderData = {
+            reminder_time: document.getElementById("reminder_time").value || null,
+            remind_x_minutes_before: document.getElementById("remind_x_minutes_before").value || null,
+            remind_x_hours_before: document.getElementById("remind_x_hours_before").value || null,
+            remind_x_days_before: document.getElementById("remind_x_days_before").value || null,
+            remind_assignee_every_morning: document.getElementById("remind_assignee_every_morning").checked,
+            remind_assignee_every_evening: document.getElementById("remind_assignee_every_evening").checked,
+            snooze_until: document.getElementById("snooze_until").value || null,
+            notification_type: "email",  // Only Email allowed
+            priority: document.getElementById("priority").value
+        };
+
+        fetch(`/tasks/set-task-reminder/${org_id}/${group_id}/${task_id}/`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(reminderData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                alert("Reminder Set Successfully!");
+                modal.hide();
+            } else {
+                alert("Error: " + data.message);
+            }
+        })
+        .catch(error => alert("Failed to set reminder!"));
+    });
+});
+
+
+
+
+
 
 
 </script>
