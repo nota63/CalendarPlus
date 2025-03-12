@@ -870,27 +870,52 @@ video::-webkit-media-controls-panel {
 
 
 <!-- CUSTOM REPLY MODAL -->
+<!-- CUSTOM REPLY MODAL -->
 <div id="customReplyModal" class="modal fade" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Send Custom Reply</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content backdrop-blur-lg bg-white/30 border border-white/20 rounded-xl shadow-2xl">
+            <div class="modal-header border-b border-white/20 px-6 py-4">
+                <div class="flex flex-col space-y-1">
+                    <h5 class="modal-title text-xl font-bold text-slate-800 tracking-tight">
+                        ✨ Send Custom Reply
+                    </h5>
+                    <p class="text-sm text-slate-600 font-medium">
+                        Replying to <span class="text-indigo-600">@{{task.assigned_to.username}}</span> about 
+                        <span class="font-semibold text-slate-700">"{{task.title}}"</span>
+                    </p>
+                </div>
+                <button type="button" class="btn-close opacity-70 hover:opacity-100 transition-opacity" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <textarea id="custom-reply-text" class="form-control" rows="4" placeholder="Type your reply here..."></textarea>
-                <input type="hidden" id="reply-meeting-id">
-                <input type="hidden" id="reply-org-id">
-                <input type="hidden" id="reply-task-id">
+
+            <div class="modal-body px-6 py-4">
+                <div class="space-y-4">
+                    <textarea 
+                        id="custom-reply-text" 
+                        class="form-control focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 border-2 border-slate-200 rounded-xl p-3 bg-white/50 shadow-sm transition-all duration-300 placeholder-slate-400 text-slate-700" 
+                        rows="5" 
+                        placeholder="Compose your message here..."
+                    ></textarea>
+                    
+                    <div class="hidden">
+                        <input type="hidden" id="reply-meeting-id">
+                        <input type="hidden" id="reply-org-id">
+                        <input type="hidden" id="reply-task-id">
+                    </div>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" onclick="sendCustomReply()">Send Reply</button>
+
+            <div class="modal-footer border-t border-white/20 px-6 py-4 bg-white/20">
+                <button 
+                    onclick="sendCustomReply()"
+                    class="btn bg-gradient-to-r from-indigo-500 to-indigo-600 hover:to-indigo-700 text-white px-6 py-2.5 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
+                >
+                    <i class="fas fa-paper-plane mr-2"></i>
+                    Send Reply
+                </button>
             </div>
         </div>
     </div>
 </div>
-
-
 
 
 
