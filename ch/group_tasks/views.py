@@ -1368,8 +1368,61 @@ Best,
         logger.error(f"❌ Error in notify_task_cloned: {str(e)}")
 
 
+# FETCH TASK RELATED MEETINGS (sortable.js (drag&drop))
+# ✅ 1️⃣ Fetch Meetings for a Specific Task
+@login_required
+def fetch_meetings_sortable(request, org_id, group_id, task_id):
+    # Ensure task exists in the given organization & group
+    task = get_object_or_404(Task, id=task_id, group_id=group_id, organization_id=org_id)
+
+    # Fetch meetings related to this specific task
+    meetings = MeetingTaskQuery.objects.filter(organization_id=org_id, group_id=group_id, task_id=task_id)
+
+    meetings_data = [
+        {
+            "id": meeting.id,
+            "task_title": meeting.task.title,
+            "scheduled_by": meeting.scheduled_by.username,
+            "task_creator": meeting.task_creator.username,
+            "date": meeting.date.strftime("%Y-%m-%d") if meeting.date else "Not Scheduled",
+            "start_time": meeting.start_time.strftime("%H:%M"),
+            "end_time": meeting.end_time.strftime("%H:%M"),
+            "reason": meeting.get_reason_display(),
+            "status": meeting.status,
+            "meeting_link": meeting.meeting_link if meeting.meeting_link else "#",
+        }
+        for meeting in meetings
+    ]
+
+    return JsonResponse({"meetings": meetings_data}, status=200)
 
 
+# UPDATE THE MEETING STATUS
+# ✅ 2️⃣ Handle Status Update
+@login_required
+def update_meeting_status_sortable(request):
+    if request.method == "POST":
+        meeting_id = request.POST.get("meeting_id")
+        new_status = request.POST.get("new_status")
+
+        # Validate input
+        if not meeting_id or new_status not in ["pending", "confirmed", "cancelled"]:
+            return JsonResponse({"error": "Invalid request data."}, status=400)
+
+        # Fetch meeting object
+        meeting = get_object_or_404(MeetingTaskQuery, id=meeting_id)
+
+        # Check if the user is the task creator
+        if request.user != meeting.task.created_by:
+            return JsonResponse({"error": "Unauthorized action."}, status=403)
+
+        # Update status
+        meeting.status = new_status
+        meeting.save()
+
+        return JsonResponse({"success": "Meeting status updated successfully.", "new_status": new_status}, status=200)
+
+    return JsonResponse({"error": "Invalid request method."}, status=405)
 
 
 
