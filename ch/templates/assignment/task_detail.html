@@ -10,9 +10,14 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Inter Font-->
-   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-   <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Material+Icons+Round" rel="stylesheet">
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Material Symbols (Latest) -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
 
     <!-- Add in head -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -1199,88 +1204,91 @@ video::-webkit-media-controls-panel {
 
 
 <!-- SIDEBAR -->
- <!-- Sidebar Structure -->
-<div class="fixed left-0 top-0 h-screen w-64 bg-white/80 backdrop-blur-lg border-r border-white/30 shadow-xl z-50">
-    <!-- Sidebar Content -->
-    <div class="p-4 flex flex-col h-full">
+<!-- Inter Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- Material Symbols (Latest) -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<!-- Sidebar Structure -->
+<div class="fixed left-0 top-0 h-screen w-20 hover:w-64 transition-all duration-300 ease-in-out group border-r border-white/10 bg-gradient-to-b from-white/5 to-white/2 backdrop-blur-xl z-50">
+    <div class="flex flex-col h-full px-3 py-4 overflow-hidden">
         <!-- Logo Section -->
-        <div class="mb-8 px-2 py-3">
-            <h2 class="font-poppins text-2xl font-bold bg-gradient-to-r from-blue-600 to-pink-500 bg-clip-text text-transparent">
-                TaskFlow
-            </h2>
+        <div class="mb-8 px-2 flex items-center gap-3">
+            <div class="p-2 bg-gradient-to-tr from-blue-600 to-purple-500 rounded-lg shadow-lg">
+                <span class="material-symbols-rounded text-white text-2xl">task</span>
+            </div>
+            <span class="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">TaskFlow</span>
         </div>
 
         <!-- Navigation Items -->
-        <nav class="space-y-2 flex-1">
-            <!-- Your Button -->
-            <button class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-white/50 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md"
+        <nav class="flex-1 space-y-1.5">
+            <!-- Manage Subtasks -->
+            <button class="w-full flex items-center gap-4 px-3 py-3 text-sm font-medium text-gray-300 hover:bg-white/5 rounded-xl transition-all duration-200 hover:translate-x-2"
                 data-bs-toggle="modal" 
                 data-bs-target="#tasksSubtasksModal"
                 data-org-id="{{ organization.id }}" 
                 data-group-id="{{ group.id }}" 
                 data-task-id="{{ task.id }}">
-                <span class="material-icons-sharp text-blue-600">visibility</span>
-                <span class="bg-gradient-to-r from-blue-600 to-pink-600 bg-clip-text text-transparent font-semibold">
-                    Manage Subtasks
-                </span>
+                <span class="material-symbols-rounded text-blue-400 text-xl p-2 bg-white/10 rounded-lg shrink-0">subdirectory_arrow_right</span>
+                <span class="text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity">Manage Subtasks</span>
             </button>
 
-            <!-- clone task -->
-            <button class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-white/50 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md"
-             onclick="openCloneTaskModal('{{ organization.id }}', '{{ group.id }}', '{{ task.id }}')" 
-             data-bs-toggle="modal" 
-             data-bs-target="#cloneTaskModal"
-          
-            >
-            <span class="material-icons-sharp text-blue-600">content_copy</span>
-                Clone Task
-           </button>
+            <!-- Clone Task -->
+            <button class="w-full flex items-center gap-4 px-3 py-3 text-sm font-medium text-gray-300 hover:bg-white/5 rounded-xl transition-all duration-200 hover:translate-x-2"
+                onclick="openCloneTaskModal('{{ organization.id }}', '{{ group.id }}', '{{ task.id }}')"
+                data-bs-toggle="modal" 
+                data-bs-target="#cloneTaskModal"
+                >
+                <span class="material-symbols-rounded text-purple-400 text-xl p-2 bg-white/10 rounded-lg shrink-0">content_copy</span>
+                <span class="text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity">Clone Task</span>
+            </button>
 
-           <!-- meeting management -->
-           <button 
-           class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-white/50 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md open-meeting-modal"
-           data-org-id="{{ organization.id }}"
-           data-group-id="{{ group.id }}"
-           data-task-id="{{ task.id }}"
-         >
-         <span class="material-icons-sharp text-blue-600">event</span>
-           Manage Meetings
-       </button>
+            <!-- Meeting Management -->
+            <button class="w-full flex items-center gap-4 px-3 py-3 text-sm font-medium text-gray-300 hover:bg-white/5 rounded-xl transition-all duration-200 hover:translate-x-2 open-meeting-modal"
+                data-org-id="{{ organization.id }}"
+                data-group-id="{{ group.id }}"
+                data-task-id="{{ task.id }}">
+                <span class="material-symbols-rounded text-green-400 text-xl p-2 bg-white/10 rounded-lg shrink-0">video_call</span>
+                <span class="text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity">Meetings</span>
+            </button>
 
-       <!-- Reminders -->
-       <button class="btn btn-primary set-reminder-btn"
-       data-org-id="{{ organization.id }}"
-       data-group-id="{{ group.id }}"
-       data-task-id="{{ task.id }}"
-       data-task-title="{{ task.title }}">
-       Set Reminder
-     </button>
-   
-       
+            <!-- Reminders -->
+            <button class="w-full flex items-center gap-4 px-3 py-3 text-sm font-medium text-gray-300 hover:bg-white/5 rounded-xl transition-all duration-200 hover:translate-x-2 set-reminder-btn"
+                data-org-id="{{ organization.id }}"
+                data-group-id="{{ group.id }}"
+                data-task-id="{{ task.id }}"
+                data-task-title="{{ task.title }}">
+                <span class="material-symbols-rounded text-yellow-400 text-xl p-2 bg-white/10 rounded-lg shrink-0">notifications</span>
+                <span class="text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity">Reminders</span>
+            </button>
 
-            
-            <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-600 hover:bg-white/50 rounded-lg transition-colors">
-                <span class="material-icons-sharp text-gray-500">groups</span>
-                Teams
+            <!-- Teams -->
+            <a href="#" class="w-full flex items-center gap-4 px-3 py-3 text-sm font-medium text-gray-300 hover:bg-white/5 rounded-xl transition-all duration-200 hover:translate-x-2">
+                <span class="material-symbols-rounded text-pink-400 text-xl p-2 bg-white/10 rounded-lg shrink-0">groups</span>
+                <span class="text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity">Teams</span>
             </a>
         </nav>
 
-        <!-- Footer Section -->
-        <div class="border-t border-white/30 pt-4">
-            <div class="flex items-center gap-3 px-2 py-2 text-sm text-gray-600 hover:bg-white/50 rounded-lg transition-colors">
-                <div class="h-8 w-8 rounded-full bg-gradient-to-r from-blue-400 to-pink-300"></div>
-                <div>
+        <!-- Profile Section -->
+        <div class="border-t border-white/10 pt-4 mt-auto">
+            <div class="flex items-center gap-3 group-hover:px-2 transition-all">
+                <div class="relative shrink-0">
                     {% if profile_pic %}
-                       <img src="{{profile_pic.url}}" alt="my-profile">
-                    {% endif %}   
-                    <p class="font-medium text-gray-700">{{request.user.username}}</p>
-                    <p class="text-xs text-gray-500">Project Manager</p>
+                    <img src="{{profile_pic.url}}" alt="Profile" class="h-10 w-10 rounded-xl object-cover border-2 border-white/20">
+                    {% else %}
+                    <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center text-white font-medium">
+                        {{ request.user.username|first|upper }}
+                    </div>
+                    {% endif %}
+                    <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white/20"></div>
+                </div>
+                <div class="opacity-0 group-hover:opacity-100 transition-opacity">
+                    <p class="text-sm font-medium text-gray-200">{{ request.user.username }}</p>
+                    <p class="text-xs text-gray-400/80 font-light">Project Lead</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 <!----- ------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
 
