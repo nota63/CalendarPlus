@@ -696,6 +696,11 @@ video::-webkit-media-controls-panel {
                         <h6>Details</h6>
                         <ul id="details-meetings" class="sortable-list bg-light p-3"></ul>
                     </div>
+
+                    <div class="col-md-3">
+                        <h6>Custom Reply</h6>
+                        <ul id="reply-meetings" class="sortable-list bg-light p-3"></ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -725,7 +730,26 @@ video::-webkit-media-controls-panel {
     </div>
 </div>
 
-
+<!-- CUSTOM REPLY MODAL -->
+<div id="customReplyModal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Send Custom Reply</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <textarea id="custom-reply-text" class="form-control" rows="4" placeholder="Type your reply here..."></textarea>
+                <input type="hidden" id="reply-meeting-id">
+                <input type="hidden" id="reply-org-id">
+                <input type="hidden" id="reply-task-id">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="sendCustomReply()">Send Reply</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -1644,9 +1668,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // MEETING MANAGEMENT (SORTABLE.JS)
+// MEETING MANAGEMENT (SORTABLE.JS)
 document.addEventListener("DOMContentLoaded", function () {
     const modal = new bootstrap.Modal(document.getElementById("meetingsModal"));
     const detailsModal = new bootstrap.Modal(document.getElementById("meetingDetailsModal"));
+    const replyModal = new bootstrap.Modal(document.getElementById("customReplyModal"));
 
     document.querySelector(".open-meeting-modal").addEventListener("click", function () {
         let orgId = this.dataset.orgId;
@@ -1666,12 +1692,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("confirmed-meetings").innerHTML = "";
                 document.getElementById("cancelled-meetings").innerHTML = "";
                 document.getElementById("details-meetings").innerHTML = "";
+                document.getElementById("reply-meetings").innerHTML = ""; // Custom Reply section
 
                 data.meetings.forEach(meeting => {
                     let li = document.createElement("li");
                     li.className = "list-group-item";
                     li.textContent = `${meeting.task_title} - ${meeting.reason} (${meeting.start_time} to ${meeting.end_time})`;
                     li.dataset.meetingId = meeting.id;
+                    li.dataset.orgId = orgId;
+                    li.dataset.taskId = taskId;
 
                     // Append to respective section
                     if (meeting.status === "pending") {
@@ -1689,17 +1718,22 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function setupSortable() {
-        let statuses = ["pending-meetings", "confirmed-meetings", "cancelled-meetings", "details-meetings"];
+        let statuses = ["pending-meetings", "confirmed-meetings", "cancelled-meetings", "details-meetings", "reply-meetings"];
+        
         statuses.forEach(statusId => {
             new Sortable(document.getElementById(statusId), {
                 group: "meetings",
                 animation: 150,
                 onEnd: function (evt) {
                     let meetingId = evt.item.dataset.meetingId;
+                    let orgId = evt.item.dataset.orgId;
+                    let taskId = evt.item.dataset.taskId;
                     let newStatus = evt.to.id.replace("-meetings", ""); // Extract status from ID
 
                     if (newStatus === "details") {
                         fetchMeetingDetails(meetingId);
+                    } else if (newStatus === "reply") {
+                        openReplyModal(meetingId, orgId, taskId);
                     } else {
                         updateMeetingStatus(meetingId, newStatus);
                     }
@@ -1728,43 +1762,80 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error("Error updating meeting status:", error));
     }
 
-    // modifying
     function fetchMeetingDetails(meetingId) {
-    fetch(`/tasks/get-meeting-details/${meetingId}/`)
+        fetch(`/tasks/get-meeting-details/${meetingId}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("details-task-title").textContent = data.task_title;
+                document.getElementById("details-reason").textContent = data.reason;
+                document.getElementById("details-date").textContent = data.date;
+                document.getElementById("details-time").textContent = `${data.start_time} - ${data.end_time}`;
+                document.getElementById("details-status").textContent = data.status;
+
+                let hangoutContainer = document.getElementById("details-meeting_link");
+                hangoutContainer.innerHTML = "";
+
+                if (data.meeting_link) {
+                    let joinButton = document.createElement("a");
+                    joinButton.href = data.meeting_link;
+                    joinButton.target = "_blank";
+                    joinButton.className = "btn btn-primary mt-3";
+                    joinButton.textContent = "Join Meeting";
+
+                    hangoutContainer.appendChild(joinButton);
+                } else {
+                    hangoutContainer.textContent = "No meeting link available.";
+                }
+
+                detailsModal.show();
+            })
+            .catch(error => console.error("Error fetching meeting details:", error));
+    }
+
+    function openReplyModal(meetingId, orgId, taskId) {
+        document.getElementById("reply-meeting-id").value = meetingId;
+        document.getElementById("reply-org-id").value = orgId;
+        document.getElementById("reply-task-id").value = taskId;
+
+        replyModal.show();
+    }
+
+    window.sendCustomReply = function () {
+        let meetingId = document.getElementById("reply-meeting-id").value;
+        let orgId = document.getElementById("reply-org-id").value;
+        let taskId = document.getElementById("reply-task-id").value;
+        let replyText = document.getElementById("custom-reply-text").value.trim();
+
+        if (!replyText) {
+            alert("Please enter a reply before sending.");
+            return;
+        }
+
+        fetch(`/tasks/send-custom-reply/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken()
+            },
+            body: JSON.stringify({ 
+                meeting_id: meetingId, 
+                org_id: orgId, 
+                task_id: taskId, 
+                reply_text: replyText 
+            })
+        })
         .then(response => response.json())
         .then(data => {
-            document.getElementById("details-task-title").textContent = data.task_title;
-            document.getElementById("details-reason").textContent = data.reason;
-            document.getElementById("details-date").textContent = data.date;
-            document.getElementById("details-time").textContent = `${data.start_time} - ${data.end_time}`;
-            document.getElementById("details-status").textContent = data.status;
-
-            // ✅ Get the Hangout (meeting link) container
-            let hangoutContainer = document.getElementById("details-meeting_link");
-            hangoutContainer.innerHTML = ""; // Clear previous content
-
-            // ✅ Add the "Join Meeting" button dynamically if the meeting link exists
-            if (data.meeting_link) {
-                let joinButton = document.createElement("a");
-                joinButton.href = data.meeting_link;
-                joinButton.target = "_blank"; // Opens in a new tab
-                joinButton.className = "btn btn-primary mt-3";
-                joinButton.textContent = "Join Meeting";
-
-                // ✅ Append the button inside the Hangout container
-                hangoutContainer.appendChild(joinButton);
+            if (data.success) {
+                alert("Reply sent successfully!");
+                replyModal.hide();
+                document.getElementById("custom-reply-text").value = ""; // Clear input
             } else {
-                hangoutContainer.textContent = "No meeting link available.";
+                alert("Error sending reply: " + data.error);
             }
-
-            // ✅ Show the modal
-            let detailsModal = new bootstrap.Modal(document.getElementById("meetingDetailsModal"));
-            detailsModal.show();
         })
-        .catch(error => console.error("Error fetching meeting details:", error));
-}
-
-
+        .catch(error => console.error("Error sending reply:", error));
+    };
 
     function getCSRFToken() {
         return document.querySelector("meta[name='csrf-token']").getAttribute("content");

@@ -1449,6 +1449,41 @@ def get_meeting_details(request, meeting_id):
     return JsonResponse(data, status=200)
 
 
+# HANDLE CUSTOM REPLY
+from .utils import send_reply
+
+@csrf_exempt
+def send_custom_reply(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            meeting_id = data.get("meeting_id")
+            org_id = data.get("org_id")
+            task_id = data.get("task_id")
+            reply_text = data.get("reply_text")
+
+            print('RECIEVED TEXT:',reply_text)
+
+            meeting = MeetingTaskQuery.objects.get(id=meeting_id, organization_id=org_id)
+            task = Task.objects.get(id=task_id)
+            organization=get_object_or_404(Organization, id=org_id)
+
+            # Here, send the reply to meeting.created_by (modify as needed)
+            recipient = meeting.scheduled_by
+            message = f"Custom Reply for Task '{task.title}': {reply_text}"
+
+            # Simulate sending message (you can integrate email/notifications)
+            print(f"Message sent to {recipient.email}: {message}")
+
+            # send the email
+            send_reply(org_id=organization.id, task_id=task.id, meeting_id=meeting.id, reply_text=reply_text)
+
+            return JsonResponse({"success": True, "message": "Reply sent successfully."})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
 
 
 
