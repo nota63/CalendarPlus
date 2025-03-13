@@ -56,36 +56,77 @@
 
 
 /* search box highlight */
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    position: relative;
+}
+
+/* 🔍 Search Input - Positioned at Top-Right */
+.search-container {
+    position: fixed;
+    top: 10px;
+    right: 20px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.search-box {
+    width: 250px;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #007bff;
+    border-radius: 20px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.search-box:focus {
+    border-color: #0056b3;
+    box-shadow: 0px 0px 8px rgba(0, 123, 255, 0.5);
+}
+
+/* 🎛️ Controls - Initially Hidden */
+.controls {
+    display: none; 
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 5px 10px;
+    border-radius: 10px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.counter {
+    font-weight: bold;
+    color: #333;
+}
+
+.btn {
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    transition: 0.2s ease;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+.btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* 🟡 Highlighted Text */
 .highlight {
     background-color: yellow;
     color: black;
     font-weight: bold;
     padding: 2px;
     border-radius: 3px;
-}
-.search-box {
-    width: 300px;
-    padding: 10px;
-    font-size: 16px;
-    margin-right: 5px;
-}
-.controls {
-    margin-bottom: 10px;
-}
-.counter {
-    font-weight: bold;
-    margin-right: 10px;
-}
-.btn {
-    padding: 6px 10px;
-    font-size: 14px;
-    cursor: pointer;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    border-radius: 5px;
-}
-.btn:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
 }
