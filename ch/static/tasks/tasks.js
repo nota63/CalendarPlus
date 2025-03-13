@@ -291,15 +291,25 @@ document.addEventListener("DOMContentLoaded", function () {
 // ✅ Firecracker Animation with Smooth Effect
 function startFireworks() {
     const fireworksContainer = document.createElement("div");
-    fireworksContainer.id = "fireworks-container";
+    fireworksContainer.className = "fixed inset-0 pointer-events-none z-[9999]";
     document.body.appendChild(fireworksContainer);
 
     for (let i = 0; i < 500; i++) {
         const firework = document.createElement("div");
-        firework.className = "firework";
+        firework.className = `
+            absolute w-[3px] h-[3px] rounded-full 
+            bg-gradient-to-r from-yellow-400 to-red-500 
+            shadow-[0_0_8px_#f59e0b] animate-sparkle
+            transition-opacity duration-1000
+        `;
         firework.style.left = Math.random() * 100 + "vw";
         firework.style.top = Math.random() * 100 + "vh";
         fireworksContainer.appendChild(firework);
+
+        // Add secondary animation effect
+        setTimeout(() => {
+            firework.classList.add("opacity-0", "scale-150");
+        }, Math.random() * 1000);
 
         setTimeout(() => {
             firework.remove();
@@ -311,18 +321,53 @@ function startFireworks() {
     }, 5000);
 }
 
-// ✅ Show Glassmorphism Success Message
 function showSuccessMessage() {
     const messageDiv = document.createElement("div");
-    messageDiv.id = "success-message";
+    messageDiv.className = `
+        fixed inset-0 z-[10000] flex items-center justify-center 
+        backdrop-blur-sm transition-all duration-1000
+    `;
     messageDiv.innerHTML = `
-        <div class="glassmorphism-box">
-            <span class="checkmark">✔</span> Task Approved & Completed! 🎉
+        <div class="
+            glass-morphism bg-white/10 border border-white/20
+            rounded-2xl p-8 shadow-2xl transform 
+            animate-jump-in animate-duration-500 animate-ease-out
+        ">
+            <div class="flex flex-col items-center space-y-4">
+                <span class="
+                    text-4xl text-emerald-400 animate-bounce 
+                    animate-infinite animate-duration-1000
+                ">✔</span>
+                <p class="
+                    text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 
+                    bg-clip-text text-transparent tracking-wide
+                    animate-pulse animate-duration-1000
+                ">
+                    Task Approved & Completed! 🎉
+                </p>
+            </div>
         </div>
     `;
     document.body.appendChild(messageDiv);
 
     setTimeout(() => {
-        messageDiv.remove();
+        messageDiv.classList.add("opacity-0", "backdrop-blur-none");
+        setTimeout(() => messageDiv.remove(), 1000);
     }, 5000);
 }
+
+// Add custom animations to head
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes sparkle {
+        0% { transform: scale(1); opacity: 1; }
+        100% { transform: scale(3); opacity: 0; }
+    }
+    .animate-sparkle { animation: sparkle 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    
+    .glass-morphism {
+        backdrop-filter: blur(16px) saturate(180%);
+        -webkit-backdrop-filter: blur(16px) saturate(180%);
+    }
+`;
+document.head.appendChild(style);
