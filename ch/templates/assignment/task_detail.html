@@ -1234,45 +1234,91 @@ video::-webkit-media-controls-panel {
  <!-- Task Approval Modal -->
 <div class="modal fade" id="taskApprovalModal" tabindex="-1" aria-labelledby="taskApprovalModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content p-4">
-            <div class="modal-header">
-                <h3 class="modal-title fw-bold text-primary">Task Approval Request</h3>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-
-            <div class="modal-body">
-                <p class="fs-5">The user has **submitted a request** for task approval. <br>
-                    **System Scan Completed ✅** - No issues found.</p>
-                
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">✅ Comments Verified</li>
-                    <li class="list-group-item">✅ Chats Analyzed</li>
-                    <li class="list-group-item">✅ Files & Attachments Checked</li>
-                    <li class="list-group-item">✅ Activity Log Reviewed</li>
-                    <li class="list-group-item">✅ Time Spent Evaluated</li>
-                    <li class="list-group-item">✅ Problems & Errors Resolved</li>
-                </ul>
-
-                <div class="mt-4">
-                    <label for="managerPassword" class="form-label fw-bold">Enter Password:</label>
-                    <input type="password" class="form-control" id="managerPassword" placeholder="Your Password">
-                    <p class="text-danger mt-2" id="approvalError"></p>
+        <div class="modal-content overflow-hidden" style="font-family: 'Poppins', sans-serif">
+            <div class="bg-white/50 backdrop-blur-lg rounded-2xl shadow-xl">
+                <!-- Modal Header -->
+                <div class="p-6 border-b border-white/20">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                            <i class="material-icons-round text-blue-600 align-text-bottom mr-2">task_alt</i>
+                            Task Approval Request
+                        </h3>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
                 </div>
-            </div>
 
-            <div class="modal-footer">
-                <button class="btn btn-danger w-50" id="rejectTask">
-                    <span id="rejectSpinner" class="spinner-border spinner-border-sm d-none"></span>
-                    Reject Task ❌
-                </button>
-                <button class="btn btn-success w-50" id="approveTask">
-                    <span id="approveSpinner" class="spinner-border spinner-border-sm d-none"></span>
-                    Approve & Complete Task 🎉
-                </button>
+                <!-- Modal Body -->
+                <div class="modal-body p-6 space-y-6">
+                    <div class="bg-blue-50/50 rounded-xl p-4 border border-blue-100">
+                        <p class="text-gray-700 leading-relaxed">
+                            {{task.assigned_to.username}} has <strong>submitted a request</strong> for task approval.<br>
+                            <strong class="text-emerald-600 font-medium">
+                                <i class="material-icons-round text-sm align-middle">verified</i> 
+                                System Scan Completed
+                            </strong> - No issues found.
+                        </p>
+                    </div>
+
+                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-4 list-unstyled">
+                        <li class="flex items-center space-x-3 bg-white/80 p-3 rounded-lg border border-white/20">
+                            <i class="material-icons-round text-emerald-500">check_circle</i>
+                            <span>Comments Verified</span>
+                        </li>
+                        <li class="flex items-center space-x-3 bg-white/80 p-3 rounded-lg border border-white/20">
+                            <i class="material-icons-round text-emerald-500">check_circle</i>
+                            <span>Chats Analyzed</span>
+                        </li>
+                        <li class="flex items-center space-x-3 bg-white/80 p-3 rounded-lg border border-white/20">
+                            <i class="material-icons-round text-emerald-500">check_circle</i>
+                            <span>Files & Attachments Checked</span>
+                        </li>
+                        <li class="flex items-center space-x-3 bg-white/80 p-3 rounded-lg border border-white/20">
+                            <i class="material-icons-round text-emerald-500">check_circle</i>
+                            <span>Activity Log Reviewed</span>
+                        </li>
+                        <li class="flex items-center space-x-3 bg-white/80 p-3 rounded-lg border border-white/20">
+                            <i class="material-icons-round text-emerald-500">check_circle</i>
+                            <span>Time Spent Evaluated</span>
+                        </li>
+                        <li class="flex items-center space-x-3 bg-white/80 p-3 rounded-lg border border-white/20">
+                            <i class="material-icons-round text-emerald-500">check_circle</i>
+                            <span>Problems & Errors Resolved</span>
+                        </li>
+                    </ul>
+
+                    <div class="mt-4">
+                        <label for="managerPassword" class="form-label fw-bold">Enter Password:</label>
+                        <div class="relative">
+                            <input type="password" 
+                                   class="form-control w-full px-4 py-2.5 rounded-lg border border-gray-200"
+                                   id="managerPassword" 
+                                   placeholder="Your Password">
+                            <i class="material-icons-round absolute right-3 top-3 text-gray-400">lock</i>
+                        </div>
+                        <p class="text-danger mt-2" id="approvalError"></p>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer p-6 pt-0">
+                    <div class="grid grid-cols-2 gap-4 w-full">
+                        <button class="btn btn-danger w-full py-3 text-white rounded-lg font-semibold transition-all"
+                                id="rejectTask">
+                            <span id="rejectSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                            Reject Task ❌
+                        </button>
+                        <button class="btn btn-success w-full py-3 text-white rounded-lg font-semibold transition-all"
+                                id="approveTask">
+                            <span id="approveSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                            Approve & Complete Task 🎉
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
 
 <!-------------------------------------------------------------------------------------------------------------------------------------------------------  -->
    
