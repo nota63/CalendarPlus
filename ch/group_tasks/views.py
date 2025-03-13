@@ -1719,6 +1719,7 @@ def approve_or_reject_task(request):
             # ❌ Reject Task
             elif action == "reject":
                 task.status = "need_changes"
+                task.progress=50
                 task.save()
                 return JsonResponse({"status": "success", "message": "Task has been rejected & set to Need Changes!", "approved": False}, status=200)
 
