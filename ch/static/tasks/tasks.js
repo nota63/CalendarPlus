@@ -76,6 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
 // Handle live in-page search
 document.addEventListener("DOMContentLoaded", function () {
     const searchInput = document.getElementById("searchEverything");
+    const searchControls = document.getElementById("searchControls");
     const searchCounter = document.getElementById("searchCounter");
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
@@ -89,9 +90,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const searchText = searchInput.value.trim().toLowerCase();
 
         if (searchText !== "") {
+            searchControls.style.display = "block"; // Show controls
             matches = highlightMatches(searchText);
             updateCounter();
         } else {
+            searchControls.style.display = "none"; // Hide controls
             matches = [];
             updateCounter();
         }
@@ -190,5 +193,6 @@ document.addEventListener("DOMContentLoaded", function () {
     clearBtn.addEventListener("click", function () {
         searchInput.value = "";
         removeHighlights();
+        searchControls.style.display = "none"; // Hide controls after clearing
     });
 });
