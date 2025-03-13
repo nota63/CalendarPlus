@@ -1337,9 +1337,13 @@ video::-webkit-media-controls-panel {
 </div>
 <!----- ------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
-
-<input type="text" id="searchEverything" class="search-box" placeholder="Search everything on this page...">
-
+<div class="controls">
+    <input type="text" id="searchEverything" class="search-box" placeholder="Search everything...">
+    <span class="counter" id="searchCounter">0 results</span>
+    <button class="btn" id="prevBtn" disabled>⬅ Prev</button>
+    <button class="btn" id="nextBtn" disabled>Next ➡</button>
+    <button class="btn" id="clearBtn">Clear</button>
+</div>
     <!-- Main Content -->
     <div class="container py-4">
         <!-- Task Header -->

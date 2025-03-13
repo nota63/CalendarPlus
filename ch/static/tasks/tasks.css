@@ -67,6 +67,25 @@
     width: 300px;
     padding: 10px;
     font-size: 16px;
+    margin-right: 5px;
+}
+.controls {
     margin-bottom: 10px;
-    display: block;
+}
+.counter {
+    font-weight: bold;
+    margin-right: 10px;
+}
+.btn {
+    padding: 6px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+}
+.btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
 }
