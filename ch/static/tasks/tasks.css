@@ -53,3 +53,20 @@
         transform: scale(1);
     }
 }
+
+
+/* search box highlight */
+.highlight {
+    background-color: yellow;
+    color: black;
+    font-weight: bold;
+    padding: 2px;
+    border-radius: 3px;
+}
+.search-box {
+    width: 300px;
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 10px;
+    display: block;
+}

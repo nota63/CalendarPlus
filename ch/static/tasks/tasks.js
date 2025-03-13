@@ -71,3 +71,58 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+
+// Handle live in-page search
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("searchEverything");
+
+    searchInput.addEventListener("input", function () {
+        const searchText = searchInput.value.trim().toLowerCase();
+        removeHighlights();
+
+        if (searchText !== "") {
+            highlightMatches(searchText);
+        }
+    });
+
+    function highlightMatches(searchText) {
+        const textNodes = getTextNodes(document.body);
+        
+        textNodes.forEach(node => {
+            const text = node.nodeValue.toLowerCase();
+            const parent = node.parentNode;
+
+            if (text.includes(searchText) && !parent.classList.contains("highlight")) {
+                const regex = new RegExp(`(${searchText})`, "gi");
+                const newHTML = node.nodeValue.replace(regex, `<span class="highlight">$1</span>`);
+                
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = newHTML;
+
+                while (tempDiv.firstChild) {
+                    parent.insertBefore(tempDiv.firstChild, node);
+                }
+
+                parent.removeChild(node);
+            }
+        });
+    }
+
+    function getTextNodes(element) {
+        let textNodes = [];
+        const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
+
+        while (walker.nextNode()) {
+            textNodes.push(walker.currentNode);
+        }
+
+        return textNodes;
+    }
+
+    function removeHighlights() {
+        document.querySelectorAll(".highlight").forEach(span => {
+            span.replaceWith(span.textContent);
+        });
+    }
+});
