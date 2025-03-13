@@ -1,5 +1,6 @@
 
 // DELETE THE TASK - MANAGER ONLY
+// DELETE THE TASK - MANAGER ONLY
 document.addEventListener("DOMContentLoaded", function () {
     const confirmDeleteBtn = document.getElementById("confirmDeleteTask");
     const errorMsg = document.getElementById("taskDeleteError");
@@ -26,6 +27,11 @@ document.addEventListener("DOMContentLoaded", function () {
             errorMsg.textContent = "Password is required!";
             return;
         }
+
+        // Store original button text & add spinner
+        const originalText = confirmDeleteBtn.innerHTML;
+        confirmDeleteBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...`;
+        confirmDeleteBtn.disabled = true; // Disable button to prevent multiple clicks
 
         fetch("/tasks/task-delete-view/", {
             method: "POST",
@@ -54,10 +60,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 }, 2000);
             } else {
                 errorMsg.textContent = data.message;
+                confirmDeleteBtn.innerHTML = originalText; // Restore button text
+                confirmDeleteBtn.disabled = false;
             }
         })
         .catch(error => {
             errorMsg.textContent = "Something went wrong. Try again.";
+            confirmDeleteBtn.innerHTML = originalText; // Restore button text
+            confirmDeleteBtn.disabled = false;
         });
     });
 });
