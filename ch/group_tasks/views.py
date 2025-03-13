@@ -40,6 +40,7 @@ import json
 import os
 from django.core.files.base import ContentFile
 from django.core.exceptions import ObjectDoesNotExist
+from .utils import send_reply,after_task_deletion
 # Create your views here.
 
 
@@ -1450,7 +1451,7 @@ def get_meeting_details(request, meeting_id):
 
 
 # HANDLE CUSTOM REPLY
-from .utils import send_reply
+
 
 @csrf_exempt
 def send_custom_reply(request):
@@ -1620,6 +1621,8 @@ def task_delete_view(request):
             # Authenticate user password
             if not user.check_password(password):
                 return JsonResponse({"status": "error", "message": "Incorrect password. Task deletion failed."}, status=401)
+            
+            after_task_deletion(org_id=organization.id,group_id=group.id,task_id=task.id)
 
             # Delete Task
             task.delete()
