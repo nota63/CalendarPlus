@@ -222,3 +222,77 @@ body {
     font-size: 3rem;
     color: green;
 }
+
+
+/* approval btn animation */
+@keyframes urgentGlow {
+    0% {
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 25px 10px rgba(59, 130, 246, 0.6);
+    }
+    100% {
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+    }
+  }
+  
+  button[id="openTaskApprovalModal"] {
+    animation: urgentGlow 1.5s ease-in-out infinite;
+    position: relative;
+    border: 1px solid rgba(59, 130, 246, 0.3) !important;
+  }
+  
+  button[id="openTaskApprovalModal"] span:last-child {
+    position: relative;
+    color: #3B82F6 !important;
+    opacity: 1 !important;
+    font-weight: 700 !important;
+    padding-right: 1.2rem;
+  }
+  
+  button[id="openTaskApprovalModal"] span:last-child::after {
+    content: "ACTION NEEDED";
+    position: absolute;
+    right: 0;
+    top: -5px;
+    background: #3B82F6;
+    color: white;
+    font-size: 0.65rem;
+    padding: 2px 5px;
+    border-radius: 3px;
+    animation: textPulse 1s ease-in-out infinite;
+  }
+  
+  @keyframes textPulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+  }
+  
+  button[id="openTaskApprovalModal"] span:first-child {
+    background-color: rgba(59, 130, 246, 0.15) !important;
+    color: #3B82F6 !important;
+    animation: iconPulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes iconPulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+      filter: brightness(1.2);
+    }
+  }
+  
+  /* Maintain original hover transition */
+  button[id="openTaskApprovalModal"]:hover {
+    transform: translateX(0) !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+  }
