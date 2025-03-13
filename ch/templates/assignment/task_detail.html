@@ -1354,13 +1354,15 @@ video::-webkit-media-controls-panel {
           </button>
 
           <!-- Manager Approval Button -->
-           <button class="w-full flex items-center gap-4 px-3 py-3 text-sm font-medium text-gray-300 hover:bg-white/5 rounded-xl transition-all duration-200 hover:translate-x-2" id="openTaskApprovalModal"
-              data-org-id="{{ organization.id }}"
-              data-group-id="{{ group.id }}"
-              data-task-id="{{ task.id }}">
-              <span class="material-symbols-rounded text-pink-400 text-xl p-2 bg-white/10 rounded-lg shrink-0">task</span>
-              <span class="text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity">Approve Task</span>
-           </button>
+           {% if task.status == 'pending_approval' %}
+              <button class="w-full flex items-center gap-4 px-3 py-3 text-sm font-medium text-gray-300 hover:bg-white/5 rounded-xl transition-all duration-200 hover:translate-x-2" id="openTaskApprovalModal"
+                data-org-id="{{ organization.id }}"
+                data-group-id="{{ group.id }}"
+                data-task-id="{{ task.id }}">
+               <span class="material-symbols-rounded text-pink-400 text-xl p-2 bg-white/10 rounded-lg shrink-0">task</span>
+               <span class="text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity">Approve Task</span>
+              </button>
+            {% endif %}
 
 
 
