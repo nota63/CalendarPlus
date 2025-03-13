@@ -1622,6 +1622,7 @@ def task_delete_view(request):
             if not user.check_password(password):
                 return JsonResponse({"status": "error", "message": "Incorrect password. Task deletion failed."}, status=401)
             
+            # notify the user about task deletion
             after_task_deletion(org_id=organization.id,group_id=group.id,task_id=task.id)
 
             # Delete Task
