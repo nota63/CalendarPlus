@@ -169,7 +169,7 @@ body {
 
 
 /* FIRE CRACKERS AFTER APPROVAL */
-/* Firecracker Animation */
+/* ✅ Firecracker Animation */
 #fireworks-container {
     position: fixed;
     top: 0;
@@ -177,50 +177,68 @@ body {
     width: 100vw;
     height: 100vh;
     pointer-events: none;
-    overflow: hidden;
     z-index: 9999;
 }
 
 .firework {
     position: absolute;
-    width: 5px;
-    height: 5px;
-    background: red;
+    width: 10px;
+    height: 10px;
+    background: linear-gradient(45deg, #ff007b, #ffdd00, #00ffb3);
     border-radius: 50%;
-    animation: explode 1s linear infinite;
+    animation: explode 1.5s ease-out forwards;
 }
 
 @keyframes explode {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(2); opacity: 0.5; }
-    100% { transform: scale(3); opacity: 0; }
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.5);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
 }
 
-/* Success Message */
+/* ✅ Glassmorphism Success Message */
 #success-message {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 2rem;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 20px 40px;
+    border-radius: 15px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+    font-size: 24px;
     font-weight: bold;
-    color: #28a745;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
-    z-index: 99999;
-}
-
-.success-text {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    color: white;
+    text-align: center;
+    z-index: 10000;
 }
 
 .checkmark {
-    font-size: 3rem;
-    color: green;
+    display: inline-block;
+    font-size: 30px;
+    color: limegreen;
+    margin-right: 10px;
+    animation: popIn 0.5s ease-out forwards;
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 

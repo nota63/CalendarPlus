@@ -1676,7 +1676,7 @@ def task_completion_request_view(request):
     return JsonResponse({"status": "error", "message": "Invalid request method."}, status=400)
 
 
-# MANAGER SIDE (TASK APPROVE)
+# MANAGER SIDE (TASK APPROVE OR REJECT)
 @csrf_exempt
 def approve_or_reject_task(request):
     if request.method == "POST":

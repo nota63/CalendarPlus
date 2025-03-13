@@ -260,6 +260,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.querySelector(".modal-backdrop").remove();
 
                 if (data.approved) {
+                    // ✅ Trigger Firecrackers Animation
                     startFireworks();
                     showSuccessMessage();
                 } else {
@@ -286,3 +287,42 @@ document.addEventListener("DOMContentLoaded", function () {
         rejectTaskBtn.addEventListener("click", () => handleTaskAction("reject"));
     }
 });
+
+// ✅ Firecracker Animation with Smooth Effect
+function startFireworks() {
+    const fireworksContainer = document.createElement("div");
+    fireworksContainer.id = "fireworks-container";
+    document.body.appendChild(fireworksContainer);
+
+    for (let i = 0; i < 500; i++) {
+        const firework = document.createElement("div");
+        firework.className = "firework";
+        firework.style.left = Math.random() * 100 + "vw";
+        firework.style.top = Math.random() * 100 + "vh";
+        fireworksContainer.appendChild(firework);
+
+        setTimeout(() => {
+            firework.remove();
+        }, 3000 + Math.random() * 2000);
+    }
+
+    setTimeout(() => {
+        fireworksContainer.remove();
+    }, 5000);
+}
+
+// ✅ Show Glassmorphism Success Message
+function showSuccessMessage() {
+    const messageDiv = document.createElement("div");
+    messageDiv.id = "success-message";
+    messageDiv.innerHTML = `
+        <div class="glassmorphism-box">
+            <span class="checkmark">✔</span> Task Approved & Completed! 🎉
+        </div>
+    `;
+    document.body.appendChild(messageDiv);
+
+    setTimeout(() => {
+        messageDiv.remove();
+    }, 5000);
+}
