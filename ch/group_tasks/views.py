@@ -40,7 +40,7 @@ import json
 import os
 from django.core.files.base import ContentFile
 from django.core.exceptions import ObjectDoesNotExist
-from .utils import send_reply,after_task_deletion
+from .utils import (send_reply,after_task_deletion,task_submission_approval)
 # Create your views here.
 
 
@@ -1665,6 +1665,8 @@ def task_completion_request_view(request):
             # ✅ Send request to task.created_by for approval
             task.status = "pending_approval"
             task.save()
+            # send task approval to the manager
+            task_submission_approval(org_id=organization.id, group_id=group_id,task_id=task.id)
 
             return JsonResponse({"status": "success", "message": "Task completion request sent for approval."})
 

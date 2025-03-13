@@ -4,6 +4,9 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
 from groups.models import Group
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+
 
 # send the reply
 def send_reply(org_id,task_id,meeting_id,reply_text):
@@ -22,7 +25,6 @@ def send_reply(org_id,task_id,meeting_id,reply_text):
 
 
 # SEND EMAIL AFTER TASK DELETION
-
 def after_task_deletion(org_id, group_id,task_id):
     organization=get_object_or_404(Organization,id=org_id)
     task=get_object_or_404(Task, id=task_id)
@@ -37,7 +39,33 @@ def after_task_deletion(org_id, group_id,task_id):
     send_mail(subject,message,from_email,recipient_list)
 
 
+# SEND TASK SUBMISSION APPROVAL TO THE MANAGER
+def task_submission_approval(org_id, group_id, task_id):
+    organization = get_object_or_404(Organization, id=org_id)
+    group = get_object_or_404(Group, id=group_id, organization=organization)
+    task = get_object_or_404(Task, id=task_id, group=group, organization=organization)
 
+    # ✅ Get manager email (task.created_by)
+    manager_email = task.created_by.email
+
+    # ✅ Render email content
+    subject = f"Approval Required: Task '{task.title}' Submission"
+    html_message = render_to_string("task/email/task_submission_email.html", {
+        "task": task,
+        "organization": organization,
+        "group": group,
+    })
+    plain_message = strip_tags(html_message)  # Convert HTML to plain text
+
+    # ✅ Send email
+    send_mail(
+        subject,
+        plain_message,
+        settings.DEFAULT_FROM_EMAIL,  
+        [manager_email],
+        html_message=html_message,
+        fail_silently=False,
+    )
 
 
 
