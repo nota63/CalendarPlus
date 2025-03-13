@@ -69,7 +69,9 @@ class Task(models.Model):
             ('in_progress', 'In Progress'),
             ('completed', 'Completed'),
             ('cancelled', 'Cancelled'),
-            ('overdue', 'Overdue')
+            ('overdue', 'Overdue'),
+            ('pending_approval','Pending approval'),
+            ('need_changes','Need changes'),
         ],
         default='pending',
         help_text="The current status of the task."

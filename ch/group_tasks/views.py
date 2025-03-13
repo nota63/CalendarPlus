@@ -1635,6 +1635,43 @@ def task_delete_view(request):
     return JsonResponse({"status": "error", "message": "Invalid request."}, status=400)
 
 
+# TASK SUBMISSION & APPROVAL
+
+# USER (SIDE)
+@csrf_exempt
+@login_required
+def task_completion_request_view(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            org_id = data.get("org_id")
+            group_id = data.get("group_id")
+            task_id = data.get("task_id")
+            password = data.get("password")
+
+            user = request.user
+            organization = get_object_or_404(Organization, id=org_id)
+            group = get_object_or_404(Group, id=group_id, organization=organization)
+            task = get_object_or_404(Task, id=task_id, group=group, organization=organization)
+
+            # ✅ Ensure only the assigned user can submit task completion
+            if task.assigned_to != user:
+                return JsonResponse({"status": "error", "message": "You are not authorized to complete this task."}, status=403)
+
+            # ✅ Check user password authentication
+            if not user.check_password(password):
+                return JsonResponse({"status": "error", "message": "Incorrect password. Task completion failed."}, status=401)
+
+            # ✅ Send request to task.created_by for approval
+            task.status = "pending_approval"
+            task.save()
+
+            return JsonResponse({"status": "success", "message": "Task completion request sent for approval."})
+
+        except json.JSONDecodeError:
+            return JsonResponse({"status": "error", "message": "Invalid JSON data."}, status=400)
+
+    return JsonResponse({"status": "error", "message": "Invalid request method."}, status=400)
 
 
 

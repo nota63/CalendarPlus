@@ -60,7 +60,8 @@ urlpatterns = [
     path('set-reminder-meet/',set_reminder, name='set_reminder_meet'),
     path('delete-meeting-task/<int:meeting_id>/',delete_meeting, name='delete_meeting'),
     path("set-task-reminder/<int:org_id>/<int:group_id>/<int:task_id>/", set_task_reminder, name="set_task_reminder"),
-    path('task-delete-view/',task_delete_view, name='task_delete_view')
+    path('task-delete-view/',task_delete_view, name='task_delete_view'),
+    path('submit-task-completion/',task_completion_request_view, name='submit_task_completion')
   
   
   
