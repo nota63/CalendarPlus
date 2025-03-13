@@ -1733,12 +1733,15 @@ video::-webkit-media-controls-panel {
 
                
                 <!-- Task Completion Button -->
-                <button class="btn btn-success" id="openTaskCompletionModal"
-                   data-org-id="{{ organization.id }}"
-                   data-group-id="{{ group.id }}"
-                   data-task-id="{{ task.id }}">
+                {% if task.status != 'completed' and task.status != 'pending_approval' %}
+                    <button class="btn btn-success" id="openTaskCompletionModal"
+                    data-org-id="{{ organization.id }}"
+                    data-group-id="{{ group.id }}"
+                    data-task-id="{{ task.id }}">
                    Submit Task for Approval
-               </button>
+                  </button>
+                {% endif %}
+
 
 
 
@@ -1751,13 +1754,7 @@ video::-webkit-media-controls-panel {
                                data-group-id="{{ group_id }}" 
                                {% if task.status == 'completed' %} checked {% endif %}>
                     </div>
-                    <label class="form-check-label inline-block text-gray-700" for="toggleTaskStatus">
-                        {% if task.status == 'completed' %}
-                            Mark as Pending
-                        {% else %}
-                            Mark as Completed
-                        {% endif %}
-                    </label>
+                   
                 </div>
             </div>
 
