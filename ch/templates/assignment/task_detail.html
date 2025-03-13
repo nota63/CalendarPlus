@@ -1230,6 +1230,48 @@ video::-webkit-media-controls-panel {
 </div>
 
 
+<!-- TASK APPROVAL MODAL -->
+ <!-- Task Approval Modal -->
+<div class="modal fade" id="taskApprovalModal" tabindex="-1" aria-labelledby="taskApprovalModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content p-4">
+            <div class="modal-header">
+                <h3 class="modal-title fw-bold text-success">Task Approval Request</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <p class="fs-5">The user has **submitted a request** for task approval. <br>
+                    **System Scan Completed ✅** - No issues found.</p>
+                
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">✅ Comments Verified</li>
+                    <li class="list-group-item">✅ Chats Analyzed</li>
+                    <li class="list-group-item">✅ Files & Attachments Checked</li>
+                    <li class="list-group-item">✅ Activity Log Reviewed</li>
+                    <li class="list-group-item">✅ Time Spent Evaluated</li>
+                    <li class="list-group-item">✅ Problems & Errors Resolved</li>
+                </ul>
+
+                <div class="mt-4">
+                    <label for="managerPassword" class="form-label fw-bold">Enter Password to Approve:</label>
+                    <input type="password" class="form-control" id="managerPassword" placeholder="Your Password">
+                    <p class="text-danger mt-2" id="approvalError"></p>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-success w-100" id="approveTask">
+                    <span id="approveSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                    Approve & Complete Task 🎉
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <!-------------------------------------------------------------------------------------------------------------------------------------------------------  -->
    
 
@@ -1310,6 +1352,15 @@ video::-webkit-media-controls-panel {
           <button id="deleteTaskBtn" class="w-full flex items-center gap-4 px-3 py-3 text-sm font-medium text-gray-300 hover:bg-white/5 rounded-xl transition-all duration-200 hover:translate-x-2" data-bs-toggle="modal" data-bs-target="#deleteTaskModal">
             <span class="material-symbols-rounded text-pink-400 text-xl p-2 bg-white/10 rounded-lg shrink-0">delete</span> <span class="text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity">Delete Task</span>
           </button>
+
+          <!-- Manager Approval Button -->
+           <button class="btn btn-primary" id="openTaskApprovalModal"
+              data-org-id="{{ organization.id }}"
+              data-group-id="{{ group.id }}"
+              data-task-id="{{ task.id }}">
+              Approve Task ✅
+           </button>
+
 
 
         </nav>

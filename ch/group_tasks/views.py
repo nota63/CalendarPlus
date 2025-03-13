@@ -1676,8 +1676,51 @@ def task_completion_request_view(request):
     return JsonResponse({"status": "error", "message": "Invalid request method."}, status=400)
 
 
+# MANAGER SIDE (TASK APPROVE)
 
+@csrf_exempt
+def approve_task_completion(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            org_id = data.get("org_id")
+            group_id = data.get("group_id")
+            task_id = data.get("task_id")
+            password = data.get("password")
 
+            # ✅ Validate Fields
+            if not (org_id and group_id and task_id and password):
+                return JsonResponse({"status": "error", "message": "Missing required fields."}, status=400)
+
+            # ✅ Get Logged-in Manager
+            user = request.user
+            if not user.is_authenticated:
+                return JsonResponse({"status": "error", "message": "You must be logged in."}, status=401)
+
+            # ✅ Authenticate Password
+            if not authenticate(username=user.username, password=password):
+                return JsonResponse({"status": "error", "message": "Incorrect password."}, status=403)
+
+            # ✅ Get Task
+            try:
+                task = Task.objects.get(id=task_id, group_id=group_id, organization_id=org_id)
+            except Task.DoesNotExist:
+                return JsonResponse({"status": "error", "message": "Task not found."}, status=404)
+
+            # ✅ Check if Already Approved
+            if task.status == "completed":
+                return JsonResponse({"status": "error", "message": "Task is already completed."}, status=400)
+
+            # ✅ Approve Task
+            task.status = "completed"
+            task.save()
+
+            return JsonResponse({"status": "success", "message": "Task has been approved & completed!"}, status=200)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"status": "error", "message": "Invalid JSON format."}, status=400)
+
+    return JsonResponse({"status": "error", "message": "Invalid request method."}, status=405)
 
 
 

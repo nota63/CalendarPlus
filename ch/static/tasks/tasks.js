@@ -196,3 +196,127 @@ document.addEventListener("DOMContentLoaded", function () {
         searchControls.style.display = "none"; // Hide controls after clearing
     });
 });
+
+
+// ACCEPT THE TASK APPROVAL
+
+document.addEventListener("DOMContentLoaded", function () {
+    const openModalBtn = document.getElementById("openTaskApprovalModal");
+    const approveTaskBtn = document.getElementById("approveTask");
+    const errorMsg = document.getElementById("approvalError");
+    const spinner = document.getElementById("approveSpinner");
+
+    let orgId, groupId, taskId;
+
+    // ✅ Open Modal and Set Task Data
+    if (openModalBtn) {
+        openModalBtn.addEventListener("click", function () {
+            orgId = this.getAttribute("data-org-id");
+            groupId = this.getAttribute("data-group-id");
+            taskId = this.getAttribute("data-task-id");
+
+            const approvalModal = new bootstrap.Modal(document.getElementById("taskApprovalModal"));
+            approvalModal.show();
+        });
+    }
+
+    // ✅ Function to get CSRF token
+    function getCSRFToken() {
+        const csrfMetaTag = document.querySelector('meta[name="csrf-token"]');
+        return csrfMetaTag ? csrfMetaTag.getAttribute("content") : null;
+    }
+
+    // ✅ Handle Task Approval Request
+    if (approveTaskBtn) {
+        approveTaskBtn.addEventListener("click", function () {
+            const password = document.getElementById("managerPassword").value;
+            const csrfToken = getCSRFToken();
+
+            if (!password.trim()) {
+                errorMsg.textContent = "Password is required!";
+                return;
+            }
+
+            if (!csrfToken) {
+                errorMsg.textContent = "CSRF token missing. Please refresh the page.";
+                return;
+            }
+
+            // ✅ Show Spinner
+            approveTaskBtn.disabled = true;
+            spinner.classList.remove("d-none");
+
+            fetch("/tasks/approve-task-completion/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+                body: JSON.stringify({
+                    org_id: window.djangoData.orgId,
+                    group_id: window.djangoData.groupId,
+                    task_id: window.djangoData.taskId,
+                    password: password
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    // ✅ Hide Modal
+                    document.getElementById("taskApprovalModal").classList.remove("show");
+                    document.body.classList.remove("modal-open");
+                    document.querySelector(".modal-backdrop").remove();
+
+                    // ✅ Start Firecracker Animation & Success Message
+                    startFireworks();
+                    showSuccessMessage();
+                } else {
+                    errorMsg.textContent = data.message;
+                }
+            })
+            .catch(error => {
+                errorMsg.textContent = "Something went wrong. Try again.";
+            })
+            .finally(() => {
+                // ✅ Reset Button & Spinner
+                approveTaskBtn.disabled = false;
+                spinner.classList.add("d-none");
+            });
+        });
+    }
+});
+
+// ✅ Firecracker Animation Function
+function startFireworks() {
+    const fireworksContainer = document.createElement("div");
+    fireworksContainer.id = "fireworks-container";
+    document.body.appendChild(fireworksContainer);
+
+    for (let i = 0; i < 1000; i++) {
+        const firework = document.createElement("div");
+        firework.className = "firework";
+        firework.style.left = Math.random() * 100 + "vw";
+        firework.style.top = Math.random() * 100 + "vh";
+        fireworksContainer.appendChild(firework);
+    }
+
+    setTimeout(() => {
+        fireworksContainer.remove();
+    }, 5000);
+}
+
+// ✅ Show Success Message
+function showSuccessMessage() {
+    const messageDiv = document.createElement("div");
+    messageDiv.id = "success-message";
+    messageDiv.innerHTML = `
+        <div class="success-text">
+            <span class="checkmark">✔</span> Task has been Approved & Completed! 🎉
+        </div>
+    `;
+    document.body.appendChild(messageDiv);
+
+    setTimeout(() => {
+        messageDiv.remove();
+    }, 5000);
+}
