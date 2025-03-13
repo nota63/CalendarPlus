@@ -3975,6 +3975,7 @@ function renderMessages(messages) {
 }
 
 
+
 // TASK SUBMISSION
 document.addEventListener("DOMContentLoaded", function () {
     const openModalBtn = document.getElementById("openTaskCompletionModal");
@@ -4001,7 +4002,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ✅ Handle Task Submission
+    // ✅ Handle Task Submission with Loading Spinner
     if (submitTaskBtn) {
         submitTaskBtn.addEventListener("click", function () {
             const password = document.getElementById("taskPassword").value;
@@ -4016,6 +4017,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 errorMsg.textContent = "CSRF token missing. Please refresh the page.";
                 return;
             }
+
+            // ✅ Store original button content & show spinner
+            const originalBtnText = submitTaskBtn.innerHTML;
+            submitTaskBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...`;
+            submitTaskBtn.disabled = true;
 
             fetch("/tasks/submit-task-completion/", {
                 method: "POST",
@@ -4037,16 +4043,18 @@ document.addEventListener("DOMContentLoaded", function () {
                     location.reload();
                 } else {
                     errorMsg.textContent = data.message;
+                    submitTaskBtn.innerHTML = originalBtnText;
+                    submitTaskBtn.disabled = false;
                 }
             })
             .catch(error => {
                 errorMsg.textContent = "Something went wrong. Try again.";
+                submitTaskBtn.innerHTML = originalBtnText;
+                submitTaskBtn.disabled = false;
             });
         });
     }
 });
-
-
 
 
 
