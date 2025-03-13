@@ -55,78 +55,114 @@
 }
 
 
+
+
 /* search box highlight */
+/* 🌟 General Page Styling */
 body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    position: relative;
+    font-family: "Inter", sans-serif;
+    background: #f5f5f5;
+    margin: 0;
+    padding: 0;
 }
 
-/* 🔍 Search Input - Positioned at Top-Right */
+/* 🔍 Search Container (Top-Right) */
 .search-container {
     position: fixed;
     top: 10px;
     right: 20px;
     display: flex;
-    gap: 5px;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-end;
+    z-index: 1000; /* Ensures it stays above other elements */
 }
 
+/* 🔎 Search Input Styling */
 .search-box {
-    width: 250px;
-    padding: 8px 12px;
-    font-size: 14px;
-    border: 2px solid #007bff;
-    border-radius: 20px;
-    outline: none;
-    transition: all 0.3s ease;
+    width: 320px; /* Increased width */
+    height: 48px; /* Bigger height */
+    font-size: 16px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 2px solid #6200ea; /* Material UI Purple */
+    background: #ffffff;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
 }
 
+/* ✨ Hover & Focus Effect */
 .search-box:focus {
-    border-color: #0056b3;
-    box-shadow: 0px 0px 8px rgba(0, 123, 255, 0.5);
+    outline: none;
+    border-color: #3700b3;
+    box-shadow: 0px 4px 12px rgba(98, 0, 234, 0.3);
 }
 
-/* 🎛️ Controls - Initially Hidden */
+/* 🕵️‍♂️ Search Controls (Hidden Initially) */
 .controls {
-    display: none; 
-    gap: 10px;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 5px 10px;
+    display: none;
+    margin-top: 8px;
+    background: #ffffff;
+    padding: 12px;
     border-radius: 10px;
-    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid #ddd;
+    width: 320px;
+    text-align: center;
+    animation: fadeIn 0.3s ease-in-out;
 }
 
+/* 📊 Search Counter */
 .counter {
+    font-size: 14px;
     font-weight: bold;
     color: #333;
 }
 
+/* 🎨 Buttons Styling */
 .btn {
-    padding: 5px 10px;
-    font-size: 12px;
-    cursor: pointer;
-    border: none;
-    background-color: #007bff;
+    background: #6200ea;
     color: white;
-    border-radius: 5px;
-    transition: 0.2s ease;
+    border: none;
+    padding: 10px 14px;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin: 5px;
 }
 
+/* 🟢 Hover Effects */
 .btn:hover {
-    background-color: #0056b3;
+    background: #3700b3;
 }
 
-.btn:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
+/* 🔄 Reset Button */
+#clearBtn {
+    background: #ff1744;
 }
 
-/* 🟡 Highlighted Text */
+#clearBtn:hover {
+    background: #d50000;
+}
+
+/* ✨ Highlighted Search Results */
 .highlight {
-    background-color: yellow;
-    color: black;
-    font-weight: bold;
-    padding: 2px;
+    background: #ffeb3b; /* Yellow highlight */
+    color: #000;
+    padding: 2px 4px;
     border-radius: 3px;
+    font-weight: bold;
+    transition: all 0.3s ease-in-out;
+}
+
+/* 🎬 Smooth Fade-in Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
