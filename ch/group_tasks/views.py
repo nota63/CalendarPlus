@@ -1666,7 +1666,7 @@ def task_completion_request_view(request):
             task.status = "pending_approval"
             task.save()
             # send task approval to the manager
-            task_submission_approval(org_id=organization.id, group_id=group_id,task_id=task.id)
+            # task_submission_approval(org_id=organization.id, group_id=group_id,task_id=task.id)
 
             return JsonResponse({"status": "success", "message": "Task completion request sent for approval."})
 
@@ -1677,9 +1677,8 @@ def task_completion_request_view(request):
 
 
 # MANAGER SIDE (TASK APPROVE)
-
 @csrf_exempt
-def approve_task_completion(request):
+def approve_or_reject_task(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
@@ -1687,9 +1686,10 @@ def approve_task_completion(request):
             group_id = data.get("group_id")
             task_id = data.get("task_id")
             password = data.get("password")
+            action = data.get("action")  # "approve" or "reject"
 
             # ✅ Validate Fields
-            if not (org_id and group_id and task_id and password):
+            if not (org_id and group_id and task_id and password and action):
                 return JsonResponse({"status": "error", "message": "Missing required fields."}, status=400)
 
             # ✅ Get Logged-in Manager
@@ -1707,21 +1707,27 @@ def approve_task_completion(request):
             except Task.DoesNotExist:
                 return JsonResponse({"status": "error", "message": "Task not found."}, status=404)
 
-            # ✅ Check if Already Approved
-            if task.status == "completed":
-                return JsonResponse({"status": "error", "message": "Task is already completed."}, status=400)
-
             # ✅ Approve Task
-            task.status = "completed"
-            task.save()
+            if action == "approve":
+                if task.status == "completed":
+                    return JsonResponse({"status": "error", "message": "Task is already completed."}, status=400)
 
-            return JsonResponse({"status": "success", "message": "Task has been approved & completed!"}, status=200)
+                task.status = "completed"
+                task.save()
+                return JsonResponse({"status": "success", "message": "Task has been approved & completed!", "approved": True}, status=200)
+
+            # ❌ Reject Task
+            elif action == "reject":
+                task.status = "need_changes"
+                task.save()
+                return JsonResponse({"status": "success", "message": "Task has been rejected & set to Need Changes!", "approved": False}, status=200)
+
+            return JsonResponse({"status": "error", "message": "Invalid action."}, status=400)
 
         except json.JSONDecodeError:
             return JsonResponse({"status": "error", "message": "Invalid JSON format."}, status=400)
 
     return JsonResponse({"status": "error", "message": "Invalid request method."}, status=405)
-
 
 
 

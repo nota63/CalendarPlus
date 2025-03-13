@@ -1236,7 +1236,7 @@ video::-webkit-media-controls-panel {
     <div class="modal-dialog modal-lg">
         <div class="modal-content p-4">
             <div class="modal-header">
-                <h3 class="modal-title fw-bold text-success">Task Approval Request</h3>
+                <h3 class="modal-title fw-bold text-primary">Task Approval Request</h3>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
@@ -1254,14 +1254,18 @@ video::-webkit-media-controls-panel {
                 </ul>
 
                 <div class="mt-4">
-                    <label for="managerPassword" class="form-label fw-bold">Enter Password to Approve:</label>
+                    <label for="managerPassword" class="form-label fw-bold">Enter Password:</label>
                     <input type="password" class="form-control" id="managerPassword" placeholder="Your Password">
                     <p class="text-danger mt-2" id="approvalError"></p>
                 </div>
             </div>
 
             <div class="modal-footer">
-                <button class="btn btn-success w-100" id="approveTask">
+                <button class="btn btn-danger w-50" id="rejectTask">
+                    <span id="rejectSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                    Reject Task ❌
+                </button>
+                <button class="btn btn-success w-50" id="approveTask">
                     <span id="approveSpinner" class="spinner-border spinner-border-sm d-none"></span>
                     Approve & Complete Task 🎉
                 </button>
@@ -1269,8 +1273,6 @@ video::-webkit-media-controls-panel {
         </div>
     </div>
 </div>
-
-
 
 <!-------------------------------------------------------------------------------------------------------------------------------------------------------  -->
    

@@ -199,12 +199,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // ACCEPT THE TASK APPROVAL
-
 document.addEventListener("DOMContentLoaded", function () {
     const openModalBtn = document.getElementById("openTaskApprovalModal");
     const approveTaskBtn = document.getElementById("approveTask");
+    const rejectTaskBtn = document.getElementById("rejectTask");
     const errorMsg = document.getElementById("approvalError");
-    const spinner = document.getElementById("approveSpinner");
+    const approveSpinner = document.getElementById("approveSpinner");
+    const rejectSpinner = document.getElementById("rejectSpinner");
 
     let orgId, groupId, taskId;
 
@@ -220,103 +221,68 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ✅ Function to get CSRF token
-    function getCSRFToken() {
-        const csrfMetaTag = document.querySelector('meta[name="csrf-token"]');
-        return csrfMetaTag ? csrfMetaTag.getAttribute("content") : null;
-    }
+    function handleTaskAction(action) {
+        const password = document.getElementById("managerPassword").value;
+        if (!password.trim()) {
+            errorMsg.textContent = "Password is required!";
+            return;
+        }
 
-    // ✅ Handle Task Approval Request
-    if (approveTaskBtn) {
-        approveTaskBtn.addEventListener("click", function () {
-            const password = document.getElementById("managerPassword").value;
-            const csrfToken = getCSRFToken();
-
-            if (!password.trim()) {
-                errorMsg.textContent = "Password is required!";
-                return;
-            }
-
-            if (!csrfToken) {
-                errorMsg.textContent = "CSRF token missing. Please refresh the page.";
-                return;
-            }
-
-            // ✅ Show Spinner
+        // ✅ Show Spinner
+        if (action === "approve") {
             approveTaskBtn.disabled = true;
-            spinner.classList.remove("d-none");
+            approveSpinner.classList.remove("d-none");
+        } else {
+            rejectTaskBtn.disabled = true;
+            rejectSpinner.classList.remove("d-none");
+        }
 
-            fetch("/tasks/approve-task-completion/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": csrfToken
-                },
-                body: JSON.stringify({
-                    org_id: window.djangoData.orgId,
-                    group_id: window.djangoData.groupId,
-                    task_id: window.djangoData.taskId,
-                    password: password
-                })
+        fetch("/tasks/approve-or-reject-task/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            },
+            body: JSON.stringify({
+                org_id: orgId,
+                group_id: groupId,
+                task_id: taskId,
+                password: password,
+                action: action
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === "success") {
-                    // ✅ Hide Modal
-                    document.getElementById("taskApprovalModal").classList.remove("show");
-                    document.body.classList.remove("modal-open");
-                    document.querySelector(".modal-backdrop").remove();
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                // ✅ Hide Modal
+                document.getElementById("taskApprovalModal").classList.remove("show");
+                document.body.classList.remove("modal-open");
+                document.querySelector(".modal-backdrop").remove();
 
-                    // ✅ Start Firecracker Animation & Success Message
+                if (data.approved) {
                     startFireworks();
                     showSuccessMessage();
                 } else {
-                    errorMsg.textContent = data.message;
+                    alert("Task has been rejected and set to 'Need Changes'!");
                 }
-            })
-            .catch(error => {
-                errorMsg.textContent = "Something went wrong. Try again.";
-            })
-            .finally(() => {
-                // ✅ Reset Button & Spinner
-                approveTaskBtn.disabled = false;
-                spinner.classList.add("d-none");
-            });
+            } else {
+                errorMsg.textContent = data.message;
+            }
+        })
+        .finally(() => {
+            // ✅ Reset Buttons & Spinners
+            approveTaskBtn.disabled = false;
+            rejectTaskBtn.disabled = false;
+            approveSpinner.classList.add("d-none");
+            rejectSpinner.classList.add("d-none");
         });
     }
-});
 
-// ✅ Firecracker Animation Function
-function startFireworks() {
-    const fireworksContainer = document.createElement("div");
-    fireworksContainer.id = "fireworks-container";
-    document.body.appendChild(fireworksContainer);
-
-    for (let i = 0; i < 1000; i++) {
-        const firework = document.createElement("div");
-        firework.className = "firework";
-        firework.style.left = Math.random() * 100 + "vw";
-        firework.style.top = Math.random() * 100 + "vh";
-        fireworksContainer.appendChild(firework);
+    if (approveTaskBtn) {
+        approveTaskBtn.addEventListener("click", () => handleTaskAction("approve"));
     }
 
-    setTimeout(() => {
-        fireworksContainer.remove();
-    }, 5000);
-}
-
-// ✅ Show Success Message
-function showSuccessMessage() {
-    const messageDiv = document.createElement("div");
-    messageDiv.id = "success-message";
-    messageDiv.innerHTML = `
-        <div class="success-text">
-            <span class="checkmark">✔</span> Task has been Approved & Completed! 🎉
-        </div>
-    `;
-    document.body.appendChild(messageDiv);
-
-    setTimeout(() => {
-        messageDiv.remove();
-    }, 5000);
-}
+    if (rejectTaskBtn) {
+        rejectTaskBtn.addEventListener("click", () => handleTaskAction("reject"));
+    }
+});
