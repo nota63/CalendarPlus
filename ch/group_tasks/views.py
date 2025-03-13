@@ -1594,6 +1594,41 @@ def set_task_reminder(request, org_id, group_id, task_id):
     return JsonResponse({"status": "error", "message": "Invalid request method!"})
 
 
+# HANDLE TASK DELETION (MANAGER ONLY)
+from django.contrib.auth import authenticate
+
+@login_required
+@csrf_exempt
+def task_delete_view(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)  
+            org_id = data.get("org_id")
+            group_id = data.get("group_id")
+            task_id = data.get("task_id")
+            password = data.get("password")
+
+            user = request.user
+            organization = get_object_or_404(Organization, id=org_id)
+            group = get_object_or_404(Group, id=group_id, organization=organization)
+            task = get_object_or_404(Task, id=task_id, group=group, organization=organization)
+
+            # Ensure only the task creator can delete
+            if task.created_by != user:
+                return JsonResponse({"status": "error", "message": "You are not authorized to delete this task."}, status=403)
+
+            # Authenticate user password
+            if not user.check_password(password):
+                return JsonResponse({"status": "error", "message": "Incorrect password. Task deletion failed."}, status=401)
+
+            # Delete Task
+            task.delete()
+            return JsonResponse({"status": "success", "message": "Task deleted successfully."})
+
+        except json.JSONDecodeError:
+            return JsonResponse({"status": "error", "message": "Invalid JSON data."}, status=400)
+
+    return JsonResponse({"status": "error", "message": "Invalid request."}, status=400)
 
 
 
