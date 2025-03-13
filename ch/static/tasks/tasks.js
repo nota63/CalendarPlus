@@ -3,8 +3,8 @@
 document.addEventListener("DOMContentLoaded", function () {
     const confirmDeleteBtn = document.getElementById("confirmDeleteTask");
     const errorMsg = document.getElementById("taskDeleteError");
+    const successPopup = document.getElementById("taskDeleteSuccessPopup");
 
-    // ✅ Generate CSRF token dynamically from Django cookie
     function getCSRFToken() {
         let cookieValue = null;
         const cookies = document.cookie.split(';');
@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRFToken": getCSRFToken()  // ✅ Now generates CSRF dynamically
+                "X-CSRFToken": getCSRFToken()
             },
             body: JSON.stringify({
                 task_id: window.djangoData.taskId,
@@ -43,8 +43,15 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(response => response.json())
         .then(data => {
             if (data.status === "success") {
-                alert("Task deleted successfully!");
-                location.reload();
+                // ✅ Show Success Pop-up
+                successPopup.style.opacity = "1";
+                successPopup.style.visibility = "visible";
+
+                // ✅ Redirect after 2 seconds
+                setTimeout(() => {
+                    const redirectURL = `http://127.0.0.1:8000/tasks/tasks/assigned-users/${window.djangoData.orgId}/${window.djangoData.groupId}/`;
+                    window.location.href = redirectURL;
+                }, 2000);
             } else {
                 errorMsg.textContent = data.message;
             }

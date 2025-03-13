@@ -38,6 +38,8 @@
     <meta name="csrf-token" content="{{ csrf_token }}">
     <!-- Sortable.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <!-- Link CSS File -->
+    <link rel="stylesheet" href="{% static 'tasks/tasks.css' %}">
 
 
 
@@ -1213,6 +1215,17 @@ video::-webkit-media-controls-panel {
                 </button>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Fullscreen Pop-up for after deletion -->
+ <!-- ✅ Fullscreen Success Popup -->
+<div id="taskDeleteSuccessPopup" class="success-popup">
+    <div class="success-content">
+        <div class="checkmark-animation">
+            ✔
+        </div>
+        <h2>{{task.title}} Deleted Successfully!</h2>
     </div>
 </div>
 

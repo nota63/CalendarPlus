@@ -1,0 +1,55 @@
+/* ✅ Fullscreen Success Popup */
+.success-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9); /* Dark semi-transparent */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* ✅ Success Content */
+.success-content {
+    text-align: center;
+    background: #fff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+    animation: popUp 0.3s ease-in-out;
+}
+
+/* ✅ Checkmark Animation */
+.checkmark-animation {
+    font-size: 60px;
+    color: #28a745;
+    font-weight: bold;
+    animation: checkmarkScale 0.5s ease-in-out;
+}
+
+/* ✅ Keyframe Animation */
+@keyframes popUp {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes checkmarkScale {
+    from {
+        transform: scale(0);
+    }
+    to {
+        transform: scale(1);
+    }
+}
