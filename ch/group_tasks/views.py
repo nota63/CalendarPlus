@@ -1212,6 +1212,12 @@ def clone_task(request):
             # Debugging: Print extracted values
             print(f"✅ Extracted Data - org_id: {org_id}, group_id: {group_id}, task_id: {task_id}, email: {email}")
 
+            # security check manual
+            profile= get_object_or_404(Profile,user=request.user, organization_id=org_id)
+            if not profile:
+              return JsonResponse({'error:':'You are not authorized to perform this action'})
+
+
             # Validate required fields
             if not all([org_id, group_id, task_id, email]):
                 print("❌ Missing required parameters!")
@@ -1298,6 +1304,7 @@ def notify_task_cloned(org_id, group_id, task_id):
         group = get_object_or_404(Group, id=group_id, organization=organization)
         task = get_object_or_404(Task, id=task_id, group=group, organization=organization)
 
+       
         # Ensure task has an assignee
         if not task.assigned_to or not task.assigned_to.email:
             logger.warning(f"Task {task_id} has no valid assignee. Skipping email notification.")
@@ -1379,6 +1386,12 @@ def fetch_meetings_sortable(request, org_id, group_id, task_id):
     # Fetch meetings related to this specific task
     meetings = MeetingTaskQuery.objects.filter(organization_id=org_id, group_id=group_id, task_id=task_id)
 
+    # security check manual
+    profile= get_object_or_404(Profile,user=request.user, organization=task.organization)
+    if not profile:
+        return JsonResponse({'error:':'You are not authorized to perform this action'})
+
+
     meetings_data = [
         {
             "id": meeting.id,
@@ -1417,6 +1430,12 @@ def update_meeting_status_sortable(request):
             # Fetch meeting object
             meeting = get_object_or_404(MeetingTaskQuery, id=meeting_id)
 
+            # security check manual
+            profile= get_object_or_404(Profile,user=request.user, organization=meeting.organization)
+            if not profile:
+              return JsonResponse({'error:':'You are not authorized to perform this action'})
+
+
             # Check if the user is the task creator
             if request.user != meeting.task.created_by:
                 return JsonResponse({"error": "Unauthorized action."}, status=403)
@@ -1436,6 +1455,12 @@ def update_meeting_status_sortable(request):
 @login_required
 def get_meeting_details(request, meeting_id):
     meeting = get_object_or_404(MeetingTaskQuery, id=meeting_id)
+
+    # security check manual
+    profile= get_object_or_404(Profile,user=request.user, organization=meeting.organization)
+    if not profile:
+        return JsonResponse({'error:':'You are not authorized to perform this action'})
+
 
     data = {
         "task_title": meeting.task.title,
@@ -1468,6 +1493,12 @@ def send_custom_reply(request):
             meeting = MeetingTaskQuery.objects.get(id=meeting_id, organization_id=org_id)
             task = Task.objects.get(id=task_id)
             organization=get_object_or_404(Organization, id=org_id)
+
+            # security check manual
+            profile= get_object_or_404(Profile,user=request.user, organization=organization)
+            if not profile:
+              return JsonResponse({'error:':'You are not authorized to perform this action'})
+
 
             # Here, send the reply to meeting.created_by (modify as needed)
             recipient = meeting.scheduled_by
@@ -1507,6 +1538,11 @@ def delete_meeting(request, meeting_id):
     if request.method == "POST":
         try:
             meeting = MeetingTaskQuery.objects.get(id=meeting_id)
+            # security check manual
+            profile= get_object_or_404(Profile,user=request.user, organization=meeting.organization)
+            if not profile:
+               return JsonResponse({'error:':'You are not authorized to perform this action'})
+
             meeting.delete()
             return JsonResponse({"success": True, "message": "Meeting deleted successfully."})
         except MeetingOrganization.DoesNotExist:
@@ -1527,6 +1563,13 @@ def set_task_reminder(request, org_id, group_id, task_id):
             organization = get_object_or_404(Organization, id=org_id)
             group = get_object_or_404(Group, id=group_id) if group_id != "null" else None
             task = get_object_or_404(Task, id=task_id, organization=organization)
+
+
+            # security check manual
+            profile= get_object_or_404(Profile,user=request.user, organization=organization)
+            if not profile:
+              return JsonResponse({'error:':'You are not authorized to perform this action'})
+
 
             # Extract Reminder Data
             reminder_time = data.get("reminder_time")
@@ -1614,6 +1657,13 @@ def task_delete_view(request):
             group = get_object_or_404(Group, id=group_id, organization=organization)
             task = get_object_or_404(Task, id=task_id, group=group, organization=organization)
 
+
+            # security check manual
+            profile= get_object_or_404(Profile,user=request.user, organization=organization)
+            if not profile:
+              return JsonResponse({'error:':'You are not authorized to perform this action'})
+
+
             # Ensure only the task creator can delete
             if task.created_by != user:
                 return JsonResponse({"status": "error", "message": "You are not authorized to delete this task."}, status=403)
@@ -1653,6 +1703,13 @@ def task_completion_request_view(request):
             organization = get_object_or_404(Organization, id=org_id)
             group = get_object_or_404(Group, id=group_id, organization=organization)
             task = get_object_or_404(Task, id=task_id, group=group, organization=organization)
+
+
+             # security check manual
+            profile= get_object_or_404(Profile,user=request.user, organization=organization)
+            if not profile:
+               return JsonResponse({'error:':'You are not authorized to perform this action'})
+
 
             # ✅ Ensure only the assigned user can submit task completion
             if task.assigned_to != user:
@@ -1701,6 +1758,12 @@ def approve_or_reject_task(request):
             # ✅ Authenticate Password
             if not authenticate(username=user.username, password=password):
                 return JsonResponse({"status": "error", "message": "Incorrect password."}, status=403)
+            
+            # security check manual
+            profile= get_object_or_404(Profile,user=request.user, organization_id=org_id)
+            if not profile:
+               return JsonResponse({'error:':'You are not authorized to perform this action'})
+
 
             # ✅ Get Task
             try:
@@ -1742,6 +1805,12 @@ def get_workspace_members(request):
         return JsonResponse({"status": "error", "message": "Organization ID is required"}, status=400)
     
     organization = get_object_or_404(Organization, id=org_id)
+
+    # security check manual
+    profile= get_object_or_404(Profile,user=request.user, organization=organization)
+    if not profile:
+        return JsonResponse({'error:':'You are not authorized to perform this action'})
+
     
     members = Profile.objects.filter(organization=organization)
     
@@ -1777,6 +1846,11 @@ def send_task_to_members(request):
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id,organization=organization)
     task = get_object_or_404(Task, id=task_id,group=group,organization=organization)
+
+    # security check manual
+    profile= get_object_or_404(Profile,user=request.user, organization=organization)
+    if not profile:
+        return JsonResponse({'error:':'You are not authorized to perform this action'})
 
     # Share the Task details
     send_task_details(org_id=organization.id, group_id=group.id, task_id=task.id,selected_members=selected_members)

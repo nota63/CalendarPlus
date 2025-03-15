@@ -115,12 +115,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
         membersList.querySelectorAll(".member-card").forEach(card => {
             let memberName = card.querySelector("h6").textContent.toLowerCase();
+            let memberRole = card.querySelector("p").textContent.toLowerCase();
 
-            if (memberName.includes(query)) {
+            if (memberName.includes(query) || memberRole.includes(query)) {
                 card.style.display = "flex"; // Show matching members
             } else {
                 card.style.display = "none"; // Hide non-matching members
             }
+        });
+    });
+
+    // Reset search when modal opens
+    document.getElementById("shareTaskModal").addEventListener("shown.bs.modal", function () {
+        searchInput.value = ""; // Clear search bar
+        membersList.querySelectorAll(".member-card").forEach(card => {
+            card.style.display = "flex"; // Show all members again
         });
     });
 });
