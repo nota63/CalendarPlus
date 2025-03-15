@@ -103,3 +103,24 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+
+// Filter members in real time
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("searchMembers");
+    const membersList = document.getElementById("membersList");
+
+    searchInput.addEventListener("input", function () {
+        let query = searchInput.value.toLowerCase().trim();
+
+        membersList.querySelectorAll(".member-card").forEach(card => {
+            let memberName = card.querySelector("h6").textContent.toLowerCase();
+
+            if (memberName.includes(query)) {
+                card.style.display = "flex"; // Show matching members
+            } else {
+                card.style.display = "none"; // Hide non-matching members
+            }
+        });
+    });
+});
