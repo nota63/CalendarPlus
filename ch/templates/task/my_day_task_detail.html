@@ -1768,24 +1768,200 @@ video::-webkit-media-controls-panel {
 
 <!-- WORKING ON IT -------------------------------------------------------------------------------------------------------  -->
 {% if calpoints and calpoints.points %}
-   <div class="text-center mt-6">
-       <strong class="text-2xl font-bold text-white px-6 py-3 rounded-lg shadow-lg bg-gradient-to-r from-blue-500 to-purple-500 animate-glow">
-           🎉 Congratulations! You have Earned 
-           <span class="text-yellow-300">{{ calpoints.points }}</span> CP 🎉
-       </strong>
-   </div>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Exo+2:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
-   <style>
-       @keyframes glow {
-           0% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.8); }
-           50% { box-shadow: 0 0 20px rgba(255, 215, 0, 1); }
-           100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.8); }
-       }
-       
-       .animate-glow {
-           animation: glow 1.5s infinite alternate ease-in-out;
-       }
-   </style>
+<div class="cyber-celebration-container">
+    <div class="cyber-wire-frame">
+        <div class="cyber-content">
+            <span class="material-symbols-outlined icon-spark">auto_awesome</span>
+            <h1 class="cyber-title">
+                <span class="text-gradient">Mission Complete!</span><br>
+                <span class="cyber-points">{{ calpoints.points }}</span> CP Acquired
+            </h1>
+            <div class="cyber-wires"></div>
+            <div class="particle-network"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+.cyber-celebration-container {
+    --neon-blue: #00f3ff;
+    --neon-purple: #bc13fe;
+    --neon-pink: #ff1ffb;
+    --glow-intensity: 2.5;
+    font-family: 'Exo 2', sans-serif;
+}
+
+.cyber-wire-frame {
+    position: relative;
+    margin: 2rem auto;
+    padding: 2px;
+    border-radius: 15px;
+    background: linear-gradient(45deg, 
+        var(--neon-blue) 0%, 
+        var(--neon-purple) 25%, 
+        var(--neon-pink) 50%, 
+        var(--neon-purple) 75%, 
+        var(--neon-blue) 100%);
+    background-size: 400% 400%;
+    animation: gradient-flow 8s ease infinite, 
+               cyber-pulse 2s ease-in-out infinite;
+    box-shadow: 0 0 40px rgba(188, 19, 254, 0.4);
+}
+
+.cyber-content {
+    position: relative;
+    padding: 2rem 4rem;
+    background: #0a0a12;
+    border-radius: 13px;
+    overflow: hidden;
+}
+
+.icon-spark {
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    font-size: 4rem;
+    color: var(--neon-pink);
+    filter: drop-shadow(0 0 10px var(--neon-pink));
+    animation: icon-float 3s ease-in-out infinite;
+}
+
+.cyber-title {
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 1rem 0;
+}
+
+.text-gradient {
+    background: linear-gradient(90deg, 
+        var(--neon-blue), 
+        var(--neon-purple), 
+        var(--neon-pink));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: text-shine 3s linear infinite;
+}
+
+.cyber-points {
+    display: inline-block;
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: var(--neon-blue);
+    text-shadow: 0 0 20px var(--neon-blue);
+    animation: points-glow 1.5s ease-in-out infinite;
+}
+
+/* Wire Frame Animation */
+.cyber-wires {
+    position: absolute;
+    inset: 0;
+    background: 
+        repeating-linear-gradient(90deg, 
+            var(--neon-blue) 0% 0.5%, 
+            transparent 0.5% 15%),
+        repeating-linear-gradient(0deg, 
+            var(--neon-purple) 0% 0.5%, 
+            transparent 0.5% 15%);
+    mask: 
+        linear-gradient(#000 0 0) content-box, 
+        linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    animation: wire-move 4s linear infinite;
+}
+
+/* Particle Network */
+.particle-network {
+    position: absolute;
+    inset: 0;
+    background: 
+        radial-gradient(circle at center, 
+            rgba(255,255,255,0.1) 0%, 
+            transparent 70%);
+    animation: particle-glow 2s ease-in-out infinite;
+}
+
+@keyframes gradient-flow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes cyber-pulse {
+    0%, 100% { opacity: 0.9; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.02); }
+}
+
+@keyframes text-shine {
+    to { background-position: 200% center; }
+}
+
+@keyframes points-glow {
+    0%, 100% { text-shadow: 0 0 20px var(--neon-blue); }
+    50% { text-shadow: 0 0 40px var(--neon-blue), 0 0 60px var(--neon-purple); }
+}
+
+@keyframes wire-move {
+    to { background-position: 200% 100%; }
+}
+
+@keyframes icon-float {
+    0%, 100% { transform: translate(0,0) rotate(0deg); }
+    25% { transform: translate(5px,-5px) rotate(5deg); }
+    75% { transform: translate(-5px,5px) rotate(-5deg); }
+}
+
+@keyframes particle-glow {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.05); }
+}
+
+/* Modern Wire Effects */
+.cyber-wire-frame::before,
+.cyber-wire-frame::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    z-index: -1;
+    background: linear-gradient(45deg, 
+        var(--neon-blue), 
+        var(--neon-purple), 
+        var(--neon-pink), 
+        var(--neon-blue));
+    background-size: 400% 400%;
+    border-radius: 17px;
+    animation: gradient-flow 6s linear infinite, 
+               rotate 20s linear infinite;
+    filter: blur(25px);
+    opacity: 0.7;
+}
+
+.cyber-wire-frame::after {
+    filter: blur(45px);
+    opacity: 0.4;
+    animation-duration: 8s, 25s;
+}
+
+@keyframes rotate {
+    to { transform: rotate(360deg); }
+}
+
+/* Modern Font Enhancements */
+.cyber-title {
+    font-size: 1.8rem;
+    line-height: 1.4;
+    text-shadow: 0 0 15px rgba(188, 19, 254, 0.6);
+}
+
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 1, 'wght' 700, 'GRAD' 0, 'opsz' 48;
+}
+</style>
 {% endif %}
 
 <!-- main content  -->
