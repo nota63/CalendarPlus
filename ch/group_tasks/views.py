@@ -40,7 +40,7 @@ import json
 import os
 from django.core.files.base import ContentFile
 from django.core.exceptions import ObjectDoesNotExist
-from .utils import (send_reply,after_task_deletion,task_submission_approval)
+from .utils import (send_reply,after_task_deletion,task_submission_approval,send_task_details)
 # Create your views here.
 
 
@@ -1775,33 +1775,13 @@ def send_task_to_members(request):
 
     # Fetch organization, group, and task
     organization = get_object_or_404(Organization, id=org_id)
-    group = get_object_or_404(Group, id=group_id)
-    task = get_object_or_404(Task, id=task_id)
+    group = get_object_or_404(Group, id=group_id,organization=organization)
+    task = get_object_or_404(Task, id=task_id,group=group,organization=organization)
 
-    # Fetch members' emails
-    members = Profile.objects.filter(user_id__in=selected_members, organization=organization)
-    recipient_emails = [member.user.email for member in members]
+    # Share the Task details
+    send_task_details(org_id=organization.id, group_id=group.id, task_id=task.id,selected_members=selected_members)
 
-    # Email Subject & Body
-    subject = f"Task Assigned: {task.title}"
-    message = f"""
-    Hello,
-    
-    You have been assigned a task in {organization.name}.
-    
-    **Task Title:** {task.title}
-    **Group:** {group.name}
-    **Description:** {task.description}
-    
-    Please check it in your workspace.
-    
-    Best Regards,
-    {organization.name} Team
-    """
-
-    # Send Email
-    send_mail(subject, message, "no-reply@calendarplus.com", recipient_emails)
-
+   
     return JsonResponse({"status": "success", "message": "Task details sent successfully!"})
 
 

@@ -68,6 +68,46 @@ def task_submission_approval(org_id, group_id, task_id):
     )
 
 
+# Share task details to workspace members
+def send_task_details(org_id, group_id, task_id, selected_members):
+    organization = get_object_or_404(Organization, id=org_id)
+    group = get_object_or_404(Group, id=group_id, organization=organization)
+    task = get_object_or_404(Task, id=task_id, group=group, organization=organization)
 
+    # Fetch members' emails
+    members = Profile.objects.filter(user_id__in=selected_members, organization=organization)
+    recipient_emails = [member.user.email for member in members]
 
+    subject = f"📌 Task Collaboration Request: {task.title} | {organization.name}"
 
+    message = f"""
+    Dear Team,  
+
+    I hope you're doing well. I wanted to share an important task with you that was assigned to me in our workspace **{organization.name}**.  
+    Your expertise and insights would be greatly appreciated in helping me accomplish it effectively.  
+
+    ### **Task Details**  
+    - **Workspace:** {organization.name}  
+    - **Group:** {group.name}  
+    - **Task Title:** {task.title}  
+    - **Description:** {task.description}  
+    - **Deadline:** {task.deadline.strftime('%B %d, %Y')}  
+    - **Priority:** {task.priority}  
+
+    ### **Why I Need Your Help**  
+    I believe your knowledge and experience can provide valuable insights on how to efficiently complete this task. If you have any suggestions, feedback, or guidance, I'd love to hear from you.  
+
+    ### **How to Reach Me?**  
+    You can connect with me directly through **Calendar Plus DMs** or drop me an email at **{task.assigned_to.email}**.  
+
+    I truly appreciate your time and support. Looking forward to collaborating with you.  
+
+    Best Regards,  
+    **{task.assigned_to.get_full_name()}**  
+    *{task.assigned_to.email}*  
+    """
+
+    from_email = settings.DEFAULT_FROM_EMAIL
+    recipient_list = recipient_emails
+
+    send_mail(subject, message, from_email, recipient_list)
