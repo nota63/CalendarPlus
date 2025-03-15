@@ -111,3 +111,54 @@ def send_task_details(org_id, group_id, task_id, selected_members):
     recipient_list = recipient_emails
 
     send_mail(subject, message, from_email, recipient_list)
+
+
+# Notify the task assignee about task approval or rejection by manager
+
+def send_task_notification_email(org_id, group_id, task_id, action):
+    """
+    Sends an email notification to task.assigned_to when a task is approved or rejected.
+    """
+    # ✅ Fetch Task, Organization, and Group
+    task = get_object_or_404(Task, id=task_id, group_id=group_id, organization_id=org_id)
+    organization = get_object_or_404(Organization, id=org_id)
+    group = get_object_or_404(Group, id=group_id)
+
+    # ✅ Get Assignee Details
+    assignee = task.assigned_to
+    assignee_name = assignee.get_full_name() if assignee.get_full_name() else assignee.username
+
+    # ✅ Set Subject & Message Based on Action
+    if action == "approve":
+        subject = f"✅ Task Approved: {task.title} - {organization.name}"
+        message = (
+            f"Dear {assignee_name},\n\n"
+            f"Your task **'{task.title}'** has been **approved** ✅ by the manager in the organization **{organization.name}**, under the group **{group.name}**.\n"
+            f"The task is now marked as **Completed**.\n\n"
+            f"📅 Deadline: {task.deadline.strftime('%Y-%m-%d %H:%M') if task.deadline else 'No deadline'}\n"
+            f"📝 Task Description: {task.description}\n\n"
+            f"Keep up the great work!\n\n"
+            f"Best Regards,\n"
+            f"Calendar Plus Team"
+        )
+    elif action == "reject":
+        subject = f"❌ Task Rejected: {task.title} - {organization.name}"
+        message = (
+            f"Dear {assignee_name},\n\n"
+            f"Your task **'{task.title}'** has been **rejected** ❌ in the organization **{organization.name}**, under the group **{group.name}**.\n"
+            f"The task progress is now set to **50%** and requires **changes** before approval.\n\n"
+            f"📅 Deadline: {task.deadline.strftime('%Y-%m-%d %H:%M') if task.deadline else 'No deadline'}\n"
+            f"📝 Task Description: {task.description}\n\n"
+            f"Please make the necessary updates and resubmit the task.\n\n"
+            f"Best Regards,\n"
+            f"Calendar Plus Team"
+        )
+
+    # ✅ Send Email
+    send_mail(
+        subject,
+        message,
+        settings.DEFAULT_FROM_EMAIL,  
+        [assignee.email],  
+        fail_silently=False,
+    )

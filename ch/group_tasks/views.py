@@ -40,7 +40,7 @@ import json
 import os
 from django.core.files.base import ContentFile
 from django.core.exceptions import ObjectDoesNotExist
-from .utils import (send_reply,after_task_deletion,task_submission_approval,send_task_details)
+from .utils import (send_reply,after_task_deletion,task_submission_approval,send_task_details,send_task_notification_email)
 # Create your views here.
 
 
@@ -1778,6 +1778,9 @@ def approve_or_reject_task(request):
 
                 task.status = "completed"
                 task.save()
+                 # 💌 Send Email Notification with Organization & Group Details
+                send_task_notification_email(org_id, group_id, task_id, "approve")
+    
                 return JsonResponse({"status": "success", "message": "Task has been approved & completed!", "approved": True}, status=200)
 
             # ❌ Reject Task
@@ -1785,6 +1788,9 @@ def approve_or_reject_task(request):
                 task.status = "need_changes"
                 task.progress=50
                 task.save()
+                # 💌 Send Email Notification with Organization & Group Details
+                send_task_notification_email(org_id, group_id, task_id, "reject")
+    
                 return JsonResponse({"status": "success", "message": "Task has been rejected & set to Need Changes!", "approved": False}, status=200)
 
             return JsonResponse({"status": "error", "message": "Invalid action."}, status=400)
@@ -1793,6 +1799,9 @@ def approve_or_reject_task(request):
             return JsonResponse({"status": "error", "message": "Invalid JSON format."}, status=400)
 
     return JsonResponse({"status": "error", "message": "Invalid request method."}, status=405)
+
+
+
 
 
 
