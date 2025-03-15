@@ -159,6 +159,46 @@ class Task(models.Model):
         print(f"DEBUG: Task {self.id} marked as COMPLETED. Forcing progress to 100%.")
         self.progress = 100  # Ensure progress is set to 100 if completed
 
+        # REWARD THE TASK.ASSIGNED_TO ON TASK COMPLETION
+        if self.status == "completed":
+          from datetime import datetime  # Importing here to avoid circular imports
+          from .models import CalPoints  # Importing inside to prevent issues
+
+        assigned_user = self.assigned_to
+        if assigned_user:
+            points = 0
+            reason = f"Completed task: {self.title}"
+
+            # ✅ Priority-based points
+            priority_points = {
+                "low": 5,
+                "medium": 10,
+                "high": 20,
+                "urgent": 30,
+            }
+            points += priority_points.get(self.priority, 0)
+
+            # ✅ Recurring task bonus
+            if self.is_recurring:
+                points += 3
+                reason += " (Recurring Task Bonus)"
+
+            # ✅ Early completion bonus
+            if self.end_date and self.deadline and self.end_date < self.deadline:
+                points += 10
+                reason += " (Early Completion Bonus)"
+
+            # ✅ Save reward record
+            CalPoints.objects.create(
+                user=assigned_user,
+                organization=self.organization,
+                group=self.group,
+                task=self,
+                points=points,
+                reason=reason
+            )
+
+
      print(f"DEBUG: Saving Task {self.id} - Status: {self.status}, Progress: {self.progress}")  
 
      super().save(*args, **kwargs)  # Save without calling update_task_progress() again
@@ -784,3 +824,42 @@ class TaskReminder(models.Model):
             self.reminder_time = self.task.deadline - timedelta(days=months_before * 30)
 
       super().save(*args, **kwargs)
+
+
+# CALPOINTS MODEL - REWARD USERS ON TASK COMPLETION
+
+class CalPoints(models.Model):
+    """
+    This model tracks the reward system (CalPoints) for task completions.
+    Users earn CalPoints when they complete tasks based on priority, deadlines, and group assignments.
+    """
+
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="calpoints",
+        help_text="User who earned the CalPoints."
+    )
+    organization = models.ForeignKey(
+        Organization, on_delete=models.CASCADE, related_name="calpoints",
+        help_text="Organization where the task was completed."
+    )
+    group = models.ForeignKey(
+        Group, on_delete=models.SET_NULL, null=True, blank=True, related_name="calpoints",
+        help_text="Group associated with the task, if applicable."
+    )
+    task = models.ForeignKey(
+        Task, on_delete=models.CASCADE, related_name="calpoints",
+        help_text="Task for which the CalPoints were awarded."
+    )
+
+    points = models.IntegerField(default=0, help_text="Number of CalPoints awarded for this task.")
+    reason = models.TextField(blank=True, null=True, help_text="Reason why the user earned these CalPoints.")
+    created_at = models.DateTimeField(auto_now_add=True, help_text="Timestamp when the points were awarded.")
+
+    def __str__(self):
+        return f"{self.user.username} - {self.points} CalPoints for {self.task.title}"
+
+    class Meta:
+        ordering = ["-created_at"]  
+        verbose_name = "CalPoints Record"
+        verbose_name_plural = "CalPoints Records"
+
