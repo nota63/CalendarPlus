@@ -63,6 +63,8 @@ urlpatterns = [
     path('task-delete-view/',task_delete_view, name='task_delete_view'),
     path('submit-task-completion/',task_completion_request_view, name='submit_task_completion'),
     path("approve-or-reject-task/", approve_or_reject_task, name="approve_or_reject_task"),
+    path('get-workspace-members/',get_workspace_members, name='get_workspace_members'),
+    path('send-task-to-members/',send_task_to_members, name='send_task_to_members')
   
   
   

@@ -1677,6 +1677,7 @@ def task_completion_request_view(request):
 
 
 # MANAGER SIDE (TASK APPROVE OR REJECT)
+# Pending EMail notification
 @csrf_exempt
 def approve_or_reject_task(request):
     if request.method == "POST":
@@ -1729,6 +1730,82 @@ def approve_or_reject_task(request):
             return JsonResponse({"status": "error", "message": "Invalid JSON format."}, status=400)
 
     return JsonResponse({"status": "error", "message": "Invalid request method."}, status=405)
+
+
+
+# Share the task with team members
+def get_workspace_members(request):
+    """Fetch all members of an organization."""
+    org_id = request.GET.get("org_id")
+    
+    if not org_id:
+        return JsonResponse({"status": "error", "message": "Organization ID is required"}, status=400)
+    
+    organization = get_object_or_404(Organization, id=org_id)
+    
+    members = Profile.objects.filter(organization=organization).values(
+        "user_id", "full_name", "profile_picture", "user__email"
+    )
+    
+    return JsonResponse({"status": "success", "members": list(members)})
+
+
+# Send task details to members
+def send_task_to_members(request):
+    """Send task details to selected workspace members via email."""
+    if request.method != "POST":
+        return JsonResponse({"status": "error", "message": "Invalid request method"}, status=405)
+    
+    data = json.loads(request.body)
+    org_id = data.get("org_id")
+    group_id = data.get("group_id")
+    task_id = data.get("task_id")
+    selected_members = data.get("selected_members", [])
+
+    if not (org_id and group_id and task_id and selected_members):
+        return JsonResponse({"status": "error", "message": "Missing required fields"}, status=400)
+
+    # Fetch organization, group, and task
+    organization = get_object_or_404(Organization, id=org_id)
+    group = get_object_or_404(Group, id=group_id)
+    task = get_object_or_404(Task, id=task_id)
+
+    # Fetch members' emails
+    members = Profile.objects.filter(user_id__in=selected_members, organization=organization)
+    recipient_emails = [member.user.email for member in members]
+
+    # Email Subject & Body
+    subject = f"Task Assigned: {task.title}"
+    message = f"""
+    Hello,
+    
+    You have been assigned a task in {organization.name}.
+    
+    **Task Title:** {task.title}
+    **Group:** {group.name}
+    **Description:** {task.description}
+    
+    Please check it in your workspace.
+    
+    Best Regards,
+    {organization.name} Team
+    """
+
+    # Send Email
+    send_mail(subject, message, "no-reply@calendarplus.com", recipient_emails)
+
+    return JsonResponse({"status": "success", "message": "Task details sent successfully!"})
+
+
+
+
+
+
+
+
+
+
+
 
 
 
