@@ -102,10 +102,14 @@
         <!-- Reward Card -->
         <div class="reward-card" id="rewardCard">
             <h2>🏆 CalPoints Reward</h2>
-            <p><strong>Task:</strong> {{ task.title }}</p>
-            <p><strong>Priority:</strong> {{ task.priority }}</p>
-            <p><strong>Assigned To:</strong> {{ task.assigned_to.username }}</p>
-            <p><strong>Earned:</strong> <span class="highlight">{{ calpoints }} CalPoints</span></p>
+            <p><strong></strong> {{ latest_reward.task.assigned_to.username }}</p>
+            <strong>Workspace: {{latest_reward.organization.name}}</strong>
+            <strong>Group: {{latest_reward.group.name}}</strong>
+            <strong>Project Manager: {{latest_reward.task.created_by.username}}</strong>
+            <p><strong>Task:</strong> {{ latest_reward.task.title }}</p>
+            <p><strong>Priority:</strong> {{ latest_reward.task.priority }}</p>
+            <p><strong>Earned:</strong> <span class="highlight">{{ calpoints.points }} CalPoints</span></p>
+        
         </div>
 
         <!-- Download Button -->
