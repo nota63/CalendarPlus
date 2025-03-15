@@ -3,226 +3,144 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>🎉 CalPoints Earned! | CalendarPlus</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>🎉 You Earned CalPoints! 🏆</title>
     <style>
-        :root {
-            --primary-gradient: linear-gradient(135deg, #00C9FF 0%, #92FE9D 100%);
-            --glass-bg: rgba(255, 255, 255, 0.9);
-            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-        }
-
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--primary-gradient);
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
             margin: 0;
-            padding: 2rem;
-            min-height: 100vh;
-            display: grid;
-            place-items: center;
+            padding: 20px;
         }
-
         .container {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            border-radius: 24px;
-            box-shadow: var(--shadow);
-            width: 100%;
-            max-width: 680px;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .header {
-            background: var(--primary-gradient);
-            padding: 2.5rem;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: auto;
             text-align: center;
-            position: relative;
         }
-
-        .header h1 {
+        .header {
+            background-color: #4CAF50;
             color: white;
-            margin: 0;
-            font-size: 2.2rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px;
+            font-size: 22px;
+            font-weight: bold;
+            border-radius: 8px 8px 0 0;
         }
-
-        .logo-container {
+        .logos {
+            margin-top: 15px;
             display: flex;
             justify-content: center;
-            gap: 1.5rem;
-            margin-top: -3rem;
+            align-items: center;
+            gap: 15px;
         }
-
         .logo {
-            width: 80px;
-            height: 80px;
-            background: white;
-            border-radius: 16px;
-            padding: 1rem;
-            box-shadow: var(--shadow);
-            transition: transform 0.3s ease;
+            width: 100px;
+            height: auto;
+            border-radius: 50%;
         }
-
-        .logo:hover {
-            transform: translateY(-5px);
-        }
-
         .plus-icon {
-            position: relative;
-            top: 28px;
-            font-size: 2rem;
-            color: white;
-            font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-size: 24px;
+            color: #4CAF50;
+            font-weight: bold;
         }
-
         .content {
-            padding: 2.5rem;
-            color: #2d3748;
+            padding: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+            text-align: left;
         }
-
-        .calpoints-badge {
-            background: var(--primary-gradient);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin: 1.5rem 0;
-            box-shadow: var(--shadow);
+        .highlight {
+            color: #E67E22;
+            font-size: 18px;
+            font-weight: bold;
         }
-
-        .task-details {
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .detail-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.8rem 0;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .reward-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .reward-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .reward-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow);
-        }
-
-        .reward-icon {
-            width: 48px;
-            height: 48px;
-            margin-bottom: 1rem;
-        }
-
-        .btn-primary {
-            background: var(--primary-gradient);
-            color: white;
-            padding: 1rem 2.5rem;
+        .rewards-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
             border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-
-        .footer {
-            padding: 2rem;
             text-align: center;
-            background: rgba(255, 255, 255, 0.6);
-            color: #718096;
-            font-size: 0.9rem;
+        }
+        .reward-icons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        .reward-icons img {
+            width: 50px;
+            height: auto;
+        }
+        .footer {
+            margin-top: 20px;
+            padding: 15px;
+            font-size: 14px;
+            color: #777;
+            background-color: #f9f9f9;
+            border-radius: 0 0 8px 8px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-size: 16px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .btn:hover {
+            background-color: #388E3C;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Logos Section -->
+        <div class="logos">
+            <img src="{% static 'assets/images/calpoints.png'%}" alt="CalPoints" class="logo">
+            <span class="plus-icon">+</span>
+            <img src="{% static 'assets/images/calendarplus.png'%}" alt="Calendar Plus" class="logo">
+        </div>
+        
         <div class="header">
-            <h1>Task Completed! 🎉</h1>
-            <div class="logo-container">
-                <img src="{% static 'assets/images/calpoints.png' %}" alt="CalPoints" class="logo">
-                <span class="plus-icon">+</span>
-                <img src="{% static 'assets/images/calendarplus.png' %}" alt="Calendar Plus" class="logo">
-            </div>
+            🎉 Congratulations, {{ assignee_name }}! 🎉
         </div>
 
         <div class="content">
-            <div class="calpoints-badge">
-                🏆 Earned {{ calpoints }} CalPoints
+            <p>You've just completed the task: <strong>{{ task_title }}</strong> 🚀</p>
+            <p>Your dedication and hard work have paid off, and you’ve earned <span class="highlight">{{ calpoints }} CalPoints!</span> 🎯</p>
+
+            <p>💪 **Keep pushing your limits, keep achieving!**</p>
+            <p>🌟 Every task you complete brings you closer to your goals.</p>
+
+            <p>Here’s a breakdown of your achievement:</p>
+            <ul>
+                <li>🎯 **Task Priority:** {{ task_priority }}</li>
+                <li>📅 **Deadline:** {{ deadline }}</li>
+                <li>✅ **Completed On:** {{ completed_on }}</li>
+                <li>🏢 **Organization:** {{ organization }}</li>
+            </ul>
+
+            <a href="https://calendarplus.com/dashboard" class="btn">View Your Progress 🚀</a>
+        </div>
+
+        <!-- Uses of CalPoints Section -->
+        <div class="rewards-section">
+            <h3>🛍️ Uses of CalPoints</h3>
+            <p>You can redeem your CalPoints to purchase **premium apps** on **CalAppStore**! 🚀</p>
+            <div class="reward-icons">
+                <img src="https://yourdomain.com/static/calappstore_logo.png" alt="CalAppStore">
             </div>
-
-            <p class="greeting">Hey {{ assignee_name }},</p>
-            <p>Great work completing <strong>"{{ task_title }}"</strong>! Your dedication is moving <strong>{{ organization }}</strong> forward. 🚀</p>
-
-            <div class="task-details">
-                <div class="detail-item">
-                    <span>Priority:</span>
-                    <strong>{{ task_priority }}</strong>
-                </div>
-                <div class="detail-item">
-                    <span>Deadline:</span>
-                    <strong>{{ deadline }}</strong>
-                </div>
-                <div class="detail-item">
-                    <span>Completed:</span>
-                    <strong>{{ completed_on }}</strong>
-                </div>
-            </div>
-
-            <h3>Redeem Your Points</h3>
-            <div class="reward-grid">
-                <div class="reward-card">
-                    <img src="https://yourdomain.com/static/amazon_logo.svg" class="reward-icon" alt="Amazon">
-                    <div>Amazon Gift Cards</div>
-                </div>
-                <div class="reward-card">
-                    <img src="https://yourdomain.com/static/flipkart_logo.svg" class="reward-icon" alt="Flipkart">
-                    <div>Flipkart Vouchers</div>
-                </div>
-                <div class="reward-card">
-                    <img src="https://yourdomain.com/static/zomato_logo.svg" class="reward-icon" alt="Zomato">
-                    <div>Zomato Credits</div>
-                </div>
-            </div>
-
-            <a href="https://calendarplus.com/dashboard" class="btn-primary">
-                View Dashboard →
-            </a>
+            <a href="https://calendarplus.com/calappstore" class="btn">Explore CalAppStore 🛒</a>
         </div>
 
         <div class="footer">
-            <p>🎯 Keep achieving with CalendarPlus</p>
-            <p>📍 Made with ❤️ by Team CalendarPlus</p>
+            <p>📅 **CalPoints by CalendarPlus** | Empowering Productivity</p>
+            <p>🚀 Keep growing, keep winning!</p>
         </div>
     </div>
 </body>
