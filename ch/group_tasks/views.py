@@ -1735,7 +1735,7 @@ def approve_or_reject_task(request):
 
 # Share the task with team members
 def get_workspace_members(request):
-    """Fetch all members of an organization."""
+    """Fetch all members of an organization with full profile picture URLs."""
     org_id = request.GET.get("org_id")
     
     if not org_id:
@@ -1743,11 +1743,19 @@ def get_workspace_members(request):
     
     organization = get_object_or_404(Organization, id=org_id)
     
-    members = Profile.objects.filter(organization=organization).values(
-        "user_id", "full_name", "profile_picture", "user__email"
-    )
+    members = Profile.objects.filter(organization=organization)
     
-    return JsonResponse({"status": "success", "members": list(members)})
+    members_data = []
+    for member in members:
+        members_data.append({
+            "user_id": member.user.id,
+            "full_name": member.full_name,
+            "profile_picture": request.build_absolute_uri(member.profile_picture.url) if member.profile_picture else settings.STATIC_URL + "default-profile.png",
+            "email": member.user.email
+        })
+    
+    return JsonResponse({"status": "success", "members": members_data})
+
 
 
 # Send task details to members
