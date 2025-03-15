@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect , get_list_or_404
 from .models import (Task, TaskNote, TaskComment , TaskTag, ActivityLog,RecentVisit,MeetingTaskQuery,CommunicateTask,TaskReminder
                      
-                     ,PendingRewardNotification)
+                     ,PendingRewardNotification,CalPoints)
 from accounts.models import Organization, Profile
 from groups.models import Group
 from django.views import View
@@ -1947,6 +1947,12 @@ def my_day_task_detail(request, org_id, group_id, task_id):
     time_spent = task_timer.accumulated_time if task_timer else timedelta()
     formatted_time = str(time_spent)
 
+    # find earned points if task is completed
+    calpoints = None
+    if task.status =='completed':
+        calpoints = CalPoints.objects.filter(task=task, organization=organization, group=group, user=request.user).first()
+    
+
     # check if user installed the Extend Tasks app
     # Check if "Extend Tasks" app is installed
     extend_tasks = InstalledMiniApp.objects.filter(organization=organization, user=request.user, mini_app__name="Extend Tasks")
@@ -1968,6 +1974,7 @@ def my_day_task_detail(request, org_id, group_id, task_id):
         'problems':problems,
         'extend_tasks':extend_tasks,
         'queries':queries,
+        'calpoints':calpoints,
     })
 
 
@@ -2927,4 +2934,4 @@ def clear_recent_tabs(request):
 
 
 
-# VIEW TO FETCH LATEST UNSEEN REWARDS
+
