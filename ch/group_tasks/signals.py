@@ -4,8 +4,11 @@ from django.dispatch import receiver
 from django.core.mail import send_mail, EmailMessage
 from django.template.loader import render_to_string
 from django.conf import settings
-from .models import Problem, TaskComment,MeetingTaskQuery
+from .models import (Problem, TaskComment,MeetingTaskQuery,CalPoints)
+from django.utils.html import strip_tags
 
+
+# when a user report a problem , notify the manager 
 @receiver(post_save, sender=Problem)
 def send_problem_report_email(sender, instance, created, **kwargs):
     if created:
@@ -152,3 +155,42 @@ def send_meeting_email(sender, instance, created, **kwargs):
             recipient_list, 
             fail_silently=False
         )
+
+
+
+# SEND EMAIL NOTIFICATION TO THE TASK ASSIGNEE AFTER EARINING POINTS
+@receiver(post_save, sender=CalPoints)
+def send_calpoints_email(sender, instance, created, **kwargs):
+    """
+    Sends an email notification to the user when they earn CalPoints.
+    """
+    if created:  # Only send email for new reward records
+        subject = "🎉 Congratulations! You've Earned CalPoints!"
+
+        context = {
+            "assignee_name": instance.user.get_full_name() or instance.user.username,
+            "task_title": instance.task.title,
+            "calpoints": instance.points,
+            "task_priority": instance.task.priority,
+            "deadline": instance.task.deadline.strftime("%d %b %Y") if instance.task.deadline else "No deadline",
+            "completed_on": instance.task.end_date.strftime("%d %b %Y") if instance.task.end_date else "Today",
+            "organization": instance.organization.name if instance.organization else "N/A",
+            "reason": instance.reason
+        }
+
+        # Load the email template
+        html_message = render_to_string('emails/calpoints_earned.html', context)
+        plain_message = strip_tags(html_message)  # Fallback for non-HTML clients
+
+        send_mail(
+            subject,
+            plain_message,
+            settings.DEFAULT_FROM_EMAIL,
+            [instance.user.email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+
+
+
+

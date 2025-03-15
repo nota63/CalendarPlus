@@ -162,3 +162,5 @@ def send_task_notification_email(org_id, group_id, task_id, action):
         [assignee.email],  
         fail_silently=False,
     )
+
+

@@ -161,8 +161,8 @@ class Task(models.Model):
 
         # REWARD THE TASK.ASSIGNED_TO ON TASK COMPLETION
         if self.status == "completed":
-          from datetime import datetime  # Importing here to avoid circular imports
-          from .models import CalPoints  # Importing inside to prevent issues
+          from datetime import datetime  
+          from .models import CalPoints 
 
         assigned_user = self.assigned_to
         if assigned_user:
@@ -199,6 +199,7 @@ class Task(models.Model):
             )
 
 
+
      print(f"DEBUG: Saving Task {self.id} - Status: {self.status}, Progress: {self.progress}")  
 
      super().save(*args, **kwargs)  # Save without calling update_task_progress() again
@@ -228,6 +229,9 @@ class Task(models.Model):
         pass
 
     
+
+
+
 
 # Add day to track the task
 class AddDay(models.Model):
