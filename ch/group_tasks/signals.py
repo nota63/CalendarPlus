@@ -179,7 +179,7 @@ def send_calpoints_email(sender, instance, created, **kwargs):
         }
 
         # Load the email template
-        html_message = render_to_string('emails/calpoints_earned.html', context)
+        html_message = render_to_string('task/email/calpoints_earned.html', context)
         plain_message = strip_tags(html_message)  # Fallback for non-HTML clients
 
         send_mail(
