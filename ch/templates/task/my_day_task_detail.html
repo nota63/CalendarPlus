@@ -1501,30 +1501,57 @@ video::-webkit-media-controls-panel {
 </div>
 
 <!-- Share task with team - members -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <div class="modal fade" id="shareTaskModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">👥 Share Task with Workspace Members</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 overflow-hidden" style="
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 1.5rem;
+            font-family: 'Poppins', sans-serif;
+        ">
+            <div class="modal-header p-6" style="border-bottom: 1px solid rgba(255, 255, 255, 0.3);">
+                <h5 class="modal-title text-xl font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                    ✨ Share Task with Team
+                </h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <div id="membersList" class="d-flex flex-wrap gap-3">
-                    <!-- Members will be dynamically added here -->
+            
+            <div class="modal-body p-6" style="max-height: 60vh; overflow-y: auto;">
+                <div class="space-y-3">
+                    <div class="flex items-center px-4 py-2.5 bg-white/50 rounded-lg shadow-sm transition-all duration-200 hover:shadow-md">
+                        <input type="text" 
+                               class="form-control border-0 bg-transparent focus:ring-0 placeholder-gray-400" 
+                               placeholder="Search members...">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+
+                    <div id="membersList" class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        <!-- Sample Member Card -->
+                        <div class="member-card flex items-center p-3 bg-white/60 rounded-xl shadow-sm transition-all duration-200 hover:shadow-md cursor-pointer border-2 border-transparent hover:border-indigo-100">
+                            <img src="avatar-placeholder.png" class="w-8 h-8 rounded-full shadow-sm">
+                            <div class="ml-3">
+                                <h6 class="text-sm font-semibold text-gray-800 mb-0">John Doe</h6>
+                                <p class="text-xs text-gray-500 mb-0">Developer</p>
+                            </div>
+                        </div>
+                        <!-- Repeat member cards -->
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button id="sendTaskBtn" class="btn btn-success">
-                    <span id="sendSpinner" class="spinner-border spinner-border-sm d-none"></span>
-                    📩 Send Task
+
+            <div class="modal-footer p-6" style="border-top: 1px solid rgba(255, 255, 255, 0.3);">
+                <button id="sendTaskBtn" class="btn btn-lg w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
+                    <span id="sendSpinner" class="spinner-border spinner-border-sm d-none me-2"></span>
+                    Share Task with Selected Members
                 </button>
             </div>
         </div>
     </div>
 </div>
-
-
-
 
 
 
@@ -2087,7 +2114,7 @@ video::-webkit-media-controls-panel {
                       data-task-id="789" 
                       class="w-full flex items-center gap-3 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors">
                       <span class="material-icons" style="color: dodgerblue;" >share</span>
-                     Share Task
+                     Share and Help
                   </button>
 
                 <!-- Task Completion Button -->

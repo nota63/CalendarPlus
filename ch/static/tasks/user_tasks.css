@@ -1,0 +1,15 @@
+ /* Custom Scrollbar */
+ .modal-body::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+}
+
+.member-card.selected {
+    border-color: #6366f1;
+    background: rgba(99, 102, 241, 0.08);
+}
+
+.modal-content {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
