@@ -1666,7 +1666,7 @@ def task_completion_request_view(request):
             task.status = "pending_approval"
             task.save()
             # send task approval to the manager
-            # task_submission_approval(org_id=organization.id, group_id=group_id,task_id=task.id)
+            task_submission_approval(org_id=organization.id, group_id=group_id,task_id=task.id)
 
             return JsonResponse({"status": "success", "message": "Task completion request sent for approval."})
 
