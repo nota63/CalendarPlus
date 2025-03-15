@@ -6,7 +6,9 @@ import time
 import pyautogui
 from PIL import Image
 from io import BytesIO
-from .models import RecentVisit
+from .models import RecentVisit,PendingRewardNotification
+from django.shortcuts import redirect
+
 
 class RecentActivityMiddleware(MiddlewareMixin):
     def process_request(self, request):
@@ -71,3 +73,23 @@ class RecentActivityMiddleware(MiddlewareMixin):
         except Exception as e:
             print(f"❌ Screenshot Capture Error: {e}")
             return None
+
+
+
+
+# REDIRECT AND SHOW THE USER / UNSEEN REWARDS
+
+class RewardRedirectMiddleware(MiddlewareMixin):
+    def process_request(self, request):
+        # Check if the user is authenticated
+        if request.user.is_authenticated:
+            # Check if the user has any unseen pending rewards
+            has_pending_reward = PendingRewardNotification.objects.filter(
+                user=request.user, is_seen=False
+            ).exists()
+
+            # If an unseen reward exists and the user is visiting the organizations page, redirect them
+            if has_pending_reward and request.path == "/calendar/organizations/":
+                return redirect("/latest_pending_reward/")  
+
+        return None  # Allow normal request processing if no condition matches

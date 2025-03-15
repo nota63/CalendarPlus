@@ -24,6 +24,7 @@ from calendar_plus.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('latest_pending_reward/',views.latest_pending_reward, name='latest_pending_reward'),
     # path('',LandingPageView.as_view(), name='landing_page'),
     path('',views.home, name='home'),
     path('meet/', include('meet.urls')),

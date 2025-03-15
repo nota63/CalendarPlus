@@ -867,3 +867,12 @@ class CalPoints(models.Model):
         verbose_name = "CalPoints Record"
         verbose_name_plural = "CalPoints Records"
 
+
+# HANDLE UNSEEN PENDING REWARDS
+class PendingRewardNotification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)  
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_seen = models.BooleanField(default=False) 

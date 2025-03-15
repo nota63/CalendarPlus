@@ -2,7 +2,8 @@ from django.contrib import admin
 from unfold.admin import ModelAdmin
 from .models import (Task, AddDay, TaskComment, TaskNote, TaskTag, TaskTimer, ActivityLog, TaskTimeTracking,
                      
-                      Problem,AttachmentsTasksApp,RecentVisit,MeetingTaskQuery,CommunicateTask,SubTask,TaskReminder,CalPoints)
+                      Problem,AttachmentsTasksApp,RecentVisit,MeetingTaskQuery,CommunicateTask,SubTask,TaskReminder,CalPoints,
+                      PendingRewardNotification)
 
 @admin.register(Task)
 class TaskAdmin(ModelAdmin):
@@ -78,4 +79,9 @@ class TaskRemindersAdmin(ModelAdmin):
 @admin.register(CalPoints)
 class CalpointsAdmin(ModelAdmin):
     list_display = [field.name for field in CalPoints._meta.fields]
+
+
+@admin.register(PendingRewardNotification)
+class PendingRewardNotificationAdmin(ModelAdmin):
+    list_display = [field.name for field in PendingRewardNotification._meta.fields]
 

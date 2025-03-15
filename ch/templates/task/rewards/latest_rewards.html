@@ -1,0 +1,128 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎉 You Earned CalPoints! 🏆</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            text-align: center;
+        }
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo {
+            width: 80px;
+            height: auto;
+            border-radius: 50%;
+        }
+        .header {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-top: 15px;
+        }
+        .greeting {
+            font-size: 16px;
+            color: #333;
+            margin-top: 10px;
+            line-height: 1.6;
+        }
+        .reward-card {
+            background: linear-gradient(135deg, #4CAF50, #388E3C);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            color: white;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .reward-card h2 {
+            margin: 10px 0;
+            font-size: 22px;
+        }
+        .highlight {
+            font-size: 18px;
+            font-weight: bold;
+            color: #FFD700;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #FF9800;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-size: 16px;
+            border-radius: 5px;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: background 0.3s ease-in-out;
+        }
+        .btn:hover {
+            background-color: #E67E22;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Logos -->
+        <div class="logo-container">
+            <img src="{% static 'assets/images/calendarplus.png' %}" alt="CalendarPlus" class="logo">
+            <img src="{% static 'assets/images/calpoints.png' %}" alt="CalPoints" class="logo">
+        </div>
+
+        <!-- Greeting -->
+        <div class="header">🎉 Congratulations, {{ user.username }}! 🎉</div>
+        <p class="greeting">
+            Hard work always pays off! You just completed the task "<strong>{{ task.title }}</strong>" and your dedication has earned you a well-deserved **CalPoints reward**!  
+            <br><br>
+            🌟 Every step you take is a step toward greatness. Keep completing tasks, keep earning, and make the most of your achievements! 🚀
+        </p>
+
+        <!-- Reward Card -->
+        <div class="reward-card" id="rewardCard">
+            <h2>🏆 CalPoints Reward</h2>
+            <p><strong>Task:</strong> {{ task.title }}</p>
+            <p><strong>Priority:</strong> {{ task.priority }}</p>
+            <p><strong>Assigned To:</strong> {{ task.assigned_to.username }}</p>
+            <p><strong>Earned:</strong> <span class="highlight">{{ calpoints }} CalPoints</span></p>
+        </div>
+
+        <!-- Download Button -->
+        <button class="btn" onclick="downloadRewardCard()">📥 Download Your Reward</button>
+    </div>
+
+    <script>
+        function downloadRewardCard() {
+            const cardElement = document.getElementById('rewardCard');
+
+            html2canvas(cardElement).then((canvas) => {
+                let link = document.createElement('a');
+                link.href = canvas.toDataURL("image/png");
+                link.download = "CalPoints_Reward.png";
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>

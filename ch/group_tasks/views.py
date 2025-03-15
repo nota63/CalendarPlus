@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect , get_list_or_404
-from .models import (Task, TaskNote, TaskComment , TaskTag, ActivityLog,RecentVisit,MeetingTaskQuery,CommunicateTask,TaskReminder)
+from .models import (Task, TaskNote, TaskComment , TaskTag, ActivityLog,RecentVisit,MeetingTaskQuery,CommunicateTask,TaskReminder
+                     
+                     ,PendingRewardNotification)
 from accounts.models import Organization, Profile
 from groups.models import Group
 from django.views import View
@@ -1744,7 +1746,9 @@ def approve_or_reject_task(request):
             group_id = data.get("group_id")
             task_id = data.get("task_id")
             password = data.get("password")
-            action = data.get("action")  # "approve" or "reject"
+            action = data.get("action") 
+
+            organization = get_object_or_404(Organization, id=org_id)
 
             # ✅ Validate Fields
             if not (org_id and group_id and task_id and password and action):
@@ -1778,7 +1782,16 @@ def approve_or_reject_task(request):
 
                 task.status = "completed"
                 task.save()
-                 # 💌 Send Email Notification with Organization & Group Details
+
+                # Save the unseen info 
+                PendingRewardNotification.objects.create(
+                    task=task,
+                    organization=organization,
+                    group=task.group,
+                    user=task.assigned_to,
+
+                )
+                # 💌 Send Email Notification with Organization & Group Details
                 send_task_notification_email(org_id, group_id, task_id, "approve")
     
                 return JsonResponse({"status": "success", "message": "Task has been approved & completed!", "approved": True}, status=200)
@@ -2911,3 +2924,7 @@ def clear_recent_tabs(request):
         return JsonResponse({"status": "success", "message": "Recent tabs cleared!"})
     
     return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)
+
+
+
+# VIEW TO FETCH LATEST UNSEEN REWARDS

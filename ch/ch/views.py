@@ -90,3 +90,18 @@ class OrgGuideView(View):
             return redirect("org_detail", org_id=org_id)  
 
         return redirect("organization_list")  # Fallback if org_id is missing
+    
+
+
+# FETCH UNSEEN REWARDS 
+from group_tasks.models import PendingRewardNotification
+
+@login_required
+def latest_pending_reward(request):
+    latest_reward = PendingRewardNotification.objects.filter(user=request.user, is_seen=False).order_by('-created_at').first()
+    
+    if latest_reward:
+        latest_reward.is_seen = True  
+        latest_reward.save()
+
+    return render(request, 'task/rewards/latest_rewards.html', {'latest_reward': latest_reward})

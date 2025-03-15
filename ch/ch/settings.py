@@ -135,6 +135,7 @@ MIDDLEWARE = [
     'ch.middlewares.CheckEmailMiddleware',
     'ch.middlewares.FirstTimeGuideMiddleware',
     'ch.middlewares.OrgGuideMiddleware',
+    'group_tasks.middlewares.RewardRedirectMiddleware',
     # 'axes.middleware.AxesMiddleware',
     # 'group_tasks.middlewares.RecentActivityMiddleware',
 
