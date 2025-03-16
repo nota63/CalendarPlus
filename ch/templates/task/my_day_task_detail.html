@@ -1967,13 +1967,34 @@ video::-webkit-media-controls-panel {
 
 
 <!-- TASK DEADLINE -->
-<div class="mt-4">
-    <p class="text-xl font-semibold">Time Left:</p>
-    <p id="countdown" class="text-2xl font-bold text-green-400 mt-2 animate-pulse"></p>
+<div class="fixed top-0 left-1/2 -translate-x-1/2 z-50 w-full max-w-screen-md mx-auto pt-2">
+    <div class="p-3 rounded-b-lg bg-white/90 backdrop-blur-sm border border-t-0 border-blue-100 shadow-sm transition-all duration-300 hover:bg-white hover:border-blue-200 hover:shadow-md mx-4">
+        <div class="flex items-baseline gap-2">
+            <p class="text-[11px] font-medium text-blue-400/90 tracking-wide">TIME REMAINING</p>
+            <div class="relative">
+                <div class="absolute -inset-x-1.5 inset-y-0 bg-blue-100/30 rounded-sm blur opacity-0 hover:opacity-40 transition-opacity duration-300"></div>
+                <p id="countdown" class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-600 font-mono tracking-tighter animate-soft-pulse">
+                    00:00:00
+                </p>
+            </div>
+        </div>
+    </div>
 </div>
 
+<style>
+@keyframes soft-pulse {
+    0% { opacity: 0.95; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(-1px); }
+    100% { opacity: 0.95; transform: translateY(0); }
+}
 
-<!-- main content  -->
+.animate-soft-pulse {
+    animation: soft-pulse 2.5s ease-in-out infinite;
+}
+</style>
+
+
+<!-- main content  ---------------------------------------------------------------------------------------------------------->
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 font-['Roboto']">
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <!-- Main Content -->
