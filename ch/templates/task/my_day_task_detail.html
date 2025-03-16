@@ -1964,6 +1964,15 @@ video::-webkit-media-controls-panel {
 </style>
 {% endif %}
 
+
+
+<!-- TASK DEADLINE -->
+<div class="mt-4">
+    <p class="text-xl font-semibold">Time Left:</p>
+    <p id="countdown" class="text-2xl font-bold text-green-400 mt-2 animate-pulse"></p>
+</div>
+
+
 <!-- main content  -->
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 font-['Roboto']">
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -4528,6 +4537,47 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+// TASK DEADLINE COUNT
+function startCountdown(deadline) {
+            let countdownElement = document.getElementById("countdown");
+            let deadlineDate = new Date(deadline).getTime();
+
+            function updateCountdown() {
+                let now = new Date().getTime();
+                let timeLeft = deadlineDate - now;
+
+                if (timeLeft <= 0) {
+                    countdownElement.innerHTML = "⏳ Time Over!";
+                    countdownElement.classList.remove("text-green-400", "text-yellow-400");
+                    countdownElement.classList.add("text-red-500");
+                    return;
+                }
+
+                let days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                let hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                let minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                let seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                countdownElement.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+                // Change styles dynamically
+                if (days < 1) {
+                    countdownElement.classList.remove("text-green-400");
+                    countdownElement.classList.add("text-yellow-400");
+                }
+                if (hours < 1) {
+                    countdownElement.classList.remove("text-yellow-400");
+                    countdownElement.classList.add("text-red-500");
+                }
+            }
+
+            setInterval(updateCountdown, 1000);
+            updateCountdown(); // Run instantly
+        }
+
+        // Get deadline from Django (formatted as ISO 8601)
+        let taskDeadline = "{{ task.deadline|date:'c' }}";  
+        startCountdown(taskDeadline);
 
 
 
