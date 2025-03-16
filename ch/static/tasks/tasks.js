@@ -383,6 +383,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const userProfilePicture = document.getElementById("userProfilePicture");
     const userTasks=document.getElementById("userTasks");
     const userCompletedTasks=document.getElementById("userCompletedTasks");
+    const userCalpoints = document.getElementById("userCalpoints");
 
     // Set your variables dynamically from the template
     const ORG_ID = window.djangoData.orgId; // Pass from Django template
@@ -398,6 +399,7 @@ document.addEventListener("DOMContentLoaded", function () {
             userTasks.textContent="-";
             userProfilePicture.style.display = "none";
             userCompletedTasks.textContent="-";
+            userCalpoints.textContent="-";
             submitBtn.disabled = true;
             return;
         }
@@ -411,12 +413,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     userProfilePicture.style.display = "none";
                     userTasks.style.display='none';
                     userCompletedTasks.style.display='none';
+                    userCalpoints.style.display="none"
                     submitBtn.disabled = true;
                 } else {
                     userFullName.textContent = data.full_name;
                     userTasks.textContent=data.tasks;
                     userStatus.textContent = "Available in group";
                     userCompletedTasks.textContent=data.completed_tasks;
+                    userCalpoints.textContent=data.calpoints;
                     if (data.profile_picture) {
                         userProfilePicture.src = data.profile_picture;
                         userProfilePicture.style.display = "block";

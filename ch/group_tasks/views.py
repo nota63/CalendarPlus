@@ -1925,6 +1925,8 @@ def fetch_user_info(request, org_id, group_id):
 
         # Fetch user profile
         profile = Profile.objects.filter(user=user, organization=organization).first()
+        # total calpoints earned
+        calpoints=CalPoints.objects.filter(organization=organization,group=group,user=user).count()
 
 
         # Tasks preparation
@@ -1941,6 +1943,7 @@ def fetch_user_info(request, org_id, group_id):
             "profile_picture": profile.profile_picture.url if profile and profile.profile_picture else None,
             'tasks':tasks,
             'completed_tasks':completed_tasks,
+            "calpoints":calpoints,
             "message": "User found!"
         })
 
