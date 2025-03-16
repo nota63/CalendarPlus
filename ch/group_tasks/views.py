@@ -1925,9 +1925,12 @@ def fetch_user_info(request, org_id, group_id):
 
         # Fetch user profile
         profile = Profile.objects.filter(user=user, organization=organization).first()
-        # currently having tasks
-        tasks=Task.objects.filter(assigned_to=user,organization=organization,group=group).count()
+        # currently having incomplete-tasks 
+        tasks=Task.objects.filter(assigned_to=user,organization=organization,group=group,status='in_progress').count()
+        # completed_tasks
 
+        # prepare the message 
+        
         return JsonResponse({
             "full_name": profile.full_name if profile else user.username,
             "profile_picture": profile.profile_picture.url if profile and profile.profile_picture else None,
