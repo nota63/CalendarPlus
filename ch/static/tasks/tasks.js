@@ -381,6 +381,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const userFullName = document.getElementById("userFullName");
     const userStatus = document.getElementById("userStatus");
     const userProfilePicture = document.getElementById("userProfilePicture");
+    const userTasks=document.getElementById("userTasks")
 
     // Set your variables dynamically from the template
     const ORG_ID = window.djangoData.orgId; // Pass from Django template
@@ -393,6 +394,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (email.length < 5) {
             userFullName.textContent = "-";
             userStatus.textContent = "-";
+            userTasks.textContent="-";
             userProfilePicture.style.display = "none";
             submitBtn.disabled = true;
             return;
@@ -405,9 +407,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     userFullName.textContent = "Not Found!";
                     userStatus.textContent = data.error;
                     userProfilePicture.style.display = "none";
+                    userTasks.style.display='none';
                     submitBtn.disabled = true;
                 } else {
                     userFullName.textContent = data.full_name;
+                    userTasks.textContent=data.tasks;
                     userStatus.textContent = "Available in group";
                     if (data.profile_picture) {
                         userProfilePicture.src = data.profile_picture;
