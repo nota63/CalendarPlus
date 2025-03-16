@@ -1907,6 +1907,8 @@ def reassign_task(request, org_id, group_id, task_id):
     
     return JsonResponse({"error": "Invalid request!"}, status=400)
 
+
+# USER INFO AND SUGGESTIONS TO CONSIDER OR NOT 
 def fetch_user_info(request, org_id, group_id):
     """Fetches user info dynamically based on email input."""
     email = request.GET.get("email")
@@ -1989,7 +1991,7 @@ def fetch_user_info(request, org_id, group_id):
               final_message = (
         f"🔥 {user.username} has completed **{completed_tasks}** tasks! This is an **elite level** of contribution. "
         f"They are **indispensable** to the team. Assign **critical** tasks to them only if absolutely necessary!"
-    )
+     )
 
         print("FINAL MESSAGE:",final_message)
 
