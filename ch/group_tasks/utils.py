@@ -6,7 +6,7 @@ from django.core.mail import send_mail
 from groups.models import Group
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-
+from django.http import HttpResponseBadRequest
 
 # send the reply
 def send_reply(org_id,task_id,meeting_id,reply_text):
@@ -162,5 +162,24 @@ def send_task_notification_email(org_id, group_id, task_id, action):
         [assignee.email],  
         fail_silently=False,
     )
+
+
+
+# SEND TASK ASSIGNED 
+
+def send_task_assignment_notification(org_id, group_id, task_id,user):
+    organization = get_object_or_404(Organization, id=org_id)
+    group=get_object_or_404(Group, id=group_id, organization=organization)
+    task=get_object_or_404(Task, id=task_id, organization=organization, group=group)
+
+    if not all(organization and group and task):
+        return HttpResponseBadRequest("Required Parameters are missing!")
+    
+    subject= f'Task Reassignment - {task.title}'
+    message=f'Hello {task.assigned_to.username},\n {task.created_by.username} Assigned a task to you\n Below are the important details you have to read\n Task:{task.title}\n Deadline:{task.deadline}\n Priority:{task.priority}\n Description:{task.description}\n Workspace & Group\n Workspace:{organization.name}\n Group:{group.name}\n Please complete the task ASAP! Thank you,\n Team CalendarPlus'
+    from_email=settings.DEFAULT_FROM_EMAIL
+    recipient_list=[task.assigned_to.email]
+
+    send_mail(subject, message, from_email, recipient_list)
 
 
