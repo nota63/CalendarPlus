@@ -1321,7 +1321,40 @@ video::-webkit-media-controls-panel {
 
 
 <!-------------------------------------------------------------------------------------------------------------------------------------------------------  -->
-   
+<!-- Task Deadline -->
+
+<!-- TASK DEADLINE -->
+<div class="fixed top-0 left-1/2 -translate-x-1/2 z-50 w-full max-w-screen-md mx-auto pt-2">
+    <div class="p-3 rounded-b-lg bg-white/90 backdrop-blur-sm border border-t-0 border-blue-100 shadow-sm transition-all duration-300 hover:bg-white hover:border-blue-200 hover:shadow-md mx-4">
+        <div class="flex items-baseline gap-2">
+            <p class="text-[11px] font-medium text-blue-400/90 tracking-wide">TIME REMAINING</p>
+            <div class="relative">
+                <div class="absolute -inset-x-1.5 inset-y-0 bg-blue-100/30 rounded-sm blur opacity-0 hover:opacity-40 transition-opacity duration-300"></div>
+                <p id="countdown" class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-600 font-mono tracking-tighter animate-soft-pulse">
+                    00:00:00
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes soft-pulse {
+    0% { opacity: 0.95; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(-1px); }
+    100% { opacity: 0.95; transform: translateY(0); }
+}
+
+.animate-soft-pulse {
+    animation: soft-pulse 2.5s ease-in-out infinite;
+}
+</style>
+<br><br><br>
+<!-- ---------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+
+
+
+
 
     <button class="chat-fab start-chat-btn" 
         data-org="{{ organization.id }}" 
@@ -2688,6 +2721,48 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+
+// TASK DEADLINE COUNT
+function startCountdown(deadline) {
+            let countdownElement = document.getElementById("countdown");
+            let deadlineDate = new Date(deadline).getTime();
+
+            function updateCountdown() {
+                let now = new Date().getTime();
+                let timeLeft = deadlineDate - now;
+
+                if (timeLeft <= 0) {
+                    countdownElement.innerHTML = "⏳ Time Over!";
+                    countdownElement.classList.remove("text-green-400", "text-yellow-400");
+                    countdownElement.classList.add("text-red-500");
+                    return;
+                }
+
+                let days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                let hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                let minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                let seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                countdownElement.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+                // Change styles dynamically
+                if (days < 1) {
+                    countdownElement.classList.remove("text-green-400");
+                    countdownElement.classList.add("text-yellow-400");
+                }
+                if (hours < 1) {
+                    countdownElement.classList.remove("text-yellow-400");
+                    countdownElement.classList.add("text-red-500");
+                }
+            }
+
+            setInterval(updateCountdown, 1000);
+            updateCountdown(); // Run instantly
+        }
+
+        // Get deadline from Django (formatted as ISO 8601)
+        let taskDeadline = "{{ task.deadline|date:'c' }}";  
+        startCountdown(taskDeadline);
 
 </script>
 </body>
