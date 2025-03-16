@@ -1928,7 +1928,6 @@ def fetch_user_info(request, org_id, group_id):
         # total calpoints earned
         calpoints=CalPoints.objects.filter(organization=organization,group=group,user=user).count()
 
-
         # Tasks preparation
         # currently having incomplete-tasks 
         tasks=Task.objects.filter(assigned_to=user,organization=organization,group=group,status='pending').count()
@@ -1936,7 +1935,66 @@ def fetch_user_info(request, org_id, group_id):
         completed_tasks=Task.objects.filter(assigned_to=user, organization=organization, group=group,status='completed').count()
 
 
-        # prepare the message 
+    
+        # Prepare the suggestion based on completed task count
+        final_message = None
+
+        if completed_tasks == 0:
+          final_message = (
+          f"{user.username} has not completed any tasks yet. Assigning this task can help them gain experience, "
+                   f"but if it's a high-priority task, consider someone more experienced."
+       )
+        elif completed_tasks == 1:
+          final_message = (
+           f"{user.username} has completed 1 task. They are starting out and may need guidance, but it’s a good chance for them to contribute."
+          )
+        elif completed_tasks == 2:
+           final_message = (
+          f"{user.username} has completed 2 tasks. They are getting familiar with responsibilities. Assign if it's a low-to-medium priority task."
+    )
+        elif completed_tasks == 3:
+          final_message = (
+          f"{user.username} has completed 3 tasks. They are building confidence. Assign this task if they are comfortable handling it."
+    )
+        elif completed_tasks == 4:
+           final_message = (
+          f"{user.username} has completed 4 tasks. They are becoming a regular contributor. Consider assigning this task if workload permits."
+    )
+        elif completed_tasks == 5:
+          final_message = (
+          f"{user.username} has completed 5 tasks. They have a solid start. Assign them if they can manage additional responsibility."
+    )
+        elif 6 <= completed_tasks <= 20:
+           final_message = (
+         f"{user.username} has completed {completed_tasks} tasks. They are gaining momentum. Assigning them more tasks can boost efficiency."
+    )
+        elif 21 <= completed_tasks <= 50:
+           final_message = (
+          f"{user.username} has completed {completed_tasks} tasks. They are now a consistent performer. They should be prioritized for key assignments."
+    )
+        elif 51 <= completed_tasks <= 100:
+           final_message = (
+         f"{user.username} has completed {completed_tasks} tasks! Their experience makes them highly reliable. Assigning them is a great choice."
+    )
+        elif 101 <= completed_tasks <= 500:
+             final_message = (
+         f"{user.username} has completed {completed_tasks} tasks! They are one of the top contributors. Prioritize them for high-priority tasks."
+      )
+        elif 501 <= completed_tasks <= 999:
+            final_message = (
+         f"{user.username} has completed {completed_tasks} tasks! They are a **power user** and a **high-performance team member**. "
+         f"Only assign tasks if they aren’t overloaded."
+    )
+        elif completed_tasks >= 1000:
+              final_message = (
+        f"🔥 {user.username} has completed **{completed_tasks}** tasks! This is an **elite level** of contribution. "
+        f"They are **indispensable** to the team. Assign **critical** tasks to them only if absolutely necessary!"
+    )
+
+        print("FINAL MESSAGE:",final_message)
+
+
+
         
         return JsonResponse({
             "full_name": profile.full_name if profile else user.username,
@@ -1944,6 +2002,7 @@ def fetch_user_info(request, org_id, group_id):
             'tasks':tasks,
             'completed_tasks':completed_tasks,
             "calpoints":calpoints,
+            "final_message":final_message,
             "message": "User found!"
         })
 
