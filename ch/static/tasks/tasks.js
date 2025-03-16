@@ -371,3 +371,81 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+
+// RE-ASSIGN THE TASK
+document.addEventListener("DOMContentLoaded", function () {
+    const emailInput = document.getElementById("userEmail");
+    const submitBtn = document.getElementById("submitReassignTask");
+
+    const userFullName = document.getElementById("userFullName");
+    const userStatus = document.getElementById("userStatus");
+    const userProfilePicture = document.getElementById("userProfilePicture");
+
+    // Set your variables dynamically from the template
+    const ORG_ID = window.djangoData.orgId; // Pass from Django template
+    const GROUP_ID = window.djangoData.groupId;
+    const TASK_ID = window.djangoData.taskId;
+
+    // Fetch user details in real-time
+    emailInput.addEventListener("input", function () {
+        const email = this.value.trim();
+        if (email.length < 5) {
+            userFullName.textContent = "-";
+            userStatus.textContent = "-";
+            userProfilePicture.style.display = "none";
+            submitBtn.disabled = true;
+            return;
+        }
+
+        fetch(`/tasks/fetch-user-info/${ORG_ID}/${GROUP_ID}/?email=${encodeURIComponent(email)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    userFullName.textContent = "Not Found!";
+                    userStatus.textContent = data.error;
+                    userProfilePicture.style.display = "none";
+                    submitBtn.disabled = true;
+                } else {
+                    userFullName.textContent = data.full_name;
+                    userStatus.textContent = "Available in group";
+                    if (data.profile_picture) {
+                        userProfilePicture.src = data.profile_picture;
+                        userProfilePicture.style.display = "block";
+                    } else {
+                        userProfilePicture.style.display = "none";
+                    }
+                    submitBtn.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching user:", error);
+            });
+    });
+
+    // Submit Reassignment Request
+    submitBtn.addEventListener("click", function () {
+        const email = emailInput.value.trim();
+        if (!email) return;
+
+        fetch(`/tasks/reassign-task/${ORG_ID}/${GROUP_ID}/${TASK_ID}/`, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded", "X-CSRFToken": getCSRFToken() },
+            body: new URLSearchParams({ email: email })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message || data.error);
+            if (!data.error) new bootstrap.Modal(document.getElementById("reAssignmentTaskModal")).hide();
+        })
+        .catch(error => {
+            console.error("Error reassigning task:", error);
+        });
+    });
+
+    // Function to get CSRF Token from cookies (required for Django POST requests)
+    function getCSRFToken() {
+        const cookieValue = document.cookie.split("; ").find(row => row.startsWith("csrftoken="));
+        return cookieValue ? cookieValue.split("=")[1] : "";
+    }
+});

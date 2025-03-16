@@ -1320,6 +1320,38 @@ video::-webkit-media-controls-panel {
 </div>
 
 
+<!-- RE-ASSIGN THE TASK -->
+<!-- Bootstrap 5 Modal -->
+<div class="modal fade" id="reAssignmentTaskModal" tabindex="-1" aria-labelledby="reAssignmentTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reAssignmentTaskModalLabel">Reassign Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Email Input -->
+                <div class="mb-3">
+                    <label for="userEmail" class="form-label">Enter User Email:</label>
+                    <input type="email" class="form-control" id="userEmail" placeholder="Enter user email..." required>
+                </div>
+
+                <!-- User Info Box (Real-time updates) -->
+                <div id="userInfoBox" class="alert alert-light">
+                    <p><strong>Full Name:</strong> <span id="userFullName">-</span></p>
+                    <p><strong>Status:</strong> <span id="userStatus">-</span></p>
+                    <img id="userProfilePicture" src="" alt="Profile Picture" class="rounded-circle mt-2" width="50" style="display: none;">
+                </div>
+
+                <!-- Submit Button -->
+                <button id="submitReassignTask" class="btn btn-success w-100" disabled>Reassign Task</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <!-------------------------------------------------------------------------------------------------------------------------------------------------------  -->
 <!-- Task Deadline -->
 
@@ -1435,6 +1467,11 @@ video::-webkit-media-controls-panel {
              data-task="{{ task.id }}">
              <span class="material-symbols-rounded text-pink-400 text-xl p-2 bg-white/10 rounded-lg shrink-0">chat</span>
              <span class="text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity">chat</span>
+
+            <!-- RE-ASSIGN TASK -->
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reAssignmentTaskModal">
+                Reassign Task
+            </button>
 
        
             <!-- Delete Task Button -->

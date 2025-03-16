@@ -1882,6 +1882,57 @@ def send_task_to_members(request):
 
 
 
+# TASK RE-ASSIGNMENT
+
+def reassign_task(request, org_id, group_id, task_id):
+    """Reassigns a task to a new user if they belong to the organization & group."""
+    if request.method == "POST":
+        email = request.POST.get("email")
+        new_assignee = get_object_or_404(User, email=email)
+        
+        # Ensure the user exists in the organization & group
+        organization = get_object_or_404(Organization, id=org_id)
+        group = get_object_or_404(Group, id=group_id, organization=organization)
+        
+        # Check if user is in GroupMember model
+        if not GroupMember.objects.filter(user=new_assignee, group=group).exists():
+            return JsonResponse({"error": "User is not a member of this group!"}, status=400)
+
+        # Update task assignment
+        task = get_object_or_404(Task, id=task_id, group=group, organization=organization)
+        task.assigned_to = new_assignee
+        task.save()
+
+        return JsonResponse({"message": "Task reassigned successfully!"})
+    
+    return JsonResponse({"error": "Invalid request!"}, status=400)
+
+def fetch_user_info(request, org_id, group_id):
+    """Fetches user info dynamically based on email input."""
+    email = request.GET.get("email")
+    
+    if email:
+        user = User.objects.filter(email=email).first()
+        if not user:
+            return JsonResponse({"error": "User not found!"}, status=404)
+
+        # Ensure user exists in Organization & Group
+        organization = get_object_or_404(Organization, id=org_id)
+        group = get_object_or_404(Group, id=group_id, organization=organization)
+
+        if not GroupMember.objects.filter(user=user, group=group).exists():
+            return JsonResponse({"error": "User is not a member of this group!"}, status=400)
+
+        # Fetch user profile
+        profile = Profile.objects.filter(user=user, organization=organization).first()
+
+        return JsonResponse({
+            "full_name": profile.full_name if profile else user.username,
+            "profile_picture": profile.profile_picture.url if profile and profile.profile_picture else None,
+            "message": "User found!"
+        })
+
+    return JsonResponse({"error": "Invalid email input!"}, status=400)
 
 
 
