@@ -374,6 +374,7 @@ document.head.appendChild(style);
 
 
 // RE-ASSIGN THE TASK
+// RE-ASSIGN THE TASK
 document.addEventListener("DOMContentLoaded", function () {
     const emailInput = document.getElementById("userEmail");
     const submitBtn = document.getElementById("submitReassignTask");
@@ -381,15 +382,20 @@ document.addEventListener("DOMContentLoaded", function () {
     const userFullName = document.getElementById("userFullName");
     const userStatus = document.getElementById("userStatus");
     const userProfilePicture = document.getElementById("userProfilePicture");
-    const userTasks=document.getElementById("userTasks");
-    const userCompletedTasks=document.getElementById("userCompletedTasks");
+    const userTasks = document.getElementById("userTasks");
+    const userCompletedTasks = document.getElementById("userCompletedTasks");
     const userCalpoints = document.getElementById("userCalpoints");
-    const calAI=document.getElementById('calAI');
+    const calAI = document.getElementById("calAI");
 
     // Set your variables dynamically from the template
-    const ORG_ID = window.djangoData.orgId; // Pass from Django template
+    const ORG_ID = window.djangoData.orgId;
     const GROUP_ID = window.djangoData.groupId;
     const TASK_ID = window.djangoData.taskId;
+
+    // Create a loading spinner (Tailwind-based)
+    const spinner = document.createElement("span");
+    spinner.className = "ml-2 animate-spin h-5 w-5 border-t-2 border-b-2 border-gray-500 hidden";
+    submitBtn.appendChild(spinner); // Append spinner inside the button
 
     // Fetch user details in real-time
     emailInput.addEventListener("input", function () {
@@ -397,14 +403,18 @@ document.addEventListener("DOMContentLoaded", function () {
         if (email.length < 5) {
             userFullName.textContent = "-";
             userStatus.textContent = "-";
-            userTasks.textContent="-";
+            userTasks.textContent = "-";
             userProfilePicture.style.display = "none";
-            userCompletedTasks.textContent="-";
-            userCalpoints.textContent="-";
-            calAI.textContent="-";
+            userCompletedTasks.textContent = "-";
+            userCalpoints.textContent = "-";
+            calAI.textContent = "-";
             submitBtn.disabled = true;
             return;
         }
+
+        // Show loading state
+        userStatus.textContent = "Checking...";
+        submitBtn.disabled = true;
 
         fetch(`/tasks/fetch-user-info/${ORG_ID}/${GROUP_ID}/?email=${encodeURIComponent(email)}`)
             .then(response => response.json())
@@ -413,18 +423,18 @@ document.addEventListener("DOMContentLoaded", function () {
                     userFullName.textContent = "Not Found!";
                     userStatus.textContent = data.error;
                     userProfilePicture.style.display = "none";
-                    userTasks.style.display='none';
-                    userCompletedTasks.style.display='none';
-                    userCalpoints.style.display="none";
-                    calAI.style.display="none";
+                    userTasks.style.display = 'none';
+                    userCompletedTasks.style.display = 'none';
+                    userCalpoints.style.display = "none";
+                    calAI.style.display = "none";
                     submitBtn.disabled = true;
                 } else {
                     userFullName.textContent = data.full_name;
-                    userTasks.textContent=data.tasks;
+                    userTasks.textContent = data.tasks;
                     userStatus.textContent = "Available in group";
-                    userCompletedTasks.textContent=data.completed_tasks;
-                    userCalpoints.textContent=data.calpoints;
-                    calAI.textContent=data.final_message;
+                    userCompletedTasks.textContent = data.completed_tasks;
+                    userCalpoints.textContent = data.calpoints;
+                    calAI.textContent = data.final_message;
                     if (data.profile_picture) {
                         userProfilePicture.src = data.profile_picture;
                         userProfilePicture.style.display = "block";
@@ -444,6 +454,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const email = emailInput.value.trim();
         if (!email) return;
 
+        // Show spinner & disable button
+        spinner.classList.remove("hidden");
+        submitBtn.disabled = true;
+
         fetch(`/tasks/reassign-task/${ORG_ID}/${GROUP_ID}/${TASK_ID}/`, {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded", "X-CSRFToken": getCSRFToken() },
@@ -456,6 +470,11 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .catch(error => {
             console.error("Error reassigning task:", error);
+        })
+        .finally(() => {
+            // Hide spinner & re-enable button after request completes
+            spinner.classList.add("hidden");
+            submitBtn.disabled = false;
         });
     });
 

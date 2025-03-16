@@ -1883,6 +1883,7 @@ def send_task_to_members(request):
 
 
 # TASK RE-ASSIGNMENT
+from .utils import *
 
 def reassign_task(request, org_id, group_id, task_id):
     """Reassigns a task to a new user if they belong to the organization & group."""
@@ -1903,6 +1904,8 @@ def reassign_task(request, org_id, group_id, task_id):
         task.assigned_to = new_assignee
         task.save()
 
+        # send notification about task reassignment
+        send_task_assignment_notification(org_id=organization.id, group_id=group.id,task_id=task.id)
         return JsonResponse({"message": "Task reassigned successfully!"})
     
     return JsonResponse({"error": "Invalid request!"}, status=400)

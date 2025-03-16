@@ -166,20 +166,42 @@ def send_task_notification_email(org_id, group_id, task_id, action):
 
 
 # SEND TASK ASSIGNED 
-
-def send_task_assignment_notification(org_id, group_id, task_id,user):
+def send_task_assignment_notification(org_id, group_id, task_id):
     organization = get_object_or_404(Organization, id=org_id)
-    group=get_object_or_404(Group, id=group_id, organization=organization)
-    task=get_object_or_404(Task, id=task_id, organization=organization, group=group)
+    group = get_object_or_404(Group, id=group_id, organization=organization)
+    task = get_object_or_404(Task, id=task_id, organization=organization, group=group)
 
-    if not all(organization and group and task):
+    if not all([organization, group, task]):
         return HttpResponseBadRequest("Required Parameters are missing!")
-    
-    subject= f'Task Reassignment - {task.title}'
-    message=f'Hello {task.assigned_to.username},\n {task.created_by.username} Assigned a task to you\n Below are the important details you have to read\n Task:{task.title}\n Deadline:{task.deadline}\n Priority:{task.priority}\n Description:{task.description}\n Workspace & Group\n Workspace:{organization.name}\n Group:{group.name}\n Please complete the task ASAP! Thank you,\n Team CalendarPlus'
-    from_email=settings.DEFAULT_FROM_EMAIL
-    recipient_list=[task.assigned_to.email]
 
-    send_mail(subject, message, from_email, recipient_list)
+    subject = f"📌 Task Assigned: {task.title} | Priority: {task.priority}"
 
+    message = f"""
+    Dear {task.assigned_to.get_full_name() or task.assigned_to.username},
 
+    You have been assigned a new task by {task.created_by.get_full_name() or task.created_by.username}. Please review the task details below:
+
+    🔹 **Task Title**: {task.title}  
+    🔹 **Assigned By**: {task.created_by.get_full_name() or task.created_by.username}  
+    🔹 **Deadline**: {task.deadline.strftime('%A, %d %B %Y %I:%M %p')}  
+    🔹 **Priority**: {task.priority}  
+    🔹 **Description**: {task.description or 'No additional details provided.'}  
+
+    📌 **Workspace & Group Details**:  
+    🔹 **Workspace**: {organization.name}  
+    🔹 **Group**: {group.name}  
+
+    Please ensure that the task is completed in a timely manner. If you have any questions or require further clarification, feel free to reach out.
+
+    🔔 **Action Required:** Mark the task as completed once finished, and keep your team updated.
+
+    Thank you for your dedication and hard work!  
+
+    Best regards,  
+    **Team CalendarPlus**  
+    """
+
+    from_email = settings.DEFAULT_FROM_EMAIL
+    recipient_list = [task.assigned_to.email]
+
+    send_mail(subject, message.strip(), from_email, recipient_list)
