@@ -1926,8 +1926,9 @@ def fetch_user_info(request, org_id, group_id):
         # Fetch user profile
         profile = Profile.objects.filter(user=user, organization=organization).first()
         # currently having incomplete-tasks 
-        tasks=Task.objects.filter(assigned_to=user,organization=organization,group=group,status='in_progress').count()
+        tasks=Task.objects.filter(assigned_to=user,organization=organization,group=group,status='pending').count()
         # completed_tasks
+
 
         # prepare the message 
         
