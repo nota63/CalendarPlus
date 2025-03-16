@@ -36,6 +36,10 @@
     <!-- Link CSS File -->
     <link rel="stylesheet" href="{% static 'tasks/user_tasks.css' %}">
 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+
 
 
 
@@ -1554,9 +1558,87 @@ video::-webkit-media-controls-panel {
     </div>
 </div>
 
+<!-- CAL-AI MODAL  -->
+<div class="modal fade" id="aiChatModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered max-w-4xl">
+        <div class="modal-content border-0 overflow-hidden" style="
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        ">
+            <div class="modal-header px-6 py-4 border-b border-gray-200/50">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-rounded text-3xl bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent">
+                        smart_toy
+                    </span>
+                    <div>
+                        <h5 class="modal-title text-lg font-semibold text-gray-800 font-[Inter]">
+                            CalAI Assistant
+                            <span class="ml-2 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full uppercase font-medium">Beta</span>
+                        </h5>
+                        <p class="text-sm text-gray-600 mt-1">Your AI-powered productivity companion for {{organization.name}}</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close p-2 rounded-full hover:bg-gray-100/50 transition-colors" data-bs-dismiss="modal">
+                    <span class="material-symbols-rounded text-gray-500">close</span>
+                </button>
+            </div>
 
+            <div class="modal-body p-6 flex flex-col gap-4">
+                <!-- Chat Messages -->
+                <div class="flex-1 bg-white/50 rounded-xl p-4 shadow-inner" style="height: 400px">
+                    <div id="chatMessages" class="space-y-4 overflow-y-auto h-full pr-3">
+                        <!-- System Message -->
+                        <div class="flex items-start gap-3">
+                            <div class="mt-1">
+                                <span class="material-symbols-rounded text-indigo-500">auto_awesome</span>
+                            </div>
+                            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 max-w-[85%]">
+                                <p class="text-sm text-gray-700">
+                                    Hi! I'm CalAI - official AI by CalendarPLus. I can help with:
+                                    <br>• Task/subtask management
+                                    <br>• Meeting scheduling
+                                    <br>• Progress tracking
+                                    <br>• Workflow optimization
+                                    <br>• I work on {{organization.name}} Datasets
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- Predefined Queries -->
+                <div class="grid md:grid-cols-3 gap-3">
+                    <button class="query-btn px-4 py-2.5 bg-white/80 hover:bg-white text-gray-700 text-sm font-medium rounded-xl border border-gray-200/60 shadow-xs hover:shadow-md transition-all">
+                        Get nearest subtask
+                    </button>
+                    <button class="query-btn px-4 py-2.5 bg-white/80 hover:bg-white text-gray-700 text-sm font-medium rounded-xl border border-gray-200/60 shadow-xs hover:shadow-md transition-all">
+                        Create new subtask
+                    </button>
+                    <button class="query-btn px-4 py-2.5 bg-white/80 hover:bg-white text-gray-700 text-sm font-medium rounded-xl border border-gray-200/60 shadow-xs hover:shadow-md transition-all">
+                        Schedule meeting with {{task.created_by.username}}
+                    </button>
+                </div>
 
+                <!-- Input Area -->
+                <div class="relative mt-2">
+                    <div class="flex gap-2 items-center bg-white/80 backdrop-blur-sm border border-gray-200/60 rounded-xl p-2 shadow-sm">
+                        <input type="text" 
+                               id="userQuery" 
+                               class="flex-1 border-0 bg-transparent focus:ring-0 px-3 py-2 text-gray-700 placeholder-gray-400 text-sm"
+                               placeholder="Ask CalAI anything...">
+                               <!-- sendQuery -->
+                        <button id="senduery" class="btn-send bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-2 rounded-xl hover:shadow-lg transition-shadow">
+                            <span class="material-symbols-rounded text-xl">send</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <!-- -------------------------------------------------------------------------------------------------------------------------- -->
@@ -2356,6 +2438,12 @@ video::-webkit-media-controls-panel {
                    Submit Task for Approval
                   </button>
                  {% endif %}
+
+                <!-- Launch CalAI -->
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aiChatModal">
+                    Ask AI
+                </button>
+                
                 </div>
             </div>
 

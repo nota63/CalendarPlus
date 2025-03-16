@@ -108,6 +108,7 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'organization_channels',
      'formtools',
+     'cal_ai',
 
     #  Unfold admin configurations
     "unfold",  # before django.contrib.admin

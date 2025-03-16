@@ -133,3 +133,80 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+
+
+// LAUNCH CAL-AI (THE AI TASK ASSISTANT)
+document.addEventListener("DOMContentLoaded", function () {
+    const modalElement = document.getElementById("aiChatModal");
+    if (!modalElement) return; // Prevent errors if modal is missing
+    const modal = new bootstrap.Modal(modalElement);
+
+    const chatContainer = document.getElementById("chatMessages");
+    const userInput = document.getElementById("userQuery");
+    const sendBtn = document.getElementById("sendQuery");
+    const predefinedQueries = document.querySelectorAll(".query-btn");
+
+    function getCSRFToken() {
+        return document.querySelector("[name=csrfmiddlewaretoken]")?.value || "";
+    }
+
+    function appendMessage(sender, message) {
+        if (!chatContainer) return;
+        const messageDiv = document.createElement("div");
+        messageDiv.classList.add("message", sender);
+        messageDiv.innerHTML = `<strong>${sender === "user" ? "You" : "CalAI"}:</strong> ${message}`;
+        chatContainer.appendChild(messageDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function sendMessage(userQuestion) {
+        if (!userQuestion.trim()) return;
+
+        const orgId = window.djangoData?.orgId || null;
+        const groupId = window.djangoData?.groupId || null;
+        const taskId = window.djangoData?.taskId || null;
+
+        if (!orgId || !groupId || !taskId) {
+            appendMessage("ai", "Error: Missing organization, group, or task ID.");
+            return;
+        }
+
+        const url = `/cal_ai/cal-ai/${orgId}/${groupId}/${taskId}/`;
+
+        appendMessage("user", userQuestion);
+        userInput.value = "";
+
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken(),
+            },
+            body: JSON.stringify({ question: userQuestion }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            appendMessage("ai", data.response || "Error fetching response.");
+        })
+        .catch(() => appendMessage("ai", "Error: Unable to reach the server."));
+    }
+
+    if (sendBtn && userInput) {
+        sendBtn.addEventListener("click", function () {
+            sendMessage(userInput.value);
+        });
+
+        userInput.addEventListener("keypress", function (e) {
+            if (e.key === "Enter") sendBtn.click();
+        });
+    }
+
+    if (predefinedQueries.length) {
+        predefinedQueries.forEach(query => {
+            query.addEventListener("click", function () {
+                sendMessage(this.dataset.query);
+            });
+        });
+    }
+});
