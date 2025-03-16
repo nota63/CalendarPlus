@@ -1428,6 +1428,14 @@ video::-webkit-media-controls-panel {
                 <span class="text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity">Teams</span>
             </a>
 
+            <!-- Live Session -->
+            <button class="w-full flex items-center gap-4 px-3 py-3 text-sm font-medium text-gray-300 hover:bg-white/5 rounded-xl transition-all duration-200 hover:translate-x-2 start-chat-btn" 
+             data-org="{{ organization.id }}" 
+             data-group="{{ group.id }}" 
+             data-task="{{ task.id }}">
+             <span class="material-symbols-rounded text-pink-400 text-xl p-2 bg-white/10 rounded-lg shrink-0">chat</span>
+             <span class="text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity">chat</span>
+
        
             <!-- Delete Task Button -->
           <button id="deleteTaskBtn" class="w-full flex items-center gap-4 px-3 py-3 text-sm font-medium text-gray-300 hover:bg-white/5 rounded-xl transition-all duration-200 hover:translate-x-2" data-bs-toggle="modal" data-bs-target="#deleteTaskModal">
