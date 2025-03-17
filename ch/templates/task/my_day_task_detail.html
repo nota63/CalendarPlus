@@ -1672,7 +1672,7 @@ video::-webkit-media-controls-panel {
                             </div>
                             <div class="flex-1">
                                 <h3 class="font-semibold text-gray-800">Welcome Message</h3>
-                                <p class="text-sm text-gray-600">Send welcome text to new users</p>
+                                <p class="text-sm text-gray-600">Send welcome text to {{task.created_by.username}} every Morning</p>
                             </div>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" class="sr-only peer" data-key="send_welcome_text">
@@ -1689,7 +1689,7 @@ video::-webkit-media-controls-panel {
                             </div>
                             <div class="flex-1">
                                 <h3 class="font-semibold text-gray-800">Submission Request</h3>
-                                <p class="text-sm text-gray-600">Send request after completion</p>
+                                <p class="text-sm text-gray-600">Automate Submission request after progress reaches to 100</p>
                             </div>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" class="sr-only peer" data-key="send_submission_request_after_completion">
@@ -1740,7 +1740,7 @@ video::-webkit-media-controls-panel {
                             </div>
                             <div class="flex-1">
                                 <h3 class="font-semibold text-gray-800">Progress Updates</h3>
-                                <p class="text-sm text-gray-600">Provide regular updates</p>
+                                <p class="text-sm text-gray-600">Provide regular progress updates to {{task.created_by.username}}</p>
                             </div>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" class="sr-only peer" data-key="progress_update">
