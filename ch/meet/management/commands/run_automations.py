@@ -51,7 +51,6 @@ class Command(BaseCommand):
 
                     # 🚀 Automation Conditions
 
-                    # 1️⃣ **Send Welcome Text** (Prevent duplicate welcome messages)
                    # 1️⃣ **Send Welcome Text** (Only at 6 AM)
                     current_time = localtime().strftime("%H:%M")  # Get local time in HH:MM format
 
@@ -63,6 +62,7 @@ class Command(BaseCommand):
                              f"and your efforts bring success and fulfillment. If there's anything you need, feel free to reach out.\n\n"
                              f"Have a fantastic day!\n\n"
                              f"Best Regards,\n"
+                             f"Wish by {task.assigned_to.username}\n  Task:{task.title},\n"
                              f"{organization.name} Team"
                                )
 
