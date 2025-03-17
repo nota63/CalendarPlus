@@ -133,6 +133,51 @@ class Command(BaseCommand):
                             send_mail(subject, message, from_email, recipient_list)
                     self.stdout.write(self.style.SUCCESS(f"✅ Progress update sent : {task.title}"))
 
+                    # SEND GREETING AFTER APPROVAL
+                    if automation.send_greeting_after_approval:
+                        if task.status == 'completed' and not task.after_approval_greeting_sent:
+                            task.after_approval_greeting_sent=True
+                            task.save()
+                            # send greeting after approval
+                            subject=f'Thank You {task.created_by.username} For My Task Approval'
+                            message = (
+                               f'Dear {task.created_by.username},\n\n'
+                               f'I sincerely appreciate your time and effort in reviewing and approving my task submission. '
+                               f'Your approval of the task **"{task.title}"** means a lot to me, and I am grateful for the opportunity to contribute effectively to our team.\n\n'
+    
+                               f'Here are the details of the approved task:\n\n'
+                               f'🔹 **Task Title:** {task.title}\n'
+                               f'📅 **Deadline:** {task.deadline}\n'
+                               f'⚡ **Priority:** {task.priority}\n'
+                               f'📌 **Status:** Approved & Completed ✅\n\n'
+
+                               f'I am truly pleased that you found my work valuable, and I am eager to continue making meaningful contributions. '
+                               f'Working on this task has been an enriching experience, and I look forward to taking on more challenges.\n\n'
+    
+                                f'### **Project Details:**\n'
+                                f'🏢 **Organization:** {organization.name}\n'
+                                f'👥 **Group:** {group.name}\n\n'
+    
+                                f'Thank you once again for your support and guidance. If there’s anything else I can improve or any feedback you’d like to share, '
+                                f'please feel free to let me know.\n\n'
+    
+                                f'Looking forward to working on more projects together!\n\n'
+    
+                                f'Best Regards,\n'
+                                f'{task.assigned_to.username}'
+                            )
+                            from_email=settings.DEFAULT_FROM_EMAIL
+                            recipient_list=[task.created_by.email]
+
+                            # send the email
+                            send_mail(subject, message, from_email, recipient_list)
+
+                        self.stdout.write(self.style.SUCCESS(f"✅ After approval Greeting Sent: {task.title}"))
+
+
+
+
+
 
             except Exception as e:
                 self.stderr.write(self.style.ERROR(f"❌ Error processing automation: {str(e)}"))
