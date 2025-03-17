@@ -880,25 +880,27 @@ class PendingRewardNotification(models.Model):
 
 
 # AUTOMATION (TASK)
+
 class AutomationTask(models.Model):
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    user=models.ForeignKey(User, on_delete=models.CASCADE)
+    organization=models.ForeignKey(Organization, on_delete=models.CASCADE)
+    group=models.ForeignKey(Group, on_delete=models.CASCADE)
+    task=models.ForeignKey(Task, on_delete=models.CASCADE)
+    user=models.ForeignKey(User,on_delete=models.CASCADE)
 
-    # Store automation rules dynamically in JSONField
-    automations = models.JSONField(default=dict)  
+    # automations
+    send_welcome_text=models.BooleanField(default=False)
+    send_submission_request_after_completion=models.BooleanField(default=False)
+    generate_summary_after_approval=models.BooleanField(default=False)
+    translate_in_english=models.BooleanField(default=False)
+    progress_update=models.BooleanField(default=False)
+    send_greeting_after_approval=models.BooleanField(default=False)
+    notify_task_creator_on_completion=models.BooleanField(default=False)
+    escalate_if_not_completed=models.BooleanField(default=False)
+    remind_before_deadline =models.BooleanField(default=False)
+    auto_assign_reviewer =models.BooleanField(default=False)
+    log_activity_on_completion =models.BooleanField(default=False)
+    assign_task_if_previous_completed=models.BooleanField(default=False)
 
-    def is_enabled(self, automation_type):
-        """Check if a specific automation is enabled"""
-        return self.automations.get(automation_type, False)
+    def __str__(self):
+        return f'Automation For {self.task.title}'
 
-    def enable_automation(self, automation_type):
-        """Enable a specific automation"""
-        self.automations[automation_type] = True
-        self.save()
-
-    def disable_automation(self, automation_type):
-        """Disable a specific automation"""
-        self.automations[automation_type] = False
-        self.save()

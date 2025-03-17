@@ -1,6 +1,6 @@
 
 
-// SHARE THE TASK WITH TEAM-MEMBERS
+
 // SHARE THE TASK WITH TEAM-MEMBERS
 document.addEventListener("DOMContentLoaded", function () {
     const openModalBtn = document.getElementById("openShareTaskModal");
@@ -210,3 +210,75 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+
+
+// HANDLE AND MANAGE AUTOMATIONS
+document.addEventListener("DOMContentLoaded", function () {
+    const automationList = document.getElementById("automationList");
+    const orgId = window.djangoData.orgId;
+    const groupId = window.djangoData.groupId;
+    const taskId = window.djangoData.taskId;
+
+    // ✅ Predefined Automations
+    const predefinedAutomations = [
+        "send_welcome_text",
+        "send_submission_request_after_completion",
+        "generate_summary_after_approval",
+        "translate_in_english",
+        "progress_update",
+        "send_greeting_after_approval",
+        "notify_task_creator_on_completion",
+        "escalate_if_not_completed",
+        "remind_before_deadline",
+        "auto_assign_reviewer",
+        "log_activity_on_completion",
+        "assign_task_if_previous_completed"
+    ];
+
+    // ✅ Fetch enabled automations
+    fetch(`/tasks/get-enabled-automations/${orgId}/${groupId}/${taskId}/`)
+        .then(response => response.json())
+        .then(data => {
+            const enabledSet = new Set(data.enabled_automations);
+            automationList.innerHTML = "";
+
+            predefinedAutomations.forEach(automation => {
+                const isEnabled = enabledSet.has(automation);
+                const li = document.createElement("li");
+                li.className = "list-group-item d-flex justify-content-between align-items-center";
+                li.innerHTML = `
+                    <span>${automation.replace(/_/g, ' ')}</span>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input toggle-switch" type="checkbox"
+                            id="${automation}" ${isEnabled ? "checked" : ""} 
+                            data-automation="${automation}">
+                    </div>
+                `;
+                automationList.appendChild(li);
+            });
+
+            // ✅ Add Event Listener for Toggle Switches
+            document.querySelectorAll(".toggle-switch").forEach(switchElement => {
+                switchElement.addEventListener("change", function () {
+                    toggleAutomation(this.dataset.automation, this.checked);
+                });
+            });
+        })
+        .catch(error => console.error("Error fetching automations:", error));
+});
+
+function toggleAutomation(automation, enable) {
+    fetch(`/tasks/toggle-automation/${window.djangoData.orgId}/${window.djangoData.groupId}/${window.djangoData.taskId}/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken()
+        },
+        body: JSON.stringify({ automation_type: automation, enable: enable })
+    }).catch(error => console.error("Error updating automation:", error));
+}
+
+function getCSRFToken() {
+    return document.cookie.split("; ").find(row => row.startsWith("csrftoken="))?.split("=")[1];
+}
