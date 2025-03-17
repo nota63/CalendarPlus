@@ -2017,41 +2017,52 @@ def fetch_user_info(request, org_id, group_id):
 # HANDLE TASK AUTOMATIONS
 
 # FETCH ENABLED AUTOMATIONS
-def get_enabled_automations(request, org_id, group_id, task_id):
-    """Fetch all enabled automations for a given task"""
-    automation_task = get_object_or_404(AutomationTask, organization_id=org_id, group_id=group_id, task_id=task_id,user=request.user)
-    
-    enabled_automations = [key for key, value in automation_task.automations.items() if value]
-    
-    return JsonResponse({"enabled_automations": enabled_automations})
-
-# HANDLE ENABLE DISABLE AUTOMATIONS
 @csrf_exempt
-def toggle_automation(request, org_id, group_id, task_id):
-    """Enable or disable a specific automation"""
+def fetch_enabled_automations(request):
+    """ Fetch enabled automations for a specific task in an organization & group. """
+    if request.method == "GET":
+        org_id = request.GET.get("org_id")
+        group_id = request.GET.get("group_id")
+        task_id = request.GET.get("task_id")
 
-    organization=get_object_or_404(Organization, id=org_id)
-    group=get_object_or_404(Group, id=group_id, organization=organization)
-    task=get_object_or_404(Task, id=task_id, organization=organization, group=group)
+        automation = AutomationTask.objects.filter(
+            organization_id=org_id, group_id=group_id, task_id=task_id,user=request.user
+        ).first()
 
+        if automation:
+            automation_data = {field.name: getattr(automation, field.name) for field in AutomationTask._meta.fields if isinstance(field, models.BooleanField)}
+        else:
+            automation_data = {}
+
+        return JsonResponse({"status": "success", "automations": automation_data})
+
+    return JsonResponse({"status": "error", "message": "Invalid request method"}, status=400)
+
+
+
+# update the automation
+@csrf_exempt
+def toggle_automation(request):
+    """ Enable or disable a specific automation for a task. """
     if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            automation_type = data.get("automation_type")
-            enable = data.get("enable", False)  # True for enable, False for disable
-            
-            automation_task = get_object_or_404(AutomationTask, organization_id=org_id, group_id=group_id, task_id=task_id,user=request.user)
-            automation_task.automations[automation_type] = enable
-            automation_task.user=request.user
-            automation_task.group=group
-            automation_task.organization=organization
-            automation_task.save()
-            
-            return JsonResponse({"success": True, "automation": automation_type, "enabled": enable})
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=400)
+        org_id = request.POST.get("org_id")
+        group_id = request.POST.get("group_id")
+        task_id = request.POST.get("task_id")
+        automation_key = request.POST.get("automation_key")
+        status = request.POST.get("status") == "true"
 
+        automation, created = AutomationTask.objects.get_or_create(
+            organization_id=org_id, group_id=group_id, task_id=task_id,user=request.user,
+            defaults={automation_key: status}
+        )
 
+        if not created:
+            setattr(automation, automation_key, status)
+            automation.save()
+
+        return JsonResponse({"status": "success", "message": f"{automation_key} updated", "enabled": status})
+
+    return JsonResponse({"status": "error", "message": "Invalid request method"}, status=400)
 
 
 

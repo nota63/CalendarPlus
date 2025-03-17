@@ -885,7 +885,7 @@ class AutomationTask(models.Model):
     organization=models.ForeignKey(Organization, on_delete=models.CASCADE)
     group=models.ForeignKey(Group, on_delete=models.CASCADE)
     task=models.ForeignKey(Task, on_delete=models.CASCADE)
-    user=models.ForeignKey(User,on_delete=models.CASCADE)
+    user=models.ForeignKey(User,on_delete=models.CASCADE,null=True, blank=True)
 
     # automations
     send_welcome_text=models.BooleanField(default=False)
