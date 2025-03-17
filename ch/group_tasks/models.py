@@ -876,3 +876,29 @@ class PendingRewardNotification(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     is_seen = models.BooleanField(default=False) 
+
+
+
+# AUTOMATION (TASK)
+class AutomationTask(models.Model):
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    user=models.ForeignKey(User, on_delete=models.CASCADE)
+
+    # Store automation rules dynamically in JSONField
+    automations = models.JSONField(default=dict)  # Use JSONField for flexibility
+
+    def is_enabled(self, automation_type):
+        """Check if a specific automation is enabled"""
+        return self.automations.get(automation_type, False)
+
+    def enable_automation(self, automation_type):
+        """Enable a specific automation"""
+        self.automations[automation_type] = True
+        self.save()
+
+    def disable_automation(self, automation_type):
+        """Disable a specific automation"""
+        self.automations[automation_type] = False
+        self.save()
