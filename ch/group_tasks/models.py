@@ -144,7 +144,9 @@ class Task(models.Model):
     progress_update_sent=models.BooleanField(default=False,null=True,blank=True)
     after_approval_greeting_sent=models.BooleanField(default=False,null=True,blank=True)
     after_completion_notification_sent=models.BooleanField(default=False, null=True, blank=True)
+    escalate_if_not_completed_action=models.BooleanField(default=False, null=True, blank=True)
     
+
 
     class Meta:
         ordering = ['-created_at']
