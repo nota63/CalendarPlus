@@ -1931,7 +1931,7 @@ def fetch_user_info(request, org_id, group_id):
         # Fetch user profile
         profile = Profile.objects.filter(user=user, organization=organization).first()
         # total calpoints earned
-        calpoints=CalPoints.objects.filter(organization=organization,group=group,user=user).count()
+        calpoints=CalPoints.objects.filter(organization=organization,user=user).count()
 
         # Tasks preparation
         # currently having incomplete-tasks 

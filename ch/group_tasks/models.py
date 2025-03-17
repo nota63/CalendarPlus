@@ -145,7 +145,7 @@ class Task(models.Model):
     after_approval_greeting_sent=models.BooleanField(default=False,null=True,blank=True)
     after_completion_notification_sent=models.BooleanField(default=False, null=True, blank=True)
     escalate_if_not_completed_action=models.BooleanField(default=False, null=True, blank=True)
-    
+
 
 
     class Meta:
@@ -202,8 +202,6 @@ class Task(models.Model):
             CalPoints.objects.create(
                 user=assigned_user,
                 organization=self.organization,
-                group=self.group,
-                task=self,
                 points=points,
                 reason=reason
             )
@@ -856,15 +854,7 @@ class CalPoints(models.Model):
         Organization, on_delete=models.CASCADE, related_name="calpoints",
         help_text="Organization where the task was completed."
     )
-    group = models.ForeignKey(
-        Group, on_delete=models.SET_NULL, null=True, blank=True, related_name="calpoints",
-        help_text="Group associated with the task, if applicable."
-    )
-    task = models.ForeignKey(
-        Task, on_delete=models.CASCADE, related_name="calpoints",
-        help_text="Task for which the CalPoints were awarded."
-    )
-
+   
     points = models.IntegerField(default=0, help_text="Number of CalPoints awarded for this task.")
     reason = models.TextField(blank=True, null=True, help_text="Reason why the user earned these CalPoints.")
     created_at = models.DateTimeField(auto_now_add=True, help_text="Timestamp when the points were awarded.")
