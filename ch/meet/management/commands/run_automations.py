@@ -269,72 +269,81 @@ class Command(BaseCommand):
 
 
                         #🔹 Deduct 4 CalPoints from the task.assigned_to's account
-                        # 🔹 Get user's CalPoints
-                         calpoints = get_object_or_404(CalPoints, user=task.assigned_to, organization=organization, group=group, task=task)
+                        # 🔹 Get user's CalPoints (Use .filter().first() to prevent errors)
+                         calpoints = CalPoints.objects.filter(user=task.assigned_to, organization=organization, group=group, task=task).first()
 
-                         if calpoints.points < 4:
-                         # 🚨 Not enough points! Remove user from organization
-                            profile = get_object_or_404(Profile, user=task.assigned_to, organization=organization)
-                            profile.organization = None  # ❌ Remove user from the organization
-                            profile.save()
+                         if not calpoints or calpoints.points < 4:
+                        # 🚨 User has insufficient CalPoints or no CalPoints record exists
 
-                             # 🔹 Send removal notification to the user
-                            subject = "Account Action: Removal from Organization"
-                            message = (
-                               f"Dear {task.assigned_to.username},\n\n"
-                               f"You have been removed from {organization.name} due to insufficient CalPoints. "
-                               f"Your performance has been reviewed, and since your balance fell below the required threshold, "
-                               f"you are no longer part of the organization.\n\n"
-                               f"If you have any questions, please reach out to the administrator.\n\n"
-                               f"Best regards,\n"
-                               f"{organization.name} Team"
-                               )
+                        # 🔹 Remove user from organization
+                               profile = get_object_or_404(Profile, user=task.assigned_to, organization=organization)
+                               profile.organization = None  # ❌ Remove user from the organization
+                               profile.save()
 
-                            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [task.assigned_to.email])
+                               # 🔹 Send removal notification to the user
+                               subject = "Account Action: Removal from Organization"
+                               message = (
+                                        f"Dear {task.assigned_to.username},\n\n"
+                                        f"We regret to inform you that due to missing the task deadline and insufficient CalPoints, "
+                                        f"you have been removed from **{organization.name}**.\n\n"
+                                        f"Your performance was reviewed, and your balance fell below the required threshold. "
+                                        f"As a result, your access to the organization has been revoked.\n\n"
+                                        f"If you have any concerns or believe this action was taken in error, please contact the administrator.\n\n"
+                                        f"Best regards,\n"
+                                        f"{organization.name} Team"
+                                       )
+                               send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [task.assigned_to.email])
 
-                            # notify the manager as well 
-                            # 🔹 Notify the manager about the removal
-                            subject_manager = f"User {task.assigned_to.username} Removed from {organization.name} Due to Missed Deadline & Insufficient CalPoints"
-
-                            message_manager = (
-                                 f"Dear {task.created_by.username},\n\n"
-                                 f"We would like to inform you that **{task.assigned_to.username}** has been removed from **{organization.name}** "
-                                 f"due to failure to complete the assigned task (**{task.title}**) by the deadline (**{task.deadline}**), "
-                                 f"combined with insufficient CalPoints in their account to compensate for the missed deadline.\n\n"
-                                 f"As part of our workflow, CalPoints are deducted when deadlines are not met, ensuring accountability and efficiency. "
-                                 f"Since their balance was too low to cover the penalty, they have been automatically removed from the organization.\n\n"
-                                 f"If you believe this action was taken in error or if you wish to give them another chance, you can reinstate them by "
-                                 f"sending a new invitation from your dashboard.\n\n"
-                                 f"Let us know if you need any further assistance.\n\n"
-                                 f"Best Regards,\n"
-                                 f"Team CalendarPlus"
-                                )
-                            
-                            from_email=settings.DEFAULT_FROM_EMAIL
-                            recipient_list=[task.created_by.email]
-
-                            send_mail(subject_manager, message_manager,from_email,recipient_list)
-
+                                # 🔹 Notify the manager about the removal
+                               subject_manager = f"User {task.assigned_to.username} Removed from {organization.name} Due to Missed Deadline & Insufficient CalPoints"
+                               message_manager = (
+                                      f"Dear {task.created_by.username},\n\n"
+                                      f"We would like to inform you that **{task.assigned_to.username}** has been removed from **{organization.name}** "
+                                      f"due to failure to complete the assigned task (**{task.title}**) by the deadline (**{task.deadline}**), "
+                                      f"combined with insufficient CalPoints in their account to cover the penalty.\n\n"
+                                      f"As per our workflow, CalPoints are deducted when deadlines are missed to ensure accountability. "
+                                      f"Since their balance was too low, they have been automatically removed from the organization.\n\n"
+                                      f"If you believe this action was taken in error or wish to reinstate them, you may invite them back from your dashboard.\n\n"
+                                      f"Let us know if you need any further assistance.\n\n"
+                                      f"Best Regards,\n"
+                                      f"Team CalendarPlus"
+                                      )
+                               send_mail(subject_manager, message_manager, settings.DEFAULT_FROM_EMAIL, [task.created_by.email])
 
                          else:
                              # ✅ Deduct 4 CalPoints if the user has enough
-                             calpoints.points -= 4
-                             calpoints.save()
+                            calpoints.points -= 4
+                            calpoints.save()
 
-                              # 🔹 Transfer 4 CalPoints to the manager's account (task.created_by)
-                             calpoints_manager = get_object_or_404(CalPoints, user=task.created_by, organization=organization, group=group, task=task)
-                             calpoints_manager.points += 4 
-                             calpoints_manager.save()
+                            # 🔹 Transfer 4 CalPoints to the manager's account (task.created_by)
+                            calpoints_manager, created = CalPoints.objects.get_or_create(
+                            user=task.created_by, organization=organization, group=group, task=task,
+                            defaults={'points': 0}  # If no record exists, create one with 0 points
+                            )
+
+                            calpoints_manager.points += 4
+                            calpoints_manager.save()
+
+                            # 🔹 Notify manager about CalPoints transfer
+                            subject_transfer = f"CalPoints Transfer Notification - {task.assigned_to.username}"
+                            message_transfer = (
+                                 f"Dear {task.created_by.username},\n\n"
+                                  f"We have successfully transferred **4 CalPoints** from **{task.assigned_to.username}** to your account "
+                                 f"as compensation for the missed deadline of the task **{task.title}**.\n\n"
+                                 f"This ensures fairness and accountability in task management. Keep up the great work!\n\n"
+                                 f"Best Regards,\n"
+                                 f"Team CalendarPlus"
+                                )
+                            send_mail(subject_transfer, message_transfer, settings.DEFAULT_FROM_EMAIL, [task.created_by.email])
 
                               # change task settings
-                             task.escalate_if_not_completed_action = True
-                             task.save()
+                            task.escalate_if_not_completed_action = True
+                            task.save()
 
 
                         
 
                     self.stdout.write(self.style.WARNING(f"⚠️ Escalation triggered for overdue task: {task.title}"))
-
 
 
             except Exception as e:
