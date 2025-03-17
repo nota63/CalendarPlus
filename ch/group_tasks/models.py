@@ -143,6 +143,7 @@ class Task(models.Model):
     submission_request_sent = models.BooleanField(default=False, null=True, blank=True)
     progress_update_sent=models.BooleanField(default=False,null=True,blank=True)
     after_approval_greeting_sent=models.BooleanField(default=False,null=True,blank=True)
+    after_completion_notification_sent=models.BooleanField(default=False, null=True, blank=True)
     
 
     class Meta:

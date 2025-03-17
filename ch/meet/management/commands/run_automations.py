@@ -172,9 +172,48 @@ class Command(BaseCommand):
                             # send the email
                             send_mail(subject, message, from_email, recipient_list)
 
-                        self.stdout.write(self.style.SUCCESS(f"✅ After approval Greeting Sent: {task.title}"))
+                    self.stdout.write(self.style.SUCCESS(f"✅ After approval Greeting Sent: {task.title}"))
+
+                    # notify task creator after completion
+                    if automation.notify_task_creator_on_completion:
+                        if task.status == 'completed' and not task.after_completion_notification_sent:
+                            task.after_completion_notification_sent = True
+                            task.save()
+
+                            # prepare the message
+                            # Prepare the message
+                            subject = f"🎯 Task Completion Notification: {task.title}"
+
+                            message = (
+                               f"Hello {task.created_by.username},\n\n"
+                               f"We are delighted to inform you that the task **'{task.title}'** has been successfully completed.\n\n"
+                               f"📌 **Task Details:**\n"
+                               f"   - **Title:** {task.title}\n"
+                               f"   - **Description:** {task.description}\n"
+                               f"   - **Deadline:** {task.deadline}\n"
+                               f"   - **Priority:** {task.priority}\n"
+                               f"   - **Status:** Pending Approval ✅\n"
+                               f"\n"
+                               f"👨‍💻 **Assigned To:** {task.assigned_to.username}\n"
+                               f"🏢 **Organization:** {task.organization.name}\n"
+                               f"👥 **Group:** {task.group.name}\n\n"
+                               f"The task has been successfully worked on, reaching its final stage. "
+                               f"It is now ready for the next steps as needed. "
+                               f"Feel free to access the details and take further actions through your dashboard.\n\n"
+                               f"Thank you for your continued support and collaboration!\n\n"
+                               f"Best Regards,\n"
+                               f"✨ **Team {task.organization.name}**"
+                             )
+                            from_email= settings.DEFAULT_FROM_EMAIL
+                            recipient_list=[task.created_by.email]
+                            # send the email
+                            send_mail(subject, message, from_email, recipient_list)
+
+                    self.stdout.write(self.style.SUCCESS(f"✅ After completion Notification Sent Sent: {task.title}"))
 
 
+
+                        
 
 
 
