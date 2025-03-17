@@ -86,3 +86,17 @@
 .chat-message {
     animation: fadeIn 0.3s ease-out;
 }
+
+
+/* Enable scrolling in Quick actions container */
+.quick-actions-container {
+    max-height: 300px; /* Adjust height as needed */
+    overflow-y: auto; /* Enable vertical scrolling */
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+    -ms-overflow-style: none; /* Hide scrollbar for IE/Edge */
+}
+
+/* Hide scrollbar for WebKit browsers (Chrome, Safari) */
+.quick-actions-container::-webkit-scrollbar {
+    display: none;
+}
