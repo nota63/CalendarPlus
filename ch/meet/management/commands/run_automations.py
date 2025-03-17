@@ -8,6 +8,10 @@ from django.conf import settings
 from group_tasks.models import AutomationTask, Task
 from accounts.models import Profile, Organization
 from groups.models import Group
+from django.utils.timezone import localtime
+
+
+
 class Command(BaseCommand):
     help = "Continuously runs automation tasks every minute"
 
@@ -48,16 +52,19 @@ class Command(BaseCommand):
                     # 🚀 Automation Conditions
 
                     # 1️⃣ **Send Welcome Text** (Prevent duplicate welcome messages)
-                    if automation.send_welcome_text and not task.welcome_text_sent:
+                   # 1️⃣ **Send Welcome Text** (Only at 6 AM)
+                    current_time = localtime().strftime("%H:%M")  # Get local time in HH:MM format
+
+                    if automation.send_welcome_text and not task.welcome_text_sent and current_time == "06:00":
                         subject = "Good Morning! Wishing You a Productive Day Ahead 🌟"
                         message = (
-                            f"Dear {task.created_by.username},\n\n"
-                            f"Wishing you a wonderful and productive day ahead! May your tasks unfold smoothly, "
-                            f"and your efforts bring success and fulfillment. If there's anything you need, feel free to reach out.\n\n"
-                            f"Have a fantastic day!\n\n"
-                            f"Best Regards,\n"
-                            f"{organization.name} Team"
-                        )
+                             f"Dear {task.created_by.username},\n\n"
+                             f"Wishing you a wonderful and productive day ahead! May your tasks unfold smoothly, "
+                             f"and your efforts bring success and fulfillment. If there's anything you need, feel free to reach out.\n\n"
+                             f"Have a fantastic day!\n\n"
+                             f"Best Regards,\n"
+                             f"{organization.name} Team"
+                               )
 
                         from_email = settings.DEFAULT_FROM_EMAIL
                         recipient_list = [task.created_by.email]

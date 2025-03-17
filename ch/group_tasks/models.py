@@ -138,7 +138,7 @@ class Task(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, help_text="Task creation timestamp.")
     updated_at = models.DateTimeField(auto_now=True, help_text="Task last updated timestamp.")
 
-    # Track if automation ran
+    # Track if automation ran (AUTOMATION CONTROLS AND SETTINGS)
     welcome_text_sent = models.BooleanField(default=False,null=True, blank=True)
     submission_request_sent = models.BooleanField(default=False, null=True, blank=True)
 
