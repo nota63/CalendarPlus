@@ -66,7 +66,10 @@ urlpatterns = [
     path('get-workspace-members/',get_workspace_members, name='get_workspace_members'),
     path('send-task-to-members/',send_task_to_members, name='send_task_to_members'),
     path('fetch-user-info/<int:org_id>/<int:group_id>/',fetch_user_info, name='fetch_user_info'),
-    path('reassign-task/<int:org_id>/<int:group_id>/<int:task_id>/',reassign_task, name='reassign_task')
+    path('reassign-task/<int:org_id>/<int:group_id>/<int:task_id>/',reassign_task, name='reassign_task'),
+    path('get-enabled-automations/<int:org_id>/<int:group_id>/<int:task_id>/',get_enabled_automations, name='get_enabled_automations'),
+    path('toggle-automation/<int:org_id>/<int:group_id>/<int:task_id>/',toggle_automation, name='toggle_automation')
+
   
   
   

@@ -887,7 +887,7 @@ class AutomationTask(models.Model):
     user=models.ForeignKey(User, on_delete=models.CASCADE)
 
     # Store automation rules dynamically in JSONField
-    automations = models.JSONField(default=dict)  # Use JSONField for flexibility
+    automations = models.JSONField(default=dict)  
 
     def is_enabled(self, automation_type):
         """Check if a specific automation is enabled"""

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect , get_list_or_404
 from .models import (Task, TaskNote, TaskComment , TaskTag, ActivityLog,RecentVisit,MeetingTaskQuery,CommunicateTask,TaskReminder
                      
-                     ,PendingRewardNotification,CalPoints)
+                     ,PendingRewardNotification,CalPoints,AutomationTask)
 from accounts.models import Organization, Profile
 from groups.models import Group
 from django.views import View
@@ -2012,6 +2012,44 @@ def fetch_user_info(request, org_id, group_id):
         })
 
     return JsonResponse({"error": "Invalid email input!"}, status=400)
+
+
+# HANDLE TASK AUTOMATIONS
+
+# FETCH ENABLED AUTOMATIONS
+def get_enabled_automations(request, org_id, group_id, task_id):
+    """Fetch all enabled automations for a given task"""
+    automation_task = get_object_or_404(AutomationTask, organization_id=org_id, group_id=group_id, task_id=task_id,user=request.user)
+    
+    enabled_automations = [key for key, value in automation_task.automations.items() if value]
+    
+    return JsonResponse({"enabled_automations": enabled_automations})
+
+# HANDLE ENABLE DISABLE AUTOMATIONS
+@csrf_exempt
+def toggle_automation(request, org_id, group_id, task_id):
+    """Enable or disable a specific automation"""
+
+    organization=get_object_or_404(Organization, id=org_id)
+    group=get_object_or_404(Group, id=group_id, organization=organization)
+    task=get_object_or_404(Task, id=task_id, organization=organization, group=group)
+
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            automation_type = data.get("automation_type")
+            enable = data.get("enable", False)  # True for enable, False for disable
+            
+            automation_task = get_object_or_404(AutomationTask, organization_id=org_id, group_id=group_id, task_id=task_id,user=request.user)
+            automation_task.automations[automation_type] = enable
+            automation_task.user=request.user
+            automation_task.group=group
+            automation_task.organization=organization
+            automation_task.save()
+            
+            return JsonResponse({"success": True, "automation": automation_type, "enabled": enable})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
 
 
 

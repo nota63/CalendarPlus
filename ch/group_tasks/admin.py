@@ -3,7 +3,7 @@ from unfold.admin import ModelAdmin
 from .models import (Task, AddDay, TaskComment, TaskNote, TaskTag, TaskTimer, ActivityLog, TaskTimeTracking,
                      
                       Problem,AttachmentsTasksApp,RecentVisit,MeetingTaskQuery,CommunicateTask,SubTask,TaskReminder,CalPoints,
-                      PendingRewardNotification)
+                      PendingRewardNotification,AutomationTask)
 
 @admin.register(Task)
 class TaskAdmin(ModelAdmin):
@@ -84,4 +84,9 @@ class CalpointsAdmin(ModelAdmin):
 @admin.register(PendingRewardNotification)
 class PendingRewardNotificationAdmin(ModelAdmin):
     list_display = [field.name for field in PendingRewardNotification._meta.fields]
+
+
+@admin.register(AutomationTask)
+class AutomationAdmin(ModelAdmin):
+    list_display = [field.name for field in AutomationTask._meta.fields]
 
