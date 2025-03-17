@@ -8,7 +8,6 @@ from django.conf import settings
 from group_tasks.models import AutomationTask, Task
 from accounts.models import Profile, Organization
 from groups.models import Group
-
 class Command(BaseCommand):
     help = "Continuously runs automation tasks every minute"
 
@@ -32,103 +31,72 @@ class Command(BaseCommand):
             time.sleep(1)
 
     def process_automations(self):
-        """Fetches and processes automation tasks while preventing duplicate executions."""
+        """Fetches and processes automation tasks while preventing duplicate executions per task."""
         self.stdout.write(self.style.SUCCESS("🔄 Running automation tasks..."))
 
         automations = AutomationTask.objects.all()
 
         for automation in automations:
             try:
-                task = automation.task  
-                user = automation.user  
-                group = automation.group  
-                organization = automation.organization  
+                tasks = Task.objects.filter(assigned_to=automation.user)
 
-                # Prevent re-execution on the same day
-                if automation.last_executed and automation.last_executed.date() == now().date():
-                    continue  # Skip if it has already run today
+                for task in tasks:
+                    user = automation.user
+                    group = automation.group
+                    organization = automation.organization
 
-                # 🚀 Automation Conditions (With Tracking)
-                
-                if automation.send_welcome_text:
-                   subject = "Good Morning! Wishing You a Productive Day Ahead 🌟"
-                   message = (
-                      f"Dear {task.created_by.username},\n\n"
-                      f"Wishing you a wonderful and productive day ahead! May your tasks unfold smoothly, "
-                      f"and your efforts bring success and fulfillment. If there's anything you need, feel free to reach out.\n\n"
-                      f"Have a fantastic day!\n\n"
-                      f"Best Regards,\n"
-                      f"{organization.name} Team"
-                     )
-    
-                   from_email = settings.DEFAULT_FROM_EMAIL
-                   recipient_list = [task.created_by.email]
-                   send_mail(subject, message, from_email, recipient_list)
-                   automation.last_executed = now()
-                   automation.save()
+                    # 🚀 Automation Conditions
 
+                    # 1️⃣ **Send Welcome Text** (Prevent duplicate welcome messages)
+                    if automation.send_welcome_text and not task.welcome_text_sent:
+                        subject = "Good Morning! Wishing You a Productive Day Ahead 🌟"
+                        message = (
+                            f"Dear {task.created_by.username},\n\n"
+                            f"Wishing you a wonderful and productive day ahead! May your tasks unfold smoothly, "
+                            f"and your efforts bring success and fulfillment. If there's anything you need, feel free to reach out.\n\n"
+                            f"Have a fantastic day!\n\n"
+                            f"Best Regards,\n"
+                            f"{organization.name} Team"
+                        )
 
-                # submission request after completion
-                if automation.send_submission_request_after_completion:
-                   if task.progress == 100:
-                      task.status = 'pending_approval'  # Corrected assignment
-        
-                      subject = "Task Submission Awaiting Your Approval ✅"
-                      message = (
-                         f"Hello {task.created_by.username},\n\n"
-                         f"{task.assigned_to.username} has submitted a task for your approval. Below are the details:\n\n"
-                         f"📌 **Task:** {task.title}\n"
-                         f"📅 **Deadline:** {task.deadline}\n"
-                         f"⚡ **Priority:** {task.priority}\n\n"
-                         f"📂 **Workspace:** {organization.name}\n"
-                         f"👥 **Group:** {group.name}\n\n"
-                         f"Please review and approve the task at your earliest convenience via your dashboard.\n\n"
-                         f"Thank you for your collaboration!\n\n"
-                         f"Best regards,\n"
-                         f"Team CalendarPlus"
-                         )
-        
-                      from_email = settings.DEFAULT_FROM_EMAIL
-                      recipient_list = [task.created_by.email]
-        
-                      send_mail(subject, message, from_email, recipient_list)
-                      automation.last_executed = now()
-                      automation.save()
+                        from_email = settings.DEFAULT_FROM_EMAIL
+                        recipient_list = [task.created_by.email]
+                        send_mail(subject, message, from_email, recipient_list)
 
-                
-                if automation.generate_summary_after_approval:
-                    pass  # TODO: Generate summary after approval
-                
-                if automation.translate_in_english:
-                    pass  # TODO: Translate task content into English
-                
-                if automation.progress_update:
-                    pass  # TODO: Send progress updates
-                
-                if automation.send_greeting_after_approval:
-                    pass  # TODO: Send greeting after approval
-                
-                if automation.notify_task_creator_on_completion:
-                    pass  # TODO: Notify task creator when task is completed
-                
-                if automation.escalate_if_not_completed:
-                    pass  # TODO: Escalate task if not completed on time
-                
-                if automation.remind_before_deadline:
-                    pass  # TODO: Send a reminder before the deadline
-                
-                if automation.auto_assign_reviewer:
-                    pass  # TODO: Auto-assign a reviewer
-                
-                if automation.log_activity_on_completion:
-                    pass  # TODO: Log task completion activity
-                
-                if automation.assign_task_if_previous_completed:
-                    pass  # TODO: Assign a new task if the previous one is completed
-                
-                self.stdout.write(self.style.SUCCESS(f"✅ Processed automations for task: {task.title}"))
+                        # ✅ Mark as sent
+                        task.welcome_text_sent = True
+                        task.save()
+
+                    # 2️⃣ **Send Submission Request to Assigned User if Task is Complete**
+                    if automation.send_submission_request_after_completion:
+                        if task.progress == 100 and task.status != "pending_approval" and not task.submission_request_sent:
+                            task.status = "pending_approval"
+                            task.submission_request_sent = True  # ✅ Mark task as processed
+                            task.save()
+
+                            subject = "Task Submission Awaiting Your Approval ✅"
+                            message = (
+                                f"Hello {task.created_by.username},\n\n"
+                                f"Your task has been marked as complete and is now pending approval. Here are the details:\n\n"
+                                f"📌 **Task:** {task.title}\n"
+                                f"📅 **Deadline:** {task.deadline}\n"
+                                f"⚡ **Priority:** {task.priority}\n\n"
+                                f"📂 **Workspace:** {organization.name}\n"
+                                f"👥 **Group:** {group.name}\n\n"
+                                f"Please review the task and approve it via your dashboard.\n\n"
+                                f"Thank you for your hard work!\n\n"
+                                f"Best regards,\n"
+                                f"Team CalendarPlus"
+                            )
+
+                            from_email = settings.DEFAULT_FROM_EMAIL
+                            recipient_list = [task.created_by.email]  # 💡 Send email to `task.assigned_to`
+
+                            send_mail(subject, message, from_email, recipient_list)
+
+                    self.stdout.write(self.style.SUCCESS(f"✅ Processed automations for task: {task.title}"))
 
             except Exception as e:
-                self.stderr.write(self.style.ERROR(f"❌ Error processing task {automation.task.title}: {str(e)}"))
+                self.stderr.write(self.style.ERROR(f"❌ Error processing automation: {str(e)}"))
 
         self.stdout.write(self.style.SUCCESS("🎯 All automations processed successfully!"))

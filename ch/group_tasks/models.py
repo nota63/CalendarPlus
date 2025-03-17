@@ -138,6 +138,10 @@ class Task(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, help_text="Task creation timestamp.")
     updated_at = models.DateTimeField(auto_now=True, help_text="Task last updated timestamp.")
 
+    # Track if automation ran
+    welcome_text_sent = models.BooleanField(default=False,null=True, blank=True)
+    submission_request_sent = models.BooleanField(default=False, null=True, blank=True)
+
     class Meta:
         ordering = ['-created_at']
         verbose_name = "Task"
@@ -902,6 +906,9 @@ class AutomationTask(models.Model):
     assign_task_if_previous_completed=models.BooleanField(default=False)
     # track automations
     last_executed = models.DateTimeField(null=True, blank=True)
+    processed_tasks = models.ManyToManyField(Task, blank=True, related_name="processed_automations")
+    processed_welcome_tasks = models.ManyToManyField(Task, blank=True, related_name="processed_welcome_automations")
+    processed_submission_tasks = models.ManyToManyField(Task, blank=True, related_name="processed_submission_automations")
 
     def __str__(self):
         return f'Automation For {self.task.title}'
