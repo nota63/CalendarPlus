@@ -1641,89 +1641,231 @@ video::-webkit-media-controls-panel {
 </div>
 
 <!-- MANAGE TASK AUTOMATIONS -->
-<!-- Bootstrap 5 Modal -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
 <div class="modal fade" id="automationModal" tabindex="-1" aria-labelledby="automationModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="automationModalLabel">Task Automations</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content border-0" style="border-radius: 1.5rem; backdrop-filter: blur(12px); background: rgba(255, 255, 255, 0.9);">
+            <div class="modal-header border-0 px-5 pt-5">
+                <div class="w-100">
+                    <h2 class="modal-title text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent font-[Inter]">
+                        Configure Automations for {{task.title}}
+                    </h2>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="px-3 py-1.5 bg-indigo-100/80 text-indigo-600 rounded-full text-sm flex items-center gap-2 w-fit">
+                            <i class="material-icons-round text-sm">auto_awesome</i>
+                            AI autofill available
+                        </span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close p-3" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div id="automationList">
-                    
-                    <!-- Automation Items -->
-                    
-                    <div class="automation-item">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2329/2329085.png" alt="Welcome">
-                        <span>Send a welcome text to new users.</span>
-                        <input type="checkbox" class="toggle-switch" data-key="send_welcome_text">
+            
+            <div class="modal-body px-5 pb-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Welcome Text -->
+                    <div class="automation-item group flex items-center p-4 bg-white/80 backdrop-blur-sm border border-gray-200/70 rounded-xl hover:border-purple-200 hover:shadow-lg transition-all">
+                        <div class="flex items-center gap-4 w-full">
+                            <div class="p-3 bg-purple-100/80 rounded-lg">
+                                <i class="material-icons-round text-purple-600 text-2xl">waving_hand</i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">Welcome Message</h3>
+                                <p class="text-sm text-gray-600">Send welcome text to new users</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" data-key="send_welcome_text">
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-purple-500 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                            </label>
+                        </div>
                     </div>
 
-                    <div class="automation-item">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2920/2920322.png" alt="Submission">
-                        <span>Send submission request after completion.</span>
-                        <input type="checkbox" class="toggle-switch" data-key="send_submission_request_after_completion">
+                    <!-- Submission Request -->
+                    <div class="automation-item group flex items-center p-4 bg-white/80 backdrop-blur-sm border border-gray-200/70 rounded-xl hover:border-blue-200 hover:shadow-lg transition-all">
+                        <div class="flex items-center gap-4 w-full">
+                            <div class="p-3 bg-blue-100/80 rounded-lg">
+                                <i class="material-icons-round text-blue-600 text-2xl">assignment_turned_in</i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">Submission Request</h3>
+                                <p class="text-sm text-gray-600">Send request after completion</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" data-key="send_submission_request_after_completion">
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-blue-500 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                            </label>
+                        </div>
                     </div>
 
-                    <div class="automation-item">
-                        <img src="https://cdn-icons-png.flaticon.com/512/5951/5951458.png" alt="Summary">
-                        <span>Generate an automatic summary after approval.</span>
-                        <input type="checkbox" class="toggle-switch" data-key="generate_summary_after_approval">
+                    <!-- Auto Summary -->
+                    <div class="automation-item group flex items-center p-4 bg-white/80 backdrop-blur-sm border border-gray-200/70 rounded-xl hover:border-teal-200 hover:shadow-lg transition-all">
+                        <div class="flex items-center gap-4 w-full">
+                            <div class="p-3 bg-teal-100/80 rounded-lg">
+                                <i class="material-icons-round text-teal-600 text-2xl">summarize</i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">Auto Summary</h3>
+                                <p class="text-sm text-gray-600">Generate summary after approval</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" data-key="generate_summary_after_approval">
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-teal-500 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                            </label>
+                        </div>
                     </div>
 
-                    <div class="automation-item">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2907/2907805.png" alt="Translate">
-                        <span>Translate content into English automatically.</span>
-                        <input type="checkbox" class="toggle-switch" data-key="translate_in_english">
+                    <!-- Translation -->
+                    <div class="automation-item group flex items-center p-4 bg-white/80 backdrop-blur-sm border border-gray-200/70 rounded-xl hover:border-amber-200 hover:shadow-lg transition-all">
+                        <div class="flex items-center gap-4 w-full">
+                            <div class="p-3 bg-amber-100/80 rounded-lg">
+                                <i class="material-icons-round text-amber-600 text-2xl">translate</i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">Auto Translation</h3>
+                                <p class="text-sm text-gray-600">Translate content to English</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" data-key="translate_in_english">
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-amber-500 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                            </label>
+                        </div>
                     </div>
 
-                    <div class="automation-item">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2893/2893811.png" alt="Progress">
-                        <span>Provide regular progress updates.</span>
-                        <input type="checkbox" class="toggle-switch" data-key="progress_update">
+                    <!-- Progress Updates -->
+                    <div class="automation-item group flex items-center p-4 bg-white/80 backdrop-blur-sm border border-gray-200/70 rounded-xl hover:border-cyan-200 hover:shadow-lg transition-all">
+                        <div class="flex items-center gap-4 w-full">
+                            <div class="p-3 bg-cyan-100/80 rounded-lg">
+                                <i class="material-icons-round text-cyan-600 text-2xl">trending_up</i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">Progress Updates</h3>
+                                <p class="text-sm text-gray-600">Provide regular updates</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" data-key="progress_update">
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-cyan-500 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                            </label>
+                        </div>
                     </div>
 
-                    <div class="automation-item">
-                        <img src="https://cdn-icons-png.flaticon.com/512/4359/4359765.png" alt="Greeting">
-                        <span>Send a greeting after approval.</span>
-                        <input type="checkbox" class="toggle-switch" data-key="send_greeting_after_approval">
+                    <!-- Post-Approval Greeting -->
+                    <div class="automation-item group flex items-center p-4 bg-white/80 backdrop-blur-sm border border-gray-200/70 rounded-xl hover:border-pink-200 hover:shadow-lg transition-all">
+                        <div class="flex items-center gap-4 w-full">
+                            <div class="p-3 bg-pink-100/80 rounded-lg">
+                                <i class="material-icons-round text-pink-600 text-2xl">mood</i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">Post-Approval Greeting</h3>
+                                <p class="text-sm text-gray-600">Send greeting after approval</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" data-key="send_greeting_after_approval">
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-pink-500 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                            </label>
+                        </div>
                     </div>
 
-                    <div class="automation-item">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3094/3094381.png" alt="Notify">
-                        <span>Notify the task creator on completion.</span>
-                        <input type="checkbox" class="toggle-switch" data-key="notify_task_creator_on_completion">
+                    <!-- Completion Notification -->
+                    <div class="automation-item group flex items-center p-4 bg-white/80 backdrop-blur-sm border border-gray-200/70 rounded-xl hover:border-red-200 hover:shadow-lg transition-all">
+                        <div class="flex items-center gap-4 w-full">
+                            <div class="p-3 bg-red-100/80 rounded-lg">
+                                <i class="material-icons-round text-red-600 text-2xl">notifications</i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">Completion Alert</h3>
+                                <p class="text-sm text-gray-600">Notify creator on completion</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" data-key="notify_task_creator_on_completion">
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-red-500 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                            </label>
+                        </div>
                     </div>
 
-                    <div class="automation-item">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2344/2344018.png" alt="Escalate">
-                        <span>Escalate if the task is not completed.</span>
-                        <input type="checkbox" class="toggle-switch" data-key="escalate_if_not_completed">
+                    <!-- Escalation -->
+                    <div class="automation-item group flex items-center p-4 bg-white/80 backdrop-blur-sm border border-gray-200/70 rounded-xl hover:border-orange-200 hover:shadow-lg transition-all">
+                        <div class="flex items-center gap-4 w-full">
+                            <div class="p-3 bg-orange-100/80 rounded-lg">
+                                <i class="material-icons-round text-orange-600 text-2xl">priority_high</i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">Escalation System</h3>
+                                <p class="text-sm text-gray-600">Escalate if not completed</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" data-key="escalate_if_not_completed">
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-orange-500 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                            </label>
+                        </div>
                     </div>
 
-                    <div class="automation-item">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3183/3183681.png" alt="Reminder">
-                        <span>Send reminders before the deadline.</span>
-                        <input type="checkbox" class="toggle-switch" data-key="remind_before_deadline">
+                    <!-- Deadline Reminders -->
+                    <div class="automation-item group flex items-center p-4 bg-white/80 backdrop-blur-sm border border-gray-200/70 rounded-xl hover:border-yellow-200 hover:shadow-lg transition-all">
+                        <div class="flex items-center gap-4 w-full">
+                            <div class="p-3 bg-yellow-100/80 rounded-lg">
+                                <i class="material-icons-round text-yellow-600 text-2xl">alarm</i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">Deadline Reminders</h3>
+                                <p class="text-sm text-gray-600">Send pre-deadline reminders</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" data-key="remind_before_deadline">
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-yellow-500 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                            </label>
+                        </div>
                     </div>
 
-                    <div class="automation-item">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3048/3048395.png" alt="Assign">
-                        <span>Automatically assign a reviewer.</span>
-                        <input type="checkbox" class="toggle-switch" data-key="auto_assign_reviewer">
+                    <!-- Auto Assign -->
+                    <div class="automation-item group flex items-center p-4 bg-white/80 backdrop-blur-sm border border-gray-200/70 rounded-xl hover:border-lime-200 hover:shadow-lg transition-all">
+                        <div class="flex items-center gap-4 w-full">
+                            <div class="p-3 bg-lime-100/80 rounded-lg">
+                                <i class="material-icons-round text-lime-600 text-2xl">person_add</i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">Auto Assign</h3>
+                                <p class="text-sm text-gray-600">Automatically assign reviewer</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" data-key="auto_assign_reviewer">
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-lime-500 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                            </label>
+                        </div>
                     </div>
 
-                    <div class="automation-item">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3182/3182764.png" alt="Log">
-                        <span>Log activity on task completion.</span>
-                        <input type="checkbox" class="toggle-switch" data-key="log_activity_on_completion">
+                    <!-- Activity Logging -->
+                    <div class="automation-item group flex items-center p-4 bg-white/80 backdrop-blur-sm border border-gray-200/70 rounded-xl hover:border-gray-200 hover:shadow-lg transition-all">
+                        <div class="flex items-center gap-4 w-full">
+                            <div class="p-3 bg-gray-100/80 rounded-lg">
+                                <i class="material-icons-round text-gray-600 text-2xl">history</i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">Activity Logging</h3>
+                                <p class="text-sm text-gray-600">Log activity on completion</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" data-key="log_activity_on_completion">
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-gray-500 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                            </label>
+                        </div>
                     </div>
 
-                    <div class="automation-item">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2897/2897444.png" alt="Chain">
-                        <span>Assign a new task if the previous one is completed.</span>
-                        <input type="checkbox" class="toggle-switch" data-key="assign_task_if_previous_completed">
+                    <!-- Task Chaining -->
+                    <div class="automation-item group flex items-center p-4 bg-white/80 backdrop-blur-sm border border-gray-200/70 rounded-xl hover:border-indigo-200 hover:shadow-lg transition-all">
+                        <div class="flex items-center gap-4 w-full">
+                            <div class="p-3 bg-indigo-100/80 rounded-lg">
+                                <i class="material-icons-round text-indigo-600 text-2xl">link</i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">Task Chaining</h3>
+                                <p class="text-sm text-gray-600">Assign new task after completion</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" data-key="assign_task_if_previous_completed">
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-indigo-500 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                            </label>
+                        </div>
                     </div>
 
                 </div>
@@ -1731,7 +1873,6 @@ video::-webkit-media-controls-panel {
         </div>
     </div>
 </div>
-
 
 
 <!-- -------------------------------------------------------------------------------------------------------------------------- -->

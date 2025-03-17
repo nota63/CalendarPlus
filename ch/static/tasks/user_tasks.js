@@ -222,7 +222,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function fetchEnabledAutomations() {
-        const orgId = window.djangoData.orgId;  // Replace with dynamic values
+        const orgId = window.djangoData.orgId;
         const groupId = window.djangoData.groupId;
         const taskId = window.djangoData.taskId;
 
@@ -230,18 +230,23 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(data => {
                 if (data.status === "success") {
-                    document.querySelectorAll(".toggle-switch").forEach((toggle) => {
+                    document.querySelectorAll("[data-key]").forEach((toggle) => {
                         toggle.checked = data.automations[toggle.dataset.key] || false;
-                        toggle.addEventListener("change", function () {
-                            toggleAutomation(this.dataset.key, this.checked);
-                        });
+
+                        // Ensure event listener is added only once
+                        if (!toggle.dataset.listenerAdded) {
+                            toggle.addEventListener("change", function () {
+                                toggleAutomation(this.dataset.key, this.checked);
+                            });
+                            toggle.dataset.listenerAdded = "true";
+                        }
                     });
                 }
             });
     }
 
     function toggleAutomation(automationKey, status) {
-        const orgId = window.djangoData.orgId;  // Replace with dynamic values
+        const orgId = window.djangoData.orgId;
         const groupId = window.djangoData.groupId;
         const taskId = window.djangoData.taskId;
 
