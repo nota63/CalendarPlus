@@ -74,6 +74,8 @@ class Command(BaseCommand):
                         task.welcome_text_sent = True
                         task.save()
 
+                    self.stdout.write(self.style.SUCCESS(f"✅ Processed automations for task: {task.title}"))
+
                     # 2️⃣ **Send Submission Request to Assigned User if Task is Complete**
                     if automation.send_submission_request_after_completion:
                         if task.progress == 100 and task.status != "pending_approval" and not task.submission_request_sent:
@@ -102,6 +104,35 @@ class Command(BaseCommand):
                             send_mail(subject, message, from_email, recipient_list)
 
                     self.stdout.write(self.style.SUCCESS(f"✅ Processed automations for task: {task.title}"))
+
+
+                    # SEND PROGRESS UPDATE TO MANAGER IF ENABLED
+                    if automation.progress_update:
+                        if task.progress and not task.progress_update_sent:
+                            task.progress_update_sent=True
+                            task.save()
+
+                            subject=f'Progress Update Task: {task.title}'
+                            message=(
+                                f'Hello {task.created_by.username}\n'
+                                f'We noticed One of your task you assigned to {task.assigned_to.username} Has Been progressed forward\n'
+                                f'We thought will let you know about because the task is moving forward to be completed\n'
+                                f'Below are the task & Workspace details you can read\n'
+                                f'Task: {task.title}\n'
+                                f'Deadline: {task.deadline}\n'
+                                f'Priority:{task.priority}\n'
+                                f'The task progress currently is {task.progress}%\n'
+                                f'Workspace: {organization.name}\n'
+                                f'Group: {group.name}\n'
+                                f'Thank you\n'
+                                f'Team CalendarPlus'
+                            )
+                            from_email=settings.DEFAULT_FROM_EMAIL
+                            recipient_list=[task.created_by.email]
+
+                            send_mail(subject, message, from_email, recipient_list)
+                    self.stdout.write(self.style.SUCCESS(f"✅ Progress update sent : {task.title}"))
+
 
             except Exception as e:
                 self.stderr.write(self.style.ERROR(f"❌ Error processing automation: {str(e)}"))

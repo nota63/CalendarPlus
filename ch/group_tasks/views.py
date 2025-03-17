@@ -2332,6 +2332,7 @@ def update_task_progress(request, org_id, group_id, task_id):
         if 0 <= new_progress <= 100:
             try:
               task.progress = new_progress
+              task.progress_update_sent=False
               task.save()
               ActivityLog.objects.create(
                   user=request.user,
