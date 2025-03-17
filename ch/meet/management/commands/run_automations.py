@@ -218,7 +218,7 @@ class Command(BaseCommand):
                     # 🚨 Escalate If Not Completed - Report to Manager & Deduct 5 Calpoints
                     if automation.escalate_if_not_completed:
                       # Check if the task deadline has passed, task is NOT completed, and escalation action hasn't been taken
-                         if task.deadline <= datetime.now().date() and task.status != "completed" and not task.escalate_if_not_completed_action:
+                         if task.deadline.date() <= datetime.now().date() and task.status != "completed" and not task.escalate_if_not_completed_action:
                               subject = f"⚠️ Urgent: Task '{task.title}' is Overdue!"
                               message = (
                               f"Dear {task.created_by.username},\n\n"
