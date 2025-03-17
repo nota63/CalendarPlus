@@ -9,9 +9,12 @@ from group_tasks.models import AutomationTask, Task
 from accounts.models import Profile, Organization
 from groups.models import Group
 from django.utils.timezone import localtime
+from datetime import datetime
+from group_tasks.models import CalPoints
+from django.shortcuts import redirect, get_object_or_404
 
 
-
+# IMPLEMENT THE COMMAND
 class Command(BaseCommand):
     help = "Continuously runs automation tasks every minute"
 
@@ -211,10 +214,126 @@ class Command(BaseCommand):
 
                     self.stdout.write(self.style.SUCCESS(f"✅ After completion Notification Sent Sent: {task.title}"))
 
+                    # Escalate If Not Completed - Report to the Manager and - 5 Calpoints
+                    # 🚨 Escalate If Not Completed - Report to Manager & Deduct 5 Calpoints
+                    if automation.escalate_if_not_completed:
+                      # Check if the task deadline has passed, task is NOT completed, and escalation action hasn't been taken
+                         if task.deadline <= datetime.now().date() and task.status != "completed" and not task.escalate_if_not_completed_action:
+                              subject = f"⚠️ Urgent: Task '{task.title}' is Overdue!"
+                              message = (
+                              f"Dear {task.created_by.username},\n\n"
+                              f"The task **'{task.title}'** assigned to **{task.assigned_to.username}** in **{task.organization.name}** "
+                              f"was due on **{task.deadline.strftime('%Y-%m-%d')}**, but it has **not been completed** yet.\n\n"
+                              f"As the task creator, you may consider the following actions:\n"
+                              f"🔹 **Warn {task.assigned_to.username}** about the delay.\n"
+                              f"🔹 **Reassign the task** to another member of **{task.organization.name}**.\n"
+                              f"🔹 **Set a new deadline** if needed.\n\n"
+                              f"📂 **Group:** {task.group.name}\n"
+                              f"⚡ **Priority:** {task.priority}\n"
+                              f"⏳ **Current Status:** {task.status}\n\n"
+                              f"We have deducted 4 CalPoints from {task.assigned_to.username}'s account due to the task delay and transferred them to your account as compensation for overseeing the task's completion"
+                              f"💡 To manage this task, please visit your dashboard.\n\n"
+                              f"Best Regards,\n"
+                              f"Team CalendarPlus"
+                             )
+
+                         from_email = settings.DEFAULT_FROM_EMAIL
+                         recipient_list = [task.created_by.email]
+        
+                        # Send escalation warning email
+                         send_mail(subject, message, from_email, recipient_list)
+
+                         # ✅ Mark task as escalated to prevent duplicate warnings
+                        
+                        #  send email to task.assigned_to about deadline missed and deducted the points
+                         subject_user = "Task Deadline Missed – Points Deducted"
+                         message_user = (
+                              f"Hello {task.assigned_to.username},\n\n"
+                              f"We noticed that the task **\"{task.title}\"** assigned to you under **{organization.name}** "
+                              f"in the **{group.name}** workspace was not completed before the deadline (**{task.deadline}**).\n\n"
+                              f"As a result, **4 CalPoints have been deducted from your account** and transferred to {task.assigned_to.username}'s Account** as per the organization's task compliance policy. "
+                              f"Please ensure better time management in the future to avoid deductions.\n\n"
+                              f"📌 **Task Details:**\n"
+                              f"   - **Title:** {task.title}\n"
+                              f"   - **Deadline:** {task.deadline}\n"
+                              f"   - **Priority:** {task.priority}\n"
+                              f"   - **Workspace:** {organization.name}\n"
+                              f"   - **Group:** {group.name}\n\n"
+                              f"If you need any assistance or have any concerns, feel free to reach out.\n\n"
+                              f"Best Regards,\n"
+                              f"Team CalendarPlus"
+                            )
+                         from_email=settings.DEFAULT_FROM_EMAIL
+                         recipient_list_user=[task.assigned_to.email]
+                         send_mail(subject=subject_user,message=message_user,from_email=from_email,recipient_list=recipient_list_user)
+
+
+                        #🔹 Deduct 4 CalPoints from the task.assigned_to's account
+                        # 🔹 Get user's CalPoints
+                         calpoints = get_object_or_404(CalPoints, user=task.assigned_to, organization=organization, group=group, task=task)
+
+                         if calpoints.points < 4:
+                         # 🚨 Not enough points! Remove user from organization
+                            profile = get_object_or_404(Profile, user=task.assigned_to, organization=organization)
+                            profile.organization = None  # ❌ Remove user from the organization
+                            profile.save()
+
+                             # 🔹 Send removal notification to the user
+                            subject = "Account Action: Removal from Organization"
+                            message = (
+                               f"Dear {task.assigned_to.username},\n\n"
+                               f"You have been removed from {organization.name} due to insufficient CalPoints. "
+                               f"Your performance has been reviewed, and since your balance fell below the required threshold, "
+                               f"you are no longer part of the organization.\n\n"
+                               f"If you have any questions, please reach out to the administrator.\n\n"
+                               f"Best regards,\n"
+                               f"{organization.name} Team"
+                               )
+
+                            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [task.assigned_to.email])
+
+                            # notify the manager as well 
+                            # 🔹 Notify the manager about the removal
+                            subject_manager = f"User {task.assigned_to.username} Removed from {organization.name} Due to Missed Deadline & Insufficient CalPoints"
+
+                            message_manager = (
+                                 f"Dear {task.created_by.username},\n\n"
+                                 f"We would like to inform you that **{task.assigned_to.username}** has been removed from **{organization.name}** "
+                                 f"due to failure to complete the assigned task (**{task.title}**) by the deadline (**{task.deadline}**), "
+                                 f"combined with insufficient CalPoints in their account to compensate for the missed deadline.\n\n"
+                                 f"As part of our workflow, CalPoints are deducted when deadlines are not met, ensuring accountability and efficiency. "
+                                 f"Since their balance was too low to cover the penalty, they have been automatically removed from the organization.\n\n"
+                                 f"If you believe this action was taken in error or if you wish to give them another chance, you can reinstate them by "
+                                 f"sending a new invitation from your dashboard.\n\n"
+                                 f"Let us know if you need any further assistance.\n\n"
+                                 f"Best Regards,\n"
+                                 f"Team CalendarPlus"
+                                )
+                            
+                            from_email=settings.DEFAULT_FROM_EMAIL
+                            recipient_list=[task.created_by.email]
+
+                            send_mail(subject_manager, message_manager,from_email,recipient_list)
+
+
+                         else:
+                             # ✅ Deduct 4 CalPoints if the user has enough
+                             calpoints.points -= 4
+                             calpoints.save()
+
+                              # 🔹 Transfer 4 CalPoints to the manager's account (task.created_by)
+                             calpoints_manager = get_object_or_404(CalPoints, user=task.created_by, organization=organization, group=group, task=task)
+                             calpoints_manager.points += 4 
+                             calpoints_manager.save()
+
+                              # change task settings
+                             task.escalate_if_not_completed_action = True
+                             task.save()
 
 
                         
 
+                    self.stdout.write(self.style.WARNING(f"⚠️ Escalation triggered for overdue task: {task.title}"))
 
 
 
