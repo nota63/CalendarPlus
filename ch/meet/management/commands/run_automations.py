@@ -219,8 +219,8 @@ class Command(BaseCommand):
                     if automation.escalate_if_not_completed:
                       # Check if the task deadline has passed, task is NOT completed, and escalation action hasn't been taken
                          if task.deadline.date() <= datetime.now().date() and task.status != "completed" and not task.escalate_if_not_completed_action:
-                              subject = f"⚠️ Urgent: Task '{task.title}' is Overdue!"
-                              message = (
+                              subject_created_by = f"⚠️ Urgent: Task '{task.title}' is Overdue!"
+                              message_created_by = (
                               f"Dear {task.created_by.username},\n\n"
                               f"The task **'{task.title}'** assigned to **{task.assigned_to.username}** in **{task.organization.name}** "
                               f"was due on **{task.deadline.strftime('%Y-%m-%d')}**, but it has **not been completed** yet.\n\n"
@@ -238,10 +238,10 @@ class Command(BaseCommand):
                              )
 
                          from_email = settings.DEFAULT_FROM_EMAIL
-                         recipient_list = [task.created_by.email]
+                         recipient_list_created_by = [task.created_by.email]
         
-                        # Send escalation warning email
-                         send_mail(subject, message, from_email, recipient_list)
+                         # Send escalation warning email
+                         send_mail(subject=subject_created_by, message=message_created_by, from_email=from_email, recipient_list=recipient_list_created_by)
 
                          # ✅ Mark task as escalated to prevent duplicate warnings
                         
@@ -268,9 +268,9 @@ class Command(BaseCommand):
                          send_mail(subject=subject_user,message=message_user,from_email=from_email,recipient_list=recipient_list_user)
 
 
-                        #🔹 Deduct 4 CalPoints from the task.assigned_to's account
-                        # 🔹 Get user's CalPoints (Use .filter().first() to prevent errors)
-                         calpoints = CalPoints.objects.filter(user=task.assigned_to, organization=organization, group=group, task=task).first()
+                         #🔹 Deduct 4 CalPoints from the task.assigned_to's account
+                         # 🔹 Get user's CalPoints (Use .filter().first() to prevent errors)
+                         calpoints = CalPoints.objects.filter(user=task.assigned_to, organization=organization).first()
 
                          if not calpoints or calpoints.points < 4:
                         # 🚨 User has insufficient CalPoints or no CalPoints record exists
