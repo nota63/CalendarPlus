@@ -2,103 +2,168 @@
 <html>
 <head>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            padding: 20px;
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7ff;
+            padding: 40px;
+            margin: 0;
         }
+
         .container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
+            max-width: 700px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+            padding: 30px;
             margin: auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        h2 {
-            color: #333;
-        }
-        .details {
-            background: #f9f9f9;
-            padding: 10px;
-            border-left: 5px solid #4CAF50;
-            margin-bottom: 20px;
-        }
-        .footer {
-            font-size: 12px;
-            color: #777;
+
+        .header {
             text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+        }
+
+        h2 {
+            color: #2c3e50;
+            font-size: 22px;
+            margin-top: 10px;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 5px solid #4CAF50;
+        }
+
+        .task-details {
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.3);
             margin-top: 20px;
         }
+
         .highlight {
             color: #D32F2F;
             font-weight: bold;
         }
+
+        .footer {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: #388E3C;
+        }
+
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Task Review Request: {{ task.title }}</h2>
-        <p>Hello <strong>{{ group.created_by.username }}</strong>,</p>
-        <p>The task <strong>{{ task.title }}</strong> has been marked as completed and needs your review.</p>
 
-        <div class="details">
-            <p><strong>Task Details:</strong></p>
-            <p>📌 <strong>Priority:</strong> {{ task.priority }}</p>
-            <p>⏳ <strong>Due Date:</strong> <span class="highlight">{{ task.deadline }}</span></p>
-            <p>📝 <strong>Description:</strong> {{ task.description }}</p>
+    <div class="container">
+        
+        <!-- Header Section -->
+        <div class="header">
+            <img class="logo" src="https://your-calendarplus-logo-url.com/logo.png" alt="CalendarPlus Logo">
+            <h2>Task Review Request: {{ task.title }}</h2>
+        </div>
+
+        <!-- Task Details Section -->
+        <div class="task-details">
+            <p>Hello <strong>{{ group.created_by.username }}</strong>,</p>
+            <p>The task <strong>{{ task.title }}</strong> has been marked as completed and requires your review.</p>
+        </div>
+
+        <!-- Task Info -->
+        <div class="section">
+            <h3>📌 Task Details</h3>
+            <p><strong>Priority:</strong> {{ task.priority }}</p>
+            <p><strong>Due Date:</strong> <span class="highlight">{{ task.deadline }}</span></p>
+            <p><strong>Description:</strong> {{ task.description }}</p>
         </div>
 
         {% if time_tracking %}
-        <div class="details">
-            <p><strong>Time Spent:</strong> {{ time_tracking.time_spent }}</p>
+        <div class="section">
+            <h3>⏳ Time Spent</h3>
+            <p>{{ time_tracking.time_spent }}</p>
         </div>
         {% endif %}
 
         {% if comments %}
-        <div class="details">
-            <p><strong>Comments:</strong></p>
+        <div class="section">
+            <h3>💬 Comments</h3>
             {% for comment in comments %}
-                <p>💬 <strong>{{ comment.user.username }}:</strong> {{ comment.comment }}</p>
+                <p><strong>{{ comment.user.username }}:</strong> {{ comment.comment }}</p>
             {% endfor %}
         </div>
         {% endif %}
 
         {% if notes %}
-        <div class="details">
-            <p><strong>Notes:</strong></p>
+        <div class="section">
+            <h3>🗒 Notes</h3>
             {% for note in notes %}
-                <p>🗒 <strong>{{ note.user }}:</strong> {{ note.note }}</p>
+                <p><strong>{{ note.user }}:</strong> {{ note.note }}</p>
             {% endfor %}
         </div>
         {% endif %}
 
         {% if subtasks %}
-        <div class="details">
-            <p><strong>Subtasks:</strong></p>
+        <div class="section">
+            <h3>✅ Subtasks</h3>
             {% for subtask in subtasks %}
-                <p>✅ <strong>{{ subtask.title }}</strong> ({{ subtask.status }})</p>
+                <p><strong>{{ subtask.title }}</strong> ({{ subtask.status }})</p>
             {% endfor %}
         </div>
         {% endif %}
 
         {% if activities %}
-        <div class="details">
-            <p><strong>Activity Log:</strong></p>
+        <div class="section">
+            <h3>📅 Activity Log</h3>
             {% for activity in activities %}
-                <p>📅 <strong>{{ activity.timestamp }}</strong> - {{ activity.details }}</p>
+                <p><strong>{{ activity.timestamp }}</strong> - {{ activity.details }}</p>
             {% endfor %}
         </div>
         {% endif %}
 
         <p>📩 Please review the task and provide feedback if needed.</p>
 
-        <p>Best Regards,</p>
-        <p><strong>Team {{ organization.name }}</strong></p>
+        <a href="https://calendarplus.com/task/{{ task.id }}/review" class="btn">Review Task</a>
 
         <div class="footer">
             <p>This is an automated email from CalendarPlus. Please do not reply.</p>
         </div>
+
     </div>
+
 </body>
 </html>
