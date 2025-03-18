@@ -12,6 +12,9 @@ from django.utils.timezone import localtime
 from datetime import datetime
 from group_tasks.models import CalPoints
 from django.shortcuts import redirect, get_object_or_404
+from django.utils import timezone
+from datetime import timedelta
+
 
 
 # IMPLEMENT THE COMMAND
@@ -346,6 +349,112 @@ class Command(BaseCommand):
                     self.stdout.write(self.style.WARNING(f"⚠️ Escalation triggered for overdue task: {task.title}"))
 
 
+                    # Remind before deadline notification
+                    # Get today's date
+                    today_date = timezone.now().date()
+
+                    # Print task details
+                    print(f"🔹 Checking reminders for task: {task.title} (Deadline: {task.deadline})")
+                    print(f"🔹 Today's date: {today_date}")
+
+                    # Reminder logic for 2 days before the deadline
+                    if automation.remind_before_deadline:
+                          print(f"🔹 Reminder setting is enabled ✅")
+    
+                          if task.status != "completed":
+                               print(f"🔹 Task is still **pending** (Status: {task.status})")
+
+                               # Reminder logic for 2 days before the deadline
+                               if task.deadline and (task.deadline - timedelta(days=2)).date() == today_date:
+                                   print(f"🔹 Task deadline is in **2 days** (Triggering first reminder)")
+
+                                   if not task.reminder_before_2_days_sent:
+                                        print(f"✅ First reminder **NOT** sent yet! Sending now...")
+
+                                        subject = f"Reminder: Task '{task.title}' Deadline in 2 Days"
+                                        message = (
+                                             f"Dear {task.assigned_to.username},\n\n"
+                                             f"This is a friendly reminder that your task **'{task.title}'** is due in **2 days** (Deadline: {task.deadline}).\n"
+                                             f"Please make sure you're on track to complete it on time.\n\n"
+                                             f"Let us know if you need assistance.\n\n"
+                                             f"Best Regards,\n"
+                                             f"Team {organization.name}"
+                                                )
+                
+                                        try:
+                                            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [task.assigned_to.email])
+                                            print(f"✅ Email sent successfully to {task.assigned_to.email}")
+                    
+                                            # Mark reminder as sent
+                                            task.reminder_before_2_days_sent = True
+                                            task.save()
+                                            print(f"✅ Task updated: reminder_before_2_days_sent = True")
+
+                                        except Exception as e:
+                                           print(f"❌ ERROR sending first reminder email: {e}")
+
+                                   else:
+                                      print(f"⚠️ First reminder already sent. Skipping...")
+
+                               else:
+                                   print(f"❌ Today is NOT 2 days before the deadline. No first reminder sent.")
+
+                               # Reminder logic for 1 day before the deadline
+                               # Reminder logic for 1 day before the deadline
+                               if task.deadline and (task.deadline - timedelta(days=1)).date() == today_date:
+                                    print(f"🔹 Task deadline is **tomorrow** (Triggering final reminder)")
+
+                                    if not task.reminder_before_1_day_sent:
+                                         print(f"✅ Final reminder **NOT** sent yet! Sending now...")
+
+                                         subject_1_day = f"Final Reminder: Task '{task.title}' Deadline Tomorrow!"
+                                         message_1_day = (
+                                               f"Dear {task.assigned_to.username},\n\n"
+                                               f"This is your final reminder! Your task **'{task.title}'** is due **tomorrow** (Deadline: {task.deadline}).\n"
+                                               f"Please ensure it is completed on time to avoid penalties.\n\n"
+                                               f"Reach out if you need any support.\n\n"
+                                               f"Best Regards,\n"
+                                               f"Team {organization.name}"
+                                                )
+                
+                                         try:
+                                             send_mail(subject_1_day, message_1_day, settings.DEFAULT_FROM_EMAIL, [task.assigned_to.email])
+                                             print(f"✅ Final reminder email sent successfully to {task.assigned_to.email}")
+
+                                             # Mark reminder as sent
+                                             task.reminder_before_1_day_sent = True
+                                             task.save()
+                                             print(f"✅ Task updated: reminder_before_1_day_sent = True")
+
+                                         except Exception as e:
+                                              print(f"❌ ERROR sending final reminder email: {e}")
+
+                                         # 🔹 Notify manager as well
+                                         subject_manager = f"Task Pre-Deadline Reminder"
+                                         message_manager = f"Hello Manager,\n\nThe task **'{task.title}'** assigned to {task.assigned_to.username} has an approaching deadline.\n\nPlease ensure all necessary actions are taken.\n\nBest,\n{organization.name}"
+                
+                                         try:
+                                             send_mail(subject_manager, message_manager, settings.DEFAULT_FROM_EMAIL, [task.created_by.email])
+                                             print(f"✅ Manager notified via email: {task.created_by.email}")
+
+                                         except Exception as e:
+                                             print(f"❌ ERROR sending manager notification: {e}")
+
+                                    else:
+                                        print(f"⚠️ Final reminder already sent. Skipping...")
+
+                               else:
+                                   print(f"❌ Today is NOT 1 day before the deadline. No final reminder sent.")
+
+                          else:
+                             print(f"⚠️ Task is already completed. No reminders needed.")
+
+                    else:
+                        print(f"❌ Reminder setting is **disabled**. No emails will be sent.")
+
+                    print(f"✅ Reminder check completed for task: {task.title}")
+
+# Automations Ends Here-------------------------------------------------------------------------------------------------- 
             except Exception as e:
                 self.stderr.write(self.style.ERROR(f"❌ Error processing automation: {str(e)}"))
 
