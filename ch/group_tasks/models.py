@@ -906,6 +906,7 @@ class AutomationTask(models.Model):
     auto_assign_reviewer =models.BooleanField(default=False)
     log_activity_on_completion =models.BooleanField(default=False)
     assign_task_if_previous_completed=models.BooleanField(default=False)
+    install_new_apps=models.BooleanField(default=False,null=True,blank=True)
     # track automations
     last_executed = models.DateTimeField(null=True, blank=True)
     processed_tasks = models.ManyToManyField(Task, blank=True, related_name="processed_automations")
