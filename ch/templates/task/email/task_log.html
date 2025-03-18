@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Completion Log</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f4f7f9;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 650px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            margin: auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+        }
+        .header img {
+            width: 100px;
+            border-radius: 50%;
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .details {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .highlight {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+        .footer {
+            font-size: 12px;
+            color: #777;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .tag {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .box {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://your-calendarplus-logo-url.com/logo.png" alt="CalendarPlus Logo">
+            <h2>Task Completion Log</h2>
+        </div>
+
+        <p>Hello <strong>{{ task.assigned_to.username }}</strong>,</p>
+        <p>Your task <strong>{{ task.title }}</strong> has been marked as <span class="highlight">Completed</span>.</p>
+
+        <div class="details">
+            <p><strong>📌 Task Details:</strong></p>
+            <p>📝 <strong>Task:</strong> {{ task.title }}</p>
+            <p>⏳ <strong>Due Date:</strong> {{ task.deadline }}</p>
+            <p>🔹 <strong>Priority:</strong> <span class="tag">{{ task.priority }}</span></p>
+        </div>
+
+        <div class="details">
+            <p><strong>📑 Task Summary:</strong></p>
+            <div class="box">
+                <p>⏱ <strong>Time Spent:</strong> {{ log.time_spent }}</p>
+            </div>
+            <div class="box">
+                <p>💬 <strong>Comments:</strong></p>
+                {% for comment in log.comments_added %}
+                    <p>— <strong>{{ comment.user.username }}:</strong> {{ comment.comment }}</p>
+                {% endfor %}
+            </div>
+            <div class="box">
+                <p>📝 <strong>Notes:</strong></p>
+                {% for note in log.notes %}
+                    <p>— <strong>{{ note.user.username }}:</strong> {{ note.note }}</p>
+                {% endfor %}
+            </div>
+            <div class="box">
+                <p>📎 <strong>Attachments:</strong></p>
+                {% for attachment in log.files_uploaded %}
+                    <p>— <strong>{{ attachment.description }}</strong> ({{ attachment.name }})</p>
+                {% endfor %}
+            </div>
+            <div class="box">
+                <p>📋 <strong>Subtasks:</strong></p>
+                {% for subtask in log.subtasks %}
+                    <p>✅ <strong>{{ subtask.title }}</strong> - {{ subtask.status }}</p>
+                {% endfor %}
+            </div>
+            <div class="box">
+                <p>📜 <strong>Activity Log:</strong></p>
+                {% for activity in log.activities %}
+                    <p>📅 <strong>{{ activity.timestamp }}</strong> - {{ activity.details }}</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <p>📩 This log is recorded for your reference. If you need any changes, contact your project manager.</p>
+
+        <p>Best Regards,</p>
+        <p><strong>Team {{ organization.name }}</strong></p>
+
+        <div class="footer">
+            <p>This is an automated email from CalendarPlus. Please do not reply.</p>
+        </div>
+    </div>
+</body>
+</html>

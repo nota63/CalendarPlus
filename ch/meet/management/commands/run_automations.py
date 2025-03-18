@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 from django.utils.timezone import now
 from django.core.mail import send_mail
 from django.conf import settings
-from group_tasks.models import AutomationTask, Task,TaskTimeTracking,TaskComment,TaskNote,AttachmentsTasksApp,SubTask,ActivityLog
+from group_tasks.models import (AutomationTask, Task,TaskTimeTracking,TaskComment,TaskNote,AttachmentsTasksApp,SubTask,ActivityLog,TaskCompletionActivities)
 from accounts.models import Profile, Organization
 from groups.models import Group
 from django.utils.timezone import localtime
@@ -546,6 +546,97 @@ class Command(BaseCommand):
 
                     else:
                         print("❌ Auto-reviewer is disabled. Skipping task review email.")
+
+
+                    # Process log activity on completion
+                    if automation.log_activity_on_completion:
+                        if task.status == 'completed' and not task.log_completion_activity:
+
+                            # Log the activity
+                            time_tracking = TaskTimeTracking.objects.filter(task=task, organization=organization, group=group).first()
+                            comments = TaskComment.objects.filter(task=task, organization=organization, group=group)
+                            notes = TaskNote.objects.filter(task=task, organization=organization, group=group)
+                            attachments = AttachmentsTasksApp.objects.filter(task=task, organization=organization, group=group)
+                            subtasks = SubTask.objects.filter(task=task, organization=organization, group=group)
+                            activities = ActivityLog.objects.filter(task=task, organization=organization, group=group)
+
+                            # prepare the log
+                            # Process log activity on completion
+                            if automation.log_activity_on_completion:
+                               if task.status == 'completed' and not task.log_completion_activity:
+
+                                    # Fetch related objects
+                                    time_tracking = TaskTimeTracking.objects.filter(task=task, organization=organization, group=group).first()
+                                    comments = TaskComment.objects.filter(task=task, organization=organization, group=group)
+                                    notes = TaskNote.objects.filter(task=task, organization=organization, group=group)
+                                    attachments = AttachmentsTasksApp.objects.filter(task=task, organization=organization, group=group)
+                                    subtasks = SubTask.objects.filter(task=task, organization=organization, group=group)
+                                    activities = ActivityLog.objects.filter(task=task, organization=organization, group=group)
+
+                                    # Prepare the log data (Convert QuerySets into JSON serializable data)
+                                    # Prepare the log data (Convert QuerySets into JSON serializable data)
+                                    action_log = {
+                                           "status": "completed",
+                                           "timestamp": timezone.now().isoformat(),  # Current timestamp
+                                           "comments_added": [{"user": c.user.username, "comment": c.comment, "timestamp": c.created_at.isoformat()} for c in comments],
+                                          "files_uploaded": [{"user": att.user.username, "file": att.attachment.name, "description": att.description} for att in attachments],
+                                          "notes": [{"user": n.user.username, "note": n.note, "timestamp": n.created_at.isoformat()} for n in notes],
+                                          "time_spent": float(time_tracking.time_spent) if time_tracking and time_tracking.time_spent else "N/A",  # FIX HERE
+                                          "subtasks": [{"title": sub.title, "status": sub.status, "progress": float(sub.progress)} for sub in subtasks],  # FIX HERE
+                                          "activities": [{"user": act.user.username, "action": act.action, "details": act.details, "timestamp": act.timestamp.isoformat()} for act in activities],
+                                       }
+
+                                    # Log the activity
+                                    TaskCompletionActivities.objects.create(
+                                          organization=task.organization,
+                                          task=task,
+                                          group=task.group,
+                                          accomplisher=task.assigned_to,
+                                          action=action_log,
+                                       )
+
+
+                                    # Send Email to the user about task log
+                                    # Prepare Email Content
+                                    context = {
+                                          "task": task,
+                                           "log": {
+                                          "time_spent": time_tracking.time_spent if time_tracking else "N/A",
+                                            "comments_added": comments,
+                                           "files_uploaded": attachments,
+                                           "notes": notes,
+                                           "subtasks": subtasks,
+                                            "activities": activities
+                                       },
+                                          "organization": organization.name,
+                                          "group":group.name,
+                                          "project_manager":task.created_by.username, 
+                                          "workspace_admin":group.created_by.username
+                                       }
+
+                                    email_html_content = render_to_string("task/email/task_log.html", context)
+                                    email_text_content = strip_tags(email_html_content) 
+
+                                    # Send Email
+                                    email = EmailMessage(
+                                            subject=f"Task Log - {task.title}",
+                                            body=email_html_content,
+                                            from_email=settings.DEFAULT_FROM_EMAIL,
+                                             to=[task.assigned_to.email]
+                                       )
+                                    email.content_subtype = "html"  # Send as HTML email
+                                    email.send()
+
+                                    print(f"✅ Task log email sent to {task.assigned_to.email} for task: {task.title}")
+
+                                    # Mark task as logged
+                                    task.log_completion_activity = True
+                                    task.save()
+
+                        print(f"✅ Task completion logged for task: {task.title}")
+
+
+
 
 
 

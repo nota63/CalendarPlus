@@ -148,7 +148,9 @@ class Task(models.Model):
     reminder_before_2_days_sent=models.BooleanField(default=False, null=True, blank=True)
     reminder_before_1_day_sent=models.BooleanField(default=False,null=True,blank=True)
     auto_assign_reviewer_sent=models.BooleanField(default=False,null=True,blank=True)
+    log_completion_activity=models.BooleanField(default=False, null=True, blank=True)
     
+
 
 
 
@@ -913,3 +915,25 @@ class AutomationTask(models.Model):
     def __str__(self):
         return f'Automation For {self.task.title}'
 
+
+
+
+# ACTIVITYLOG FOR TASK COMPLETIONS
+class TaskCompletionActivities(models.Model):
+    organization = models.ForeignKey(
+        Organization, on_delete=models.CASCADE, related_name="task_completion_activities"
+    )
+    task = models.ForeignKey(
+        Task, on_delete=models.CASCADE, related_name="task_completion_activities"
+    )
+    group = models.ForeignKey(
+        Group, on_delete=models.CASCADE, related_name="task_completion_groups"
+    )
+    accomplisher = models.ForeignKey(
+        User, related_name="task_accomplisher", on_delete=models.CASCADE
+    )
+    action = models.JSONField(default=dict)  # Ensuring a default empty dictionary
+    created_at = models.DateTimeField(auto_now_add=True)  # Timestamp for activity log
+
+    def __str__(self):
+        return f"{self.accomplisher.username} - {self.task.title} ({self.created_at})"
