@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 from django.utils.timezone import now
 from django.core.mail import send_mail
 from django.conf import settings
-from group_tasks.models import AutomationTask, Task
+from group_tasks.models import AutomationTask, Task,TaskTimeTracking,TaskComment,TaskNote,AttachmentsTasksApp,SubTask,ActivityLog
 from accounts.models import Profile, Organization
 from groups.models import Group
 from django.utils.timezone import localtime
@@ -14,7 +14,9 @@ from group_tasks.models import CalPoints
 from django.shortcuts import redirect, get_object_or_404
 from django.utils import timezone
 from datetime import timedelta
-
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 
 # IMPLEMENT THE COMMAND
@@ -399,7 +401,7 @@ class Command(BaseCommand):
                                else:
                                    print(f"❌ Today is NOT 2 days before the deadline. No first reminder sent.")
 
-                               # Reminder logic for 1 day before the deadline
+                           
                                # Reminder logic for 1 day before the deadline
                                if task.deadline and (task.deadline - timedelta(days=1)).date() == today_date:
                                     print(f"🔹 Task deadline is **tomorrow** (Triggering final reminder)")
@@ -453,6 +455,101 @@ class Command(BaseCommand):
                         print(f"❌ Reminder setting is **disabled**. No emails will be sent.")
 
                     print(f"✅ Reminder check completed for task: {task.title}")
+
+                    # ** Handle Auto Task reviewer assignment
+                    # Handle Auto Task reviewer assignment
+                    print("🔍 Checking Auto Task Reviewer Assignment...")
+
+                    # Handle Auto Task reviewer assignment
+                    if automation.auto_assign_reviewer:
+                        print("✅ Auto-reviewer is enabled!")
+
+                        if task.status == "completed" and not task.auto_assign_reviewer_sent:
+                            print(f"🛠 Task '{task.title}' is completed but has not been sent for review. Proceeding...")
+
+                            # 🔹 Fetch workspace admin (who created the group)
+                            print("🔍 Fetching group admin profile...")
+                            profile = get_object_or_404(Profile, user=group.created_by, organization=organization)
+                            print(f"✅ Group Admin: {group.created_by.username}")
+
+                            # 🔹 Fetch Task Details
+                            print("🔍 Fetching task details...")
+                            time_tracking = TaskTimeTracking.objects.filter(task=task, organization=organization, group=group).first()
+                            comments = TaskComment.objects.filter(task=task, organization=organization, group=group)
+                            notes = TaskNote.objects.filter(task=task, organization=organization, group=group)
+                            attachments = AttachmentsTasksApp.objects.filter(task=task, organization=organization, group=group)
+                            subtasks = SubTask.objects.filter(task=task, organization=organization, group=group)
+                            activities = ActivityLog.objects.filter(task=task, organization=organization, group=group)
+
+                            print(f"✅ Time Tracking: {time_tracking}")
+                            print(f"✅ Found {comments.count()} comments.")
+                            print(f"✅ Found {notes.count()} notes.")
+                            print(f"✅ Found {attachments.count()} attachments.")
+                            print(f"✅ Found {subtasks.count()} subtasks.")
+                            print(f"✅ Found {activities.count()} activities.")
+
+                            # 🔹 Render HTML Email
+                            print("🔍 Rendering email template...")
+                            context = {
+                                  "task": task,
+                                 "time_tracking": time_tracking,
+                                  "comments": comments,
+                                     "notes": notes,
+                                    "attachments": attachments,
+                                     "subtasks": subtasks,
+                                    "activities": activities,
+                                   "group": group,
+                                  "organization": organization,
+                                 }
+                            email_html_content = render_to_string("task/email/task_review_request.html", context)
+                            email_text_content = strip_tags(email_html_content)  # Fallback for clients that don't support HTML
+
+                            # 🔹 Prepare Email
+                            print("🔍 Preparing email...")
+                            recipient_email = group.created_by.email
+
+                            if not recipient_email:
+                                  print("❌ ERROR: No recipient email found! Aborting email send.")
+                            else:
+                                  print(f"📩 Sending email to: {recipient_email}")
+
+                                  email = EmailMessage(
+                                        subject=f"Task Review - {task.title}",
+                                        body=email_html_content,
+                                        from_email=settings.DEFAULT_FROM_EMAIL,
+                                        to=[recipient_email],
+                                      )
+                                  email.content_subtype = "html"  # Send as HTML email
+
+                                  # 🔹 Attach Images (Convert URLs to attachments)
+                                  if attachments.exists():
+                                       print(f"🔍 Attaching {attachments.count()} files...")
+                                       for attachment in attachments:
+                                            if attachment.attachment:
+                                               print(f"📎 Attaching file: {attachment.attachment.path}")
+                                               email.attach_file(attachment.attachment.path)  # Attach images
+                                  else:
+                                      print("ℹ️ No attachments found.")
+
+                                      # 🔹 Send Email
+                                  try:
+                                     print("📨 Sending email now...")
+                                     email.send()
+                                     print("✅ Email sent successfully!")
+                                  except Exception as e:
+                                         print(f"❌ ERROR: Failed to send email! Error: {e}")
+
+                                    # 🔹 Mark task as review notification sent
+                                  task.auto_assign_reviewer_sent = True
+                                  task.save()
+                                  print(f"✅ Task '{task.title}' marked as review notification sent.")
+
+                    else:
+                        print("❌ Auto-reviewer is disabled. Skipping task review email.")
+
+
+
+
 
 # Automations Ends Here-------------------------------------------------------------------------------------------------- 
             except Exception as e:

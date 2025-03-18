@@ -169,11 +169,11 @@ def send_calpoints_email(sender, instance, created, **kwargs):
 
         context = {
             "assignee_name": instance.user.get_full_name() or instance.user.username,
-            "task_title": instance.task.title,
-            "calpoints": instance.points,
-            "task_priority": instance.task.priority,
-            "deadline": instance.task.deadline.strftime("%d %b %Y") if instance.task.deadline else "No deadline",
-            "completed_on": instance.task.end_date.strftime("%d %b %Y") if instance.task.end_date else "Today",
+            "task_title": 'its a surprice',
+            "calpoints":10,
+            "task_priority": None,
+            "deadline": None,
+            "completed_on": None,
             "organization": instance.organization.name if instance.organization else "N/A",
             "reason": instance.reason
         }

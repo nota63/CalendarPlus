@@ -147,7 +147,9 @@ class Task(models.Model):
     escalate_if_not_completed_action=models.BooleanField(default=False, null=True, blank=True)
     reminder_before_2_days_sent=models.BooleanField(default=False, null=True, blank=True)
     reminder_before_1_day_sent=models.BooleanField(default=False,null=True,blank=True)
+    auto_assign_reviewer_sent=models.BooleanField(default=False,null=True,blank=True)
     
+
 
 
     class Meta:

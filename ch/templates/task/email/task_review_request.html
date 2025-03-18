@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: auto;
+        }
+        h2 {
+            color: #333;
+        }
+        .details {
+            background: #f9f9f9;
+            padding: 10px;
+            border-left: 5px solid #4CAF50;
+            margin-bottom: 20px;
+        }
+        .footer {
+            font-size: 12px;
+            color: #777;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .highlight {
+            color: #D32F2F;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Task Review Request: {{ task.title }}</h2>
+        <p>Hello <strong>{{ group.created_by.username }}</strong>,</p>
+        <p>The task <strong>{{ task.title }}</strong> has been marked as completed and needs your review.</p>
+
+        <div class="details">
+            <p><strong>Task Details:</strong></p>
+            <p>📌 <strong>Priority:</strong> {{ task.priority }}</p>
+            <p>⏳ <strong>Due Date:</strong> <span class="highlight">{{ task.deadline }}</span></p>
+            <p>📝 <strong>Description:</strong> {{ task.description }}</p>
+        </div>
+
+        {% if time_tracking %}
+        <div class="details">
+            <p><strong>Time Spent:</strong> {{ time_tracking.time_spent }}</p>
+        </div>
+        {% endif %}
+
+        {% if comments %}
+        <div class="details">
+            <p><strong>Comments:</strong></p>
+            {% for comment in comments %}
+                <p>💬 <strong>{{ comment.user.username }}:</strong> {{ comment.comment }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if notes %}
+        <div class="details">
+            <p><strong>Notes:</strong></p>
+            {% for note in notes %}
+                <p>🗒 <strong>{{ note.user }}:</strong> {{ note.note }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if subtasks %}
+        <div class="details">
+            <p><strong>Subtasks:</strong></p>
+            {% for subtask in subtasks %}
+                <p>✅ <strong>{{ subtask.title }}</strong> ({{ subtask.status }})</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if activities %}
+        <div class="details">
+            <p><strong>Activity Log:</strong></p>
+            {% for activity in activities %}
+                <p>📅 <strong>{{ activity.timestamp }}</strong> - {{ activity.details }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <p>📩 Please review the task and provide feedback if needed.</p>
+
+        <p>Best Regards,</p>
+        <p><strong>Team {{ organization.name }}</strong></p>
+
+        <div class="footer">
+            <p>This is an automated email from CalendarPlus. Please do not reply.</p>
+        </div>
+    </div>
+</body>
+</html>
