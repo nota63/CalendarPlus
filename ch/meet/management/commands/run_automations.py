@@ -624,7 +624,7 @@ class Command(BaseCommand):
                                             from_email=settings.DEFAULT_FROM_EMAIL,
                                              to=[task.assigned_to.email]
                                        )
-                                    email.content_subtype = "html"  # Send as HTML email
+                                    email.content_subtype = "html"  
                                     email.send()
 
                                     print(f"✅ Task log email sent to {task.assigned_to.email} for task: {task.title}")
@@ -633,7 +633,80 @@ class Command(BaseCommand):
                                     task.log_completion_activity = True
                                     task.save()
 
-                        print(f"✅ Task completion logged for task: {task.title}")
+                    print(f"✅ Task completion logged for task: {task.title}")
+
+                    # Task chaining notification
+                    if automation.assign_task_if_previous_completed:
+                        if task.status == 'completed' and not task.task_chaining_notification_sent:
+
+                            # send email to the manager that the user is available for new tasks
+                            subject=f'{task.assigned_to.username} Is Open For New Tasks'
+                            
+                            message = (
+                                  f"Dear {task.created_by.username},\n\n"
+                                  f"We are pleased to inform you that **{task.assigned_to.username}** has successfully completed the task **\"{task.title}\"** "
+                                  f"that was assigned to them. Their commitment and efficiency in handling tasks have been commendable.\n\n"
+    
+                                  f"🎯 **Task Summary:**\n"
+                                  f"- **Title:** {task.title}\n"
+                                  f"- **Priority:** {task.priority}\n"
+                                  f"- **Completed On:** {timezone.localtime(task.updated_at).strftime('%Y-%m-%d %H:%M')}\n\n"
+                                  f'-**Workspace:** {task.organization.name}\n\n'
+                                  f"-**Group:** {task.group.name}"
+     
+                                  f"With this task now completed, **{task.assigned_to.username}** is available to take on new responsibilities. "
+                                  f"We encourage you to leverage their skills and assign them new tasks as needed.\n\n"
+    
+                                   f"💡 **Next Steps:**\n"
+                                   f"➡️ Review the completed task if needed.\n"
+                                   f"➡️ Assign a new task to {task.assigned_to.username}.\n"
+                                   f"➡️ Provide feedback to enhance productivity.\n\n"
+    
+                                    f"Thank you for your leadership and for keeping projects moving efficiently.\n\n"
+    
+                                    f"Best Regards,\n"
+                                    f"**Team CalendarPlus**"
+                               )
+
+                            from_email = settings.DEFAULT_FROM_EMAIL
+                            recipient_list=[task.created_by.email]
+
+                            # send the mail
+                            send_mail(subject,message,from_email,recipient_list)
+
+                            # send notification to the user 
+                            subject_assignee=f'Task Chaining Request Sent'
+                            message_assignee = (
+                                 f"Dear {task.assigned_to.username},\n\n"
+                                 f"First of all, we sincerely appreciate your efforts in completing the task **\"{task.title}\"**. "
+                                 f"Your dedication and efficiency are truly valued.\n\n"
+    
+                                 f"🔗 **Task Chaining Enabled**\n"
+                                 f"As per your task settings, **task chaining** has been enabled for you. "
+                                 f"We have sent a chaining request to your manager (**{task.created_by.email}**) for further task assignments.\n\n"
+    
+                                 f"🏢 **Workspace & Group Details:**\n"
+                                 f"- **Workspace:** {task.organization.name}\n"
+                                 f"- **Group:** {task.group.name}\n\n"
+    
+                                 f"Thank you for your continued contributions. "
+                                 f"We look forward to your participation in upcoming tasks.\n\n"
+    
+                                 f"Best Regards,\n"
+                                 f"**Team CalendarPlus**"
+                                  )
+                            from_email=settings.DEFAULT_FROM_EMAIL
+                            recipient_list_assignee=[task.assigned_to.email]
+
+                            send_mail(subject=subject_assignee,message=message_assignee,from_email=from_email,recipient_list=recipient_list_assignee)
+
+
+                            # mark the task
+                            task.task_chaining_notification_sent = True
+                            task.save()
+
+                    print(f"TASK CHAINING NOTIFICATION SENT TO {task.created_by.email}")
+
 
 
 

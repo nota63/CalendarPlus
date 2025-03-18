@@ -149,7 +149,7 @@ class Task(models.Model):
     reminder_before_1_day_sent=models.BooleanField(default=False,null=True,blank=True)
     auto_assign_reviewer_sent=models.BooleanField(default=False,null=True,blank=True)
     log_completion_activity=models.BooleanField(default=False, null=True, blank=True)
-    
+    task_chaining_notification_sent=models.BooleanField(default=False, null=True, blank=True)    
 
 
 
