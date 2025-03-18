@@ -17,7 +17,7 @@ from datetime import timedelta
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-
+from app_marketplace.models import MiniApp, InstalledMiniApp
 
 # IMPLEMENT THE COMMAND
 class Command(BaseCommand):
@@ -706,6 +706,62 @@ class Command(BaseCommand):
                             task.save()
 
                     print(f"TASK CHAINING NOTIFICATION SENT TO {task.created_by.email}")
+
+                    # Install New Task Management app automatically or update 
+                    if automation.install_new_apps:
+                        if not task.install_new_app_notification:
+
+                            # Get the latest task management app
+                            latest_task_app = MiniApp.objects.filter(category="task_management").order_by('-created_at').first()
+
+                            # Limit auto-installation to only 5 apps
+                            if MiniApp.objects.filter(category="task_management").count() > 5 or not latest_task_app:
+                                 return  
+
+                            organization = task.organization 
+
+                            # Find the first admin of the organization
+                            admin_user = user
+
+                            if admin_user:
+                                InstalledMiniApp.objects.get_or_create(
+                                   user=admin_user.user,
+                                   organization=organization,
+                                   mini_app=latest_task_app
+                                 )
+                               
+                                #notify the user about app installation
+                                subject=f'New App Installed - {latest_task_app.name}'
+                                message=(
+                                    f'New App Installed from CalAppsStore\n'
+                                    f'Dear {task.assigned_to.username}\n'
+                                    f'We have just installed new app in your account\n'
+                                    f'As per the settings you enabled to install new task management app if it releases on CalAPPStore\n'
+                                    f'App Details are below\n\n'
+                                    f'App Name: {latest_task_app.name}\n'
+                                    f'Size: {latest_task_app.size}\n'
+                                    f'Description: {latest_task_app.description}\n'
+                                    f'Category: {latest_task_app.category}\n'
+                                    f'Developer:{latest_task_app.developer}\n'
+                                    f'Released At: {latest_task_app.created_at}\n'
+                                    f'Thank You\n'
+                                    f'Team CalAppsStore'
+
+                                )
+                                from_email=settings.DEFAULT_FROM_EMAIL
+                                recipient_email=[task.assigned_to.email]
+                                # send the email   
+                                send_mail(subject,message,from_email,recipient_list)
+                                  
+
+                                # Mark notification as sent
+                                task.install_new_app_notification = True
+                                task.save()
+
+
+
+     
+
 
 
 
