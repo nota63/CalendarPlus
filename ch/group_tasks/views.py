@@ -2129,7 +2129,7 @@ def my_day_task_detail(request, org_id, group_id, task_id):
     # find earned points if task is completed
     calpoints = None
     if task.status =='completed':
-        calpoints = CalPoints.objects.filter(task=task, organization=organization, group=group, user=request.user).first()
+        calpoints = CalPoints.objects.filter(organization=organization,user=request.user).first()
     
 
     # check if user installed the Extend Tasks app
