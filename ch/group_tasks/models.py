@@ -154,6 +154,7 @@ class Task(models.Model):
     deadline_extend_notification=models.BooleanField(default=False, null=True, blank=True)
     automate_stalled_action=models.BooleanField(default=False, null=True, blank=True)
     task_priortization_update=models.BooleanField(default=False, null=True, blank=True)
+    auto_meeting_scheduled=models.BooleanField(default=False, null=True, blank=True)
 
 
 
@@ -915,6 +916,7 @@ class AutomationTask(models.Model):
     extend_deadline=models.BooleanField(default=False, null=True, blank=True)
     automate_stalled=models.BooleanField(default=True, null=True, blank=True)
     task_priortization=models.BooleanField(default=True, null=True, blank=True)
+    auto_schedule_meeting_on_approval=models.BooleanField(default=False,null=True, blank=True)
     # track automations
     last_executed = models.DateTimeField(null=True, blank=True)
     processed_tasks = models.ManyToManyField(Task, blank=True, related_name="processed_automations")
