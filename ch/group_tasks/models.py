@@ -151,7 +151,8 @@ class Task(models.Model):
     log_completion_activity=models.BooleanField(default=False, null=True, blank=True)
     task_chaining_notification_sent=models.BooleanField(default=False, null=True, blank=True) 
     install_new_app_notification=models.BooleanField(default=False, null=True, blank=True)
-       
+    deadline_extend_notification=models.BooleanField(default=False, null=True, blank=True)
+
 
 
 
@@ -909,6 +910,7 @@ class AutomationTask(models.Model):
     log_activity_on_completion =models.BooleanField(default=False)
     assign_task_if_previous_completed=models.BooleanField(default=False)
     install_new_apps=models.BooleanField(default=False,null=True,blank=True)
+    extend_deadline=models.BooleanField(default=False, null=True, blank=True)
     # track automations
     last_executed = models.DateTimeField(null=True, blank=True)
     processed_tasks = models.ManyToManyField(Task, blank=True, related_name="processed_automations")

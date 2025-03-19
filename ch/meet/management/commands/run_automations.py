@@ -758,6 +758,57 @@ class Command(BaseCommand):
                                 task.install_new_app_notification = True
                                 task.save()
 
+                    # Deadline extention if task is 80% completed 
+                    if automation.extend_deadline:
+                        if task.progress >= 80 and task.deadline - timezone.now() < timedelta(hours=24) and not task.deadline_extend_notification:
+                            task.deadline += timedelta(days=2)   
+
+                            # notify about deadline extinction to manager and user     
+                            subject_manager=f'Deadline Extend - {task.title}'
+                            message_manager = (
+                                f"Dear {task.created_by.username},\n\n"
+                                f"We want to inform you that the deadline for the task **'{task.title}'** assigned to **{task.assigned_to.username}** "
+                                f"in the group **'{group.name}'** under the organization **'{organization.name}'** has been extended.\n\n"
+                                 f"This extension has been applied based on **{task.assigned_to.username}’s task settings** and your organization's policy, "
+                                f"since they have successfully completed **{task.progress}%** of the task.\n\n"
+                                f"🔹 **New Deadline:** {task.deadline.strftime('%Y-%m-%d %H:%M')}\n\n"
+                                f"We encourage you to review the updated timeline and provide any further instructions if needed.\n\n"
+                                f"Thank you for using CalendarPlus!\n\n"
+                                f"Best Regards,\n"
+                                f"**Team CalendarPlus**"
+                            )
+
+                            from_email=settings.DEFAULT_FROM_EMAIL
+                            recipient_list_manager=[task.created_by.email]
+
+                            # send mail
+                            send_mail(subject=subject_manager,message=message_manager,from_email=from_email,recipient_list=recipient_list_manager)
+
+                            # send the email to the user (task.assigned_to)
+                            subject_user = f"Task Deadline Extended for {task.title}"
+                            message_user = (
+                               f"Dear {task.assigned_to.username},\n\n"
+                               f"We appreciate your efforts in completing **{task.progress}%** of the task **'{task.title}'** "
+                               f"in the group **'{group.name}'** under the organization **'{organization.name}'**.\n\n"
+                               f"Based on your progress and according to the company policy, we have **extended your task deadline** to give you additional time to complete the remaining work.\n\n"
+                               f"🔹 **New Deadline:** {task.deadline.strftime('%Y-%m-%d %H:%M')}\n\n"
+                               f"Please utilize this extended period effectively to ensure the successful completion of your task.\n\n"
+                               f"If you need any further assistance, feel free to reach out.\n\n"
+                               f"Thank you for your dedication!\n\n"
+                               f"Best Regards,\n"
+                               f"**Team CalendarPlus**"
+                              )
+                            
+                            recipient_list_user = [task.assigned_to.email]
+                            from_email=settings.DEFAULT_FROM_EMAIL
+                            send_mail(subject=subject_user, message=message_user, from_email=from_email, recipient_list=recipient_list_user)
+
+                            # mark the notification as sent 
+                            task.deadline_extend_notification = True
+                            task.save()
+                            
+
+
 
 
      
