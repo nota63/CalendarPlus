@@ -1902,6 +1902,24 @@ video::-webkit-media-controls-panel {
                         </div>
                     </div>
 
+                    <!-- Escalate auto stalled  -->
+                    <div class="automation-item group flex items-center p-4 bg-white/80 backdrop-blur-sm border border-gray-200/70 rounded-xl hover:border-lime-200 hover:shadow-lg transition-all">
+                        <div class="flex items-center gap-4 w-full">
+                            <div class="p-3 bg-lime-100/80 rounded-lg">
+                                <i class="material-icons-round text-blue-600 text-2xl">apps</i>
+                            </div>
+                            <div class="flex-1">
+                                    <h3 class="font-semibold text-gray-800">Automate Escalation for {{task.title}} if stalled!</h3>
+                                    <p class="text-sm text-gray-600"> If no progress is made for 48 hours, notify the manager for follow-up..</p>
+                            </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" data-key="automate_stalled">
+                                    <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-lime-500 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                                </label>
+                            </div>
+                    </div>
+    
+
 
                 </div>
             </div>
