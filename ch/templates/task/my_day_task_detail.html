@@ -1919,6 +1919,25 @@ video::-webkit-media-controls-panel {
                                 </label>
                             </div>
                     </div>
+
+                    <!-- Smart Task Priortization -->
+                    <div class="automation-item group flex items-center p-4 bg-white/80 backdrop-blur-sm border border-gray-200/70 rounded-xl hover:border-indigo-200 hover:shadow-lg transition-all">
+                        <div class="flex items-center gap-4 w-full">
+                            <div class="p-3 bg-indigo-100/80 rounded-lg">
+                                <i class="material-icons-round text-red-700 text-2xl">error</i>
+
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">Smart Task Priortization/h3>
+                                <p class="text-sm text-gray-600">If {{task.title}} is critical and approaching the deadline but hasn’t started then we force its priority to urgent.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" data-key="task_priortization">
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-indigo-500 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                            </label>
+                        </div>
+                    </div>
+
     
 
 
