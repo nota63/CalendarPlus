@@ -100,3 +100,27 @@
 .quick-actions-container::-webkit-scrollbar {
     display: none;
 }
+
+
+/* enable scrolling in automation */
+#automationModal .modal-content {
+    max-height: 100vh; /* Adjust height as needed */
+    overflow: hidden;
+}
+
+#automationModal .modal-body {
+    max-height: 65vh; /* Adjust height as needed */
+    overflow-y: auto;
+    padding-right: 15px; /* Prevents content shift */
+}
+
+/* Hide scrollbar but keep scrolling functional */
+#automationModal .modal-body::-webkit-scrollbar {
+    width: 0px;
+    display: none;
+}
+
+#automationModal .modal-body {
+    -ms-overflow-style: none;  /* Hide scrollbar in IE/Edge */
+    scrollbar-width: none;      /* Hide scrollbar in Firefox */
+}
