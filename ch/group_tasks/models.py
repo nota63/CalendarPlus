@@ -153,6 +153,7 @@ class Task(models.Model):
     install_new_app_notification=models.BooleanField(default=False, null=True, blank=True)
     deadline_extend_notification=models.BooleanField(default=False, null=True, blank=True)
     automate_stalled_action=models.BooleanField(default=False, null=True, blank=True)
+    task_priortization_update=models.BooleanField(default=False, null=True, blank=True)
 
 
 
@@ -913,6 +914,7 @@ class AutomationTask(models.Model):
     install_new_apps=models.BooleanField(default=False,null=True,blank=True)
     extend_deadline=models.BooleanField(default=False, null=True, blank=True)
     automate_stalled=models.BooleanField(default=True, null=True, blank=True)
+    task_priortization=models.BooleanField(default=True, null=True, blank=True)
     # track automations
     last_executed = models.DateTimeField(null=True, blank=True)
     processed_tasks = models.ManyToManyField(Task, blank=True, related_name="processed_automations")

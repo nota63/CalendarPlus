@@ -865,8 +865,66 @@ class Command(BaseCommand):
                                 # mark the action as happened
                                 task.automate_stalled_action = True
                                 task.save()
-                                
 
+                    # Smart Task Priortization 
+                    # 🚀 Smart Task Prioritization: Escalate to URGENT if Not Started & Deadline Near
+                    if automation.task_priortization:
+                       if task.progress == 0 and not task.task_priortization_update:  # No progress made
+                           hours_remaining = (task.deadline - timezone.now()).total_seconds() / 3600  # Convert to hours
+
+                           if hours_remaining <= 12 and not task.task_priortization_update:
+                                task.priority = "urgent"  # Force update to urgent
+                                task.task_priortization_update=True
+                                task.save(update_fields=["priority", "priority_escalated"])  # Save only required fields
+
+                                # 📩 Email for Task Assignee (task.assigned_to)
+                                subject_assignee = f"🚨 Urgent Task Alert: {task.title}"
+                                message_assignee = (
+                                     f"Dear {task.assigned_to.username},\n\n"
+                                     f"The task **'{task.title}'** in **{task.group.name}** under **{task.organization.name}** "
+                                     f"is **approaching its deadline** and has **not been started yet**.\n"
+                                     f"To ensure timely completion, the system has **escalated its priority to URGENT**.\n\n"
+                                      f"🔹 **Deadline:** {task.deadline.strftime('%Y-%m-%d %H:%M')}\n"
+                                     f"🔹 **Assigned By:** {task.created_by.username}\n"
+                                     f"🔹 **New Priority:** 🚨 URGENT\n\n"
+                                     f"Please take immediate action to complete this task on time.\n\n"
+                                     f"Best Regards,\n"
+                                      f"**Team CalendarPlus**"
+                                      )
+
+                                # 📩 Email for Task Manager (task.created_by)
+                                subject_manager = f"⚠️ Task Escalation: {task.title} is Now URGENT"
+                                message_manager = (
+                                        f"Dear {task.created_by.username},\n\n"
+                                        f"The task **'{task.title}'** assigned to **{task.assigned_to.username}** "
+                                        f"in **{task.group.name}** under **{task.organization.name}** has **not started yet** "
+                                        f"and is nearing its deadline.\n"
+                                        f"To avoid delay, the system has **automatically escalated its priority to URGENT**.\n\n"
+                                        f"🔹 **Deadline:** {task.deadline.strftime('%Y-%m-%d %H:%M')}\n"
+                                        f"🔹 **Current Progress:** 0%\n"
+                                        f"🔹 **New Priority:** 🚨 URGENT\n\n"
+                                        f"📢 Please follow up with {task.assigned_to.username} to ensure timely completion.\n\n"
+                                        f"Best Regards,\n"
+                                        f"**Team CalendarPlus**"
+                                     )
+
+                                # Send emails separately
+                                send_mail(
+                                   subject=subject_assignee,
+                                   message=message_assignee,
+                                   from_email=settings.DEFAULT_FROM_EMAIL,
+                                   recipient_list=[task.assigned_to.email]
+                                     )
+
+                                send_mail(
+                                      subject=subject_manager,
+                                      message=message_manager,
+                                      from_email=settings.DEFAULT_FROM_EMAIL,
+                                      recipient_list=[task.created_by.email]
+                                  )
+                               
+
+                                print(f"📧 Urgent Priority Alert Sent for Task: {task.title}")
 
 
                                 
