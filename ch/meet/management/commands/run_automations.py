@@ -806,7 +806,73 @@ class Command(BaseCommand):
                             # mark the notification as sent 
                             task.deadline_extend_notification = True
                             task.save()
-                            
+
+                    # Auto escalate task if no progress made in 48 hours     
+                    if automation.automate_stalled:
+                           if task.progress == 0 and (timezone.now() - task.updated_at).total_seconds() > 172800 and not task.automate_stalled_action:
+                               
+                                subject_manager_stalled = f"🚨 Task Escalation Alert: {task.title}"
+                                recipient_list_manager_stalled=[task.created_by.email]
+                                message_manager_stalled = (
+                                    f"Dear {task.created_by.username},\n\n"
+                                    f"The task **'{task.title}'** assigned to **{task.assigned_to.username}** in the group **'{group.name}'** under the organization **'{organization.name}'** "
+                                    f"has not shown any progress in the last **48 hours**.\n\n"
+                                    f"📌 **Task Details:**\n"
+                                    f"🔹 **Task Name:** {task.title}\n"
+                                    f"🔹 **Assigned To:** {task.assigned_to.username} ({task.assigned_to.email})\n"
+                                    f"🔹 **Group:** {group.name}\n"
+                                    f"🔹 **Organization:** {organization.name}\n"
+                                    f"🔹 **Last Updated:** {task.updated_at.strftime('%Y-%m-%d %H:%M')}\n\n"
+                                    f"We recommend checking in with **{task.assigned_to.username}** to understand any challenges and ensure smooth progress.\n\n"
+                                    f"Please take the necessary action to prevent delays.\n\n"
+                                    f"Best Regards,\n"
+                                    f"**Team CalendarPlus**"
+                                 )
+                                from_email=settings.DEFAULT_FROM_EMAIL
+
+                                # SEND THE EMAIL TO THE MANAGER
+                                send_mail(
+                                      subject=subject_manager_stalled,
+                                      message=message_manager_stalled,
+                                      from_email=settings.DEFAULT_FROM_EMAIL,
+                                      recipient_list=recipient_list_manager_stalled
+                                     )
+                                
+                                # send email to the assignee
+                                subject_user_stalled = f"⏳ Task Escalation Alert: {task.title}"
+                                message_user_stalled = (
+                                     f"Dear {task.assigned_to.username},\n\n"
+                                     f"We noticed that there has been **no progress** on your assigned task **'{task.title}'** "
+                                     f"in the group **'{group.name}'** under the organization **'{organization.name}'** for the last **48 hours**.\n\n"
+                                     f"📌 **Task Details:**\n"
+                                     f"🔹 **Task Name:** {task.title}\n"
+                                     f"🔹 **Assigned By:** {task.created_by.username} ({task.created_by.email})\n"
+                                     f"🔹 **Group:** {group.name}\n"
+                                     f"🔹 **Organization:** {organization.name}\n"
+                                     f"🔹 **Last Updated:** {task.updated_at.strftime('%Y-%m-%d %H:%M')}\n\n"
+                                     f"If you are facing any blockers, please reach out to your manager **{task.created_by.username}** to discuss any required support or assistance.\n\n"
+                                     f"Your timely efforts help ensure smooth task management and project success.\n\n"
+                                     f"Best Regards,\n"
+                                     f"**Team CalendarPlus**"
+                                    )
+                                recipient_list_user_stalled = [task.assigned_to.email]
+                                send_mail(
+                                   subject=subject_user_stalled,
+                                   message=message_user_stalled,
+                                   from_email=settings.DEFAULT_FROM_EMAIL,
+                                   recipient_list=recipient_list_user_stalled
+                                )
+                                # mark the action as happened
+                                task.automate_stalled_action = True
+                                task.save()
+                                
+
+
+
+                                
+                                 
+
+
 
 
 
