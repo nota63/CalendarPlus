@@ -1068,7 +1068,8 @@ class Command(BaseCommand):
                                 print(f"📌 Task '{task.title}' marked as having a scheduled meeting.")
 
                     # Overdue Notification 
-                    if automation.overdue_notification and task.deadline < timezone.now().date() and task.status != "completed" and not task.overdue_notification_sent:
+                    if automation.overdue_notification and task.deadline.date() < timezone.now().date() and task.status != "completed" and not task.overdue_notification_sent:
+
                             print(f"⚠️ Task '{task.title}' is overdue! Updating status...")
 
                             # Update task status to 'overdue'
