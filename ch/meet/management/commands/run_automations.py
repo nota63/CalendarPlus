@@ -1,5 +1,5 @@
 # Initialize OpenAI Client
-
+from textblob import TextBlob
 from datetime import datetime, time  
 from django.utils import timezone
 import schedule
@@ -34,10 +34,26 @@ logger = logging.getLogger(__name__)  # Logger for debugging
 client=None
 
 
+
+
+# Saperate functions for 
+
+
+
+
+
+
+
+
+
+
 # IMPLEMENT THE COMMAND
 class Command(BaseCommand):
     help = "Continuously runs automation tasks every minute"
 
+
+  
+    # main thread
     def handle(self, *args, **kwargs):
         self.stdout.write(self.style.SUCCESS("🚀 Automation Scheduler Started..."))
 
@@ -1361,8 +1377,54 @@ class Command(BaseCommand):
                                                                     
                     # SEND CHAT INSIGHTS CAL-AI
                     if automation.provide_chat_insights:
-                        if task.status == 'completed' and not task.chat_insights_sent:
-                            # write your code here
+                            if task.status == 'completed' and not task.chat_insights_sent:
+                                messages = CommunicateTask.objects.filter(task=task)
+                                
+                                positive = 0
+                                neutral = 0
+                                negative = 0
+                                total_messages = messages.count()
+
+                                insights = []
+
+                                if total_messages > 0:
+                                    for message in messages:
+                                        analysis = TextBlob(message.message)
+                                        polarity = analysis.sentiment.polarity
+
+                                        if polarity > 0.2:
+                                            positive += 1
+                                        elif polarity < -0.2:
+                                            negative += 1
+                                            insights.append(f"❌ Negative Message: \"{message.message}\" - Sent by {message.sender.username}")
+                                        else:
+                                            neutral += 1
+
+                                    report = f"""
+                                    📊 **Chat Insights for Task: {task.title}**
+                                    ✅ **Positive Messages:** {positive} ({(positive/total_messages)*100:.2f}%)
+                                    ⚖️ **Neutral Messages:** {neutral} ({(neutral/total_messages)*100:.2f}%)
+                                    ❌ **Negative Messages:** {negative} ({(negative/total_messages)*100:.2f}%)
+
+                                    **🔍 Detailed Report:**
+                                    {chr(10).join(insights) if insights else "No critical issues detected."}
+                                    """
+
+                                    # Send insights via email
+                                    subject = f"📊 Chat Insights Report for Task: {task.title}"
+                                    recipients = [task.created_by.email, task.assigned_to.email]
+
+                                    send_mail(
+                                        subject, 
+                                        report, 
+                                        "no-reply@calendarplus.com", 
+                                        recipients, 
+                                        fail_silently=True
+                                    )
+
+                                # Mark insights as sent
+                                task.chat_insights_sent = True
+                                task.save()
 
 
 # Automations Ends Here-------------------------------------------------------------------------------------------------- 
