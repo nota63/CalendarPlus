@@ -1210,6 +1210,82 @@ class Command(BaseCommand):
 
                                 except Exception as e:
                                     print(f"❌ AI Subtask Generation Failed: {e}")
+
+                    # Let CalAI suggest plans and send to task.assigneee 
+                    if automation.cal_ai_plans:
+                            if task.status != 'completed' and not task.cal_ai_plans_executed:
+                                print(f"🚀 Executing CalAI Planning for Task: {task.title}")
+
+                            
+                                # Fetch subtasks related to the task
+                                subtasks = SubTask.objects.filter(task=task)
+                                subtask_titles = [subtask.title for subtask in subtasks]
+                                subtask_progress = [subtask.progress for subtask in subtasks]
+
+                                ai_prompt = f"""
+                                Based on the following task details, predict the estimated time required to complete it.
+                                Also, provide a structured work plan with phases:
+
+                                Task Title: {task.title}
+                                Description: {task.description}
+                                Priority: {task.priority}
+                                Deadline: {task.deadline}
+                                Current Progress: {task.progress}%
+                                Subtasks: {subtask_titles}
+                                Subtask Progress: {subtask_progress}
+
+                                Please give an estimated duration in hours and a step-by-step breakdown of the work plan.
+                                """
+
+                                try:
+                                    client = OpenAI() 
+
+                                    response = client.chat.completions.create(
+                                        model="gpt-4o",
+                                        messages=[{"role": "user", "content": ai_prompt}]
+                                    )
+
+                                    ai_response = response.choices[0].message.content
+                                    print(f"🤖 AI Response: {ai_response}")
+
+                                    # Store the AI-generated plan in the task (assuming you have a field for it)
+                                    task.cal_ai_plans_executed = True
+                                    task.save()
+
+                                    print(f"✅ AI Plan Generated and Saved for Task: {task.title}")
+
+                                    # Send email notification
+                                    subject = f"📌 CalAI Work Plan for Task: {task.title}"
+                                    message = (
+                                        f"Dear {task.assigned_to.username},\n\n"
+                                        f"CalAI has analyzed your task and suggested the following plan:\n\n"
+                                        f'Task and workspace details\n'
+                                        f'Task: {task.title}\n Deadline:{task.deadline}\n priority:{task.priority}\n Progress: {task.progress}\n'
+                                        f'Workspace & Group:\n'
+                                        f'Workspace: {organization.name}\n\n Group:{group.name}\n\n'
+                                        f'Final Plan:\n'
+                                        f"{ai_response}\n\n"
+                                        f"⚡ Use this structured plan to complete your task efficiently!\n\n"
+                                        f"Best,\nTeam CalendarPlus"
+                                    )
+
+                                    recipient_list = [task.assigned_to.email]
+                                    send_mail(
+                                        subject=subject,
+                                        message=message,
+                                        from_email=settings.DEFAULT_FROM_EMAIL,
+                                        recipient_list=recipient_list
+                                    )
+
+                                    print(f"📩 AI Plan sent successfully to {task.assigned_to.email}!")
+
+                                except Exception as e:
+                                    print(f"❌ AI Plan Generation Failed: {e}")
+
+
+
+
+
 # Automations Ends Here-------------------------------------------------------------------------------------------------- 
             except Exception as e:
                 self.stderr.write(self.style.ERROR(f"❌ Error processing automation: {str(e)}"))

@@ -137,6 +137,10 @@ class Task(models.Model):
   
     created_at = models.DateTimeField(auto_now_add=True, help_text="Task creation timestamp.")
     updated_at = models.DateTimeField(auto_now=True, help_text="Task last updated timestamp.")
+    estimated_completion_time = models.DurationField(
+        null=True, blank=True,
+        help_text="Estimated time required to complete the task"
+    )
 
     # Track if automation ran (AUTOMATION CONTROLS AND SETTINGS)
     welcome_text_sent = models.BooleanField(default=False,null=True, blank=True)
@@ -157,7 +161,8 @@ class Task(models.Model):
     auto_meeting_scheduled=models.BooleanField(default=False, null=True, blank=True)
     overdue_notification_sent=models.BooleanField(default=False, null=True, blank=True)
     ai_created_subtasks=models.BooleanField(default=False, null=True, blank=True)
-    
+    cal_ai_plans_executed=models.BooleanField(default=False, null=True, blank=True)
+
 
 
 
@@ -922,6 +927,7 @@ class AutomationTask(models.Model):
     auto_schedule_meeting_on_approval=models.BooleanField(default=False,null=True, blank=True)
     overdue_notification=models.BooleanField(default=True, null=True, blank=True)
     ai_subtasks=models.BooleanField(default=True, null=True, blank=True)
+    cal_ai_plans=models.BooleanField(default=True, null=True, blank=True)
     # track automations
     last_executed = models.DateTimeField(null=True, blank=True)
     processed_tasks = models.ManyToManyField(Task, blank=True, related_name="processed_automations")
