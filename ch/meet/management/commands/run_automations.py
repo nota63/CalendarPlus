@@ -1,3 +1,4 @@
+# Initialize OpenAI Client
 
 from datetime import datetime, time  
 from django.utils import timezone
@@ -22,8 +23,14 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from app_marketplace.models import MiniApp, InstalledMiniApp
 import logging
+import os
+from openai import OpenAI
+
+
 logger = logging.getLogger(__name__)  # Logger for debugging
 
+# initialize openAI client
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # IMPLEMENT THE COMMAND
 class Command(BaseCommand):
@@ -1100,8 +1107,109 @@ class Command(BaseCommand):
                                 )
                                 print(f"📩 Overdue email sent successfully to {recipient_list}!")
                             except Exception as e:
-                                print(f"❌ Failed to send overdue email: {e}")       
+                                print(f"❌ Failed to send overdue email: {e}") 
 
+
+                    # Let CalAI create subtasks based on task 
+                    if automation.ai_subtasks:
+                            if task.status != 'completed' and not task.ai_created_subtasks:
+                                print(f"🤖 AI is generating 3 subtasks for '{task.title}'...")
+
+                                # AI prompt to generate subtasks
+                                prompt = f"""
+                                You are an intelligent task planner. Based on the given main task details, generate exactly 3 structured subtasks.
+                                
+                                Task Title: {task.title}
+                                Task Description: {task.description}
+                                Task Priority: {task.priority}
+                                Task Deadline: {task.deadline.strftime('%Y-%m-%d %H:%M')}
+                                
+                                Return the subtasks in this format:
+                                1. **Title:** [Subtask Title]  
+                                **Description:** [Brief description]  
+                                **Priority:** [Low/Medium/High/Urgent]  
+                                2. **Title:** [Subtask Title]  
+                                **Description:** [Brief description]  
+                                **Priority:** [Low/Medium/High/Urgent]  
+                                3. **Title:** [Subtask Title]  
+                                **Description:** [Brief description]  
+                                **Priority:** [Low/Medium/High/Urgent]
+                                """
+
+                                try:
+                                    # Call OpenAI to generate subtasks
+                                    completion = client.chat.completions.create(
+                                        model="gpt-4o",
+                                        messages=[{"role": "user", "content": prompt}]
+                                    )
+
+                                    ai_output = completion.choices[0].message.content.strip()
+                                    print(f"🔍 AI Response:\n{ai_output}")
+
+                                    subtask_objects = []  # To store created subtasks
+
+                                    # Parse AI response and create subtasks
+                                    subtask_texts = ai_output.split("\n\n")
+                                    for index, subtask_text in enumerate(subtask_texts[:3]):  # Ensure only 3 subtasks
+                                        if not subtask_text.strip():
+                                            continue
+                                        
+                                        lines = subtask_text.split("\n")
+                                        title = lines[0].replace("**Title:** ", "").strip()
+                                        description = lines[1].replace("**Description:** ", "").strip()
+                                        priority = lines[2].replace("**Priority:** ", "").strip().lower()
+
+                                        # Spread subtask deadlines within the main task deadline
+                                        task_duration = max((task.deadline - timezone.now()).days, 1)
+                                        subtask_deadline = timezone.now() + timedelta(days=(task_duration // 3) * (index + 1))
+
+                                        # Create subtask
+                                        subtask = SubTask.objects.create(
+                                            organization=task.organization,
+                                            group=task.group,
+                                            task=task,
+                                            created_by=task.created_by,
+                                            title=title,
+                                            description=description,
+                                            priority=priority if priority in ["low", "medium", "high", "urgent"] else "medium",
+                                            status="pending",
+                                            deadline=subtask_deadline,
+                                            progress=0
+                                        )
+
+                                        subtask_objects.append(subtask)
+                                        print(f"✅ AI Created Subtask: {title} - {priority} (Deadline: {subtask_deadline})")
+
+                                    # Mark task as AI-generated subtasks completed
+                                    task.ai_created_subtasks = True
+                                    task.save()
+
+                                    # Notify assigned user via email
+                                    subject = f"CalAI Generated 3 Subtasks for Your Task: {task.title}"
+                                    message = (
+                                        f"Dear {task.assigned_to.username},\n\n"
+                                        f"CalAI has generated 3 subtasks to help you complete the task '{task.title}'.\n\n"
+                                        f"Subtasks:\n"
+                                    )
+
+                                    for subtask in subtask_objects:
+                                        message += f"✅ {subtask.title} (Priority: {subtask.priority}, Deadline: {subtask.deadline.strftime('%Y-%m-%d %H:%M')})\n"
+
+                                    message += "\nPlease review them and take action accordingly.\n\nBest,\nTeam CalendarPlus"
+
+                                    try:
+                                        send_mail(
+                                            subject=subject,
+                                            message=message,
+                                            from_email=settings.DEFAULT_FROM_EMAIL,
+                                            recipient_list=[task.assigned_to.email]
+                                        )
+                                        print(f"📩 AI-generated subtask email sent to {task.assigned_to.username}!")
+                                    except Exception as e:
+                                        print(f"❌ Failed to send AI subtask email: {e}")
+
+                                except Exception as e:
+                                    print(f"❌ AI Subtask Generation Failed: {e}")
 # Automations Ends Here-------------------------------------------------------------------------------------------------- 
             except Exception as e:
                 self.stderr.write(self.style.ERROR(f"❌ Error processing automation: {str(e)}"))
