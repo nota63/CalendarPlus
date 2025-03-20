@@ -1376,9 +1376,15 @@ class Command(BaseCommand):
                                     task.save()
                                                                     
                     # SEND CHAT INSIGHTS CAL-AI
+                    # SEND CHAT INSIGHTS CAL-AI
                     if automation.provide_chat_insights:
+                            print("✅ Automation for Chat Insights is enabled.")
+                            
                             if task.status == 'completed' and not task.chat_insights_sent:
+                                print(f"🔍 Processing chat insights for completed task: {task.title}")
+                                
                                 messages = CommunicateTask.objects.filter(task=task)
+                                print(f"📩 Total messages found: {messages.count()}")
                                 
                                 positive = 0
                                 neutral = 0
@@ -1389,16 +1395,24 @@ class Command(BaseCommand):
 
                                 if total_messages > 0:
                                     for message in messages:
+                                        print(f"📝 Analyzing message: {message.message} (Sent by {message.sender.username})")
+                                        
                                         analysis = TextBlob(message.message)
                                         polarity = analysis.sentiment.polarity
+                                        print(f"⚖️ Sentiment Polarity: {polarity}")
 
                                         if polarity > 0.2:
                                             positive += 1
+                                            print("✅ Marked as Positive")
                                         elif polarity < -0.2:
                                             negative += 1
                                             insights.append(f"❌ Negative Message: \"{message.message}\" - Sent by {message.sender.username}")
+                                            print("❌ Marked as Negative")
                                         else:
                                             neutral += 1
+                                            print("⚖️ Marked as Neutral")
+
+                                    print("📊 Generating report...")
 
                                     report = f"""
                                     📊 **Chat Insights for Task: {task.title}**
@@ -1410,21 +1424,33 @@ class Command(BaseCommand):
                                     {chr(10).join(insights) if insights else "No critical issues detected."}
                                     """
 
-                                    # Send insights via email
+                                    print("📧 Sending Email Report...")
                                     subject = f"📊 Chat Insights Report for Task: {task.title}"
                                     recipients = [task.created_by.email, task.assigned_to.email]
 
-                                    send_mail(
-                                        subject, 
-                                        report, 
-                                        "no-reply@calendarplus.com", 
-                                        recipients, 
-                                        fail_silently=True
-                                    )
+                                    try:
+                                        send_mail(
+                                            subject, 
+                                            report, 
+                                            settings.DEFAULT_FROM_EMAIL, 
+                                            recipients, 
+                                            fail_silently=False
+                                        )
+                                        print("✅ Email sent successfully!")
+                                    except Exception as e:
+                                        print(f"❌ Error sending email: {e}")
 
-                                # Mark insights as sent
+                                else:
+                                    print("⚠️ No messages found. Skipping insights.")
+
+                                print("✅ Marking chat insights as sent.")
                                 task.chat_insights_sent = True
                                 task.save()
+                                print("💾 Task updated successfully.")
+                            else:
+                                print("🚫 Task is either not completed or insights already sent.")
+                    else:
+                            print("🚫 Chat Insights automation is disabled.")
 
 
 # Automations Ends Here-------------------------------------------------------------------------------------------------- 
