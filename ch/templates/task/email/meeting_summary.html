@@ -1,0 +1,101 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f4f7fc; 
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 20px auto; 
+            background: #ffffff; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+            padding: 20px; 
+        }
+        .logo-container {
+            text-align: center;
+            padding: 15px;
+        }
+        .logo-container img {
+            max-width: 180px;
+        }
+        .header { 
+            text-align: center; 
+            font-size: 22px; 
+            font-weight: bold; 
+            color: #2c3e50; 
+            margin-bottom: 15px; 
+        }
+        .meeting-card { 
+            background: #f9f9f9; 
+            padding: 15px; 
+            border-radius: 8px; 
+            border-left: 5px solid #007bff; 
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+        .meeting-card h3 { 
+            margin: 0; 
+            color: #007bff; 
+            font-size: 18px; 
+        }
+        .meeting-card p { 
+            margin: 5px 0; 
+            font-size: 14px; 
+            color: #555; 
+        }
+        .meeting-link { 
+            display: inline-block; 
+            padding: 10px 20px; 
+            background: #007bff; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .meeting-link:hover { 
+            background: #0056b3; 
+        }
+        .footer { 
+            text-align: center; 
+            font-size: 12px; 
+            color: #888; 
+            padding-top: 10px; 
+            border-top: 1px solid #ddd; 
+            margin-top: 20px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <img src="{% static 'assets/images/calendarplus.png'%}" alt="CalendarPlus Logo">
+        </div>
+        <div class="header">📅 Meeting Summary for Task: <br> <strong>{{ task.title }}</strong></div>
+
+        {% for meeting in meetings %}
+        <div class="meeting-card">
+            <h3>📌 {{ meeting.reason }}</h3>
+            <p><strong>Date:</strong> {{ meeting.date }}</p>
+            <p><strong>Time:</strong> {{ meeting.start_time }} - {{ meeting.end_time }}</p>
+            <p><strong>Status:</strong> {{ meeting.status }}</p>
+            <p><strong>Project Manager:</strong> {{ meeting.task_creator.username }}</p>
+            <div style="text-align: center; margin-top: 10px;">
+                <a href="{{ meeting.meeting_link }}" class="meeting-link">🔗 Join Meeting</a>
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="footer">
+            Sent by <strong>CalendarPlus</strong> | <a href="https://calendarplus.com">Visit Us</a>
+        </div>
+    </div>
+</body>
+</html>

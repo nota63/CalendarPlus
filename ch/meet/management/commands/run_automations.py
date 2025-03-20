@@ -30,7 +30,9 @@ from openai import OpenAI
 logger = logging.getLogger(__name__)  # Logger for debugging
 
 # initialize openAI client
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# client = OpenAI(api_key=os.getenv("#"))
+client=None
+
 
 # IMPLEMENT THE COMMAND
 class Command(BaseCommand):
@@ -1283,7 +1285,36 @@ class Command(BaseCommand):
                                     print(f"❌ AI Plan Generation Failed: {e}")
 
 
+                    # Send Meeting Summary if requested
+                    if automation.send_meeting_summary:
+                            if task.status == 'completed' and not task.meeting_summary_sent:
+                                meetings = MeetingTaskQuery.objects.filter(task=task,organization=task.organization,group=task.group)
 
+                                if meetings.exists():
+                                    # Prepare data for the HTML template
+                                    meeting_data = []
+                                    for meeting in meetings:
+                                        meeting_data.append({
+                                            "date": meeting.date,
+                                            "start_time": meeting.start_time.strftime("%Y-%m-%d %H:%M"),
+                                            "end_time": meeting.end_time.strftime("%Y-%m-%d %H:%M"),
+                                            "reason": meeting.get_reason_display(),
+                                            "meeting_link": meeting.meeting_link,
+                                            "status": meeting.get_status_display()
+                                        })
+
+                                    # Render the email template
+                                    html_message = render_to_string("task/email/meeting_summary.html", {"task": task, "meetings": meeting_data})
+                                    subject = f"Meeting Summary for Task: {task.title}"
+                                    recipient_list = [task.assigned_to.email]
+
+                                    try:
+                                        send_mail(subject, "", settings.DEFAULT_FROM_EMAIL, recipient_list, html_message=html_message)
+                                        print(f"📩 Meeting summary email sent to {recipient_list}!")
+                                        task.meeting_summary_sent = True
+                                        task.save()
+                                    except Exception as e:
+                                        print(f"❌ Failed to send meeting summary email: {e}")
 
 
 # Automations Ends Here-------------------------------------------------------------------------------------------------- 
