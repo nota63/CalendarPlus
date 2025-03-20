@@ -1067,15 +1067,6 @@ class Command(BaseCommand):
 
                                 print(f"📌 Task '{task.title}' marked as having a scheduled meeting.")
 
-
-
-
-
-
-
-
-
-
 # Automations Ends Here-------------------------------------------------------------------------------------------------- 
             except Exception as e:
                 self.stderr.write(self.style.ERROR(f"❌ Error processing automation: {str(e)}"))
