@@ -9,7 +9,7 @@ from django.core.management.base import BaseCommand
 from django.utils.timezone import now
 from django.core.mail import send_mail
 from django.conf import settings
-from group_tasks.models import (AutomationTask, Task,TaskTimeTracking,TaskComment,TaskNote,AttachmentsTasksApp,SubTask,ActivityLog,TaskCompletionActivities,MeetingTaskQuery)
+from group_tasks.models import (AutomationTask, Task,TaskTimeTracking,TaskComment,TaskNote,AttachmentsTasksApp,SubTask,ActivityLog,TaskCompletionActivities,MeetingTaskQuery,CommunicateTask)
 from accounts.models import Profile, Organization,Availability,MeetingOrganization
 from groups.models import Group
 from django.utils.timezone import localtime
@@ -1359,6 +1359,10 @@ class Command(BaseCommand):
                                     task.meeting_reminder_sent = True
                                     task.save()
                                                                     
+                    # SEND CHAT INSIGHTS CAL-AI
+                    if automation.provide_chat_insights:
+                        if task.status == 'completed' and not task.chat_insights_sent:
+                            # write your code here
 
 
 # Automations Ends Here-------------------------------------------------------------------------------------------------- 

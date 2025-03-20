@@ -164,6 +164,7 @@ class Task(models.Model):
     cal_ai_plans_executed=models.BooleanField(default=False, null=True, blank=True)
     meeting_summary_sent=models.BooleanField(default=False, null=True, blank=True)
     meeting_reminder_sent=models.BooleanField(default=False,null=True, blank=True)
+    chat_insights_sent=models.BooleanField(default=False, null=True, blank=True)
 
 
 
@@ -715,6 +716,12 @@ class MeetingTaskQuery(models.Model):
 
 # COMMUNICATE IN TASK
 class CommunicateTask(models.Model):
+    SENTIMENT_CHOICES = [
+        ("positive", "Positive"),
+        ("neutral", "Neutral"),
+        ("negative", "Negative"),
+    ]
+
     task = models.ForeignKey(
         Task, 
         on_delete=models.CASCADE, 
@@ -757,6 +764,19 @@ class CommunicateTask(models.Model):
     updated_at = models.DateTimeField(
         auto_now=True, 
         help_text="Timestamp when the message was last updated."
+    )
+
+     # NEW SENTIMENT ANALYSIS FIELDS  
+    sentiment = models.CharField(
+        max_length=10, 
+        choices=SENTIMENT_CHOICES, 
+        default="neutral",
+        help_text="Sentiment of the message (Positive, Neutral, Negative).",null=True, blank=True
+    )
+    flagged_for_review = models.BooleanField(
+        default=False, 
+        help_text="Flagged for manager review if negative sentiment is detected.",
+        null=True, blank=True
     )
 
     class Meta:
@@ -932,6 +952,7 @@ class AutomationTask(models.Model):
     cal_ai_plans=models.BooleanField(default=True, null=True, blank=True)
     send_meeting_summary=models.BooleanField(default=False, null=True, blank=True)
     remind_my_meetings=models.BooleanField(default=True, null=True, blank=True)
+    provide_chat_insights=models.BooleanField(default=True, null=True, blank=True)
     # track automations
     last_executed = models.DateTimeField(null=True, blank=True)
     processed_tasks = models.ManyToManyField(Task, blank=True, related_name="processed_automations")
