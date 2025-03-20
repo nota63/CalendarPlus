@@ -18,6 +18,9 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from app_marketplace.models import MiniApp, InstalledMiniApp
+import logging
+logger = logging.getLogger(__name__)  # Logger for debugging
+
 
 # IMPLEMENT THE COMMAND
 class Command(BaseCommand):
@@ -705,7 +708,9 @@ class Command(BaseCommand):
                             task.task_chaining_notification_sent = True
                             task.save()
 
-                    print(f"TASK CHAINING NOTIFICATION SENT TO {task.created_by.email}")
+                    self.stdout.write(self.style.SUCCESS(f" Task chaining notification sent for task: {task.title}"))
+
+
 
                     # Install New Task Management app automatically or update 
                     if automation.install_new_apps:
@@ -758,6 +763,10 @@ class Command(BaseCommand):
                                 task.install_new_app_notification = True
                                 task.save()
 
+                    self.stdout.write(self.style.WARNING(f"⚠️ Task Management apps installed for : {task.title}"))
+
+      
+
                     # Deadline extention if task is 80% completed 
                     if automation.extend_deadline:
                         if task.progress >= 80 and task.deadline - timezone.now() < timedelta(hours=24) and not task.deadline_extend_notification:
@@ -807,6 +816,10 @@ class Command(BaseCommand):
                             task.deadline_extend_notification = True
                             task.save()
 
+                    self.stdout.write(self.style.WARNING(f"⚠️ Task deadline extend notification sent for: {task.title}"))
+
+           
+
                     # Auto escalate task if no progress made in 48 hours     
                     if automation.automate_stalled:
                            if task.progress == 0 and (timezone.now() - task.updated_at).total_seconds() > 172800 and not task.automate_stalled_action:
@@ -834,7 +847,7 @@ class Command(BaseCommand):
                                 send_mail(
                                       subject=subject_manager_stalled,
                                       message=message_manager_stalled,
-                                      from_email=settings.DEFAULT_FROM_EMAIL,
+                                      from_email=from_email,
                                       recipient_list=recipient_list_manager_stalled
                                      )
                                 
@@ -866,6 +879,10 @@ class Command(BaseCommand):
                                 task.automate_stalled_action = True
                                 task.save()
 
+
+                    self.stdout.write(self.style.WARNING(f"⚠️Automated Stalled task: {task.title}"))
+
+
                     # Smart Task Priortization 
                     # 🚀 Smart Task Prioritization: Escalate to URGENT if Not Started & Deadline Near
                     if automation.task_priortization:
@@ -875,10 +892,12 @@ class Command(BaseCommand):
                            if hours_remaining <= 12 and not task.task_priortization_update:
                                 task.priority = "urgent"  # Force update to urgent
                                 task.task_priortization_update=True
-                                task.save(update_fields=["priority", "priority_escalated"])  # Save only required fields
+                                task.save(update_fields=["priority"])  # Save only required fields
 
                                 # 📩 Email for Task Assignee (task.assigned_to)
                                 subject_assignee = f"🚨 Urgent Task Alert: {task.title}"
+                                recipient_list_assignee=[task.assigned_to.email]
+                                recipient_list_manager=[task.created_by.email]
                                 message_assignee = (
                                      f"Dear {task.assigned_to.username},\n\n"
                                      f"The task **'{task.title}'** in **{task.group.name}** under **{task.organization.name}** "
@@ -913,136 +932,155 @@ class Command(BaseCommand):
                                    subject=subject_assignee,
                                    message=message_assignee,
                                    from_email=settings.DEFAULT_FROM_EMAIL,
-                                   recipient_list=[task.assigned_to.email]
-                                     )
+                                   recipient_list=recipient_list_assignee
+                                )
 
                                 send_mail(
                                       subject=subject_manager,
                                       message=message_manager,
                                       from_email=settings.DEFAULT_FROM_EMAIL,
-                                      recipient_list=[task.created_by.email]
+                                      recipient_list=recipient_list_manager
                                   )
                                
 
                                 print(f"📧 Urgent Priority Alert Sent for Task: {task.title}")
 
+                    self.stdout.write(self.style.WARNING(f"Urgent priority alert action triggered for : {task.title}"))
+
+            
                     # Auto schedule meeting after task submission for review 
                     if automation.auto_schedule_meeting_on_approval:
-                        if task.status == "pending_approval" and not task.auto_meeting_scheduled:
-                            assigned_user = task.created_by
+                            print(f"🔍 Checking task '{task.title}' (ID: {task.id}) for auto-scheduling...")
 
-                            # Get all available slots for assigned user
-                            available_slots = Availability.objects.filter(
-                                   user=assigned_user,
-                                   organization=task.organization,
-                                   is_booked=False
-                                 ).order_by("day_of_week", "start_time")
+                            if task.status == "pending_approval" and not task.auto_meeting_scheduled:
+                                print("ACTION HITTED FOR AUTO SCHEDULE MEETING...")
+                                assigned_user = task.created_by
+                                task_assignee = task.assigned_to
 
-                            meeting_scheduled = False  # Flag to track if we found a slot
+                                print(f"📝 Task '{task.title}' is pending approval. Finding available slots for {assigned_user.username}...")
 
-                            for slot in available_slots:
-                            # Convert the day_of_week to a date
-                                today = timezone.now().date()
-                                days_ahead = (slot.day_of_week - today.weekday()) % 7  # Find next occurrence of the weekday
-                                meeting_date = today + timedelta(days=days_ahead)
-
-                                # Check if this slot is already booked in MeetingTaskQuery or MeetingOrganization
-                                overlapping_meetings = MeetingTaskQuery.objects.filter(
-                                    organization=task.organization,
-                                    task_creator=assigned_user,
-                                    date=meeting_date,
-                                    start_time=slot.start_time,
-                                    end_time=slot.end_time,
-                                    status="confirmed"
-                                    ).exists() or MeetingOrganization.objects.filter(
-                                    organization=task.organization,
+                                # Get all available slots for the task creator
+                                available_slots = Availability.objects.filter(
                                     user=assigned_user,
-                                    meeting_date=meeting_date,
-                                    start_time=slot.start_time,
-                                    end_time=slot.end_time,
-                                    status="scheduled"
-                                ).exists()
+                                    organization=task.organization,
+                                    is_booked=False
+                                ).order_by("day_of_week", "start_time")
 
-                                if not overlapping_meetings:
-                                # Schedule meeting
-                                   meeting = MeetingTaskQuery.objects.create(
-                                        organization=task.organization,
-                                        group=task.group,
-                                        task=task,
-                                        scheduled_by=task.assigned_to,
-                                        task_creator=assigned_user,
-                                        date=meeting_date,
-                                        start_time=timezone.datetime.combine(meeting_date, slot.start_time),
-                                        end_time=timezone.datetime.combine(meeting_date, slot.end_time),
-                                        reason="need_clarification",
-                                        meeting_link="https://meet.google.com/new",
-                                        status="pending"
-                                    )
+                                if not available_slots.exists():
+                                    print(f"⚠️ No available slots found for {assigned_user.username}. Cannot auto-schedule a meeting.")
+                                else:
+                                    meeting_scheduled = False  # Flag to check if a meeting is successfully scheduled
 
-                                    # Mark slot as booked
-                                   slot.is_booked = True
-                                   slot.save()
+                                    for slot in available_slots:
+                                        today = timezone.now().date()
+                                        days_ahead = (slot.day_of_week - today.weekday()) % 7  # Find next occurrence of the weekday
+                                        meeting_date = today + timedelta(days=days_ahead)
 
-                                   meeting_scheduled = True
-                                   break  # Exit loop after scheduling the first available meeting
+                                        print(f"⏳ Checking availability on {meeting_date} from {slot.start_time} to {slot.end_time}...")
 
-                            if meeting_scheduled:
-                            # Notify the task creator
-                               subject_creator = f"Meeting Scheduled for Task Approval - {task.title}"
-                               message_creator = (
-                                   f"Dear {task.created_by.username},\n\n"
-                                   f"A meeting has been scheduled for {task.assigned_to.username} to discuss task approval for '{task.title}'.\n"
-                                   f"Meeting Details:\n"
-                                   f"📅 Date: {meeting_date}\n"
-                                   f"⏰ Time: {slot.start_time} - {slot.end_time}\n"
-                                   f"📍 Meeting Link: {meeting.meeting_link}\n\n"
-                                   f"Best,\nTeam CalendarPlus"
-                                   )
+                                        # Check if this slot is already booked
+                                        overlapping_meetings = MeetingTaskQuery.objects.filter(
+                                            organization=task.organization,
+                                            task_creator=assigned_user,
+                                            date=meeting_date,
+                                            start_time=slot.start_time,
+                                            end_time=slot.end_time,
+                                            status="confirmed"
+                                        ).exists() or MeetingOrganization.objects.filter(
+                                            organization=task.organization,
+                                            user=assigned_user,
+                                            meeting_date=meeting_date,
+                                            start_time=slot.start_time,
+                                            end_time=slot.end_time,
+                                            status="scheduled"
+                                        ).exists()
 
-                               send_mail(
-                                      subject=subject_creator,
-                                      message=message_creator,
-                                      from_email=settings.DEFAULT_FROM_EMAIL,
-                                      recipient_list=[task.created_by.email]
-                                   )
+                                        if overlapping_meetings:
+                                            print(f"🔴 Slot on {meeting_date} from {slot.start_time} to {slot.end_time} is already booked. Skipping...")
+                                            continue  # Try the next available slot
 
-                               # Notify the task assignee
-                               subject_assignee = f"Task Approval Meeting Scheduled - {task.title}"
-                               message_assignee = (
-                                    f"Dear {task.assigned_to.username},\n\n"
-                                    f"A meeting has been scheduled for you to discuss the approval of the task '{task.title}'.\n"
-                                    f"Meeting Details:\n"
-                                    f"📅 Date: {meeting_date}\n"
-                                    f"⏰ Time: {slot.start_time} - {slot.end_time}\n"
-                                    f"📍 Meeting Link: {meeting.meeting_link}\n\n"
-                                    f"Please be prepared with any necessary details regarding the task.\n\n"
-                                    f"Best,\nTeam CalendarPlus"
-                                )
+                                        # Schedule the meeting
+                                        meeting = MeetingTaskQuery.objects.create(
+                                            organization=task.organization,
+                                            group=task.group,
+                                            task=task,
+                                            scheduled_by=task_assignee,
+                                            task_creator=assigned_user,
+                                            date=meeting_date,
+                                            start_time=timezone.datetime.combine(meeting_date, slot.start_time),
+                                            end_time=timezone.datetime.combine(meeting_date, slot.end_time),
+                                            reason="need_clarification",
+                                            meeting_link="https://meet.google.com/new",
+                                            status="pending"
+                                        )
 
-                               send_mail(
-                                     subject=subject_assignee,
-                                     message=message_assignee,
-                                     from_email=settings.DEFAULT_FROM_EMAIL,
-                                     recipient_list=[task.assigned_to.email]
-                               )
+                                        # Mark the slot as booked
+                                        slot.is_booked = True
+                                        slot.save()
 
-                               #mark as meeting scheduled
-                               task.auto_meeting_scheduled = True
-                               task.save()
+                                        meeting_scheduled = True
+                                        print(f"✅ Meeting scheduled for {assigned_user.username} on {meeting_date} at {slot.start_time}.")
 
-                               print(f"✅ Meeting scheduled for {task.assigned_to.username} on {meeting_date} at {slot.start_time}.")
+                                        # Send meeting notifications
+                                        subject_creator = f"Meeting Scheduled for Task Approval - {task.title}"
+                                        message_creator = (
+                                            f"Dear {assigned_user.username},\n\n"
+                                            f"A meeting has been scheduled for {task_assignee.username} to discuss task approval for '{task.title}'.\n"
+                                            f"Meeting Details:\n"
+                                            f"📅 Date: {meeting_date}\n"
+                                            f"⏰ Time: {slot.start_time} - {slot.end_time}\n"
+                                            f"📍 Meeting Link: {meeting.meeting_link}\n\n"
+                                            f"Best,\nTeam CalendarPlus"
+                                        )
 
-                            else:
-                               print(f"❌ No available time slots found for {task.assigned_to.username} to schedule a meeting.")  
+                                        subject_assignee = f"Task Approval Meeting Scheduled - {task.title}"
+                                        message_assignee = (
+                                            f"Dear {task_assignee.username},\n\n"
+                                            f"A meeting has been scheduled for you to discuss the approval of the task '{task.title}'.\n"
+                                            f"Meeting Details:\n"
+                                            f"📅 Date: {meeting_date}\n"
+                                            f"⏰ Time: {slot.start_time} - {slot.end_time}\n"
+                                            f"📍 Meeting Link: {meeting.meeting_link}\n\n"
+                                            f"Please be prepared with any necessary details regarding the task.\n\n"
+                                            f"Best,\nTeam CalendarPlus"
+                                        )
+
+                                        try:
+                                            send_mail(
+                                                subject=subject_creator,
+                                                message=message_creator,
+                                                from_email=settings.DEFAULT_FROM_EMAIL,
+                                                recipient_list=[task.assigned_to.email]
+                                            )
+                                            print(f"📩 Email sent to {assigned_user.username} ({assigned_user.email}) successfully!")
+                                        except Exception as e:
+                                            print(f"❌ Failed to send email to {assigned_user.username}: {e}")
+
+                                        try:
+                                            send_mail(
+                                                subject=subject_assignee,
+                                                message=message_assignee,
+                                                from_email=settings.DEFAULT_FROM_EMAIL,
+                                                recipient_list=[task.created_by.email]
+                                            )
+                                            print(f"📩 Email sent to {task_assignee.username} ({task_assignee.email}) successfully!")
+                                        except Exception as e:
+                                            print(f"❌ Failed to send email to {task_assignee.username}: {e}")
+
+                                        # Mark task as having an auto-scheduled meeting
+                                        task.auto_meeting_scheduled = True
+                                        task.save()
+                                        print(f"📌 Task '{task.title}' marked as having a scheduled meeting.")
+
+                                        break  # Stop checking further slots after scheduling
+
+                                    if not meeting_scheduled:
+                                        print(f"⚠️ No suitable slot found for {assigned_user.username}. Meeting not scheduled.")
+
+                    self.stdout.write(self.style.WARNING(f"Auto schedule triggered : {task.title}"))
+
+                        
                                 
-                                 
-
-
-
-
-
-
-     
 
 
 
