@@ -163,6 +163,7 @@ class Task(models.Model):
     ai_created_subtasks=models.BooleanField(default=False, null=True, blank=True)
     cal_ai_plans_executed=models.BooleanField(default=False, null=True, blank=True)
     meeting_summary_sent=models.BooleanField(default=False, null=True, blank=True)
+    meeting_reminder_sent=models.BooleanField(default=False,null=True, blank=True)
 
 
 
@@ -930,6 +931,7 @@ class AutomationTask(models.Model):
     ai_subtasks=models.BooleanField(default=True, null=True, blank=True)
     cal_ai_plans=models.BooleanField(default=True, null=True, blank=True)
     send_meeting_summary=models.BooleanField(default=False, null=True, blank=True)
+    remind_my_meetings=models.BooleanField(default=True, null=True, blank=True)
     # track automations
     last_executed = models.DateTimeField(null=True, blank=True)
     processed_tasks = models.ManyToManyField(Task, blank=True, related_name="processed_automations")

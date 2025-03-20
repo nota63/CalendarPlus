@@ -1316,6 +1316,50 @@ class Command(BaseCommand):
                                     except Exception as e:
                                         print(f"❌ Failed to send meeting summary email: {e}")
 
+                    # CalAI Meeting Reminder Before 1 hour 
+                    if automation.remind_my_meetings:
+                        meetings = MeetingTaskQuery.objects.filter(task=task, status="confirmed")
+
+                        for meeting in meetings:
+                            if task.status != "completed" and not task.meeting_reminder_sent:
+                                current_time = localtime(now())
+                                one_hour_later = current_time + timedelta(hours=1)
+
+                                if meeting.start_time.strftime("%Y-%m-%d %H:%M") == one_hour_later.strftime("%Y-%m-%d %H:%M"):
+                                    subject = f"Reminder: Meeting for Task - {task.title}"
+                                    message = f"""
+                                    Hello,
+
+                                    This is a reminder that you have a scheduled meeting in 1 hour.
+
+                                    **Meeting Details:**
+                                    - **Task:** {task.title}
+                                    - **Date:** {meeting.date}
+                                    - **Time:** {meeting.start_time.strftime('%I:%M %p')}
+                                    - **Meeting Link:** {meeting.meeting_link}
+                                    - **Reason:** {meeting.get_reason_display()}
+
+                                    Please make sure to join on time.
+
+                                    Best,
+                                    Calendar Plus Team
+                                    """
+
+                                    recipients = [task.created_by.email, task.assigned_to.email]
+
+                                    send_mail(
+                                        subject, 
+                                        message, 
+                                        settings.DEFAULT_FROM_EMAIL, 
+                                        recipients, 
+                                        fail_silently=True
+                                    )
+
+                                    # Mark reminder as sent to avoid duplicate emails
+                                    task.meeting_reminder_sent = True
+                                    task.save()
+                                                                    
+
 
 # Automations Ends Here-------------------------------------------------------------------------------------------------- 
             except Exception as e:
