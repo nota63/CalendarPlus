@@ -2075,6 +2075,25 @@ video::-webkit-media-controls-panel {
                         </div>
                     </div>
 
+                    <!-- Share problems to workspace admin -->
+                    <div class="automation-item group flex items-center p-4 bg-white/80 backdrop-blur-sm border border-gray-200/70 rounded-xl hover:border-purple-200 hover:shadow-lg transition-all">
+                        <div class="flex items-center gap-4 w-full">
+                            <div class="p-3 bg-purple-100/80 rounded-lg">
+                                <i class="material-icons-round text-purple-600 text-2xl">help_outline</i>
+
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">Ensure Admin Oversight on Task-Related Issues</h3>
+                                <p class="text-sm text-gray-600">CalAI keeps {{group.created_by.username}} informed about problems for better tracking.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" data-key="share_problems_to_admin">
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-purple-500 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                            </label>
+                        </div>
+                    </div>
+
+
 
 
 

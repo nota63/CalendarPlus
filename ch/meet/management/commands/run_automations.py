@@ -9,7 +9,10 @@ from django.core.management.base import BaseCommand
 from django.utils.timezone import now
 from django.core.mail import send_mail
 from django.conf import settings
-from group_tasks.models import (AutomationTask, Task,TaskTimeTracking,TaskComment,TaskNote,AttachmentsTasksApp,SubTask,ActivityLog,TaskCompletionActivities,MeetingTaskQuery,CommunicateTask)
+from group_tasks.models import (AutomationTask, Task,TaskTimeTracking,TaskComment,TaskNote,AttachmentsTasksApp,SubTask,ActivityLog,
+                                TaskCompletionActivities,MeetingTaskQuery,
+                                CommunicateTask,Problem)
+
 from accounts.models import Profile, Organization,Availability,MeetingOrganization
 from groups.models import Group
 from django.utils.timezone import localtime
@@ -1507,8 +1510,49 @@ class Command(BaseCommand):
                                     except Exception as e:
                                         print(f"❌ Error sending daily activity email for Task: {task.title} - {str(e)}")
 
+                    # SEND PROBLEMS TO THE GROUP AND WORKSPACE ADMIN
+                    if automation.share_problems_to_admin:
+                            if task.status != 'completed':
+                                try:
+                                    # Get all unresolved problems for the given task
+                                    problems = Problem.objects.filter(task=task, is_resolved=False).order_by('-created_at')
 
+                                    if not problems.exists():
+                                        print(f"⚠️ No unresolved problems found for Task: {task.title}. Skipping email.")
+                                    else:
+                                        # Get workspace admin email
+                                        admin_email = group.created_by.email
 
+                                        # Prepare context for email template
+                                        context = {
+                                            "task": task,
+                                            "organization": task.organization,
+                                            'group':group,
+                                            "problems": problems,
+                                            "timestamp": now().strftime("%Y-%m-%d %H:%M:%S"),
+                                        }
+
+                                        # Render the HTML email template
+                                        html_message = render_to_string("task/email/problem_report_to_admin.html", context)
+                                        plain_message = strip_tags(html_message)  # Fallback for text email
+
+                                        # Email subject
+                                        subject = f"🚨 Unresolved Problems in Task: {task.title}"
+
+                                        # Send email
+                                        send_mail(
+                                            subject,
+                                            plain_message,
+                                            settings.DEFAULT_FROM_EMAIL,
+                                            [admin_email],
+                                            html_message=html_message,
+                                            fail_silently=False  
+                                        )
+
+                                        print(f"✅ Problem report successfully sent to {admin_email} for Task: {task.title}")
+
+                                except Exception as e:
+                                    print(f"❌ Error sending problem report for Task: {task.title} - {str(e)}")
 
 
 # Automations Ends Here-------------------------------------------------------------------------------------------------- 
