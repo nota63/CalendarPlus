@@ -1067,6 +1067,40 @@ class Command(BaseCommand):
 
                                 print(f"📌 Task '{task.title}' marked as having a scheduled meeting.")
 
+                    # Overdue Notification 
+                    if automation.overdue_notification and task.deadline < timezone.now().date() and task.status != "completed" and not task.overdue_notification_sent:
+                            print(f"⚠️ Task '{task.title}' is overdue! Updating status...")
+
+                            # Update task status to 'overdue'
+                            task.status = "overdue"
+                            task.overdue_notification_sent = True
+                            task.save()
+
+                            print(f"🔴 Task '{task.title}' status set to OVERDUE.")
+
+                            # Email notifications
+                            subject = f"Task Overdue Alert: {task.title}"
+                            message = (
+                                f"Dear {task.created_by.username} & {task.assigned_to.username},\n\n"
+                                f"The task '{task.title}' has exceeded its deadline and is now marked as OVERDUE.\n"
+                                f"📅 Deadline: {task.deadline}\n"
+                                f"⚠️ Please review and take the necessary actions immediately.\n\n"
+                                f"Best,\nTeam CalendarPlus"
+                            )
+
+                            recipient_list = [task.created_by.email, task.assigned_to.email]
+
+                            try:
+                                send_mail(
+                                    subject=subject,
+                                    message=message,
+                                    from_email=settings.DEFAULT_FROM_EMAIL,
+                                    recipient_list=recipient_list
+                                )
+                                print(f"📩 Overdue email sent successfully to {recipient_list}!")
+                            except Exception as e:
+                                print(f"❌ Failed to send overdue email: {e}")       
+
 # Automations Ends Here-------------------------------------------------------------------------------------------------- 
             except Exception as e:
                 self.stderr.write(self.style.ERROR(f"❌ Error processing automation: {str(e)}"))
