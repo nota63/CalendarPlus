@@ -1,62 +1,82 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html>
 <head>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
         body { 
-            font-family: Arial, sans-serif; 
+            font-family: 'Poppins', sans-serif;
             margin: 0; 
             padding: 0; 
-            background-color: #f4f7fc; 
+            background-color: #eef2f7; 
+            color: #333;
         }
         .container { 
-            max-width: 600px; 
-            margin: 20px auto; 
+            max-width: 800px; 
+            margin: 30px auto; 
             background: #ffffff; 
             border-radius: 10px; 
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
-            padding: 20px; 
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); 
+            padding: 25px;
         }
         .logo-container {
             text-align: center;
-            padding: 15px;
+            padding: 20px;
         }
         .logo-container img {
-            max-width: 180px;
+            max-width: 200px;
         }
         .header { 
             text-align: center; 
-            font-size: 22px; 
-            font-weight: bold; 
+            font-size: 24px; 
+            font-weight: 600; 
             color: #2c3e50; 
             margin-bottom: 15px; 
         }
+        .message {
+            text-align: center;
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 25px;
+            padding: 0 20px;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            padding: 10px;
+        }
         .meeting-card { 
-            background: #f9f9f9; 
+            background: #ffffff; 
             padding: 15px; 
-            border-radius: 8px; 
+            border-radius: 10px; 
             border-left: 5px solid #007bff; 
-            margin-bottom: 15px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: 0.3s ease-in-out;
+        }
+        .meeting-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
         }
         .meeting-card h3 { 
-            margin: 0; 
+            margin: 0 0 5px; 
             color: #007bff; 
             font-size: 18px; 
         }
         .meeting-card p { 
             margin: 5px 0; 
             font-size: 14px; 
-            color: #555; 
+            color: #444; 
         }
         .meeting-link { 
             display: inline-block; 
-            padding: 10px 20px; 
+            padding: 8px 15px; 
             background: #007bff; 
             color: white; 
             text-decoration: none; 
-            border-radius: 5px; 
+            border-radius: 6px; 
             font-weight: bold;
             transition: 0.3s;
         }
@@ -66,10 +86,17 @@
         .footer { 
             text-align: center; 
             font-size: 12px; 
-            color: #888; 
-            padding-top: 10px; 
+            color: #777; 
+            padding-top: 15px; 
             border-top: 1px solid #ddd; 
-            margin-top: 20px; 
+            margin-top: 25px; 
+        }
+        .calendarplus-promo {
+            text-align: center;
+            font-size: 14px;
+            margin-top: 20px;
+            color: #007bff;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -78,24 +105,40 @@
         <div class="logo-container">
             <img src="{% static 'assets/images/calendarplus.png'%}" alt="CalendarPlus Logo">
         </div>
+
         <div class="header">📅 Meeting Summary for Task: <br> <strong>{{ task.title }}</strong></div>
 
-        {% for meeting in meetings %}
-        <div class="meeting-card">
-            <h3>📌 {{ meeting.reason }}</h3>
-            <p><strong>Date:</strong> {{ meeting.date }}</p>
-            <p><strong>Time:</strong> {{ meeting.start_time }} - {{ meeting.end_time }}</p>
-            <p><strong>Status:</strong> {{ meeting.status }}</p>
-            <p><strong>Project Manager:</strong> {{ meeting.task_creator.username }}</p>
-            <div style="text-align: center; margin-top: 10px;">
-                <a href="{{ meeting.meeting_link }}" class="meeting-link">🔗 Join Meeting</a>
-            </div>
+        <div class="message">
+            Greetings {{ task.assigned_to.get_full_name }},<br><br>
+            Below is the detailed meeting summary related to your recently completed task.  
+            Thank you for using **CalendarPlus**, your go-to platform for seamless team collaboration and productivity! 🚀
         </div>
-        {% endfor %}
+
+        <div class="grid-container">
+            {% for meeting in meetings %}
+            <div class="meeting-card">
+                <h3>📌 {{ meeting.reason }}</h3>
+                <p><strong>Date:</strong> {{ meeting.date }}</p>
+                <p><strong>Time:</strong> {{ meeting.start_time }} - {{ meeting.end_time }}</p>
+                <p><strong>Status:</strong> {{ meeting.status }}</p>
+                <p><strong>Project Manager:</strong> {{ meeting.task_creator.username }}</p>
+                <div style="margin-top: 10px;">
+                    <a href="{{ meeting.meeting_link }}" class="meeting-link">🔗 Join Meeting</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="calendarplus-promo">
+            ✨ **Boost your productivity with CalendarPlus!** ✨ <br>  
+            Plan, organize, and collaborate like never before!  
+            <a href="https://calendarplus.com" style="color: #0056b3; text-decoration: none;">Visit CalendarPlus Now</a>
+        </div>
 
         <div class="footer">
-            Sent by <strong>CalendarPlus</strong> | <a href="https://calendarplus.com">Visit Us</a>
+            Sent with ❤️ by <strong>CalendarPlus</strong> | <a href="https://calendarplus.com">Visit Us</a>
         </div>
     </div>
 </body>
 </html>
+
