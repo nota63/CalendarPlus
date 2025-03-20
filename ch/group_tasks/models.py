@@ -165,6 +165,7 @@ class Task(models.Model):
     meeting_summary_sent=models.BooleanField(default=False, null=True, blank=True)
     meeting_reminder_sent=models.BooleanField(default=False,null=True, blank=True)
     chat_insights_sent=models.BooleanField(default=False, null=True, blank=True)
+    activity_sent=models.BooleanField(default=False, null=True , blank=True)
 
 
 
@@ -953,6 +954,7 @@ class AutomationTask(models.Model):
     send_meeting_summary=models.BooleanField(default=False, null=True, blank=True)
     remind_my_meetings=models.BooleanField(default=True, null=True, blank=True)
     provide_chat_insights=models.BooleanField(default=True, null=True, blank=True)
+    send_daily_activities=models.BooleanField(default=True, null=True , blank=True)
     # track automations
     last_executed = models.DateTimeField(null=True, blank=True)
     processed_tasks = models.ManyToManyField(Task, blank=True, related_name="processed_automations")

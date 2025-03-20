@@ -1459,6 +1459,58 @@ class Command(BaseCommand):
                                     print("🚫 Task is either not completed or insights already sent.")
                     else:
                                 print("🚫 Chat Insights automation is disabled.")
+
+                
+                    # Send daily activities to workspace admin at 10 PM
+                    if automation.send_daily_activities:
+                            current_time = now().time()  # Get current time
+                            target_time = datetime.strptime("22:00", "%H:%M").time()  # Target: 10 PM
+
+                            if current_time.hour == target_time.hour and current_time.minute == target_time.minute:
+                                if task.status != 'completed':
+                                    try:
+                                        # Filter activity logs for the given task
+                                        activities = ActivityLog.objects.filter(task=task).order_by('-timestamp')
+
+                                        if not activities.exists():
+                                            print(f"⚠️ No activities found for Task: {task.title}. Skipping email.")
+                                        else:
+                                            # Prepare context for email template
+                                            context = {
+                                                "task": task,
+                                                "organization": task.organization,  # Adding organization details
+                                                "group": task.group,  # Adding group details
+                                                "activities": activities,
+                                                "timestamp": now().strftime("%Y-%m-%d %H:%M:%S"),  # Adding current timestamp
+                                            }
+
+                                            # Render the HTML email template
+                                            html_message = render_to_string("task/email/daily_activity_email.html", context)
+                                            plain_message = strip_tags(html_message)  # Fallback for text email
+
+                                            # Email subject & recipient
+                                            subject = f"📊 Daily Activity Report for {task.title}"
+                                            recipient_email = group.created_by.email
+
+                                            # Send email
+                                            send_mail(
+                                                subject,
+                                                plain_message,
+                                                settings.DEFAULT_FROM_EMAIL,
+                                                [recipient_email],
+                                                html_message=html_message,
+                                                fail_silently=False  
+                                            )
+
+                                            print(f"✅ Daily activity email successfully sent to {recipient_email} for Task: {task.title}")
+
+                                    except Exception as e:
+                                        print(f"❌ Error sending daily activity email for Task: {task.title} - {str(e)}")
+
+
+
+
+
 # Automations Ends Here-------------------------------------------------------------------------------------------------- 
             except Exception as e:
                 self.stderr.write(self.style.ERROR(f"❌ Error processing automation: {str(e)}"))
