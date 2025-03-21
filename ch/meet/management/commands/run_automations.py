@@ -1556,7 +1556,10 @@ class Command(BaseCommand):
 
        
                     # Send Morning Reminders If Enabled
-                    if automation.remind_me_every_morning:
+                    # Check if it's 6 AM and automation is enabled
+                    # Get the current local time
+                    current_time = localtime(now()).strftime("%H:%M")
+                    if automation.remind_me_every_morning and current_time == "06:00":
                             if task.status != 'completed' and task.assigned_to:
                                 try:
                                     # Prepare email context
@@ -1565,7 +1568,7 @@ class Command(BaseCommand):
                                         "assigned_user": task.assigned_to,
                                         "organization": task.organization,
                                         "group": task.group,
-                                        "timestamp": now().strftime("%Y-%m-%d %H:%M:%S"),
+                                        "timestamp": localtime(now()).strftime("%Y-%m-%d %H:%M:%S"),
                                     }
 
                                     # Render email template
@@ -1573,7 +1576,7 @@ class Command(BaseCommand):
                                     plain_message = strip_tags(html_message)  # Text fallback
 
                                     # Email subject & recipient
-                                    subject = f"🌟 Rise & Shine, {task.assigned_to.username}! Time to Conquer {task.title}!"
+                                    subject = f"🌟 Good Morning, {task.assigned_to.username}! Time to Conquer {task.title}!"
                                     recipient_email = task.assigned_to.email
 
                                     # Send email
@@ -1590,7 +1593,6 @@ class Command(BaseCommand):
 
                                 except Exception as e:
                                     print(f"❌ Error sending morning reminder for Task: {task.title} - {str(e)}")
-
 
 # ----------------------------------------------------------------------------------------------------------------------------
             except Exception as e:
