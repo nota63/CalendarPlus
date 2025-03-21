@@ -2065,10 +2065,29 @@ def toggle_automation(request):
     return JsonResponse({"status": "error", "message": "Invalid request method"}, status=400)
 
 
+# DISPLAY SPECTORS
+def get_task_details(request, task_id):
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":  # Check if it's an AJAX request
+        try:
+            task = get_object_or_404(Task, id=task_id)
 
+            # Filter profile to avoid "multiple objects returned" error
+            profile = Profile.objects.filter(user=task.created_by).first()  # Get the first profile if multiple exist
 
-
-
+            return JsonResponse({
+                "success": True,
+                "description": task.description,
+                "created_by": {
+                    "username": task.created_by.username,
+                    "email": task.created_by.email,
+                },
+                "last_login": profile.last_login.isoformat() if profile and profile.last_login else None,
+                'profile_picture':profile.profile_picture url if profile.profile_picture else None
+            })
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+    else:
+        return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
 
 
 

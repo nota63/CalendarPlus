@@ -2117,6 +2117,39 @@ video::-webkit-media-controls-panel {
 </div>
 
 
+<!-- Show Spectors -->
+<div class="modal fade" id="spectorsModal" tabindex="-1" aria-labelledby="spectorsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="spectorsModalLabel">Task Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <strong>{{task.created_by.username}} Is Proctoring you| Any changes you made on task they will be reflected in proctors system in real time</strong>
+                <p><strong>Description:</strong> <span id="profilePicture"></span></p>
+                <p><strong>Description:</strong> <span id="taskDescription"></span></p>
+                <p><strong>Created By:</strong> <span id="taskCreatedBy"></span></p>
+                <p><strong>Email:</strong> <span id="taskEmail"></span></p>
+                <p><strong>Last Login:</strong> <span id="taskLastLogin"></span></p>
+            </div>
+            <button class="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 
+            text-white rounded-full transition-all text-xs font-medium shadow-sm active:scale-95 start-chat-btn"
+            data-org="{{ organization.id }}" 
+            data-group="{{ group.id }}" 
+            data-task="{{ task.id }}">
+        <span class="material-icons text-sm">live_tv</span>
+        Chat
+    </button>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <!-- -------------------------------------------------------------------------------------------------------------------------- -->
 <!-- Modal to add note -->
 <div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
@@ -2369,13 +2402,20 @@ video::-webkit-media-controls-panel {
                     <span class="text-sm">Home</span>
                 </a>
 
-                <a href="#" class="flex items-center px-3 py-2.5 rounded-lg text-slate-600 hover:bg-gray-100/50 transition-colors duration-200 group ml-2 mr-2">
-                    <svg class="w-5 h-5 ml-1 mr-3 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                    </svg>
-                    <span class="text-sm">Profile</span>
-                    <span class="ml-auto bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-md text-xs font-medium">New</span>
-                </a>
+                <!-- spectors -->
+                <a href="#" class="spectors-btn flex items-center px-3 py-2.5 rounded-lg text-slate-600 hover:bg-gray-100/50 transition-colors duration-200 group ml-2 mr-2" 
+                   data-bs-toggle="modal" 
+                   data-bs-target="#spectorsModal" 
+                   data-task-id="1">
+                  <svg class="w-5 h-5 ml-1 mr-3 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                 </svg>
+                 <span class="text-sm">Spectors</span>
+                 <span class="ml-auto bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-md text-xs font-medium">New</span>
+             </a>
+             
+                
+                
 
                 <a href="#" class="flex items-center px-3 py-2.5 rounded-lg text-slate-600 hover:bg-gray-100/50 transition-colors duration-200 group ml-2 mr-2">
                     <svg class="w-5 h-5 ml-1 mr-3 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">

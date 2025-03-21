@@ -68,7 +68,8 @@ urlpatterns = [
     path('fetch-user-info/<int:org_id>/<int:group_id>/',fetch_user_info, name='fetch_user_info'),
     path('reassign-task/<int:org_id>/<int:group_id>/<int:task_id>/',reassign_task, name='reassign_task'),
     path('fetch-enabled-automations/',fetch_enabled_automations, name='fetch_enabled_automations'),
-    path('toggle-automation/',toggle_automation, name='toggle_automation')
+    path('toggle-automation/',toggle_automation, name='toggle_automation'),
+    path('get-task-details/<int:task_id>/',get_task_details, name='get_task_details')
   
   
   

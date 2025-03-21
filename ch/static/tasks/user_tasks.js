@@ -263,3 +263,63 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+
+// DISPLAY SPECTORS
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("🌟 DOM fully loaded and parsed.");
+
+    document.querySelectorAll(".spectors-btn").forEach(button => {
+        button.addEventListener("click", function (event) {
+            event.preventDefault();
+            console.log("📌 Button clicked:", this);
+
+            // Debug: Check if djangoData is available
+            if (!window.djangoData || !window.djangoData.taskId) {
+                console.error("❌ Error: djangoData.taskId is missing!", window.djangoData);
+                alert("Task ID is missing! Debugging needed.");
+                return;
+            }
+
+            let taskId = window.djangoData.taskId;
+            console.log("🔍 Fetching task details for Task ID:", taskId);
+
+            fetch(`/tasks/get-task-details/${taskId}/`, {
+                method: "GET",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            })
+            .then(response => {
+                console.log("✅ Response received:", response);
+                return response.json();
+            })
+            .then(data => {
+                console.log("📊 Parsed JSON data:", data);
+
+                if (data.success) {
+                    document.getElementById("taskDescription").textContent = data.description;
+                    document.getElementById("taskCreatedBy").textContent = data.created_by.username;
+                    document.getElementById("taskEmail").textContent = data.created_by.email;
+                    document.getElementById("taskMessage").textContent = "Proctoring";
+                    document.getElementById("taskLastLogin").textContent = data.last_login ? new Date(data.last_login).toLocaleString() : "N/A";
+
+                    console.log("🟢 Data populated into modal successfully.");
+
+                    // Open Bootstrap Modal Manually
+                    let modalElement = document.getElementById("spectorsModal");
+                    let modal = new bootstrap.Modal(modalElement);
+                    modal.show();
+                    console.log("🎉 Bootstrap Modal Opened!");
+                } else {
+                    console.error("❌ Error fetching task details:", data.error);
+                    alert(`Error fetching task details: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                console.error("🔥 AJAX Fetch Error:", error);
+                alert("An error occurred while fetching task details. Check the console for details.");
+            });
+        });
+    });
+});
