@@ -301,8 +301,15 @@ document.addEventListener("DOMContentLoaded", function () {
                     document.getElementById("taskDescription").textContent = data.description;
                     document.getElementById("taskCreatedBy").textContent = data.created_by.username;
                     document.getElementById("taskEmail").textContent = data.created_by.email;
-                    document.getElementById("taskMessage").textContent = "Proctoring";
                     document.getElementById("taskLastLogin").textContent = data.last_login ? new Date(data.last_login).toLocaleString() : "N/A";
+
+                    // Display Profile Picture
+                    let profilePicElement = document.getElementById("profilePicture");
+                    if (data.profile_picture) {
+                        profilePicElement.innerHTML = `<img src="${data.profile_picture}" alt="Profile Picture" class="rounded-circle" width="50" height="50">`;
+                    } else {
+                        profilePicElement.innerHTML = `<span>No Profile Picture</span>`;
+                    }
 
                     console.log("🟢 Data populated into modal successfully.");
 

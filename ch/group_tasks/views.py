@@ -2082,7 +2082,7 @@ def get_task_details(request, task_id):
                     "email": task.created_by.email,
                 },
                 "last_login": profile.last_login.isoformat() if profile and profile.last_login else None,
-                'profile_picture':profile.profile_picture url if profile.profile_picture else None
+                "profile_picture": profile.profile_picture.url if profile and profile.profile_picture else None  # ✅ FIXED
             })
         except Exception as e:
             return JsonResponse({"success": False, "error": str(e)})
