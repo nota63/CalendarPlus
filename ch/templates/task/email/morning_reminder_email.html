@@ -1,0 +1,121 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7fc;
+        }
+        .container {
+            max-width: 700px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .logo-container {
+            text-align: center;
+            padding-bottom: 15px;
+        }
+        .logo-container img {
+            max-width: 200px;
+        }
+        .header {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+        .motivational {
+            background: #eaf4ff;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #333;
+            text-align: center;
+            font-style: italic;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+        .task-details {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 5px solid #007bff;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+        .task-details h3 {
+            margin: 0;
+            color: #007bff;
+            font-size: 18px;
+        }
+        .task-details p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #555;
+        }
+        .start-button {
+            display: block;
+            width: fit-content;
+            padding: 12px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 20px auto;
+            text-align: center;
+            transition: 0.3s;
+        }
+        .start-button:hover {
+            background: #0056b3;
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <img src="{% static 'assets/images/calendarplus.png' %}" alt="CalendarPlus Logo">
+        </div>
+
+        <div class="header">🌞 Good Morning, {{ assigned_user.username }}!</div>
+
+        <div class="motivational">
+            “Every great achievement starts with a single step. Today is your chance to take that step and make progress. Stay focused, stay determined, and make the most of today!”
+        </div>
+
+        <p>We hope you're ready for a productive day! Here's your task that needs attention:</p>
+
+        <div class="task-details">
+            <h3>📌 Task: {{ task.title }}</h3>
+            <p><strong>Organization:</strong> {{ organization.name }}</p>
+            <p><strong>Group:</strong> {{ group.name }}</p>
+            <p><strong>Deadline:</strong> {{ task.deadline }}</p>
+            <p><strong>Priority:</strong> {{ task.priority }}</p>
+        </div>
+
+        <p>Remember, success is built one step at a time. Take that first step now!</p>
+
+        <a href="https://calendarplus.com/tasks/{{ task.id }}" class="start-button">🚀 Start Task</a>
+
+        <div class="footer">
+            Sent by <strong>CalendarPlus</strong> | <a href="https://calendarplus.com">Visit Us</a>
+        </div>
+    </div>
+</body>
+</html>

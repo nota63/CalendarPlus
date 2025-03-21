@@ -2094,6 +2094,25 @@ video::-webkit-media-controls-panel {
                     </div>
 
 
+                    <!-- Remind me every morning -->
+                    <div class="automation-item group flex items-center p-4 bg-white/80 backdrop-blur-sm border border-gray-200/70 rounded-xl hover:border-pink-200 hover:shadow-lg transition-all">
+                        <div class="flex items-center gap-4 w-full">
+                            <div class="p-3 bg-pink-100/80 rounded-lg">
+                                <i class="material-icons-round text-pink-600 text-2xl">mood</i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">Wake up me Every Morning</h3>
+                                <p class="text-sm text-gray-600">CalAI will send me reminders every morning to work on {{task.title}}</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" data-key="remind_me_every_morning">
+                                <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-pink-500 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                            </label>
+                        </div>
+                    </div>
+
+
+
 
 
 

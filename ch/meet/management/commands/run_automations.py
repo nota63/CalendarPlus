@@ -1554,8 +1554,45 @@ class Command(BaseCommand):
                                 except Exception as e:
                                     print(f"❌ Error sending problem report for Task: {task.title} - {str(e)}")
 
+       
+                    # Send Morning Reminders If Enabled
+                    if automation.remind_me_every_morning:
+                            if task.status != 'completed' and task.assigned_to:
+                                try:
+                                    # Prepare email context
+                                    context = {
+                                        "task": task,
+                                        "assigned_user": task.assigned_to,
+                                        "organization": task.organization,
+                                        "group": task.group,
+                                        "timestamp": now().strftime("%Y-%m-%d %H:%M:%S"),
+                                    }
 
-# Automations Ends Here-------------------------------------------------------------------------------------------------- 
+                                    # Render email template
+                                    html_message = render_to_string("task/email/morning_reminder_email.html", context)
+                                    plain_message = strip_tags(html_message)  # Text fallback
+
+                                    # Email subject & recipient
+                                    subject = f"🌟 Rise & Shine, {task.assigned_to.username}! Time to Conquer {task.title}!"
+                                    recipient_email = task.assigned_to.email
+
+                                    # Send email
+                                    send_mail(
+                                        subject,
+                                        plain_message,
+                                        settings.DEFAULT_FROM_EMAIL,
+                                        [recipient_email],
+                                        html_message=html_message,
+                                        fail_silently=False
+                                    )
+
+                                    print(f"✅ Morning reminder sent to {recipient_email} for Task: {task.title}")
+
+                                except Exception as e:
+                                    print(f"❌ Error sending morning reminder for Task: {task.title} - {str(e)}")
+
+
+# ----------------------------------------------------------------------------------------------------------------------------
             except Exception as e:
                 self.stderr.write(self.style.ERROR(f"❌ Error processing automation: {str(e)}"))
 

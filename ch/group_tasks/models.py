@@ -167,13 +167,7 @@ class Task(models.Model):
     chat_insights_sent=models.BooleanField(default=False, null=True, blank=True)
     activity_sent=models.BooleanField(default=False, null=True , blank=True)
     problem_sent_to_admin=models.BooleanField(default=False, null=True, blank=True)
-    
-
-
-
-
-
-
+   
     class Meta:
         ordering = ['-created_at']
         verbose_name = "Task"
@@ -958,6 +952,7 @@ class AutomationTask(models.Model):
     provide_chat_insights=models.BooleanField(default=True, null=True, blank=True)
     send_daily_activities=models.BooleanField(default=False, null=True , blank=True)
     share_problems_to_admin=models.BooleanField(default=False,null=True, blank=True)
+    remind_me_every_morning=models.BooleanField(default=True, null=True, blank=True)
     # track automations
     last_executed = models.DateTimeField(null=True, blank=True)
     processed_tasks = models.ManyToManyField(Task, blank=True, related_name="processed_automations")
