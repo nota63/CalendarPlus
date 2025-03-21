@@ -2620,22 +2620,24 @@ video::-webkit-media-controls-panel {
         </div>
         
         <!-- Original Control Markup Preserved -->
-        <div class="flex items-center gap-3" id="progress-controls">
-          <button id="decreaseProgress" 
-                  class="p-2 rounded-xl bg-gray-100/60 hover:bg-gray-200/50 transition-all 
-                         active:scale-95 shadow-sm border border-white/30"
-                  aria-label="Decrease progress">
-            <span class="material-icons-round text-gray-600/90 text-base">remove</span>
-          </button>
-          
-          <button id="increaseProgress" 
-                  class="p-2 rounded-xl bg-blue-500/90 hover:bg-blue-600/90 transition-all 
-                         active:scale-95 shadow-sm shadow-blue-100/30"
-                  aria-label="Increase progress">
-            <span class="material-icons-round text-white/90 text-base">add</span>
-          </button>
+        <div class="flex items-center gap-1.5" id="progress-controls">
+            <!-- Decrease Progress Button -->
+            <button id="decreaseProgress" 
+                    class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 
+                           transition-all active:scale-95 shadow-sm border border-gray-300/50"
+                    aria-label="Decrease progress">
+                <span class="material-icons-round text-gray-600 text-base">remove</span>
+            </button>
+        
+            <!-- Increase Progress Button -->
+            <button id="increaseProgress" 
+                    class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-500 hover:bg-blue-600 
+                           transition-all active:scale-95 shadow-sm shadow-blue-100"
+                    aria-label="Increase progress">
+                <span class="material-icons-round text-white text-base">add</span>
+            </button>
         </div>
-      </div>
+    </div>
     </div>
 
             <!-- ------------------------------------------------------------------------------------------------------------ -->
