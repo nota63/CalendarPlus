@@ -2806,77 +2806,73 @@ video::-webkit-media-controls-panel {
               
             
             <!-- Tags & Attachments -->
-            <div class="grid md:grid-cols-2 gap-6 mb-8">
+            <div class="grid md:grid-cols-2 gap-4 mb-6">
+    
                 <!-- Tags Section -->
-                <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold text-gray-800">Tags</h3>
-                        <button id="add-tag-btn" class="p-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg transition-colors"
-                        id="add-tag-btn"
-                        data-task-id="{{ task.id }}"
-                        data-org-id="{{ org_id }}"
-                        data-group-id="{{ group_id }}">
-                        
-                            <span class="material-icons">add</span>
-                        </button>
-                
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        {% if task.tags.all %}
-                            {% for tag in task.tags.all %}
-                            <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full flex items-center gap-2 text-sm">
-                                {{ tag.name }}
-                                <button class="text-blue-700 hover:text-blue-800 remove-tag"
-                                data-tag="{{ tag.name }}" 
-                                data-tag-id="{{ tag.id }}"
+                <div class="bg-white/90 backdrop-blur-md rounded-xl shadow-md p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-medium text-gray-800">Tags</h3>
+                        <button id="add-tag-btn" 
+                                class="p-1.5 bg-green-100 hover:bg-green-200 text-green-700 rounded-md transition-all"
                                 data-task-id="{{ task.id }}"
                                 data-org-id="{{ org_id }}"
                                 data-group-id="{{ group_id }}">
+                            <span class="material-icons text-sm">add</span>
+                        </button>
+                    </div>
+            
+                    <div class="flex flex-wrap gap-1">
+                        {% if task.tags.all %}
+                            {% for tag in task.tags.all %}
+                            <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-md flex items-center gap-1 text-xs">
+                                {{ tag.name }}
+                                <button class="text-blue-700 hover:text-blue-800 remove-tag"
+                                        data-tag="{{ tag.name }}" 
+                                        data-tag-id="{{ tag.id }}"
+                                        data-task-id="{{ task.id }}"
+                                        data-org-id="{{ org_id }}"
+                                        data-group-id="{{ group_id }}">
                                     ×
                                 </button>
-
-                        
                             </span>
                             {% endfor %}
                         {% else %}
-                            <p class="text-gray-500 text-sm">No tags added yet</p>
+                            <p class="text-gray-500 text-xs">No tags added yet</p>
                         {% endif %}
                     </div>
                 </div>
-
-                <!-- working on tags -->
-
-                
-
-
-                    <!-- Attachments -->
-                    {% if extend_tasks %}
-                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Attachments</h3>
-                        <div class="space-y-3">
-                            <button class="w-full flex items-center gap-3 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-colors"
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#premiumAttachmentsModal"
-                                    data-org-id="{{ org_id }}" 
-                                    data-group-id="{{ group.id }}" 
-                                    data-task-id="{{ task.id }}">
-                                <span class="material-icons">attach_file</span>
-                                Manage Files
-                            </button>
-                            <button class="w-full flex items-center gap-3 px-4 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl transition-colors"
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#fullCalendarModal"
-                                    data-org-id="{{ org_id }}" 
-                                    data-group-id="{{ group.id }}" 
-                                    data-task-id="{{ task.id }}">
-                                <span class="material-icons">schedule</span>
-                                Schedule Meeting
-                            </button>
-                        </div>
+            
+                <!-- Attachments Section -->
+                {% if extend_tasks %}
+                <div class="bg-white/90 backdrop-blur-md rounded-xl shadow-md p-4">
+                    <h3 class="text-sm font-medium text-gray-800 mb-2">Attachments</h3>
+                    <div class="flex flex-col gap-2">
+                        <button class="flex items-center justify-center gap-2 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white 
+                                rounded-lg transition-all text-xs font-medium shadow-sm active:scale-95"
+                                data-bs-toggle="modal" 
+                                data-bs-target="#premiumAttachmentsModal"
+                                data-org-id="{{ org_id }}" 
+                                data-group-id="{{ group.id }}" 
+                                data-task-id="{{ task.id }}">
+                            <span class="material-icons text-xs">attach_file</span>
+                            Manage Files
+                        </button>
+                        
+                        <button class="flex items-center justify-center gap-2 px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white 
+                                rounded-lg transition-all text-xs font-medium shadow-sm active:scale-95"
+                                data-bs-toggle="modal" 
+                                data-bs-target="#fullCalendarModal"
+                                data-org-id="{{ org_id }}" 
+                                data-group-id="{{ group.id }}" 
+                                data-task-id="{{ task.id }}">
+                            <span class="material-icons text-xs">schedule</span>
+                            Schedule Meeting
+                        </button>
                     </div>
-                    {% endif %}
                 </div>
-
+                {% endif %}
+            
+            </div>
                 <!-- Notes & Comments -->
                 <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6">
                     <!-- Notes -->
