@@ -466,14 +466,18 @@ function fetchAutomationStatus(type, listElement, countElement) {
     })
     .then(response => response.json())
     .then(data => {
-        listElement.innerHTML = "";  // Clear previous content
+        listElement.innerHTML = ""; // Clear previous content
 
         let automationData = data[type]; // Get 'proceeded' or 'running' data
 
         if (automationData && Object.keys(automationData).length > 0) {
             Object.keys(automationData).forEach(key => {
                 const listItem = document.createElement("li");
-                listItem.className = type === "proceeded" ? "p-2 bg-green-100 text-green-800 rounded" : "p-2 bg-yellow-100 text-yellow-800 rounded";
+                listItem.className = type === "proceeded" ? 
+                    "p-2 bg-green-100 text-green-800 rounded automation-item" : 
+                    "p-2 bg-yellow-100 text-yellow-800 rounded automation-item";
+
+                listItem.setAttribute("data-name", key.toLowerCase()); // Store searchable name
                 listItem.innerHTML = `<strong>${formatKey(key)}:</strong> ${type === "proceeded" ? "✅ Proceeded" : "⏳ Running"}`;
                 listElement.appendChild(listItem);
             });
@@ -490,6 +494,21 @@ function fetchAutomationStatus(type, listElement, countElement) {
         listElement.innerHTML = `<li class="p-2 text-red-500">Error loading data.</li>`;
     });
 }
+
+// Real-Time Search in Automations
+document.getElementById("searchAutomation").addEventListener("input", function () {
+    let searchTerm = this.value.toLowerCase();
+    let items = document.querySelectorAll(".automation-item");
+
+    items.forEach(item => {
+        let name = item.getAttribute("data-name");
+        if (name.includes(searchTerm)) {
+            item.style.display = "block";
+        } else {
+            item.style.display = "none";
+        }
+    });
+});
 
 // Helper function to format field names
 function formatKey(key) {
