@@ -395,3 +395,17 @@ function fetchActivityLogs() {
         activityList.innerHTML = `<p class="text-danger text-center">Failed to fetch activities.</p>`;
     });
 }
+
+
+
+// filter activities in real time
+// FILTER ACTIVITIES IN REAL TIME
+function filterActivities() {
+    let searchQuery = document.getElementById("activitySearch").value.toLowerCase();
+    let activities = document.querySelectorAll("#activity-list .timeline-item");
+
+    activities.forEach(activity => {
+        let textContent = activity.textContent.toLowerCase();
+        activity.style.display = textContent.includes(searchQuery) ? "block" : "none";
+    });
+}

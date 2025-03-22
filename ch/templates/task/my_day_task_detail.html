@@ -2762,6 +2762,9 @@ video::-webkit-media-controls-panel {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                <!-- Search Bar -->
+                <input type="text" id="activitySearch" class="form-control mb-3" placeholder="🔍 Search activities..." oninput="filterActivities()">
+
                 <!-- Activity Timeline -->
                 <div class="timeline">
                     <div id="activity-list">
@@ -2772,6 +2775,7 @@ video::-webkit-media-controls-panel {
         </div>
     </div>
 </div>
+
 
 <!-- Timeline CSS -->
 <style>
