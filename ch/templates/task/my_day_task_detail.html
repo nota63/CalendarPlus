@@ -2980,32 +2980,200 @@ video::-webkit-media-controls-panel {
 </div>
 
 <!-- Background Processes Guide -->
- <!-- Guide Modal -->
-<div id="AutomationGuideModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white p-5 rounded-lg shadow-lg max-w-lg w-full">
-        <div class="flex justify-between items-center border-b pb-2">
-            <h2 class="text-lg font-semibold">Automation Guide</h2>
-            <button id="closeAutomationGuide" class="text-gray-500 hover:text-gray-700">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+<div id="AutomationGuideModal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+    <div class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl max-w-4xl w-full mx-4 border border-white/20 font-['Inter']">
+        <!-- Enhanced Header -->
+        <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200/50">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-indigo-100 rounded-lg">
+                    <span class="material-icons-round text-indigo-600 text-xl">auto_awesome</span>
+                </div>
+                <div>
+                    <h2 class="text-xl font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                        Automation Orchestration Guide
+                    </h2>
+                    <div class="flex items-center gap-2 mt-1">
+                        <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                        <span class="text-xs text-gray-500">Live Document v2.1.8</span>
+                    </div>
+                </div>
+            </div>
+            <button id="closeAutomationGuide" class="text-gray-500 hover:bg-gray-100/50 p-2 rounded-full">
                 <span class="material-icons-round">close</span>
             </button>
         </div>
 
-        <div class="mt-4 text-sm text-gray-700">
-            <p>Automations help streamline tasks by automatically executing predefined actions. Below are the two main automation statuses:</p>
-            <ul class="mt-3 space-y-2">
-                <li><strong class="text-green-600">✅ Completed:</strong> These automations have successfully executed.</li>
-                <li><strong class="text-yellow-600">⏳ Active:</strong> These automations are currently running.</li>
-            </ul>
-            <p class="mt-3">For troubleshooting or customization, visit the settings page.</p>
+        <!-- Content Tabs -->
+        <div class="px-6 pt-4 flex gap-4 border-b border-gray-200/50">
+            <button class="pb-2 px-1 border-b-2 border-indigo-600 text-indigo-600 font-medium">Guide</button>
+            <button class="pb-2 px-1 text-gray-500 hover:text-gray-700">Security</button>
+            <button class="pb-2 px-1 text-gray-500 hover:text-gray-700">Stats</button>
         </div>
 
-        <div class="mt-4 flex justify-end">
-            <button id="closeAutomationGuideFooter" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700">Close</button>
+        <!-- Enhanced Content -->
+        <div class="px-6 py-4 max-h-[70vh] overflow-y-auto">
+            <!-- Core Section -->
+            <div class="grid grid-cols-2 gap-6">
+                <!-- Status Guide -->
+                <div class="space-y-4">
+                    <div class="p-4 bg-green-50/50 rounded-xl border border-green-100">
+                        <h3 class="flex items-center gap-2 text-green-700 font-semibold">
+                            <span class="material-icons-round">check_circle</span>
+                            Completed Automations
+                        </h3>
+                        <p class="mt-2 text-sm text-gray-600">Successfully executed workflows with verified outcomes</p>
+                        <div class="mt-3 p-3 bg-white rounded-lg border border-gray-200">
+                            <span class="text-xs text-gray-500">Last Completion:</span>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="material-icons-round text-sm text-green-600">task_alt</span>
+                                <span class="text-sm">Report Generation</span>
+                                <span class="text-xs text-gray-400 ml-auto">2m ago</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-amber-50/50 rounded-xl border border-amber-100">
+                        <h3 class="flex items-center gap-2 text-amber-700 font-semibold">
+                            <span class="material-icons-round">schedule</span>
+                            Active Automations
+                        </h3>
+                        <p class="mt-2 text-sm text-gray-600">Real-time executing processes with progress tracking</p>
+                        <div class="mt-3 space-y-2">
+                            <div class="flex items-center gap-2 p-2 bg-white rounded-lg border border-gray-200">
+                                <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                    <div class="bg-amber-600 h-1.5 rounded-full w-3/4"></div>
+                                </div>
+                                <span class="text-xs text-amber-600">75%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Systems Overview -->
+                <div class="space-y-4">
+                    <div class="p-4 bg-blue-50/50 rounded-xl border border-blue-100">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">⚡ Automation Engines</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
+                                <div class="p-2 bg-blue-100 rounded-lg">
+                                    <span class="material-icons-round text-blue-600">smart_toy</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-blue-600">CalAI Core</h4>
+                                    <p class="text-xs text-gray-500 mt-1">AI-driven scheduling optimizer</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
+                                <div class="p-2 bg-purple-100 rounded-lg">
+                                    <span class="material-icons-round text-purple-600">bolt</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-purple-600">SmartTriggers v3</h4>
+                                    <p class="text-xs text-gray-500 mt-1">Real-time condition processor</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
+                                <div class="p-2 bg-red-100 rounded-lg">
+                                    <span class="material-icons-round text-red-600">security</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-red-600">Proctoring System</h4>
+                                    <p class="text-xs text-gray-500 mt-1">Activity monitoring & compliance</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security Protocols -->
+                    <div class="p-4 bg-gray-50/50 rounded-xl border border-gray-100">
+                        <h3 class="text-sm font-semibold text-gray-700 mb-2">🔐 Security Protocols</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full">AES-256</span>
+                            <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">GDPR</span>
+                            <span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">HIPAA</span>
+                        </div>
+                        <div class="mt-3 flex items-center gap-2 text-xs text-gray-500">
+                            <span class="material-icons-round text-sm">verified</span>
+                            Last Audited: 24 hours ago
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Extended Content -->
+            <div class="mt-6 grid grid-cols-3 gap-4 border-t pt-4">
+                <div class="p-3 bg-white rounded-xl border border-gray-200">
+                    <div class="flex items-center gap-2">
+                        <span class="material-icons-round text-green-600">speed</span>
+                        <span class="text-sm font-medium">Avg. Response</span>
+                    </div>
+                    <div class="mt-2 text-2xl font-semibold">1.2s</div>
+                    <span class="text-xs text-gray-500">90th percentile</span>
+                </div>
+
+                <div class="p-3 bg-white rounded-xl border border-gray-200">
+                    <div class="flex items-center gap-2">
+                        <span class="material-icons-round text-blue-600">donut_large</span>
+                        <span class="text-sm font-medium">CPU Usage</span>
+                    </div>
+                    <div class="mt-2 text-2xl font-semibold">34%</div>
+                    <span class="text-xs text-gray-500">8-core processor</span>
+                </div>
+
+                <div class="p-3 bg-white rounded-xl border border-gray-200">
+                    <div class="flex items-center gap-2">
+                        <span class="material-icons-round text-purple-600">swap_vert</span>
+                        <span class="text-sm font-medium">Throughput</span>
+                    </div>
+                    <div class="mt-2 text-2xl font-semibold">1.4k/m</div>
+                    <span class="text-xs text-gray-500">Transactions</span>
+                </div>
+            </div>
+
+            <!-- Support Section -->
+            <div class="mt-6 p-4 bg-indigo-50/50 rounded-xl border border-indigo-100">
+                <h3 class="flex items-center gap-2 text-indigo-700 font-semibold">
+                    <span class="material-icons-round">support_agent</span>
+                    Automation Support
+                </h3>
+                <div class="grid grid-cols-2 gap-4 mt-3">
+                    <div class="p-3 bg-white rounded-lg border border-gray-200">
+                        <div class="text-xs text-gray-500">Documentation</div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="material-icons-round text-sm text-gray-500">article</span>
+                            <span class="text-sm">Guides & API References</span>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-white rounded-lg border border-gray-200">
+                        <div class="text-xs text-gray-500">Live Support</div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="material-icons-round text-sm text-gray-500">chat</span>
+                            <span class="text-sm">24/7 Engineering Team</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Footer -->
+        <div class="px-6 py-4 border-t border-gray-200/50 flex justify-between items-center">
+            <div class="flex items-center gap-2 text-gray-500 text-sm">
+                <span class="material-icons-round text-sm">history</span>
+                <span>Last Updated: 15m ago</span>
+            </div>
+            <button id="closeAutomationGuideFooter" 
+                    class="px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 flex items-center gap-2">
+                <span class="material-icons-round text-sm">check</span>
+                Got It
+            </button>
         </div>
     </div>
 </div>
-
-
 
 <!-- -------------------------------------------------------------------------------------------------------------------------- -->
 
