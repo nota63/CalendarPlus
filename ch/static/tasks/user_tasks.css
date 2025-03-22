@@ -308,3 +308,47 @@
         padding: 1rem;
     }
 }
+
+
+
+/* proctor system */
+.glass-card {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
+  }
+
+  .control-btn {
+    @apply p-4 rounded-xl flex flex-col items-center gap-3 text-sm font-medium transition-all;
+  }
+
+  .diagnostic-card {
+    @apply p-4 rounded-xl flex flex-col items-center gap-2 text-center;
+  }
+
+  .threat-card {
+    @apply p-3 rounded-lg flex items-center gap-2 text-sm font-medium;
+  }
+
+  .info-item {
+    @apply flex items-center gap-3 p-3 rounded-lg bg-white/50 text-sm text-gray-700;
+  }
+
+  .metric-item {
+    @apply bg-white/50 p-3 rounded-lg;
+  }
+
+  .badge {
+    @apply px-2 py-1 rounded-md text-xs font-medium;
+  }
+
+  .modal-content {
+    @apply h-screen;
+  }
+
+  .material-icons-sharp {
+    @apply select-none;
+  }
+
+  
