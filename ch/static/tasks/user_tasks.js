@@ -412,6 +412,7 @@ function filterActivities() {
 
 
 // fetch and monitor automations
+
 // fetch and monitor automations
 // Open Automation Modal
 document.getElementById("openAutomationModal").addEventListener("click", function () {
@@ -436,8 +437,8 @@ document.getElementById("toggleRunning").addEventListener("click", function () {
 });
 
 function toggleSection(type) {
-    const listElement = document.getElementById(${type}List);
-    const countElement = document.getElementById(${type}Count);
+    const listElement = document.getElementById(`${type}List`);
+    const countElement = document.getElementById(`${type}Count`);
 
     // Toggle visibility
     listElement.classList.toggle("hidden");
@@ -455,7 +456,7 @@ function fetchAutomationStatus(type, listElement, countElement) {
     const taskId = window.djangoData.taskId;
 
     // Show Loading Indicator
-    listElement.innerHTML = <li class="p-2 text-gray-500">Loading...</li>;
+    listElement.innerHTML = `<li class="p-2 text-gray-500">Loading...</li>`;
 
     fetch("/tasks/automation-status/", {
         method: "POST",
@@ -463,7 +464,7 @@ function fetchAutomationStatus(type, listElement, countElement) {
             "Content-Type": "application/x-www-form-urlencoded",
             "X-CSRFToken": getCSRFToken()
         },
-        body: org_id=${orgId}&group_id=${groupId}&task_id=${taskId}
+        body: `org_id=${orgId}&group_id=${groupId}&task_id=${taskId}`
     })
     .then(response => response.json())
     .then(data => {
@@ -479,20 +480,20 @@ function fetchAutomationStatus(type, listElement, countElement) {
                     "p-2 bg-yellow-100 text-yellow-800 rounded automation-item";
 
                 listItem.setAttribute("data-name", key.toLowerCase()); // Store searchable name
-                listItem.innerHTML = <strong>${formatKey(key)}:</strong> ${type === "proceeded" ? "✅ Proceeded" : "⏳ Running"};
+                listItem.innerHTML = `<strong>${formatKey(key)}:</strong> ${type === "proceeded" ? "✅ Proceeded" : "⏳ Running"}`;
                 listElement.appendChild(listItem);
             });
 
             // Update Count
             countElement.textContent = Object.keys(automationData).length;
         } else {
-            listElement.innerHTML = <li class="p-2 text-gray-500">No ${type} automations found.</li>;
+            listElement.innerHTML = `<li class="p-2 text-gray-500">No ${type} automations found.</li>`;
             countElement.textContent = "0";
         }
     })
     .catch(error => {
         console.error("Error fetching automation status:", error);
-        listElement.innerHTML = <li class="p-2 text-red-500">Error loading data.</li>;
+        listElement.innerHTML = `<li class="p-2 text-red-500">Error loading data.</li>`;
     });
 }
 
@@ -521,4 +522,4 @@ function getCSRFToken() {
     return document.cookie.split("; ")
         .find(row => row.startsWith("csrftoken="))
         ?.split("=")[1] || "";
-} 
+}
