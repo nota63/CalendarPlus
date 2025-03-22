@@ -414,9 +414,47 @@ function filterActivities() {
 // fetch and monitor automations
 // Open Automation Modal
 document.getElementById("openAutomationModal").addEventListener("click", function () {
+    document.getElementById("AutomationStatusModal").classList.remove("hidden");
+});
+
+// Close Modal
+document.getElementById("closeAutomationModal").addEventListener("click", closeModal);
+document.getElementById("closeAutomationModalFooter").addEventListener("click", closeModal);
+
+function closeModal() {
+    document.getElementById("AutomationStatusModal").classList.add("hidden");
+}
+
+// Toggle Sections and Fetch Data Dynamically
+document.getElementById("toggleProceeded").addEventListener("click", function () {
+    toggleSection("proceeded");
+});
+
+document.getElementById("toggleRunning").addEventListener("click", function () {
+    toggleSection("running");
+});
+
+function toggleSection(type) {
+    const listElement = document.getElementById(`${type}List`);
+    const countElement = document.getElementById(`${type}Count`);
+
+    // Toggle visibility
+    listElement.classList.toggle("hidden");
+
+    // Fetch data if not already populated
+    if (listElement.children.length === 0) {
+        fetchAutomationStatus(type, listElement, countElement);
+    }
+}
+
+// Fetch Automations when Section Expands
+function fetchAutomationStatus(type, listElement, countElement) {
     const orgId = window.djangoData.orgId;
     const groupId = window.djangoData.groupId;
     const taskId = window.djangoData.taskId;
+
+    // Show Loading Indicator
+    listElement.innerHTML = `<li class="p-2 text-gray-500">Loading...</li>`;
 
     fetch("/tasks/automation-status/", {
         method: "POST",
@@ -428,72 +466,30 @@ document.getElementById("openAutomationModal").addEventListener("click", functio
     })
     .then(response => response.json())
     .then(data => {
-        const proceededList = document.getElementById("proceededList");
-        const runningList = document.getElementById("runningList");
+        listElement.innerHTML = "";  // Clear previous content
 
-        proceededList.innerHTML = "";
-        runningList.innerHTML = "";
+        let automationData = data[type]; // Get 'proceeded' or 'running' data
 
-        let hasProceeded = false;
-        let hasRunning = false;
-
-        // Populate Proceeded List
-        if (data.proceeded && Object.keys(data.proceeded).length > 0) {
-            hasProceeded = true;
-            Object.keys(data.proceeded).forEach(key => {
+        if (automationData && Object.keys(automationData).length > 0) {
+            Object.keys(automationData).forEach(key => {
                 const listItem = document.createElement("li");
-                listItem.className = "p-2 bg-green-100 text-green-800 rounded";
-                listItem.innerHTML = `<strong>${formatKey(key)}:</strong> ✅ Proceeded`;
-                proceededList.appendChild(listItem);
+                listItem.className = type === "proceeded" ? "p-2 bg-green-100 text-green-800 rounded" : "p-2 bg-yellow-100 text-yellow-800 rounded";
+                listItem.innerHTML = `<strong>${formatKey(key)}:</strong> ${type === "proceeded" ? "✅ Proceeded" : "⏳ Running"}`;
+                listElement.appendChild(listItem);
             });
+
+            // Update Count
+            countElement.textContent = Object.keys(automationData).length;
         } else {
-            proceededList.innerHTML = `<li class="p-2 text-gray-500">No automations proceeded yet.</li>`;
+            listElement.innerHTML = `<li class="p-2 text-gray-500">No ${type} automations found.</li>`;
+            countElement.textContent = "0";
         }
-
-        // Populate Running List
-        if (data.running && Object.keys(data.running).length > 0) {
-            hasRunning = true;
-            Object.keys(data.running).forEach(key => {
-                const listItem = document.createElement("li");
-                listItem.className = "p-2 bg-yellow-100 text-yellow-800 rounded";
-                listItem.innerHTML = `<strong>${formatKey(key)}:</strong> ⏳ Running`;
-                runningList.appendChild(listItem);
-            });
-        } else {
-            runningList.innerHTML = `<li class="p-2 text-gray-500">No running automations.</li>`;
-        }
-
-        // Show/Hide Sections Based on Data
-        proceededList.style.display = hasProceeded ? "block" : "none";
-        runningList.style.display = hasRunning ? "block" : "none";
-
-        // Show Modal
-        document.getElementById("AutomationStatusModal").classList.remove("hidden");
     })
     .catch(error => {
         console.error("Error fetching automation status:", error);
-        document.getElementById("proceededList").innerHTML = `<li class="p-2 text-red-500">Error loading data.</li>`;
-        document.getElementById("runningList").innerHTML = `<li class="p-2 text-red-500">Error loading data.</li>`;
+        listElement.innerHTML = `<li class="p-2 text-red-500">Error loading data.</li>`;
     });
-});
-
-// Close Modal
-document.getElementById("closeAutomationModal").addEventListener("click", function () {
-    document.getElementById("AutomationStatusModal").classList.add("hidden");
-});
-
-document.getElementById("closeAutomationModalFooter").addEventListener("click", function () {
-    document.getElementById("AutomationStatusModal").classList.add("hidden");
-});
-
-// Toggle Sections
-document.getElementById("toggleProceeded").addEventListener("click", function () {
-    document.getElementById("proceededList").classList.toggle("hidden");
-});
-
-document.getElementById("toggleRunning").addEventListener("click", function () {
-    document.getElementById("runningList").classList.toggle("hidden");
-});
+}
 
 // Helper function to format field names
 function formatKey(key) {
