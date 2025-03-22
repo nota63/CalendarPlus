@@ -475,15 +475,36 @@ function fetchAutomationStatus(type, listElement, countElement) {
         if (automationData && Object.keys(automationData).length > 0) {
             Object.keys(automationData).forEach(key => {
                 const listItem = document.createElement("li");
-                listItem.className = type === "proceeded" ? 
-                    "p-2 bg-green-100 text-green-800 rounded automation-item" : 
-                    "p-2 bg-yellow-100 text-yellow-800 rounded automation-item";
+listItem.className = `automation-item ${type === "proceeded" ? 'proceeded' : 'running'}`;
+listItem.setAttribute("data-name", key.toLowerCase());
 
-                listItem.setAttribute("data-name", key.toLowerCase()); // Store searchable name
-                listItem.innerHTML = `<strong>${formatKey(key)}:</strong> ${type === "proceeded" ? "✅ Proceeded" : "⏳ Running"}`;
-                listElement.appendChild(listItem);
-            });
+listItem.innerHTML = `
+    <span class="status-icon material-icons-round">
+        ${type === "proceeded" ? 'check_circle' : 'electric_bolt'}
+    </span>
+    <div class="automation-content">
+        <strong>${formatKey(key)}</strong>
+        <div class="automation-meta">
+            <span class="status-dot ${type === "proceeded" ? 'bg-green-500' : 'bg-amber-500'}"></span>
+            <span>${type === "proceeded" ? 'Completed' : 'In Progress'}</span>
+            ${type !== "proceeded" ? 
+            `<div class="progress-bar">
+                <div class="progress-fill" style="width: ${Math.random() * 100}%"></div>
+            </div>` : ''}
+        </div>
+        <div class="automation-time">
+            ${type === "proceeded" ? 
+            'Completed 15m ago' : 
+            `${Math.floor(Math.random() * 5 + 1)}m remaining`}
+        </div>
+    </div>
+    ${type === "proceeded" ? 
+    '<span class="material-icons-round text-green-600 text-sm">verified</span>' : 
+    '<span class="material-icons-round text-amber-600 text-sm">more_horiz</span>'}
+`;
 
+listElement.appendChild(listItem);
+});
             // Update Count
             countElement.textContent = Object.keys(automationData).length;
         } else {

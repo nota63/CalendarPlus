@@ -543,3 +543,89 @@ body {
     0% { background-position: 100% 0; }
     100% { background-position: -100% 0; }
 }
+
+/* Automation Items */
+/* Automation Items Styling */
+.automation-item {
+    @apply relative p-4 mb-3 rounded-xl transition-all duration-300 
+           hover:scale-[1.005] hover:shadow-lg border border-transparent 
+           hover:border-white/20 flex items-start gap-4 overflow-hidden;
+}
+
+/* Proceeded Items */
+.automation-item.proceeded {
+    @apply bg-gradient-to-r from-green-50/60 to-emerald-50/40 
+           hover:shadow-green-100/30;
+    
+    &::before {
+        @apply absolute inset-0 bg-gradient-to-r from-green-200/10 to-transparent;
+        content: '';
+    }
+    
+    .status-icon {
+        @apply bg-green-100 text-green-600;
+    }
+}
+
+/* Running Items */
+.automation-item.running {
+    @apply bg-gradient-to-r from-amber-50/60 to-yellow-50/40 
+           hover:shadow-amber-100/30;
+    
+    &::before {
+        @apply absolute inset-0 bg-gradient-to-r from-amber-200/10 to-transparent;
+        content: '';
+    }
+    
+    .status-icon {
+        @apply bg-amber-100 text-amber-600 animate-pulse;
+    }
+}
+
+/* Content Styling */
+.automation-content {
+    @apply flex-1;
+    
+    strong {
+        @apply block text-sm font-semibold text-gray-800 mb-1;
+    }
+    
+    .automation-meta {
+        @apply flex items-center gap-3 text-xs text-gray-500;
+    }
+    
+    .progress-bar {
+        @apply w-full h-1 bg-gray-200 rounded-full overflow-hidden mt-2;
+        
+        &::after {
+            @apply block h-full bg-current rounded-full;
+            content: '';
+            width: var(--progress, 50%);
+        }
+    }
+}
+
+/* Status Icon */
+.status-icon {
+    @apply p-2 rounded-lg flex-shrink-0 text-lg;
+}
+
+/* Timestamp */
+.automation-time {
+    @apply text-xs text-gray-400 mt-1;
+}
+
+/* Status Dot */
+.status-dot {
+    @apply w-2 h-2 rounded-full;
+}
+
+/* Animation Keyframes */
+@keyframes pulse-opacity {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.animate-pulse {
+    animation: pulse-opacity 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
