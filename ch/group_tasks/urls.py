@@ -70,7 +70,8 @@ urlpatterns = [
     path('fetch-enabled-automations/',fetch_enabled_automations, name='fetch_enabled_automations'),
     path('toggle-automation/',toggle_automation, name='toggle_automation'),
     path('get-task-details/<int:task_id>/',get_task_details, name='get_task_details'),
-    path('get-activities/',fetch_activity_logs_tasks, name='get_activities')
+    path('get-activities/',fetch_activity_logs_tasks, name='get_activities'),
+    path('automation-status/',get_task_automation_status, name='automation_status')
   
   
   

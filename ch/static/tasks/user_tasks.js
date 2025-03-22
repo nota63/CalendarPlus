@@ -409,3 +409,56 @@ function filterActivities() {
         activity.style.display = textContent.includes(searchQuery) ? "block" : "none";
     });
 }
+
+
+// fetch and monitor automations
+document.getElementById("openAutomationModal").addEventListener("click", function () {
+    const orgId = window.djangoData.orgId;
+    const groupId =window.djangoData.groupId;
+    const taskId = window.djangoData.taskId;
+
+    fetch("/tasks/automation-status/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": getCSRFToken()
+        },
+        body: `org_id=${orgId}&group_id=${groupId}&task_id=${taskId}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        const statusList = document.getElementById("automationStatusList");
+        statusList.innerHTML = ""; // Clear existing content
+
+        if (data.automation_status) {
+            for (const [key, value] of Object.entries(data.automation_status)) {
+                const listItem = document.createElement("li");
+                listItem.className = "list-group-item";
+                listItem.innerHTML = `<strong>${formatKey(key)}:</strong> ${value ? '<span class="text-success">Proceeded</span>' : '<span class="text-danger">Not Initialized</span>'}`;
+                statusList.appendChild(listItem);
+            }
+        } else {
+            statusList.innerHTML = `<li class="list-group-item text-danger">Error fetching data.</li>`;
+        }
+
+        // Open the updated modal
+        new bootstrap.Modal(document.getElementById("AutomationStatusModal")).show();
+    })
+    .catch(error => {
+        console.error("Error fetching automation status:", error);
+        document.getElementById("automationStatusList").innerHTML = `<li class="list-group-item text-danger">Error loading data.</li>`;
+    });
+});
+
+// Helper function to format field names
+function formatKey(key) {
+    return key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+}
+
+// CSRF Token Retrieval (Django)
+function getCSRFToken() {
+    return document.cookie.split("; ")
+        .find(row => row.startsWith("csrftoken="))
+        ?.split("=")[1] || "";
+}
+

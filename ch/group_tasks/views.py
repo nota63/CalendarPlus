@@ -2149,6 +2149,50 @@ def get_activity_icon(action):
     }
     return icon_mapping.get(action, "info")
 
+
+# TASK INFO & IMPORTANT STUFF
+@csrf_exempt  # Allow AJAX requests without CSRF token (if needed)
+def get_task_automation_status(request):
+    if request.method == "POST":
+        org_id = request.POST.get("org_id")
+        group_id = request.POST.get("group_id")
+        task_id = request.POST.get("task_id")
+
+        # Fetch the specific task
+        task = get_object_or_404(Task, organization_id=org_id, group_id=group_id, id=task_id)
+
+        # Automation fields to fetch
+        automation_fields = [
+            "welcome_text_sent", "submission_request_sent", "progress_update_sent", 
+            "after_approval_greeting_sent", "after_completion_notification_sent",
+            "escalate_if_not_completed_action", "reminder_before_2_days_sent", 
+            "reminder_before_1_day_sent", "auto_assign_reviewer_sent", "log_completion_activity",
+            "task_chaining_notification_sent", "install_new_app_notification", 
+            "deadline_extend_notification", "automate_stalled_action", "task_priortization_update",
+            "auto_meeting_scheduled", "overdue_notification_sent", "ai_created_subtasks", 
+            "cal_ai_plans_executed", "meeting_summary_sent", "meeting_reminder_sent", 
+            "chat_insights_sent", "activity_sent", "problem_sent_to_admin"
+        ]
+
+        # Generate response with True/False values
+        automation_status = {field: getattr(task, field) for field in automation_fields}
+
+        return JsonResponse({"automation_status": automation_status}, status=200)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+
+
+
+
+
+
+
+
+
+
+
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Add the task to my day 
 @login_required

@@ -2867,6 +2867,29 @@ video::-webkit-media-controls-panel {
     </div>
 </div>
 
+
+<!-- FETCH AND MONITOR AUTOMATIONS -->
+<div class="modal fade" id="AutomationStatusModal" tabindex="-1" aria-labelledby="AutomationStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="AutomationStatusModalLabel">Automation Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="automationStatusList" class="list-group">
+                    <li class="list-group-item">Loading...</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <!-- -------------------------------------------------------------------------------------------------------------------------- -->
 
 
@@ -2961,6 +2984,12 @@ video::-webkit-media-controls-panel {
                     
                     <span class="text-sm">Activities</span>
                 </button>
+
+                <!-- MONITOR AUTOMATIONS -->
+                <button class="btn btn-primary" id="openAutomationModal" data-org-id="1" data-group-id="5" data-task-id="12">
+                    View Automation Status
+                </button>
+                
 
             </nav>
 
