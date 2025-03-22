@@ -2204,89 +2204,281 @@ video::-webkit-media-controls-panel {
           </div>
 
           <!-- System Diagnostics -->
-          <div class="glass-card p-6 rounded-2xl">
-            <h3 class="text-lg font-['Poppins'] font-semibold mb-4 flex items-center gap-2">
-              <span class="material-icons-sharp text-blue-600">monitor_heart</span>
+          <div class="glass-card p-6 rounded-2xl bg-white shadow-md">
+            <h3 class="text-lg font-['Inter'] font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <span class="material-icons text-blue-600 text-2xl">monitor_heart</span>
               Environment Integrity
             </h3>
             <div class="grid grid-cols-4 gap-4">
               <div class="diagnostic-card bg-green-50">
-                <span class="material-icons-sharp text-green-600">check_circle</span>
-                <span class="text-sm">Verified OS</span>
+                <span class="material-icons text-green-600 text-xl">check_circle</span>
+                <span class="text-sm text-gray-800">Verified OS</span>
               </div>
               <div class="diagnostic-card bg-red-50">
-                <span class="material-icons-sharp text-red-600">dangerous</span>
-                <span class="text-sm">2 Blocked Apps</span>
+                <span class="material-icons text-red-600 text-xl">dangerous</span>
+                <span class="text-sm text-gray-800">2 Blocked Apps</span>
               </div>
               <div class="diagnostic-card bg-blue-50">
-                <span class="material-icons-sharp text-blue-600">security</span>
-                <span class="text-sm">Secure Boot</span>
+                <span class="material-icons text-blue-600 text-xl">security</span>
+                <span class="text-sm text-gray-800">Secure Boot</span>
               </div>
               <div class="diagnostic-card bg-purple-50">
-                <span class="material-icons-sharp text-purple-600">network_check</span>
-                <span class="text-sm">Stable Connection</span>
+                <span class="material-icons text-purple-600 text-xl">network_check</span>
+                <span class="text-sm text-gray-800">Stable Connection</span>
               </div>
             </div>
+          </div>
+        
+          <!-- Additional Controls -->
+          <!-- Complete Control Panel Section -->
+<div class="glass-card p-8 rounded-3xl bg-white/90 backdrop-blur-lg border border-white/30 shadow-2xl mt-8 mx-4">
+    <!-- Panel Header -->
+    <div class="flex items-center justify-between mb-8">
+      <h3 class="text-2xl font-['Inter'] font-bold text-gray-900 flex items-center gap-3">
+        <span class="material-icons-sharp bg-gray-900 text-white p-3 rounded-full shadow-lg">engineering</span>
+        Advanced Control Console
+      </h3>
+      <span class="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">v2.4.1</span>
+    </div>
+  
+    <!-- Control Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+      
+      <!-- Modify Task -->
+      <div class="control-item group bg-white border border-gray-200/80 rounded-xl p-5 transition-all duration-300 hover:border-blue-500/40 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+        <div class="flex items-start gap-4">
+          <div class="bg-blue-100/90 p-3 rounded-lg">
+            <span class="material-icons-round text-2xl text-blue-600">edit_document</span>
+          </div>
+          <div>
+            <h4 class="font-semibold text-gray-900 mb-1">Modify Task</h4>
+            <p class="text-sm text-gray-500 leading-snug">Adjust task parameters and configurations</p>
           </div>
         </div>
-
+      </div>
+  
+      <!-- System Activities -->
+      <div class="control-item group bg-white border border-gray-200/80 rounded-xl p-5 transition-all duration-300 hover:border-green-500/40 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+        <div class="flex items-start gap-4">
+          <div class="bg-green-100/90 p-3 rounded-lg">
+            <span class="material-icons-round text-2xl text-green-600">analytics</span>
+          </div>
+          <div>
+            <h4 class="font-semibold text-gray-900 mb-1">System Activities</h4>
+            <p class="text-sm text-gray-500 leading-snug">Monitor real-time processes and workflows</p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Start Monitoring -->
+      <div class="control-item group bg-white border border-gray-200/80 rounded-xl p-5 transition-all duration-300 hover:border-red-500/40 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+        <div class="flex items-start gap-4">
+          <div class="bg-red-100/90 p-3 rounded-lg">
+            <span class="material-icons-round text-2xl text-red-600">monitor_heart</span>
+          </div>
+          <div>
+            <h4 class="font-semibold text-gray-900 mb-1">Start Monitoring</h4>
+            <p class="text-sm text-gray-500 leading-snug">Initiate system surveillance protocol</p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Audit Logs -->
+      <div class="control-item group bg-white border border-gray-200/80 rounded-xl p-5 transition-all duration-300 hover:border-purple-500/40 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+        <div class="flex items-start gap-4">
+          <div class="bg-purple-100/90 p-3 rounded-lg">
+            <span class="material-icons-round text-2xl text-purple-600">history_edu</span>
+          </div>
+          <div>
+            <h4 class="font-semibold text-gray-900 mb-1">Audit Logs</h4>
+            <p class="text-sm text-gray-500 leading-snug">Review comprehensive activity history</p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- View Reports -->
+      <div class="control-item group bg-white border border-gray-200/80 rounded-xl p-5 transition-all duration-300 hover:border-yellow-500/40 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+        <div class="flex items-start gap-4">
+          <div class="bg-yellow-100/90 p-3 rounded-lg">
+            <span class="material-icons-round text-2xl text-yellow-600">summarize</span>
+          </div>
+          <div>
+            <h4 class="font-semibold text-gray-900 mb-1">View Reports</h4>
+            <p class="text-sm text-gray-500 leading-snug">Generate detailed analytics reports</p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Manage Alerts -->
+      <div class="control-item group bg-white border border-gray-200/80 rounded-xl p-5 transition-all duration-300 hover:border-teal-500/40 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+        <div class="flex items-start gap-4">
+          <div class="bg-teal-100/90 p-3 rounded-lg">
+            <span class="material-icons-round text-2xl text-teal-600">notification_important</span>
+          </div>
+          <div>
+            <h4 class="font-semibold text-gray-900 mb-1">Manage Alerts</h4>
+            <p class="text-sm text-gray-500 leading-snug">Configure notification thresholds</p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- User Access -->
+      <div class="control-item group bg-white border border-gray-200/80 rounded-xl p-5 transition-all duration-300 hover:border-gray-500/40 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+        <div class="flex items-start gap-4">
+          <div class="bg-gray-100/90 p-3 rounded-lg">
+            <span class="material-icons-round text-2xl text-gray-600">shield_person</span>
+          </div>
+          <div>
+            <h4 class="font-semibold text-gray-900 mb-1">User Access</h4>
+            <p class="text-sm text-gray-500 leading-snug">Manage permissions and roles</p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Backup Data -->
+      <div class="control-item group bg-white border border-gray-200/80 rounded-xl p-5 transition-all duration-300 hover:border-indigo-500/40 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+        <div class="flex items-start gap-4">
+          <div class="bg-indigo-100/90 p-3 rounded-lg">
+            <span class="material-icons-round text-2xl text-indigo-600">cloud_sync</span>
+          </div>
+          <div>
+            <h4 class="font-semibold text-gray-900 mb-1">Backup Data</h4>
+            <p class="text-sm text-gray-500 leading-snug">Initiate secure data backups</p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- System Restore -->
+      <div class="control-item group bg-white border border-gray-200/80 rounded-xl p-5 transition-all duration-300 hover:border-pink-500/40 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+        <div class="flex items-start gap-4">
+          <div class="bg-pink-100/90 p-3 rounded-lg">
+            <span class="material-icons-round text-2xl text-pink-600">restore</span>
+          </div>
+          <div>
+            <h4 class="font-semibold text-gray-900 mb-1">System Restore</h4>
+            <p class="text-sm text-gray-500 leading-snug">Rollback to previous states</p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Performance Metrics -->
+      <div class="control-item group bg-white border border-gray-200/80 rounded-xl p-5 transition-all duration-300 hover:border-orange-500/40 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+        <div class="flex items-start gap-4">
+          <div class="bg-orange-100/90 p-3 rounded-lg">
+            <span class="material-icons-round text-2xl text-orange-600">speed</span>
+          </div>
+          <div>
+            <h4 class="font-semibold text-gray-900 mb-1">Performance Metrics</h4>
+            <p class="text-sm text-gray-500 leading-snug">Analyze system efficiency</p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Additional Enterprise Controls -->
+      <div class="control-item group bg-white border border-gray-200/80 rounded-xl p-5 transition-all duration-300 hover:border-rose-500/40 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+        <div class="flex items-start gap-4">
+          <div class="bg-rose-100/90 p-3 rounded-lg">
+            <span class="material-icons-round text-2xl text-rose-600">security</span>
+          </div>
+          <div>
+            <h4 class="font-semibold text-gray-900 mb-1">Security Center</h4>
+            <p class="text-sm text-gray-500 leading-snug">Manage firewall and protection</p>
+          </div>
+        </div>
+      </div>
+  
+      <div class="control-item group bg-white border border-gray-200/80 rounded-xl p-5 transition-all duration-300 hover:border-lime-500/40 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+        <div class="flex items-start gap-4">
+          <div class="bg-lime-100/90 p-3 rounded-lg">
+            <span class="material-icons-round text-2xl text-lime-600">database</span>
+          </div>
+          <div>
+            <h4 class="font-semibold text-gray-900 mb-1">Storage Manager</h4>
+            <p class="text-sm text-gray-500 leading-snug">Allocate disk resources</p>
+          </div>
+        </div>
+      </div>
+  
+    </div>
+  
+    <!-- Panel Footer -->
+    <div class="mt-8 pt-6 border-t border-gray-200/50 flex items-center justify-between">
+      <div class="text-sm text-gray-500">
+        <span class="material-icons-round text-base align-middle mr-1">info</span>
+        Last updated: 2 hours ago
+      </div>
+      <div class="flex gap-2">
+        <button class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+          <span class="material-icons-round text-base align-middle mr-1">refresh</span>
+          Refresh Panel
+        </button>
+        <button class="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800">
+          <span class="material-icons-round text-base align-middle mr-1">settings</span>
+          Advanced Settings
+        </button>
+      </div>
+    </div>
+</div>
+</div>
         <!-- Right Column - Proctor Panel -->
-        <div class="p-6 bg-white/30 backdrop-blur-lg">
-          <!-- Proctor Profile -->
-          <div class="glass-card p-6 rounded-2xl mb-6">
-            <div class="flex items-center gap-4 mb-4">
-              <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                <span class="material-icons-sharp text-blue-600">admin_panel_settings</span>
-              </div>
-              <div>
-                <h3 class="font-['Poppins'] font-semibold">{{task.created_by.username}}</h3>
-                <p class="text-sm text-gray-600">Senior Proctor</p>
-              </div>
-            </div>
-            <div class="space-y-3">
-              <div class="info-item">
-                <span class="material-icons-sharp text-green-500">fiber_manual_record</span>
-                <span>Active Session</span>
-                <span class="ml-auto font-medium">12:34</span>
-              </div>
-              <div class="info-item">
-                <span class="material-icons-sharp">verified_user</span>
-                <span>Security Level</span>
-                <span class="ml-auto badge bg-blue-100 text-blue-800">Tier 3</span>
-              </div>
-              <div class="info-item">
-                <span class="material-icons-sharp">mail</span>
-                <span>{{task.created_by.email}}</span>
-              </div>
-            </div>
-          </div>
+        <!-- Right Column - Proctor Panel -->
+<div class="p-6 bg-white/30 backdrop-blur-lg rounded-2xl shadow-lg">
+    <!-- Proctor Profile -->
+    <div class="glass-card p-6 rounded-2xl mb-6 bg-white shadow-md">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="w-14 h-14 bg-blue-200 rounded-full flex items-center justify-center shadow-md">
+          <span class="material-icons text-blue-700 text-2xl">admin_panel_settings</span>
+        </div>
+        <div>
+          <h3 class="font-['Inter'] font-semibold text-gray-900 text-lg">{{task.created_by.username}}</h3>
+          <p class="text-sm text-gray-600">Senior Proctor</p>
+        </div>
+      </div>
+      <div class="space-y-4 text-gray-700">
+        <div class="flex items-center gap-2">
+          <span class="material-icons text-green-500 text-lg">fiber_manual_record</span>
+          <span>Active Session</span>
+          <span class="ml-auto font-medium text-gray-900">12:34</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="material-icons text-blue-600 text-lg">verified_user</span>
+          <span>Security Level</span>
+          <span class="ml-auto bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">Tier 3</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="material-icons text-gray-700 text-lg">mail</span>
+          <span>{{task.created_by.email}}</span>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Threat Detection -->
+    <div class="glass-card p-6 rounded-2xl bg-white shadow-md">
+      <h3 class="text-lg font-['Inter'] font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <span class="material-icons text-red-600 text-2xl">security</span>
+        Threat Prevention
+      </h3>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="flex items-center gap-2 p-4 rounded-lg bg-green-50 shadow-sm">
+          <span class="material-icons text-green-600 text-xl">check_circle</span>
+          <span class="text-gray-800 font-medium">Zero Malware</span>
+        </div>
+        <div class="flex items-center gap-2 p-4 rounded-lg bg-red-50 shadow-sm">
+          <span class="material-icons text-red-600 text-xl">warning</span>
+          <span class="text-gray-800 font-medium">2 Policy Violations</span>
+        </div>
+        <div class="flex items-center gap-2 p-4 rounded-lg bg-blue-50 shadow-sm">
+          <span class="material-icons text-blue-600 text-xl">vpn_lock</span>
+          <span class="text-gray-800 font-medium">Encrypted</span>
+        </div>
+        <div class="flex items-center gap-2 p-4 rounded-lg bg-purple-50 shadow-sm">
+          <span class="material-icons text-purple-600 text-xl">update</span>
+          <span class="text-gray-800 font-medium">Last Scan: 2m</span>
+        </div>
+      </div>
+    </div>
 
-          <!-- Threat Detection -->
-          <div class="glass-card p-6 rounded-2xl mb-6">
-            <h3 class="text-lg font-['Poppins'] font-semibold mb-4 flex items-center gap-2">
-              <span class="material-icons-sharp text-red-600">security</span>
-              Threat Prevention
-            </h3>
-            <div class="grid grid-cols-2 gap-4">
-              <div class="threat-card bg-green-50">
-                <span class="material-icons-sharp text-green-600">check_circle</span>
-                Zero Malware
-              </div>
-              <div class="threat-card bg-red-50">
-                <span class="material-icons-sharp text-red-600">warning</span>
-                2 Policy Violations
-              </div>
-              <div class="threat-card bg-blue-50">
-                <span class="material-icons-sharp text-blue-600">vpn_lock</span>
-                Encrypted
-              </div>
-              <div class="threat-card bg-purple-50">
-                <span class="material-icons-sharp text-purple-600">update</span>
-                Last Scan: 2m
-              </div>
-            </div>
-          </div>
-
+  
           <!-- Session Analytics -->
           <div class="glass-card p-6 rounded-2xl">
             <h3 class="text-lg font-['Poppins'] font-semibold mb-4 flex items-center gap-2">
