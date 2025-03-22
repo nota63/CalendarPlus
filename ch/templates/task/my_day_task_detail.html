@@ -2965,7 +2965,7 @@ video::-webkit-media-controls-panel {
                 <span class="text-xs">Processes run async in background</span>
             </div>
             <div class="flex gap-3">
-                <button class="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1">
+                <button id="openAutomationGuide" class="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1 relative">
                     <span class="material-icons-round text-sm">help</span>
                     Docs
                 </button>
@@ -2978,6 +2978,35 @@ video::-webkit-media-controls-panel {
         </div>
     </div>
 </div>
+
+<!-- Background Processes Guide -->
+ <!-- Guide Modal -->
+<div id="AutomationGuideModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-5 rounded-lg shadow-lg max-w-lg w-full">
+        <div class="flex justify-between items-center border-b pb-2">
+            <h2 class="text-lg font-semibold">Automation Guide</h2>
+            <button id="closeAutomationGuide" class="text-gray-500 hover:text-gray-700">
+                <span class="material-icons-round">close</span>
+            </button>
+        </div>
+
+        <div class="mt-4 text-sm text-gray-700">
+            <p>Automations help streamline tasks by automatically executing predefined actions. Below are the two main automation statuses:</p>
+            <ul class="mt-3 space-y-2">
+                <li><strong class="text-green-600">✅ Completed:</strong> These automations have successfully executed.</li>
+                <li><strong class="text-yellow-600">⏳ Active:</strong> These automations are currently running.</li>
+            </ul>
+            <p class="mt-3">For troubleshooting or customization, visit the settings page.</p>
+        </div>
+
+        <div class="mt-4 flex justify-end">
+            <button id="closeAutomationGuideFooter" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700">Close</button>
+        </div>
+    </div>
+</div>
+
+
+
 <!-- -------------------------------------------------------------------------------------------------------------------------- -->
 
 

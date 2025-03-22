@@ -523,3 +523,21 @@ function getCSRFToken() {
         .find(row => row.startsWith("csrftoken="))
         ?.split("=")[1] || "";
 }
+
+
+// Background Proccesses Guide
+
+document.getElementById("openAutomationGuide").addEventListener("mouseenter", function () {
+    document.getElementById("AutomationGuideModal").classList.remove("hidden");
+});
+
+// Close Modal on Button Click
+document.getElementById("closeAutomationGuide").addEventListener("click", closeGuideModal);
+document.getElementById("closeAutomationGuideFooter").addEventListener("click", closeGuideModal);
+
+// Close Modal on Mouse Leave
+document.getElementById("AutomationGuideModal").addEventListener("mouseleave", closeGuideModal);
+
+function closeGuideModal() {
+    document.getElementById("AutomationGuideModal").classList.add("hidden");
+}
