@@ -2151,7 +2151,7 @@ def get_activity_icon(action):
 
 
 # TASK INFO & IMPORTANT STUFF
-@csrf_exempt  # Allow AJAX requests without CSRF token (if needed)
+@csrf_exempt  
 def get_task_automation_status(request):
     if request.method == "POST":
         org_id = request.POST.get("org_id")
@@ -2174,13 +2174,16 @@ def get_task_automation_status(request):
             "chat_insights_sent", "activity_sent", "problem_sent_to_admin"
         ]
 
-        # Generate response with True/False values
-        automation_status = {field: getattr(task, field) for field in automation_fields}
+        # Separate proceeded (True) and running (False) automations
+        proceeded = {field: True for field in automation_fields if getattr(task, field)}
+        running = {field: False for field in automation_fields if not getattr(task, field)}
 
-        return JsonResponse({"automation_status": automation_status}, status=200)
+        return JsonResponse({
+            "proceeded": proceeded,
+            "running": running
+        }, status=200)
 
     return JsonResponse({"error": "Invalid request"}, status=400)
-
 
 
 

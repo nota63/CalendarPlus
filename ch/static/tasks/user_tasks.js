@@ -414,7 +414,7 @@ function filterActivities() {
 // fetch and monitor automations
 document.getElementById("openAutomationModal").addEventListener("click", function () {
     const orgId = window.djangoData.orgId;
-    const groupId =window.djangoData.groupId;
+    const groupId = window.djangoData.groupId;
     const taskId = window.djangoData.taskId;
 
     fetch("/tasks/automation-status/", {
@@ -427,18 +427,34 @@ document.getElementById("openAutomationModal").addEventListener("click", functio
     })
     .then(response => response.json())
     .then(data => {
-        const statusList = document.getElementById("automationStatusList");
-        statusList.innerHTML = ""; // Clear existing content
+        const proceededList = document.getElementById("proceededList");
+        const runningList = document.getElementById("runningList");
 
-        if (data.automation_status) {
-            for (const [key, value] of Object.entries(data.automation_status)) {
+        proceededList.innerHTML = "";
+        runningList.innerHTML = "";
+
+        // Populate Proceeded List
+        if (data.proceeded && Object.keys(data.proceeded).length > 0) {
+            for (const key of Object.keys(data.proceeded)) {
                 const listItem = document.createElement("li");
-                listItem.className = "list-group-item";
-                listItem.innerHTML = `<strong>${formatKey(key)}:</strong> ${value ? '<span class="text-success">Proceeded</span>' : '<span class="text-danger">Not Initialized</span>'}`;
-                statusList.appendChild(listItem);
+                listItem.className = "list-group-item text-success";
+                listItem.innerHTML = `<strong>${formatKey(key)}:</strong> ✅ Proceeded`;
+                proceededList.appendChild(listItem);
             }
         } else {
-            statusList.innerHTML = `<li class="list-group-item text-danger">Error fetching data.</li>`;
+            proceededList.innerHTML = `<li class="list-group-item text-muted">No automations proceeded yet.</li>`;
+        }
+
+        // Populate Running List
+        if (data.running && Object.keys(data.running).length > 0) {
+            for (const key of Object.keys(data.running)) {
+                const listItem = document.createElement("li");
+                listItem.className = "list-group-item text-warning";
+                listItem.innerHTML = `<strong>${formatKey(key)}:</strong> ⏳ Running`;
+                runningList.appendChild(listItem);
+            }
+        } else {
+            runningList.innerHTML = `<li class="list-group-item text-muted">No running automations.</li>`;
         }
 
         // Open the updated modal
@@ -446,7 +462,8 @@ document.getElementById("openAutomationModal").addEventListener("click", functio
     })
     .catch(error => {
         console.error("Error fetching automation status:", error);
-        document.getElementById("automationStatusList").innerHTML = `<li class="list-group-item text-danger">Error loading data.</li>`;
+        document.getElementById("proceededList").innerHTML = `<li class="list-group-item text-danger">Error loading data.</li>`;
+        document.getElementById("runningList").innerHTML = `<li class="list-group-item text-danger">Error loading data.</li>`;
     });
 });
 
@@ -461,4 +478,3 @@ function getCSRFToken() {
         .find(row => row.startsWith("csrftoken="))
         ?.split("=")[1] || "";
 }
-
