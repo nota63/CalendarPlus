@@ -541,3 +541,72 @@ document.getElementById("AutomationGuideModal").addEventListener("mouseleave", c
 function closeGuideModal() {
     document.getElementById("AutomationGuideModal").classList.add("hidden");
 }
+
+
+// Stop ALL Automations
+document.getElementById("openStopModal").addEventListener("click", function () {
+    document.getElementById("stopAutomationModal").classList.remove("hidden");
+    
+    let progressBar = document.getElementById("progressBar");
+    let progressText = document.getElementById("progressText");
+    let closeBtn = document.getElementById("closeStopModal");
+
+    let progress = 0;
+    let interval = setInterval(() => {
+        progress += 5; // Increase by 5% every 200ms
+        progressBar.style.width = `${progress}%`;
+
+        if (progress >= 100) {
+            clearInterval(interval);
+            progressText.textContent = "All background processes stopped successfully.";
+            
+            // Make API Request to Disable Automations
+            stopAllAutomations();
+        }
+    }, 200);
+});
+
+// Function to send request to disable automations
+function stopAllAutomations() {
+    const orgId = window.djangoData.orgId;
+    const groupId = window.djangoData.groupId;
+    const taskId = window.djangoData.taskId;
+
+    fetch("/tasks/disable-all-automations/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": getCSRFToken()
+        },
+        body: `org_id=${orgId}&group_id=${groupId}&task_id=${taskId}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            document.getElementById("progressText").textContent = "✅ All automations have been turned off.";
+        } else {
+            document.getElementById("progressText").textContent = "❌ Failed to stop automations.";
+        }
+        
+        // Show Close Button
+        document.getElementById("closeStopModal").classList.remove("hidden");
+    })
+    .catch(error => {
+        console.error("Error disabling automations:", error);
+        document.getElementById("progressText").textContent = "❌ Error occurred. Try again.";
+        document.getElementById("closeStopModal").classList.remove("hidden");
+    });
+}
+
+// Close Modal
+document.getElementById("closeStopModal").addEventListener("click", function () {
+    document.getElementById("stopAutomationModal").classList.add("hidden");
+});
+
+// CSRF Token Retrieval (Django)
+function getCSRFToken() {
+    return document.cookie.split("; ")
+        .find(row => row.startsWith("csrftoken="))
+        ?.split("=")[1] || "";
+}
+

@@ -2187,6 +2187,38 @@ def get_task_automation_status(request):
 
 
 
+# DISABLE ALL THE AUTOMATIONS
+@csrf_exempt
+def disable_all_automations(request):
+    if request.method == "POST":
+        org_id = request.POST.get("org_id")
+        group_id = request.POST.get("group_id")
+        task_id = request.POST.get("task_id")
+
+        # Fetch the AutomationTask instance
+        automation_task = get_object_or_404(AutomationTask, organization_id=org_id, group_id=group_id, task_id=task_id)
+
+        # List all boolean fields related to automations
+        automation_fields = [
+            "send_welcome_text", "send_submission_request_after_completion", "generate_summary_after_approval",
+            "translate_in_english", "progress_update", "send_greeting_after_approval",
+            "notify_task_creator_on_completion", "escalate_if_not_completed", "remind_before_deadline",
+            "auto_assign_reviewer", "log_activity_on_completion", "assign_task_if_previous_completed",
+            "install_new_apps", "extend_deadline", "automate_stalled", "task_priortization",
+            "auto_schedule_meeting_on_approval", "overdue_notification", "ai_subtasks", "cal_ai_plans",
+            "send_meeting_summary", "remind_my_meetings", "provide_chat_insights", "send_daily_activities",
+            "share_problems_to_admin", "remind_me_every_morning"
+        ]
+
+        # Disable all automations by setting them to False
+        for field in automation_fields:
+            setattr(automation_task, field, False)
+
+        automation_task.save()  # Save changes
+
+        return JsonResponse({"status": "success", "message": "All automations have been disabled."})
+
+    return JsonResponse({"status": "error", "message": "Invalid request."}, status=400)
 
 
 
