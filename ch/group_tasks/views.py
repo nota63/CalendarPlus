@@ -2090,9 +2090,64 @@ def get_task_details(request, task_id):
         return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
 
 
+# Task Activities 
+@login_required
+def fetch_activity_logs_tasks(request):
+    """Fetch activity logs filtered by Organization, Group, or Task."""
+    org_id = request.GET.get("org_id")
+    group_id = request.GET.get("group_id")
+    task_id = request.GET.get("task_id")
 
+    logger.info(f"📡 Fetching activities for Org ID: {org_id}, Group ID: {group_id}, Task ID: {task_id}")
 
+    # Start with all logs
+    activities = ActivityLog.objects.select_related("user", "organization", "task").order_by("-timestamp")
 
+    # Apply filters dynamically
+    if org_id:
+        activities = activities.filter(organization_id=org_id)
+    if group_id:
+        activities = activities.filter(group_id=group_id)
+    if task_id:
+        activities = activities.filter(task_id=task_id)
+
+    logger.info(f"🔍 Found {activities.count()} matching activities")
+
+    # Format response data
+    data = []
+    for activity in activities[:50]:  # Limit to 50 for efficiency
+        formatted_activity = {
+            "user": activity.user.username,
+            "action": activity.get_action_display(),
+            "details": activity.details or "",
+            "timestamp": activity.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            "color": get_activity_color(activity.action),
+            "icon": get_activity_icon(activity.action),
+        }
+        logger.debug(f"📝 Activity Log: {formatted_activity}")
+        data.append(formatted_activity)
+
+    return JsonResponse({"activities": data}, safe=False)
+
+def get_activity_color(action):
+    """Assign colors based on activity type."""
+    color_mapping = {
+        "TASK_CREATED": "green",
+        "PROGRESS_UPDATE": "blue",
+        "RAISED_PROBLEM": "red",
+        "TASK_COMPLETED": "black",
+    }
+    return color_mapping.get(action, "gray")
+
+def get_activity_icon(action):
+    """Assign material icons based on activity type."""
+    icon_mapping = {
+        "TASK_CREATED": "add_task",
+        "PROGRESS_UPDATE": "timeline",
+        "RAISED_PROBLEM": "error",
+        "TASK_COMPLETED": "check_circle",
+    }
+    return icon_mapping.get(action, "info")
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Add the task to my day 

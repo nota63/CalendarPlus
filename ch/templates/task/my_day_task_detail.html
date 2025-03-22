@@ -2752,7 +2752,80 @@ video::-webkit-media-controls-panel {
     </div>
 </div>
 
+<!-- FETCH AND DISPLAY TASK ACTIVITIES -->
+ <!-- Bootstrap 5 Modal -->
+<div class="modal fade" id="TaskActivitiesModal" tabindex="-1" aria-labelledby="TaskActivitiesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="TaskActivitiesModalLabel">📌 Task Activities</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Activity Timeline -->
+                <div class="timeline">
+                    <div id="activity-list">
+                        <p class="text-muted text-center">Loading activities...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- Timeline CSS -->
+<style>
+    .timeline {
+        position: relative;
+        margin: 20px 0;
+        padding-left: 40px;
+    }
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 20px;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: #ddd;
+        border-radius: 2px;
+    }
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    .timeline-item::before {
+        content: attr(data-icon);
+        font-family: 'Material Icons Sharp';
+        position: absolute;
+        left: -35px;
+        background: var(--icon-bg, #888);
+        color: white;
+        padding: 5px;
+        border-radius: 50%;
+        font-size: 18px;
+    }
+    .timeline-content {
+        background: #f9f9f9;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+    .timeline-content:hover::after {
+        content: attr(data-details);
+        position: absolute;
+        left: 105%;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+</style>
 
 <!-- -------------------------------------------------------------------------------------------------------------------------- -->
 
@@ -2839,6 +2912,13 @@ video::-webkit-media-controls-panel {
                     </svg>
                     <span class="text-sm">Projects</span>
                 </a>
+
+                <!-- FETCH AND DISPLAY ACTIVITIES -->
+                 <!-- Button to Open Modal -->
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#TaskActivitiesModal">
+                   View Activities
+                </button>
+
             </nav>
 
             <!-- Divider -->

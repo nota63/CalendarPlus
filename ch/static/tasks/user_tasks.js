@@ -330,3 +330,68 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+
+
+// FETCH AND DISPLAY THE TASK ACTIVITIES
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("TaskActivitiesModal");
+
+    modal.addEventListener("show.bs.modal", function () {
+        console.log("🚀 TaskActivitiesModal opened!");
+        fetchActivityLogs();
+    });
+});
+
+function fetchActivityLogs() {
+    const activityList = document.getElementById("activity-list");
+    activityList.innerHTML = `<p class="text-muted text-center">Fetching activities...</p>`;
+
+    const orgId = window.djangoData.orgId;
+    const groupId = window.djangoData.groupId;
+    const taskId = window.djangoData.taskId;
+
+    console.log("📡 Sending AJAX request to fetch activities...");
+    console.log(`🔹 Org ID: ${orgId}, Group ID: ${groupId}, Task ID: ${taskId}`);
+
+    fetch(`/tasks/get-activities/?org_id=${orgId}&group_id=${groupId}&task_id=${taskId}`, {
+        method: "GET",
+        headers: {
+            "X-Requested-With": "XMLHttpRequest",
+        },
+    })
+    .then(response => {
+        console.log("✅ Received response from server:", response);
+        return response.json();
+    })
+    .then(data => {
+        console.log("📜 Parsed JSON data:", data);
+        activityList.innerHTML = "";
+
+        if (!data.activities || data.activities.length === 0) {
+            activityList.innerHTML = `<p class="text-muted text-center">No activities found.</p>`;
+            return;
+        }
+
+        data.activities.forEach(activity => {
+            console.log("📝 Processing activity:", activity);
+            const item = document.createElement("div");
+            item.classList.add("timeline-item");
+            item.setAttribute("data-icon", activity.icon);
+            item.innerHTML = `
+                <div class="timeline-content" data-details="${activity.details}">
+                    <strong>${activity.user}</strong> - ${activity.action} <br>
+                    <small class="text-muted">${activity.timestamp}</small>
+                </div>
+            `;
+            item.style.setProperty("--icon-bg", activity.color);
+            activityList.appendChild(item);
+        });
+
+        console.log("🎉 Successfully displayed activities!");
+    })
+    .catch(error => {
+        console.error("❌ Error fetching activities:", error);
+        activityList.innerHTML = `<p class="text-danger text-center">Failed to fetch activities.</p>`;
+    });
+}
