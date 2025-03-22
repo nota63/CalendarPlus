@@ -9,6 +9,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ task.title }} - Task Details</title>
     <link rel="stylesheet" href="{% static 'assets/css/my_tasks.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Sharp&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
@@ -2120,98 +2122,108 @@ video::-webkit-media-controls-panel {
 <!-- Show Spectors -->
 <div class="modal fade" id="spectorsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog max-w-7xl">
-        <div class="modal-content border-0 bg-white/20 backdrop-blur-xl rounded-2xl shadow-2xl">
+        <div class="modal-content border-0 bg-gradient-to-br from-blue-50/30 to-purple-50/20 backdrop-blur-2xl rounded-2xl shadow-2xl">
             <!-- Close Button -->
-            <button type="button" class="absolute top-6 right-6 text-gray-500 hover:text-gray-700 z-10"
+            <button type="button" class="absolute top-6 right-6 text-gray-600 hover:text-gray-800 z-10"
                 data-bs-dismiss="modal" aria-label="Close">
-                <span class="material-icons text-3xl">close</span>
+                <span class="material-icons-sharp text-3xl">close</span>
             </button>
+
+            <strong>You are being proctorred Live</strong>
+            <p>All your activities are sharing live on {{task.created_by.username}} system</p>
 
             <div class="modal-body p-6 h-[80vh] overflow-y-auto scroll-container">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <!-- Left Column - Live Monitoring -->
+                    <!-- Left Column - Monitoring & Controls -->
                     <div class="lg:col-span-2 space-y-6">
                         <!-- Header -->
                         <div class="flex items-center justify-between mb-8">
-                            <h2 class="text-3xl font-bold text-gray-800 font-['Inter']">
-                                <span class="material-icons text-4xl align-middle mr-3 text-blue-600">security</span>
-                                Proctoring Console
+                            <h2 class="text-3xl font-bold text-gray-900 font-['Inter']">
+                                <span class="material-icons-sharp text-4xl align-middle mr-3 text-blue-600">admin_panel_settings</span>
+                                Proctoring Dashboard
                             </h2>
-                            <div class="flex items-center space-x-4">
-                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm flex items-center">
-                                    <span class="material-icons text-sm mr-1">check_circle</span>
-                                    SECURE
+
+                            <img src="#">
+                            <!-- add windows 11 svg logo here -->
+                            <div class="flex items-center gap-3">
+                                <span class="badge bg-emerald-100 text-emerald-800">
+                                    <span class="material-icons-sharp text-sm mr-1">verified</span>
+                                    Certified
                                 </span>
-                                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center">
-                                    <span class="material-icons text-sm mr-1">schedule</span>
-                                    <span id="sessionTimer">00:12:34</span>
+                                <span class="badge bg-blue-100 text-blue-800">
+                                    <span class="material-icons-sharp text-sm mr-1">timer</span>
+                                    <span id="sessionTimer">12:34</span>
                                 </span>
                             </div>
                         </div>
 
-                        <!-- Video Feed Section -->
-                        <div class="glass-card p-4 rounded-xl bg-white/30 border border-white/50">
-                            <div class="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
-                                <span class="material-icons text-6xl text-gray-400">videocam_off</span>
+                        <!-- Video Surveillance -->
+                        <div class="glass-card p-4 rounded-xl">
+                            <div class="aspect-video bg-gray-100/50 rounded-xl flex items-center justify-center">
+                                <span class="material-icons-sharp text-6xl text-gray-400">videocam_off</span>
                             </div>
-                            <div class="grid grid-cols-3 gap-4 mt-4">
-                                <div class="glass-card p-3 rounded-lg flex items-center">
-                                    <span class="material-icons text-red-500 mr-2">fiber_manual_record</span>
-                                    <span>Recording</span>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+                                <div class="status-chip bg-red-50 text-red-800">
+                                    <span class="material-icons-sharp animate-pulse">fiber_manual_record</span>
+                                    Recording
                                 </div>
-                                <div class="glass-card p-3 rounded-lg flex items-center">
-                                    <span class="material-icons text-green-500 mr-2">mic</span>
-                                    <div class="w-full">
-                                        <div class="h-1 bg-green-100 rounded-full">
-                                            <div class="w-1/3 h-full bg-green-500 rounded-full animate-pulse"></div>
-                                        </div>
-                                    </div>
+                                <div class="status-chip bg-green-50 text-green-800">
+                                    <span class="material-icons-sharp">mic</span>
+                                    Audio Active
                                 </div>
-                                <div class="glass-card p-3 rounded-lg flex items-center">
-                                    <span class="material-icons text-blue-500 mr-2">visibility</span>
-                                    <span>Eye Tracking</span>
+                                <div class="status-chip bg-blue-50 text-blue-800">
+                                    <span class="material-icons-sharp">visibility</span>
+                                    Gaze Tracking
+                                </div>
+                                <div class="status-chip bg-purple-50 text-purple-800">
+                                    <span class="material-icons-sharp">keyboard</span>
+                                    Keystroke Log
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Proctoring Controls -->
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <button class="control-btn bg-red-100 text-red-800 hover:bg-red-200">
-                                <span class="material-icons">warning</span>
-                                Raise Flag
+                        <!-- Proctoring Controls Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <button class="control-btn bg-red-100 hover:bg-red-200 text-red-800">
+                                <span class="material-icons-sharp">flag</span>
+                                Raise Incident
                             </button>
-                            <button class="control-btn bg-blue-100 text-blue-800 hover:bg-blue-200">
-                                <span class="material-icons">screen_share</span>
-                                Share Screen
+                            <button class="control-btn bg-blue-100 hover:bg-blue-200 text-blue-800">
+                                <span class="material-icons-sharp">screen_search_desktop</span>
+                                Screen Analyze
                             </button>
-                            <button class="control-btn bg-purple-100 text-purple-800 hover:bg-purple-200">
-                                <span class="material-icons">history</span>
-                                Activity Log
+                            <button class="control-btn bg-orange-100 hover:bg-orange-200 text-orange-800">
+                                <span class="material-icons-sharp">content_paste_off</span>
+                                Block Clipboard
                             </button>
-                            <button class="control-btn bg-green-100 text-green-800 hover:bg-green-200">
-                                <span class="material-icons">lock</span>
-                                Lock Session
+                            <button class="control-btn bg-purple-100 hover:bg-purple-200 text-purple-800">
+                                <span class="material-icons-sharp">lock_clock</span>
+                                Time Lock
                             </button>
                         </div>
 
-                        <!-- System Monitoring -->
+                        <!-- System Health Dashboard -->
                         <div class="glass-card p-5 rounded-xl">
-                            <h4 class="text-lg font-semibold mb-4 flex items-center">
-                                <span class="material-icons mr-2">insights</span>
-                                System Monitor
+                            <h4 class="text-lg font-semibold mb-4 flex items-center text-gray-800">
+                                <span class="material-icons-sharp mr-2 text-blue-600">monitor_heart</span>
+                                System Integrity
                             </h4>
-                            <div class="grid grid-cols-3 gap-4">
-                                <div class="text-center">
-                                    <div class="radial-progress text-blue-500" style="--value:75;">75%</div>
-                                    <p class="text-sm mt-2">CPU Usage</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div class="metric-card">
+                                    <div class="metric-value text-blue-600">83%</div>
+                                    <div class="metric-label">Environment Check</div>
                                 </div>
-                                <div class="text-center">
-                                    <div class="radial-progress text-green-500" style="--value:45;">45%</div>
-                                    <p class="text-sm mt-2">Memory</p>
+                                <div class="metric-card">
+                                    <div class="metric-value text-green-600">64%</div>
+                                    <div class="metric-label">Clipboard Access</div>
                                 </div>
-                                <div class="text-center">
-                                    <div class="radial-progress text-purple-500" style="--value:90;">90%</div>
-                                    <p class="text-sm mt-2">Network</p>
+                                <div class="metric-card">
+                                    <div class="metric-value text-purple-600">97%</div>
+                                    <div class="metric-label">Device Trust</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-value text-red-600">3</div>
+                                    <div class="metric-label">Violations</div>
                                 </div>
                             </div>
                         </div>
@@ -2221,82 +2233,100 @@ video::-webkit-media-controls-panel {
                     <div class="space-y-6">
                         <!-- Proctor Profile -->
                         <div class="glass-card p-5 rounded-xl">
-                            <div class="flex items-center space-x-4 mb-4">
-                                <p><span id="profilePicture"></span></p> 
-                                     class="w-16 h-16 rounded-full border-4 border-blue-100">
+                            <div class="flex items-center gap-4 mb-4">
+                               
+                                <p><span id="profilePicture"></span></p>
+
+                                    
                                 <div>
-                                    <h3 id="taskCreatedBy" class="text-2xl font-bold">Proctor Name</h3>
-                                    <p class="text-gray-600">Senior Proctor</p>
+                                    <h3 id="taskCreatedBy" class="text-xl font-bold text-gray-900">Proctor Name</h3>
+                                    <p class="text-sm text-gray-600">{{task.created_by.username}}</p>
                                 </div>
                             </div>
-                            <div class="space-y-3">
-                                <div class="flex items-center">
-                                    <span class="material-icons text-sm mr-2 text-green-500">circle</span>
-                                    <span id="taskLastLogin" class="font-medium">Active Now</span>
+                            <div class="space-y-2">
+                                <div class="info-item">
+                                    <span class="material-icons-sharp text-green-500">circle</span>
+                                    <span id="taskLastLogin">Active Now</span>
                                 </div>
-                                <div class="flex items-center">
-                                    <span class="material-icons text-sm mr-2">mail</span>
-                                    <span id="taskEmail">proctor@example.com</span>
+                                <div class="info-item">
+                                    <span class="material-icons-sharp">mail</span>
+                                    <span id="taskEmail">{{task.created_by.email}}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="material-icons-sharp">shield</span>
+                                    Security Level: <span class="font-medium">Tier 3</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Session Analytics -->
+                        <div class="glass-card p-5 rounded-xl">
+                            <h4 class="text-lg font-semibold mb-4 flex items-center text-gray-800">
+                                <span class="material-icons-sharp mr-2 text-purple-600">analytics</span>
+                                Session Metrics
+                            </h4>
+                            <div class="space-y-3">
+                                <div class="metric-line">
+                                    <div class="metric-title">Focus Level</div>
+                                    <div class="metric-bar bg-blue-100">
+                                        <div class="metric-progress bg-blue-600" style="width: 75%"></div>
+                                    </div>
+                                </div>
+                                <div class="metric-line">
+                                    <div class="metric-title">Activity Consistency</div>
+                                    <div class="metric-bar bg-green-100">
+                                        <div class="metric-progress bg-green-600" style="width: 82%"></div>
+                                    </div>
+                                </div>
+                                <div class="metric-line">
+                                    <div class="metric-title">Input Variation</div>
+                                    <div class="metric-bar bg-red-100">
+                                        <div class="metric-progress bg-red-600" style="width: 34%"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Session Details -->
+                        <!-- Security Command Center -->
                         <div class="glass-card p-5 rounded-xl">
-                            <h4 class="text-lg font-semibold mb-4 flex items-center">
-                                <span class="material-icons mr-2">list_alt</span>
-                                Session Details
+                            <h4 class="text-lg font-semibold mb-4 flex items-center text-gray-800">
+                                <span class="material-icons-sharp mr-2 text-red-600">security</span>
+                                Threat Prevention
                             </h4>
-                            <div class="space-y-3">
-                                <p class="text-sm">
-                                    <span class="font-medium">Task:</span> 
-                                    <span id="taskDescription">Complete dashboard implementation...</span>
-                                </p>
-                                <p class="text-sm">
-                                    <span class="font-medium">Started:</span> 2:45 PM
-                                </p>
-                                <p class="text-sm">
-                                    <span class="font-medium">Duration:</span> 12m 34s
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Security Panel -->
-                        <div class="glass-card p-5 rounded-xl">
-                            <h4 class="text-lg font-semibold mb-4 flex items-center">
-                                <span class="material-icons mr-2">security</span>
-                                Security Status
-                            </h4>
-                            <div class="space-y-3">
-                                <div class="security-status">
-                                    <span class="material-icons text-green-500">check_circle</span>
-                                    Virtual Machine Detection
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="security-status bg-green-50 text-green-800">
+                                    <span class="material-icons-sharp">devices</span>
+                                    Device Approved
                                 </div>
-                                <div class="security-status">
-                                    <span class="material-icons text-red-500">error</span>
-                                    Screen Mirroring Detected
+                                <div class="security-status bg-red-50 text-red-800">
+                                    <span class="material-icons-sharp">warning</span>
+                                    2 Alerts
                                 </div>
-                                <div class="security-status">
-                                    <span class="material-icons text-yellow-500">warning</span>
-                                    Network Stability Moderate
+                                <div class="security-status bg-blue-50 text-blue-800">
+                                    <span class="material-icons-sharp">vpn_key</span>
+                                    Encryption Active
+                                </div>
+                                <div class="security-status bg-purple-50 text-purple-800">
+                                    <span class="material-icons-sharp">update</span>
+                                    Last Scan: 2m
                                 </div>
                             </div>
                         </div>
 
                         <!-- Quick Actions -->
                         <div class="glass-card p-5 rounded-xl">
-                            <h4 class="text-lg font-semibold mb-4 flex items-center">
-                                <span class="material-icons mr-2">bolt</span>
-                                Quick Actions
+                            <h4 class="text-lg font-semibold mb-4 flex items-center text-gray-800">
+                                <span class="material-icons-sharp mr-2 text-orange-600">flash_on</span>
+                                Session Controls
                             </h4>
                             <div class="grid grid-cols-2 gap-3">
-                                <button class="action-btn bg-blue-100 text-blue-800">
-                                    <span class="material-icons">refresh</span>
-                                    Reconnect
+                                <button class="action-btn bg-blue-600 hover:bg-blue-700 text-white">
+                                    <span class="material-icons-sharp">settings</span>
+                                    Preferences
                                 </button>
-                                <button class="action-btn bg-red-100 text-red-800">
-                                    <span class="material-icons">exit_to_app</span>
-                                    End Session
+                                <button class="action-btn bg-red-600 hover:bg-red-700 text-white">
+                                    <span class="material-icons-sharp">exit_to_app</span>
+                                    Terminate
                                 </button>
                             </div>
                         </div>
@@ -2308,43 +2338,65 @@ video::-webkit-media-controls-panel {
 </div>
 
 <style>
+    .scroll-container {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
     .scroll-container::-webkit-scrollbar {
-        width: 0;
-        background: transparent;
+        display: none;
     }
 
     .glass-card {
-        background: rgba(255, 255, 255, 0.25);
-        backdrop-filter: blur(12px);
+        background: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(16px);
         border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
     }
 
     .control-btn {
-        @apply p-3 rounded-lg flex items-center justify-center transition-all text-sm font-medium;
+        @apply p-3 rounded-xl flex items-center justify-center gap-2 text-sm font-medium transition-all;
     }
 
-    .action-btn {
-        @apply p-2 rounded-md flex items-center justify-center space-x-1 text-sm transition-colors;
+    .status-chip {
+        @apply p-2 rounded-lg flex items-center justify-center gap-1 text-sm font-medium;
+    }
+
+    .metric-card {
+        @apply text-center p-3 rounded-xl bg-white/50;
+    }
+
+    .metric-value {
+        @apply text-2xl font-bold mb-1;
+    }
+
+    .metric-label {
+        @apply text-xs text-gray-600;
+    }
+
+    .info-item {
+        @apply flex items-center gap-2 text-sm text-gray-700 p-2 rounded-md bg-white/30;
+    }
+
+    .metric-bar {
+        @apply h-2 rounded-full overflow-hidden;
+    }
+
+    .metric-progress {
+        @apply h-full rounded-full transition-all duration-500;
     }
 
     .security-status {
-        @apply flex items-center space-x-2 text-sm p-2 rounded-md bg-gray-50;
+        @apply p-2 rounded-lg flex items-center gap-2 text-sm font-medium;
     }
 
-    .radial-progress {
-        @apply relative w-16 h-16 rounded-full flex items-center justify-center mx-auto;
-        background: conic-gradient(currentColor calc(var(--value)*1%), #eee 0);
-    }
-    .radial-progress::before {
-        content: attr(style);
-        @apply absolute w-[84%] h-[84%] bg-white rounded-full flex items-center justify-center text-base font-bold;
+    .action-btn {
+        @apply p-3 rounded-xl flex items-center justify-center gap-2 text-sm font-medium transition-colors;
     }
 
-    body {
-        font-family: 'Inter', sans-serif;
+    .badge {
+        @apply px-3 py-1 rounded-full text-sm flex items-center;
     }
 </style>
-
 <!-- -------------------------------------------------------------------------------------------------------------------------- -->
 <!-- Modal to add note -->
 <div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
