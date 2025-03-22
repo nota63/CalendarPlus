@@ -2869,57 +2869,37 @@ video::-webkit-media-controls-panel {
 
 
 <!-- FETCH AND MONITOR AUTOMATIONS -->
-<div class="modal fade" id="AutomationStatusModal" tabindex="-1" aria-labelledby="AutomationStatusModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="AutomationStatusModalLabel">Automation Status</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- FETCH AND MONITOR AUTOMATIONS - Headless UI Modal -->
+<div id="AutomationStatusModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl">
+        <div class="flex justify-between items-center px-4 py-3 border-b">
+            <h2 class="text-lg font-semibold">Automation Status</h2>
+            <button id="closeAutomationModal" class="text-gray-500 hover:text-gray-700">&times;</button>
+        </div>
+        <div class="p-4 space-y-4">
+
+            <!-- Proceeded Section -->
+            <div>
+                <button class="w-full text-left font-medium text-green-600 flex justify-between items-center" id="toggleProceeded">
+                    ✅ Proceeded Automations <span id="proceededCount" class="ml-2 px-2 py-0.5 text-xs bg-green-200 text-green-800 rounded">0</span>
+                </button>
+                <ul id="proceededList" class="mt-2 space-y-2 hidden"></ul>
             </div>
-            <div class="modal-body">
 
-                <!-- Accordion for Proceeded and Running -->
-                <div class="accordion" id="automationAccordion">
-
-                    <!-- Proceeded Section -->
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="proceededHeading">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#proceededSection" aria-expanded="true">
-                                ✅ Proceeded Automations
-                            </button>
-                        </h2>
-                        <div id="proceededSection" class="accordion-collapse collapse show" aria-labelledby="proceededHeading">
-                            <div class="accordion-body">
-                                <ul id="proceededList" class="list-group"></ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Running Section -->
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="runningHeading">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#runningSection" aria-expanded="false">
-                                ⏳ Running Automations
-                            </button>
-                        </h2>
-                        <div id="runningSection" class="accordion-collapse collapse" aria-labelledby="runningHeading">
-                            <div class="accordion-body">
-                                <ul id="runningList" class="list-group"></ul>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
+            <!-- Running Section -->
+            <div>
+                <button class="w-full text-left font-medium text-yellow-600 flex justify-between items-center" id="toggleRunning">
+                    ⏳ Running Automations <span id="runningCount" class="ml-2 px-2 py-0.5 text-xs bg-yellow-200 text-yellow-800 rounded">0</span>
+                </button>
+                <ul id="runningList" class="mt-2 space-y-2 hidden"></ul>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
+
+        </div>
+        <div class="p-4 border-t flex justify-end">
+            <button id="closeAutomationModalFooter" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Close</button>
         </div>
     </div>
 </div>
-
-
 
 
 <!-- -------------------------------------------------------------------------------------------------------------------------- -->
@@ -3018,13 +2998,14 @@ video::-webkit-media-controls-panel {
                 </button>
 
                 <!-- MONITOR AUTOMATIONS -->
-                <button class="flex items-center px-3 py-2.5 rounded-lg text-slate-600 hover:bg-gray-100/50 transition-colors duration-200 group ml-2 mr-2" id="openAutomationModal" data-org-id="1" data-group-id="5" data-task-id="12">
-                    <svg class="w-6 h-6 ml-1 mr-3 animate-spin text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 0116 0m-8-8v8l4 2"/>
-                    </svg>
-                    
-                    <span class="text-sm">Running Processes</span>
+                <!-- Open Automation Modal Button -->
+                <button class="flex items-center px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100 transition group ml-2 mr-2" id="openAutomationModal">
+                   <svg class="w-6 h-6 ml-1 mr-3 animate-spin text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 0116 0m-8-8v8l4 2"/>
+                   </svg>
+                  <span class="text-sm">Running Processes</span>
                 </button>
+
                 
 
             </nav>

@@ -412,6 +412,7 @@ function filterActivities() {
 
 
 // fetch and monitor automations
+// Open Automation Modal
 document.getElementById("openAutomationModal").addEventListener("click", function () {
     const orgId = window.djangoData.orgId;
     const groupId = window.djangoData.groupId;
@@ -433,38 +434,65 @@ document.getElementById("openAutomationModal").addEventListener("click", functio
         proceededList.innerHTML = "";
         runningList.innerHTML = "";
 
+        let hasProceeded = false;
+        let hasRunning = false;
+
         // Populate Proceeded List
         if (data.proceeded && Object.keys(data.proceeded).length > 0) {
-            for (const key of Object.keys(data.proceeded)) {
+            hasProceeded = true;
+            Object.keys(data.proceeded).forEach(key => {
                 const listItem = document.createElement("li");
-                listItem.className = "list-group-item text-success";
+                listItem.className = "p-2 bg-green-100 text-green-800 rounded";
                 listItem.innerHTML = `<strong>${formatKey(key)}:</strong> ✅ Proceeded`;
                 proceededList.appendChild(listItem);
-            }
+            });
         } else {
-            proceededList.innerHTML = `<li class="list-group-item text-muted">No automations proceeded yet.</li>`;
+            proceededList.innerHTML = `<li class="p-2 text-gray-500">No automations proceeded yet.</li>`;
         }
 
         // Populate Running List
         if (data.running && Object.keys(data.running).length > 0) {
-            for (const key of Object.keys(data.running)) {
+            hasRunning = true;
+            Object.keys(data.running).forEach(key => {
                 const listItem = document.createElement("li");
-                listItem.className = "list-group-item text-warning";
+                listItem.className = "p-2 bg-yellow-100 text-yellow-800 rounded";
                 listItem.innerHTML = `<strong>${formatKey(key)}:</strong> ⏳ Running`;
                 runningList.appendChild(listItem);
-            }
+            });
         } else {
-            runningList.innerHTML = `<li class="list-group-item text-muted">No running automations.</li>`;
+            runningList.innerHTML = `<li class="p-2 text-gray-500">No running automations.</li>`;
         }
 
-        // Open the updated modal
-        new bootstrap.Modal(document.getElementById("AutomationStatusModal")).show();
+        // Show/Hide Sections Based on Data
+        proceededList.style.display = hasProceeded ? "block" : "none";
+        runningList.style.display = hasRunning ? "block" : "none";
+
+        // Show Modal
+        document.getElementById("AutomationStatusModal").classList.remove("hidden");
     })
     .catch(error => {
         console.error("Error fetching automation status:", error);
-        document.getElementById("proceededList").innerHTML = `<li class="list-group-item text-danger">Error loading data.</li>`;
-        document.getElementById("runningList").innerHTML = `<li class="list-group-item text-danger">Error loading data.</li>`;
+        document.getElementById("proceededList").innerHTML = `<li class="p-2 text-red-500">Error loading data.</li>`;
+        document.getElementById("runningList").innerHTML = `<li class="p-2 text-red-500">Error loading data.</li>`;
     });
+});
+
+// Close Modal
+document.getElementById("closeAutomationModal").addEventListener("click", function () {
+    document.getElementById("AutomationStatusModal").classList.add("hidden");
+});
+
+document.getElementById("closeAutomationModalFooter").addEventListener("click", function () {
+    document.getElementById("AutomationStatusModal").classList.add("hidden");
+});
+
+// Toggle Sections
+document.getElementById("toggleProceeded").addEventListener("click", function () {
+    document.getElementById("proceededList").classList.toggle("hidden");
+});
+
+document.getElementById("toggleRunning").addEventListener("click", function () {
+    document.getElementById("runningList").classList.toggle("hidden");
 });
 
 // Helper function to format field names
