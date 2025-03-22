@@ -2142,7 +2142,7 @@ video::-webkit-media-controls-panel {
               <use xlink:href="#windows-logo"/>
             </svg>
             <h2 class="text-2xl font-bold text-gray-900 font-['Poppins']">
-              <span class="text-blue-600">SecureProctor</span> Surveillance System
+              <span class="text-blue-600">SecureProctor</span> Monitor {{task.assigned_to.username}}
             </h2>
           </div>
           
@@ -2184,24 +2184,91 @@ video::-webkit-media-controls-panel {
           </div>
 
           <!-- Advanced Controls -->
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <button class="control-btn bg-red-100 hover:bg-red-200 text-red-800">
-              <span class="material-icons-sharp bg-red-100 p-3 rounded-full">warning</span>
-              Emergency Lock
-            </button>
-            <button class="control-btn bg-blue-100 hover:bg-blue-200 text-blue-800">
-              <span class="material-icons-sharp bg-blue-100 p-3 rounded-full">screen_share</span>
-              Request Control
-            </button>
-            <button class="control-btn bg-purple-100 hover:bg-purple-200 text-purple-800">
-              <span class="material-icons-sharp bg-purple-100 p-3 rounded-full">content_paste_off</span>
-              Block Clipboard
-            </button>
-            <button class="control-btn bg-green-100 hover:bg-green-200 text-green-800">
-              <span class="material-icons-sharp bg-green-100 p-3 rounded-full">motion_photos_auto</span>
-              Motion Detect
-            </button>
-          </div>
+
+          <!-- Enhanced Advanced Controls -->
+<div class="glass-card p-6 rounded-3xl bg-white/90 backdrop-blur-lg border border-white/30 shadow-xl mb-8">
+  <h4 class="text-lg font-['Inter'] font-semibold text-gray-700 mb-5 pl-2">
+    Critical System Controls
+  </h4>
+  
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Emergency Lock -->
+    <div class="control-card group relative bg-white border border-red-200/60 rounded-xl p-4 transition-all duration-300 hover:border-red-500/40 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+      <div class="flex items-center gap-4">
+        <div class="bg-red-100/80 p-3 rounded-xl">
+          <span class="material-icons-sharp text-2xl text-red-600">emergency</span>
+        </div>
+        <div>
+          <h5 class="font-semibold text-red-800">Emergency Lock</h5>
+          <p class="text-sm text-red-600/80">Immediate system freeze</p>
+        </div>
+      </div>
+      <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <span class="material-icons-sharp text-red-500 text-lg">priority_high</span>
+      </div>
+    </div>
+
+    <!-- Request Control -->
+    <div class="control-card group relative bg-white border border-blue-200/60 rounded-xl p-4 transition-all duration-300 hover:border-blue-500/40 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+      <div class="flex items-center gap-4">
+        <div class="bg-blue-100/80 p-3 rounded-xl">
+          <span class="material-icons-sharp text-2xl text-blue-600">desktop_windows</span>
+        </div>
+        <div>
+          <h5 class="font-semibold text-blue-800">Remote Access</h5>
+          <p class="text-sm text-blue-600/80">Request system control</p>
+        </div>
+      </div>
+      <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <span class="material-icons-sharp text-blue-500 text-lg">login</span>
+      </div>
+    </div>
+
+    <!-- Block Clipboard -->
+    <div class="control-card group relative bg-white border border-purple-200/60 rounded-xl p-4 transition-all duration-300 hover:border-purple-500/40 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+      <div class="flex items-center gap-4">
+        <div class="bg-purple-100/80 p-3 rounded-xl">
+          <span class="material-icons-sharp text-2xl text-purple-600">content_cut_off</span>
+        </div>
+        <div>
+          <h5 class="font-semibold text-purple-800">Clipboard Block</h5>
+          <p class="text-sm text-purple-600/80">Disable copy/paste</p>
+        </div>
+      </div>
+      <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <span class="material-icons-sharp text-purple-500 text-lg">block</span>
+      </div>
+    </div>
+
+    <!-- Motion Detect -->
+    <div class="control-card group relative bg-white border border-green-200/60 rounded-xl p-4 transition-all duration-300 hover:border-green-500/40 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+      <div class="flex items-center gap-4">
+        <div class="bg-green-100/80 p-3 rounded-xl">
+          <span class="material-icons-sharp text-2xl text-green-600">motion_sensor_active</span>
+        </div>
+        <div>
+          <h5 class="font-semibold text-green-800">Motion Detection</h5>
+          <p class="text-sm text-green-600/80">Enable surveillance</p>
+        </div>
+      </div>
+      <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <span class="material-icons-sharp text-green-500 text-lg">radar</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Indicator -->
+  <div class="mt-5 pt-4 border-t border-gray-200/50 flex items-center justify-between px-2">
+    <div class="flex items-center gap-2 text-sm text-gray-500">
+      <span class="material-icons-sharp text-base text-green-500">fiber_manual_record</span>
+      Security System: Active
+    </div>
+    <div class="text-sm text-gray-500">
+      <span class="material-icons-sharp text-base align-middle mr-1">schedule</span>
+      24/7 Monitoring
+    </div>
+  </div>
+</div>
 
           <!-- System Diagnostics -->
           <div class="glass-card p-6 rounded-2xl bg-white shadow-md">
