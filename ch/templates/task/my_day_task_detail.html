@@ -3391,6 +3391,7 @@ video::-webkit-media-controls-panel {
                 </button>
 
                 <!-- MONITOR AUTOMATIONS -->
+                {% if automations %}
                 <!-- Open Automation Modal Button -->
                 <button class="flex items-center px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100 transition group ml-2 mr-2" id="openAutomationModal">
                    <svg class="w-6 h-6 ml-1 mr-3 animate-spin text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3398,6 +3399,7 @@ video::-webkit-media-controls-panel {
                    </svg>
                   <span class="text-sm">Running Processes</span>
                 </button>
+                {% endif %}
 
                 
 

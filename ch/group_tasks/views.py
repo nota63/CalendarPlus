@@ -2283,10 +2283,25 @@ def my_day_task_detail(request, org_id, group_id, task_id):
     calpoints = None
     if task.status =='completed':
         calpoints = CalPoints.objects.filter(organization=organization,user=request.user).first()
-    
+
+    # Check automation records 
+    # Get all boolean fields dynamically
+    boolean_fields = [field.name for field in AutomationTask._meta.fields if isinstance(field, models.BooleanField)]
+
+    # Build dynamic Q filter for True values
+    query = Q()
+    for field in boolean_fields:
+        query |= Q(**{field: True})
+
+        # Apply filter
+    automations = AutomationTask.objects.filter(
+            task=task,
+            organization=organization,
+            group=group,
+            user=request.user
+        ).filter(query)
 
     # check if user installed the Extend Tasks app
-    # Check if "Extend Tasks" app is installed
     extend_tasks = InstalledMiniApp.objects.filter(organization=organization, user=request.user, mini_app__name="Extend Tasks")
 
     if extend_tasks.exists():
@@ -2307,6 +2322,7 @@ def my_day_task_detail(request, org_id, group_id, task_id):
         'extend_tasks':extend_tasks,
         'queries':queries,
         'calpoints':calpoints,
+        'automations':automations,
     })
 
 
