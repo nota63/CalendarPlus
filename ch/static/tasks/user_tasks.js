@@ -333,6 +333,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
+
 // FETCH AND DISPLAY THE TASK ACTIVITIES
 document.addEventListener("DOMContentLoaded", function () {
     const modal = document.getElementById("TaskActivitiesModal");
@@ -395,7 +396,6 @@ function fetchActivityLogs() {
         activityList.innerHTML = `<p class="text-danger text-center">Failed to fetch activities.</p>`;
     });
 }
-
 
 
 // filter activities in real time

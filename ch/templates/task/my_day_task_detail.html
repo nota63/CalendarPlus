@@ -2753,22 +2753,113 @@ video::-webkit-media-controls-panel {
 </div>
 
 <!-- FETCH AND DISPLAY TASK ACTIVITIES -->
- <!-- Bootstrap 5 Modal -->
-<div class="modal fade" id="TaskActivitiesModal" tabindex="-1" aria-labelledby="TaskActivitiesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="TaskActivitiesModalLabel">📌 Task Activities</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<!-- Modal Structure -->
+<div class="modal fade !font-[Poppins]" id="TaskActivitiesModal" tabindex="-1" aria-labelledby="TaskActivitiesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content rounded-2xl bg-gradient-to-br from-gray-50 to-blue-50/50 backdrop-blur-lg shadow-2xl border border-white/30">
+            <div class="modal-header px-6 py-4 border-b border-gray-200/50">
+                <div class="flex items-center justify-between w-full">
+                    <h5 class="modal-title text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        📍Activities in {{task.title}}
+                    </h5>
+                    <div class="flex space-x-3">
+                        <button class="p-2 rounded-full bg-white shadow-lg hover:shadow-xl transition-shadow">
+                            <i class="fas fa-cog text-blue-500"></i>
+                        </button>
+                        <button type="button" class="p-2 rounded-full bg-white shadow-lg hover:shadow-xl transition-shadow" data-bs-dismiss="modal">
+                            <i class="fas fa-times text-gray-500"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body">
-                <!-- Search Bar -->
-                <input type="text" id="activitySearch" class="form-control mb-3" placeholder="🔍 Search activities..." oninput="filterActivities()">
+
+            <div class="modal-body p-6">
+                <!-- Dashboard Controls -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="col-span-2">
+                        <div class="relative">
+                            <input type="text" id="activitySearch" 
+                                   class="w-full pl-12 pr-4 py-3 rounded-xl border-0 shadow-md hover:shadow-lg focus:shadow-xl focus:ring-2 focus:ring-blue-300 transition-all placeholder-gray-400"
+                                   placeholder="Search activities...">
+                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                    </div>
+                    <select class="rounded-xl bg-white shadow-md hover:shadow-lg px-4 border-0 focus:ring-2 focus:ring-purple-300">
+                        <option>Filter by Date</option>
+                        <option>Last 24h</option>
+                        <option>Last Week</option>
+                    </select>
+                    <select class="rounded-xl bg-white shadow-md hover:shadow-lg px-4 border-0 focus:ring-2 focus:ring-green-300">
+                        <option>Filter by Status</option>
+                        <option>Completed</option>
+                        <option>Pending</option>
+                    </select>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+                        <div class="text-gray-500">Total Activities</div>
+                        <div class="text-2xl font-bold text-blue-600">1,234</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+                        <div class="text-gray-500">Active Users</div>
+                        <div class="text-2xl font-bold text-purple-600">42</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+                        <div class="text-gray-500">Avg. Daily</div>
+                        <div class="text-2xl font-bold text-green-600">89</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+                        <div class="text-gray-500">Completion Rate</div>
+                        <div class="text-2xl font-bold text-orange-600">78%</div>
+                    </div>
+                </div>
 
                 <!-- Activity Timeline -->
-                <div class="timeline">
-                    <div id="activity-list">
-                        <p class="text-muted text-center">Loading activities...</p>
+                <div class="relative h-96 overflow-y-scroll scrollbar-hidden bg-white/50 rounded-2xl shadow-inner p-6">
+                    <div class="absolute left-8 h-full w-1 bg-gray-200/50 rounded-full"></div>
+                    <div id="activity-list" class="space-y-6">
+                        <!-- Sample Activity Item -->
+                        <div class="relative pl-16 group hover:scale-[1.01] transition-transform">
+                            <div class="absolute left-0 w-6 h-6 rounded-full bg-blue-500 shadow-lg border-2 border-white -translate-x-1/2"></div>
+                            <div class="p-4 bg-white rounded-xl shadow-md hover:shadow-lg">
+                                <div class="flex justify-between items-center mb-2">
+                                    <div class="font-semibold text-blue-600">@john_doe</div>
+                                    <div class="text-sm text-gray-500">2h ago</div>
+                                </div>
+                                <p class="text-gray-600">Updated task status to "In Progress"</p>
+                                <div class="mt-2 flex space-x-2">
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-600 rounded-full text-sm">Update</span>
+                                    <span class="px-2 py-1 bg-purple-100 text-purple-600 rounded-full text-sm">High Priority</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Repeat similar structure for other activities -->
+                    </div>
+                </div>
+
+                <!-- Additional Controls -->
+                <div class="mt-6 flex justify-between items-center">
+                    <div class="flex space-x-3">
+                        <button class="flex items-center space-x-2 px-4 py-2 bg-white rounded-xl shadow-md hover:shadow-lg">
+                            <i class="fas fa-download text-gray-600"></i>
+                            <span>Export</span>
+                        </button>
+                        <button class="flex items-center space-x-2 px-4 py-2 bg-white rounded-xl shadow-md hover:shadow-lg">
+                            <i class="fas fa-filter text-purple-600"></i>
+                            <span>Advanced Filters</span>
+                        </button>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="p-2 rounded-lg bg-white shadow-md hover:shadow-lg">
+                            <i class="fas fa-list-ul text-gray-600"></i>
+                        </button>
+                        <button class="p-2 rounded-lg bg-white shadow-md hover:shadow-lg">
+                            <i class="fas fa-th-large text-blue-600"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -2776,61 +2867,24 @@ video::-webkit-media-controls-panel {
     </div>
 </div>
 
-
-<!-- Timeline CSS -->
 <style>
-    .timeline {
-        position: relative;
-        margin: 20px 0;
-        padding-left: 40px;
-    }
-    .timeline::before {
-        content: '';
-        position: absolute;
-        left: 20px;
-        top: 0;
-        bottom: 0;
-        width: 4px;
-        background: #ddd;
-        border-radius: 2px;
-    }
-    .timeline-item {
-        position: relative;
-        margin-bottom: 20px;
-    }
-    .timeline-item::before {
-        content: attr(data-icon);
-        font-family: 'Material Icons Sharp';
-        position: absolute;
-        left: -35px;
-        background: var(--icon-bg, #888);
-        color: white;
-        padding: 5px;
-        border-radius: 50%;
-        font-size: 18px;
-    }
-    .timeline-content {
-        background: #f9f9f9;
-        padding: 10px;
-        border-radius: 5px;
-        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-        position: relative;
-    }
-    .timeline-content:hover::after {
-        content: attr(data-details);
-        position: absolute;
-        left: 105%;
-        top: 50%;
-        transform: translateY(-50%);
-        background: rgba(0, 0, 0, 0.8);
-        color: #fff;
-        padding: 5px 10px;
-        border-radius: 5px;
-        font-size: 12px;
-        white-space: nowrap;
-    }
-</style>
+.scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+}
 
+.modal-content {
+    font-family: 'Poppins', sans-serif;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.activity-item {
+    animation: fadeIn 0.3s ease-out;
+}
+</style>
 <!-- -------------------------------------------------------------------------------------------------------------------------- -->
 
 
