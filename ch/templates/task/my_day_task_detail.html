@@ -2120,283 +2120,257 @@ video::-webkit-media-controls-panel {
 
 
 <!-- Show Spectors -->
-<div class="modal fade" id="spectorsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog max-w-7xl">
-        <div class="modal-content border-0 bg-gradient-to-br from-blue-50/30 to-purple-50/20 backdrop-blur-2xl rounded-2xl shadow-2xl">
-            <!-- Close Button -->
-            <button type="button" class="absolute top-6 right-6 text-gray-600 hover:text-gray-800 z-10"
-                data-bs-dismiss="modal" aria-label="Close">
-                <span class="material-icons-sharp text-3xl">close</span>
-            </button>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 
-            <strong>You are being proctorred Live</strong>
-            <p>All your activities are sharing live on {{task.created_by.username}} system</p>
+<!-- Windows 11 SVG -->
+<svg style="display: none;">
+  <symbol id="windows-logo" viewBox="0 0 24 24">
+    <path fill="#0078D4" d="M0 3.449L9.75 2.1v9.65H0m10.949-9.6L24 0v11.4H10.949M0 12.6h9.75v9.65L0 20.6M10.949 12.6H24V24l-13.051-1.35"/>
+  </symbol>
+</svg>
 
-            <div class="modal-body p-6 h-[80vh] overflow-y-auto scroll-container">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <!-- Left Column - Monitoring & Controls -->
-                    <div class="lg:col-span-2 space-y-6">
-                        <!-- Header -->
-                        <div class="flex items-center justify-between mb-8">
-                            <h2 class="text-3xl font-bold text-gray-900 font-['Inter']">
-                                <span class="material-icons-sharp text-4xl align-middle mr-3 text-blue-600">admin_panel_settings</span>
-                                Proctoring Dashboard
-                            </h2>
-
-                            <img src="#">
-                            <!-- add windows 11 svg logo here -->
-                            <div class="flex items-center gap-3">
-                                <span class="badge bg-emerald-100 text-emerald-800">
-                                    <span class="material-icons-sharp text-sm mr-1">verified</span>
-                                    Certified
-                                </span>
-                                <span class="badge bg-blue-100 text-blue-800">
-                                    <span class="material-icons-sharp text-sm mr-1">timer</span>
-                                    <span id="sessionTimer">12:34</span>
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Video Surveillance -->
-                        <div class="glass-card p-4 rounded-xl">
-                            <div class="aspect-video bg-gray-100/50 rounded-xl flex items-center justify-center">
-                                <span class="material-icons-sharp text-6xl text-gray-400">videocam_off</span>
-                            </div>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
-                                <div class="status-chip bg-red-50 text-red-800">
-                                    <span class="material-icons-sharp animate-pulse">fiber_manual_record</span>
-                                    Recording
-                                </div>
-                                <div class="status-chip bg-green-50 text-green-800">
-                                    <span class="material-icons-sharp">mic</span>
-                                    Audio Active
-                                </div>
-                                <div class="status-chip bg-blue-50 text-blue-800">
-                                    <span class="material-icons-sharp">visibility</span>
-                                    Gaze Tracking
-                                </div>
-                                <div class="status-chip bg-purple-50 text-purple-800">
-                                    <span class="material-icons-sharp">keyboard</span>
-                                    Keystroke Log
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Proctoring Controls Grid -->
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            <button class="control-btn bg-red-100 hover:bg-red-200 text-red-800">
-                                <span class="material-icons-sharp">flag</span>
-                                Raise Incident
-                            </button>
-                            <button class="control-btn bg-blue-100 hover:bg-blue-200 text-blue-800">
-                                <span class="material-icons-sharp">screen_search_desktop</span>
-                                Screen Analyze
-                            </button>
-                            <button class="control-btn bg-orange-100 hover:bg-orange-200 text-orange-800">
-                                <span class="material-icons-sharp">content_paste_off</span>
-                                Block Clipboard
-                            </button>
-                            <button class="control-btn bg-purple-100 hover:bg-purple-200 text-purple-800">
-                                <span class="material-icons-sharp">lock_clock</span>
-                                Time Lock
-                            </button>
-                        </div>
-
-                        <!-- System Health Dashboard -->
-                        <div class="glass-card p-5 rounded-xl">
-                            <h4 class="text-lg font-semibold mb-4 flex items-center text-gray-800">
-                                <span class="material-icons-sharp mr-2 text-blue-600">monitor_heart</span>
-                                System Integrity
-                            </h4>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                <div class="metric-card">
-                                    <div class="metric-value text-blue-600">83%</div>
-                                    <div class="metric-label">Environment Check</div>
-                                </div>
-                                <div class="metric-card">
-                                    <div class="metric-value text-green-600">64%</div>
-                                    <div class="metric-label">Clipboard Access</div>
-                                </div>
-                                <div class="metric-card">
-                                    <div class="metric-value text-purple-600">97%</div>
-                                    <div class="metric-label">Device Trust</div>
-                                </div>
-                                <div class="metric-card">
-                                    <div class="metric-value text-red-600">3</div>
-                                    <div class="metric-label">Violations</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Right Column - Proctor Panel -->
-                    <div class="space-y-6">
-                        <!-- Proctor Profile -->
-                        <div class="glass-card p-5 rounded-xl">
-                            <div class="flex items-center gap-4 mb-4">
-                               
-                                <p><span id="profilePicture"></span></p>
-
-                                    
-                                <div>
-                                    <h3 id="taskCreatedBy" class="text-xl font-bold text-gray-900">Proctor Name</h3>
-                                    <p class="text-sm text-gray-600">{{task.created_by.username}}</p>
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <div class="info-item">
-                                    <span class="material-icons-sharp text-green-500">circle</span>
-                                    <span id="taskLastLogin">Active Now</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="material-icons-sharp">mail</span>
-                                    <span id="taskEmail">{{task.created_by.email}}</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="material-icons-sharp">shield</span>
-                                    Security Level: <span class="font-medium">Tier 3</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Session Analytics -->
-                        <div class="glass-card p-5 rounded-xl">
-                            <h4 class="text-lg font-semibold mb-4 flex items-center text-gray-800">
-                                <span class="material-icons-sharp mr-2 text-purple-600">analytics</span>
-                                Session Metrics
-                            </h4>
-                            <div class="space-y-3">
-                                <div class="metric-line">
-                                    <div class="metric-title">Focus Level</div>
-                                    <div class="metric-bar bg-blue-100">
-                                        <div class="metric-progress bg-blue-600" style="width: 75%"></div>
-                                    </div>
-                                </div>
-                                <div class="metric-line">
-                                    <div class="metric-title">Activity Consistency</div>
-                                    <div class="metric-bar bg-green-100">
-                                        <div class="metric-progress bg-green-600" style="width: 82%"></div>
-                                    </div>
-                                </div>
-                                <div class="metric-line">
-                                    <div class="metric-title">Input Variation</div>
-                                    <div class="metric-bar bg-red-100">
-                                        <div class="metric-progress bg-red-600" style="width: 34%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Security Command Center -->
-                        <div class="glass-card p-5 rounded-xl">
-                            <h4 class="text-lg font-semibold mb-4 flex items-center text-gray-800">
-                                <span class="material-icons-sharp mr-2 text-red-600">security</span>
-                                Threat Prevention
-                            </h4>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div class="security-status bg-green-50 text-green-800">
-                                    <span class="material-icons-sharp">devices</span>
-                                    Device Approved
-                                </div>
-                                <div class="security-status bg-red-50 text-red-800">
-                                    <span class="material-icons-sharp">warning</span>
-                                    2 Alerts
-                                </div>
-                                <div class="security-status bg-blue-50 text-blue-800">
-                                    <span class="material-icons-sharp">vpn_key</span>
-                                    Encryption Active
-                                </div>
-                                <div class="security-status bg-purple-50 text-purple-800">
-                                    <span class="material-icons-sharp">update</span>
-                                    Last Scan: 2m
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Quick Actions -->
-                        <div class="glass-card p-5 rounded-xl">
-                            <h4 class="text-lg font-semibold mb-4 flex items-center text-gray-800">
-                                <span class="material-icons-sharp mr-2 text-orange-600">flash_on</span>
-                                Session Controls
-                            </h4>
-                            <div class="grid grid-cols-2 gap-3">
-                                <button class="action-btn bg-blue-600 hover:bg-blue-700 text-white">
-                                    <span class="material-icons-sharp">settings</span>
-                                    Preferences
-                                </button>
-                                <button class="action-btn bg-red-600 hover:bg-red-700 text-white">
-                                    <span class="material-icons-sharp">exit_to_app</span>
-                                    Terminate
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<!-- Proctoring Modal -->
+<div class="modal fade fixed top-0 left-0" id="spectorsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content bg-gradient-to-br from-blue-50/70 via-white to-purple-50/60 backdrop-blur-xl">
+      <!-- Header Section -->
+      <div class="border-b border-white/20">
+        <div class="flex items-center justify-between p-6">
+          <div class="flex items-center gap-4">
+            <svg class="w-8 h-8 text-blue-600">
+              <use xlink:href="#windows-logo"/>
+            </svg>
+            <h2 class="text-2xl font-bold text-gray-900 font-['Poppins']">
+              <span class="text-blue-600">SecureProctor</span> Surveillance System
+            </h2>
+          </div>
+          
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 text-sm font-medium text-gray-700">
+              <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+              LIVE SESSION
             </div>
+            <button type="button" class="p-2 hover:bg-gray-100/50 rounded-lg" data-bs-dismiss="modal">
+              <span class="material-icons-sharp text-2xl text-gray-600">close</span>
+            </button>
+          </div>
         </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_400px] h-[calc(100vh-80px)]">
+        <!-- Left Column - Surveillance -->
+        <div class="p-6 border-r border-white/20">
+          <!-- Video Feed Grid -->
+          <div class="grid grid-cols-2 gap-6 mb-8">
+            <div class="glass-card aspect-video rounded-2xl overflow-hidden">
+              <div class="bg-gray-100 h-full flex items-center justify-center">
+                <span class="material-icons-sharp text-6xl text-gray-400">face</span>
+              </div>
+              <div class="absolute bottom-4 left-4 badge bg-black/30 text-white backdrop-blur-sm">
+                Facial Recognition
+              </div>
+            </div>
+            
+            <div class="glass-card aspect-video rounded-2xl overflow-hidden">
+              <div class="bg-gray-100 h-full flex items-center justify-center">
+                <span class="material-icons-sharp text-6xl text-gray-400">desktop_windows</span>
+              </div>
+              <div class="absolute bottom-4 left-4 badge bg-black/30 text-white backdrop-blur-sm">
+                Screen Capture
+              </div>
+            </div>
+          </div>
+
+          <!-- Advanced Controls -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <button class="control-btn bg-red-100 hover:bg-red-200 text-red-800">
+              <span class="material-icons-sharp bg-red-100 p-3 rounded-full">warning</span>
+              Emergency Lock
+            </button>
+            <button class="control-btn bg-blue-100 hover:bg-blue-200 text-blue-800">
+              <span class="material-icons-sharp bg-blue-100 p-3 rounded-full">screen_share</span>
+              Request Control
+            </button>
+            <button class="control-btn bg-purple-100 hover:bg-purple-200 text-purple-800">
+              <span class="material-icons-sharp bg-purple-100 p-3 rounded-full">content_paste_off</span>
+              Block Clipboard
+            </button>
+            <button class="control-btn bg-green-100 hover:bg-green-200 text-green-800">
+              <span class="material-icons-sharp bg-green-100 p-3 rounded-full">motion_photos_auto</span>
+              Motion Detect
+            </button>
+          </div>
+
+          <!-- System Diagnostics -->
+          <div class="glass-card p-6 rounded-2xl">
+            <h3 class="text-lg font-['Poppins'] font-semibold mb-4 flex items-center gap-2">
+              <span class="material-icons-sharp text-blue-600">monitor_heart</span>
+              Environment Integrity
+            </h3>
+            <div class="grid grid-cols-4 gap-4">
+              <div class="diagnostic-card bg-green-50">
+                <span class="material-icons-sharp text-green-600">check_circle</span>
+                <span class="text-sm">Verified OS</span>
+              </div>
+              <div class="diagnostic-card bg-red-50">
+                <span class="material-icons-sharp text-red-600">dangerous</span>
+                <span class="text-sm">2 Blocked Apps</span>
+              </div>
+              <div class="diagnostic-card bg-blue-50">
+                <span class="material-icons-sharp text-blue-600">security</span>
+                <span class="text-sm">Secure Boot</span>
+              </div>
+              <div class="diagnostic-card bg-purple-50">
+                <span class="material-icons-sharp text-purple-600">network_check</span>
+                <span class="text-sm">Stable Connection</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column - Proctor Panel -->
+        <div class="p-6 bg-white/30 backdrop-blur-lg">
+          <!-- Proctor Profile -->
+          <div class="glass-card p-6 rounded-2xl mb-6">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                <span class="material-icons-sharp text-blue-600">admin_panel_settings</span>
+              </div>
+              <div>
+                <h3 class="font-['Poppins'] font-semibold">{{task.created_by.username}}</h3>
+                <p class="text-sm text-gray-600">Senior Proctor</p>
+              </div>
+            </div>
+            <div class="space-y-3">
+              <div class="info-item">
+                <span class="material-icons-sharp text-green-500">fiber_manual_record</span>
+                <span>Active Session</span>
+                <span class="ml-auto font-medium">12:34</span>
+              </div>
+              <div class="info-item">
+                <span class="material-icons-sharp">verified_user</span>
+                <span>Security Level</span>
+                <span class="ml-auto badge bg-blue-100 text-blue-800">Tier 3</span>
+              </div>
+              <div class="info-item">
+                <span class="material-icons-sharp">mail</span>
+                <span>{{task.created_by.email}}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Threat Detection -->
+          <div class="glass-card p-6 rounded-2xl mb-6">
+            <h3 class="text-lg font-['Poppins'] font-semibold mb-4 flex items-center gap-2">
+              <span class="material-icons-sharp text-red-600">security</span>
+              Threat Prevention
+            </h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="threat-card bg-green-50">
+                <span class="material-icons-sharp text-green-600">check_circle</span>
+                Zero Malware
+              </div>
+              <div class="threat-card bg-red-50">
+                <span class="material-icons-sharp text-red-600">warning</span>
+                2 Policy Violations
+              </div>
+              <div class="threat-card bg-blue-50">
+                <span class="material-icons-sharp text-blue-600">vpn_lock</span>
+                Encrypted
+              </div>
+              <div class="threat-card bg-purple-50">
+                <span class="material-icons-sharp text-purple-600">update</span>
+                Last Scan: 2m
+              </div>
+            </div>
+          </div>
+
+          <!-- Session Analytics -->
+          <div class="glass-card p-6 rounded-2xl">
+            <h3 class="text-lg font-['Poppins'] font-semibold mb-4 flex items-center gap-2">
+              <span class="material-icons-sharp text-purple-600">analytics</span>
+              Behavioral Metrics
+            </h3>
+            <div class="space-y-4">
+              <div class="metric-item">
+                <div class="flex justify-between mb-1">
+                  <span>Focus Level</span>
+                  <span class="font-medium">84%</span>
+                </div>
+                <div class="h-2 bg-gray-100 rounded-full">
+                  <div class="h-2 bg-green-500 rounded-full w-4/5"></div>
+                </div>
+              </div>
+              <div class="metric-item">
+                <div class="flex justify-between mb-1">
+                  <span>Activity Consistency</span>
+                  <span class="font-medium">76%</span>
+                </div>
+                <div class="h-2 bg-gray-100 rounded-full">
+                  <div class="h-2 bg-blue-500 rounded-full w-3/4"></div>
+                </div>
+              </div>
+              <div class="metric-item">
+                <div class="flex justify-between mb-1">
+                  <span>Input Anomalies</span>
+                  <span class="font-medium">12%</span>
+                </div>
+                <div class="h-2 bg-gray-100 rounded-full">
+                  <div class="h-2 bg-red-500 rounded-full w-1/5"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <style>
-    .scroll-container {
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-    }
-    .scroll-container::-webkit-scrollbar {
-        display: none;
-    }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
+  }
 
-    .glass-card {
-        background: rgba(255, 255, 255, 0.4);
-        backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
-    }
+  .control-btn {
+    @apply p-4 rounded-xl flex flex-col items-center gap-3 text-sm font-medium transition-all;
+  }
 
-    .control-btn {
-        @apply p-3 rounded-xl flex items-center justify-center gap-2 text-sm font-medium transition-all;
-    }
+  .diagnostic-card {
+    @apply p-4 rounded-xl flex flex-col items-center gap-2 text-center;
+  }
 
-    .status-chip {
-        @apply p-2 rounded-lg flex items-center justify-center gap-1 text-sm font-medium;
-    }
+  .threat-card {
+    @apply p-3 rounded-lg flex items-center gap-2 text-sm font-medium;
+  }
 
-    .metric-card {
-        @apply text-center p-3 rounded-xl bg-white/50;
-    }
+  .info-item {
+    @apply flex items-center gap-3 p-3 rounded-lg bg-white/50 text-sm text-gray-700;
+  }
 
-    .metric-value {
-        @apply text-2xl font-bold mb-1;
-    }
+  .metric-item {
+    @apply bg-white/50 p-3 rounded-lg;
+  }
 
-    .metric-label {
-        @apply text-xs text-gray-600;
-    }
+  .badge {
+    @apply px-2 py-1 rounded-md text-xs font-medium;
+  }
 
-    .info-item {
-        @apply flex items-center gap-2 text-sm text-gray-700 p-2 rounded-md bg-white/30;
-    }
+  .modal-content {
+    @apply h-screen;
+  }
 
-    .metric-bar {
-        @apply h-2 rounded-full overflow-hidden;
-    }
-
-    .metric-progress {
-        @apply h-full rounded-full transition-all duration-500;
-    }
-
-    .security-status {
-        @apply p-2 rounded-lg flex items-center gap-2 text-sm font-medium;
-    }
-
-    .action-btn {
-        @apply p-3 rounded-xl flex items-center justify-center gap-2 text-sm font-medium transition-colors;
-    }
-
-    .badge {
-        @apply px-3 py-1 rounded-full text-sm flex items-center;
-    }
+  .material-icons-sharp {
+    @apply select-none;
+  }
 </style>
+
+
 <!-- -------------------------------------------------------------------------------------------------------------------------- -->
 <!-- Modal to add note -->
 <div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
