@@ -533,3 +533,13 @@ body {
 .activity-item {
     animation: fadeIn 0.3s ease-out;
 }
+
+.animate-shimmer {
+    animation: shimmer 2s infinite linear;
+    background-size: 200% 100%;
+}
+
+@keyframes shimmer {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+}

@@ -553,7 +553,7 @@ document.getElementById("openStopModal").addEventListener("click", function () {
 
     let progress = 0;
     let interval = setInterval(() => {
-        progress += 5; // Increase by 5% every 200ms
+        progress += 3; // Increase by 5% every 200ms
         progressBar.style.width = `${progress}%`;
 
         if (progress >= 100) {
