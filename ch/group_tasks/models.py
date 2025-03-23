@@ -984,3 +984,70 @@ class TaskCompletionActivities(models.Model):
 
     def __str__(self):
         return f"{self.accomplisher.username} - {self.task.title} ({self.created_at})"
+
+
+# TASK BACKUP 
+class TaskBackup(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)  # Backup Owner
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True, blank=True)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, null=True, blank=True)  # Task being backed up
+
+    backup_data = models.JSONField(null=True, blank=True)
+    comments = models.JSONField(null=True, blank=True) 
+    subtasks = models.JSONField(null=True, blank=True)  
+    attachments = models.JSONField(null=True, blank=True) 
+    activity_logs = models.JSONField(null=True, blank=True)  
+    automations = models.JSONField(null=True, blank=True)  
+    reminders = models.JSONField(null=True, blank=True) 
+    time_traced=models.JSONField(null=True, blank=True)
+    notes=models.JSONField(null=True, blank=True)
+    tags=models.JSONField(null=True, blank=True)
+    meetings=models.JSONField(null=True, blank=True)
+    conversation=models.JSONField(null=True, blank=True)
+
+
+    file_size = models.FloatField(null=True, blank=True)  # Approx. backup size in KB
+    backup_type = models.CharField(
+        max_length=20,
+        choices=[("manual", "Manual"), ("auto", "Automatic")],
+        default="manual",
+        null=True,
+        blank=True
+    )  
+    is_restored = models.BooleanField(default=False, null=True, blank=True)  # Track if restored
+    storage_location = models.CharField(
+        max_length=50, 
+        choices=[("database", "Database"), ("file", "File Storage")], 
+        default="database",
+        null=True,
+        blank=True
+    )  
+
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)  # When Backup was Created
+    restored_at = models.DateTimeField(null=True, blank=True)  # Last Restore Time
+
+    class Meta:
+        ordering = ["-created_at"]  # Show latest backups first
+
+    def calculate_size(self):
+        """Calculates approx. JSON size in KB"""
+        import sys
+        total_size = sum([
+            sys.getsizeof(self.backup_data),
+            sys.getsizeof(self.comments),
+            sys.getsizeof(self.subtasks),
+            sys.getsizeof(self.attachments),
+            sys.getsizeof(self.activity_logs),
+            sys.getsizeof(self.automations),
+            sys.getsizeof(self.reminders)
+        ])
+        return total_size / 1024  # Convert bytes to KB
+
+    def save(self, *args, **kwargs):
+        """Auto calculate file size before saving"""
+        self.file_size = self.calculate_size()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Backup #{self.id} - {self.task.title if self.task else 'Unknown Task'} ({self.created_at.strftime('%Y-%m-%d') if self.created_at else 'N/A'})"
