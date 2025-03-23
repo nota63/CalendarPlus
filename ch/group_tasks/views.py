@@ -1894,6 +1894,13 @@ def reassign_task(request, org_id, group_id, task_id):
         # Ensure the user exists in the organization & group
         organization = get_object_or_404(Organization, id=org_id)
         group = get_object_or_404(Group, id=group_id, organization=organization)
+
+        # prevent unauthorized access
+        organization = get_object_or_404(Organization, id=org_id)
+        profile = get_object_or_404(Profile, user=request.user , organization=organization)
+        if not profile:
+            return JsonResponse({'error':'You are not Authorized!'}, status= 404)
+
         
         # Check if user is in GroupMember model
         if not GroupMember.objects.filter(user=new_assignee, group=group).exists():
@@ -1915,6 +1922,13 @@ def reassign_task(request, org_id, group_id, task_id):
 def fetch_user_info(request, org_id, group_id):
     """Fetches user info dynamically based on email input."""
     email = request.GET.get("email")
+
+    # prevent unauthorized access
+    organization = get_object_or_404(Organization, id=org_id)
+    profiles = get_object_or_404(Profile, user=request.user , organization=organization)
+    if not profiles:
+        return JsonResponse({'error':'You are not Authorized!'}, status= 404)
+
     
     if email:
         user = User.objects.filter(email=email).first()
@@ -2025,6 +2039,13 @@ def fetch_enabled_automations(request):
         group_id = request.GET.get("group_id")
         task_id = request.GET.get("task_id")
 
+        # prevent unauthorized access
+        organization = get_object_or_404(Organization, id=org_id)
+        profile = get_object_or_404(Profile, user=request.user , organization=organization)
+        if not profile:
+            return JsonResponse({'error':'You are not Authorized!'}, status= 404)
+
+
         automation = AutomationTask.objects.filter(
             organization_id=org_id, group_id=group_id, task_id=task_id,user=request.user
         ).first()
@@ -2051,6 +2072,13 @@ def toggle_automation(request):
         automation_key = request.POST.get("automation_key")
         status = request.POST.get("status") == "true"
 
+        # prevent unauthorized access
+        organization = get_object_or_404(Organization, id=org_id)
+        profile = get_object_or_404(Profile, user=request.user , organization=organization)
+        if not profile:
+            return JsonResponse({'error':'You are not Authorized!'}, status= 404)
+
+
         automation, created = AutomationTask.objects.get_or_create(
             organization_id=org_id, group_id=group_id, task_id=task_id,user=request.user,
             defaults={automation_key: status}
@@ -2072,7 +2100,14 @@ def get_task_details(request, task_id):
             task = get_object_or_404(Task, id=task_id)
 
             # Filter profile to avoid "multiple objects returned" error
-            profile = Profile.objects.filter(user=task.created_by).first()  # Get the first profile if multiple exist
+            profile = Profile.objects.filter(user=task.created_by).first()  
+
+            # prevent unauthorized access
+            organization =task.organization
+            profiles = get_object_or_404(Profile, user=request.user , organization=organization)
+            if not profiles:
+                return JsonResponse({'error':'You are not Authorized!'}, status= 404)
+
 
             return JsonResponse({
                 "success": True,
@@ -2097,6 +2132,13 @@ def fetch_activity_logs_tasks(request):
     org_id = request.GET.get("org_id")
     group_id = request.GET.get("group_id")
     task_id = request.GET.get("task_id")
+
+    # prevent unauthorized access
+    organization = get_object_or_404(Organization, id=org_id)
+    profile = get_object_or_404(Profile, user=request.user , organization=organization)
+    if not profile:
+        return JsonResponse({'error':'You are not Authorized!'}, status= 404)
+
 
     logger.info(f"📡 Fetching activities for Org ID: {org_id}, Group ID: {group_id}, Task ID: {task_id}")
 
@@ -2160,6 +2202,12 @@ def get_task_automation_status(request):
 
         # Fetch the specific task
         task = get_object_or_404(Task, organization_id=org_id, group_id=group_id, id=task_id)
+        # prevent unauthorized access
+        organization = get_object_or_404(Organization, id=org_id)
+        profile = get_object_or_404(Profile, user=request.user , organization=organization)
+        if not profile:
+            return JsonResponse({'error':'You are not Authorized!'}, status= 404)
+
 
         # Automation fields to fetch
         automation_fields = [
