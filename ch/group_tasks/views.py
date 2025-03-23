@@ -2195,6 +2195,12 @@ def disable_all_automations(request):
         group_id = request.POST.get("group_id")
         task_id = request.POST.get("task_id")
 
+        # prevent unauthorized access
+        organization = get_object_or_404(Organization, id=org_id)
+        profile = get_object_or_404(Profile, user=request.user , organization=organization)
+        if not profile:
+            return JsonResponse({'error':'You are not Authorized!'}, status= 404)
+
         # Fetch the AutomationTask instance
         automation_task = get_object_or_404(AutomationTask, organization_id=org_id, group_id=group_id, task_id=task_id)
 
@@ -2214,7 +2220,7 @@ def disable_all_automations(request):
         for field in automation_fields:
             setattr(automation_task, field, False)
 
-        automation_task.save()  # Save changes
+        automation_task.save() 
 
         return JsonResponse({"status": "success", "message": "All automations have been disabled."})
 
