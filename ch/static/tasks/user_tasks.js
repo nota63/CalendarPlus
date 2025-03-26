@@ -710,3 +710,128 @@ document.addEventListener("DOMContentLoaded", function () {
         return csrfToken || "";
     }
 });
+
+
+// RESTORE BACK-UPS
+document.addEventListener("DOMContentLoaded", function () {
+    let selectedBackupId = null;
+
+    // Open Modal & Fetch Backups
+    document.getElementById("openRestoreBackupModal").addEventListener("click", function () {
+        let modal = new bootstrap.Modal(document.getElementById("RestoreBackUpModal"));
+        modal.show();
+        fetchBackups();
+    });
+
+    // Fetch Backups
+    function fetchBackups() {
+        let orgId = window.djangoData.orgId;  
+        let groupId = window.djangoData.groupId;  
+        let taskId = window.djangoData.taskId;  
+
+        fetch(`/tasks/fetch-task-backups/${orgId}/${groupId}/${taskId}/`)
+            .then(response => response.json())
+            .then(data => {
+                let backupList = document.getElementById("backupList");
+                backupList.innerHTML = "";
+
+                if (data.backups.length === 0) {
+                    backupList.innerHTML = '<li class="list-group-item text-center">No backups found!</li>';
+                } else {
+                    data.backups.forEach(backup => {
+                        let listItem = document.createElement("li");
+                        listItem.classList.add("list-group-item", "d-flex", "justify-content-between", "align-items-center");
+                        listItem.dataset.backupId = backup.id;
+
+                        listItem.innerHTML = `
+                            <span>Backup ID: ${backup.id} | ${backup.backup_size} | ${backup.created_at}</span>
+                            <input type="radio" name="backupSelect" value="${backup.id}">
+                        `;
+                        backupList.appendChild(listItem);
+                    });
+
+                    // Attach event listener to radio buttons
+                    document.querySelectorAll("input[name='backupSelect']").forEach(input => {
+                        input.addEventListener("change", function () {
+                            selectedBackupId = this.value;
+                            document.getElementById("restoreBackupBtn").disabled = false;
+                        });
+                    });
+                }
+            })
+            .catch(() => {
+                alert("Error fetching backups!");
+            });
+    }
+
+    // Restore Backup with Progress Bar
+    document.getElementById("restoreBackupBtn").addEventListener("click", function () {
+        if (!selectedBackupId) return;
+
+        document.getElementById("progressContainer").style.display = "block";
+        let progressBar = document.getElementById("progressBar");
+        progressBar.style.width = "0%";
+        let progress = 0;
+
+        let interval = setInterval(function () {
+            progress += 20;
+            progressBar.style.width = progress + "%";
+
+            if (progress >= 100) {
+                clearInterval(interval);
+                restoreBackup(selectedBackupId);
+            }
+        }, 800);
+    });
+
+    // API Call to Restore Backup
+    function restoreBackup(backupId) {
+        fetch(`/tasks/restore-backup/${backupId}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => response.json())
+        .then(() => {
+            let modal = bootstrap.Modal.getInstance(document.getElementById("RestoreBackUpModal"));
+            modal.hide();
+            document.getElementById("progressContainer").style.display = "none";
+            showToast("Backup restored successfully!", "success");
+        })
+        .catch(() => {
+            document.getElementById("progressContainer").style.display = "none";
+            showToast("Error restoring backup!", "error");
+        });
+    }
+
+    // Toast Notification (Bootstrap 5)
+    function showToast(message, type) {
+        let bgColor = type === "success" ? "bg-success" : "bg-danger";
+        let toastContainer = document.createElement("div");
+
+        toastContainer.className = `toast ${bgColor} text-white position-fixed bottom-0 end-0 m-3`;
+        toastContainer.role = "alert";
+        toastContainer.dataset.bsAutohide = "true";
+        toastContainer.dataset.bsDelay = "3000";
+
+        toastContainer.innerHTML = `
+            <div class="toast-header ${bgColor} text-white">
+                <strong class="me-auto">${type === "success" ? "Success" : "Error"}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">${message}</div>
+        `;
+
+        document.body.appendChild(toastContainer);
+        let toast = new bootstrap.Toast(toastContainer);
+        toast.show();
+
+        setTimeout(() => {
+            toastContainer.remove();
+        }, 3500);
+    }
+});
+
+

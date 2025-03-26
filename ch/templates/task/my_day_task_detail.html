@@ -3303,6 +3303,11 @@ video::-webkit-media-controls-panel {
             <div class="modal-header">
                 <h5 class="modal-title" id="backupModalLabel">Task Backup</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                <button id="openRestoreBackupModal" class="btn btn-primary">
+                    <i class="fas fa-history"></i> Restore Backup
+                </button>
+                
             </div>
             <div class="modal-body">
                 <!-- Backup Info -->
@@ -3325,6 +3330,40 @@ video::-webkit-media-controls-panel {
         </div>
     </div>
 </div>
+
+
+<!-- RESTORE BACK-UP -->
+<div id="RestoreBackUpModal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select a Backup to Restore</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="backupList" class="list-group">
+                    <!-- Backups will be dynamically loaded here -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button id="restoreBackupBtn" class="btn btn-success" disabled>
+                    <i class="fas fa-upload"></i> Restore Backup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="progressContainer" class="text-center mt-3" style="display: none;">
+    <p>Restoring Backup... Please wait</p>
+    <div class="progress">
+        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+            role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        </div>
+    </div>
+</div>
+
+
 
 <!-- -------------------------------------------------------------------------------------------------------------------------- -->
 
