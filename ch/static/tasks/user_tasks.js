@@ -725,9 +725,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Fetch Backups
     function fetchBackups() {
-        let orgId = window.djangoData.orgId;  
-        let groupId = window.djangoData.groupId;  
-        let taskId = window.djangoData.taskId;  
+        let orgId = window.djangoData.orgId;
+        let groupId = window.djangoData.groupId;
+        let taskId = window.djangoData.taskId;
 
         fetch(`/tasks/fetch-task-backups/${orgId}/${groupId}/${taskId}/`)
             .then(response => response.json())
@@ -770,22 +770,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.getElementById("progressContainer").style.display = "block";
         let progressBar = document.getElementById("progressBar");
-        progressBar.style.width = "0%";
-        let progress = 0;
+        let progressText = document.getElementById("progressText");
+        progressBar.classList.remove("bg-danger"); // Reset in case of an error
+        progressBar.classList.add("bg-success");
+        progressText.textContent = "Restoring backup...";
 
-        let interval = setInterval(function () {
-            progress += 20;
+        let progress = 0;
+        let interval = setInterval(() => {
+            progress += 10;
             progressBar.style.width = progress + "%";
 
             if (progress >= 100) {
                 clearInterval(interval);
-                restoreBackup(selectedBackupId);
+                progressText.textContent = "Finalizing restoration...";
             }
-        }, 800);
+        }, 300);
+
+        restoreBackup(selectedBackupId, progressBar, progressText);
     });
 
     // API Call to Restore Backup
-    function restoreBackup(backupId) {
+    function restoreBackup(backupId, progressBar, progressText) {
         fetch(`/tasks/restore-backup/${backupId}/`, {
             method: "POST",
             headers: {
@@ -801,7 +806,9 @@ document.addEventListener("DOMContentLoaded", function () {
             showToast("Backup restored successfully!", "success");
         })
         .catch(() => {
-            document.getElementById("progressContainer").style.display = "none";
+            progressBar.classList.remove("bg-success");
+            progressBar.classList.add("bg-danger");
+            progressText.textContent = "Error restoring backup!";
             showToast("Error restoring backup!", "error");
         });
     }
@@ -833,5 +840,3 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 3500);
     }
 });
-
-

@@ -3333,6 +3333,7 @@ video::-webkit-media-controls-panel {
 
 
 <!-- RESTORE BACK-UP -->
+<!-- RESTORE BACK-UP MODAL -->
 <div id="RestoreBackUpModal" class="modal fade" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -3344,6 +3345,14 @@ video::-webkit-media-controls-panel {
                 <ul id="backupList" class="list-group">
                     <!-- Backups will be dynamically loaded here -->
                 </ul>
+
+                <!-- Progress Bar (Initially Hidden) -->
+                <div id="progressContainer" class="mt-3" style="display: none;">
+                    <small id="progressText">Restoring backup...</small>
+                    <div class="progress">
+                        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="width: 0%;"></div>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button id="restoreBackupBtn" class="btn btn-success" disabled>
@@ -3353,16 +3362,6 @@ video::-webkit-media-controls-panel {
         </div>
     </div>
 </div>
-
-<div id="progressContainer" class="text-center mt-3" style="display: none;">
-    <p>Restoring Backup... Please wait</p>
-    <div class="progress">
-        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
-            role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-        </div>
-    </div>
-</div>
-
 
 
 <!-- -------------------------------------------------------------------------------------------------------------------------- -->
