@@ -2433,6 +2433,130 @@ def get_last_backup(request, task_id):
         return JsonResponse({"error": str(e)}, status=500)
 
 
+# Restore Back-Ups
+# Fetch Back-Ups
+@csrf_exempt
+def fetch_task_backups(request, org_id, group_id, task_id):
+    """ Fetches all available backups for a given task. """
+
+    print("=== Fetch Task Backups API Called ===")
+    user = request.user  
+    print("User:", user)
+
+    try:
+        # Fetch all backups for the task
+        print(f"Fetching backups for Task ID: {task_id} | Org ID: {org_id} | Group ID: {group_id}")
+        backups = TaskBackup.objects.filter(task_id=task_id, organization_id=org_id, group_id=group_id)
+
+        if not backups.exists():
+            print("No backups found for this task.")
+            return JsonResponse({"message": "No backups found!"}, status=200)
+
+        # Prepare backup list
+        backup_list = []
+        for backup in backups:
+            backup_list.append({
+                "id": backup.id,
+                "backup_size": f"{backup.backup_size / 1024:.2f} KB",  # Convert to KB
+                "created_at": localtime(backup.created_at).strftime('%Y-%m-%d %H:%M:%S'),
+                "backup_type": backup.backup_type,
+            })
+
+        print("Backups Fetched Successfully!")
+
+        return JsonResponse({"backups": backup_list}, status=200)
+
+    except Exception as e:
+        print(f"Unexpected Error: {e}")
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+# Restore Back-ups
+@csrf_exempt
+def restore_backup(request, backup_id):
+    """ Restores a task backup, including comments, subtasks, attachments, etc. """
+    
+    print("=== Restore Backup API Called ===")
+    user = request.user  
+    print("User:", user)
+
+    try:
+        # Fetch the backup record
+        print(f"Fetching Backup ID: {backup_id}")
+        task_backup = TaskBackup.objects.get(id=backup_id, user=user)
+        backup_data = json.loads(task_backup.backup_data)  # Convert JSON string back to dict
+        print("Backup Data Fetched Successfully!")
+
+        # Restore Task
+        print("Restoring Task...")
+        task_data = backup_data["task"]
+        task, created = Task.objects.update_or_create(
+            id=task_data["id"],
+            defaults={
+                "title": task_data["title"],
+                "description": task_data["description"],
+                "priority": task_data["priority"],
+                "deadline": task_data["deadline"],
+                "status": task_data["status"],
+                "progress": task_data["progress"],
+                "queries_sent": task_data["queries_sent"],
+                "organization": task_backup.organization,
+                "group": task_backup.group,
+            }
+        )
+        print(f"Task Restored! {'Created' if created else 'Updated'}: {task}")
+
+        # Restore Related Data
+        def restore_model_data(model, data_list, task_field="task", extra_fields=None):
+            """Helper function to restore related model data"""
+            if extra_fields is None:
+                extra_fields = {}
+            restored_objects = []
+            for data in data_list:
+                obj, _ = model.objects.update_or_create(
+                    id=data["id"], 
+                    defaults={**data, task_field: task, **extra_fields}
+                )
+                restored_objects.append(obj)
+            print(f"Restored {model.__name__}: {len(restored_objects)}")
+            return restored_objects
+
+        # Restore Each Related Model
+        restore_model_data(TaskComment, backup_data["comments"])
+        restore_model_data(SubTask, backup_data["subtasks"])
+        restore_model_data(AttachmentsTasksApp, backup_data["attachments"])
+        restore_model_data(ActivityLog, backup_data["activity_logs"])
+        restore_model_data(AutomationTask, backup_data["automations"], extra_fields={"user": user})
+        restore_model_data(TaskReminder, backup_data["reminders"])
+        restore_model_data(TaskTag, backup_data["tags"])
+        restore_model_data(TaskNote, backup_data["notes"], extra_fields={"user": user})
+        restore_model_data(TaskTimeTracking, backup_data["time_trace"], extra_fields={"user": user})
+        restore_model_data(Problem, backup_data["problem"], extra_fields={"reported_by": user})
+        restore_model_data(MeetingTaskQuery, backup_data["meetings"])
+        restore_model_data(CommunicateTask, backup_data["messages"])
+
+        print("All Data Restored Successfully!")
+
+        return JsonResponse({
+            "message": "Backup restored successfully!",
+            "task_id": task.id
+        }, status=200)
+
+    except TaskBackup.DoesNotExist:
+        print("Error: Backup not found!")
+        return JsonResponse({"error": "Backup not found!"}, status=404)
+
+    except Exception as e:
+        print(f"Unexpected Error: {e}")
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+
+
+
+
+
+
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Add the task to my day 
