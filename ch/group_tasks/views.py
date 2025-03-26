@@ -2277,7 +2277,7 @@ def disable_all_automations(request):
 
 
 # Task Back-UP
-from .models import TaskBackup,AttachmentsTasksApp
+from .models import TaskBackup,AttachmentsTasksApp,BackupSchedule
 import sys
 from django.utils.timezone import localtime
 
@@ -2604,10 +2604,71 @@ def delete_backup(request, backup_id):
     return JsonResponse({"success": False, "message": "Invalid request!"}, status=400)
 
 
+# Schedule Backup
 
+# get scheduled backup settings
+def get_backup_schedule(request):
+    org_id = request.GET.get("org_id")
+    group_id = request.GET.get("group_id")
+    task_id = request.GET.get("task_id")
+    user = request.user  # Assuming the user is logged in
 
+    try:
+        schedule = BackupSchedule.objects.get(
+            organization_id=org_id,
+            group_id=group_id,
+            task_id=task_id,
+            user=user
+        )
+        return JsonResponse({
+            "success": True,
+            "frequency": schedule.frequency,
+            "next_run": schedule.next_run.strftime("%Y-%m-%d %H:%M:%S"),
+            "is_active": schedule.is_active,
+        })
+    except BackupSchedule.DoesNotExist:
+        return JsonResponse({"success": False, "message": "No schedule found."})
+    
 
+# Update Status
+@csrf_exempt  # Use only if CSRF token is NOT needed (Not recommended for security)
+def update_backup_schedule(request):
+    if request.method != "POST":
+        return JsonResponse({"success": False, "message": "Invalid request method."}, status=400)
 
+    try:
+        data = json.loads(request.body)
+        org_id = data.get("org_id")
+        group_id = data.get("group_id")
+        task_id = data.get("task_id")
+        frequency = data.get("frequency")
+        is_active = data.get("is_active", True)  # Ensure this field is handled
+        user = request.user  # Assuming user is logged in
+
+        # Check for missing data
+        if not all([org_id, group_id, task_id, frequency]):
+            return JsonResponse({"success": False, "message": "Missing required fields."}, status=400)
+
+        # Fetch or create backup schedule
+        schedule, created = BackupSchedule.objects.update_or_create(
+            user=user,
+            organization_id=org_id,
+            group_id=group_id,
+            task_id=task_id,
+            defaults={"frequency": frequency, "is_active": is_active}
+        )
+
+        # Update the next run based on the frequency
+        schedule.update_next_run()
+
+        return JsonResponse({"success": True, "message": "Backup schedule updated successfully!"})
+    
+    except json.JSONDecodeError:
+        return JsonResponse({"success": False, "message": "Invalid JSON data."}, status=400)
+    except Exception as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=500)
+
+        
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Add the task to my day 
 @login_required

@@ -3316,6 +3316,11 @@ video::-webkit-media-controls-panel {
                         <button id="openRestoreBackupModal" class="btn px-4 py-2 rounded-xl bg-purple-600/90 hover:bg-purple-700/90 text-white transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
                             <i class="fas fa-history mr-2"></i>Restore
                         </button>
+                        <!-- schedule Backup -->
+                        <button class="btn btn-primary" onclick="openScheduleBackupModal(orgId, groupId, taskId)">
+                            <i class="fas fa-clock"></i> Schedule Backup
+                        </button>
+                        
                        
                     </div>
                 </div>
@@ -3488,6 +3493,38 @@ video::-webkit-media-controls-panel {
                 <div class="w-2 h-2 bg-green-400 rounded-full animate-bounce"></div>
                 <div class="w-2 h-2 bg-yellow-400 rounded-full animate-bounce delay-100"></div>
                 <div class="w-2 h-2 bg-red-400 rounded-full animate-bounce delay-200"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Schedule BackUP -->
+ <!-- Bootstrap 5 Modal -->
+<div class="modal fade" id="ScheduleBackUpModal" tabindex="-1" aria-labelledby="ScheduleBackUpModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ScheduleBackUpModalLabel">Schedule Backup</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label for="backupScheduleSelect" class="form-label">Backup Frequency</label>
+                <select id="backupScheduleSelect" class="form-select">
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                </select>
+
+                <div class="form-check mt-3">
+                    <input class="form-check-input" type="checkbox" id="activeCheckbox">
+                    <label class="form-check-label" for="activeCheckbox">Enable Backup</label>
+                </div>
+
+                <p class="mt-2"><strong>Next Backup:</strong> <span id="nextRunDisplay">-</span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" onclick="updateBackupSchedule()">Save Changes</button>
             </div>
         </div>
     </div>

@@ -946,3 +946,70 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 3500);
     }
 });
+
+
+// ScheduleBackUp
+// Open the modal and fetch backup schedule
+function openScheduleBackupModal(orgId, groupId, taskId) {
+    // Store IDs globally for later use
+    window.djangoData.orgId = orgId;
+    window.djangoData.groupId = groupId;
+    window.djangoData.taskId = taskId;
+
+    // Fetch the backup schedule and display it
+    fetch(`/tasks/get-backup-schedule/?org_id=${orgId}&group_id=${groupId}&task_id=${taskId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.querySelector("#backupScheduleSelect").value = data.frequency;
+                document.querySelector("#nextRunDisplay").innerText = data.next_run;
+                document.querySelector("#activeCheckbox").checked = data.is_active;
+            } else {
+                console.warn("No backup schedule found.");
+            }
+        })
+        .catch(error => console.error("Error fetching backup schedule:", error));
+
+    // Show Bootstrap modal
+    let modal = new bootstrap.Modal(document.getElementById("ScheduleBackUpModal"));
+    modal.show();
+}
+
+// Update backup schedule via AJAX
+// Update backup schedule via AJAX
+function updateBackupSchedule() {
+    const frequency = document.querySelector("#backupScheduleSelect").value;
+    const isActive = document.querySelector("#activeCheckbox").checked;
+
+    fetch("/tasks/update-backup-schedule/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken(),  // Only needed if CSRF protection is enabled
+        },
+        body: JSON.stringify({
+            org_id: window.djangoData.orgId,
+            group_id: window.djangoData.groupId,
+            task_id: window.djangoData.taskId,
+            frequency: frequency,
+            is_active: isActive
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Backup schedule updated successfully!");
+            let modal = bootstrap.Modal.getInstance(document.getElementById("ScheduleBackUpModal"));
+            modal.hide(); // Close modal after update
+        } else {
+            alert("Failed to update schedule: " + data.message);
+        }
+    })
+    .catch(error => console.error("Error updating backup schedule:", error));
+}
+
+// Function to get CSRF token (Modify if needed)
+function getCSRFToken() {
+    let tokenElement = document.querySelector("[name=csrfmiddlewaretoken]");
+    return tokenElement ? tokenElement.value : "";
+}

@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import timedelta
 from django.utils.timezone import now
-
+from datetime import timedelta, datetime
 
 # Create your models here.
 
@@ -1052,3 +1052,47 @@ class TaskBackup(models.Model):
 
     def __str__(self):
         return f"Backup #{self.id} - {self.task.title if self.task else 'Unknown Task'} ({self.created_at.strftime('%Y-%m-%d') if self.created_at else 'N/A'})"
+
+
+# Backup Frequency
+
+class BackupSchedule(models.Model):
+    INTERVAL_CHOICES = [
+        ('daily', 'Daily'),
+        ('weekly', 'Weekly'),
+        ('monthly', 'Monthly'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    
+    frequency = models.CharField(max_length=10, choices=INTERVAL_CHOICES, default='daily')
+    next_run = models.DateTimeField()  
+    is_active = models.BooleanField(default=True) 
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def calculate_next_run(self):
+        """ Calculate next run based on frequency """
+        now = datetime.now()
+        if self.frequency == 'daily':
+            return now + timedelta(days=1)
+        elif self.frequency == 'weekly':
+            return now + timedelta(weeks=1)
+        elif self.frequency == 'monthly':
+            return now + timedelta(days=30)  # Approximate month
+        return now
+
+    def save(self, *args, **kwargs):
+        if not self.next_run: 
+            self.next_run = self.calculate_next_run()
+        super().save(*args, **kwargs)
+
+    def update_next_run(self):
+        """ Update the next run time based on the frequency """
+        self.next_run = self.calculate_next_run()
+        self.save()
+
+    def __str__(self):
+        return f"Backup Schedule - {self.user.username} | {self.organization.name} | {self.group.name} | {self.task.title}"
