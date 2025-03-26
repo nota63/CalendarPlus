@@ -750,3 +750,56 @@ body {
 .shadow-grade {
     box-shadow: 0 4px 24px -4px rgba(0,0,0,0.15);
 }
+
+
+/* Back-up items btns */
+/* Backup Item Container */
+.group {
+    position: relative;
+    padding-left: 7rem; /* Space for left-side buttons */
+}
+
+/* Buttons Container (Left Side) */
+.action-buttons {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 10;
+}
+
+/* Button Styling */
+.action-buttons button {
+    display: none;
+    padding: 6px 10px;
+    font-size: 0.875rem;
+    color: white;
+    border-radius: 5px;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Show Buttons on Hover */
+.group:hover .action-buttons button {
+    display: flex;
+}
+
+/* Download Button */
+.download-btn {
+    background-color: #2563eb; /* Blue */
+}
+
+.download-btn:hover {
+    background-color: #1d4ed8; /* Darker Blue */
+}
+
+/* Delete Button */
+.delete-btn {
+    background-color: #dc2626; /* Red */
+}
+
+.delete-btn:hover {
+    background-color: #b91c1c; /* Darker Red */
+}
