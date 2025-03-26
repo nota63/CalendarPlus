@@ -713,6 +713,43 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // RESTORE BACK-UPS
+function deleteBackup(backupId) {
+    if (!confirm("Are you sure you want to delete this backup?")) return;
+
+    fetch(`/tasks/delete-backup/${backupId}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCSRFToken(),
+            "Content-Type": "application/json"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Backup deleted successfully!");
+            document.getElementById(`backup-${backupId}`).remove(); // Remove item from UI
+        } else {
+            alert("Failed to delete backup: " + data.message);
+        }
+    })
+    .catch(error => console.error("Error:", error));
+}
+
+// Function to get CSRF Token from cookies
+function getCSRFToken() {
+    let cookieValue = null;
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.startsWith('csrftoken=')) {
+            cookieValue = cookie.substring(10);
+            break;
+        }
+    }
+    return cookieValue;
+}
+
+
 // Download Backup Function (Move outside DOMContentLoaded for global access)
 function downloadBackup(backupId) {
     window.location.href = `/tasks/download-backup/${backupId}/`;

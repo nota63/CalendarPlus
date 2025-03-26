@@ -2593,6 +2593,16 @@ def download_backup(request, backup_id):
     return response
 
 
+# Delete Back-UP
+def delete_backup(request, backup_id):
+    """Handles deleting a backup when requested via AJAX."""
+    if request.method == "POST":
+        backup = get_object_or_404(TaskBackup, id=backup_id)
+        backup.delete()
+        return JsonResponse({"success": True, "message": "Backup deleted successfully!"})
+
+    return JsonResponse({"success": False, "message": "Invalid request!"}, status=400)
+
 
 
 
