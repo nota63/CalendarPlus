@@ -629,3 +629,82 @@ body {
 .animate-pulse {
     animation: pulse-opacity 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+/* Back-up Modal */
+/* Custom Styles */
+.backup-card {
+    @apply bg-gray-800/50 p-4 rounded-xl border border-gray-700 flex items-center space-x-4 hover:bg-gray-800/70 transition-colors;
+}
+
+.backup-card i {
+    @apply text-2xl p-3 rounded-lg bg-gray-900/50;
+}
+
+.card-label {
+    @apply text-xs text-gray-400 mb-1;
+}
+
+.card-value {
+    @apply text-lg font-semibold text-gray-100;
+}
+
+.control-item {
+    @apply p-2 rounded-lg bg-gray-800/50 border border-gray-700 hover:bg-gray-800 transition-colors cursor-pointer;
+}
+
+.timeline-item {
+    @apply h-2 rounded-full bg-gray-700 relative overflow-hidden;
+}
+
+.timeline-item::after {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500;
+}
+
+.timeline-item.success::after { width: 90%; }
+.timeline-item.warning::after { width: 65%; }
+.timeline-item.error::after { width: 30%; }
+
+/* Animations */
+@keyframes wave {
+    0% { background-position: 0 0; }
+    100% { background-position: 200% 0; }
+}
+
+.animate-wave {
+    animation: wave 4s linear infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+    animation: spin-slow 8s linear infinite;
+}
+
+
+
+/* Custom Modal Width */
+@media (min-width: 576px) {
+    #backupModal .modal-dialog {
+        max-width: 80%; /* Adjust width as needed */
+    }
+}
+
+/* Optional: Make it even wider for larger screens */
+@media (min-width: 992px) {
+    #backupModal .modal-dialog {
+        max-width: 60%; /* Adjust width as needed */
+    }
+}
