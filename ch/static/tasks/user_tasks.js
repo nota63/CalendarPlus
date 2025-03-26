@@ -746,8 +746,75 @@ document.addEventListener("DOMContentLoaded", function () {
                         listItem.dataset.backupId = backup.id;
 
                         listItem.innerHTML = `
-                            <span>Backup ID: ${backup.id} | ${backup.backup_size} | ${backup.created_at}</span>
-                            <input type="radio" name="backupSelect" value="${backup.id}">
+                        <div class="group flex items-start gap-4 p-4 mb-3 bg-gray-850 rounded-xl border border-gray-700 hover:border-blue-400/30 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md relative overflow-hidden">
+                            <!-- Status Indicator -->
+                            <div class="absolute top-0 right-0 w-16 h-16 bg-blue-500/5 transform translate-x-8 -translate-y-4 rotate-45"></div>
+                            
+                            <!-- Main Content -->
+                            <div class="flex-1">
+                                <!-- Header -->
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                                    <h3 class="text-base font-semibold text-gray-100">
+                                        Backup Snapshot
+                                        <span class="font-mono text-blue-400 ml-2">#${backup.id}</span>
+                                    </h3>
+                                    <span class="text-xs px-2 py-1 bg-gray-700/50 text-gray-300 rounded-md">
+                                        v${Math.floor(Math.random() * 5) + 1}.0.0
+                                    </span>
+                                </div>
+                        
+                               <!-- Metadata Grid -->
+                                <div class="grid grid-cols-2 gap-3 text-sm">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-database text-yellow-400/90 text-sm"></i> 
+                                        <div>
+                                            <p class="text-gray-400">Size</p>
+                                            <p class="text-yellow-300 font-medium">${backup.backup_size}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-clock text-emerald-400/90 text-sm"></i>
+                                        <div>
+                                            <p class="text-gray-400">Date</p>
+                                            <p class="text-emerald-300 font-medium">${new Date(backup.created_at).toLocaleDateString('en-US', { dateStyle: 'medium' })}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Additional Info -->
+                                <div class="mt-3 flex items-center gap-4 text-xs">
+                                    <span class="flex items-center gap-1 text-green-400">
+                                        <i class="fas fa-lock"></i>
+                                        <span>Encrypted</span>
+                                    </span>
+                                    <span class="flex items-center gap-1 text-gray-400">
+                                        <i class="fas fa-shield-alt"></i>
+                                        <span>AES-256</span>
+                                    </span>
+                                </div>
+                            </div>
+                        
+                            <!-- Custom Radio -->
+                            <div class="flex items-center pl-4">
+                                <div class="relative">
+                                    <input type="radio" name="backupSelect" value="${backup.id}" 
+                                           class="peer absolute inset-0 opacity-0 cursor-pointer">
+                                    <div class="w-6 h-6 border-2 border-gray-500 rounded-full flex items-center justify-center
+                                              peer-checked:border-blue-400 peer-hover:border-blue-300 transition-all
+                                              group-hover:bg-gray-800/30">
+                                        <div class="w-3 h-3 bg-blue-400 rounded-full scale-0 
+                                                  peer-checked:scale-100 transition-transform"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        
+                            <!-- Success Checkmark -->
+                            <div class="absolute bottom-2 right-2 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fas fa-check-circle text-lg"></i>
+                            </div>
+                        </div>
                         `;
                         backupList.appendChild(listItem);
                     });

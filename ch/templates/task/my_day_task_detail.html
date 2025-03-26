@@ -3437,11 +3437,11 @@ video::-webkit-media-controls-panel {
                     </h3>
                     <div class="flex items-center space-x-2">
                         <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                        <button type="button" class="text-gray-400 hover:text-white transition-transform hover:scale-110 text-xl">&times;</button>
+                       
                     </div>
                 </div>
-                <p class="mt-2 text-sm text-gray-400">Select a recovery point from your backup history</p>
             </div>
+            <p class="mt-2 text-sm text-gray-400">Select a recovery point from your backup history</p>
 
             <div class="modal-body p-6 relative">
                 <!-- Backup List -->
@@ -3482,41 +3482,7 @@ video::-webkit-media-controls-panel {
     </div>
 </div>
 
-<style>
-/* Custom Scrollbar */
-.custom-scroll::-webkit-scrollbar {
-    width: 6px;
-}
 
-.custom-scroll::-webkit-scrollbar-track {
-    background: rgba(255,255,255,0.05);
-    border-radius: 4px;
-}
-
-.custom-scroll::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.2);
-    border-radius: 4px;
-}
-
-/* Wave Animation */
-@keyframes wave {
-    0% { background-position: 0 0; }
-    100% { background-position: 200% 0; }
-}
-
-.animate-wave {
-    animation: wave 2s linear infinite;
-}
-
-/* Backup Item Template */
-.backup-item {
-    @apply p-4 bg-gray-700/50 rounded-xl border border-gray-600 hover:border-blue-400 transition-all cursor-pointer;
-}
-
-.backup-item.selected {
-    @apply border-green-400 bg-gray-700/70;
-}
-</style>
 <!-- -------------------------------------------------------------------------------------------------------------------------- -->
 
 

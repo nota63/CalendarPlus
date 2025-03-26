@@ -694,3 +694,59 @@ body {
 }
 
 
+/* Custom Scrollbar */
+.custom-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+}
+
+/* Wave Animation */
+@keyframes wave {
+    0% { background-position: 0 0; }
+    100% { background-position: 200% 0; }
+}
+
+.animate-wave {
+    animation: wave 2s linear infinite;
+}
+
+/* Backup Item Template */
+.backup-item {
+    @apply p-4 bg-gray-700/50 rounded-xl border border-gray-600 hover:border-blue-400 transition-all cursor-pointer;
+}
+
+.backup-item.selected {
+    @apply border-green-400 bg-gray-700/70;
+}
+
+/* Back-up items */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.backup-item {
+    font-family: 'Inter', sans-serif;
+    animation: cardEntrance 0.4s ease-out;
+}
+
+@keyframes cardEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.shadow-grade {
+    box-shadow: 0 4px 24px -4px rgba(0,0,0,0.15);
+}
