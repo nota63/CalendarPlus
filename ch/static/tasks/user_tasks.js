@@ -713,6 +713,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // RESTORE BACK-UPS
+// Delete The BackUP
 function deleteBackup(backupId) {
     if (!confirm("Are you sure you want to delete this backup?")) return;
 
