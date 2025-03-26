@@ -713,8 +713,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // RESTORE BACK-UPS
+// Download Backup Function (Move outside DOMContentLoaded for global access)
+function downloadBackup(backupId) {
+    window.location.href = `/tasks/download-backup/${backupId}/`;
+}
 
-// RESTORE BACK-UPS
 document.addEventListener("DOMContentLoaded", function () {
     let selectedBackupId = null;
 
@@ -747,24 +750,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         listItem.innerHTML = `
                         <div class="group flex items-start gap-4 p-4 mb-3 bg-gray-850 rounded-xl border border-gray-700 hover:border-blue-400/30 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md relative overflow-hidden">
-                            <!-- Status Indicator -->
                             <div class="absolute top-0 right-0 w-16 h-16 bg-blue-500/5 transform translate-x-8 -translate-y-4 rotate-45"></div>
-                            
-                            <!-- Main Content -->
                             <div class="flex-1">
-                                <!-- Header -->
                                 <div class="flex items-center gap-3 mb-2">
                                     <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                                     <h3 class="text-base font-semibold text-gray-100">
-                                        Backup Snapshot
-                                        <span class="font-mono text-blue-400 ml-2">#${backup.id}</span>
+                                        Backup Snapshot <span class="font-mono text-blue-400 ml-2">#${backup.id}</span>
                                     </h3>
                                     <span class="text-xs px-2 py-1 bg-gray-700/50 text-gray-300 rounded-md">
                                         v${Math.floor(Math.random() * 5) + 1}.0.0
                                     </span>
                                 </div>
                         
-                               <!-- Metadata Grid -->
                                 <div class="grid grid-cols-2 gap-3 text-sm">
                                     <div class="flex items-center gap-2">
                                         <i class="fas fa-database text-yellow-400/90 text-sm"></i> 
@@ -773,7 +770,6 @@ document.addEventListener("DOMContentLoaded", function () {
                                             <p class="text-yellow-300 font-medium">${backup.backup_size}</p>
                                         </div>
                                     </div>
-                                    
                                     <div class="flex items-center gap-2">
                                         <i class="fas fa-clock text-emerald-400/90 text-sm"></i>
                                         <div>
@@ -783,7 +779,6 @@ document.addEventListener("DOMContentLoaded", function () {
                                     </div>
                                 </div>
 
-                                <!-- Additional Info -->
                                 <div class="mt-3 flex items-center gap-4 text-xs">
                                     <span class="flex items-center gap-1 text-green-400">
                                         <i class="fas fa-lock"></i>
@@ -796,7 +791,6 @@ document.addEventListener("DOMContentLoaded", function () {
                                 </div>
                             </div>
                         
-                            <!-- Custom Radio -->
                             <div class="flex items-center pl-4">
                                 <div class="relative">
                                     <input type="radio" name="backupSelect" value="${backup.id}" 
@@ -810,21 +804,14 @@ document.addEventListener("DOMContentLoaded", function () {
                                 </div>
                             </div>
                         
-                            <!-- Success Checkmark -->
-                            <div class="absolute bottom-2 right-2 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <i class="fas fa-check-circle text-lg"></i>
-                            </div>
+                            <button class="absolute top-2 right-2 px-3 py-1 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded hidden group-hover:block"
+                                    onclick="downloadBackup(${backup.id})">
+                                <i class="fas fa-download"></i> Download
+                            </button>
                         </div>
                         `;
-                        backupList.appendChild(listItem);
-                    });
 
-                    // Attach event listener to radio buttons
-                    document.querySelectorAll("input[name='backupSelect']").forEach(input => {
-                        input.addEventListener("change", function () {
-                            selectedBackupId = this.value;
-                            document.getElementById("restoreBackupBtn").disabled = false;
-                        });
+                        backupList.appendChild(listItem);
                     });
                 }
             })
@@ -833,14 +820,24 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
-    // Restore Backup with Spinner (JS-Only)
+    // Delegate Event Listener for Radio Selection (Fix)
+    document.getElementById("backupList").addEventListener("change", function (event) {
+        if (event.target.name === "backupSelect") {
+            selectedBackupId = event.target.value;
+            document.getElementById("restoreBackupBtn").disabled = false;
+        }
+    });
+
+    // Restore Backup with Spinner
     document.getElementById("restoreBackupBtn").addEventListener("click", function () {
-        if (!selectedBackupId) return;
+        if (!selectedBackupId) {
+            alert("Please select a backup first!");
+            return;
+        }
 
         let restoreBtn = document.getElementById("restoreBackupBtn");
         restoreBtn.disabled = true;
 
-        // Show spinner inside the button
         restoreBtn.innerHTML = `
             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
             Restoring Backup, Please hold...
@@ -862,18 +859,21 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(() => {
             let modal = bootstrap.Modal.getInstance(document.getElementById("RestoreBackUpModal"));
             modal.hide();
-            restoreBtn.innerHTML = "Restore Backup"; // Reset button text
+            restoreBtn.innerHTML = "Restore Backup"; 
             restoreBtn.disabled = false;
             showToast("Backup restored successfully!", "success");
         })
         .catch(() => {
-            restoreBtn.innerHTML = "Restore Backup"; // Reset button text
+            restoreBtn.innerHTML = "Restore Backup"; 
             restoreBtn.disabled = false;
             showToast("Error restoring backup!", "error");
         });
     }
 
-    // Toast Notification (Bootstrap 5)
+  
+    
+
+    // Toast Notification
     function showToast(message, type) {
         let bgColor = type === "success" ? "bg-success" : "bg-danger";
         let toastContainer = document.createElement("div");

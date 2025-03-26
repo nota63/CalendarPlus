@@ -2551,6 +2551,46 @@ def restore_backup(request, backup_id):
         return JsonResponse({"error": str(e)}, status=500)
 
 
+# Download The Back-Up
+def download_backup(request, backup_id):
+    backup = get_object_or_404(TaskBackup, id=backup_id)
+
+    # Collect all backup data
+    backup_content = {
+        "backup_id": backup.id,
+        "task_id": backup.task.id if backup.task else None,
+        "organization_id": backup.organization.id if backup.organization else None,
+        "group_id": backup.group.id if backup.group else None,
+        "user_id": backup.user.id if backup.user else None,
+        "backup_data": backup.backup_data,
+        "comments": backup.comments,
+        "subtasks": backup.subtasks,
+        "attachments": backup.attachments,
+        "activity_logs": backup.activity_logs,
+        "automations": backup.automations,
+        "reminders": backup.reminders,
+        "time_traced": backup.time_traced,
+        "notes": backup.notes,
+        "tags": backup.tags,
+        "meetings": backup.meetings,
+        "conversation": backup.conversation,
+        "problem": backup.problem,
+        "backup_size": backup.backup_size,
+        "backup_type": backup.backup_type,
+        "is_restored": backup.is_restored,
+        "storage_location": backup.storage_location,
+        "created_at": backup.created_at.strftime('%Y-%m-%d %H:%M:%S') if backup.created_at else None,
+        "restored_at": backup.restored_at.strftime('%Y-%m-%d %H:%M:%S') if backup.restored_at else None,
+    }
+
+    # Convert data to JSON string
+    backup_json = json.dumps(backup_content, indent=4)
+
+    # Create HTTP response
+    response = HttpResponse(backup_json, content_type="application/json")
+    response['Content-Disposition'] = f'attachment; filename=task_backup_{backup.id}.json'
+    
+    return response
 
 
 

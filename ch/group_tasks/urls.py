@@ -76,7 +76,8 @@ urlpatterns = [
     path('back-up/<int:org_id>/<int:group_id>/<int:task_id>/',backup_task, name='back_up'),
     path('last-backup/<int:task_id>/',get_last_backup, name='last_backup'),
     path('fetch-task-backups/<int:org_id>/<int:group_id>/<int:task_id>/',fetch_task_backups, name='fetch_task_backups'),
-    path('restore-backup/<int:backup_id>/',restore_backup, name='restore_backup')
+    path('restore-backup/<int:backup_id>/',restore_backup, name='restore_backup'),
+    path('download-backup/<int:backup_id>/',download_backup, name='download_backup')
   
   
   
