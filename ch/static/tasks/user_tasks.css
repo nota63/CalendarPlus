@@ -803,3 +803,24 @@ body {
 .delete-btn:hover {
     background-color: #b91c1c; /* Darker Red */
 }
+
+
+/* Schedule backup */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(12px) !important;
+    border-radius: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15) !important;
+  }
+
+  .neu-input {
+    box-shadow: 5px 5px 10px #d1d9e6, -5px -5px 10px #ffffff !important;
+  }
+
+  .gradient-text {
+    background: linear-gradient(45deg, #6366f1, #8b5cf6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }

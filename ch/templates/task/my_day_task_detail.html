@@ -3499,38 +3499,125 @@ video::-webkit-media-controls-panel {
 </div>
 
 <!-- Schedule BackUP -->
- <!-- Bootstrap 5 Modal -->
-<div class="modal fade" id="ScheduleBackUpModal" tabindex="-1" aria-labelledby="ScheduleBackUpModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="ScheduleBackUpModalLabel">Schedule Backup</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <label for="backupScheduleSelect" class="form-label">Backup Frequency</label>
-                <select id="backupScheduleSelect" class="form-select">
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
-                </select>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-                <div class="form-check mt-3">
-                    <input class="form-check-input" type="checkbox" id="activeCheckbox">
-                    <label class="form-check-label" for="activeCheckbox">Enable Backup</label>
-                </div>
-
-                <p class="mt-2"><strong>Next Backup:</strong> <span id="nextRunDisplay">-</span></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success" onclick="updateBackupSchedule()">Save Changes</button>
-            </div>
+<!-- Modal Structure -->
+<div class="modal fade glass-panel" id="ScheduleBackUpModal" tabindex="-1" aria-labelledby="ScheduleBackUpModalLabel" aria-hidden="true" style="font-family: 'Inter', sans-serif">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content glass-panel border-0">
+      <div class="modal-header border-0 pb-0">
+        <div class="w-100">
+          <h3 class="modal-title gradient-text fw-bold fs-3" id="ScheduleBackUpModalLabel">
+            <i class="fas fa-calendar-alt me-2"></i>Backup Scheduler
+          </h3>
+          <p class="text-muted mb-0">Configure automated backup preferences</p>
         </div>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body pt-4">
+        <div class="row g-4">
+          <!-- Left Column -->
+          <div class="col-md-6">
+            <div class="p-3 neu-input rounded-3 mb-4">
+              <label class="form-label text-primary fw-bold mb-2"><i class="fas fa-sync-alt me-2"></i>Schedule Settings</label>
+              <select id="backupScheduleSelect" class="form-select border-0 shadow-none bg-transparent">
+                <option value="daily">Daily Backup</option>
+                <option value="weekly">Weekly Backup</option>
+                <option value="monthly">Monthly Backup</option>
+              </select>
+
+              <div class="mt-4">
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="activeCheckbox" style="width: 2.5em">
+                  <label class="form-check-label ms-2 fw-medium" for="activeCheckbox">Enable Automation</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 neu-input rounded-3">
+              <label class="d-block text-primary fw-bold mb-3"><i class="fas fa-shield-alt me-2"></i>Security</label>
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <span>Data Encryption</span>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="encryptionToggle">
+                </div>
+              </div>
+              <div class="d-flex justify-content-between align-items-center">
+                <span>Two-Factor Auth</span>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="2faToggle">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column -->
+          <div class="col-md-6">
+            <div class="p-3 neu-input rounded-3 mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="text-primary fw-bold"><i class="fas fa-clock me-2"></i>Next Backup</span>
+                <span id="nextRunDisplay" class="badge bg-primary rounded-pill">Calculating...</span>
+              </div>
+              
+              <div class="progress mb-3" style="height: 8px">
+                <div class="progress-bar bg-gradient-primary" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+
+              <div class="d-flex justify-content-between small">
+                <span class="text-muted">Storage Used</span>
+                <span class="text-primary">65% • 32.5GB/50GB</span>
+              </div>
+            </div>
+
+            <div class="p-3 neu-input rounded-3">
+              <label class="d-block text-primary fw-bold mb-3"><i class="fas fa-bell me-2"></i>Notifications</label>
+              <div class="mb-3">
+                <select class="form-select border-0 shadow-none bg-transparent">
+                  <option>Email Notifications</option>
+                  <option>Push Notifications</option>
+                  <option>Both</option>
+                  <option>None</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <input type="email" class="form-control border-0" placeholder="Notification Email">
+                <button class="btn btn-link text-primary"><i class="fas fa-check-circle"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Features -->
+        <div class="row mt-4">
+          <div class="col-12">
+            <div class="p-3 neu-input rounded-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <span class="text-primary fw-bold me-3"><i class="fas fa-cloud-upload-alt me-2"></i>Backup Destination</span>
+                  <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-primary active">AWS S3</button>
+                    <button class="btn btn-sm btn-outline-primary">Google Drive</button>
+                    <button class="btn btn-sm btn-outline-primary">Local Storage</button>
+                  </div>
+                </div>
+                <button class="btn btn-sm btn-primary"><i class="fas fa-plus me-2"></i>Add Storage</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-lg btn-light rounded-pill px-4" data-bs-dismiss="modal">Discard</button>
+        <button type="button" class="btn btn-lg btn-primary rounded-pill px-4" onclick="updateBackupSchedule()">
+          <i class="fas fa-save me-2"></i>Save Configuration
+        </button>
+      </div>
     </div>
+  </div>
 </div>
-
-
 <!-- -------------------------------------------------------------------------------------------------------------------------- -->
 
 
