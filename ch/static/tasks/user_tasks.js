@@ -713,6 +713,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // RESTORE BACK-UPS
+
+// RESTORE BACK-UPS
 document.addEventListener("DOMContentLoaded", function () {
     let selectedBackupId = null;
 
@@ -764,33 +766,24 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
-    // Restore Backup with Progress Bar
+    // Restore Backup with Spinner (JS-Only)
     document.getElementById("restoreBackupBtn").addEventListener("click", function () {
         if (!selectedBackupId) return;
 
-        document.getElementById("progressContainer").style.display = "block";
-        let progressBar = document.getElementById("progressBar");
-        let progressText = document.getElementById("progressText");
-        progressBar.classList.remove("bg-danger"); // Reset in case of an error
-        progressBar.classList.add("bg-success");
-        progressText.textContent = "Restoring backup...";
+        let restoreBtn = document.getElementById("restoreBackupBtn");
+        restoreBtn.disabled = true;
 
-        let progress = 0;
-        let interval = setInterval(() => {
-            progress += 10;
-            progressBar.style.width = progress + "%";
+        // Show spinner inside the button
+        restoreBtn.innerHTML = `
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Restoring Backup, Please hold...
+        `;
 
-            if (progress >= 100) {
-                clearInterval(interval);
-                progressText.textContent = "Finalizing restoration...";
-            }
-        }, 300);
-
-        restoreBackup(selectedBackupId, progressBar, progressText);
+        restoreBackup(selectedBackupId, restoreBtn);
     });
 
     // API Call to Restore Backup
-    function restoreBackup(backupId, progressBar, progressText) {
+    function restoreBackup(backupId, restoreBtn) {
         fetch(`/tasks/restore-backup/${backupId}/`, {
             method: "POST",
             headers: {
@@ -802,13 +795,13 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(() => {
             let modal = bootstrap.Modal.getInstance(document.getElementById("RestoreBackUpModal"));
             modal.hide();
-            document.getElementById("progressContainer").style.display = "none";
+            restoreBtn.innerHTML = "Restore Backup"; // Reset button text
+            restoreBtn.disabled = false;
             showToast("Backup restored successfully!", "success");
         })
         .catch(() => {
-            progressBar.classList.remove("bg-success");
-            progressBar.classList.add("bg-danger");
-            progressText.textContent = "Error restoring backup!";
+            restoreBtn.innerHTML = "Restore Backup"; // Reset button text
+            restoreBtn.disabled = false;
             showToast("Error restoring backup!", "error");
         });
     }
