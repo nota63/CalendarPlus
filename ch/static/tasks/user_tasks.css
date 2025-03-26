@@ -694,17 +694,3 @@ body {
 }
 
 
-
-/* Custom Modal Width */
-@media (min-width: 576px) {
-    #backupModal .modal-dialog {
-        max-width: 80%; /* Adjust width as needed */
-    }
-}
-
-/* Optional: Make it even wider for larger screens */
-@media (min-width: 992px) {
-    #backupModal .modal-dialog {
-        max-width: 60%; /* Adjust width as needed */
-    }
-}
