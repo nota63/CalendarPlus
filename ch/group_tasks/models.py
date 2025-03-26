@@ -1007,8 +1007,8 @@ class TaskBackup(models.Model):
     meetings=models.JSONField(null=True, blank=True)
     conversation=models.JSONField(null=True, blank=True)
     problem=models.JSONField(null=True, blank=True)
-
-    file_size = models.FloatField(null=True, blank=True)  # Approx. backup size in KB
+   
+    backup_size = models.FloatField(null=True, blank=True)  # Approx. backup size in KB
     backup_type = models.CharField(
         max_length=20,
         choices=[("manual", "Manual"), ("auto", "Automatic")],

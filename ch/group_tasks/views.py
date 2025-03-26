@@ -2278,33 +2278,68 @@ def disable_all_automations(request):
 
 # Task Back-UP
 from .models import TaskBackup,AttachmentsTasksApp
+import sys
 
 
 # Back-up Task
-
 @csrf_exempt
 def backup_task(request, org_id, group_id, task_id):
     """ Creates a backup of a task including comments, subtasks, attachments, etc. """
     
-    user = request.user  # Get logged-in user
+    print("=== Backup Task API Called ===")
+    user = request.user  
+    print("User:", user)
+
     try:
         # Fetch the task
+        print(f"Fetching Task ID: {task_id} | Org ID: {org_id} | Group ID: {group_id}")
         task = Task.objects.get(id=task_id, organization_id=org_id, group_id=group_id)
+        print("Task Found:", task)
 
         # Fetch related data
+        print("Fetching related data...")
         comments = list(TaskComment.objects.filter(task=task).values())
         subtasks = list(SubTask.objects.filter(task=task).values())
         attachments = list(AttachmentsTasksApp.objects.filter(task=task).values())
         activity_logs = list(ActivityLog.objects.filter(task=task).values())
         automations = list(AutomationTask.objects.filter(task=task, user=user).values())
         reminders = list(TaskReminder.objects.filter(task=task).values())
-        tags=list(TaskTag.objects.filter(task=task).values())
-        notes=list(TaskNote.objects.filter(task=task,user=user).values())
-        time_trace=list(TaskTimeTracking.objects.filter(task=task, user=user).values())
-        problem=list(Problem.objects.filter(task=task,user=user).values())
-        meetings=list(MeetingTaskQuery.objects.filter(task=task).values())
-        messages=list(CommunicateTask.objects.filter(task=task).values())
-       
+        tags = list(TaskTag.objects.filter(task=task).values())
+        notes = list(TaskNote.objects.filter(task=task, user=user).values())
+        time_trace = list(TaskTimeTracking.objects.filter(task=task, user=user).values())
+        problem = list(Problem.objects.filter(task=task, reported_by=user).values())
+        meetings = list(MeetingTaskQuery.objects.filter(task=task).values())
+        messages = list(CommunicateTask.objects.filter(task=task).values())
+
+        print("Data Fetched Successfully!")
+
+        # Convert datetime and decimal fields
+        def serialize_object(obj):
+            """ Convert datetime and decimal fields to JSON-serializable format """
+            if isinstance(obj, dict):  # If it's a dictionary, iterate over its keys
+                return {
+                    key: (
+                        value.strftime('%Y-%m-%d %H:%M:%S') if isinstance(value, (now().__class__,)) 
+                        else float(value) if isinstance(value, Decimal) 
+                        else value
+                    )
+                    for key, value in obj.items()
+                }
+            return obj
+
+        # Apply serialization to all fetched data
+        comments = [serialize_object(comment) for comment in comments]
+        subtasks = [serialize_object(subtask) for subtask in subtasks]
+        attachments = [serialize_object(attachment) for attachment in attachments]
+        activity_logs = [serialize_object(log) for log in activity_logs]
+        automations = [serialize_object(auto) for auto in automations]
+        reminders = [serialize_object(reminder) for reminder in reminders]
+        tags = [serialize_object(tag) for tag in tags]
+        notes = [serialize_object(note) for note in notes]
+        time_trace = [serialize_object(time) for time in time_trace]
+        problem = [serialize_object(p) for p in problem]
+        meetings = [serialize_object(meeting) for meeting in meetings]
+        messages = [serialize_object(msg) for msg in messages]
 
         # Backup data
         backup_data = {
@@ -2315,9 +2350,8 @@ def backup_task(request, org_id, group_id, task_id):
                 "priority": task.priority,
                 "deadline": task.deadline.strftime('%Y-%m-%d %H:%M:%S') if task.deadline else None,
                 "status": task.status,
-                "progress":task.progress,
-                'queries_sent':task.queries_sent,
-
+                "progress": float(task.progress) if isinstance(task.progress, Decimal) else task.progress,
+                "queries_sent": task.queries_sent,
             },
             "comments": comments,
             "subtasks": subtasks,
@@ -2325,49 +2359,78 @@ def backup_task(request, org_id, group_id, task_id):
             "activity_logs": activity_logs,
             "automations": automations,
             "reminders": reminders,
-
-            'tags':tags,
-            'notes':notes,
-            'time_trace':time_trace,
-            'problem':problem,
-            'meetings':meetings,
-            'messages':messages,
+            "tags": tags,
+            "notes": notes,
+            "time_trace": time_trace,
+            "problem": problem,
+            "meetings": meetings,
+            "messages": messages,
         }
 
+        print("Backup Data Structured Successfully!")
+
+        # Convert to JSON and calculate backup size
+        backup_json = json.dumps(backup_data)  # Convert to JSON string
+        backup_size = sys.getsizeof(backup_json)
+        print(f"Backup Size: {backup_size} bytes ({backup_size / 1024:.2f} KB)")
+
         # Create backup record
+        print("Creating TaskBackup record...")
         task_backup = TaskBackup.objects.create(
             user=user,
             organization=task.organization,
             group=task.group,
             task=task,
-            backup_data=backup_data,
+            backup_data=backup_json,  # Store backup as JSON
             comments=comments,
             subtasks=subtasks,
             attachments=attachments,
             activity_logs=activity_logs,
             automations=automations,
             reminders=reminders,
-
             tags=tags,
             time_traced=time_trace,
             notes=notes,
             meetings=meetings,
             conversation=messages,
             problem=problem,
-
             backup_type="manual",
+            backup_size=backup_size,  # Store backup size in DB
             created_at=now(),
         )
 
-        return JsonResponse({"message": "Backup created successfully!", "backup_id": task_backup.id}, status=201)
+        print(f"Backup Created Successfully! Backup ID: {task_backup.id}")
+
+        return JsonResponse({
+            "message": "Backup created successfully!",
+            "backup_id": task_backup.id,
+            "backup_size": f"{backup_size / 1024:.2f} KB"  # Convert bytes to KB
+        }, status=201)
 
     except Task.DoesNotExist:
+        print("Error: Task not found!")
         return JsonResponse({"error": "Task not found!"}, status=404)
+    
     except Exception as e:
+        print(f"Unexpected Error: {e}")
         return JsonResponse({"error": str(e)}, status=500)
 
+# Get Last Back-Up 
+def get_last_backup(request, task_id):
+    """ Fetch the latest backup details for a specific task. """
+    try:
+        last_backup = TaskBackup.objects.filter(task_id=task_id).order_by("-created_at").first()
+        
+        if not last_backup:
+            return JsonResponse({"backup_size": "No Backup", "backup_date": "N/A"}, status=200)
 
+        return JsonResponse({
+            "backup_size": f"{last_backup.backup_size / 1024:.2f} KB",  # Convert bytes to KB
+            "backup_date": localtime(last_backup.created_at).strftime("%Y-%m-%d %H:%M:%S"),
+        }, status=200)
 
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 
 
 

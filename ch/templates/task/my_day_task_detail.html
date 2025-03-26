@@ -3295,6 +3295,37 @@ video::-webkit-media-controls-panel {
 </div>
 
 
+<!-- Back-up -->
+ <!-- Bootstrap Modal -->
+<div class="modal fade" id="backupModal" tabindex="-1" aria-labelledby="backupModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="backupModalLabel">Task Backup</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Backup Info -->
+                <div id="backupInfo" class="mb-3">
+                    <p class="text-muted">Last Backup Size: <strong id="backupSize">-</strong></p>
+                    <p class="text-muted">Last Backup Date: <strong id="backupDate">-</strong></p>
+                </div>
+
+                <!-- Progress Bar (Hidden Initially) -->
+                <div id="backupProgressContainer" class="mb-3 d-none">
+                    <div class="progress">
+                        <div id="backupProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
+                    </div>
+                    <p id="progressText" class="mt-2 text-muted">Starting Backup...</p>
+                </div>
+
+                <!-- Backup Button -->
+                <button id="startBackup" class="btn btn-success w-100">Start Backup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- -------------------------------------------------------------------------------------------------------------------------- -->
 
 
@@ -3400,6 +3431,13 @@ video::-webkit-media-controls-panel {
                   <span class="text-sm">Running Processes</span>
                 </button>
                 {% endif %}
+
+                <!-- Backup -->
+                <!-- Backup Button -->
+                <button class="btn btn-primary" id="openBackupModal" data-bs-toggle="modal" data-bs-target="#backupModal">
+                    Open Backup Modal
+                </button>
+
 
                 
 

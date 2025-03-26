@@ -631,3 +631,82 @@ function getCSRFToken() {
         ?.split("=")[1] || "";
 }
 
+
+
+// Back-up The Task
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("backupModal");
+    const startBackupBtn = document.getElementById("startBackup");
+    const progressBar = document.getElementById("backupProgressBar");
+    const progressContainer = document.getElementById("backupProgressContainer");
+    const progressText = document.getElementById("progressText");
+    const backupSizeEl = document.getElementById("backupSize");
+    const backupDateEl = document.getElementById("backupDate");
+
+    // Task Info (Replace these with dynamic values)
+    const orgId = window.djangoData.orgId;
+    const groupId = window.djangoData.groupId;
+    const taskId = window.djangoData.taskId;
+
+    // When Modal Opens → Fetch Last Backup Info
+    modal.addEventListener("shown.bs.modal", function () {
+        fetch(`/tasks/last-backup/${taskId}/`)
+            .then(response => response.json())
+            .then(data => {
+                backupSizeEl.textContent = data.backup_size || "-";
+                backupDateEl.textContent = data.backup_date || "-";
+            })
+            .catch(error => console.error("Error fetching backup data:", error));
+    });
+
+    // Start Backup Process
+    startBackupBtn.addEventListener("click", function () {
+        startBackupBtn.disabled = true;
+        progressContainer.classList.remove("d-none");
+
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 25;
+            progressBar.style.width = `${progress}%`;
+
+            if (progress === 100) {
+                clearInterval(interval);
+                progressText.textContent = "Backup Completed! Saving Data...";
+
+                // Make AJAX Request to Backup API
+                fetch(`/tasks/back-up/${orgId}/${groupId}/${taskId}/`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCSRFToken(), // CSRF Token for security
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        backupSizeEl.textContent = data.backup_size;
+                        backupDateEl.textContent = new Date().toLocaleString();
+                        progressText.textContent = "Backup Successfully Saved!";
+                    } else {
+                        progressText.textContent = "Backup Failed!";
+                    }
+                    startBackupBtn.disabled = false;
+                })
+                .catch(error => {
+                    console.error("Backup error:", error);
+                    progressText.textContent = "Error in Backup!";
+                    startBackupBtn.disabled = false;
+                });
+            }
+        }, 1000);
+    });
+
+    // Function to Get CSRF Token
+    function getCSRFToken() {
+        const csrfToken = document.cookie
+            .split("; ")
+            .find(row => row.startsWith("csrftoken="))
+            ?.split("=")[1];
+        return csrfToken || "";
+    }
+});

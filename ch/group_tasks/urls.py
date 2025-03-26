@@ -72,7 +72,9 @@ urlpatterns = [
     path('get-task-details/<int:task_id>/',get_task_details, name='get_task_details'),
     path('get-activities/',fetch_activity_logs_tasks, name='get_activities'),
     path('automation-status/',get_task_automation_status, name='automation_status'),
-    path('disable-all-automations/',disable_all_automations, name='disable_all_automations')
+    path('disable-all-automations/',disable_all_automations, name='disable_all_automations'),
+    path('back-up/<int:org_id>/<int:group_id>/<int:task_id>/',backup_task, name='back_up'),
+    path('last-backup/<int:task_id>/',get_last_backup, name='last_backup')
   
   
   
