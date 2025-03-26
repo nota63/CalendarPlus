@@ -1000,12 +1000,13 @@ class TaskBackup(models.Model):
     activity_logs = models.JSONField(null=True, blank=True)  
     automations = models.JSONField(null=True, blank=True)  
     reminders = models.JSONField(null=True, blank=True) 
+
     time_traced=models.JSONField(null=True, blank=True)
     notes=models.JSONField(null=True, blank=True)
     tags=models.JSONField(null=True, blank=True)
     meetings=models.JSONField(null=True, blank=True)
     conversation=models.JSONField(null=True, blank=True)
-
+    problem=models.JSONField(null=True, blank=True)
 
     file_size = models.FloatField(null=True, blank=True)  # Approx. backup size in KB
     backup_type = models.CharField(

@@ -2277,9 +2277,95 @@ def disable_all_automations(request):
 
 
 # Task Back-UP
+from .models import TaskBackup,AttachmentsTasksApp
 
 
- 
+# Back-up Task
+
+@csrf_exempt
+def backup_task(request, org_id, group_id, task_id):
+    """ Creates a backup of a task including comments, subtasks, attachments, etc. """
+    
+    user = request.user  # Get logged-in user
+    try:
+        # Fetch the task
+        task = Task.objects.get(id=task_id, organization_id=org_id, group_id=group_id)
+
+        # Fetch related data
+        comments = list(TaskComment.objects.filter(task=task).values())
+        subtasks = list(SubTask.objects.filter(task=task).values())
+        attachments = list(AttachmentsTasksApp.objects.filter(task=task).values())
+        activity_logs = list(ActivityLog.objects.filter(task=task).values())
+        automations = list(AutomationTask.objects.filter(task=task, user=user).values())
+        reminders = list(TaskReminder.objects.filter(task=task).values())
+        tags=list(TaskTag.objects.filter(task=task).values())
+        notes=list(TaskNote.objects.filter(task=task,user=user).values())
+        time_trace=list(TaskTimeTracking.objects.filter(task=task, user=user).values())
+        problem=list(Problem.objects.filter(task=task,user=user).values())
+        meetings=list(MeetingTaskQuery.objects.filter(task=task).values())
+        messages=list(CommunicateTask.objects.filter(task=task).values())
+       
+
+        # Backup data
+        backup_data = {
+            "task": {
+                "id": task.id,
+                "title": task.title,
+                "description": task.description,
+                "priority": task.priority,
+                "deadline": task.deadline.strftime('%Y-%m-%d %H:%M:%S') if task.deadline else None,
+                "status": task.status,
+                "progress":task.progress,
+                'queries_sent':task.queries_sent,
+
+            },
+            "comments": comments,
+            "subtasks": subtasks,
+            "attachments": attachments,
+            "activity_logs": activity_logs,
+            "automations": automations,
+            "reminders": reminders,
+
+            'tags':tags,
+            'notes':notes,
+            'time_trace':time_trace,
+            'problem':problem,
+            'meetings':meetings,
+            'messages':messages,
+        }
+
+        # Create backup record
+        task_backup = TaskBackup.objects.create(
+            user=user,
+            organization=task.organization,
+            group=task.group,
+            task=task,
+            backup_data=backup_data,
+            comments=comments,
+            subtasks=subtasks,
+            attachments=attachments,
+            activity_logs=activity_logs,
+            automations=automations,
+            reminders=reminders,
+
+            tags=tags,
+            time_traced=time_trace,
+            notes=notes,
+            meetings=meetings,
+            conversation=messages,
+            problem=problem,
+
+            backup_type="manual",
+            created_at=now(),
+        )
+
+        return JsonResponse({"message": "Backup created successfully!", "backup_id": task_backup.id}, status=201)
+
+    except Task.DoesNotExist:
+        return JsonResponse({"error": "Task not found!"}, status=404)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
 
 
 
