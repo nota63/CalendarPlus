@@ -3634,7 +3634,13 @@ video::-webkit-media-controls-panel {
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Backup Activity Logs</h5>
+
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <!-- share logs -->
+                <button id="sendLogsBtn" class="btn btn-primary" onclick="sendLogsEmail()"> 
+                    Send Logs 📩
+                </button>
+                
             </div>
             <div class="modal-body">
                 <select id="logFilter" class="form-select" onchange="filterBackupLogs()">

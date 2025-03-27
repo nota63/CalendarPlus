@@ -1080,3 +1080,44 @@ function filterBackupLogs() {
     const selectedAction = document.getElementById("logFilter").value;
     fetchBackupLogs(selectedAction);
 }
+
+
+// Share Logs
+function sendLogsEmail() {
+    const button = document.getElementById("sendLogsBtn");
+
+    // Show loading spinner
+    button.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Sending...`;
+    button.disabled = true;
+
+    fetch("/tasks/send-task-logs/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCSRFToken(),  
+        },
+        body: JSON.stringify({
+            org_id: window.djangoData.orgId,
+            group_id: window.djangoData.groupId,
+            task_id: window.djangoData.taskId
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Logs sent successfully!");
+        } else {
+            alert("Failed to send logs: " + data.message);
+        }
+    })
+    .catch(error => console.error("Error sending logs:", error))
+    .finally(() => {
+        button.innerHTML = `Send Logs 📩`;
+        button.disabled = false;
+    });
+}
+
+// Function to get CSRF token
+function getCSRFToken() {
+    return document.querySelector("[name=csrfmiddlewaretoken]").value;
+}

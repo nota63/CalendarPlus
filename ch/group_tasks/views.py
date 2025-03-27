@@ -2783,7 +2783,46 @@ def fetch_backup_logs(request):
     return JsonResponse({"success": False, "message": "Invalid request method."})
 
 
+# Send Task Logs
+def send_task_logs_email(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            org_id = data.get("org_id")
+            group_id = data.get("group_id")
+            task_id = data.get("task_id")
 
+            # Fetch task and assigned user
+            task = Task.objects.get(id=task_id, organization_id=org_id, group_id=group_id)
+            assigned_user = task.created_by
+
+            if not assigned_user or not assigned_user.email:
+                return JsonResponse({"success": False, "message": "Assigned user email not found!"})
+
+            # Fetch logs for this task
+            logs = ActivityBackup.objects.filter(organization_id=org_id, group_id=group_id, task_id=task_id).order_by("-timestamp")
+
+            # Prepare email content
+            subject = f"Backup Logs for Task: {task.title}"
+            email_body = render_to_string("task/email/tasks_logs_email.html", {"task": task, "logs": logs})
+
+            # Send email
+            send_mail(
+                subject,
+                "",
+                settings.DEFAULT_FROM_EMAIL,
+                [assigned_user.email],
+                html_message=email_body
+            )
+
+            return JsonResponse({"success": True, "message": "Logs sent successfully!"})
+        
+        except Task.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Task not found!"})
+        except Exception as e:
+            return JsonResponse({"success": False, "message": str(e)})
+    
+    return JsonResponse({"success": False, "message": "Invalid request method!"})
 
 
 
