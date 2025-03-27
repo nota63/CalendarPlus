@@ -2277,7 +2277,7 @@ def disable_all_automations(request):
 
 
 # Task Back-UP
-from .models import TaskBackup,AttachmentsTasksApp,BackupSchedule
+from .models import TaskBackup,AttachmentsTasksApp,BackupSchedule,ActivityBackup
 import sys
 from django.utils.timezone import localtime
 
@@ -2536,6 +2536,24 @@ def restore_backup(request, backup_id):
         restore_model_data(CommunicateTask, backup_data["messages"])
 
         print("All Data Restored Successfully!")
+        # Fetch the backup instance
+    
+        # Log the restore action in ActivityBackup
+        ActivityBackup.objects.create(
+                organization=task_backup.organization,
+                group=task_backup.group,
+                task=task_backup.task,
+                backup=task_backup,
+                performed_by=user,
+                action="restored",
+                details={
+                    "restored_at": str(now()),
+                    "restored_by": user.username,
+                 
+                }
+            )
+        print("ACTIVITY LOGGED")
+
 
         return JsonResponse({
             "message": "Backup restored successfully!",
@@ -2670,7 +2688,7 @@ def update_backup_schedule(request):
 
         
 
-        
+
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Add the task to my day 
 @login_required
