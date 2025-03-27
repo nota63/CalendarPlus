@@ -3873,21 +3873,74 @@ video::-webkit-media-controls-panel {
 
 <!-- Progress Details Modal -->
 <div class="modal fade" id="progressDetailsModalNew" tabindex="-1" aria-labelledby="progressDetailsModalLabelNew" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Please let {{task.created_by.username}} know what you have done?</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 overflow-hidden" style="
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(12px);
+            border-radius: 1rem;
+            font-family: 'Inter', sans-serif;
+        ">
+            <div class="modal-header border-0 bg-gradient-to-r from-indigo-50 to-purple-50">
+                <div class="w-full">
+                    <h5 class="modal-title text-xl font-semibold text-gray-800">
+                        Update for <span class="text-indigo-600">{{task.created_by.username}}</span>
+                    </h5>
+                    <p class="text-sm text-gray-500 mt-1">Describe your completed work in detail</p>
+                </div>
+                <button type="button" class="btn-close opacity-70 hover:opacity-100 transition-opacity" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <textarea id="progressDetailsNew" class="form-control" placeholder="Specify your work..."></textarea>
+
+            <div class="modal-body p-6">
+                <div class="space-y-4">
+                    <div class="bg-white/70 backdrop-blur-sm p-4 rounded-xl shadow-sm border border-white/80">
+                        <textarea id="progressDetailsNew" 
+                              class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-indigo-300 focus:ring-2 focus:ring-indigo-200/50 transition-all"
+                              rows="4"
+                              placeholder="✍️ Example: Completed UI redesign for dashboard components, implemented responsive grid layout, added interactive charts..."></textarea>
+                        <div class="mt-2 text-sm text-gray-400 flex justify-between">
+                            <span>Minimum 100 characters</span>
+                            <span id="charCount">0/500</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-purple-50/50 p-4 rounded-lg">
+                        <div class="flex items-start space-x-3">
+                            <div class="text-purple-500">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                <p class="font-medium">Tips for good updates:</p>
+                                <ul class="list-disc list-inside mt-1 space-y-1">
+                                    <li>Specific features implemented</li>
+                                    <li>Technical challenges overcome</li>
+                                    <li>Screenshots/references if available</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" id="submitProgressNew" class="btn btn-primary">Submit</button>
+
+            <div class="modal-footer border-0 bg-gray-50/70">
+                <button type="button" 
+                        class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg transition-colors"
+                        data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <button type="button" 
+                        id="submitProgressNew"
+                        class="px-6 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-lg font-medium 
+                               transition-all transform hover:scale-[1.02] shadow-md hover:shadow-lg">
+                    📨 Submit Update
+                </button>
             </div>
         </div>
     </div>
 </div>
+
+
 
 <!-- ProgressLogs -->
 <!-- Task Progress Logs Modal -->
