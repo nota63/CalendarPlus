@@ -1128,3 +1128,145 @@ function sendLogsEmail() {
 function getCSRFToken() {
     return document.querySelector("[name=csrfmiddlewaretoken]").value;
 }
+
+
+// Handle Task Progress
+
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("✅ Document Loaded: JavaScript is running...");
+
+    const progressModal = new bootstrap.Modal(document.getElementById("progressModal"));
+    const detailsModal = new bootstrap.Modal(document.getElementById("progressDetailsModal"));
+
+    let progressValue = 0;  // Fetched from server
+    let actionType = "";  // Track increase or decrease
+
+    document.getElementById("openProgressModal").addEventListener("click", function() {
+        console.log("🟢 Open Progress Modal Clicked.");
+        fetchProgress();
+        progressModal.show();
+    });
+
+    document.getElementById("increaseProgressBtn").addEventListener("click", function() {
+        actionType = "increase";
+        console.log("🟢 Increase Progress Clicked.");
+        detailsModal.show();
+    });
+
+    document.getElementById("decreaseProgressBtn").addEventListener("click", function() {
+        actionType = "decrease";
+        console.log("🟢 Decrease Progress Clicked.");
+        detailsModal.show();
+    });
+
+    document.getElementById("submitProgress").addEventListener("click", function() {
+        let details = document.getElementById("progressDetails").value.trim();
+        console.log(`🟡 Submit Progress Clicked. Action: ${actionType}, Details: ${details}`);
+
+        if (!details) {
+            alert("⚠️ Please enter details before submitting.");
+            console.warn("⚠️ Submission aborted: No details provided.");
+            return;
+        }
+
+        let submitBtn = document.getElementById("submitProgress");
+        submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Updating...`;
+        submitBtn.disabled = true;
+
+        updateProgress(actionType, details, function(newProgress) {
+            submitBtn.innerHTML = "Submit";
+            submitBtn.disabled = false;
+            detailsModal.hide();
+            updateProgressBar(newProgress);
+        });
+    });
+
+    function fetchProgress() {
+        let orgId = window.djangoData.orgId;
+        let groupId = window.djangoData.groupId;
+        let taskId = window.djangoData.taskId;
+        let url = `/tasks/fetch-task-progress-new/?org_id=${orgId}&group_id=${groupId}&task_id=${taskId}`;
+
+        console.log(`🔵 Fetching Progress: ${url}`);
+
+        fetch(url, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => {
+            console.log(`🔵 Fetch Response Status: ${response.status}`);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            console.log("🟢 Progress Data Received:", data);
+            if (data.error) {
+                alert("❌ Error: " + data.error);
+                return;
+            }
+            progressValue = data.progress;
+            updateProgressBar(progressValue);
+        })
+        .catch(error => console.error("❌ Error fetching progress:", error));
+    }
+
+    function updateProgress(action, details, callback) {
+        let csrfToken = getCSRFToken();
+        if (!csrfToken) {
+            alert("⚠️ CSRF token missing! Please refresh the page.");
+            console.error("❌ CSRF Token Missing. Aborting request.");
+            return;
+        }
+
+        let payload = {
+            org_id: window.djangoData.orgId,
+            group_id: window.djangoData.groupId,
+            task_id: window.djangoData.taskId,
+            action: action,
+            details: details
+        };
+
+        console.log("🔵 Updating Progress. Payload:", payload);
+        console.log("🔵 CSRF Token:", csrfToken);
+
+        fetch(`/tasks/update-task-progress-new/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => {
+            console.log(`🔵 Update Response Status: ${response.status}`);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            console.log("🟢 Progress Update Response:", data);
+            if (data.success) {
+                alert("✅ Progress updated successfully!");
+                callback(data.new_progress);
+            } else {
+                alert("❌ Error: " + (data.error || "Failed to update progress."));
+            }
+        })
+        .catch(error => console.error("❌ Error updating progress:", error));
+    }
+
+    function updateProgressBar(value) {
+        let progressBar = document.getElementById("progressBar");
+        progressBar.style.width = `${value}%`;
+        progressBar.innerText = `${value}%`;
+        console.log(`🔵 Progress Bar Updated: ${value}%`);
+    }
+
+    function getCSRFToken() {
+        let csrfCookie = document.cookie.split("; ").find(row => row.startsWith("csrftoken="));
+        let csrfToken = csrfCookie ? csrfCookie.split("=")[1] : null;
+        console.log("🔵 Extracted CSRF Token:", csrfToken);
+        return csrfToken;
+    }
+});

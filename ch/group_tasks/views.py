@@ -2826,57 +2826,63 @@ def send_task_logs_email(request):
 
 
 # HANDLE TASKS PROGRESS
-def get_task_progress_new(request, org_id, group_id, task_id):
-    """ Fetch task progress and return JSON response """
-    task = get_object_or_404(Task, id=task_id, organization_id=org_id, group_id=group_id)
+
+# Fetch Task Progress (GET)
+def fetch_task_progress_new(request):
+    if request.method == "GET":
+        org_id = request.GET.get("org_id")
+        group_id = request.GET.get("group_id")
+        task_id = request.GET.get("task_id")
+
+        if not all([org_id, group_id, task_id]):
+            return JsonResponse({"error": "Missing parameters"}, status=400)
+
+        try:
+            task = Task.objects.get(id=task_id, organization_id=org_id, group_id=group_id)
+            return JsonResponse({"progress": task.progress})
+        except Task.DoesNotExist:
+            return JsonResponse({"error": "Task not found"}, status=404)
     
-    return JsonResponse({
-        "progress": task.progress,  # Assuming task has a `progress` field (0-100)
-        "task_title": task.title,
-        "task_description": task.description,
-    })
+    return JsonResponse({"error": "Invalid request method"}, status=405)
 
-
-# Handle Dynamic progress update
-def update_task_progress_new(request, org_id, group_id, task_id):
-    """ Handle progress update based on user input """
+# Update Task Progress (POST)
+@csrf_exempt
+def update_task_progress_new(request):
     if request.method == "POST":
-        task = get_object_or_404(Task, id=task_id, organization_id=org_id, group_id=group_id)
-        user = request.user  
-        progress_change = int(request.POST.get("progress_change", 0))  # Increase or decrease
-        details = request.POST.get("details", "").strip()
+        try:
+            data = json.loads(request.body)
+            org_id = data.get("org_id")
+            group_id = data.get("group_id")
+            task_id = data.get("task_id")
+            action = data.get("action")
+            details = data.get("details")
 
-        if not details:
-            return JsonResponse({"error": "Please enter details for the progress update."}, status=400)
+            if not all([org_id, group_id, task_id, action, details]):
+                return JsonResponse({"error": "Missing parameters"}, status=400)
 
-        # Update progress
-        new_progress = max(0, min(100, task.progress + progress_change))  # Keep within 0-100
-        task.progress = new_progress
-        task.save()
+            task = Task.objects.get(id=task_id, organization_id=org_id, group_id=group_id)
 
-        # Log the progress update
-        TaskProgressLog.objects.create(
-            task=task,
-            performed_by=user,
-            progress_change=progress_change,
-            details=details,
-            timestamp=now(),
-        )
+            # Increase or Decrease Progress
+            progress_change = 10 if action == "increase" else -10
+            task.progress = max(0, min(100, task.progress + progress_change))
+            task.save()
 
-        # Notify Task Creator
-        send_mail(
-            subject="Task Progress Updated",
-            message=f"User {user.username} updated progress of '{task.title}' by {progress_change}%.\n\nDetails:\n{details}",
-            from_email="no-reply@calendarplus.com",
-            recipient_list=[task.created_by.email],
-            fail_silently=True,
-        )
+            # Log the Progress Update
+            TaskProgressLog.objects.create(
+                task=task,
+                performed_by=request.user,
+                progress_change=progress_change,
+                details=details
+            )
 
-        return JsonResponse({"message": "Progress updated successfully!", "new_progress": new_progress})
+            return JsonResponse({"success": True, "new_progress": task.progress})
 
-    return JsonResponse({"error": "Invalid request"}, status=400)
+        except Task.DoesNotExist:
+            return JsonResponse({"error": "Task not found"}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON format"}, status=400)
 
-
+    return JsonResponse({"error": "Invalid request method"}, status=405)
 
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------

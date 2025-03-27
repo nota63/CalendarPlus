@@ -3776,6 +3776,54 @@ video::-webkit-media-controls-panel {
         </div>
     </div>
 </div>
+
+
+<!-- Manage and fetch progress of the task -->
+ <!-- Progress Modal -->
+<div class="modal fade" id="progressModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Task Progress</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p><strong>Current Progress:</strong></p>
+                <div class="progress">
+                    <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                         role="progressbar" style="width: 0%;">0%</div>
+                </div>
+                <div class="mt-3">
+                    <button id="increaseProgressBtn" class="btn btn-success">Increase Progress</button>
+                    <button id="decreaseProgressBtn" class="btn btn-danger">Decrease Progress</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Increment / decrement & details about the update -->
+ <!-- Progress Details Modal -->
+<div class="modal fade" id="progressDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Enter Progress Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <textarea id="progressDetails" class="form-control" rows="3" 
+                          placeholder="Describe what was done..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button id="submitProgress" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- -------------------------------------------------------------------------------------------------------------------------- -->
 
 
@@ -3891,6 +3939,11 @@ video::-webkit-media-controls-panel {
                     
                     <span class="text-sm">Backup & Version Control</span>
                 </button>
+                <!-- update task progress -->
+                <button id="openProgressModal" class="btn btn-primary">
+                    Update Task Progress
+                </button>
+                
 
 
                 

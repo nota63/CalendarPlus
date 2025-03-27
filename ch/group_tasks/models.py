@@ -1128,12 +1128,12 @@ class ActivityBackup(models.Model):
 class TaskProgressLog(models.Model):
     task = models.ForeignKey("Task", on_delete=models.CASCADE, related_name="progress_logs")
     performed_by = models.ForeignKey(User, on_delete=models.CASCADE)
-    progress_change = models.IntegerField()  # Can be positive (increase) or negative (decrease)
-    details = models.TextField()  # What was done
+    progress_change = models.IntegerField()  
+    details = models.TextField() 
     timestamp = models.DateTimeField(default=now)
 
     class Meta:
-        ordering = ["-timestamp"]  # Show latest updates first
+        ordering = ["-timestamp"]  
 
     def __str__(self):
         return f"{self.performed_by.username} updated {self.task.title} by {self.progress_change}%"
