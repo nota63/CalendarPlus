@@ -1,37 +1,127 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Backup Logs Notification</title>
     <style>
-        body { font-family: Arial, sans-serif; }
-        .container { padding: 20px; }
-        .log-entry { border-bottom: 1px solid #ddd; padding: 10px 0; }
-        .log-entry:last-child { border-bottom: none; }
-        .timestamp { color: gray; font-size: 12px; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 650px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+        }
+        p {
+            color: #444;
+            line-height: 1.6;
+        }
+        .log-entry {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+            background: #f9f9f9;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            padding: 12px;
+        }
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        .timestamp {
+            color: #777;
+            font-size: 12px;
+            font-style: italic;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #222;
+        }
+        .footer {
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #555;
+        }
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Backup Logs for Task: {{ task.title }}</h2>
-        <p>Dear {{task.created_by.username}}</p>
 
-        <strong>{{task.assigned_to.username}} Shared task backup logs to you| Look at the following information below</strong>
+    <div class="container">
+        <h2>📌 Backup Logs for Task: {{ task.title }}</h2>
+
+        <p>Dear <strong>{{ task.created_by.username }}</strong>,</p>
 
         <p>
-            Workspace and group
-            <strong>{{organization.name}}</strong>
-            <strong>{{group.name}}</strong>
+            We hope you're having a wonderful day! 🌟  
+            This is a gentle notification to inform you that the backup activity logs related to your task have been shared with you.  
+            These logs provide detailed information about all backup-related actions performed within your workspace.
         </p>
 
+        <h3>🔹 Workspace & Group Information</h3>
+        <p>
+            <strong>📌 Workspace:</strong> {{ organization.name }} <br>
+            <strong>📂 Group:</strong> {{ group.name }}
+        </p>
 
+        <h3>📜 Backup Activity Logs</h3>
         {% for log in logs %}
             <div class="log-entry">
-                <strong>{{ log.performed_by.username }}</strong> {{ log.action }} at <span class="timestamp">{{ log.timestamp }}</span>
-                <br>
-                <small>{{ log.details }}</small>
+                <p>
+                    <span class="highlight">{{ log.performed_by.username }}</span> 
+                    performed <span class="highlight">{{ log.action }}</span> action on  
+                    <span class="timestamp">{{ log.timestamp }}</span>
+                </p>
+                <p><small>📝 {{ log.details }}</small></p>
             </div>
         {% empty %}
-            <p>No logs available.</p>
+            <p>No logs available at this moment.</p>
         {% endfor %}
+
+        <h3>✅ Why Is This Important?</h3>
+        <p>
+            Keeping track of backup logs is essential for maintaining data integrity and security.  
+            These logs help you understand **when backups were created, restored, downloaded, or deleted**,  
+            ensuring **full transparency and control** over your task data.
+        </p>
+
+        <p>
+            If you need further details or have any concerns, feel free to reach out.  
+            Your data security and productivity matter to us! 💙
+        </p>
+
+        <a href="#" class="button">View Full Backup Logs</a>
+
+        <div class="footer">
+            <p>Best regards,</p>
+            <p><strong>🌍 CalendarPlus Team</strong></p>
+            <p>Helping you stay organized, one backup at a time. 🚀</p>
+        </div>
     </div>
+
 </body>
 </html>
