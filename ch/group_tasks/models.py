@@ -1108,7 +1108,7 @@ class ActivityBackup(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    backup = models.ForeignKey(TaskBackup, on_delete=models.CASCADE)
+
 
     performed_by = models.ForeignKey(User, on_delete=models.CASCADE)  
     action = models.CharField(max_length=10, choices=ACTION_CHOICES)  
@@ -1118,4 +1118,4 @@ class ActivityBackup(models.Model):
     details = models.JSONField()
 
     def __str__(self):
-        return f"{self.performed_by.username} {self.action} backup {self.backup.id} for {self.task.title}"
+        return f"{self.performed_by.username} {self.action}  for {self.task.title}"

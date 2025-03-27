@@ -2540,18 +2540,18 @@ def restore_backup(request, backup_id):
     
         # Log the restore action in ActivityBackup
         ActivityBackup.objects.create(
-                organization=task_backup.organization,
-                group=task_backup.group,
-                task=task_backup.task,
-                backup=task_backup,
-                performed_by=user,
-                action="restored",
-                details={
-                    "restored_at": str(now()),
-                    "restored_by": user.username,
-                 
-                }
-            )
+            organization=task_backup.organization,
+            group=task_backup.group,
+            task=task_backup.task,
+            performed_by=user,
+            action="restored",
+            details={
+                "backup_date": task_backup.created_at.isoformat(),  # Convert to string
+                "size": task_backup.backup_size,
+                "restored_at": now().isoformat(),  # Convert to string
+                "restored_by": user.username,
+            }
+        )
         print("ACTIVITY LOGGED")
 
 
