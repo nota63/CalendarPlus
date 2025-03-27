@@ -2865,6 +2865,7 @@ def update_task_progress_new(request):
             # Increase or Decrease Progress
             progress_change = 10 if action == "increase" else -10
             task.progress = max(0, min(100, task.progress + progress_change))
+            task.progress_update_sent=False
             task.save()
 
             # Log the Progress Update
