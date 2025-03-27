@@ -1103,6 +1103,7 @@ class ActivityBackup(models.Model):
     ACTION_CHOICES = [
         ("created", "Backup Created"),
         ("restored", "Backup Restored"),
+        ("download", "Backup Downloaded"),
     ]
 
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)

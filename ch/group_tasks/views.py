@@ -2407,9 +2407,9 @@ def backup_task(request, org_id, group_id, task_id):
             performed_by=user,
             action="created",
             details={
-                "backup_created": task_backup.created_at.isoformat(),  # Convert to string
+                "backup_created": task_backup.created_at.isoformat(), 
                 "size": task_backup.backup_size,
-                "created_at": now().isoformat(),  # Convert to string
+                "created_at": now().isoformat(),  
                 "created_by": user.username,
             }
         )
@@ -2618,6 +2618,21 @@ def download_backup(request, backup_id):
 
     # Convert data to JSON string
     backup_json = json.dumps(backup_content, indent=4)
+
+    # Log the restore action in ActivityBackup
+    ActivityBackup.objects.create(
+            organization=backup.organization,
+            group=backup.group,
+            task=backup.task,
+            performed_by=request.user,
+            action="download",
+            details={
+                "backup_date": backup.created_at.isoformat(),  # Convert to string
+                "size": backup.backup_size,
+                "downloaded_at": now().isoformat(),  # Convert to string
+                "downloaded_by": request.user.username,
+            }
+        )
 
     # Create HTTP response
     response = HttpResponse(backup_json, content_type="application/json")
