@@ -2627,9 +2627,9 @@ def download_backup(request, backup_id):
             performed_by=request.user,
             action="download",
             details={
-                "backup_date": backup.created_at.isoformat(),  # Convert to string
+                "backup_date": backup.created_at.isoformat(),  
                 "size": backup.backup_size,
-                "downloaded_at": now().isoformat(),  # Convert to string
+                "downloaded_at": now().isoformat(),  
                 "downloaded_by": request.user.username,
             }
         )
@@ -2646,6 +2646,20 @@ def delete_backup(request, backup_id):
     """Handles deleting a backup when requested via AJAX."""
     if request.method == "POST":
         backup = get_object_or_404(TaskBackup, id=backup_id)
+        # log the deletion
+        ActivityBackup.objects.create(
+            organization=backup.organization,
+            group=backup.group,
+            task=backup.task,
+            performed_by=request.user,
+            action="deleted",
+            details={
+                "backup_date": backup.created_at.isoformat(),  
+                "size": backup.backup_size,
+                "deleted_at": now().isoformat(),  
+                "deleted_by": request.user.username,
+            }
+        )
         backup.delete()
         return JsonResponse({"success": True, "message": "Backup deleted successfully!"})
 
