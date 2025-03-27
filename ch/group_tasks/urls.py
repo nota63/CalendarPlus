@@ -82,7 +82,9 @@ urlpatterns = [
     path("get-backup-schedule/", get_backup_schedule, name="get_backup_schedule"),
     path("update-backup-schedule/", update_backup_schedule, name="update_backup_schedule"),
     path('fetch-backup-logs/',fetch_backup_logs, name='fetch_backup_logs'),
-    path('send-task-logs/',send_task_logs_email, name='send_task_logs')
+    path('send-task-logs/',send_task_logs_email, name='send_task_logs'),
+    path('get-task-progress-new/<int:org_id>/<int:group_id>/<int:task_id>/',get_task_progress_new, name='get_task_progress_new'),
+    path('update-task-progress-new/>int:org_id>/<int:group_id>/<int:task_id>/',update_task_progress_new, name='update_task_progress_new')
   
   
   

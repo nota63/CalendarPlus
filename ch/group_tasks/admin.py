@@ -3,7 +3,7 @@ from unfold.admin import ModelAdmin
 from .models import (Task, AddDay, TaskComment, TaskNote, TaskTag, TaskTimer, ActivityLog, TaskTimeTracking,
                      
                       Problem,AttachmentsTasksApp,RecentVisit,MeetingTaskQuery,CommunicateTask,SubTask,TaskReminder,CalPoints,
-                      PendingRewardNotification,AutomationTask,TaskCompletionActivities,TaskBackup,ActivityBackup)
+                      PendingRewardNotification,AutomationTask,TaskCompletionActivities,TaskBackup,ActivityBackup,TaskProgressLog)
 
 
 @admin.register(Task)
@@ -109,5 +109,11 @@ class TaskBackupsAdmin(ModelAdmin):
 @admin.register(ActivityBackup)
 class ActivityBackupsAdmin(ModelAdmin):
     list_display = [field.name for field in ActivityBackup._meta.fields]
+
+
+
+@admin.register(TaskProgressLog)
+class TasksProgressAdmin(ModelAdmin):
+    list_display = [field.name for field in TaskProgressLog._meta.fields]
 
 

@@ -2277,7 +2277,7 @@ def disable_all_automations(request):
 
 
 # Task Back-UP
-from .models import TaskBackup,AttachmentsTasksApp,BackupSchedule,ActivityBackup
+from .models import TaskBackup,AttachmentsTasksApp,BackupSchedule,ActivityBackup,TaskProgressLog
 import sys
 from django.utils.timezone import localtime
 
@@ -2823,6 +2823,59 @@ def send_task_logs_email(request):
             return JsonResponse({"success": False, "message": str(e)})
     
     return JsonResponse({"success": False, "message": "Invalid request method!"})
+
+
+# HANDLE TASKS PROGRESS
+def get_task_progress_new(request, org_id, group_id, task_id):
+    """ Fetch task progress and return JSON response """
+    task = get_object_or_404(Task, id=task_id, organization_id=org_id, group_id=group_id)
+    
+    return JsonResponse({
+        "progress": task.progress,  # Assuming task has a `progress` field (0-100)
+        "task_title": task.title,
+        "task_description": task.description,
+    })
+
+
+# Handle Dynamic progress update
+def update_task_progress_new(request, org_id, group_id, task_id):
+    """ Handle progress update based on user input """
+    if request.method == "POST":
+        task = get_object_or_404(Task, id=task_id, organization_id=org_id, group_id=group_id)
+        user = request.user  
+        progress_change = int(request.POST.get("progress_change", 0))  # Increase or decrease
+        details = request.POST.get("details", "").strip()
+
+        if not details:
+            return JsonResponse({"error": "Please enter details for the progress update."}, status=400)
+
+        # Update progress
+        new_progress = max(0, min(100, task.progress + progress_change))  # Keep within 0-100
+        task.progress = new_progress
+        task.save()
+
+        # Log the progress update
+        TaskProgressLog.objects.create(
+            task=task,
+            performed_by=user,
+            progress_change=progress_change,
+            details=details,
+            timestamp=now(),
+        )
+
+        # Notify Task Creator
+        send_mail(
+            subject="Task Progress Updated",
+            message=f"User {user.username} updated progress of '{task.title}' by {progress_change}%.\n\nDetails:\n{details}",
+            from_email="no-reply@calendarplus.com",
+            recipient_list=[task.created_by.email],
+            fail_silently=True,
+        )
+
+        return JsonResponse({"message": "Progress updated successfully!", "new_progress": new_progress})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
 
 
 
