@@ -2669,6 +2669,8 @@ def update_backup_schedule(request):
         return JsonResponse({"success": False, "message": str(e)}, status=500)
 
         
+
+        
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Add the task to my day 
 @login_required
@@ -2931,6 +2933,7 @@ def manage_task_timer(request, org_id, group_id, task_id):
 
 
 # Update the task progress 
+@csrf_exempt
 def update_task_progress(request, org_id, group_id, task_id):
     if request.method == "POST":
         organization = get_object_or_404(Organization, id=org_id)
@@ -2960,7 +2963,6 @@ def update_task_progress(request, org_id, group_id, task_id):
             return JsonResponse({'status': 'error', 'message': 'Progress must be between 0 and 100.'}, status=400)
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
-
 
 
 # Fetch activity logs
