@@ -3780,44 +3780,39 @@ video::-webkit-media-controls-panel {
 
 <!-- Manage and fetch progress of the task -->
  <!-- Progress Modal -->
-<div class="modal fade" id="progressModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+<div class="modal fade" id="progressModalNew" tabindex="-1" aria-labelledby="progressModalLabelNew" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Update Task Progress</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body text-center">
-                <p><strong>Current Progress:</strong></p>
+            <div class="modal-body">
                 <div class="progress">
-                    <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
-                         role="progressbar" style="width: 0%;">0%</div>
+                    <div id="progressBarNew" class="progress-bar bg-info" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
                 </div>
                 <div class="mt-3">
-                    <button id="increaseProgressBtn" class="btn btn-success">Increase Progress</button>
-                    <button id="decreaseProgressBtn" class="btn btn-danger">Decrease Progress</button>
+                    <button id="increaseProgressBtnNew" class="btn btn-success">Increase Progress</button>
+                    <button id="decreaseProgressBtnNew" class="btn btn-danger">Decrease Progress</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-
-<!-- Increment / decrement & details about the update -->
- <!-- Progress Details Modal -->
-<div class="modal fade" id="progressDetailsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+<!-- Progress Details Modal -->
+<div class="modal fade" id="progressDetailsModalNew" tabindex="-1" aria-labelledby="progressDetailsModalLabelNew" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Enter Progress Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <textarea id="progressDetails" class="form-control" rows="3" 
-                          placeholder="Describe what was done..."></textarea>
+                <textarea id="progressDetailsNew" class="form-control" placeholder="Enter progress details..."></textarea>
             </div>
             <div class="modal-footer">
-                <button id="submitProgress" class="btn btn-primary">Submit</button>
+                <button type="button" id="submitProgressNew" class="btn btn-primary">Submit</button>
             </div>
         </div>
     </div>
@@ -3940,9 +3935,10 @@ video::-webkit-media-controls-panel {
                     <span class="text-sm">Backup & Version Control</span>
                 </button>
                 <!-- update task progress -->
-                <button id="openProgressModal" class="btn btn-primary">
-                    Update Task Progress
+                <button id="openProgressModalNew" class="btn btn-success">
+                    🚀 Update Task Progress
                 </button>
+                
                 
 
 

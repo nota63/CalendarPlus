@@ -1132,88 +1132,98 @@ function getCSRFToken() {
 
 // Handle Task Progress
 
-document.addEventListener("DOMContentLoaded", function() {
-    console.log("✅ Document Loaded: JavaScript is running...");
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ JavaScript Loaded: Ready to manage task progress...");
 
-    const progressModal = new bootstrap.Modal(document.getElementById("progressModal"));
-    const detailsModal = new bootstrap.Modal(document.getElementById("progressDetailsModal"));
+    // Modals
+    const progressModalNew = new bootstrap.Modal(document.getElementById("progressModalNew"));
+    const detailsModalNew = new bootstrap.Modal(document.getElementById("progressDetailsModalNew"));
 
-    let progressValue = 0;  // Fetched from server
-    let actionType = "";  // Track increase or decrease
+    // Buttons
+    const increaseBtnNew = document.getElementById("increaseProgressBtnNew");
+    const decreaseBtnNew = document.getElementById("decreaseProgressBtnNew");
+    const submitBtnNew = document.getElementById("submitProgressNew");
 
-    document.getElementById("openProgressModal").addEventListener("click", function() {
+    // Input
+    const progressDetailsInputNew = document.getElementById("progressDetailsNew");
+
+    // Progress Bar
+    const progressBarNew = document.getElementById("progressBarNew");
+
+    let progressValueNew = 0;  // Current Progress Value
+    let actionTypeNew = "";  // Track increase or decrease
+
+    // Open Progress Modal
+    document.getElementById("openProgressModalNew").addEventListener("click", function () {
         console.log("🟢 Open Progress Modal Clicked.");
-        fetchProgress();
-        progressModal.show();
+        fetchProgressNew();
+        progressModalNew.show();
     });
 
-    document.getElementById("increaseProgressBtn").addEventListener("click", function() {
-        actionType = "increase";
+    // Increase Progress
+    increaseBtnNew.addEventListener("click", function () {
+        actionTypeNew = "increase";
         console.log("🟢 Increase Progress Clicked.");
-        detailsModal.show();
+        detailsModalNew.show();
     });
 
-    document.getElementById("decreaseProgressBtn").addEventListener("click", function() {
-        actionType = "decrease";
+    // Decrease Progress
+    decreaseBtnNew.addEventListener("click", function () {
+        actionTypeNew = "decrease";
         console.log("🟢 Decrease Progress Clicked.");
-        detailsModal.show();
+        detailsModalNew.show();
     });
 
-    document.getElementById("submitProgress").addEventListener("click", function() {
-        let details = document.getElementById("progressDetails").value.trim();
-        console.log(`🟡 Submit Progress Clicked. Action: ${actionType}, Details: ${details}`);
+    // Submit Progress Update
+    submitBtnNew.addEventListener("click", function () {
+        let detailsNew = progressDetailsInputNew.value.trim();
+        console.log(`🟡 Submit Progress Clicked. Action: ${actionTypeNew}, Details: ${detailsNew}`);
 
-        if (!details) {
+        if (!detailsNew) {
             alert("⚠️ Please enter details before submitting.");
             console.warn("⚠️ Submission aborted: No details provided.");
             return;
         }
 
-        let submitBtn = document.getElementById("submitProgress");
-        submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Updating...`;
-        submitBtn.disabled = true;
+        // Disable Button & Show Loader
+        submitBtnNew.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Updating...`;
+        submitBtnNew.disabled = true;
 
-        updateProgress(actionType, details, function(newProgress) {
-            submitBtn.innerHTML = "Submit";
-            submitBtn.disabled = false;
-            detailsModal.hide();
-            updateProgressBar(newProgress);
+        updateProgressNew(actionTypeNew, detailsNew, function (newProgressNew) {
+            submitBtnNew.innerHTML = "Submit";
+            submitBtnNew.disabled = false;
+            detailsModalNew.hide();
+            updateProgressBarNew(newProgressNew);
         });
     });
 
-    function fetchProgress() {
+    // Fetch Task Progress
+    function fetchProgressNew() {
         let orgId = window.djangoData.orgId;
         let groupId = window.djangoData.groupId;
         let taskId = window.djangoData.taskId;
         let url = `/tasks/fetch-task-progress-new/?org_id=${orgId}&group_id=${groupId}&task_id=${taskId}`;
-
+    
         console.log(`🔵 Fetching Progress: ${url}`);
-
-        fetch(url, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
-        .then(response => {
-            console.log(`🔵 Fetch Response Status: ${response.status}`);
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            return response.json();
-        })
+    
+        fetch(url, { method: "GET", headers: { "Content-Type": "application/json" } })
+        .then(response => response.json())
         .then(data => {
             console.log("🟢 Progress Data Received:", data);
             if (data.error) {
                 alert("❌ Error: " + data.error);
                 return;
             }
-            progressValue = data.progress;
-            updateProgressBar(progressValue);
+    
+            progressValueNew = data.progress;
+            updateProgressBarNew(progressValueNew);  // ✅ Ensure bar updates immediately
         })
         .catch(error => console.error("❌ Error fetching progress:", error));
     }
-
-    function updateProgress(action, details, callback) {
-        let csrfToken = getCSRFToken();
+    
+    // Update Task Progress
+    function updateProgressNew(action, details, callback) {
+        let csrfToken = getCSRFTokenNew();
         if (!csrfToken) {
             alert("⚠️ CSRF token missing! Please refresh the page.");
             console.error("❌ CSRF Token Missing. Aborting request.");
@@ -1256,14 +1266,23 @@ document.addEventListener("DOMContentLoaded", function() {
         .catch(error => console.error("❌ Error updating progress:", error));
     }
 
-    function updateProgressBar(value) {
-        let progressBar = document.getElementById("progressBar");
-        progressBar.style.width = `${value}%`;
-        progressBar.innerText = `${value}%`;
+    // Update Progress Bar Dynamically
+    function updateProgressBarNew(value) {
+        if (value < 0) value = 0;
+        if (value > 100) value = 100;
+
+        progressBarNew.style.width = `${value}%`;
+        progressBarNew.innerText = `${value}%`;
+        progressBarNew.setAttribute("aria-valuenow", value);  // Ensure Bootstrap updates UI
+        progressBarNew.classList.remove("bg-info"); // Reset class to force repaint
+        void progressBarNew.offsetWidth; // Trigger reflow (force UI update)
+        progressBarNew.classList.add("bg-info"); // Reapply class after reflow
+        
         console.log(`🔵 Progress Bar Updated: ${value}%`);
     }
 
-    function getCSRFToken() {
+    // Get CSRF Token for Secure Requests
+    function getCSRFTokenNew() {
         let csrfCookie = document.cookie.split("; ").find(row => row.startsWith("csrftoken="));
         let csrfToken = csrfCookie ? csrfCookie.split("=")[1] : null;
         console.log("🔵 Extracted CSRF Token:", csrfToken);
