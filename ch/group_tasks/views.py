@@ -2720,6 +2720,22 @@ def update_backup_schedule(request):
             defaults={"frequency": frequency, "is_active": is_active}
         )
 
+        # Log scheduled backup activity
+        # Log the restore action in ActivityBackup
+        ActivityBackup.objects.create(
+            organization_id=org_id,
+            group_id=group_id,
+            task_id=task_id,
+            performed_by=user,
+            action="scheduled",
+            details={
+                "frequency":schedule.frequency,  # Convert to string
+                "next_run": schedule.next_run.isoformat(),
+                "scheduled_at": now().isoformat(),  # Convert to string
+                "scheduled_by": user.username,
+            }
+        )
+
         # Update the next run based on the frequency
         schedule.update_next_run()
 
