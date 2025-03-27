@@ -1065,12 +1065,19 @@ function displayLogs(logs) {
 
     logs.forEach(log => {
         const logEntry = `
-            <div class="border p-3 mb-2 rounded shadow-sm">
-                <strong>${log.performed_by}</strong> ${log.action} 
-                <br><small class="text-muted">${new Date(log.timestamp).toLocaleString()}</small>
-                <pre class="bg-light p-2 rounded">${JSON.stringify(log.details, null, 2)}</pre>
+        <div class="bg-white shadow-md rounded-lg p-4 mb-3 border border-gray-200">
+            <div class="flex items-center space-x-3">
+                <span class="font-semibold text-gray-900 text-lg">${log.performed_by}</span>
+                <span class="text-sm px-2 py-1 rounded-full bg-blue-100 text-blue-600">${log.action}</span>
             </div>
-        `;
+            <p class="text-sm text-gray-500 mt-1">
+                <i class="far fa-clock"></i> ${new Date(log.timestamp).toLocaleString()}
+            </p>
+            <pre class="mt-2 p-3 bg-gray-100 rounded-lg text-sm text-gray-800 border border-gray-300 font-mono overflow-x-auto">
+                ${JSON.stringify(log.details, null, 2)}
+            </pre>
+        </div>
+    `;
         container.innerHTML += logEntry;
     });
 }
