@@ -901,3 +901,38 @@ body {
     background-size: 200% auto;
     animation: wave 2s linear infinite;
 }
+
+
+/* Manage and change themes */
+
+/* Theme Previews */
+.theme-options {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.theme-option {
+    text-align: center;
+    cursor: pointer;
+}
+
+.theme-preview {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    transition: 0.3s;
+}
+
+.theme-option:hover .theme-preview {
+    transform: scale(1.1);
+}
+
+/* Theme Colors */
+.light { background-color: #f8f9fa; }
+.dark { background-color: #343a40; }
+.blue { background-color: #007bff; }
+.green { background-color: #28a745; }
+.purple { background-color: #6f42c1; }
+

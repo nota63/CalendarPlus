@@ -4067,6 +4067,189 @@ video::-webkit-media-controls-panel {
         </div>
     </div>
 </div>
+
+<!-- Manage and change themes -->
+<div class="modal fade" id="themeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 overflow-hidden" style="
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(12px);
+            border-radius: 1.5rem;
+            font-family: 'Inter', sans-serif;
+        ">
+            <div class="modal-header border-0 bg-gradient-to-r from-indigo-50 to-purple-50 relative">
+                <div class="w-full">
+                    <h5 class="modal-title text-2xl font-bold text-gray-800">Theme Customizer</h5>
+                    <div class="absolute top-4 right-20">
+                        <div class="px-2 py-1 bg-gradient-to-r from-amber-400 to-orange-400 text-white text-xs font-bold rounded-full">
+                            BETA
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn-close opacity-70 hover:opacity-100 transition-opacity" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body p-6">
+                <div class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-4">
+                    <!-- Default Themes -->
+                    <div class="theme-option group" data-theme="light">
+                        <div class="theme-preview h-24 rounded-xl bg-white border-2 border-gray-200 group-hover:border-indigo-300 transition-all cursor-pointer relative overflow-hidden">
+                            <div class="absolute top-2 left-2 right-2 h-4 rounded bg-gray-100"></div>
+                            <div class="absolute top-8 left-2 w-3/4 h-3 rounded bg-gray-50"></div>
+                            <div class="absolute top-12 left-2 w-1/2 h-3 rounded bg-gray-100"></div>
+                            <div class="absolute bottom-2 left-2 right-2 h-2 rounded-full bg-gray-100"></div>
+                        </div>
+                        <p class="text-sm text-gray-600 text-center mt-2">Light</p>
+                    </div>
+
+                    <div class="theme-option group" data-theme="dark">
+                        <div class="theme-preview h-24 rounded-xl bg-gray-900 border-2 border-gray-700 group-hover:border-indigo-300 transition-all cursor-pointer relative overflow-hidden">
+                            <div class="absolute top-2 left-2 right-2 h-4 rounded bg-gray-800"></div>
+                            <div class="absolute top-8 left-2 w-3/4 h-3 rounded bg-gray-700"></div>
+                            <div class="absolute top-12 left-2 w-1/2 h-3 rounded bg-gray-800"></div>
+                            <div class="absolute bottom-2 left-2 right-2 h-2 rounded-full bg-gray-700"></div>
+                        </div>
+                        <p class="text-sm text-gray-600 text-center mt-2">Dark</p>
+                    </div>
+
+                    <!-- Color Themes -->
+                    <div class="theme-option group" data-theme="blue">
+                        <div class="theme-preview h-24 rounded-xl border-2 border-transparent group-hover:border-indigo-300 transition-all cursor-pointer relative overflow-hidden bg-blue-50">
+                            <div class="absolute top-2 left-2 right-2 h-4 rounded bg-blue-200"></div>
+                            <div class="absolute top-8 left-2 w-3/4 h-3 rounded bg-blue-100"></div>
+                            <div class="absolute top-12 left-2 w-1/2 h-3 rounded bg-blue-200"></div>
+                            <div class="absolute bottom-2 left-2 right-2 h-2 rounded-full bg-blue-100"></div>
+                            <div class="absolute bottom-3 right-3 w-5 h-5 rounded-full bg-blue-400 shadow-sm"></div>
+                        </div>
+                        <p class="text-sm text-gray-600 text-center mt-2">Blue</p>
+                    </div>
+
+                    <div class="theme-option group" data-theme="indigo">
+                        <div class="theme-preview h-24 rounded-xl border-2 border-transparent group-hover:border-indigo-300 transition-all cursor-pointer relative overflow-hidden bg-indigo-50">
+                            <div class="absolute top-2 left-2 right-2 h-4 rounded bg-indigo-200"></div>
+                            <div class="absolute top-8 left-2 w-3/4 h-3 rounded bg-indigo-100"></div>
+                            <div class="absolute top-12 left-2 w-1/2 h-3 rounded bg-indigo-200"></div>
+                            <div class="absolute bottom-2 left-2 right-2 h-2 rounded-full bg-indigo-100"></div>
+                            <div class="absolute bottom-3 right-3 w-5 h-5 rounded-full bg-indigo-400 shadow-sm"></div>
+                        </div>
+                        <p class="text-sm text-gray-600 text-center mt-2">Indigo</p>
+                    </div>
+
+                    <!-- Continue adding other themes following the same pattern -->
+                    <div class="theme-option group" data-theme="purple">
+                        <!-- Purple theme preview elements -->
+                    </div>
+
+                    <div class="theme-option group" data-theme="pink">
+                        <!-- Pink theme preview elements -->
+                    </div>
+
+                    <div class="theme-option group" data-theme="rose">
+                        <!-- Rose theme preview elements -->
+                    </div>
+
+                    <div class="theme-option group" data-theme="red">
+                        <!-- Red theme preview elements -->
+                    </div>
+
+                    <div class="theme-option group" data-theme="orange">
+                        <!-- Orange theme preview elements -->
+                    </div>
+
+                    <div class="theme-option group" data-theme="amber">
+                        <!-- Amber theme preview elements -->
+                    </div>
+
+                    <div class="theme-option group" data-theme="yellow">
+                        <!-- Yellow theme preview elements -->
+                    </div>
+
+                    <div class="theme-option group" data-theme="lime">
+                        <!-- Lime theme preview elements -->
+                    </div>
+
+                    <div class="theme-option group" data-theme="green">
+                        <!-- Green theme preview elements -->
+                    </div>
+
+                    <div class="theme-option group" data-theme="emerald">
+                        <!-- Emerald theme preview elements -->
+                    </div>
+
+                    <div class="theme-option group" data-theme="teal">
+                        <!-- Teal theme preview elements -->
+                    </div>
+
+                    <div class="theme-option group" data-theme="cyan">
+                        <!-- Cyan theme preview elements -->
+                    </div>
+
+                    <div class="theme-option group" data-theme="sky">
+                        <!-- Sky theme preview elements -->
+                    </div>
+
+                    <div class="theme-option group" data-theme="violet">
+                        <!-- Violet theme preview elements -->
+                    </div>
+
+                    <div class="theme-option group" data-theme="fuchsia">
+                        <!-- Fuchsia theme preview elements -->
+                    </div>
+
+                    <div class="theme-option group" data-theme="stone">
+                        <!-- Stone theme preview elements -->
+                    </div>
+                </div>
+
+                <!-- Advanced Customization -->
+                <div class="mt-8 pt-6 border-t border-gray-100">
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <h6 class="font-semibold text-gray-700">Accent Colors</h6>
+                            <div class="flex gap-2 flex-wrap">
+                                <button class="w-8 h-8 rounded-full bg-red-500 hover:ring-2 ring-red-300 transition-all"></button>
+                                <button class="w-8 h-8 rounded-full bg-orange-500 hover:ring-2 ring-orange-300 transition-all"></button>
+                                <button class="w-8 h-8 rounded-full bg-amber-500 hover:ring-2 ring-amber-300 transition-all"></button>
+                                <button class="w-8 h-8 rounded-full bg-yellow-500 hover:ring-2 ring-yellow-300 transition-all"></button>
+                                <button class="w-8 h-8 rounded-full bg-lime-500 hover:ring-2 ring-lime-300 transition-all"></button>
+                                <button class="w-8 h-8 rounded-full bg-green-500 hover:ring-2 ring-green-300 transition-all"></button>
+                                <button class="w-8 h-8 rounded-full bg-emerald-500 hover:ring-2 ring-emerald-300 transition-all"></button>
+                                <button class="w-8 h-8 rounded-full bg-teal-500 hover:ring-2 ring-teal-300 transition-all"></button>
+                                <button class="w-8 h-8 rounded-full bg-cyan-500 hover:ring-2 ring-cyan-300 transition-all"></button>
+                                <button class="w-8 h-8 rounded-full bg-sky-500 hover:ring-2 ring-sky-300 transition-all"></button>
+                                <button class="w-8 h-8 rounded-full bg-blue-500 hover:ring-2 ring-blue-300 transition-all"></button>
+                                <button class="w-8 h-8 rounded-full bg-indigo-500 hover:ring-2 ring-indigo-300 transition-all"></button>
+                                <button class="w-8 h-8 rounded-full bg-violet-500 hover:ring-2 ring-violet-300 transition-all"></button>
+                                <button class="w-8 h-8 rounded-full bg-purple-500 hover:ring-2 ring-purple-300 transition-all"></button>
+                                <button class="w-8 h-8 rounded-full bg-fuchsia-500 hover:ring-2 ring-fuchsia-300 transition-all"></button>
+                                <button class="w-8 h-8 rounded-full bg-pink-500 hover:ring-2 ring-pink-300 transition-all"></button>
+                                <button class="w-8 h-8 rounded-full bg-rose-500 hover:ring-2 ring-rose-300 transition-all"></button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <h6 class="font-semibold text-gray-700">Dark Mode</h6>
+                            <div class="flex gap-4">
+                                <button class="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium hover:bg-gray-200 transition-colors">Light</button>
+                                <button class="px-4 py-2 rounded-lg bg-gray-800 text-white font-medium hover:bg-gray-900 transition-colors">Dark</button>
+                                <button class="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium hover:bg-gray-200 transition-colors">System</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0 bg-gray-50/70">
+                <button class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg transition-colors" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <button class="px-6 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-lg font-medium transition-all">
+                    Apply Theme
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- -------------------------------------------------------------------------------------------------------------------------- -->
 
 
@@ -4192,6 +4375,12 @@ video::-webkit-media-controls-panel {
 
                     <span class="text-sm">Manage Progress</span>
                 </button>
+
+                <!-- change theme -->
+                <button id="openThemeModal" class="btn btn-secondary">
+                    <i class="fas fa-palette"></i> Change Theme
+                </button>
+                
                 
                 
 

@@ -1391,3 +1391,42 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+
+// Manage themes 
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("🎨 Theme Manager Loaded...");
+
+    const themeModal = new bootstrap.Modal(document.getElementById("themeModal"));
+    const openThemeBtn = document.getElementById("openThemeModal");
+    const themeOptions = document.querySelectorAll(".theme-option");
+
+    // Open Theme Modal
+    openThemeBtn.addEventListener("click", function () {
+        console.log("🟢 Open Theme Modal Clicked.");
+        themeModal.show();
+    });
+
+    // Apply Theme on Selection
+    themeOptions.forEach(option => {
+        option.addEventListener("click", function () {
+            const selectedTheme = this.getAttribute("data-theme");
+            console.log(`🎨 Theme Selected: ${selectedTheme}`);
+            applyTheme(selectedTheme);
+            localStorage.setItem("userTheme", selectedTheme);
+        });
+    });
+
+    // Function to Apply Theme
+    function applyTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        console.log("✅ Theme Applied:", theme);
+    }
+
+    // Load User's Saved Theme
+    const savedTheme = localStorage.getItem("userTheme");
+    if (savedTheme) {
+        console.log(`🔵 Applying Saved Theme: ${savedTheme}`);
+        applyTheme(savedTheme);
+    }
+});
