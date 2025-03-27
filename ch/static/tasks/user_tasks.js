@@ -1339,13 +1339,42 @@ document.addEventListener("DOMContentLoaded", function () {
     // Render Logs in the Modal
     function renderLogs(logs) {
         let html = `<ul class="list-group">`;
+
+
         logs.forEach(log => {
             html += `
-                <li class="list-group-item log-item">
-                    <strong>${log.user}</strong> updated task by <span class="text-primary">${log.progress_change}%</span> <br>
-                    <em>${log.details}</em> <br>
-                    <small class="text-muted">${log.timestamp}</small>
-                </li>
+                <div class="p-4 mb-3 bg-white/70 backdrop-blur-sm rounded-xl shadow-sm border border-white/80 
+                    hover:shadow-md transition-shadow duration-300">
+                    <div class="flex items-start gap-3">
+                        <!-- Icon Container -->
+                        <div class="w-10 h-10 flex items-center justify-center rounded-lg 
+                            ${log.progress_change > 0 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}">
+                            ${log.progress_change > 0 ? 
+                                '<span class="material-icons text-lg">trending_up</span>' : 
+                                '<span class="material-icons text-lg">trending_down</span>'}
+                        </div>
+        
+                        <!-- Content -->
+                        <div class="flex-1">
+                            <div class="flex items-baseline gap-2">
+                                <span class="font-semibold text-gray-800">${log.user}</span>
+                                <span class="text-sm ${log.progress_change > 0 ? 'text-green-600' : 'text-red-600'} 
+                                    font-medium px-2 py-1 rounded-full bg-opacity-20 
+                                    ${log.progress_change > 0 ? 'bg-green-100' : 'bg-red-100'}">
+                                    ${log.progress_change > 0 ? '+' : ''}${log.progress_change}%
+                                </span>
+                                <span class="ml-auto text-sm text-gray-400 flex items-center gap-1">
+                                    <span class="material-icons text-base">schedule</span>
+                                    ${log.timestamp}
+                                </span>
+                            </div>
+        
+                            <div class="mt-2 text-gray-600 text-sm pl-1 border-l-2 border-indigo-200">
+                                <p class="ml-2">${log.details || 'No additional details provided'}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             `;
         });
         html += `</ul>`;
