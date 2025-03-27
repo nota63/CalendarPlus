@@ -1013,3 +1013,70 @@ function getCSRFToken() {
     let tokenElement = document.querySelector("[name=csrfmiddlewaretoken]");
     return tokenElement ? tokenElement.value : "";
 }
+
+
+// Fetch and display backup logs
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".view-backup-logs").forEach(button => {
+        button.addEventListener("click", function () {
+            // Find the closest task container and get IDs dynamically
+            let taskContainer = this.closest("[data-org][data-group][data-task]");
+            if (taskContainer) {
+                window.djangoData = {
+                    orgId: taskContainer.getAttribute("data-org"),
+                    groupId: taskContainer.getAttribute("data-group"),
+                    taskId: taskContainer.getAttribute("data-task"),
+                };
+
+                // Fetch logs when opening modal
+                fetchBackupLogs();
+            }
+        });
+    });
+});
+
+// Fetch logs and populate modal
+function fetchBackupLogs(action = "") {
+    if (!window.djangoData) return;
+    const { orgId, groupId, taskId } = window.djangoData;
+    const url = `/tasks/fetch-backup-logs/?org_id=${orgId}&group_id=${groupId}&task_id=${taskId}&action=${action}`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayLogs(data.logs);
+            } else {
+                document.getElementById("backupLogsContainer").innerHTML = `<p>No logs found.</p>`;
+            }
+        })
+        .catch(error => console.error("Error fetching logs:", error));
+}
+
+// Display logs in a timeline format
+function displayLogs(logs) {
+    const container = document.getElementById("backupLogsContainer");
+    container.innerHTML = "";
+
+    if (logs.length === 0) {
+        container.innerHTML = `<p>No logs found.</p>`;
+        return;
+    }
+
+    logs.forEach(log => {
+        const logEntry = `
+            <div class="border p-3 mb-2 rounded shadow-sm">
+                <strong>${log.performed_by}</strong> ${log.action} 
+                <br><small class="text-muted">${new Date(log.timestamp).toLocaleString()}</small>
+                <pre class="bg-light p-2 rounded">${JSON.stringify(log.details, null, 2)}</pre>
+            </div>
+        `;
+        container.innerHTML += logEntry;
+    });
+}
+
+// Filter logs based on action
+function filterBackupLogs() {
+    const selectedAction = document.getElementById("logFilter").value;
+    fetchBackupLogs(selectedAction);
+}

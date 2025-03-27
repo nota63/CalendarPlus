@@ -2747,6 +2747,44 @@ def update_backup_schedule(request):
         return JsonResponse({"success": False, "message": str(e)}, status=500)
 
         
+# Fetch and display backup activities
+@csrf_exempt
+def fetch_backup_logs(request):
+    if request.method == "GET":
+        org_id = request.GET.get("org_id")
+        group_id = request.GET.get("group_id")
+        task_id = request.GET.get("task_id")
+        action = request.GET.get("action")  # Optional filter
+
+        # Fetch logs
+        logs = ActivityBackup.objects.filter(
+            organization_id=org_id,
+            group_id=group_id,
+            task_id=task_id
+        )
+
+        # Apply action filter if provided
+        if action:
+            logs = logs.filter(action=action)
+
+        # Convert logs to JSON-friendly format
+        logs_data = [
+            {
+                "performed_by": log.performed_by.username,
+                "action": log.get_action_display(),
+                "timestamp": log.timestamp.isoformat(),
+                "details": log.details,
+            }
+            for log in logs
+        ]
+
+        return JsonResponse({"success": True, "logs": logs_data})
+
+    return JsonResponse({"success": False, "message": "Invalid request method."})
+
+
+
+
 
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------

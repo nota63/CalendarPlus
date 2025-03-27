@@ -81,6 +81,7 @@ urlpatterns = [
     path('delete-backup/<int:backup_id>/',delete_backup, name='delete_backup'),
     path("get-backup-schedule/", get_backup_schedule, name="get_backup_schedule"),
     path("update-backup-schedule/", update_backup_schedule, name="update_backup_schedule"),
+    path('fetch-backup-logs/',fetch_backup_logs, name='fetch_backup_logs')
   
   
   

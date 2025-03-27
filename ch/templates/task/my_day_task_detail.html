@@ -3320,6 +3320,12 @@ video::-webkit-media-controls-panel {
                         <button class="btn btn-primary" onclick="openScheduleBackupModal(orgId, groupId, taskId)">
                             <i class="fas fa-clock"></i> Schedule Backup
                         </button>
+
+                        <!-- Logs -->
+                        <button class="btn btn-primary view-backup-logs" data-bs-toggle="modal" data-bs-target="#BackupLogModal">
+                            View Backup Logs
+                        </button>
+                        
                         
                        
                     </div>
@@ -3620,6 +3626,36 @@ video::-webkit-media-controls-panel {
     </div>
   </div>
 </div>
+
+<!-- View backup logs -->
+
+<div class="modal fade" id="BackupLogModal" tabindex="-1" aria-labelledby="BackupLogModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Backup Activity Logs</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <select id="logFilter" class="form-select" onchange="filterBackupLogs()">
+                    <option value="">All Actions</option>
+                    <option value="created">Backup Created</option>
+                    <option value="restored">Backup Restored</option>
+                    <option value="download">Backup Downloaded</option>
+                    <option value="deleted">Backup Deleted</option>
+                    <option value="scheduled">Backup Scheduled</option>
+                </select>
+
+                <div id="backupLogsContainer" class="mt-3">
+                    <!-- Logs will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <!-- -------------------------------------------------------------------------------------------------------------------------- -->
 
 
