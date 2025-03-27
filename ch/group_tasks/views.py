@@ -2885,6 +2885,32 @@ def update_task_progress_new(request):
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
 
+# Fetch Progress Logs
+def fetch_task_progress_logs(request):
+    org_id = request.GET.get("org_id")
+    group_id = request.GET.get("group_id")
+    task_id = request.GET.get("task_id")
+
+    if not org_id or not group_id or not task_id:
+        return JsonResponse({"error": "Missing parameters!"}, status=400)
+
+    logs = TaskProgressLog.objects.filter(task_id=task_id).select_related("performed_by")
+
+    data = [
+        {
+            "user": log.performed_by.username,
+            "progress_change": log.progress_change,
+            "details": log.details,
+            "timestamp": log.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+        }
+        for log in logs
+    ]
+
+    return JsonResponse({"logs": data})
+
+
+
+
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Add the task to my day 
 @login_required

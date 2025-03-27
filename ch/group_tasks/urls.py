@@ -85,6 +85,7 @@ urlpatterns = [
     path('send-task-logs/',send_task_logs_email, name='send_task_logs'),
     path("fetch-task-progress-new/", fetch_task_progress_new, name="fetch_task_progress_new"),
     path("update-task-progress-new/",update_task_progress_new, name="update_task_progress_new"),
+    path('fetch-task-progress-logs/',fetch_task_progress_logs, name='fetch_task_progress_logs'),
   
   
   

@@ -1289,3 +1289,76 @@ document.addEventListener("DOMContentLoaded", function () {
         return csrfToken;
     }
 });
+
+
+// Fetch Progress Logs
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ Task Logs JS Loaded.");
+
+    // Elements
+    const logsModal = new bootstrap.Modal(document.getElementById("progressLogsModal"));
+    const logsContainer = document.getElementById("logsContainer");
+    const searchInput = document.getElementById("logSearch");
+    const openLogsBtn = document.getElementById("openLogsModal");
+
+    openLogsBtn.addEventListener("click", function () {
+        console.log("🟢 Fetching Progress Logs...");
+        fetchLogs();
+        logsModal.show();
+    });
+
+    // Fetch Logs from Server
+    function fetchLogs() {
+        let orgId = window.djangoData.orgId;
+        let groupId = window.djangoData.groupId;
+        let taskId = window.djangoData.taskId;
+        let url = `/tasks/fetch-task-progress-logs/?org_id=${orgId}&group_id=${groupId}&task_id=${taskId}`;
+
+        fetch(url, { method: "GET", headers: { "Content-Type": "application/json" } })
+            .then(response => response.json())
+            .then(data => {
+                console.log("🟢 Logs Data:", data);
+                if (data.error) {
+                    logsContainer.innerHTML = `<p class="text-danger text-center">${data.error}</p>`;
+                    return;
+                }
+
+                if (data.logs.length === 0) {
+                    logsContainer.innerHTML = `<p class="text-center text-muted">No logs available.</p>`;
+                    return;
+                }
+
+                renderLogs(data.logs);
+            })
+            .catch(error => {
+                console.error("❌ Error fetching logs:", error);
+                logsContainer.innerHTML = `<p class="text-danger text-center">Error fetching logs.</p>`;
+            });
+    }
+
+    // Render Logs in the Modal
+    function renderLogs(logs) {
+        let html = `<ul class="list-group">`;
+        logs.forEach(log => {
+            html += `
+                <li class="list-group-item log-item">
+                    <strong>${log.user}</strong> updated task by <span class="text-primary">${log.progress_change}%</span> <br>
+                    <em>${log.details}</em> <br>
+                    <small class="text-muted">${log.timestamp}</small>
+                </li>
+            `;
+        });
+        html += `</ul>`;
+        logsContainer.innerHTML = html;
+    }
+
+    // Real-Time Search in Logs
+    searchInput.addEventListener("input", function () {
+        let query = this.value.toLowerCase();
+        let logs = document.querySelectorAll(".log-item");
+
+        logs.forEach(log => {
+            log.style.display = log.textContent.toLowerCase().includes(query) ? "block" : "none";
+        });
+    });
+});
