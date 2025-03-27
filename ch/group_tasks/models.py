@@ -1096,3 +1096,26 @@ class BackupSchedule(models.Model):
 
     def __str__(self):
         return f"Backup Schedule - {self.user.username} | {self.organization.name} | {self.group.name} | {self.task.title}"
+    
+
+# Log Backup Activity
+class ActivityBackup(models.Model):
+    ACTION_CHOICES = [
+        ("created", "Backup Created"),
+        ("restored", "Backup Restored"),
+    ]
+
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    backup = models.ForeignKey(BackupSchedule, on_delete=models.CASCADE)
+
+    performed_by = models.ForeignKey(User, on_delete=models.CASCADE)  
+    action = models.CharField(max_length=10, choices=ACTION_CHOICES)  
+    timestamp = models.DateTimeField(auto_now_add=True) 
+
+ 
+    details = models.JSONField()
+
+    def __str__(self):
+        return f"{self.performed_by.username} {self.action} backup {self.backup.id} for {self.task.title}"
