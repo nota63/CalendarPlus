@@ -824,3 +824,80 @@ body {
     background-clip: text;
     color: transparent;
   }
+
+
+  /* Backup Modal */
+  .neu-card {
+    background: rgba(39, 39, 43, 0.4);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.2),
+               -8px -8px 16px rgba(255, 255, 255, 0.05);
+}
+
+.neu-button {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(45, 45, 50, 0.3);
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2),
+              -4px -4px 8px rgba(255, 255, 255, 0.05);
+}
+
+.neu-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.25),
+              -6px -6px 12px rgba(255, 255, 255, 0.08);
+}
+
+.glass-overlay {
+    background: linear-gradient(145deg, 
+                rgba(255, 255, 255, 0.05) 0%, 
+                rgba(255, 255, 255, 0.02) 100%);
+    backdrop-filter: blur(15px);
+}
+
+.neumorphic-card-light {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 8px 8px 16px #d1d1d1,
+               -8px -8px 16px #ffffff;
+    border: 1px solid #f0f0f0;
+}
+
+.btn-neumorphic-light {
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    color: #495057;
+}
+
+.btn-neumorphic-light:hover {
+    background: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 4px 4px 8px #d1d1d1,
+               -4px -4px 8px #ffffff;
+}
+
+.timeline-item {
+    @apply flex items-start gap-3;
+}
+
+.timeline-dot {
+    @apply w-2.5 h-2.5 rounded-full mt-1 flex-shrink-0;
+}
+
+.radial-progress {
+    --value: 0;
+    --size: 1rem;
+    --thickness: 2px;
+}
+
+@keyframes wave {
+    0% { background-position: 0 0; }
+    100% { background-position: 200% 0; }
+}
+
+.animate-wave {
+    background-size: 200% auto;
+    animation: wave 2s linear infinite;
+}
