@@ -2399,6 +2399,21 @@ def backup_task(request, org_id, group_id, task_id):
             created_at=now(),
         )
 
+        # Log the Created action in ActivityBackup
+        ActivityBackup.objects.create(
+            organization=task_backup.organization,
+            group=task_backup.group,
+            task=task_backup.task,
+            performed_by=user,
+            action="created",
+            details={
+                "backup_created": task_backup.created_at.isoformat(),  # Convert to string
+                "size": task_backup.backup_size,
+                "created_at": now().isoformat(),  # Convert to string
+                "created_by": user.username,
+            }
+        )
+
         print(f"Backup Created Successfully! Backup ID: {task_backup.id}")
 
         return JsonResponse({
