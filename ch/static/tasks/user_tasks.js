@@ -1433,10 +1433,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // TASK UNIVERSE 3D
+
+
 document.getElementById("openTaskUniverse").addEventListener("click", function () {
-    const orgId = window.djangoData.orgId; 
+    const orgId = window.djangoData.orgId;
     const groupId = window.djangoData.groupId;
-    const taskId = window.djangoData.taskId; 
+    const taskId = window.djangoData.taskId;
 
     fetch(`/tasks/task-universe/${orgId}/${groupId}/${taskId}`)
         .then(response => response.json())
@@ -1444,7 +1446,7 @@ document.getElementById("openTaskUniverse").addEventListener("click", function (
             if (data.success) {
                 setTimeout(() => {
                     renderTaskUniverse(data.data);
-                }, 300); // Small delay to ensure modal is fully open
+                }, 300);
                 new bootstrap.Modal(document.getElementById('taskUniverseModal')).show();
             }
         });
@@ -1452,50 +1454,123 @@ document.getElementById("openTaskUniverse").addEventListener("click", function (
 
 function renderTaskUniverse(data) {
     const canvas = document.getElementById("taskUniverseCanvas");
-    canvas.innerHTML = ""; // Clear previous canvas if it exists
+    canvas.innerHTML = "";
 
+    // **Three.js Scene Setup**
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
 
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
 
-    // Main Task Sphere
-    const taskGeometry = new THREE.SphereGeometry(1, 32, 32);
-    const taskMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); 
+    // **Lighting**
+    const ambientLight = new THREE.AmbientLight(0xffffff, 2);
+    const pointLight = new THREE.PointLight(0xfff1e0, 5, 100);
+    pointLight.position.set(5, 10, 5);
+    scene.add(ambientLight, pointLight);
+
+    // **Main Task Model - Glowing Orb**
+    const taskGeometry = new THREE.SphereGeometry(1.5, 64, 64);
+    const taskMaterial = new THREE.MeshStandardMaterial({
+        color: 0xff4500, 
+        emissive: 0xff2200, 
+        roughness: 0.2, 
+        metalness: 0.8
+    });
     const taskSphere = new THREE.Mesh(taskGeometry, taskMaterial);
     scene.add(taskSphere);
+    createFloatingLabel(data.task.title, 0, 2.2, 0, scene, 0xff4500);
 
-    // Subtasks as orbiting spheres
+    // **Subtasks - Orbiting & Connections**
     const subtaskNodes = [];
+    const lines = new THREE.Group();
+
     data.subtasks.forEach((subtask, index) => {
-        const subGeometry = new THREE.SphereGeometry(0.5, 32, 32);
-        const subMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 }); 
+        const subGeometry = new THREE.SphereGeometry(0.6, 32, 32);
+        const color = new THREE.Color(`hsl(${Math.random() * 360}, 80%, 50%)`);
+        const subMaterial = new THREE.MeshStandardMaterial({ color: color, emissive: color.multiplyScalar(0.5) });
+
         const subSphere = new THREE.Mesh(subGeometry, subMaterial);
-        
-        subSphere.position.set(Math.cos(index) * 3, Math.sin(index) * 3, 0);
+
+        const angle = (index / data.subtasks.length) * Math.PI * 2;
+        const distance = 3 + Math.random() * 2;
+        subSphere.position.set(Math.cos(angle) * distance, Math.sin(angle) * distance, Math.random() * 3 - 1.5);
         scene.add(subSphere);
         subtaskNodes.push(subSphere);
+
+        const lineMaterial = new THREE.LineBasicMaterial({ color: 0x00ffff });
+        const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(0, 0, 0),
+            subSphere.position
+        ]);
+        const line = new THREE.Line(lineGeometry, lineMaterial);
+        lines.add(line);
+
+        createFloatingLabel(subtask.title, subSphere.position.x, subSphere.position.y + 0.7, subSphere.position.z, scene, color.getHex());
     });
 
-    camera.position.z = 5;
+    scene.add(lines);
 
-    function animate() {
-        requestAnimationFrame(animate);
-        taskSphere.rotation.y += 0.01;
-        subtaskNodes.forEach(node => node.rotation.y += 0.02);
-        renderer.render(scene, camera);
+    // **Interactive Camera Controls**
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.1;
+    controls.minDistance = 3;
+    controls.maxDistance = 15;
+    controls.enablePan = true;
+
+    camera.position.set(0, 0, 8);
+
+    // **Particle Effect - Floating Space Dust**
+    const particleGeometry = new THREE.BufferGeometry();
+    const particlesCount = 250;
+    const positions = new Float32Array(particlesCount * 3);
+
+    for (let i = 0; i < particlesCount * 3; i++) {
+        positions[i] = (Math.random() - 0.5) * 20;
     }
 
-    animate();
+    particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const particleMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 });
+    const particles = new THREE.Points(particleGeometry, particleMaterial);
+    scene.add(particles);
 
-    // Resize Handling
-    window.addEventListener("resize", () => {
-        const width = canvas.clientWidth;
-        const height = canvas.clientHeight;
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-        renderer.setSize(width, height);
+    // **Animation**
+    function animate() {
+        requestAnimationFrame(animate);
+        taskSphere.rotation.y += 0.005;
+
+        subtaskNodes.forEach((node, i) => {
+            const speed = 0.002 + i * 0.0005;
+            const angle = performance.now() * speed;
+            const distance = 3 + Math.sin(performance.now() * 0.0005) * 1;
+
+            node.position.x = Math.cos(angle) * distance;
+            node.position.y = Math.sin(angle) * distance;
+            node.position.z = Math.sin(angle * 2) * 1.5;
+        });
+
+        particles.rotation.y += 0.0002;
+        controls.update();
+        renderer.render(scene, camera);
+    }
+    animate();
+}
+
+// **Floating 3D Task & Subtask Titles**
+function createFloatingLabel(text, x, y, z, scene, color) {
+    const loader = new THREE.FontLoader();
+    loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function (font) {
+        const textGeometry = new THREE.TextGeometry(text, {
+            font: font,
+            size: 0.3,
+            height: 0.02
+        });
+        const textMaterial = new THREE.MeshBasicMaterial({ color: color });
+        const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+        textMesh.position.set(x, y, z);
+        textMesh.lookAt(new THREE.Vector3(0, 0, 8));
+        scene.add(textMesh);
     });
 }
