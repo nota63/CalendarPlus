@@ -936,3 +936,29 @@ body {
 .green { background-color: #28a745; }
 .purple { background-color: #6f42c1; }
 
+
+
+/* 3D Universe Modal */
+#taskUniverseModal .modal-dialog {
+    max-width: 90vw;
+    height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#taskUniverseModal .modal-content {
+    background: rgba(255, 255, 255, 0.1); /* Light transparency for glass effect */
+    backdrop-filter: blur(15px) saturate(150%); /* High-quality blur effect */
+    -webkit-backdrop-filter: blur(15px) saturate(150%);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); /* Soft neuromorphic shadow */
+}
+
+#taskUniverseCanvas {
+    background: rgba(0, 0, 0, 0.3); /* Semi-transparent dark overlay */
+    backdrop-filter: blur(10px); /* Soft blur for depth */
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 15px;
+}

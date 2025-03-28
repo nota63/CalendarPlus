@@ -1433,12 +1433,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // TASK UNIVERSE 3D
-
 document.getElementById("openTaskUniverse").addEventListener("click", function () {
     const orgId = window.djangoData.orgId;
     const groupId = window.djangoData.groupId;
     const taskId = window.djangoData.taskId;
-
+    
     fetch(`/tasks/task-universe/${orgId}/${groupId}/${taskId}`)
         .then(response => response.json())
         .then(data => {
@@ -1446,7 +1445,9 @@ document.getElementById("openTaskUniverse").addEventListener("click", function (
                 setTimeout(() => {
                     renderTaskUniverse(data.data);
                 }, 300);
-                new bootstrap.Modal(document.getElementById('taskUniverseModal')).show();
+                const modal = document.getElementById('taskUniverseModal');
+                modal.classList.add('fullscreen');
+                new bootstrap.Modal(modal).show();
             }
         });
 });
@@ -1454,124 +1455,76 @@ document.getElementById("openTaskUniverse").addEventListener("click", function (
 function renderTaskUniverse(data) {
     const canvas = document.getElementById("taskUniverseCanvas");
     canvas.innerHTML = "";
-
-    // **Three.js Scene Setup**
+    
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
     const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-
-    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
-
-    // **Lighting Boost**
-    const ambientLight = new THREE.AmbientLight(0xffffff, 3);
-    const pointLight = new THREE.PointLight(0xfff1e0, 10, 150);
-    pointLight.position.set(5, 15, 5);
+    
+    const ambientLight = new THREE.AmbientLight(0xffffff, 4);
+    const pointLight = new THREE.PointLight(0xfff1e0, 15, 200);
+    pointLight.position.set(10, 30, 10);
     scene.add(ambientLight, pointLight);
 
-    // **Main Task Model - Large Glowing Orb**
-    const taskGeometry = new THREE.SphereGeometry(2.5, 64, 64);
-    const taskMaterial = new THREE.MeshStandardMaterial({
-        color: 0xff4500, 
-        emissive: 0xff2200, 
-        roughness: 0.1, 
-        metalness: 1
-    });
+    const taskGeometry = new THREE.SphereGeometry(5, 64, 64);
+    const taskMaterial = new THREE.MeshStandardMaterial({ color: 0xff4500, emissive: 0xff2200, roughness: 0.1, metalness: 1 });
     const taskSphere = new THREE.Mesh(taskGeometry, taskMaterial);
     scene.add(taskSphere);
-    createFloatingLabel(data.task.title, 0, 3, 0, scene, 0xff4500, 0.5);
-
-    // **Subtasks - Orbiting & Connections**
+    createFloatingLabel(data.task.title, 0, 6, 0, scene, 0xff4500, 1);
+    
     const subtaskNodes = [];
-    const lines = new THREE.Group();
-
     data.subtasks.forEach((subtask, index) => {
-        const subGeometry = new THREE.SphereGeometry(1.2, 32, 32);
+        const subGeometry = new THREE.SphereGeometry(2, 32, 32);
         const color = new THREE.Color(`hsl(${Math.random() * 360}, 80%, 50%)`);
         const subMaterial = new THREE.MeshStandardMaterial({ color: color, emissive: color.multiplyScalar(0.8) });
-
         const subSphere = new THREE.Mesh(subGeometry, subMaterial);
-
+        
         const angle = (index / data.subtasks.length) * Math.PI * 2;
-        const distance = 4 + Math.random() * 3;
-        subSphere.position.set(Math.cos(angle) * distance, Math.sin(angle) * distance, Math.random() * 4 - 2);
+        const distance = 10 + Math.random() * 5;
+        subSphere.position.set(Math.cos(angle) * distance, Math.sin(angle) * distance, Math.random() * 5 - 2);
+        
+        subSphere.userData = { title: subtask.title, description: subtask.description };
+        subSphere.addEventListener('click', () => displaySubtaskDetails(subSphere.userData));
+        
         scene.add(subSphere);
         subtaskNodes.push(subSphere);
-
-        const lineMaterial = new THREE.LineBasicMaterial({ color: 0x00ffff });
-        const lineGeometry = new THREE.BufferGeometry().setFromPoints([
-            new THREE.Vector3(0, 0, 0),
-            subSphere.position
-        ]);
-        const line = new THREE.Line(lineGeometry, lineMaterial);
-        lines.add(line);
-
-        createFloatingLabel(subtask.title, subSphere.position.x, subSphere.position.y + 1, subSphere.position.z, scene, color.getHex(), 0.4);
+        createFloatingLabel(subtask.title, subSphere.position.x, subSphere.position.y + 2, subSphere.position.z, scene, color.getHex(), 0.7);
     });
-
-    scene.add(lines);
-
-    // **Camera & Controls**
+    
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.1;
-    controls.minDistance = 4;
-    controls.maxDistance = 20;
-    controls.enablePan = true;
+    controls.minDistance = 5;
+    controls.maxDistance = 50;
+    controls.enablePan = false;
 
-    camera.position.set(0, 0, 10);
-
-    // **Particle Effect - Enhanced Cosmic Space**
-    const particleGeometry = new THREE.BufferGeometry();
-    const particlesCount = 500;
-    const positions = new Float32Array(particlesCount * 3);
-
-    for (let i = 0; i < particlesCount * 3; i++) {
-        positions[i] = (Math.random() - 0.5) * 30;
-    }
-
-    particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    const particleMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.15 });
-    const particles = new THREE.Points(particleGeometry, particleMaterial);
-    scene.add(particles);
-
-    // **Nebula Background Effect**
-    const nebulaTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/milkyway.jpg");
-    const nebulaMaterial = new THREE.MeshBasicMaterial({ map: nebulaTexture, side: THREE.BackSide });
-    const nebulaSphere = new THREE.Mesh(new THREE.SphereGeometry(50, 64, 64), nebulaMaterial);
-    scene.add(nebulaSphere);
-
-    // **Animation**
+    camera.position.set(0, 0, 30);
+    
     function animate() {
         requestAnimationFrame(animate);
-        taskSphere.rotation.y += 0.005;
-
+        taskSphere.rotation.y += 0.003;
+        
         subtaskNodes.forEach((node, i) => {
             const speed = 0.002 + i * 0.0005;
             const angle = performance.now() * speed;
-            const distance = 4 + Math.sin(performance.now() * 0.0005) * 1.5;
-
+            const distance = 10 + Math.sin(performance.now() * 0.0005) * 2;
             node.position.x = Math.cos(angle) * distance;
             node.position.y = Math.sin(angle) * distance;
-            node.position.z = Math.sin(angle * 2) * 2;
         });
-
-        particles.rotation.y += 0.0002;
-        nebulaSphere.rotation.y += 0.0001;
         controls.update();
         renderer.render(scene, camera);
     }
     animate();
 }
 
-// **Floating 3D Task & Subtask Titles**
 function createFloatingLabel(text, x, y, z, scene, color, size) {
     const loader = new THREE.FontLoader();
     loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function (font) {
         const textGeometry = new THREE.TextGeometry(text, {
             font: font,
             size: size,
-            height: 0.05,
+            height: 0.1,
             curveSegments: 12,
             bevelEnabled: true,
             bevelThickness: 0.02,
@@ -1582,7 +1535,11 @@ function createFloatingLabel(text, x, y, z, scene, color, size) {
         const textMaterial = new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.9 });
         const textMesh = new THREE.Mesh(textGeometry, textMaterial);
         textMesh.position.set(x, y, z);
-        textMesh.lookAt(new THREE.Vector3(0, 0, 10));
+        textMesh.lookAt(new THREE.Vector3(0, 0, 50));
         scene.add(textMesh);
     });
+}
+
+function displaySubtaskDetails(data) {
+    alert(`Subtask: ${data.title}\nDescription: ${data.description}`);
 }
