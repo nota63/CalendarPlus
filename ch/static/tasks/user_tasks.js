@@ -1434,7 +1434,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // TASK UNIVERSE 3D
 
-
 document.getElementById("openTaskUniverse").addEventListener("click", function () {
     const orgId = window.djangoData.orgId;
     const groupId = window.djangoData.groupId;
