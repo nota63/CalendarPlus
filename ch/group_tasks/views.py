@@ -1,7 +1,11 @@
 from django.shortcuts import render, redirect , get_list_or_404
 from .models import (Task, TaskNote, TaskComment , TaskTag, ActivityLog,RecentVisit,MeetingTaskQuery,CommunicateTask,TaskReminder
                      
-                     ,PendingRewardNotification,CalPoints,AutomationTask)
+                     ,PendingRewardNotification,CalPoints,AutomationTask,TaskBackup,AttachmentsTasksApp,BackupSchedule,
+                     ActivityBackup,TaskProgressLog)
+import sys
+from django.utils.timezone import localtime
+
 from accounts.models import Organization, Profile
 from groups.models import Group
 from django.views import View
@@ -2278,14 +2282,19 @@ def disable_all_automations(request):
 
 
 # Task Back-UP
-from .models import TaskBackup,AttachmentsTasksApp,BackupSchedule,ActivityBackup,TaskProgressLog
-import sys
-from django.utils.timezone import localtime
 
 # Back-up Task
+@login_required
 @csrf_exempt
 def backup_task(request, org_id, group_id, task_id):
     """ Creates a backup of a task including comments, subtasks, attachments, etc. """
+
+    organization=get_object_or_404(Organization, id=org_id)
+    # restrict the access 
+    access_check=get_object_or_404(Profile, user=request.user, organization=organization)
+    if not access_check:
+        return HttpResponseForbidden('Bad Request')
+
     
     print("=== Backup Task API Called ===")
     user = request.user  
@@ -2432,10 +2441,18 @@ def backup_task(request, org_id, group_id, task_id):
         return JsonResponse({"error": str(e)}, status=500)
 
 # Get Last Back-Up 
+@login_required
 def get_last_backup(request, task_id):
     """ Fetch the latest backup details for a specific task. """
     try:
         last_backup = TaskBackup.objects.filter(task_id=task_id).order_by("-created_at").first()
+
+        organization=last_backup.organization
+        # restrict the access 
+        access_check=get_object_or_404(Profile, user=request.user, organization=organization)
+        if not access_check:
+           return HttpResponseForbidden('Bad Request')
+
         
         if not last_backup:
             return JsonResponse({"backup_size": "No Backup", "backup_date": "N/A"}, status=200)
@@ -2451,6 +2468,7 @@ def get_last_backup(request, task_id):
 
 # Restore Back-Ups
 # Fetch Back-Ups
+@login_required
 @csrf_exempt
 def fetch_task_backups(request, org_id, group_id, task_id):
     """ Fetches all available backups for a given task. """
@@ -2458,6 +2476,13 @@ def fetch_task_backups(request, org_id, group_id, task_id):
     print("=== Fetch Task Backups API Called ===")
     user = request.user  
     print("User:", user)
+
+    organization=get_object_or_404(Organization,id=org_id)
+    # restrict the access 
+    access_check=get_object_or_404(Profile, user=request.user, organization=organization)
+    if not access_check:
+        return HttpResponseForbidden('Bad Request')
+
 
     try:
         # Fetch all backups for the task
@@ -2488,6 +2513,7 @@ def fetch_task_backups(request, org_id, group_id, task_id):
 
 
 # Restore Back-ups
+@login_required
 @csrf_exempt
 def restore_backup(request, backup_id):
     """ Restores a task backup, including comments, subtasks, attachments, etc. """
@@ -2496,12 +2522,20 @@ def restore_backup(request, backup_id):
     user = request.user  
     print("User:", user)
 
+
     try:
         # Fetch the backup record
         print(f"Fetching Backup ID: {backup_id}")
         task_backup = TaskBackup.objects.get(id=backup_id, user=user)
         backup_data = json.loads(task_backup.backup_data)  # Convert JSON string back to dict
         print("Backup Data Fetched Successfully!")
+
+        organization=task_backup.organization
+        # restrict the access 
+        access_check=get_object_or_404(Profile, user=request.user, organization=organization)
+        if not access_check:
+           print('ACCESS FAILED...')
+           return HttpResponseForbidden('Bad Request')
 
         # Restore Task
         print("Restoring Task...")
@@ -2586,8 +2620,14 @@ def restore_backup(request, backup_id):
 
 
 # Download The Back-Up
+@login_required
 def download_backup(request, backup_id):
     backup = get_object_or_404(TaskBackup, id=backup_id)
+    organization=backup.organization
+    # restrict the access 
+    access_check=get_object_or_404(Profile, user=request.user, organization=organization)
+    if not access_check:
+        return HttpResponseForbidden('Bad Request')
 
     # Collect all backup data
     backup_content = {
@@ -2643,10 +2683,17 @@ def download_backup(request, backup_id):
 
 
 # Delete Back-UP
+@login_required
 def delete_backup(request, backup_id):
     """Handles deleting a backup when requested via AJAX."""
     if request.method == "POST":
         backup = get_object_or_404(TaskBackup, id=backup_id)
+        organization=backup.organization
+        # restrict the access 
+        access_check=get_object_or_404(Profile, user=request.user, organization=organization)
+        if not access_check:
+           return HttpResponseForbidden('Bad Request')
+        
         # log the deletion
         ActivityBackup.objects.create(
             organization=backup.organization,
@@ -2670,11 +2717,18 @@ def delete_backup(request, backup_id):
 # Schedule Backup
 
 # get scheduled backup settings
+@login_required
 def get_backup_schedule(request):
     org_id = request.GET.get("org_id")
     group_id = request.GET.get("group_id")
     task_id = request.GET.get("task_id")
-    user = request.user  # Assuming the user is logged in
+    user = request.user  
+
+    organization=get_object_or_404(Organization,id=org_id)
+    # restrict the access 
+    access_check=get_object_or_404(Profile, user=request.user, organization=organization)
+    if not access_check:
+        return HttpResponseForbidden('Bad Request')
 
     try:
         schedule = BackupSchedule.objects.get(
@@ -2694,7 +2748,8 @@ def get_backup_schedule(request):
     
 
 # Update Status
-@csrf_exempt  # Use only if CSRF token is NOT needed (Not recommended for security)
+@login_required
+@csrf_exempt  
 def update_backup_schedule(request):
     if request.method != "POST":
         return JsonResponse({"success": False, "message": "Invalid request method."}, status=400)
@@ -2705,8 +2760,17 @@ def update_backup_schedule(request):
         group_id = data.get("group_id")
         task_id = data.get("task_id")
         frequency = data.get("frequency")
-        is_active = data.get("is_active", True)  # Ensure this field is handled
-        user = request.user  # Assuming user is logged in
+        is_active = data.get("is_active", True)  
+        user = request.user  
+
+        organization=get_object_or_404(Organization,id=org_id)
+        # restrict the access 
+        access_check=get_object_or_404(Profile, user=request.user, organization=organization)
+        if not access_check:
+           return HttpResponseForbidden('Bad Request')
+
+
+
 
         # Check for missing data
         if not all([org_id, group_id, task_id, frequency]):
@@ -2749,6 +2813,7 @@ def update_backup_schedule(request):
 
         
 # Fetch and display backup activities
+@login_required
 @csrf_exempt
 def fetch_backup_logs(request):
     if request.method == "GET":
@@ -2756,6 +2821,13 @@ def fetch_backup_logs(request):
         group_id = request.GET.get("group_id")
         task_id = request.GET.get("task_id")
         action = request.GET.get("action")  # Optional filter
+
+        organization=get_object_or_404(Organization,id=org_id)
+        # restrict the access 
+        access_check=get_object_or_404(Profile, user=request.user, organization=organization)
+        if not access_check:
+           return HttpResponseForbidden('Bad Request')
+
 
         # Fetch logs
         logs = ActivityBackup.objects.filter(
@@ -2785,6 +2857,7 @@ def fetch_backup_logs(request):
 
 
 # Send Task Logs
+@login_required
 def send_task_logs_email(request):
     if request.method == "POST":
         try:
@@ -2792,6 +2865,13 @@ def send_task_logs_email(request):
             org_id = data.get("org_id")
             group_id = data.get("group_id")
             task_id = data.get("task_id")
+
+            organization = get_object_or_404(Organization,id=org_id)
+            # restrict the access 
+            access_check=get_object_or_404(Profile, user=request.user, organization=organization)
+            if not access_check:
+               return HttpResponseForbidden('Bad Request')
+
 
             # Fetch task and assigned user
             task = Task.objects.get(id=task_id, organization_id=org_id, group_id=group_id)
@@ -2829,11 +2909,19 @@ def send_task_logs_email(request):
 # HANDLE TASKS PROGRESS
 
 # Fetch Task Progress (GET)
+@login_required
 def fetch_task_progress_new(request):
     if request.method == "GET":
         org_id = request.GET.get("org_id")
         group_id = request.GET.get("group_id")
         task_id = request.GET.get("task_id")
+
+        organization = get_object_or_404(Organization, id=org_id)
+        # restrict the access 
+        access_check=get_object_or_404(Profile, user=request.user, organization=organization)
+        if not access_check:
+           return HttpResponseForbidden('Bad Request')
+
 
         if not all([org_id, group_id, task_id]):
             return JsonResponse({"error": "Missing parameters"}, status=400)
@@ -2846,7 +2934,9 @@ def fetch_task_progress_new(request):
     
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
+
 # Update Task Progress (POST)
+@login_required
 @csrf_exempt
 def update_task_progress_new(request):
     if request.method == "POST":
@@ -2857,6 +2947,13 @@ def update_task_progress_new(request):
             task_id = data.get("task_id")
             action = data.get("action")
             details = data.get("details")
+
+            organization=get_object_or_404(Organization,id=org_id)
+            # restrict the access 
+            access_check=get_object_or_404(Profile, user=request.user, organization=organization)
+            if not access_check:
+               return HttpResponseForbidden('Bad Request')
+
 
             if not all([org_id, group_id, task_id, action, details]):
                 return JsonResponse({"error": "Missing parameters"}, status=400)
@@ -2888,10 +2985,19 @@ def update_task_progress_new(request):
 
 
 # Fetch Progress Logs
+@login_required
 def fetch_task_progress_logs(request):
     org_id = request.GET.get("org_id")
     group_id = request.GET.get("group_id")
     task_id = request.GET.get("task_id")
+
+    organization = get_object_or_404(Organization, id=org_id)
+
+    # restrict the access 
+    access_check=get_object_or_404(Profile, user=request.user, organization=organization)
+    if not access_check:
+        return HttpResponseForbidden('Bad Request')
+
 
     if not org_id or not group_id or not task_id:
         return JsonResponse({"error": "Missing parameters!"}, status=400)
@@ -2910,12 +3016,22 @@ def fetch_task_progress_logs(request):
 
     return JsonResponse({"logs": data})
 
-# TASK UNIVERSE
 
+# TASK UNIVERSE
+@login_required
 def task_universe_view(request, org_id, group_id, task_id):
     try:
         task = Task.objects.get(id=task_id, group_id=group_id, organization_id=org_id)
         subtasks = SubTask.objects.filter(task=task)
+
+        organization=get_object_or_404(Organization, id=org_id)
+        group=get_object_or_404(Group, id=group_id)
+
+        # restrict the access 
+        access_check=get_object_or_404(Profile, user=request.user, organization=organization)
+        if not access_check:
+            return HttpResponseForbidden('Bad Request')
+
 
         data = {
             "task": {
@@ -2940,8 +3056,7 @@ def task_universe_view(request, org_id, group_id, task_id):
         return JsonResponse({"success": False, "error": "Task not found!"})
 
 # start urgent meeting
-
-
+@login_required
 def start_urgent_meeting(request, org_id, group_id, task_id):
     if request.method == "POST":
         reason = request.POST.get("reason", "").strip()  # Get the reason from form
@@ -2950,6 +3065,12 @@ def start_urgent_meeting(request, org_id, group_id, task_id):
 
         organization=get_object_or_404(Organization,id=org_id)
         group=get_object_or_404(Group, id=group_id, organization=organization)
+
+        # restrict the access 
+        access_check=get_object_or_404(Profile, user=request.user, organization=organization)
+        if not access_check:
+          return HttpResponseForbidden('Bad Request')
+
 
         # Fetch the user's CalPoints in the given organization
         calpoints = CalPoints.objects.filter(
@@ -3040,6 +3161,11 @@ def upload_screen_recording(request):
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id)
     task = get_object_or_404(Task, id=task_id)
+
+    # restrict the access 
+    access_check=get_object_or_404(Profile, user=request.user, organization=organization)
+    if not access_check:
+        return HttpResponseForbidden('Bad Request')
 
     # ✅ Ensure the directory exists before saving
     file_path = f"task_files/screen_recordings/{user.id}_{task.id}{ext}"
