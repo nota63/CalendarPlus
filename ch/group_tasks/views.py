@@ -40,6 +40,7 @@ from reportlab.lib.pagesizes import letter
 import base64
 import json
 import os
+from django.db.models import F
 from django.core.files.base import ContentFile
 from django.core.exceptions import ObjectDoesNotExist
 from .utils import (send_reply,after_task_deletion,task_submission_approval,send_task_details,send_task_notification_email)
@@ -2939,7 +2940,7 @@ def task_universe_view(request, org_id, group_id, task_id):
         return JsonResponse({"success": False, "error": "Task not found!"})
 
 # start urgent meeting
-from django.db.models import F
+
 
 def start_urgent_meeting(request, org_id, group_id, task_id):
     if request.method == "POST":
@@ -2972,6 +2973,12 @@ def start_urgent_meeting(request, org_id, group_id, task_id):
         Hello {task.created_by.get_full_name()},
 
         An urgent meeting has been initiated for your task.
+
+        Organization: {organization.name}
+
+        Group: {group.name}
+
+        Sender: {request.user.username}
 
         📌 **Reason:** {reason}
 
