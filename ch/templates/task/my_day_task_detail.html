@@ -40,6 +40,19 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <!-- Three.js Core Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Three.js Orbit Controls -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/controls/OrbitControls.js"></script>
+    <!-- GLTF Loader for 3D Models -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/GLTFLoader.js"></script>
+    <!-- Font Loader for 3D Text -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/FontLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/geometries/TextGeometry.js"></script>
+
+
+
+
 
 
 
@@ -4250,6 +4263,24 @@ video::-webkit-media-controls-panel {
         </div>
     </div>
 </div>
+
+
+<!-- TASK UNIVERSE 3D -->
+<div class="modal fade" id="taskUniverseModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">🚀 Task Universe</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <canvas id="taskUniverseCanvas"></canvas> <!-- 3D Scene -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- -------------------------------------------------------------------------------------------------------------------------- -->
 
 
@@ -4386,6 +4417,12 @@ video::-webkit-media-controls-panel {
 
                   <span class="text-sm">Change Theme</span>
                 </button>
+
+                <!-- task universe 3d -->
+                <button id="openTaskUniverse" class="btn btn-dark">
+                    🌌 Open 3D Task Universe
+                </button>
+                
                 
                 
                 

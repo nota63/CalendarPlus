@@ -1430,3 +1430,72 @@ document.addEventListener("DOMContentLoaded", function () {
         applyTheme(savedTheme);
     }
 });
+
+
+// TASK UNIVERSE 3D
+document.getElementById("openTaskUniverse").addEventListener("click", function () {
+    const orgId = window.djangoData.orgId; 
+    const groupId = window.djangoData.groupId;
+    const taskId = window.djangoData.taskId; 
+
+    fetch(`/tasks/task-universe/${orgId}/${groupId}/${taskId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                setTimeout(() => {
+                    renderTaskUniverse(data.data);
+                }, 300); // Small delay to ensure modal is fully open
+                new bootstrap.Modal(document.getElementById('taskUniverseModal')).show();
+            }
+        });
+});
+
+function renderTaskUniverse(data) {
+    const canvas = document.getElementById("taskUniverseCanvas");
+    canvas.innerHTML = ""; // Clear previous canvas if it exists
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
+
+    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+
+    // Main Task Sphere
+    const taskGeometry = new THREE.SphereGeometry(1, 32, 32);
+    const taskMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); 
+    const taskSphere = new THREE.Mesh(taskGeometry, taskMaterial);
+    scene.add(taskSphere);
+
+    // Subtasks as orbiting spheres
+    const subtaskNodes = [];
+    data.subtasks.forEach((subtask, index) => {
+        const subGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+        const subMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 }); 
+        const subSphere = new THREE.Mesh(subGeometry, subMaterial);
+        
+        subSphere.position.set(Math.cos(index) * 3, Math.sin(index) * 3, 0);
+        scene.add(subSphere);
+        subtaskNodes.push(subSphere);
+    });
+
+    camera.position.z = 5;
+
+    function animate() {
+        requestAnimationFrame(animate);
+        taskSphere.rotation.y += 0.01;
+        subtaskNodes.forEach(node => node.rotation.y += 0.02);
+        renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // Resize Handling
+    window.addEventListener("resize", () => {
+        const width = canvas.clientWidth;
+        const height = canvas.clientHeight;
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+    });
+}

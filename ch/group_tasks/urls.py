@@ -86,6 +86,7 @@ urlpatterns = [
     path("fetch-task-progress-new/", fetch_task_progress_new, name="fetch_task_progress_new"),
     path("update-task-progress-new/",update_task_progress_new, name="update_task_progress_new"),
     path('fetch-task-progress-logs/',fetch_task_progress_logs, name='fetch_task_progress_logs'),
+    path('task-universe/<int:org_id>/<int:group_id>/<int:task_id>/',task_universe_view, name='task_universe'),
   
   
   

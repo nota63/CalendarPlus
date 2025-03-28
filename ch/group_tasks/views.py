@@ -2909,7 +2909,34 @@ def fetch_task_progress_logs(request):
 
     return JsonResponse({"logs": data})
 
+# TASK UNIVERSE
 
+def task_universe_view(request, org_id, group_id, task_id):
+    try:
+        task = Task.objects.get(id=task_id, group_id=group_id, organization_id=org_id)
+        subtasks = SubTask.objects.filter(task=task)
+
+        data = {
+            "task": {
+                "id": task.id,
+                "title": task.title,
+                "status": task.status,
+                "priority": task.priority
+            },
+            "subtasks": [
+                {
+                    "id": subtask.id,
+                    "title": subtask.title,
+                    "status": subtask.status,
+                    "priority": subtask.priority
+                }
+                for subtask in subtasks
+            ],
+        }
+        return JsonResponse({"success": True, "data": data})
+    
+    except Task.DoesNotExist:
+        return JsonResponse({"success": False, "error": "Task not found!"})
 
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------
