@@ -1463,38 +1463,38 @@ function renderTaskUniverse(data) {
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
 
-    // **Lighting**
-    const ambientLight = new THREE.AmbientLight(0xffffff, 2);
-    const pointLight = new THREE.PointLight(0xfff1e0, 5, 100);
-    pointLight.position.set(5, 10, 5);
+    // **Lighting Boost**
+    const ambientLight = new THREE.AmbientLight(0xffffff, 3);
+    const pointLight = new THREE.PointLight(0xfff1e0, 10, 150);
+    pointLight.position.set(5, 15, 5);
     scene.add(ambientLight, pointLight);
 
-    // **Main Task Model - Glowing Orb**
-    const taskGeometry = new THREE.SphereGeometry(1.5, 64, 64);
+    // **Main Task Model - Large Glowing Orb**
+    const taskGeometry = new THREE.SphereGeometry(2.5, 64, 64);
     const taskMaterial = new THREE.MeshStandardMaterial({
         color: 0xff4500, 
         emissive: 0xff2200, 
-        roughness: 0.2, 
-        metalness: 0.8
+        roughness: 0.1, 
+        metalness: 1
     });
     const taskSphere = new THREE.Mesh(taskGeometry, taskMaterial);
     scene.add(taskSphere);
-    createFloatingLabel(data.task.title, 0, 2.2, 0, scene, 0xff4500);
+    createFloatingLabel(data.task.title, 0, 3, 0, scene, 0xff4500, 0.5);
 
     // **Subtasks - Orbiting & Connections**
     const subtaskNodes = [];
     const lines = new THREE.Group();
 
     data.subtasks.forEach((subtask, index) => {
-        const subGeometry = new THREE.SphereGeometry(0.6, 32, 32);
+        const subGeometry = new THREE.SphereGeometry(1.2, 32, 32);
         const color = new THREE.Color(`hsl(${Math.random() * 360}, 80%, 50%)`);
-        const subMaterial = new THREE.MeshStandardMaterial({ color: color, emissive: color.multiplyScalar(0.5) });
+        const subMaterial = new THREE.MeshStandardMaterial({ color: color, emissive: color.multiplyScalar(0.8) });
 
         const subSphere = new THREE.Mesh(subGeometry, subMaterial);
 
         const angle = (index / data.subtasks.length) * Math.PI * 2;
-        const distance = 3 + Math.random() * 2;
-        subSphere.position.set(Math.cos(angle) * distance, Math.sin(angle) * distance, Math.random() * 3 - 1.5);
+        const distance = 4 + Math.random() * 3;
+        subSphere.position.set(Math.cos(angle) * distance, Math.sin(angle) * distance, Math.random() * 4 - 2);
         scene.add(subSphere);
         subtaskNodes.push(subSphere);
 
@@ -1506,34 +1506,40 @@ function renderTaskUniverse(data) {
         const line = new THREE.Line(lineGeometry, lineMaterial);
         lines.add(line);
 
-        createFloatingLabel(subtask.title, subSphere.position.x, subSphere.position.y + 0.7, subSphere.position.z, scene, color.getHex());
+        createFloatingLabel(subtask.title, subSphere.position.x, subSphere.position.y + 1, subSphere.position.z, scene, color.getHex(), 0.4);
     });
 
     scene.add(lines);
 
-    // **Interactive Camera Controls**
+    // **Camera & Controls**
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.1;
-    controls.minDistance = 3;
-    controls.maxDistance = 15;
+    controls.minDistance = 4;
+    controls.maxDistance = 20;
     controls.enablePan = true;
 
-    camera.position.set(0, 0, 8);
+    camera.position.set(0, 0, 10);
 
-    // **Particle Effect - Floating Space Dust**
+    // **Particle Effect - Enhanced Cosmic Space**
     const particleGeometry = new THREE.BufferGeometry();
-    const particlesCount = 250;
+    const particlesCount = 500;
     const positions = new Float32Array(particlesCount * 3);
 
     for (let i = 0; i < particlesCount * 3; i++) {
-        positions[i] = (Math.random() - 0.5) * 20;
+        positions[i] = (Math.random() - 0.5) * 30;
     }
 
     particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    const particleMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 });
+    const particleMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.15 });
     const particles = new THREE.Points(particleGeometry, particleMaterial);
     scene.add(particles);
+
+    // **Nebula Background Effect**
+    const nebulaTexture = new THREE.TextureLoader().load("https://threejs.org/examples/textures/milkyway.jpg");
+    const nebulaMaterial = new THREE.MeshBasicMaterial({ map: nebulaTexture, side: THREE.BackSide });
+    const nebulaSphere = new THREE.Mesh(new THREE.SphereGeometry(50, 64, 64), nebulaMaterial);
+    scene.add(nebulaSphere);
 
     // **Animation**
     function animate() {
@@ -1543,14 +1549,15 @@ function renderTaskUniverse(data) {
         subtaskNodes.forEach((node, i) => {
             const speed = 0.002 + i * 0.0005;
             const angle = performance.now() * speed;
-            const distance = 3 + Math.sin(performance.now() * 0.0005) * 1;
+            const distance = 4 + Math.sin(performance.now() * 0.0005) * 1.5;
 
             node.position.x = Math.cos(angle) * distance;
             node.position.y = Math.sin(angle) * distance;
-            node.position.z = Math.sin(angle * 2) * 1.5;
+            node.position.z = Math.sin(angle * 2) * 2;
         });
 
         particles.rotation.y += 0.0002;
+        nebulaSphere.rotation.y += 0.0001;
         controls.update();
         renderer.render(scene, camera);
     }
@@ -1558,18 +1565,24 @@ function renderTaskUniverse(data) {
 }
 
 // **Floating 3D Task & Subtask Titles**
-function createFloatingLabel(text, x, y, z, scene, color) {
+function createFloatingLabel(text, x, y, z, scene, color, size) {
     const loader = new THREE.FontLoader();
     loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function (font) {
         const textGeometry = new THREE.TextGeometry(text, {
             font: font,
-            size: 0.3,
-            height: 0.02
+            size: size,
+            height: 0.05,
+            curveSegments: 12,
+            bevelEnabled: true,
+            bevelThickness: 0.02,
+            bevelSize: 0.01,
+            bevelOffset: 0,
+            bevelSegments: 5
         });
-        const textMaterial = new THREE.MeshBasicMaterial({ color: color });
+        const textMaterial = new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.9 });
         const textMesh = new THREE.Mesh(textGeometry, textMaterial);
         textMesh.position.set(x, y, z);
-        textMesh.lookAt(new THREE.Vector3(0, 0, 8));
+        textMesh.lookAt(new THREE.Vector3(0, 0, 10));
         scene.add(textMesh);
     });
 }
