@@ -3210,6 +3210,10 @@ def fetch_project_plan(request):
 
     # Get the Task object
     task = get_object_or_404(Task, id=task_id, organization_id=org_id, group_id=group_id)
+    organization = get_object_or_404(Organization, id=org_id)
+    access_check= get_object_or_404(Profile, user=request.user, organization=organization)
+    if not access_check:
+        return HttpResponseForbidden("Bad request")
 
     # Convert newlines into bullet points
     if task.project_plan:
@@ -3219,9 +3223,6 @@ def fetch_project_plan(request):
         formatted_plan = "<p>No project plan available.</p>"
 
     return JsonResponse({"success": True, "project_plan": formatted_plan})
-
-
-
 
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------
