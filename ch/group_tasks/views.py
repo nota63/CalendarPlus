@@ -3195,6 +3195,35 @@ def upload_screen_recording(request):
     }, status=201)
 
 
+
+# Accesss Project Plan
+@login_required
+def fetch_project_plan(request):
+    """Fetches the project plan of a task in a structured format."""
+    
+    org_id = request.GET.get("org_id")
+    group_id = request.GET.get("group_id")
+    task_id = request.GET.get("task_id")
+
+    if not (org_id and group_id and task_id):
+        return JsonResponse({"error": "Missing required parameters."}, status=400)
+
+    # Get the Task object
+    task = get_object_or_404(Task, id=task_id, organization_id=org_id, group_id=group_id)
+
+    # Convert newlines into bullet points
+    if task.project_plan:
+        formatted_plan = task.project_plan.strip().replace("\n", "</li><li>")
+        formatted_plan = f"<ul class='plan-list'><li>{formatted_plan}</li></ul>"
+    else:
+        formatted_plan = "<p>No project plan available.</p>"
+
+    return JsonResponse({"success": True, "project_plan": formatted_plan})
+
+
+
+
+
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Add the task to my day 
 @login_required

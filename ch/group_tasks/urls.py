@@ -88,8 +88,9 @@ urlpatterns = [
     path('fetch-task-progress-logs/',fetch_task_progress_logs, name='fetch_task_progress_logs'),
     path('task-universe/<int:org_id>/<int:group_id>/<int:task_id>/',task_universe_view, name='task_universe'),
     path('start-urgent-meeting/<int:org_id>/<int:group_id>/<int:task_id>/',start_urgent_meeting, name='start_urgent_meeting'),
-    path('upload-screen-recording/',upload_screen_recording, name='upload_screen_recording')
-    
+    path('upload-screen-recording/',upload_screen_recording, name='upload_screen_recording'),
+    path('fetch-project-plan/',fetch_project_plan, name='fetch_project_plan')
+
   
   
   

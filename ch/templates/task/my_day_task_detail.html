@@ -4376,6 +4376,23 @@ video::-webkit-media-controls-panel {
 </div>
 
 
+<!-- Fetch project plan  -->
+<div class="modal fade" id="projectPlanModal" tabindex="-1" aria-labelledby="planModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="planModalLabel">📌 Project Plan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="projectPlanContent" class="p-3 text-gray-700">
+                    <p>Loading project plan...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- -------------------------------------------------------------------------------------------------------------------------- -->
 
 
@@ -4556,6 +4573,14 @@ video::-webkit-media-controls-panel {
 
                     <span class="text-sm">Record Clip</span>
                 </button>
+
+                <!-- Access project plan -->
+                <button id="openPlanModal" class="btn btn-primary">
+                    📑 View Project Plan
+                </button>
+                
+
+
             </nav>
 
             <!-- Divider -->

@@ -51,6 +51,7 @@ class Task(models.Model):
         null=True,
         help_text="Detailed description of the task."
     )
+    project_plan=models.TextField(null=True, blank=True)
     priority = models.CharField(
         max_length=20,
         choices=[

@@ -1707,3 +1707,34 @@ function getCSRFToken() {
     let cookie = document.cookie.split("; ").find(row => row.startsWith("csrftoken="));
     return cookie ? cookie.split("=")[1] : "";
 }
+
+
+// Accesss Project Plan
+
+document.getElementById("openPlanModal").addEventListener("click", function() {
+    const orgId = window.djangoData.orgId;  // Dynamically set this
+    const groupId = window.djangoData.groupId;  // Dynamically set this
+    const taskId =window.djangoData.taskId;  // Dynamically set this
+
+    fetch(`/tasks/fetch-project-plan/?org_id=${orgId}&group_id=${groupId}&task_id=${taskId}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById("projectPlanContent").innerHTML = `
+                <div class="modern-content p-3 rounded bg-light">
+                    ${data.project_plan}
+                </div>
+            `;
+        } else {
+            document.getElementById("projectPlanContent").innerHTML = `<p class="text-danger">❌ ${data.error}</p>`;
+        }
+    })
+    .catch(error => {
+        console.error("Error fetching project plan:", error);
+        document.getElementById("projectPlanContent").innerHTML = `<p class="text-danger">❌ Failed to load project plan.</p>`;
+    });
+
+    // Show Bootstrap Modal
+    var myModal = new bootstrap.Modal(document.getElementById("projectPlanModal"));
+    myModal.show();
+});
