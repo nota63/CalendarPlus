@@ -4384,6 +4384,10 @@ video::-webkit-media-controls-panel {
                 <h5 class="modal-title" id="planModalLabel">📌 Project Plan</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <!-- Button to trigger modal -->
+            <button type="button" class="btn btn-primary" id="openDescriptionModal">
+                📄 View Task Description
+            </button>
             <div class="modal-body">
                 <div id="projectPlanContent" class="p-3 text-gray-700">
                     <p>Loading project plan...</p>
@@ -4392,6 +4396,24 @@ video::-webkit-media-controls-panel {
         </div>
     </div>
 </div>
+
+<!-- Access Task Description -->
+<div class="modal fade" id="taskDescriptionModal" tabindex="-1" aria-labelledby="taskDescriptionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="taskDescriptionModalLabel">📌 Task Description</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="taskDescriptionContent" class="text-start">
+                    <p class="text-muted">Loading task description...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!-- -------------------------------------------------------------------------------------------------------------------------- -->
 

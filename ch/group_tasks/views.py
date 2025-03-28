@@ -3224,6 +3224,40 @@ def fetch_project_plan(request):
 
     return JsonResponse({"success": True, "project_plan": formatted_plan})
 
+# Fetch Task Description
+@login_required
+def fetch_task_description(request):
+    """Fetches the task description in a structured format."""
+    
+    org_id = request.GET.get("org_id")
+    group_id = request.GET.get("group_id")
+    task_id = request.GET.get("task_id")
+
+    if not (org_id and group_id and task_id):
+        return JsonResponse({"error": "Missing required parameters."}, status=400)
+
+    # Get the Task object
+    task = get_object_or_404(Task, id=task_id, organization_id=org_id, group_id=group_id)
+    organization = get_object_or_404(Organization, id=org_id)
+    access_check= get_object_or_404(Profile, user=request.user, organization=organization)
+    if not access_check:
+        return HttpResponseForbidden("Bad request")
+
+    # Format the description (handling markdown-like styling)
+    if task.description:
+        formatted_description = task.description.strip().replace("\n", "<br>")
+    else:
+        formatted_description = "<p class='text-muted'>No description available.</p>"
+
+    return JsonResponse({"success": True, "description": formatted_description})
+
+
+
+
+
+
+
+
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Add the task to my day 

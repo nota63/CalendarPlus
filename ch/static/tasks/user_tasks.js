@@ -1788,3 +1788,47 @@ function formatProjectPlan(rawPlan) {
 
     return `<ul class="list-group">${formattedPlan}</ul>`;
 }
+
+
+// Access Task Description
+
+document.getElementById("openDescriptionModal").addEventListener("click", function() {
+    const orgId = window.djangoData.orgId;
+    const groupId = window.djangoData.groupId;
+    const taskId = window.djangoData.taskId;
+
+    fetch(`/tasks/fetch-task-description/?org_id=${orgId}&group_id=${groupId}&task_id=${taskId}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById("taskDescriptionContent").innerHTML = `
+                <div class="modern-content p-4 rounded bg-white shadow-sm animate-fade-in">
+                    ${formatTaskDescription(data.description)}
+                </div>
+            `;
+        } else {
+            document.getElementById("taskDescriptionContent").innerHTML = `<p class="text-danger fw-bold">❌ ${data.error}</p>`;
+        }
+    })
+    .catch(error => {
+        console.error("Error fetching task description:", error);
+        document.getElementById("taskDescriptionContent").innerHTML = `<p class="text-danger fw-bold">❌ Failed to load description.</p>`;
+    });
+
+    // Show Bootstrap Modal
+    var myModal = new bootstrap.Modal(document.getElementById("taskDescriptionModal"));
+    myModal.show();
+});
+
+// Function to format description with Notion-like styling
+function formatTaskDescription(rawDescription) {
+    if (!rawDescription) return `<p class="text-muted">No task description available.</p>`;
+
+    let formattedDescription = rawDescription
+        .trim()
+        .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")   // Bold (**text**)
+        .replace(/\*(.*?)\*/g, "<i>$1</i>")       // Italic (*text*)
+        .replace(/\n/g, "<br>");                  // Line breaks
+
+    return `<p class="text-secondary">${formattedDescription}</p>`;
+}
