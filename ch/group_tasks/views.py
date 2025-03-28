@@ -2997,6 +2997,65 @@ def start_urgent_meeting(request, org_id, group_id, task_id):
 
     return JsonResponse({"error": "Invalid request"}, status=400)
 
+
+# Share a clip (Screen Recording)
+# Allowed video file extensions
+ALLOWED_VIDEO_EXTENSIONS = {".mp4", ".webm", ".mov", ".avi", ".mkv"}
+
+@login_required
+@csrf_exempt  # Remove this if CSRF tokens are used in AJAX
+def upload_screen_recording(request):
+    """Handles AJAX-based screen recording uploads."""
+    
+    if request.method != "POST" or not request.is_ajax():
+        return JsonResponse({"error": "Invalid request."}, status=400)
+
+    user = request.user
+    org_id = request.POST.get("org_id")
+    group_id = request.POST.get("group_id")
+    task_id = request.POST.get("task_id")
+
+    if not (org_id and group_id and task_id):
+        return JsonResponse({"error": "Missing required parameters."}, status=400)
+
+    # Validate file
+    file = request.FILES.get("recording")
+    if not file:
+        return JsonResponse({"error": "No file uploaded."}, status=400)
+
+    # Check file extension
+    ext = os.path.splitext(file.name)[1].lower()
+    if ext not in ALLOWED_VIDEO_EXTENSIONS:
+        return JsonResponse({"error": "Invalid file format."}, status=400)
+
+    # Fetch related models
+    organization = get_object_or_404(Organization, id=org_id)
+    group = get_object_or_404(Group, id=group_id)
+    task = get_object_or_404(Task, id=task_id)
+
+    # Save the video file
+    file_path = f"task_files/screen_recordings/{user.id}_{task.id}{ext}"
+    saved_path = default_storage.save(file_path, ContentFile(file.read()))
+
+    # Create task communication entry
+    communicate_task = CommunicateTask.objects.create(
+        task=task,
+        organization=organization,
+        group=group,
+        sender=user,
+        files=saved_path,
+        message="Screen recording uploaded."
+    )
+
+    return JsonResponse({
+        "success": True,
+        "message": "Screen recording uploaded successfully.",
+        "file_url": default_storage.url(saved_path),
+        "task_id": communicate_task.id
+    }, status=201)
+
+
+
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Add the task to my day 
 @login_required

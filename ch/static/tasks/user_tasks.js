@@ -1605,3 +1605,75 @@ document.addEventListener("DOMContentLoaded", function () {
         return cookieValue || "";
     }
 });
+
+
+// Record and Share a clip
+
+let mediaRecorder;
+let recordedChunks = [];
+
+document.getElementById("startRecording").addEventListener("click", async function () {
+    try {
+        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+
+        mediaRecorder = new MediaRecorder(stream, { mimeType: "video/webm" });
+
+        mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) recordedChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = async () => {
+            let blob = new Blob(recordedChunks, { type: "video/webm" });
+            recordedChunks = [];
+            await uploadScreenRecording(blob);
+        };
+
+        mediaRecorder.start();
+        this.textContent = "⏹ Stop Recording";
+        this.classList.replace("btn-primary", "btn-danger");
+
+        this.onclick = () => {
+            mediaRecorder.stop();
+            this.textContent = "🎥 Start Screen Recording";
+            this.classList.replace("btn-danger", "btn-primary");
+        };
+    } catch (err) {
+        console.error("❌ Error starting screen recording:", err);
+        alert("Failed to start screen recording!");
+    }
+});
+
+async function uploadScreenRecording(blob) {
+    let formData = new FormData();
+    formData.append("org_id", window.djangoData.orgId);
+    formData.append("group_id", window.djangoData.groupId);
+    formData.append("task_id", window.djangoData.taskId);
+    formData.append("recording", blob, "recording.webm");
+
+    // Create loading spinner dynamically
+    let uploadStatus = document.getElementById("uploadStatus");
+    uploadStatus.innerHTML = `<span class="loading-spinner">⏳ Uploading...</span>`;
+
+    try {
+        let response = await fetch("/tasks/upload-screen-recording/", {
+            method: "POST",
+            body: formData,
+            headers: { "X-CSRFToken": getCSRFToken() },
+        });
+
+        let result = await response.json();
+        uploadStatus.innerHTML = "";
+
+        if (result.success) {
+            uploadStatus.innerHTML = `<span style="color: green;">✅ Upload successful! <a href="${result.file_url}" target="_blank">View Recording</a></span>`;
+        } else {
+            uploadStatus.innerHTML = `<span style="color: red;">❌ ${result.error}</span>`;
+        }
+    } catch (error) {
+        uploadStatus.innerHTML = `<span style="color: red;">❌ Upload failed. Try again!</span>`;
+    }
+}
+
+function getCSRFToken() {
+    return document.cookie.split("; ").find(row => row.startsWith("csrftoken="))?.split("=")[1] || "";
+}
