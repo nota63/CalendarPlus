@@ -899,7 +899,7 @@ class CalPoints(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, help_text="Timestamp when the points were awarded.")
 
     def __str__(self):
-        return f"{self.user.username} - {self.points} CalPoints for {self.task.title}"
+        return f"{self.user.username} - {self.points} CalPoints "
 
     class Meta:
         ordering = ["-created_at"]  

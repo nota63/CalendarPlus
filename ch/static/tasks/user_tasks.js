@@ -1543,3 +1543,65 @@ function createFloatingLabel(text, x, y, z, scene, color, size) {
 function displaySubtaskDetails(data) {
     alert(`Subtask: ${data.title}\nDescription: ${data.description}`);
 }
+
+
+// Start Urgent Meeting
+// Start urgent / instant task meeting
+document.addEventListener("DOMContentLoaded", function () {
+    const openMeetingModal = document.getElementById("openMeetingModal");
+    const submitMeeting = document.getElementById("submitMeeting");
+    const meetingReason = document.getElementById("meetingReason");
+
+    // Org, Group, and Task IDs (Replace these dynamically in your template)
+    const orgId = window.djangoData.orgId; // Set dynamically
+    const groupId = window.djangoData.groupId; // Set dynamically
+    const taskId = window.djangoData.taskId; // Set dynamically
+
+    openMeetingModal.addEventListener("click", function () {
+        const modal = new bootstrap.Modal(document.getElementById("InstantMeetModal"));
+        modal.show();
+    });
+
+    submitMeeting.addEventListener("click", function () {
+        const reason = meetingReason.value.trim();
+        if (reason === "") {
+            alert("Please enter a reason for the urgent meeting.");
+            return;
+        }
+
+        // Show loading spinner
+        submitMeeting.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Starting...`;
+        submitMeeting.disabled = true;
+
+        // Send AJAX request to backend
+        fetch(`/tasks/start-urgent-meeting/${orgId}/${groupId}/${taskId}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCSRFToken(), // Ensure CSRF token is included
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({ reason: reason }),
+        })
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url; // Redirect to meeting link
+            } else {
+                return response.json();
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            submitMeeting.innerHTML = "Start Meeting"; // Reset button text on error
+            submitMeeting.disabled = false;
+        });
+    });
+
+    // Function to get CSRF token from cookies
+    function getCSRFToken() {
+        const cookieValue = document.cookie
+            .split("; ")
+            .find(row => row.startsWith("csrftoken="))
+            ?.split("=")[1];
+        return cookieValue || "";
+    }
+});

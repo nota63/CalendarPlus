@@ -2938,6 +2938,57 @@ def task_universe_view(request, org_id, group_id, task_id):
     except Task.DoesNotExist:
         return JsonResponse({"success": False, "error": "Task not found!"})
 
+# start urgent meeting
+from django.db.models import F
+
+def start_urgent_meeting(request, org_id, group_id, task_id):
+    if request.method == "POST":
+        reason = request.POST.get("reason", "").strip()  # Get the reason from form
+        task = get_object_or_404(Task, id=task_id)  # Fetch the task
+        recipient_email = task.created_by.email  # Get task owner's email
+
+        organization=get_object_or_404(Organization,id=org_id)
+        group=get_object_or_404(Group, id=group_id, organization=organization)
+
+        # Fetch the user's CalPoints in the given organization
+        calpoints = CalPoints.objects.filter(
+            user=request.user, 
+            organization=organization
+        ).first()  # Get the first matching entry
+
+        # Ensure the user has enough points before deduction
+        if calpoints and calpoints.points >= 2:
+            calpoints.points = F('points') - 2  # Deduct 2 points safely
+            calpoints.save(update_fields=['points'])  # Save only the updated field
+        else:
+            return JsonResponse({'error': 'Not enough CalPoints'}, status=400)
+                
+        # Meeting link
+        meeting_url = f"http://127.0.0.1:8000/organizations/start_meeting/{org_id}/"
+
+        # Email content
+        subject = "🔴 Urgent Meeting Alert!"
+        message = f"""
+        Hello {task.created_by.get_full_name()},
+
+        An urgent meeting has been initiated for your task.
+
+        📌 **Reason:** {reason}
+
+        Click below to join the meeting:  
+        🔗 {meeting_url}
+
+        Regards,  
+        CalendarPlus Team
+        """
+
+        # Send email
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [recipient_email])
+
+        # Redirect user to the meeting
+        return redirect(meeting_url)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Add the task to my day 
