@@ -1666,10 +1666,37 @@ async function uploadScreenRecording(blob) {
         uploadStatus.innerHTML = "";
 
         if (result.success) {
-            uploadStatus.innerHTML = `<span style="color: green;">✅ Upload successful! <a href="${result.file_url}" target="_blank">View Recording</a></span>`;
+            uploadStatus.innerHTML = `
+                <div class="flex items-center justify-between p-4 rounded-lg shadow-md border bg-green-100 border-green-400 text-green-800 transition-all duration-300">
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-green-500 animate-bounce" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        <span class="text-lg font-semibold">Upload successful!</span>
+                    </div>
+                    <a href="${result.file_url}" target="_blank" class="text-green-600 hover:underline font-medium">View Recording</a>
+                </div>
+            `;
         } else {
-            uploadStatus.innerHTML = `<span style="color: red;">❌ ${result.error}</span>`;
+            uploadStatus.innerHTML = `
+                <div class="flex items-center p-4 rounded-lg shadow-md border bg-red-100 border-red-400 text-red-800 transition-all duration-300">
+                    <svg class="w-6 h-6 mr-2 text-red-500 animate-shake" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                    <span class="text-lg font-semibold">${result.error}</span>
+                </div>
+            `;
         }
+        // Fade out smoothly after 3 seconds
+setTimeout(() => {
+    uploadStatus.style.opacity = "0";
+    setTimeout(() => (uploadStatus.innerHTML = ""), 500);
+}, 4000);
+
+
     } catch (error) {
         console.error("❌ Upload failed:", error);
         uploadStatus.innerHTML = `<span style="color: red;">❌ Upload failed. Try again!</span>`;
