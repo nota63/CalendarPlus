@@ -4437,8 +4437,25 @@ video::-webkit-media-controls-panel {
                 </button>
 
                 <!-- task universe 3d -->
-                <button id="openTaskUniverse" class="btn btn-dark">
-                    🌌 Open 3D Task Universe
+                <button id="openTaskUniverse" class="flex items-center px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100 transition group ml-2 mr-2">
+                    <svg class="w-6 h-6 ml-1 mr-3 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                        <!-- Main central circle -->
+                        <circle cx="12" cy="12" r="5"/>
+                        
+                        <!-- Connection lines -->
+                        <line x1="12" y1="3" x2="12" y2="6"/>
+                        <line x1="12" y1="18" x2="12" y2="21"/>
+                        <line x1="3" y1="12" x2="6" y2="12"/>
+                        <line x1="18" y1="12" x2="21" y2="12"/>
+                        
+                        <!-- Smaller relation circles -->
+                        <circle cx="6" cy="6" r="2"/>
+                        <circle cx="18" cy="6" r="2"/>
+                        <circle cx="6" cy="18" r="2"/>
+                        <circle cx="18" cy="18" r="2"/>
+                    </svg>
+                         <span class="text-sm">3D Nodes</span>
                 </button>
                 
                 
