@@ -1710,31 +1710,81 @@ function getCSRFToken() {
 
 
 // Accesss Project Plan
-
 document.getElementById("openPlanModal").addEventListener("click", function() {
-    const orgId = window.djangoData.orgId;  // Dynamically set this
-    const groupId = window.djangoData.groupId;  // Dynamically set this
-    const taskId =window.djangoData.taskId;  // Dynamically set this
+    const orgId = window.djangoData.orgId;
+    const groupId = window.djangoData.groupId;
+    const taskId = window.djangoData.taskId;
 
     fetch(`/tasks/fetch-project-plan/?org_id=${orgId}&group_id=${groupId}&task_id=${taskId}`)
     .then(response => response.json())
     .then(data => {
         if (data.success) {
             document.getElementById("projectPlanContent").innerHTML = `
-                <div class="modern-content p-3 rounded bg-light">
-                    ${data.project_plan}
+                <div class="modern-content p-4 rounded bg-white shadow-sm animate-fade-in">
+                    ${formatProjectPlan(data.project_plan)}
                 </div>
             `;
         } else {
-            document.getElementById("projectPlanContent").innerHTML = `<p class="text-danger">❌ ${data.error}</p>`;
+            document.getElementById("projectPlanContent").innerHTML = `<p class="text-danger fw-bold">❌ ${data.error}</p>`;
         }
     })
     .catch(error => {
         console.error("Error fetching project plan:", error);
-        document.getElementById("projectPlanContent").innerHTML = `<p class="text-danger">❌ Failed to load project plan.</p>`;
+        document.getElementById("projectPlanContent").innerHTML = `<p class="text-danger fw-bold">❌ Failed to load project plan.</p>`;
     });
 
     // Show Bootstrap Modal
     var myModal = new bootstrap.Modal(document.getElementById("projectPlanModal"));
     myModal.show();
 });
+
+// Function to format project plan like Notion
+function formatProjectPlan(rawPlan) {
+    if (!rawPlan) return `<p class="text-muted">No project plan available.</p>`;
+
+    let formattedPlan = rawPlan
+        .trim()
+        .split("\n")
+        .map(line => {
+            line = line.trim();
+
+            // Convert Notion-style headings
+            if (line.startsWith("# ")) {
+                return `<h2 class="fw-bold text-dark mt-3"><i class="bi bi-clipboard-check me-2"></i> ${line.slice(2).trim()}</h2>`;
+            }
+            if (line.startsWith("## ")) {
+                return `<h3 class="fw-semibold text-primary mt-2"><i class="bi bi-list-task me-2"></i> ${line.slice(3).trim()}</h3>`;
+            }
+
+            // Convert checklists (- [ ] Task) and completed tasks (- [x] Task)
+            if (line.startsWith("- [ ]")) {
+                return `<li class="list-group-item d-flex align-items-center">
+                            <input class="form-check-input me-2" type="checkbox" disabled> 
+                            ${line.slice(5).trim()}
+                        </li>`;
+            }
+            if (line.startsWith("- [x]")) {
+                return `<li class="list-group-item d-flex align-items-center text-success">
+                            <input class="form-check-input me-2" type="checkbox" checked disabled> 
+                            <del>${line.slice(5).trim()}</del>
+                        </li>`;
+            }
+
+            // Convert bullet points into modern lists
+            if (line.startsWith("- ")) {
+                return `<li class="list-group-item d-flex align-items-center">
+                            <i class="bi bi-arrow-right-circle-fill text-success me-2"></i> 
+                            ${line.slice(2).trim()}
+                        </li>`;
+            }
+
+            // Convert bold (**text**) and italic (*text*) formatting
+            line = line.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");  // Bold
+            line = line.replace(/\*(.*?)\*/g, "<i>$1</i>");      // Italics
+
+            return `<p class="text-secondary">${line}</p>`; // Normal paragraph
+        })
+        .join("");
+
+    return `<ul class="list-group">${formattedPlan}</ul>`;
+}
