@@ -4546,7 +4546,17 @@ video::-webkit-media-controls-panel {
                 </button>
 
                 <!-- share clip -->
-                <button id="startRecording" class="btn btn-primary">🎥 Start Screen Recording</button>
+                <button id="startRecording" class="flex items-center px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100 transition group ml-2 mr-2">
+                    <svg class="w-6 h-6 ml-1 mr-3 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polygon points="10,8 16,12 10,16 10,8"/>
+                    </svg>
+
+                    <span class="text-sm">Record Clip</span>
+                </button>
+
+
                 <div id="uploadStatus"></div>
 
                  
