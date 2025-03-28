@@ -1608,7 +1608,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // Record and Share a clip
-
 let mediaRecorder;
 let recordedChunks = [];
 
@@ -1650,7 +1649,6 @@ async function uploadScreenRecording(blob) {
     formData.append("task_id", window.djangoData.taskId);
     formData.append("recording", blob, "recording.webm");
 
-    // Create loading spinner dynamically
     let uploadStatus = document.getElementById("uploadStatus");
     uploadStatus.innerHTML = `<span class="loading-spinner">⏳ Uploading...</span>`;
 
@@ -1658,7 +1656,10 @@ async function uploadScreenRecording(blob) {
         let response = await fetch("/tasks/upload-screen-recording/", {
             method: "POST",
             body: formData,
-            headers: { "X-CSRFToken": getCSRFToken() },
+            headers: {
+                "X-Requested-With": "XMLHttpRequest", // ✅ Add AJAX header
+                "X-CSRFToken": getCSRFToken(), // ✅ Ensure CSRF token is sent
+            },
         });
 
         let result = await response.json();
@@ -1670,10 +1671,12 @@ async function uploadScreenRecording(blob) {
             uploadStatus.innerHTML = `<span style="color: red;">❌ ${result.error}</span>`;
         }
     } catch (error) {
+        console.error("❌ Upload failed:", error);
         uploadStatus.innerHTML = `<span style="color: red;">❌ Upload failed. Try again!</span>`;
     }
 }
 
 function getCSRFToken() {
-    return document.cookie.split("; ").find(row => row.startsWith("csrftoken="))?.split("=")[1] || "";
+    let cookie = document.cookie.split("; ").find(row => row.startsWith("csrftoken="));
+    return cookie ? cookie.split("=")[1] : "";
 }

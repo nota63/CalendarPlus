@@ -2999,45 +2999,58 @@ def start_urgent_meeting(request, org_id, group_id, task_id):
 
 
 # Share a clip (Screen Recording)
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
+
 # Allowed video file extensions
 ALLOWED_VIDEO_EXTENSIONS = {".mp4", ".webm", ".mov", ".avi", ".mkv"}
-
 @login_required
-@csrf_exempt  # Remove this if CSRF tokens are used in AJAX
+@csrf_exempt
 def upload_screen_recording(request):
     """Handles AJAX-based screen recording uploads."""
-    
-    if request.method != "POST" or not request.is_ajax():
+
+    print("🚀 Received request to upload screen recording!")  
+
+    if request.method != "POST" or request.headers.get("X-Requested-With") != "XMLHttpRequest":
+        print("🚨 Invalid request: Not POST or missing AJAX header")
         return JsonResponse({"error": "Invalid request."}, status=400)
 
     user = request.user
+    print(f"👤 User: {user}")
+
     org_id = request.POST.get("org_id")
     group_id = request.POST.get("group_id")
     task_id = request.POST.get("task_id")
 
     if not (org_id and group_id and task_id):
+        print("🚨 Missing required parameters!", org_id, group_id, task_id)
         return JsonResponse({"error": "Missing required parameters."}, status=400)
 
-    # Validate file
     file = request.FILES.get("recording")
     if not file:
+        print("🚨 No file uploaded!")
         return JsonResponse({"error": "No file uploaded."}, status=400)
 
-    # Check file extension
     ext = os.path.splitext(file.name)[1].lower()
+    print(f"📂 File Extension: {ext}")
     if ext not in ALLOWED_VIDEO_EXTENSIONS:
+        print("🚨 Invalid file format!")
         return JsonResponse({"error": "Invalid file format."}, status=400)
 
-    # Fetch related models
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id)
     task = get_object_or_404(Task, id=task_id)
 
-    # Save the video file
+    # ✅ Ensure the directory exists before saving
     file_path = f"task_files/screen_recordings/{user.id}_{task.id}{ext}"
-    saved_path = default_storage.save(file_path, ContentFile(file.read()))
+    directory = os.path.dirname(default_storage.path(file_path))
+    if not os.path.exists(directory):
+        os.makedirs(directory, exist_ok=True)
 
-    # Create task communication entry
+    # ✅ Save the file properly
+    saved_path = default_storage.save(file_path, file)
+    print(f"✅ File saved at: {saved_path}")
+
     communicate_task = CommunicateTask.objects.create(
         task=task,
         organization=organization,
@@ -3046,6 +3059,7 @@ def upload_screen_recording(request):
         files=saved_path,
         message="Screen recording uploaded."
     )
+    print(f"✅ Task communication entry created: {communicate_task.id}")
 
     return JsonResponse({
         "success": True,
@@ -3053,7 +3067,6 @@ def upload_screen_recording(request):
         "file_url": default_storage.url(saved_path),
         "task_id": communicate_task.id
     }, status=201)
-
 
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------
