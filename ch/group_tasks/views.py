@@ -3309,6 +3309,8 @@ def my_day_task_detail(request, org_id, group_id, task_id):
     task_timer = TaskTimer.objects.filter(task=task, user=request.user).first()
     time_spent = task_timer.accumulated_time if task_timer else timedelta()
     formatted_time = str(time_spent)
+    # subtask count
+    subtasks=SubTask.objects.filter(task=task, organization=organization, group=group).count()
 
     # find earned points if task is completed
     calpoints = None
@@ -3354,6 +3356,7 @@ def my_day_task_detail(request, org_id, group_id, task_id):
         'queries':queries,
         'calpoints':calpoints,
         'automations':automations,
+        "subtasks":subtasks,
     })
 
 

@@ -978,3 +978,35 @@ body {
 textarea:focus {
     box-shadow: 0 0 0 2px theme('colors.blue.500');
 }
+
+
+
+/* Task Description */
+.modal-content {
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+}
+
+.prose ul {
+    list-style-type: none;
+    padding-left: 1.5em;
+}
+
+.prose ul li::before {
+    content: "•";
+    color: #4f46e5;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+}
+
+/* description */
+.scrollbar-hide::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;  /* IE/Edge */
+    scrollbar-width: none;      /* Firefox */
+}
