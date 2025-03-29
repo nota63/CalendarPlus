@@ -1832,3 +1832,64 @@ function formatTaskDescription(rawDescription) {
 
     return `<p class="text-secondary">${formattedDescription}</p>`;
 }
+
+
+// Raise issue
+
+document.addEventListener("DOMContentLoaded", function () {
+    const issueBtn = document.getElementById("raiseIssueBtn");
+    const submitIssueBtn = document.getElementById("submitIssueBtn");
+
+    const orgId = window.djangoData.orgId; // Set dynamically in actual implementation
+    const groupId = window.djangoData.groupId; // Set dynamically in actual implementation
+    const taskId = window.djangoData.taskId; // Set dynamically in actual implementation
+    const issueUrl = `/tasks/raise-issue/${orgId}/${groupId}/${taskId}/`;
+
+    // Open Modal & Fetch Task Creator Profile Pic + Issue Count
+    issueBtn.addEventListener("click", function () {
+        fetch(issueUrl)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("issueCount").innerText = data.issue_count;
+                document.getElementById("proctorImage").src = data.proctor_image || "/static/default-avatar.png";
+                new bootstrap.Modal(document.getElementById("issueModal")).show();
+            })
+            .catch(error => console.error("Error fetching issue details:", error));
+    });
+
+    // Submit Issue
+    submitIssueBtn.addEventListener("click", function () {
+        const title = document.getElementById("issueTitle").value.trim();
+        const description = document.getElementById("issueDescription").value.trim();
+        const priority = document.getElementById("issuePriority").value;
+
+        if (!title || !description) {
+            alert("Please fill in all fields!");
+            return;
+        }
+
+        fetch(issueUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
+            body: JSON.stringify({ title, description, priority })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.issue_id) {
+                alert("Issue raised successfully!");
+                document.getElementById("issueCount").innerText = parseInt(document.getElementById("issueCount").innerText) + 1;
+                document.getElementById("issueTitle").value = "";
+                document.getElementById("issueDescription").value = "";
+                new bootstrap.Modal(document.getElementById("issueModal")).hide();
+            } else {
+                alert("Error: " + data.error);
+            }
+        })
+        .catch(error => console.error("Error submitting issue:", error));
+    });
+
+    // CSRF Token Fetcher (for Django)
+    function getCSRFToken() {
+        return document.cookie.split('; ').find(row => row.startsWith('csrftoken=')).split('=')[1];
+    }
+});

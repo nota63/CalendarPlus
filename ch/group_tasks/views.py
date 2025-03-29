@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect , get_list_or_404
 from .models import (Task, TaskNote, TaskComment , TaskTag, ActivityLog,RecentVisit,MeetingTaskQuery,CommunicateTask,TaskReminder
                      
                      ,PendingRewardNotification,CalPoints,AutomationTask,TaskBackup,AttachmentsTasksApp,BackupSchedule,
-                     ActivityBackup,TaskProgressLog)
+                     ActivityBackup,TaskProgressLog,Issue)
 import sys
 from django.utils.timezone import localtime
 
@@ -3251,6 +3251,42 @@ def fetch_task_description(request):
 
     return JsonResponse({"success": True, "description": formatted_description})
 
+
+# Issuess - Raise issues for the task 
+
+# 1) Raise an issue 
+@login_required
+def issue_view(request, org_id, group_id, task_id):
+    """Handles fetching task creator profile & issue count, and saving new issues"""
+    task = get_object_or_404(Task, id=task_id, organization_id=org_id, group_id=group_id)
+
+    if request.method == "GET":
+        # Get issue count
+        issue_count = Issue.objects.filter(task=task).count()
+
+        # Get task creator's profile picture
+        task_creator_profile = Profile.objects.filter(user=task.created_by).first()
+        profile_picture = task_creator_profile.profile_picture.url if task_creator_profile and task_creator_profile.profile_picture else None
+
+        return JsonResponse({"issue_count": issue_count, "proctor_image": profile_picture}, status=200)
+
+    elif request.method == "POST":
+        try:
+            data = json.loads(request.body)
+
+            issue = Issue.objects.create(
+                task=task,
+                organization_id=org_id,
+                group_id=group_id,
+                reported_by=request.user,
+                title=data.get("title"),
+                description=data.get("description"),
+                priority=data.get("priority", "medium"),
+            )
+
+            return JsonResponse({"message": "Issue created successfully!", "issue_id": issue.id}, status=201)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
 
 
 

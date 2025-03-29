@@ -90,7 +90,8 @@ urlpatterns = [
     path('start-urgent-meeting/<int:org_id>/<int:group_id>/<int:task_id>/',start_urgent_meeting, name='start_urgent_meeting'),
     path('upload-screen-recording/',upload_screen_recording, name='upload_screen_recording'),
     path('fetch-project-plan/',fetch_project_plan, name='fetch_project_plan'),
-    path('fetch-task-description/',fetch_task_description, name='fetch_task_description')
+    path('fetch-task-description/',fetch_task_description, name='fetch_task_description'),
+    path('raise-issue/<int:org_id>/<int:group_id>/<int:task_id>/',issue_view, name='raise_issue')
 
   
   

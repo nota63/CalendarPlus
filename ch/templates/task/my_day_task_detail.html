@@ -4633,6 +4633,50 @@ video::-webkit-media-controls-panel {
     </div>
 </div>
 
+<!-- Raise the issue -->
+<div class="modal fade" id="issueModal" tabindex="-1" aria-labelledby="issueModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="issueModalLabel">Raise an Issue</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Task Creator Profile Pic -->
+                <div class="text-center">
+                    <img id="proctorImage" src="" alt="Proctor" class="rounded-circle" width="80" height="80">
+                    <p class="text-muted">Proctored by Task Creator</p>
+                </div>
+
+                <!-- Issue Count -->
+                <p class="text-muted">Existing Issues: <span id="issueCount">0</span></p>
+
+                <!-- Issue Form -->
+                <div class="mb-3">
+                    <label for="issueTitle" class="form-label">Issue Title</label>
+                    <input type="text" class="form-control" id="issueTitle" placeholder="Enter issue title">
+                </div>
+                <div class="mb-3">
+                    <label for="issueDescription" class="form-label">Description</label>
+                    <textarea class="form-control" id="issueDescription" rows="3" placeholder="Describe the issue"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="issuePriority" class="form-label">Priority</label>
+                    <select class="form-select" id="issuePriority">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="submitIssueBtn">Submit Issue</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!----------------------------------------------------------------------------------------------------------------------------- -->
 
@@ -4827,6 +4871,10 @@ video::-webkit-media-controls-panel {
                     </svg>
                         <span class="text-sm">Roadmap</span>
                 </button>
+
+                <!-- raise the issue -->
+                <button class="btn btn-danger" id="raiseIssueBtn">Raise Issue</button>
+
                 
 
 

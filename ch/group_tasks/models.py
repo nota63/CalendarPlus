@@ -1139,4 +1139,40 @@ class TaskProgressLog(models.Model):
     def __str__(self):
         return f"{self.performed_by.username} updated {self.task.title} by {self.progress_change}%"
 
-    
+
+
+# Task Issues
+class Issue(models.Model):
+    PRIORITY_CHOICES = [
+        ("low", "Low"),
+        ("medium", "Medium"),
+        ("high", "High"),
+        ("critical", "Critical"),
+    ]
+
+    STATUS_CHOICES = [
+        ("open", "Open"),
+        ("in_progress", "In Progress"),
+        ("resolved", "Resolved"),
+        ("closed", "Closed"),
+    ]
+
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="issues")
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="issues", null=True, blank=True)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="issues")
+    reported_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reported_issues")
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default="medium")
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default="open")
+    attachments = models.FileField(upload_to="issue_attachments/", null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-priority", "-created_at"]  # Show critical & recent issues first
+
+    def __str__(self):
+        return f"Issue: {self.title} | {self.get_status_display()}"
+
+
