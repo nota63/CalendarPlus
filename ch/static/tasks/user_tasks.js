@@ -2062,7 +2062,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const messageInput = document.getElementById("discussionMessageInput");
     const fileInput = document.getElementById("discussionFileInput");
     const sendMessageButton = document.getElementById("sendDiscussionMessage");
-    const sendFileButton = document.getElementById("sendFileButton");
 
     let orgId, groupId, taskId, issueId;
     let fetchInterval;
@@ -2092,18 +2091,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     console.error("❌ Error Fetching Messages:", data.error);
                     return;
                 }
-
                 discussionMessages.innerHTML = "";
-
                 data.messages.forEach(msg => {
                     const messageElement = document.createElement("div");
                     messageElement.classList.add("flex", "items-start", "space-x-2", "p-2", "border-b", "border-gray-700");
-
                     const profilePic = document.createElement("img");
                     profilePic.src = msg.sender_profile_pic || "/static/default-profile.png";
                     profilePic.alt = "User Pic";
                     profilePic.classList.add("w-8", "h-8", "rounded-full");
-
                     const contentDiv = document.createElement("div");
                     contentDiv.classList.add("flex-1");
                     contentDiv.innerHTML = `
@@ -2112,12 +2107,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         ${msg.files ? `<a href="${msg.files}" target="_blank" class="text-blue-400 text-sm">📎 View Attachment</a>` : ""}
                         <small class="text-gray-500">${msg.created_at}</small>
                     `;
-
                     messageElement.appendChild(profilePic);
                     messageElement.appendChild(contentDiv);
                     discussionMessages.appendChild(messageElement);
                 });
-
                 discussionMessages.scrollTop = discussionMessages.scrollHeight;
             })
             .catch(error => console.error("❌ Error Fetching Messages:", error));
@@ -2128,14 +2121,11 @@ document.addEventListener("DOMContentLoaded", function () {
         if (e.key === "Enter") sendDiscussionMessage();
     });
 
-    sendFileButton.addEventListener("click", sendDiscussionMessage);
-
     function sendDiscussionMessage() {
         const message = messageInput.value.trim();
         const file = fileInput.files[0];
 
-        if (!message && !file) return alert("Please enter a message or select a file!");
-
+        if (!message && !file) return alert("Please enter a message or attach a file!");
         console.log("🚀 Sending Message/File...");
 
         const formData = new FormData();
@@ -2166,7 +2156,6 @@ document.addEventListener("DOMContentLoaded", function () {
     function getCSRFToken() {
         const tokenField = document.querySelector("[name=csrfmiddlewaretoken]");
         if (tokenField) return tokenField.value;
-        console.warn("⚠️ CSRF Token Input Not Found, Trying Cookies...");
         const csrfToken = document.cookie.split("; ").find(row => row.startsWith("csrftoken="));
         return csrfToken ? csrfToken.split("=")[1] : "";
     }

@@ -4921,27 +4921,27 @@ video::-webkit-media-controls-panel {
             <!-- Modal Body -->
             <div class="modal-body">
                 <!-- Messages Container -->
-                <div class="h-80 overflow-y-auto p-3 bg-gray-800 rounded-lg" id="discussionMessages">
-                    <!-- Messages will be loaded here via JS -->
-                </div>
+                <div class="h-80 overflow-y-auto p-3 bg-gray-800 rounded-lg" id="discussionMessages"></div>
             </div>
 
             <!-- Modal Footer (Input Box & File Upload) -->
-            <div class="modal-footer bg-gray-800 border-t border-gray-700">
-                <input type="text" id="discussionMessageInput" class="form-control bg-gray-900 text-white border-gray-700" 
-                       placeholder="Type your message..." autocomplete="off">
+            <div class="modal-footer bg-gray-800 border-t border-gray-700 flex items-center space-x-2">
+                <!-- File Upload Label -->
+                <label for="discussionFileInput" class="cursor-pointer text-gray-400 hover:text-purple-400">
+                    📎
+                </label>
+                <input type="file" id="discussionFileInput" class="hidden">
                 
-                <!-- File Input -->
-                <input type="file" id="discussionFileInput" class="form-control bg-gray-900 text-white border-gray-700">
+                <!-- Input Box -->
+                <input type="text" id="discussionMessageInput" class="flex-1 form-control bg-gray-900 text-white border-gray-700" 
+                       placeholder="Type a message or attach a file..." autocomplete="off">
                 
-                <!-- Buttons -->
-                <button class="btn btn-sm btn-secondary" id="sendFileButton">📎 Send File</button>
+                <!-- Send Button -->
                 <button class="btn btn-sm btn-purple-500" id="sendDiscussionMessage">Send</button>
             </div>
         </div>
     </div>
 </div>
-
 
 
 

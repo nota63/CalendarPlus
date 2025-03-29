@@ -1181,20 +1181,20 @@ class IssueRoom(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="issue_rooms")
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="issue_rooms")
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="issue_rooms")
-    issue = models.ForeignKey(Issue, on_delete=models.CASCADE, related_name="issue_rooms")
+    issue = models.ForeignKey( Issue, on_delete=models.CASCADE, related_name="issue_rooms")
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="issue_messages")
 
     message = models.TextField(null=True, blank=True)
     files = models.FileField(upload_to="issue_files/", max_length=500, null=True, blank=True)
 
 
-    created_at = models.DateTimeField(auto_now_add=True)  # 🔥 Timestamp for ordering messages
-    updated_at = models.DateTimeField(auto_now=True)      # 🔥 Auto update when edited
-    is_edited = models.BooleanField(default=False)        # 🔥 Track if message was edited
-    is_deleted = models.BooleanField(default=False)       # 🔥 Soft delete functionality
+    created_at = models.DateTimeField(auto_now_add=True)  
+    updated_at = models.DateTimeField(auto_now=True)    
+    is_edited = models.BooleanField(default=False)        
+    is_deleted = models.BooleanField(default=False)     
 
     class Meta:
-        ordering = ["created_at"]  # 🛠️ Always order messages by time
+        ordering = ["created_at"] 
 
     def delete_message(self):
         """Soft delete a message instead of removing it permanently."""
