@@ -1851,6 +1851,8 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(data => {
                 document.getElementById("issueCount").innerText = data.issue_count;
+                document.getElementById("issueOpen").innerText = data.open_issues;
+                document.getElementById("issueClosed").innerText = data.closed_issues;
                 document.getElementById("proctorImage").src = data.proctor_image || "/static/default-avatar.png";
                 new bootstrap.Modal(document.getElementById("issueModal")).show();
             })

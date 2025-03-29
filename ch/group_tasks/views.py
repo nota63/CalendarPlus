@@ -3263,12 +3263,15 @@ def issue_view(request, org_id, group_id, task_id):
     if request.method == "GET":
         # Get issue count
         issue_count = Issue.objects.filter(task=task).count()
+        closed_issues = Issue.objects.filter(task_id=task_id, group_id=group_id, organization_id=org_id, status='closed').count()
+        open_issues = Issue.objects.filter(task_id=task_id, group_id=group_id, organization_id=org_id, status='open').count()
+
 
         # Get task creator's profile picture
         task_creator_profile = Profile.objects.filter(user=task.created_by).first()
         profile_picture = task_creator_profile.profile_picture.url if task_creator_profile and task_creator_profile.profile_picture else None
 
-        return JsonResponse({"issue_count": issue_count, "proctor_image": profile_picture}, status=200)
+        return JsonResponse({"issue_count": issue_count,'closed_issues':closed_issues,'open_issues':open_issues,"proctor_image": profile_picture}, status=200)
 
     elif request.method == "POST":
         try:
