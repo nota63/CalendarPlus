@@ -3360,11 +3360,91 @@ from django.utils.decorators import method_decorator
 # Fetch and handle saving messages
 
 
+# @csrf_exempt  
+# def issue_discussion_view(request, org_id, group_id, task_id, issue_id):
+#     """
+#     - GET: Fetches existing messages for the issue, including sender's profile picture.
+#     - POST: Saves a new message to the issue discussion.
+#     """
+#     if request.method == "GET":
+#         messages = IssueRoom.objects.filter(
+#             organization_id=org_id, 
+#             group_id=group_id, 
+#             task_id=task_id, 
+#             issue_id=issue_id
+#         ).order_by("created_at").select_related("sender")  
+
+#         message_list = []
+#         for msg in messages:
+#             sender_profile = Profile.objects.filter(user=msg.sender).first()
+#             profile_pic_url = sender_profile.profile_picture.url if sender_profile and sender_profile.profile_picture else None
+
+#             message_list.append({
+#                 "id": msg.id,
+#                 "sender": msg.sender.username,
+#                 "sender_profile_pic": profile_pic_url,
+#                 "message": msg.message,
+#                 "files": msg.files.url if msg.files else None,
+#                 "created_at": msg.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+#                 "is_edited": msg.is_edited,
+#                 "is_deleted": msg.is_deleted
+#             })
+
+#         return JsonResponse({"success": True, "messages": message_list}, status=200)
+
+#     elif request.method == "POST":
+#         try:
+#             data = json.loads(request.body)  
+#             user = request.user
+#             message_text = data.get("message", "").strip()
+#             file_obj = request.FILES.get("file")  
+
+#             issue = get_object_or_404(Issue, id=issue_id, task_id=task_id, group_id=group_id, organization_id=org_id)
+
+#             issue_message = IssueRoom(
+#                 organization_id=org_id,
+#                 group_id=group_id,
+#                 task_id=task_id,
+#                 issue=issue,
+#                 sender=user,
+#                 message=message_text
+#             )
+
+#             if file_obj:
+#                 file_name = f"issue_files/{org_id}/{group_id}/{task_id}/{issue_id}/{file_obj.name}"
+#                 file_path = default_storage.save(file_name, ContentFile(file_obj.read()))
+#                 issue_message.files = file_path
+
+#             issue_message.save()
+
+#             sender_profile = Profile.objects.filter(user=user).first()
+#             profile_pic_url = sender_profile.profile_picture.url if sender_profile and sender_profile.profile_picture else None
+
+#             return JsonResponse({
+#                 "success": True,
+#                 "message": {
+#                     "id": issue_message.id,
+#                     "sender": user.username,
+#                     "sender_profile_pic": profile_pic_url,
+#                     "message": issue_message.message,
+#                     "files": issue_message.files.url if issue_message.files else None,
+#                     "created_at": issue_message.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+#                     "is_edited": issue_message.is_edited,
+#                     "is_deleted": issue_message.is_deleted
+#                 }
+#             }, status=201)
+
+#         except Exception as e:
+#             return JsonResponse({"success": False, "error": str(e)}, status=400)
+
+#     return JsonResponse({"success": False, "error": "Invalid request"}, status=405)
+
+
 @csrf_exempt  
 def issue_discussion_view(request, org_id, group_id, task_id, issue_id):
     """
     - GET: Fetches existing messages for the issue, including sender's profile picture.
-    - POST: Saves a new message to the issue discussion.
+    - POST: Saves a new message and/or file to the issue discussion.
     """
     if request.method == "GET":
         messages = IssueRoom.objects.filter(
@@ -3394,9 +3474,8 @@ def issue_discussion_view(request, org_id, group_id, task_id, issue_id):
 
     elif request.method == "POST":
         try:
-            data = json.loads(request.body)  
             user = request.user
-            message_text = data.get("message", "").strip()
+            message_text = request.POST.get("message", "").strip()
             file_obj = request.FILES.get("file")  
 
             issue = get_object_or_404(Issue, id=issue_id, task_id=task_id, group_id=group_id, organization_id=org_id)
@@ -3438,8 +3517,6 @@ def issue_discussion_view(request, org_id, group_id, task_id, issue_id):
             return JsonResponse({"success": False, "error": str(e)}, status=400)
 
     return JsonResponse({"success": False, "error": "Invalid request"}, status=405)
-
-
 
 
 

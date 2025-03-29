@@ -2060,7 +2060,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const discussionModal = new bootstrap.Modal(document.getElementById("discussionModal"));
     const discussionMessages = document.getElementById("discussionMessages");
     const messageInput = document.getElementById("discussionMessageInput");
+    const fileInput = document.getElementById("discussionFileInput");
     const sendMessageButton = document.getElementById("sendDiscussionMessage");
+    const sendFileButton = document.getElementById("sendFileButton");
 
     let orgId, groupId, taskId, issueId;
     let fetchInterval;
@@ -2068,22 +2070,15 @@ document.addEventListener("DOMContentLoaded", function () {
     function startDiscussion(_orgId, _groupId, _taskId, _issueId) {
         console.log("💬 Opening Discussion for Issue:", _issueId);
         
-        // Store IDs globally
         orgId = _orgId;
         groupId = _groupId;
         taskId = _taskId;
         issueId = _issueId;
 
-        // Clear previous messages
         discussionMessages.innerHTML = '<p class="text-gray-400 text-center">Loading messages...</p>';
-
-        // Fetch Messages
         fetchDiscussionMessages();
-
-        // Open Modal
         discussionModal.show();
 
-        // Start Auto Refresh Every 3 Seconds
         if (fetchInterval) clearInterval(fetchInterval);
         fetchInterval = setInterval(fetchDiscussionMessages, 3000);
     }
@@ -2098,22 +2093,19 @@ document.addEventListener("DOMContentLoaded", function () {
                     return;
                 }
 
-                discussionMessages.innerHTML = ""; // Clear existing messages
+                discussionMessages.innerHTML = "";
 
                 data.messages.forEach(msg => {
                     const messageElement = document.createElement("div");
                     messageElement.classList.add("flex", "items-start", "space-x-2", "p-2", "border-b", "border-gray-700");
 
-                    // Profile Picture
                     const profilePic = document.createElement("img");
                     profilePic.src = msg.sender_profile_pic || "/static/default-profile.png";
                     profilePic.alt = "User Pic";
                     profilePic.classList.add("w-8", "h-8", "rounded-full");
 
-                    // Message Content
                     const contentDiv = document.createElement("div");
                     contentDiv.classList.add("flex-1");
-
                     contentDiv.innerHTML = `
                         <p class="text-purple-400 font-semibold">${msg.sender}</p>
                         <p class="text-gray-300">${msg.message || ""}</p>
@@ -2123,11 +2115,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     messageElement.appendChild(profilePic);
                     messageElement.appendChild(contentDiv);
-
                     discussionMessages.appendChild(messageElement);
                 });
 
-                // Auto Scroll to Bottom
                 discussionMessages.scrollTop = discussionMessages.scrollHeight;
             })
             .catch(error => console.error("❌ Error Fetching Messages:", error));
@@ -2138,23 +2128,34 @@ document.addEventListener("DOMContentLoaded", function () {
         if (e.key === "Enter") sendDiscussionMessage();
     });
 
+    sendFileButton.addEventListener("click", sendDiscussionMessage);
+
     function sendDiscussionMessage() {
         const message = messageInput.value.trim();
-        if (!message) return;
+        const file = fileInput.files[0];
 
-        console.log("🚀 Sending Message:", message);
+        if (!message && !file) return alert("Please enter a message or select a file!");
+
+        console.log("🚀 Sending Message/File...");
+
+        const formData = new FormData();
+        formData.append("message", message);
+        if (file) {
+            formData.append("file", file);
+        }
+        formData.append("csrfmiddlewaretoken", getCSRFToken());
 
         fetch(`/tasks/issue-discussion/${orgId}/${groupId}/${taskId}/${issueId}/`, {
             method: "POST",
-            headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
-            body: JSON.stringify({ message: message })
+            body: formData
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
                 console.log("✅ Message Sent Successfully!");
                 messageInput.value = "";
-                fetchDiscussionMessages(); // Refresh messages immediately
+                fileInput.value = "";
+                fetchDiscussionMessages();
             } else {
                 console.error("❌ Error Sending Message:", data.error);
             }

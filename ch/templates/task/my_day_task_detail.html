@@ -4926,16 +4926,21 @@ video::-webkit-media-controls-panel {
                 </div>
             </div>
 
-            <!-- Modal Footer (Input Box) -->
+            <!-- Modal Footer (Input Box & File Upload) -->
             <div class="modal-footer bg-gray-800 border-t border-gray-700">
                 <input type="text" id="discussionMessageInput" class="form-control bg-gray-900 text-white border-gray-700" 
                        placeholder="Type your message..." autocomplete="off">
+                
+                <!-- File Input -->
+                <input type="file" id="discussionFileInput" class="form-control bg-gray-900 text-white border-gray-700">
+                
+                <!-- Buttons -->
+                <button class="btn btn-sm btn-secondary" id="sendFileButton">📎 Send File</button>
                 <button class="btn btn-sm btn-purple-500" id="sendDiscussionMessage">Send</button>
             </div>
         </div>
     </div>
 </div>
-
 
 
 
