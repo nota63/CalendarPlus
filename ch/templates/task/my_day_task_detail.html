@@ -4682,6 +4682,128 @@ video::-webkit-media-controls-panel {
 </div>
 
 
+<!-- Manage Issues (Drag and Drop) -->
+<!-- Manage Issues (Drag and Drop) -->
+<div class="modal fade" id="issueManageModal" tabindex="-1" aria-labelledby="issueManageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title d-flex align-items-center" id="issueManageModalLabel">
+                    Manage Task Issues 
+                    <span class="badge bg-warning text-dark ms-2">Pro</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Premium Upgrade Section -->
+            <div class="text-center p-3 bg-light rounded">
+                <h6 class="fw-bold">Unlock Advanced Issue Management</h6>
+                <p class="text-muted">Upgrade to Pro and get access to premium issue tracking features.</p>
+                <button class="btn btn-primary" id="upgradeProBtn">Upgrade to Pro</button>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="d-flex justify-content-around p-3">
+                <button class="btn btn-danger" id="raiseIssueBtn"><i class="bi bi-exclamation-circle"></i> Raise Issue</button>
+                <button class="btn btn-success"><i class="bi bi-check2-circle"></i> Auto-Resolve Issues</button>
+                <button class="btn btn-warning"><i class="bi bi-arrow-repeat"></i> Refresh Status</button>
+            </div>
+
+            <!-- Predefined Issues -->
+            <div class="p-3">
+                <h6 class="fw-bold">Common Issues</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-group">
+                            <li class="list-group-item">1. Task requirements are unclear</li>
+                            <li class="list-group-item">2. Deadline is unrealistic</li>
+                            <li class="list-group-item">3. Blocked by another task</li>
+                            <li class="list-group-item">4. Waiting for approval</li>
+                            <li class="list-group-item">5. Need more resources</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-group">
+                            <li class="list-group-item">6. Unexpected technical issues</li>
+                            <li class="list-group-item">7. Dependencies are incomplete</li>
+                            <li class="list-group-item">8. Insufficient team collaboration</li>
+                            <li class="list-group-item">9. Misalignment with project scope</li>
+                            <li class="list-group-item">10. Software bug affecting progress</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Issue Management Columns -->
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <h6 class="fw-bold text-primary">Open</h6>
+                        <ul class="issue-list list-group bg-light p-2" id="open"></ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6 class="fw-bold text-warning">In Progress</h6>
+                        <ul class="issue-list list-group bg-light p-2" id="in_progress"></ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6 class="fw-bold text-success">Resolved</h6>
+                        <ul class="issue-list list-group bg-light p-2" id="resolved"></ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6 class="fw-bold text-danger">Closed</h6>
+                        <ul class="issue-list list-group bg-light p-2" id="closed"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Insights and Activity Log -->
+            <div class="p-3">
+                <h6 class="fw-bold">Issue Insights</h6>
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <div class="p-3 bg-light rounded">
+                            <h6 class="text-primary">Open Issues</h6>
+                            <p class="fw-bold fs-4">12</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 bg-light rounded">
+                            <h6 class="text-warning">In Progress</h6>
+                            <p class="fw-bold fs-4">8</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 bg-light rounded">
+                            <h6 class="text-success">Resolved</h6>
+                            <p class="fw-bold fs-4">24</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 bg-light rounded">
+                            <h6 class="text-danger">Closed</h6>
+                            <p class="fw-bold fs-4">35</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Log -->
+            <div class="p-3">
+                <h6 class="fw-bold">Recent Activity</h6>
+                <ul class="list-group">
+                    <li class="list-group-item">🔹 John marked issue #23 as "Resolved"</li>
+                    <li class="list-group-item">🔹 Alice raised a new issue "Blocked by API delay"</li>
+                    <li class="list-group-item">🔹 Manager closed issue #18 as "Completed"</li>
+                    <li class="list-group-item">🔹 Developer moved issue #45 to "In Progress"</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
 <!----------------------------------------------------------------------------------------------------------------------------- -->
 
 
@@ -4876,8 +4998,13 @@ video::-webkit-media-controls-panel {
                         <span class="text-sm">Roadmap</span>
                 </button>
 
-                <!-- raise the issue -->
-                <button class="btn btn-danger" id="raiseIssueBtn">Raise Issue</button>
+                
+                <!-- manage issues -->
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#issueManageModal">
+                    Manage Issues
+                </button>
+                
+                
 
                 
 

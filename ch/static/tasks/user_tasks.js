@@ -1895,3 +1895,161 @@ document.addEventListener("DOMContentLoaded", function () {
         return document.cookie.split('; ').find(row => row.startsWith('csrftoken=')).split('=')[1];
     }
 });
+
+
+// Manage Issues (Drag and Drop)
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("🔥 Issue Management Loaded!");
+
+    const orgId = window.djangoData?.orgId;  
+    const groupId = window.djangoData?.groupId;
+    const taskId = window.djangoData?.taskId;
+    const fetchUrl = `/tasks/fetch-issues/${orgId}/${groupId}/${taskId}/`;
+    const updateUrl = `/tasks/update-issue/`;
+
+    // Open modal event
+    document.querySelector('[data-bs-target="#issueManageModal"]').addEventListener("click", function () {
+        console.log("📥 Opening Issue Management Modal...");
+        fetchIssues();
+    });
+
+    function fetchIssues() {
+        console.log("🔄 Fetching Issues...");
+        fetch(fetchUrl)
+            .then(response => response.json())
+            .then(data => {
+                console.log("✅ Issues Fetched:", data);
+
+                // Clear lists
+                document.querySelectorAll(".issue-list").forEach(list => list.innerHTML = "");
+
+                // Populate lists
+                Object.keys(data.issues).forEach(status => {
+                    const list = document.getElementById(status);
+                    if (!list) {
+                        console.error(`❌ List for status '${status}' not found!`);
+                        return;
+                    }
+
+                    data.issues[status].forEach(issue => {
+                        const li = document.createElement("li");
+                        li.classList.add("list-group-item", "draggable-issue");
+                        li.dataset.issueId = issue.id;
+                        li.dataset.currentStatus = status; // Store current status
+                        li.innerHTML = `<strong>${issue.title}</strong> - ${issue.priority}`;
+                        list.appendChild(li);
+                    });
+                });
+
+                enableDragDrop();
+            })
+            .catch(error => console.error("❌ Error fetching issues:", error));
+    }
+
+    function enableDragDrop() {
+        console.log("🔄 Initializing Drag & Drop...");
+        ["open", "in_progress", "resolved", "closed"].forEach(status => {
+            const list = document.getElementById(status);
+            if (!list) {
+                console.error(`❌ Column '${status}' not found for Sortable.js`);
+                return;
+            }
+
+            console.log(`✅ Drag & Drop Enabled for: #${status}`);
+
+            new Sortable(list, {
+                group: {
+                    name: "issues",
+                    put: true,  // 🔥 ALLOWS DROPPING ANYWHERE
+                    pull: true   // 🔥 ALLOWS DRAGGING FROM ANY COLUMN
+                },
+                animation: 150,
+                onEnd: function (evt) {
+                    console.log("🔄 Drag Completed!");
+                    const issueId = evt.item.dataset.issueId;
+                    let newStatus = evt.to?.id || evt.item.parentElement?.id;
+                    const previousStatus = evt.item.dataset.currentStatus;
+
+                    console.log("📌 Dragged Issue ID:", issueId);
+                    console.log("➡️ Moved To:", newStatus);
+
+                    if (!issueId) {
+                        console.error("❌ Error: Issue ID missing in dragged element!");
+                        return;
+                    }
+
+                    if (!newStatus || newStatus === previousStatus) {
+                        console.warn("⚠️ Detected same status! **Force updating...**");
+                        newStatus = evt.to?.id || evt.item.parentElement?.id;  // Force getting the new status
+                    }
+
+                    evt.item.dataset.currentStatus = newStatus; // Store new status
+
+                    updateIssueStatus(issueId, newStatus, previousStatus, evt.item);
+                }
+            });
+        });
+    }
+
+    function updateIssueStatus(issueId, newStatus, previousStatus, draggedItem) {
+        console.log(`🚀 Updating Issue #${issueId} to Status: ${newStatus}`);
+
+        fetch(updateUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
+            body: JSON.stringify({ issue_id: issueId, status: newStatus })
+        })
+        .then(res => res.json())
+        .then(response => {
+            console.log("✅ Server Response:", response);
+
+            if (!response.success) {
+                console.error("❌ Update Failed:", response.error);
+                alert(response.error);
+                revertIssue(draggedItem, previousStatus);
+            } else {
+                console.log("🎉 Issue Status Updated Successfully!");
+                forceDropIssue(draggedItem, newStatus);
+            }
+        })
+        .catch(error => {
+            console.error("❌ Error updating issue:", error);
+            revertIssue(draggedItem, previousStatus);
+        });
+    }
+
+    function forceDropIssue(draggedItem, newStatus) {
+        console.log(`🔧 Forcing issue into: #${newStatus}`);
+        document.getElementById(newStatus).appendChild(draggedItem);
+        draggedItem.dataset.currentStatus = newStatus;
+    }
+
+    function revertIssue(draggedItem, previousStatus) {
+        console.warn(`⏪ Reverting issue back to: #${previousStatus}`);
+        document.getElementById(previousStatus).appendChild(draggedItem);
+        draggedItem.dataset.currentStatus = previousStatus;
+    }
+
+    function getCSRFToken() {
+        // 🔥 First, try to fetch CSRF token from hidden input
+        let tokenField = document.querySelector("[name=csrfmiddlewaretoken]");
+        
+        if (tokenField) {
+            return tokenField.value;
+        }
+
+        console.warn("⚠️ CSRF Token Input Not Found, Trying Cookies...");
+        
+        // 🔥 If input is missing, get CSRF from cookies
+        let csrfToken = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+        
+        if (!csrfToken) {
+            console.error("❌ CSRF Token Not Found Anywhere!");
+            return "";
+        }
+        
+        return csrfToken.split('=')[1];
+    }
+
+    enableDragDrop();
+});

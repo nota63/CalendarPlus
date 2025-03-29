@@ -3292,8 +3292,48 @@ def issue_view(request, org_id, group_id, task_id):
             return JsonResponse({"error": str(e)}, status=400)
 
 
+# Issues Handle drag and drop 
 
+# fetch issues 
+def fetch_issues(request, org_id, group_id, task_id):
+    issues = Issue.objects.filter(organization_id=org_id, group_id=group_id, task_id=task_id)
+    
+    grouped_issues = {
+        "open": [],
+        "in_progress": [],
+        "resolved": [],
+        "closed": [],
+    }
 
+    for issue in issues:
+        grouped_issues[issue.status].append({
+            "id": issue.id,
+            "title": issue.title,
+            "priority": issue.get_priority_display(),
+            "reported_by": issue.reported_by.username,
+        })
+
+    return JsonResponse({"issues": grouped_issues})
+
+# Handle status update
+
+@csrf_exempt  
+def update_issue_status(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        issue_id = data.get("issue_id")
+        new_status = data.get("status")
+
+        if issue_id and new_status in ["open", "in_progress", "resolved", "closed"]:
+            try:
+                issue = Issue.objects.get(id=issue_id)
+                issue.status = new_status
+                issue.save()
+                return JsonResponse({"success": True, "message": "Status updated!"})
+            except Issue.DoesNotExist:
+                return JsonResponse({"success": False, "error": "Issue not found!"})
+        
+        return JsonResponse({"success": False, "error": "Invalid data!"})
 
 
 
