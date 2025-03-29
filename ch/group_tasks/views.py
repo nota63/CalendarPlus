@@ -4385,6 +4385,7 @@ class TaskDetailView(View):
             raise Http404("You don't have permission to view this task.")
         
         profile_pic = get_object_or_404(Profile, user=request.user, organization=organization).profile_picture
+        task_assignee_profile=get_object_or_404(Profile,user=task.assigned_to,organization=organization)
 
         comments = TaskComment.objects.filter(task=task).order_by('-created_at')
         notes = TaskNote.objects.filter(task=task).order_by('-created_at')
@@ -4405,6 +4406,7 @@ class TaskDetailView(View):
             'tags': tags,
             'user': user,
             'profile_pic':profile_pic,
+            "task_assignee_profile":task_assignee_profile,
         }
 
         return render(request, 'assignment/task_detail.html', context)

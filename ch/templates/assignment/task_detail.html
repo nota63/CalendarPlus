@@ -1430,72 +1430,125 @@ video::-webkit-media-controls-panel {
 
 
 <!-- Isssue discussion -->
-
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 
 <!-- Issue Discussion Modal -->
-<div class="modal fade" id="issueDiscussionModal" tabindex="-1" aria-labelledby="issueDiscussionModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Issue Discussion</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div id="discussionMessages" class="p-2" style="max-height: 400px; overflow-y: auto;">
-                    <p class="text-muted text-center">Loading messages...</p>
-                </div>
-                <div class="border-top pt-2">
-                    <textarea id="messageInput" class="form-control mb-2" placeholder="Type your message..."></textarea>
-                    <input type="file" id="fileInput" class="form-control mb-2">
-
-                    <!-- btns -->
-                    <div class="flex flex-wrap gap-4">
-
-                        <!-- Voice Call -->
-                        <button class="relative flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md shadow hover:bg-green-700 transition">
-                            <span class="material-icons">call</span>
-                            Voice Call
-                            <span class="absolute -top-2 -right-2 bg-yellow-500 text-xs font-bold text-white px-2 py-0.5 rounded-full">PRO</span>
-                        </button>
-                    
-                        <!-- Video Call -->
-                        <button class="relative flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 transition">
-                            <span class="material-icons">videocam</span>
-                            Video Call
-                            <span class="absolute -top-2 -right-2 bg-yellow-500 text-xs font-bold text-white px-2 py-0.5 rounded-full">PRO</span>
-                        </button>
-                    
-                        <!-- Screen Share -->
-                        <button class="relative flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-md shadow hover:bg-purple-700 transition">
-                            <span class="material-icons">screen_share</span>
-                            Screen Share
-                            <span class="absolute -top-2 -right-2 bg-yellow-500 text-xs font-bold text-white px-2 py-0.5 rounded-full">PRO</span>
-                        </button>
-                    
-                        <!-- Remote Control -->
-                        <button class="relative flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-md shadow hover:bg-red-700 transition">
-                            <span class="material-icons">settings_remote</span>
-                            Remote Control
-                            <span class="absolute -top-2 -right-2 bg-yellow-500 text-xs font-bold text-white px-2 py-0.5 rounded-full">PRO</span>
-                        </button>
-                    
-                        <!-- AI Meeting Notes -->
-                        <button class="relative flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-md shadow hover:bg-gray-900 transition">
-                            <span class="material-icons">auto_stories</span>
-                            AI Meeting Notes
-                            <span class="absolute -top-2 -right-2 bg-yellow-500 text-xs font-bold text-white px-2 py-0.5 rounded-full">PRO</span>
-                        </button>
-                    
-                        <!-- Blur Background -->
-                        <button class="relative flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700 transition">
-                            <span class="material-icons">blur_on</span>
-                            Blur Background
-                            <span class="absolute -top-2 -right-2 bg-yellow-500 text-xs font-bold text-white px-2 py-0.5 rounded-full">PRO</span>
-                        </button>
-                    
+<!-- Issue Discussion Modal -->
+<div class="modal fade" id="issueDiscussionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" style="max-width: 900px; min-height: 80vh;">
+        <div class="modal-content border-0 rounded-2xl overflow-hidden shadow-xl h-100">
+            <!-- Header with User Info -->
+            <div class="modal-header bg-gray-50 p-4 border-b">
+                <div class="flex items-center w-full">
+                    <!-- User Avatar -->
+                    <div class="relative flex-shrink-0">
+                        {% if task_assignee_profile.profile_picture %}
+                            <img src="{{ task_assignee_profile.profile_picture.url }}" 
+                                class="w-12 h-12 rounded-xl object-cover border-2 border-white shadow-md">
+                        {% else %}
+                            <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                            </div>
+                        {% endif %}
+                        <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-white"></span>
                     </div>
-                    
-                    <button class="btn btn-primary w-100" onclick="sendMessage()">Send</button>
+
+                    <!-- User Info -->
+                    <div class="ml-4 flex-1">
+                        <div class="flex items-center gap-2">
+                            <h5 class="text-lg font-semibold text-gray-800 mb-0">
+                                {{ task_assignee_profile.user.username }}
+                                <span class="bg-gradient-to-r from-amber-400 to-orange-500 text-[10px] font-bold px-2 py-0.5 rounded-full text-white ml-2">
+                                    PRO
+                                </span>
+                            </h5>
+                        </div>
+                        <p class="text-sm text-gray-500 mb-0">Active now</p>
+                    </div>
+
+                    <!-- Header Actions -->
+                    <div class="flex items-center gap-3">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Body -->
+            <div class="modal-body p-0 bg-gray-50 d-flex flex-column">
+                <!-- Messages Container -->
+                <div id="discussionMessages" class="p-4 flex-grow-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300">
+                    <!-- Sample messages remain unchanged -->
+                </div>
+
+                <!-- Fixed Input Area -->
+                <div class="border-top bg-white p-4" style="flex-shrink: 0;">
+                    <div class="flex gap-2 mb-2">
+                        <!-- Left Action Buttons -->
+                        <div class="flex items-center gap-2">
+                            <input type="file" id="fileInput" class="hidden">
+                            <button onclick="document.getElementById('fileInput').click()" class="p-2 text-gray-500 hover:text-blue-500">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
+                                </svg>
+                            </button>
+
+                            <!-- PRO Buttons -->
+                            <button class="p-2 relative text-gray-500 hover:text-blue-500">
+                                <span class="absolute -top-2 -right-2 bg-gradient-to-r from-amber-400 to-orange-500 text-[8px] px-1.5 py-0.5 rounded-full text-white shadow">PRO</span>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                </svg>
+                            </button>
+
+                            <button class="p-2 relative text-gray-500 hover:text-blue-500">
+                                <span class="absolute -top-2 -right-2 bg-gradient-to-r from-amber-400 to-orange-500 text-[8px] px-1.5 py-0.5 rounded-full text-white shadow">PRO</span>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </button>
+
+                            <button class="p-2 relative text-gray-500 hover:text-blue-500">
+                                <span class="absolute -top-2 -right-2 bg-gradient-to-r from-amber-400 to-orange-500 text-[8px] px-1.5 py-0.5 rounded-full text-white shadow">PRO</span>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Right PRO Buttons -->
+                        <div class="flex items-center gap-2 ml-auto">
+                            <button class="p-2 relative text-gray-500 hover:text-blue-500">
+                                <span class="absolute -top-2 -right-2 bg-gradient-to-r from-amber-400 to-orange-500 text-[8px] px-1.5 py-0.5 rounded-full text-white shadow">PRO</span>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M12 18.364a7 7 0 010-12.728M8.464 15.536a5 5 0 010-7.072"/>
+                                </svg>
+                            </button>
+
+                            <button class="p-2 relative text-gray-500 hover:text-blue-500">
+                                <span class="absolute -top-2 -right-2 bg-gradient-to-r from-amber-400 to-orange-500 text-[8px] px-1.5 py-0.5 rounded-full text-white shadow">PRO</span>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <textarea id="messageInput" 
+                            class="flex-1 p-3 bg-gray-100 rounded-xl border border-gray-200 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 resize-none" 
+                            rows="2" 
+                            placeholder="Type your message..."></textarea>
+
+                        <!-- Send Button -->
+                        <button onclick="sendMessage()" class="self-center px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
