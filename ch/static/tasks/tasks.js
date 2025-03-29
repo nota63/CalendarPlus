@@ -551,7 +551,6 @@ function loadTaskIssues() {
 
 
 // Real time issues discussion
-
 let issueFetchInterval = null; // Store interval reference
 let lastMessageId = null; // Track last message ID for efficient fetching
 
@@ -580,7 +579,7 @@ function openIssueDiscussion(btn) {
     // Fetch messages and start real-time updates
     fetchMessages();
     if (issueFetchInterval) clearInterval(issueFetchInterval); // Clear any existing interval
-    issueFetchInterval = setInterval(fetchMessages, 2000); // Fetch new messages every 5 seconds
+    issueFetchInterval = setInterval(fetchMessages, 2000); // Fetch new messages every 2 seconds
 }
 
 function fetchMessages() {
@@ -651,16 +650,71 @@ function sendMessage() {
 }
 
 function formatMessage(msg) {
+    let filePreview = "";
+    if (msg.files) {
+        const fileType = getFileType(msg.files);
+        filePreview = generateFilePreview(msg.files, fileType);
+    }
+
     return `
         <div class="message-box ${msg.sender === window.djangoData.username ? 'my-message' : 'other-message'}">
             <img src="${msg.sender_profile_pic || '/static/default-avatar.png'}" class="profile-pic" alt="User">
             <div class="message-content">
                 <strong>${msg.sender}</strong> <small>${msg.created_at}</small>
                 <p>${msg.message || ''}</p>
-                ${msg.files ? `<a href="${msg.files}" target="_blank">📎 Attachment</a>` : ''}
+                ${filePreview}
             </div>
         </div>
     `;
+}
+
+// Determine file type
+function getFileType(fileUrl) {
+    const ext = fileUrl.split('.').pop().toLowerCase();
+    if (["png", "jpg", "jpeg", "gif", "bmp", "svg"].includes(ext)) return "image";
+    if (["mp4", "webm", "ogg"].includes(ext)) return "video";
+    if (["mp3", "wav", "ogg"].includes(ext)) return "audio";
+    if (["pdf"].includes(ext)) return "pdf";
+    return "other";
+}
+
+// Generate file preview with modal trigger
+function generateFilePreview(fileUrl, fileType) {
+    switch (fileType) {
+        case "image":
+            return `<img src="${fileUrl}" class="file-preview img-thumbnail" onclick="openFileModal('${fileUrl}', 'image')">`;
+        case "video":
+            return `<video class="file-preview" controls onclick="openFileModal('${fileUrl}', 'video')"><source src="${fileUrl}" type="video/mp4"></video>`;
+        case "audio":
+            return `<audio class="file-preview" controls><source src="${fileUrl}" type="audio/mpeg"></audio>`;
+        case "pdf":
+            return `<a href="${fileUrl}" class="file-preview" target="_blank" onclick="openFileModal('${fileUrl}', 'pdf')">📄 View PDF</a>`;
+        default:
+            return `<a href="${fileUrl}" class="file-preview" target="_blank">📎 Download File</a>`;
+    }
+}
+
+// Open file preview modal
+function openFileModal(fileUrl, fileType) {
+    const modalBody = document.getElementById("filePreviewBody");
+    let content = "";
+
+    switch (fileType) {
+        case "image":
+            content = `<img src="${fileUrl}" class="img-fluid">`;
+            break;
+        case "video":
+            content = `<video class="w-100" controls><source src="${fileUrl}" type="video/mp4"></video>`;
+            break;
+        case "pdf":
+            content = `<iframe src="${fileUrl}" class="w-100" style="height: 500px;"></iframe>`;
+            break;
+        default:
+            content = `<p class="text-muted">Cannot preview this file. <a href="${fileUrl}" target="_blank">Download here</a>.</p>`;
+    }
+
+    modalBody.innerHTML = content;
+    new bootstrap.Modal(document.getElementById("filePreviewwModal")).show();
 }
 
 function scrollToBottom() {
