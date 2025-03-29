@@ -1430,6 +1430,8 @@ video::-webkit-media-controls-panel {
 
 
 <!-- Isssue discussion -->
+
+
 <!-- Issue Discussion Modal -->
 <div class="modal fade" id="issueDiscussionModal" tabindex="-1" aria-labelledby="issueDiscussionModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -1445,6 +1447,54 @@ video::-webkit-media-controls-panel {
                 <div class="border-top pt-2">
                     <textarea id="messageInput" class="form-control mb-2" placeholder="Type your message..."></textarea>
                     <input type="file" id="fileInput" class="form-control mb-2">
+
+                    <!-- btns -->
+                    <div class="flex flex-wrap gap-4">
+
+                        <!-- Voice Call -->
+                        <button class="relative flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md shadow hover:bg-green-700 transition">
+                            <span class="material-icons">call</span>
+                            Voice Call
+                            <span class="absolute -top-2 -right-2 bg-yellow-500 text-xs font-bold text-white px-2 py-0.5 rounded-full">PRO</span>
+                        </button>
+                    
+                        <!-- Video Call -->
+                        <button class="relative flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 transition">
+                            <span class="material-icons">videocam</span>
+                            Video Call
+                            <span class="absolute -top-2 -right-2 bg-yellow-500 text-xs font-bold text-white px-2 py-0.5 rounded-full">PRO</span>
+                        </button>
+                    
+                        <!-- Screen Share -->
+                        <button class="relative flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-md shadow hover:bg-purple-700 transition">
+                            <span class="material-icons">screen_share</span>
+                            Screen Share
+                            <span class="absolute -top-2 -right-2 bg-yellow-500 text-xs font-bold text-white px-2 py-0.5 rounded-full">PRO</span>
+                        </button>
+                    
+                        <!-- Remote Control -->
+                        <button class="relative flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-md shadow hover:bg-red-700 transition">
+                            <span class="material-icons">settings_remote</span>
+                            Remote Control
+                            <span class="absolute -top-2 -right-2 bg-yellow-500 text-xs font-bold text-white px-2 py-0.5 rounded-full">PRO</span>
+                        </button>
+                    
+                        <!-- AI Meeting Notes -->
+                        <button class="relative flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-md shadow hover:bg-gray-900 transition">
+                            <span class="material-icons">auto_stories</span>
+                            AI Meeting Notes
+                            <span class="absolute -top-2 -right-2 bg-yellow-500 text-xs font-bold text-white px-2 py-0.5 rounded-full">PRO</span>
+                        </button>
+                    
+                        <!-- Blur Background -->
+                        <button class="relative flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700 transition">
+                            <span class="material-icons">blur_on</span>
+                            Blur Background
+                            <span class="absolute -top-2 -right-2 bg-yellow-500 text-xs font-bold text-white px-2 py-0.5 rounded-full">PRO</span>
+                        </button>
+                    
+                    </div>
+                    
                     <button class="btn btn-primary w-100" onclick="sendMessage()">Send</button>
                 </div>
             </div>
