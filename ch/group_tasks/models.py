@@ -1185,7 +1185,8 @@ class IssueRoom(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="issue_messages")
 
     message = models.TextField(null=True, blank=True)
-    files = models.FileField(upload_to="issue_files/", null=True, blank=True)
+    files = models.FileField(upload_to="issue_files/", max_length=500, null=True, blank=True)
+
 
     created_at = models.DateTimeField(auto_now_add=True)  # 🔥 Timestamp for ordering messages
     updated_at = models.DateTimeField(auto_now=True)      # 🔥 Auto update when edited
