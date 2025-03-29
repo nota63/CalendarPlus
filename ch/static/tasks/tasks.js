@@ -551,12 +551,15 @@ function loadTaskIssues() {
 
 
 // Real time issues discussion
-// 🟢 Open Issue Discussion Modal
+
+let issueFetchInterval = null; // Store interval reference
+let lastMessageId = null; // Track last message ID for efficient fetching
+
 function openIssueDiscussion(btn) {
     const orgId = window.djangoData.orgId;
-    const groupId = window.djangoData.groupId || "";
+    const groupId = window.djangoData.groupId || null;
     const taskId = window.djangoData.taskId;
-    const issueId = btn.getAttribute("data-issue-id");
+    const issueId = btn.getAttribute("data-issue-id"); // Capture issue_id from button
 
     if (!orgId || !taskId || !issueId) {
         console.error("Missing parameters for issue discussion.");
@@ -566,36 +569,52 @@ function openIssueDiscussion(btn) {
     const messagesContainer = document.getElementById("discussionMessages");
     messagesContainer.innerHTML = `<p class="text-muted text-center">Loading messages...</p>`;
 
-    // Open the modal
+    // Open modal
     const modal = new bootstrap.Modal(document.getElementById("issueDiscussionModal"));
     modal.show();
 
-    const fetchUrl = `/tasks/issue-discussion/${orgId}/${groupId}/${taskId}/${issueId}/`;
-    console.log("Fetching messages from:", fetchUrl);
-
-    fetch(fetchUrl)
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP Error! Status: ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                messagesContainer.innerHTML = data.messages.length
-                    ? data.messages.map(msg => formatMessage(msg)).join("")
-                    : `<p class="text-muted text-center">No messages yet.</p>`;
-            } else {
-                throw new Error("Server responded with an error.");
-            }
-        })
-        .catch(error => {
-            console.error("Error fetching messages:", error);
-            messagesContainer.innerHTML = `<p class="text-danger text-center">Error fetching messages.</p>`;
-        });
-
+    // Store issueId globally for sending messages
     window.currentIssueId = issueId;
+    lastMessageId = null; // Reset last message tracker
+
+    // Fetch messages and start real-time updates
+    fetchMessages();
+    if (issueFetchInterval) clearInterval(issueFetchInterval); // Clear any existing interval
+    issueFetchInterval = setInterval(fetchMessages, 2000); // Fetch new messages every 5 seconds
 }
 
-// 🟢 Send Message (Text or File)
+function fetchMessages() {
+    const orgId = window.djangoData.orgId;
+    const groupId = window.djangoData.groupId || null;
+    const taskId = window.djangoData.taskId;
+    const issueId = window.currentIssueId;
+
+    if (!orgId || !taskId || !issueId) {
+        console.error("Missing parameters for fetching messages.");
+        return;
+    }
+
+    fetch(`/tasks/issue-discussion/${orgId}/${groupId}/${taskId}/${issueId}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const messagesContainer = document.getElementById("discussionMessages");
+
+                // If no new messages, return
+                if (data.messages.length === 0 || (lastMessageId && lastMessageId === data.messages[data.messages.length - 1].id)) {
+                    return;
+                }
+
+                messagesContainer.innerHTML = data.messages.map(msg => formatMessage(msg)).join("");
+                lastMessageId = data.messages[data.messages.length - 1].id; // Update last seen message ID
+                scrollToBottom(); // Auto-scroll to latest message
+            } else {
+                console.error("Failed to load messages.");
+            }
+        })
+        .catch(() => console.error("Error fetching messages."));
+}
+
 function sendMessage() {
     const messageInput = document.getElementById("messageInput");
     const fileInput = document.getElementById("fileInput");
@@ -623,6 +642,7 @@ function sendMessage() {
             document.getElementById("discussionMessages").innerHTML += formatMessage(data.message);
             messageInput.value = "";
             fileInput.value = "";
+            scrollToBottom();
         } else {
             alert("Failed to send message.");
         }
@@ -630,23 +650,29 @@ function sendMessage() {
     .catch(() => alert("Error sending message."));
 }
 
-// 🟢 Format Message for Display
 function formatMessage(msg) {
     return `
-        <div class="message-card ${msg.is_sender ? 'sent' : 'received'}">
-            <div class="message-header">
-                <strong>${msg.sender}</strong>
-                <small class="text-muted">${msg.created_at}</small>
-            </div>
-            <div class="message-body">
-                ${msg.message ? `<p>${msg.message}</p>` : ""}
-                ${msg.files ? `<a href="${msg.files}" target="_blank" class="text-primary">View Attachment</a>` : ""}
+        <div class="message-box ${msg.sender === window.djangoData.username ? 'my-message' : 'other-message'}">
+            <img src="${msg.sender_profile_pic || '/static/default-avatar.png'}" class="profile-pic" alt="User">
+            <div class="message-content">
+                <strong>${msg.sender}</strong> <small>${msg.created_at}</small>
+                <p>${msg.message || ''}</p>
+                ${msg.files ? `<a href="${msg.files}" target="_blank">📎 Attachment</a>` : ''}
             </div>
         </div>
     `;
 }
 
-// 🟢 Get CSRF Token
+function scrollToBottom() {
+    const messagesContainer = document.getElementById("discussionMessages");
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
 function getCSRFToken() {
     return document.querySelector("[name=csrfmiddlewaretoken]")?.value || "";
 }
+
+// Stop fetching when modal closes
+document.getElementById("issueDiscussionModal").addEventListener("hidden.bs.modal", () => {
+    if (issueFetchInterval) clearInterval(issueFetchInterval);
+});
