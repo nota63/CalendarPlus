@@ -1901,11 +1901,13 @@ document.addEventListener("DOMContentLoaded", function () {
 document.addEventListener("DOMContentLoaded", function () {
     console.log("🔥 Issue Management Loaded!");
 
-    const orgId = window.djangoData?.orgId;  
+    const orgId = window.djangoData?.orgId;
     const groupId = window.djangoData?.groupId;
     const taskId = window.djangoData?.taskId;
+    
     const fetchUrl = `/tasks/fetch-issues/${orgId}/${groupId}/${taskId}/`;
     const updateUrl = `/tasks/update-issue/`;
+    const detailsUrl = `/tasks/issue-details/`;
 
     // Open modal event
     document.querySelector('[data-bs-target="#issueManageModal"]').addEventListener("click", function () {
@@ -1920,22 +1922,17 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(data => {
                 console.log("✅ Issues Fetched:", data);
 
-                // Clear lists
                 document.querySelectorAll(".issue-list").forEach(list => list.innerHTML = "");
 
-                // Populate lists
                 Object.keys(data.issues).forEach(status => {
                     const list = document.getElementById(status);
-                    if (!list) {
-                        console.error(`❌ List for status '${status}' not found!`);
-                        return;
-                    }
+                    if (!list) return;
 
                     data.issues[status].forEach(issue => {
                         const li = document.createElement("li");
                         li.classList.add("list-group-item", "draggable-issue");
                         li.dataset.issueId = issue.id;
-                        li.dataset.currentStatus = status; // Store current status
+                        li.dataset.currentStatus = status;
                         li.innerHTML = `<strong>${issue.title}</strong> - ${issue.priority}`;
                         list.appendChild(li);
                     });
@@ -1948,21 +1945,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function enableDragDrop() {
         console.log("🔄 Initializing Drag & Drop...");
-        ["open", "in_progress", "resolved", "closed"].forEach(status => {
+        ["open", "in_progress", "resolved", "closed", "details"].forEach(status => {
             const list = document.getElementById(status);
-            if (!list) {
-                console.error(`❌ Column '${status}' not found for Sortable.js`);
-                return;
-            }
+            if (!list) return;
 
             console.log(`✅ Drag & Drop Enabled for: #${status}`);
 
             new Sortable(list, {
-                group: {
-                    name: "issues",
-                    put: true,  // 🔥 ALLOWS DROPPING ANYWHERE
-                    pull: true   // 🔥 ALLOWS DRAGGING FROM ANY COLUMN
-                },
+                group: { name: "issues", put: true, pull: true },
                 animation: 150,
                 onEnd: function (evt) {
                     console.log("🔄 Drag Completed!");
@@ -1973,24 +1963,44 @@ document.addEventListener("DOMContentLoaded", function () {
                     console.log("📌 Dragged Issue ID:", issueId);
                     console.log("➡️ Moved To:", newStatus);
 
-                    if (!issueId) {
-                        console.error("❌ Error: Issue ID missing in dragged element!");
-                        return;
+                    if (newStatus === "details") {
+                        fetchIssueDetails(issueId);
+                    } else {
+                        updateIssueStatus(issueId, newStatus, previousStatus, evt.item);
                     }
-
-                    if (!newStatus || newStatus === previousStatus) {
-                        console.warn("⚠️ Detected same status! **Force updating...**");
-                        newStatus = evt.to?.id || evt.item.parentElement?.id;  // Force getting the new status
-                    }
-
-                    evt.item.dataset.currentStatus = newStatus; // Store new status
-
-                    updateIssueStatus(issueId, newStatus, previousStatus, evt.item);
                 }
             });
         });
     }
 
+    function fetchIssueDetails(issueId) {
+        const issueDetailsUrl = `/tasks/get-issue-details/${issueId}/`;  // Corrected URL with issue ID
+        console.log(`📥 Fetching Details for Issue #${issueId} from ${issueDetailsUrl}`);
+    
+        fetch(issueDetailsUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    console.error("❌ Failed to fetch issue details!");
+                    return;
+                }
+    
+                console.log("✅ Issue Details:", data.issue);
+    
+                document.getElementById("details").innerHTML = `
+                    <li class="list-group-item">
+                        <strong>Title:</strong> ${data.issue.title}<br>
+                        <strong>Description:</strong> ${data.issue.description}<br>
+                        <strong>Priority:</strong> ${data.issue.priority}<br>
+                        <strong>Status:</strong> ${data.issue.status}<br>
+                        <strong>Created At:</strong> ${data.issue.created_at}<br>
+                        <strong>Updated At:</strong> ${data.issue.updated_at}
+                    </li>
+                `;
+            })
+            .catch(error => console.error("❌ Error fetching issue details:", error));
+    }
+    
     function updateIssueStatus(issueId, newStatus, previousStatus, draggedItem) {
         console.log(`🚀 Updating Issue #${issueId} to Status: ${newStatus}`);
 
@@ -2001,8 +2011,6 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(res => res.json())
         .then(response => {
-            console.log("✅ Server Response:", response);
-
             if (!response.success) {
                 console.error("❌ Update Failed:", response.error);
                 alert(response.error);
@@ -2031,24 +2039,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function getCSRFToken() {
-        // 🔥 First, try to fetch CSRF token from hidden input
         let tokenField = document.querySelector("[name=csrfmiddlewaretoken]");
-        
-        if (tokenField) {
-            return tokenField.value;
-        }
+        if (tokenField) return tokenField.value;
 
-        console.warn("⚠️ CSRF Token Input Not Found, Trying Cookies...");
-        
-        // 🔥 If input is missing, get CSRF from cookies
         let csrfToken = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
-        
-        if (!csrfToken) {
-            console.error("❌ CSRF Token Not Found Anywhere!");
-            return "";
-        }
-        
-        return csrfToken.split('=')[1];
+        return csrfToken ? csrfToken.split('=')[1] : "";
     }
 
     enableDragDrop();

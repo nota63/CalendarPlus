@@ -3336,6 +3336,22 @@ def update_issue_status(request):
         return JsonResponse({"success": False, "error": "Invalid data!"})
 
 
+# Get Issue Details
+@login_required
+def get_issue_details(request, issue_id):
+    """Fetch issue details when dragged into the details column."""
+    issue = get_object_or_404(Issue, id=issue_id)
+
+    data = {
+        "id": issue.id,
+        "title": issue.title,
+        "description": issue.description,
+        "priority": issue.priority,
+        "status": issue.status,
+        "created_at": issue.created_at.strftime("%Y-%m-%d %H:%M"),
+        "updated_at": issue.updated_at.strftime("%Y-%m-%d %H:%M"),
+    }
+    return JsonResponse({"success": True, "issue": data})
 
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------------------
