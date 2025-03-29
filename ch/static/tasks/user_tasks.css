@@ -1022,3 +1022,20 @@ textarea:focus {
     transform: rotate(2deg);
     box-shadow: 0 8px 24px rgba(0,0,0,0.2);
 }
+
+
+/* raise issue */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+.modal-content {
+    font-family: 'Inter', sans-serif;
+}
+
+input, textarea, select {
+    backdrop-filter: blur(12px);
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
+}

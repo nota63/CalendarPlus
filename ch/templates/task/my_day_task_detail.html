@@ -4635,51 +4635,103 @@ video::-webkit-media-controls-panel {
 
 <!-- Raise the issue -->
 <div class="modal fade" id="issueModal" tabindex="-1" aria-labelledby="issueModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="issueModalLabel">Raise an Issue</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-lg max-w-2xl">
+        <div class="modal-content bg-gray-900/80 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/50 rounded-xl">
+            <!-- Header -->
+            <div class="modal-header border-b border-white/10 p-6">
+                <div class="flex items-center justify-between w-full">
+                    <h5 class="modal-title text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                        Raise New Issue
+                    </h5>
+                    <button type="button" class="btn-close filter invert opacity-70 hover:opacity-100" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
             </div>
-            <div class="modal-body">
-                <!-- Task Creator Profile Pic -->
+
+            <!-- Proctor Section -->
+            <div class="p-6 border-b border-white/10">
+                <div class="flex flex-col items-center space-y-3">
+                    <img id="proctorImage" src="" alt="Proctor" class="w-20 h-20 rounded-full border-2 border-purple-400/50 shadow-lg">
+                    <div class="text-center bg-white/5 px-4 py-2 rounded-full backdrop-blur-sm">
+                        <span class="text-sm font-medium text-purple-300">Proctored by Task Creator</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Issue Stats -->
+            <div class="grid grid-cols-3 gap-4 px-6 py-4 bg-white/5 backdrop-blur-sm mx-6 rounded-lg">
                 <div class="text-center">
-                    <img id="proctorImage" src="" alt="Proctor" class="rounded-circle" width="80" height="80">
-                    <p class="text-muted">Proctored by Task Creator</p>
+                    <div class="text-sm text-gray-300">Total Issues</div>
+                    <div class="text-2xl font-bold text-blue-400" id="issueCount">0</div>
                 </div>
-
-                <!-- Issue Count -->
-                <p class="text-muted">Existing Issues: <span id="issueCount">0</span></p>
-                <p class="text-muted">Open Issues: <span id="issueOpen">0</span></p>
-                <p class="text-muted">Closed Issues: <span id="issueClosed">0</span></p>
-
-
-
-                <!-- Issue Form -->
-                <div class="mb-3">
-                    <label for="issueTitle" class="form-label">Issue Title</label>
-                    <input type="text" class="form-control" id="issueTitle" placeholder="Enter issue title">
+                <div class="text-center">
+                    <div class="text-sm text-gray-300">Open Issues</div>
+                    <div class="text-2xl font-bold text-amber-400" id="issueOpen">0</div>
                 </div>
-                <div class="mb-3">
-                    <label for="issueDescription" class="form-label">Description</label>
-                    <textarea class="form-control" id="issueDescription" rows="3" placeholder="Describe the issue"></textarea>
-                </div>
-                <div class="mb-3">
-                    <label for="issuePriority" class="form-label">Priority</label>
-                    <select class="form-select" id="issuePriority">
-                        <option value="low">Low</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="high">High</option>
-                    </select>
+                <div class="text-center">
+                    <div class="text-sm text-gray-300">Closed Issues</div>
+                    <div class="text-2xl font-bold text-green-400" id="issueClosed">0</div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="submitIssueBtn">Submit Issue</button>
+
+            <!-- Form -->
+            <div class="modal-body p-6 space-y-5">
+                <!-- Title -->
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-300">Issue Title</label>
+                    <input type="text" id="issueTitle" 
+                           class="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg 
+                                  text-gray-200 placeholder-gray-400 focus:border-purple-400 
+                                  focus:ring-1 focus:ring-purple-400/50 transition-all">
+                </div>
+
+                <!-- Description -->
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-300">Description</label>
+                    <textarea id="issueDescription" rows="4"
+                              class="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg 
+                                     text-gray-200 placeholder-gray-400 focus:border-purple-400 
+                                     focus:ring-1 focus:ring-purple-400/50 transition-all"></textarea>
+                </div>
+
+                <!-- Priority -->
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-300">Priority</label>
+                    <div class="relative">
+                        <select id="issuePriority" 
+                                class="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg 
+                                       text-gray-200 appearance-none focus:border-purple-400 
+                                       focus:ring-1 focus:ring-purple-400/50 transition-all">
+                            <option value="low" class="bg-gray-800">Low</option>
+                            <option value="medium" selected class="bg-gray-800">Medium</option>
+                            <option value="high" class="bg-gray-800">High</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer p-6 border-t border-white/10 flex justify-end space-x-3">
+                <button type="button" 
+                        class="px-6 py-2.5 border border-white/20 hover:border-white/30 text-gray-300 
+                               rounded-lg transition-all hover:bg-white/5">
+                    Close
+                </button>
+                <button type="button" id="submitIssueBtn" 
+                        class="px-6 py-2.5 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-400 
+                               hover:to-blue-400 text-white rounded-lg shadow-lg shadow-purple-500/20 
+                               transition-all hover:shadow-purple-500/30">
+                    Submit Issue
+                </button>
             </div>
         </div>
     </div>
 </div>
+
 
 
 <!-- Manage Issues (Drag and Drop) -->
