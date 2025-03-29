@@ -3359,7 +3359,7 @@ from .models import IssueRoom
 from django.utils.decorators import method_decorator
 # Fetch and handle saving messages
 
-@method_decorator(login_required, name="dispatch")
+
 @csrf_exempt  
 def issue_discussion_view(request, org_id, group_id, task_id, issue_id):
     """
