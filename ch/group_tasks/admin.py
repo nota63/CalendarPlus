@@ -4,7 +4,7 @@ from .models import (Task, AddDay, TaskComment, TaskNote, TaskTag, TaskTimer, Ac
                      
                       Problem,AttachmentsTasksApp,RecentVisit,MeetingTaskQuery,CommunicateTask,SubTask,TaskReminder,CalPoints,
                       PendingRewardNotification,AutomationTask,TaskCompletionActivities,TaskBackup,ActivityBackup,
-                      TaskProgressLog,Issue)
+                      TaskProgressLog,Issue,IssueRoom)
 
 
 @admin.register(Task)
@@ -124,4 +124,9 @@ class TasksProgressAdmin(ModelAdmin):
 class TasksIssuesAdmin(ModelAdmin):
     list_display = [field.name for field in Issue._meta.fields]
 
+
+
+@admin.register(IssueRoom)
+class TasksIssuesRoomAdmin(ModelAdmin):
+    list_display = [field.name for field in IssueRoom._meta.fields]
 

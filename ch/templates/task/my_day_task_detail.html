@@ -4851,6 +4851,14 @@ video::-webkit-media-controls-panel {
                             <!-- JS populated content -->
                         </ul>
                     </div>
+
+                     <!-- discuss Column -->
+                     <div class="bg-gray-800/40 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                        <h6 class="text-sm font-semibold text-purple-400 mb-3">DISCUSSION</h6>
+                        <ul class="issue-list space-y-2 min-h-[300px]" id="discussion">
+                            <!-- JS populated content -->
+                        </ul>
+                    </div>
                 </div>
             </div>
 
@@ -4896,6 +4904,39 @@ video::-webkit-media-controls-panel {
         </div>
     </div>
 </div>
+
+
+<!-- Discussion in real time (Issue) -->
+<!-- Discussion Modal -->
+<div class="modal fade" id="discussionModal" tabindex="-1" aria-labelledby="discussionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content bg-gray-900 text-white border border-gray-700 rounded-lg">
+            
+            <!-- Modal Header -->
+            <div class="modal-header border-b border-gray-700">
+                <h5 class="modal-title text-purple-400" id="discussionModalLabel">Issue Discussion</h5>
+                <button type="button" class="btn-close bg-gray-600 rounded-full" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <!-- Messages Container -->
+                <div class="h-80 overflow-y-auto p-3 bg-gray-800 rounded-lg" id="discussionMessages">
+                    <!-- Messages will be loaded here via JS -->
+                </div>
+            </div>
+
+            <!-- Modal Footer (Input Box) -->
+            <div class="modal-footer bg-gray-800 border-t border-gray-700">
+                <input type="text" id="discussionMessageInput" class="form-control bg-gray-900 text-white border-gray-700" 
+                       placeholder="Type your message..." autocomplete="off">
+                <button class="btn btn-sm btn-purple-500" id="sendDiscussionMessage">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 
 

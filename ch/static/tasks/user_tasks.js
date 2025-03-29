@@ -1945,7 +1945,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function enableDragDrop() {
         console.log("🔄 Initializing Drag & Drop...");
-        ["open", "in_progress", "resolved", "closed", "details"].forEach(status => {
+        ["open", "in_progress", "resolved", "closed", "details","discussion"].forEach(status => {
             const list = document.getElementById(status);
             if (!list) return;
 
@@ -1965,9 +1965,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     if (newStatus === "details") {
                         fetchIssueDetails(issueId);
+                    } else if (newStatus === "discussion") {
+                        startDiscussion(orgId, groupId, taskId, issueId);
                     } else {
                         updateIssueStatus(issueId, newStatus, previousStatus, evt.item);
                     }
+                    
                 }
             });
         });
@@ -2047,4 +2050,125 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     enableDragDrop();
+});
+
+
+// start discussion
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("🔥 Discussion Feature Loaded!");
+
+    const discussionModal = new bootstrap.Modal(document.getElementById("discussionModal"));
+    const discussionMessages = document.getElementById("discussionMessages");
+    const messageInput = document.getElementById("discussionMessageInput");
+    const sendMessageButton = document.getElementById("sendDiscussionMessage");
+
+    let orgId, groupId, taskId, issueId;
+    let fetchInterval;
+
+    function startDiscussion(_orgId, _groupId, _taskId, _issueId) {
+        console.log("💬 Opening Discussion for Issue:", _issueId);
+        
+        // Store IDs globally
+        orgId = _orgId;
+        groupId = _groupId;
+        taskId = _taskId;
+        issueId = _issueId;
+
+        // Clear previous messages
+        discussionMessages.innerHTML = '<p class="text-gray-400 text-center">Loading messages...</p>';
+
+        // Fetch Messages
+        fetchDiscussionMessages();
+
+        // Open Modal
+        discussionModal.show();
+
+        // Start Auto Refresh Every 3 Seconds
+        if (fetchInterval) clearInterval(fetchInterval);
+        fetchInterval = setInterval(fetchDiscussionMessages, 3000);
+    }
+
+    function fetchDiscussionMessages() {
+        console.log("🔄 Fetching Discussion Messages...");
+        fetch(`/tasks/issue-discussion/${orgId}/${groupId}/${taskId}/${issueId}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    console.error("❌ Error Fetching Messages:", data.error);
+                    return;
+                }
+
+                discussionMessages.innerHTML = ""; // Clear existing messages
+
+                data.messages.forEach(msg => {
+                    const messageElement = document.createElement("div");
+                    messageElement.classList.add("flex", "items-start", "space-x-2", "p-2", "border-b", "border-gray-700");
+
+                    // Profile Picture
+                    const profilePic = document.createElement("img");
+                    profilePic.src = msg.sender_profile_pic || "/static/default-profile.png";
+                    profilePic.alt = "User Pic";
+                    profilePic.classList.add("w-8", "h-8", "rounded-full");
+
+                    // Message Content
+                    const contentDiv = document.createElement("div");
+                    contentDiv.classList.add("flex-1");
+
+                    contentDiv.innerHTML = `
+                        <p class="text-purple-400 font-semibold">${msg.sender}</p>
+                        <p class="text-gray-300">${msg.message || ""}</p>
+                        ${msg.files ? `<a href="${msg.files}" target="_blank" class="text-blue-400 text-sm">📎 View Attachment</a>` : ""}
+                        <small class="text-gray-500">${msg.created_at}</small>
+                    `;
+
+                    messageElement.appendChild(profilePic);
+                    messageElement.appendChild(contentDiv);
+
+                    discussionMessages.appendChild(messageElement);
+                });
+
+                // Auto Scroll to Bottom
+                discussionMessages.scrollTop = discussionMessages.scrollHeight;
+            })
+            .catch(error => console.error("❌ Error Fetching Messages:", error));
+    }
+
+    sendMessageButton.addEventListener("click", sendDiscussionMessage);
+    messageInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") sendDiscussionMessage();
+    });
+
+    function sendDiscussionMessage() {
+        const message = messageInput.value.trim();
+        if (!message) return;
+
+        console.log("🚀 Sending Message:", message);
+
+        fetch(`/tasks/issue-discussion/${orgId}/${groupId}/${taskId}/${issueId}/`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
+            body: JSON.stringify({ message: message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log("✅ Message Sent Successfully!");
+                messageInput.value = "";
+                fetchDiscussionMessages(); // Refresh messages immediately
+            } else {
+                console.error("❌ Error Sending Message:", data.error);
+            }
+        })
+        .catch(error => console.error("❌ Error Sending Message:", error));
+    }
+
+    function getCSRFToken() {
+        const tokenField = document.querySelector("[name=csrfmiddlewaretoken]");
+        if (tokenField) return tokenField.value;
+        console.warn("⚠️ CSRF Token Input Not Found, Trying Cookies...");
+        const csrfToken = document.cookie.split("; ").find(row => row.startsWith("csrftoken="));
+        return csrfToken ? csrfToken.split("=")[1] : "";
+    }
+
+    window.startDiscussion = startDiscussion;
 });

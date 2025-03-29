@@ -1176,3 +1176,35 @@ class Issue(models.Model):
         return f"Issue: {self.title} | {self.get_status_display()}"
 
 
+# Room for issue conversation
+class IssueRoom(models.Model):
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="issue_rooms")
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="issue_rooms")
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="issue_rooms")
+    issue = models.ForeignKey(Issue, on_delete=models.CASCADE, related_name="issue_rooms")
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="issue_messages")
+
+    message = models.TextField(null=True, blank=True)
+    files = models.FileField(upload_to="issue_files/", null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)  # 🔥 Timestamp for ordering messages
+    updated_at = models.DateTimeField(auto_now=True)      # 🔥 Auto update when edited
+    is_edited = models.BooleanField(default=False)        # 🔥 Track if message was edited
+    is_deleted = models.BooleanField(default=False)       # 🔥 Soft delete functionality
+
+    class Meta:
+        ordering = ["created_at"]  # 🛠️ Always order messages by time
+
+    def delete_message(self):
+        """Soft delete a message instead of removing it permanently."""
+        self.is_deleted = True
+        self.save()
+
+    def edit_message(self, new_message):
+        """Allow editing messages with history tracking."""
+        self.message = new_message
+        self.is_edited = True
+        self.save()
+
+    def __str__(self):
+        return f"📢 IssueRoom {self.issue.title} - {self.sender.username} ({self.created_at})"
