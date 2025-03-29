@@ -484,3 +484,58 @@ document.addEventListener("DOMContentLoaded", function () {
         return cookieValue ? cookieValue.split("=")[1] : "";
     }
 });
+
+
+
+// Manage the issues 
+function loadTaskIssues() {
+    const orgId = window.djangoData.orgId;
+    const groupId = window.djangoData.groupId || null;
+    const taskId = window.djangoData.taskId;
+
+    if (!orgId || !taskId) {
+        console.error("Missing orgId or taskId");
+        return;
+    }
+
+    const modalBody = document.querySelector("#issuesModal .modal-body");
+    modalBody.innerHTML = `<div class="text-center p-3"><div class="spinner-border text-primary"></div></div>`;
+
+    // Open the modal
+    const modal = new bootstrap.Modal(document.getElementById("issuesModal"));
+    modal.show();
+
+    fetch(`/tasks/fetch-task-issues/?org_id=${orgId}&group_id=${groupId}&task_id=${taskId}`)
+        .then(response => response.json())
+        .then(data => {
+            let content = "";
+            const statuses = {
+                "open": "Open",
+                "in_progress": "In Progress",
+                "resolved": "Resolved",
+                "closed": "Closed"
+            };
+
+            Object.keys(statuses).forEach(status => {
+                let issuesList = data[status]
+                    .map(issue => `
+                        <div class="card mb-2 shadow-sm">
+                            <div class="card-body">
+                                <h6 class="card-title">${issue.title} <span class="badge bg-primary">${issue.priority}</span></h6>
+                                <p class="card-text">${issue.description}</p>
+                                <small class="text-muted">Reported by: ${issue.reported_by} | ${issue.created_at}</small>
+                            </div>
+                        </div>
+                    `)
+                    .join("");
+
+                content += `<h6 class="mt-3">${statuses[status]}</h6>`;
+                content += issuesList || `<p class="text-muted">No issues found.</p>`;
+            });
+
+            modalBody.innerHTML = content;
+        })
+        .catch(() => {
+            modalBody.innerHTML = `<p class="text-danger text-center">Failed to load issues.</p>`;
+        });
+}
