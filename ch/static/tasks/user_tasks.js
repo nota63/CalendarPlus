@@ -2062,6 +2062,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const messageInput = document.getElementById("discussionMessageInput");
     const fileInput = document.getElementById("discussionFileInput");
     const sendMessageButton = document.getElementById("sendDiscussionMessage");
+    const issueFilesModal = new bootstrap.Modal(document.getElementById("IssueFilesModal"));
+    const filePreviewContent = document.getElementById("filePreviewContent");
 
     let orgId, groupId, taskId, issueId;
     let fetchInterval;
@@ -2101,12 +2103,30 @@ document.addEventListener("DOMContentLoaded", function () {
                     profilePic.classList.add("w-8", "h-8", "rounded-full");
                     const contentDiv = document.createElement("div");
                     contentDiv.classList.add("flex-1");
+
+                    let filePreview = "";
+                    if (msg.files) {
+                        const fileUrl = msg.files;
+                        const fileExtension = fileUrl.split(".").pop().toLowerCase();
+
+                        if (["jpg", "jpeg", "png", "gif", "webp"].includes(fileExtension)) {
+                            filePreview = `<img src="${fileUrl}" alt="Image" class="mt-2 w-32 h-32 rounded-lg border border-gray-700 cursor-pointer file-preview" data-url="${fileUrl}" data-type="image">`;
+                        } else if (["mp4", "webm", "ogg"].includes(fileExtension)) {
+                            filePreview = `<video controls class="mt-2 w-64 rounded-lg border border-gray-700 cursor-pointer file-preview" data-url="${fileUrl}" data-type="video"><source src="${fileUrl}" type="video/${fileExtension}"></video>`;
+                        } else if (fileExtension === "pdf") {
+                            filePreview = `<a href="#" class="text-blue-400 text-sm file-preview" data-url="${fileUrl}" data-type="pdf">📎 View PDF</a>`;
+                        } else {
+                            filePreview = `<a href="${fileUrl}" target="_blank" class="text-blue-400 text-sm">📎 View Attachment</a>`;
+                        }
+                    }
+
                     contentDiv.innerHTML = `
                         <p class="text-purple-400 font-semibold">${msg.sender}</p>
                         <p class="text-gray-300">${msg.message || ""}</p>
-                        ${msg.files ? `<a href="${msg.files}" target="_blank" class="text-blue-400 text-sm">📎 View Attachment</a>` : ""}
+                        ${filePreview}
                         <small class="text-gray-500">${msg.created_at}</small>
                     `;
+
                     messageElement.appendChild(profilePic);
                     messageElement.appendChild(contentDiv);
                     discussionMessages.appendChild(messageElement);
@@ -2116,6 +2136,50 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(error => console.error("❌ Error Fetching Messages:", error));
     }
 
+    document.addEventListener("click", function (event) {
+        const target = event.target;
+        if (target.classList.contains("file-preview")) {
+            const fileUrl = target.getAttribute("data-url");
+            previewFile(fileUrl);
+        }
+    });
+
+    function previewFile(fileUrl) {
+        console.log("📂 Previewing File:", fileUrl);
+        const fileExtension = fileUrl.split(".").pop().toLowerCase();
+        let content = "";
+    
+        if (!fileUrl.startsWith("http")) {
+            fileUrl = window.location.origin + fileUrl; // Ensure full URL path
+        }
+    
+        if (["jpg", "jpeg", "png", "gif", "webp"].includes(fileExtension)) {
+            content = `<img src="${fileUrl}" class="w-full h-auto rounded-lg">`;
+        } else if (["mp4", "webm", "ogg"].includes(fileExtension)) {
+            content = `<video controls class="w-full rounded-lg"><source src="${fileUrl}" type="video/${fileExtension}"></video>`;
+        } else if (fileExtension === "pdf") {
+            content = `<iframe src="${fileUrl}" class="w-full h-96 border"></iframe>`;
+        } else if (["txt", "md", "json", "csv"].includes(fileExtension)) {
+            fetch(fileUrl)
+                .then(response => response.text())
+                .then(text => {
+                    document.getElementById("filePreviewContent").innerHTML = `<pre class="p-3 bg-gray-800 text-white rounded-lg overflow-auto">${text}</pre>`;
+                })
+                .catch(error => {
+                    document.getElementById("filePreviewContent").innerHTML = `<p class="text-danger">⚠️ Error loading file. <a href="${fileUrl}" target="_blank" class="text-blue-400">Download here</a></p>`;
+                });
+            return; // Prevent modal from opening before content loads
+        } else {
+            content = `<p class="text-white">📄 This file cannot be previewed. <a href="${fileUrl}" target="_blank" class="text-blue-400">Download here</a>.</p>`;
+        }
+    
+        document.getElementById("filePreviewContent").innerHTML = content;
+    
+        // Make sure the correct modal is being used
+        const filePreviewModal = new bootstrap.Modal(document.getElementById("filePreviewModal"));
+        filePreviewModal.show();
+    }
+    
     sendMessageButton.addEventListener("click", sendDiscussionMessage);
     messageInput.addEventListener("keypress", function (e) {
         if (e.key === "Enter") sendDiscussionMessage();
@@ -2161,4 +2225,5 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     window.startDiscussion = startDiscussion;
+    window.previewFile = previewFile;
 });
