@@ -1429,6 +1429,30 @@ video::-webkit-media-controls-panel {
 </div>
 
 
+<!-- Isssue discussion -->
+<!-- Issue Discussion Modal -->
+<div class="modal fade" id="issueDiscussionModal" tabindex="-1" aria-labelledby="issueDiscussionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Issue Discussion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="discussionMessages" class="p-2" style="max-height: 400px; overflow-y: auto;">
+                    <p class="text-muted text-center">Loading messages...</p>
+                </div>
+                <div class="border-top pt-2">
+                    <textarea id="messageInput" class="form-control mb-2" placeholder="Type your message..."></textarea>
+                    <input type="file" id="fileInput" class="form-control mb-2">
+                    <button class="btn btn-primary w-100" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <!-------------------------------------------------------------------------------------------------------------------------------------------------------  -->
 <!-- Task Deadline -->

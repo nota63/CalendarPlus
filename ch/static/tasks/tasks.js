@@ -521,9 +521,17 @@ function loadTaskIssues() {
                     .map(issue => `
                         <div class="card mb-2 shadow-sm">
                             <div class="card-body">
-                                <h6 class="card-title">${issue.title} <span class="badge bg-primary">${issue.priority}</span></h6>
+                                <h6 class="card-title d-flex justify-content-between">
+                                    ${issue.title} 
+                                    <span class="badge bg-primary">${issue.priority}</span>
+                                </h6>
                                 <p class="card-text">${issue.description}</p>
-                                <small class="text-muted">Reported by: ${issue.reported_by} | ${issue.created_at}</small>
+                                <small class="text-muted d-block mb-2">Reported by: ${issue.reported_by} | ${issue.created_at}</small>
+                                <button class="btn btn-sm btn-outline-primary" 
+                                    data-issue-id="${issue.id}" 
+                                    onclick="openIssueDiscussion(this)">
+                                    💬 Discuss
+                                </button>
                             </div>
                         </div>
                     `)
@@ -538,4 +546,107 @@ function loadTaskIssues() {
         .catch(() => {
             modalBody.innerHTML = `<p class="text-danger text-center">Failed to load issues.</p>`;
         });
+}
+
+
+
+// Real time issues discussion
+// 🟢 Open Issue Discussion Modal
+function openIssueDiscussion(btn) {
+    const orgId = window.djangoData.orgId;
+    const groupId = window.djangoData.groupId || "";
+    const taskId = window.djangoData.taskId;
+    const issueId = btn.getAttribute("data-issue-id");
+
+    if (!orgId || !taskId || !issueId) {
+        console.error("Missing parameters for issue discussion.");
+        return;
+    }
+
+    const messagesContainer = document.getElementById("discussionMessages");
+    messagesContainer.innerHTML = `<p class="text-muted text-center">Loading messages...</p>`;
+
+    // Open the modal
+    const modal = new bootstrap.Modal(document.getElementById("issueDiscussionModal"));
+    modal.show();
+
+    const fetchUrl = `/tasks/issue-discussion/${orgId}/${groupId}/${taskId}/${issueId}/`;
+    console.log("Fetching messages from:", fetchUrl);
+
+    fetch(fetchUrl)
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP Error! Status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                messagesContainer.innerHTML = data.messages.length
+                    ? data.messages.map(msg => formatMessage(msg)).join("")
+                    : `<p class="text-muted text-center">No messages yet.</p>`;
+            } else {
+                throw new Error("Server responded with an error.");
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching messages:", error);
+            messagesContainer.innerHTML = `<p class="text-danger text-center">Error fetching messages.</p>`;
+        });
+
+    window.currentIssueId = issueId;
+}
+
+// 🟢 Send Message (Text or File)
+function sendMessage() {
+    const messageInput = document.getElementById("messageInput");
+    const fileInput = document.getElementById("fileInput");
+
+    const messageText = messageInput.value.trim();
+    const file = fileInput.files[0];
+
+    if (!messageText && !file) {
+        alert("Enter a message or select a file.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("message", messageText);
+    if (file) formData.append("file", file);
+
+    fetch(`/tasks/issue-discussion/${window.djangoData.orgId}/${window.djangoData.groupId}/${window.djangoData.taskId}/${window.currentIssueId}/`, {
+        method: "POST",
+        body: formData,
+        headers: { "X-CSRFToken": getCSRFToken() },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById("discussionMessages").innerHTML += formatMessage(data.message);
+            messageInput.value = "";
+            fileInput.value = "";
+        } else {
+            alert("Failed to send message.");
+        }
+    })
+    .catch(() => alert("Error sending message."));
+}
+
+// 🟢 Format Message for Display
+function formatMessage(msg) {
+    return `
+        <div class="message-card ${msg.is_sender ? 'sent' : 'received'}">
+            <div class="message-header">
+                <strong>${msg.sender}</strong>
+                <small class="text-muted">${msg.created_at}</small>
+            </div>
+            <div class="message-body">
+                ${msg.message ? `<p>${msg.message}</p>` : ""}
+                ${msg.files ? `<a href="${msg.files}" target="_blank" class="text-primary">View Attachment</a>` : ""}
+            </div>
+        </div>
+    `;
+}
+
+// 🟢 Get CSRF Token
+function getCSRFToken() {
+    return document.querySelector("[name=csrfmiddlewaretoken]")?.value || "";
 }
