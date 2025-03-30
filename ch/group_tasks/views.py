@@ -4540,6 +4540,11 @@ def fetch_task_issues_manager(request):
 
     # Validate task existence under the organization
     task = get_object_or_404(Task, id=task_id, organization_id=org_id)
+    organization = task.organization
+    
+    if not request.user == task.created_by and not Profile.objects.filter(user=request.user, organization=organization).exists():
+       return JsonResponse({'error': 'Unauthorized access'}, status=400)
+
 
     # Fetch related issues (filter by group if provided)
     issues = Issue.objects.filter(task=task)
@@ -4575,6 +4580,11 @@ def task_description_view(request, org_id, group_id, task_id):
     try:
         task = get_object_or_404(Task, organization_id=org_id, group_id=group_id, id=task_id)
         print(f"Task found: {task.id} - {task.description[:50]}")  # Print first 50 chars of the description
+
+        organization = task.organization
+        if not request.user == task.created_by and not Profile.objects.filter(user=request.user, organization=organization).exists():
+            return JsonResponse({'error': 'Unauthorized access'}, status=400)
+
     except Exception as e:
         print(f"Error fetching task: {e}")
         return JsonResponse({"error": "Task not found"}, status=404)
