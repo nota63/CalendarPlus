@@ -2042,14 +2042,17 @@ video::-webkit-media-controls-panel {
 
             <!-- edit task description -->
             <button id="openTaskNewModal"
-            class="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#DescriptionTaskNewModal"
-            data-task-id="123"
-            data-org-id="1"
-            data-group-id="10">
-            Edit Task Description
-        </button>
+                    class="w-full flex items-center gap-4 px-3 py-3 text-sm font-medium text-gray-300 hover:bg-white/5 rounded-xl transition-all duration-200 hover:translate-x-2"
+                    data-bs-toggle="modal"
+                    data-bs-target="#DescriptionTaskNewModal"
+                    data-task-id="123"
+                    data-org-id="1"
+                    data-group-id="10">
+                    <span class="material-symbols-rounded text-blue-500 text-xl p-2 bg-white/10 rounded-lg shrink-0">
+                        tune
+                    </span>
+                    <span class="text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity">Description & Roadmaps</span>
+            </button>
         
         
 
