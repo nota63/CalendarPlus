@@ -2226,9 +2226,6 @@ data.messages.forEach(msg => {
             filePreview = `<a href="${fileUrl}" target="_blank" class="text-blue-400 text-sm">📎 View Attachment</a>`;
         }
     }
-
-
-
     // Message content structure
     contentDiv.innerHTML = `
         ${!isMyMessage ? `<p class="text-sm font-medium text-purple-600 mb-1">${msg.sender}</p>` : ''}
