@@ -488,6 +488,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // Manage the issues 
+// Load Task Issues & Categorize Them
 function loadTaskIssues() {
     const orgId = window.djangoData.orgId;
     const groupId = window.djangoData.groupId || null;
@@ -498,8 +499,8 @@ function loadTaskIssues() {
         return;
     }
 
-    const modalBody = document.querySelector("#issuesModal .modal-body");
-    modalBody.innerHTML = `<div class="text-center p-3"><div class="spinner-border text-primary"></div></div>`;
+    const issuesContainer = document.querySelector("#issuesContainer");
+    issuesContainer.innerHTML = `<div class="text-center p-3"><div class="spinner-border text-primary"></div></div>`;
 
     // Open the modal
     const modal = new bootstrap.Modal(document.getElementById("issuesModal"));
@@ -508,45 +509,53 @@ function loadTaskIssues() {
     fetch(`/tasks/fetch-task-issues/?org_id=${orgId}&group_id=${groupId}&task_id=${taskId}`)
         .then(response => response.json())
         .then(data => {
-            let content = "";
-            const statuses = {
-                "open": "Open",
-                "in_progress": "In Progress",
-                "resolved": "Resolved",
-                "closed": "Closed"
-            };
-
-            Object.keys(statuses).forEach(status => {
-                let issuesList = data[status]
-                    .map(issue => `
-                        <div class="card mb-2 shadow-sm">
-                            <div class="card-body">
-                                <h6 class="card-title d-flex justify-content-between">
-                                    ${issue.title} 
-                                    <span class="badge bg-primary">${issue.priority}</span>
-                                </h6>
-                                <p class="card-text">${issue.description}</p>
-                                <small class="text-muted d-block mb-2">Reported by: ${issue.reported_by} | ${issue.created_at}</small>
-                                <button class="btn btn-sm btn-outline-primary" 
-                                    data-issue-id="${issue.id}" 
-                                    onclick="openIssueDiscussion(this)">
-                                    💬 Discuss
-                                </button>
-                            </div>
-                        </div>
-                    `)
-                    .join("");
-
-                content += `<h6 class="mt-3">${statuses[status]}</h6>`;
-                content += issuesList || `<p class="text-muted">No issues found.</p>`;
-            });
-
-            modalBody.innerHTML = content;
+            window.issueData = data; // Store fetched issues for filtering
+            filterIssues("open"); // Load Open issues by default
         })
         .catch(() => {
-            modalBody.innerHTML = `<p class="text-danger text-center">Failed to load issues.</p>`;
+            issuesContainer.innerHTML = `<p class="text-danger text-center">Failed to load issues.</p>`;
         });
 }
+
+// Filter Issues Based on Selected Tab
+function filterIssues(status) {
+    if (!window.issueData) {
+        console.error("Issue data not loaded yet!");
+        return;
+    }
+
+    const issuesContainer = document.querySelector("#issuesContainer");
+    const selectedIssues = window.issueData[status] || [];
+
+    let content = selectedIssues
+        .map(issue => `
+            <div class="card mb-2 shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title d-flex justify-content-between">
+                        ${issue.title} 
+                        <span class="badge bg-primary">${issue.priority}</span>
+                    </h6>
+                    <p class="card-text">${issue.description}</p>
+                    <small class="text-muted d-block mb-2">Reported by: ${issue.reported_by} | ${issue.created_at}</small>
+                    <button class="btn btn-sm btn-outline-primary" 
+                        data-issue-id="${issue.id}" 
+                        onclick="openIssueDiscussion(this)">
+                        💬 Discuss
+                    </button>
+                </div>
+            </div>
+        `)
+        .join("");
+
+    issuesContainer.innerHTML = content || `<p class="text-muted text-center">No issues found in this category.</p>`;
+
+    // Update active tab
+    document.querySelectorAll("#issueTabs .nav-link").forEach(btn => btn.classList.remove("active"));
+    document.querySelector(`#issueTabs [data-status='${status}']`).classList.add("active");
+}
+
+
+
 
 
 

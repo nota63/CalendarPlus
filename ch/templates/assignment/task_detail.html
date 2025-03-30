@@ -1412,6 +1412,7 @@ video::-webkit-media-controls-panel {
 
 <!-- Manage Issues  -->
 <!-- Issues Modal -->
+<!-- Issues Modal -->
 <div class="modal fade" id="issuesModal" tabindex="-1" aria-labelledby="issuesModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -1419,9 +1420,29 @@ video::-webkit-media-controls-panel {
                 <h5 class="modal-title">Task Issues</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
             <div class="modal-body">
-                <div class="text-center p-3">
-                    <div class="spinner-border text-primary"></div>
+                <!-- Tabs for Different Issue Sections -->
+                <ul class="nav nav-tabs mb-3" id="issueTabs">
+                    <li class="nav-item">
+                        <button class="nav-link active" data-status="open" onclick="filterIssues('open')">🟢 Open</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-status="in_progress" onclick="filterIssues('in_progress')">🟡 In Progress</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-status="resolved" onclick="filterIssues('resolved')">🔵 Resolved</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-status="closed" onclick="filterIssues('closed')">🔴 Closed</button>
+                    </li>
+                </ul>
+
+                <!-- Issues Container -->
+                <div id="issuesContainer">
+                    <div class="text-center p-3">
+                        <div class="spinner-border text-primary"></div>
+                    </div>
                 </div>
             </div>
         </div>
