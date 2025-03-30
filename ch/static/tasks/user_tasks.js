@@ -1931,20 +1931,51 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     data.issues[status].forEach(issue => {
                         const li = document.createElement("li");
-                        li.classList.add("list-group-item", "draggable-issue");
+                        li.classList.add(
+                            "list-group-item", 
+                            "draggable-issue",
+                            "flex", 
+                            "items-center", 
+                            "gap-3",
+                            "backdrop-blur-sm",
+                            "bg-white/50",
+                            "shadow-md",
+                            "hover:shadow-lg",
+                            "rounded-lg",
+                            "p-4",
+                            "mb-2",
+                            "transition-all",
+                            "duration-200",
+                            "ease-in-out",
+                            "cursor-grab",
+                            "active:cursor-grabbing",
+                            "active:rotate-1",
+                            "border", 
+                            "border-white/20"
+                        );
                         li.dataset.issueId = issue.id;
                         li.dataset.currentStatus = status;
                     
-                        // Assuming profile_pic_task_creator and profile_pic_task_assignee are available in `issue`
                         li.innerHTML = `
-                            <img src="${issue.profile_pic_task_creator}" alt="Creator" class="profile-pic">
-                            <img src="${issue.profile_pic_assignee}" alt="Assignee" class="profile-pic">
-                            <strong>${issue.title}</strong> - ${issue.priority}
+                            <div class="relative flex -space-x-2">
+                                <img src="${issue.profile_pic_task_creator}" 
+                                     class="w-6 h-6 rounded-full ring-2 ring-white object-cover hover:z-10 transition-transform hover:scale-110">
+                                <img src="${issue.profile_pic_assignee}" 
+                                     class="w-6 h-6 rounded-full ring-2 ring-white object-cover hover:z-10 transition-transform hover:scale-110">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <strong class="block font-semibold text-gray-900 truncate text-[15px]">${issue.title}</strong>
+                                <span class="text-xs font-medium px-2 py-1 rounded-full 
+                                    ${issue.priority === 'High' ? 'bg-red-100 text-red-800' : 
+                                     issue.priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' : 
+                                     'bg-green-100 text-green-800'}">
+                                    ${issue.priority}
+                                </span>
+                            </div>
                         `;
                     
                         list.appendChild(li);
                     });
-                    
                 //  till here ----------------------
 
                 });
