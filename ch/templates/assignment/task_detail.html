@@ -1844,7 +1844,13 @@ video::-webkit-media-controls-panel {
             {% endif %}
 
             <!-- manage issues -->
-            <button class="btn btn-outline-primary" onclick="loadTaskIssues()">View Task Issues</button>
+            <button class="w-full flex items-center gap-4 px-3 py-3 text-sm font-medium text-gray-300 hover:bg-white/5 rounded-xl transition-all duration-200 hover:translate-x-2" 
+               onclick="loadTaskIssues()">
+                <span class="material-symbols-rounded text-red-500 text-xl p-2 bg-white/10 rounded-lg shrink-0">
+                  bug_report
+               </span>
+              <span class="text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity">Raised Issues</span>
+            </button>
 
              
         </nav>

@@ -571,10 +571,6 @@ function filterIssues(status) {
 }
 
 
-
-
-
-
 // Real time issues discussion
 let issueFetchInterval = null; // Store interval reference
 let lastMessageId = null; // Track last message ID for efficient fetching
