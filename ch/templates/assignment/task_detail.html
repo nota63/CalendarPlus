@@ -1567,21 +1567,36 @@ video::-webkit-media-controls-panel {
 
 <!-- Display file preview real time -->
 <div class="modal fade" id="filePreviewwModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">File Preview</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered modal-lg max-w-[95vw]">
+        <div class="modal-content bg-gray-100 rounded-lg shadow-xl border border-gray-200">
+            <!-- Header with close button -->
+            <div class="modal-header flex justify-between items-center p-4 border-b border-gray-200">
+                <h5 class="text-lg font-semibold text-gray-800">Preview</h5>
+                <button type="button" 
+                        class="p-2 hover:bg-gray-200 rounded-full transition-colors"
+                        data-bs-dismiss="modal" 
+                        aria-label="Close">
+                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
             </div>
-            <div class="modal-body text-center" id="filePreviewBody">
-                <!-- File preview will be injected here -->
+
+            <!-- Preview content -->
+            <div class="modal-body p-0 flex-1 min-h-[400px]">
+                <div class="w-full h-full flex items-center justify-center bg-gray-50 relative">
+                    <div id="filePreviewBody" class="w-full h-full overflow-auto p-4 flex items-center justify-center">
+                        <!-- Dynamic content will be inserted here -->
+                        <!-- Example image preview (replace with actual dynamic content) -->
+                        <img src="#" 
+                             alt="File preview" 
+                             class="max-w-full max-h-[70vh] object-contain rounded-lg shadow-sm">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-
-
 <!-------------------------------------------------------------------------------------------------------------------------------------------------------  -->
 <!-- Task Deadline -->
 
