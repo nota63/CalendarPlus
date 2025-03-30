@@ -660,16 +660,42 @@ function formatMessage(msg) {
     }
 
     return `
-    <div class="flex ${msg.sender === window.djangoData.username ? 'justify-end' : 'justify-start'} mb-2">
-        ${msg.sender !== window.djangoData.username ? `<img src="${msg.sender_profile_pic || 'https://via.placeholder.com/40'}" class="w-8 h-8 rounded-full mr-2">` : ''}
-        <div class="max-w-xs md:max-w-md p-3 rounded-lg ${msg.sender === window.djangoData.username ? 'bg-green-500 text-white' : 'bg-white text-gray-800'} shadow">
-            <strong class="block">${msg.sender}</strong>
-            <p class="text-sm">${msg.message || ''}</p>
-            ${filePreview}
-            <small class="text-xs block text-gray-400 mt-1">${msg.created_at}</small>
+    <div class="flex ${msg.sender === window.djangoData.username ? 'justify-end' : 'justify-start'} mb-4">
+    ${msg.sender !== window.djangoData.username ? `
+    <img src="${msg.sender_profile_pic || 'https://via.placeholder.com/40'}" 
+         class="w-10 h-10 rounded-full mr-3 self-end border-2 border-white shadow-sm">` : ''}
+    
+    <div class="relative max-w-[80%] md:max-w-lg p-4 rounded-2xl ${msg.sender === window.djangoData.username ? 
+        'bg-[#0084ff] text-white rounded-br-none ml-12' : 
+        'bg-gray-100 text-gray-900 rounded-bl-none mr-12'} 
+        shadow-sm hover:shadow-md transition-shadow duration-200">
+        
+        <div class="flex items-center gap-2 mb-1.5">
+            ${msg.sender !== window.djangoData.username ? `
+            <strong class="text-sm font-semibold">${msg.sender}</strong>` : ''}
+            <small class="text-xs opacity-80">${msg.created_at}</small>
         </div>
-        ${msg.sender === window.djangoData.username ? `<img src="${msg.sender_profile_pic || 'https://via.placeholder.com/40'}" class="w-8 h-8 rounded-full ml-2">` : ''}
+        
+        <p class="text-[15px] leading-snug font-[400]">${msg.message || ''}</p>
+        
+        ${filePreview ?
+            `<div class="mt-3 border ${
+                msg.sender === window.djangoData.username ? 'border-white/20' : 'border-gray-200'
+            } rounded-xl overflow-hidden">
+                ${filePreview}
+            </div>` : ''
+        }
+
+        ${msg.sender === window.djangoData.username ? `
+        <div class="absolute -right-2 bottom-0 w-4 h-4 overflow-hidden">
+            <div class="absolute w-4 h-4 bg-[#0084ff] -rotate-45 transform origin-bottom-right"></div>
+        </div>` : ''}
     </div>
+
+    ${msg.sender === window.djangoData.username ? `
+    <img src="${msg.sender_profile_pic || 'https://via.placeholder.com/40'}" 
+         class="w-10 h-10 rounded-full ml-3 self-end border-2 border-white shadow-sm">` : ''}
+</div>
 `;
 
 
