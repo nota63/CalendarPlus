@@ -4603,24 +4603,17 @@ def task_description_view(request, org_id, group_id, task_id):
 
 # Manage project plan 
 @csrf_exempt
-def project_plan_view(request, org_id, group_id, task_id):
-    """View to fetch and update project plan (task roadmap)."""
-    task = get_object_or_404(Task, id=task_id, organization_id=org_id, group_id=group_id)
+def project_plan_view(request, task_id):
+    """Fetch and update project plan via AJAX only."""
+    task = get_object_or_404(Task, id=task_id)
 
     if request.method == "GET":
-        try:
-            project_plan_content = task.project_plan.html if task.project_plan else ""  # FIXED HERE
-            print("Current Project Plan:", project_plan_content)
-            return JsonResponse({"project_plan": project_plan_content}, status=200)
-        except Exception as e:
-            print("Error fetching project plan:", e)
-            return JsonResponse({"error": "Failed to fetch project plan"}, status=500)
+        return JsonResponse({"project_plan": task.project_plan}, status=200)
 
     elif request.method == "POST":
         new_plan = request.POST.get("project_plan", "").strip()
         if new_plan:
-            task.project_plan = new_plan  # Save HTML directly
+            task.project_plan = new_plan
             task.save()
             return JsonResponse({"message": "Project plan updated!", "project_plan": new_plan}, status=200)
-
         return JsonResponse({"error": "Project plan cannot be empty!"}, status=400)

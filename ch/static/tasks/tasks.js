@@ -895,61 +895,78 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // Manage Project Plan
-document.addEventListener("DOMContentLoaded", function () {
-    let quillProjectPlan;
+// Initialize TinyMCE
+tinymce.init({
+    selector: "#tiny-editor",
+    menubar: false,
+    readonly: false,  // 🔥 FIXED: Set TinyMCE as editable!
+    plugins: "lists link image charmap preview",
+    toolbar: "undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist outdent indent | link image",
+});
 
-    const orgId = window.djangoData.orgId;
-    const groupId = window.djangoData.groupId;
-    const taskId = window.djangoData.taskId;
+// Function to get the dynamic task ID
+function getTaskId() {
+    return window.djangoData && window.djangoData.taskId ? window.djangoData.taskId : null;
+}
 
-    document.getElementById("openProjectPlanModal").addEventListener("click", function () {
-        if (!quillProjectPlan) {
-            quillProjectPlan = new Quill("#quillProjectPlan", {
-                theme: "snow",
-                modules: {
-                    toolbar: [
-                        [{ header: [1, 2, false] }],
-                        ["bold", "italic", "underline"],
-                        ["image", "code-block"],
-                    ],
-                },
-            });
-        }
-        fetchProjectPlan();
-    });
+// Open Modal & Fetch Data via AJAX
+document.getElementById("openProjectPlanModal").addEventListener("click", function () {
+    let taskId = getTaskId();
+    if (!taskId) {
+        alert("Error: Task ID not found!");
+        return;
+    }
+    
+    fetchProjectPlan(taskId);
+    new bootstrap.Modal(document.getElementById("projectPlanModal")).show();
+});
 
-    function fetchProjectPlan() {
-        fetch(`/tasks/project-plan/${orgId}/${groupId}/${taskId}/`)
-            .then(response => response.json())
-            .then(data => {
-                console.log("Fetched Project Plan:", data.project_plan);
-                try {
-                    quillProjectPlan.setContents(JSON.parse(data.project_plan)); // Parse Quill JSON
-                } catch (e) {
-                    console.error("Error parsing Quill JSON, loading as HTML:", e);
-                    quillProjectPlan.root.innerHTML = data.project_plan || ""; // Fallback to HTML
-                }
-            })
-            .catch(error => console.error("Error fetching project plan:", error));
+// Fetch Project Plan via AJAX
+function fetchProjectPlan(taskId) {
+    fetch(`/tasks/project-plan/${taskId}/`)
+        .then(response => response.json())
+        .then(data => tinymce.get("tiny-editor").setContent(data.project_plan || ""))  // 🔥 FIXED: Set empty content if null
+        .catch(error => console.error("Error fetching project plan:", error));
+}
+
+// Save Project Plan via AJAX
+document.getElementById("saveProjectPlanBtn").addEventListener("click", function () {
+    let taskId = getTaskId();
+    if (!taskId) {
+        alert("Error: Task ID not found!");
+        return;
     }
 
-    document.getElementById("saveProjectPlanBtn").addEventListener("click", function () {
-        const content = JSON.stringify(quillProjectPlan.getContents()); // Save Quill JSON
+    let content = tinymce.get("tiny-editor").getContent();
 
-        fetch(`/tasks/project-plan/${orgId}/${groupId}/${taskId}/`, {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({ project_plan: content }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message) {
-                console.log("Success:", data.message);
-                alert("Project Plan Updated!");
-            } else {
-                alert("Error: " + data.error);
-            }
-        })
-        .catch(error => console.error("Error updating project plan:", error));
-    });
+    fetch(`/tasks/project-plan/${taskId}/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": getCookie("csrftoken"),
+        },
+        body: `project_plan=${encodeURIComponent(content)}`,
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert("Project Plan Updated!");
+        new bootstrap.Modal(document.getElementById("projectPlanModal")).hide();
+    })
+    .catch(error => console.error("Error updating project plan:", error));
 });
+
+// CSRF Token Helper
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        let cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}

@@ -99,7 +99,7 @@ urlpatterns = [
     # manager side features
     path('fetch-task-issues/',fetch_task_issues_manager,name='fetch_task_issues'),
     path('manage-description/<int:org_id>/<int:group_id>/<int:task_id>/',task_description_view, name='manage_description'),
-    path('project-plan/<int:org_id>/<int:group_id>/<int:task_id>/',project_plan_view, name='project_plan')
+    path('project-plan/<int:task_id>/',project_plan_view, name='project_plan')
   
   
   
