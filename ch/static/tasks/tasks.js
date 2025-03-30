@@ -650,6 +650,9 @@ function sendMessage() {
 }
 
 function formatMessage(msg) {
+    const isMyMessage = msg.sender === window.djangoData.username;
+
+
     let filePreview = "";
     if (msg.files) {
         const fileType = getFileType(msg.files);
@@ -657,15 +660,20 @@ function formatMessage(msg) {
     }
 
     return `
-        <div class="message-box ${msg.sender === window.djangoData.username ? 'my-message' : 'other-message'}">
-            <img src="${msg.sender_profile_pic || '/static/default-avatar.png'}" class="profile-pic" alt="User">
-            <div class="message-content">
-                <strong>${msg.sender}</strong> <small>${msg.created_at}</small>
-                <p>${msg.message || ''}</p>
-                ${filePreview}
-            </div>
+    <div class="flex ${msg.sender === window.djangoData.username ? 'justify-end' : 'justify-start'} mb-2">
+        ${msg.sender !== window.djangoData.username ? `<img src="${msg.sender_profile_pic || 'https://via.placeholder.com/40'}" class="w-8 h-8 rounded-full mr-2">` : ''}
+        <div class="max-w-xs md:max-w-md p-3 rounded-lg ${msg.sender === window.djangoData.username ? 'bg-green-500 text-white' : 'bg-white text-gray-800'} shadow">
+            <strong class="block">${msg.sender}</strong>
+            <p class="text-sm">${msg.message || ''}</p>
+            ${filePreview}
+            <small class="text-xs block text-gray-400 mt-1">${msg.created_at}</small>
         </div>
-    `;
+        ${msg.sender === window.djangoData.username ? `<img src="${msg.sender_profile_pic || 'https://via.placeholder.com/40'}" class="w-8 h-8 rounded-full ml-2">` : ''}
+    </div>
+`;
+
+
+
 }
 
 // Determine file type
