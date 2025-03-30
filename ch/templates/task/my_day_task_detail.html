@@ -4756,7 +4756,7 @@ video::-webkit-media-controls-panel {
             <div class="mx-6 my-4 p-5 rounded-xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-white/10 backdrop-blur-sm">
                 <div class="text-center space-y-2">
                     <h6 class="text-lg font-semibold text-white">Unlock Advanced Issue Management</h6>
-                    <p class="text-gray-300 text-sm">Get AI-powered resolutions, automated workflows, and priority support</p>
+                    <p class="text-gray-300 text-sm">Get AI-powered resolutions, automated workflows, custom reminders and priority support</p>
                     <button id="upgradeProBtn" class="px-5 py-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-400 hover:to-purple-400 text-white rounded-lg text-sm font-medium transition-all duration-200 shadow-lg shadow-blue-500/30">
                         Upgrade to Pro →
                     </button>
@@ -4842,42 +4842,70 @@ video::-webkit-media-controls-panel {
 </div>
 
 
+
 <!-- Discussion in real time (Issue) -->
-<!-- Discussion Modal -->
+<!-- Add this in your head section for modern font -->
+<!-- Discussion Modal (Light Theme - ClickUp Style) -->
 <div class="modal fade" id="discussionModal" tabindex="-1" aria-labelledby="discussionModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content bg-gray-900 text-white border border-gray-700 rounded-lg">
+        <div class="modal-content bg-white text-gray-900 shadow-xl rounded-xl border border-gray-200">
             
-            <!-- Modal Header -->
-            <div class="modal-header border-b border-gray-700">
-                <h5 class="modal-title text-purple-400" id="discussionModalLabel">Issue Discussion</h5>
-                <button type="button" class="btn-close bg-gray-600 rounded-full" data-bs-dismiss="modal" aria-label="Close"></button>
+            <!-- Modal Header (Reduced Height) -->
+            <div class="modal-header border-b border-gray-200 flex items-center px-4 py-2">
+                <h5 class="modal-title text-indigo-600 font-semibold text-lg" id="discussionModalLabel">Issue Discussion</h5>
+                <button type="button" class="btn-close text-gray-500 hover:text-gray-700" data-bs-dismiss="modal" aria-label="Close">
+                    &times;
+                </button>
             </div>
-
-            <!-- Modal Body -->
-            <div class="modal-body">
+            
+            <!-- Modal Body (Increased Messages Container Height) -->
+            <div class="modal-body p-4">
                 <!-- Messages Container -->
-                <div class="h-80 overflow-y-auto p-3 bg-gray-800 rounded-lg" id="discussionMessages"></div>
+                <div class="h-96 overflow-y-auto p-4 bg-gray-50 rounded-lg border border-gray-200" id="discussionMessages"></div>
             </div>
-
-            <!-- Modal Footer (Input Box & File Upload) -->
-            <div class="modal-footer bg-gray-800 border-t border-gray-700 flex items-center space-x-2">
-                <!-- File Upload Label -->
-                <label for="discussionFileInput" class="cursor-pointer text-gray-400 hover:text-purple-400">
-                    📎
+            
+            <!-- Modal Footer (Reduced Height) -->
+            <div class="modal-footer bg-gray-100 border-t border-gray-200 flex items-center gap-4 px-4 py-2">
+                
+                <!-- File Upload -->
+                <label for="discussionFileInput" class="cursor-pointer text-gray-600 hover:text-indigo-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.586-6.586M17 9v6m4-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
                 </label>
                 <input type="file" id="discussionFileInput" class="hidden">
-                
+
                 <!-- Input Box -->
-                <input type="text" id="discussionMessageInput" class="flex-1 form-control bg-gray-900 text-white border-gray-700" 
-                       placeholder="Type a message or attach a file..." autocomplete="off">
+                <input type="text" id="discussionMessageInput" class="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Type a message..." autocomplete="off">
+                
+                <!-- Video Call (Pro) -->
+                <div class="relative group">
+                    <button class="text-gray-600 hover:text-indigo-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 5h10M5 19h10M5 5a2 2 0 00-2 2v10a2 2 0 002 2h10"></path>
+                        </svg>
+                    </button>
+                    <span class="absolute -top-3 -right-3 bg-indigo-600 text-xs text-white px-1.5 py-0.5 rounded-full shadow-lg hidden group-hover:block">Pro</span>
+                </div>
+                
+                <!-- Screen Share (Pro) -->
+                <div class="relative group">
+                    <button class="text-gray-600 hover:text-indigo-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h16v12H4zM4 16h16m-8 4v-4"></path>
+                        </svg>
+                    </button>
+                    <span class="absolute -top-3 -right-3 bg-indigo-600 text-xs text-white px-1.5 py-0.5 rounded-full shadow-lg hidden group-hover:block">Pro</span>
+                </div>
                 
                 <!-- Send Button -->
-                <button class="btn btn-sm btn-purple-500" id="sendDiscussionMessage">Send</button>
+                <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition" id="sendDiscussionMessage">Send</button>
             </div>
         </div>
     </div>
 </div>
+
+
 
 
 <!-- File previews -->
