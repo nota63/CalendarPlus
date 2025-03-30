@@ -894,7 +894,8 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-// Manage Project Plan
+// Manage Project Plan----------------------------
+
 tinymce.init({
     selector: "#tiny-editor",
     menubar: true, // Full menu bar enabled
@@ -1003,8 +1004,6 @@ tinymce.init({
     tinycomments_mode: "embedded",
     tinycomments_author: "Author Name"
 });
-
-
 
 // Function to get the dynamic task ID
 function getTaskId() {

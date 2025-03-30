@@ -41,7 +41,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <!-- Link CSS File -->
     <link rel="stylesheet" href="{% static 'tasks/tasks.css' %}">
-    <!-- Quill.js CDN -->
     <!-- TinyMCE -->
     <script src="https://cdn.tiny.cloud/1/z3tg0uud3u23g98vvuwzkwcr6kv791g1zrifajvwtp6uie9l/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 
@@ -50,6 +49,61 @@
 <!---------------------------------------------------------------------------------------------------------------------------------------------------------------  -->
 
     <style>
+        /* Custom Glassmorphism Styles */
+.modal-content {
+  background: rgba(255, 255, 255, 0.65);
+  -webkit-backdrop-filter: blur(35px);
+  backdrop-filter: blur(35px);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+}
+
+.editor-container {
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* TinyMCE Custom Skin */
+.tox-tinymce {
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: none !important;
+}
+
+.tox-toolbar__primary {
+  background: rgba(255, 255, 255, 0.25) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+  padding: 8px 12px !important;
+}
+
+.tox-tbtn {
+  background: rgba(255, 255, 255, 0.3) !important;
+  border-radius: 8px !important;
+  margin: 0 4px !important;
+  transition: all 0.2s ease !important;
+}
+
+.tox-tbtn:hover {
+  background: rgba(255, 255, 255, 0.5) !important;
+  transform: translateY(-1px) !important;
+}
+
+.tox-editor-container {
+  background: transparent !important;
+}
+
+.tox-statusbar {
+  border-top: 1px solid rgba(0, 0, 0, 0.1) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Font Family Inheritance */
+.tox-tinymce .tox-edit-area {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+}
+
+
         :root {
             --primary: #6366f1;
             --secondary: #4f46e5;
@@ -1735,23 +1789,58 @@ video::-webkit-media-controls-panel {
 </div>
 
 <!-- Prject Roadmap -->
-<!-- Bootstrap 5 Modal -->
-<div class="modal fade" id="projectPlanModal" tabindex="-1" aria-labelledby="projectPlanLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Project Plan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <textarea id="tiny-editor"></textarea>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success" id="saveProjectPlanBtn">Save</button>
-            </div>
+<!-- Add Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+<!-- Modal Structure -->
+<div class="modal fade" id="projectPlanModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl max-w-[1400px]">
+    <div class="modal-content bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-2xl border border-white/30 shadow-2xl rounded-[2rem] relative">
+      <!-- Header -->
+      <div class="modal-header border-b border-white/20 px-8 pt-6 pb-5">
+        <div class="flex-1">
+          <h2 class="font-space-grotesk text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent mb-2">
+            🚀 Project Roadmap
+          </h2>
+          <p class="font-inter text-slate-600/90 text-lg leading-relaxed">
+            Design your team's workflow with <span class="font-semibold text-blue-600/90">clarity</span> and <span class="font-semibold text-purple-600/90">precision</span>
+          </p>
         </div>
+        <button type="button" class="btn-close p-2 hover:bg-slate-100/30 rounded-full transition-colors">
+          <i class="fas fa-times text-slate-500/80 text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Editor Area -->
+      <div class="modal-body px-8 py-5">
+        <div class="editor-container bg-white/10 border-2 border-white/20 rounded-xl shadow-inner backdrop-blur-sm">
+          <textarea id="tiny-editor" class="h-[600px]"></textarea>
+        </div>
+      </div>
+
+      <!-- Footer Actions -->
+      <div class="modal-footer border-t border-white/20 px-8 py-5">
+        <div class="flex justify-between w-full items-center">
+          <div class="flex items-center space-x-3 text-slate-500/80">
+            <i class="fas fa-lightbulb text-yellow-500/80"></i>
+            <span class="font-inter text-sm">Pro tip: Use @mentions to assign tasks</span>
+          </div>
+          <div class="flex space-x-3">
+            <button type="button" 
+                    class="px-5 py-2.5 font-inter font-semibold rounded-xl border border-slate-300/60 hover:border-slate-400/80 bg-white/20 hover:bg-white/30 text-slate-600/90 transition-all duration-200 hover:shadow-sm flex items-center">
+              <i class="fas fa-times mr-2"></i>
+              Discard
+            </button>
+            <button type="button" id="saveProjectPlanBtn"
+                    class="px-5 py-2.5 font-inter font-semibold rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white transition-all duration-200 shadow-lg hover:shadow-blue-400/30 flex items-center">
+              <i class="fas fa-save mr-2"></i>
+              Save Roadmap
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 
 
