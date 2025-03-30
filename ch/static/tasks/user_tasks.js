@@ -2033,14 +2033,46 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.log("✅ Issue Details:", data.issue);
     
                 document.getElementById("details").innerHTML = `
-                    <li class="list-group-item">
-                        <strong>Title:</strong> ${data.issue.title}<br>
-                        <strong>Description:</strong> ${data.issue.description}<br>
-                        <strong>Priority:</strong> ${data.issue.priority}<br>
-                        <strong>Status:</strong> ${data.issue.status}<br>
-                        <strong>Created At:</strong> ${data.issue.created_at}<br>
-                        <strong>Updated At:</strong> ${data.issue.updated_at}
+
+                    <li class="list-group-item backdrop-blur-sm bg-white/50 shadow-md hover:shadow-lg rounded-lg p-6 mb-3 border border-white/20 transition-all duration-200 ease-in-out">
+                        <div class="space-y-3">
+                            <div class="flex items-baseline gap-2">
+                                <strong class="text-gray-600 font-semibold text-sm min-w-[80px]">Title:</strong>
+                                <span class="text-gray-800 font-medium break-words">${data.issue.title}</span>
+                            </div>
+                            
+                            <div class="flex items-start gap-2">
+                                <strong class="text-gray-600 font-semibold text-sm min-w-[80px]">Description:</strong>
+                                <p class="text-gray-700 text-sm break-words">${data.issue.description}</p>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <strong class="text-gray-600 font-semibold text-sm min-w-[80px]">Priority:</strong>
+                                <span class="text-xs font-medium px-2 py-1 rounded-full 
+                                    ${data.issue.priority === 'High' ? 'bg-red-100 text-red-800' : 
+                                    data.issue.priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' : 
+                                    'bg-green-100 text-green-800'}">
+                                    ${data.issue.priority}
+                                </span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <strong class="text-gray-600 font-semibold text-sm min-w-[80px]">Status:</strong>
+                                <span class="text-gray-700 text-sm font-medium">${data.issue.status}</span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <strong class="text-gray-600 font-semibold text-sm min-w-[80px]">Created At:</strong>
+                                <time class="text-gray-500 text-sm">${data.issue.created_at}</time>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <strong class="text-gray-600 font-semibold text-sm min-w-[80px]">Updated At:</strong>
+                                <time class="text-gray-500 text-sm">${data.issue.updated_at}</time>
+                            </div>
+                        </div>
                     </li>
+
                 `;
             })
             .catch(error => console.error("❌ Error fetching issue details:", error));
