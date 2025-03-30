@@ -3297,7 +3297,19 @@ def issue_view(request, org_id, group_id, task_id):
 # fetch issues 
 def fetch_issues(request, org_id, group_id, task_id):
     issues = Issue.objects.filter(organization_id=org_id, group_id=group_id, task_id=task_id)
+    task=get_object_or_404(Task, id=task_id, organization_id=org_id,group_id=group_id)
     
+    # task creators profile picture 
+    profile_pic_creator = Profile.objects.filter(user=task.created_by, organization=task.organization).first()
+    # task assignee profile pic
+    profile_pic_assigned_to = Profile.objects.filter(user=task.assigned_to, organization=task.organization).first()
+
+    # task creator profile pic
+    profile_pic_task_creator = profile_pic_creator.profile_picture.url if profile_pic_creator and profile_pic_creator.profile_picture else None
+    # task assignee profile pic
+    profile_pic_task_assignee = profile_pic_assigned_to.profile_picture.url if profile_pic_assigned_to and profile_pic_assigned_to.profile_picture else None
+
+
     grouped_issues = {
         "open": [],
         "in_progress": [],
@@ -3311,6 +3323,8 @@ def fetch_issues(request, org_id, group_id, task_id):
             "title": issue.title,
             "priority": issue.get_priority_display(),
             "reported_by": issue.reported_by.username,
+            "profile_pic_task_creator":profile_pic_task_creator,
+            'profile_pic_assignee':profile_pic_task_assignee,
         })
 
     return JsonResponse({"issues": grouped_issues})
@@ -4541,7 +4555,7 @@ def fetch_task_issues_manager(request):
     # Validate task existence under the organization
     task = get_object_or_404(Task, id=task_id, organization_id=org_id)
     organization = task.organization
-    
+
     if not request.user == task.created_by and not Profile.objects.filter(user=request.user, organization=organization).exists():
        return JsonResponse({'error': 'Unauthorized access'}, status=400)
 

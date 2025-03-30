@@ -1897,7 +1897,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-// Manage Issues (Drag and Drop)
+// Manage Issues (Drag and Drop) 
 document.addEventListener("DOMContentLoaded", function () {
     console.log("🔥 Issue Management Loaded!");
 
@@ -1927,15 +1927,26 @@ document.addEventListener("DOMContentLoaded", function () {
                 Object.keys(data.issues).forEach(status => {
                     const list = document.getElementById(status);
                     if (!list) return;
+                    // working ---------
 
                     data.issues[status].forEach(issue => {
                         const li = document.createElement("li");
                         li.classList.add("list-group-item", "draggable-issue");
                         li.dataset.issueId = issue.id;
                         li.dataset.currentStatus = status;
-                        li.innerHTML = `<strong>${issue.title}</strong> - ${issue.priority}`;
+                    
+                        // Assuming profile_pic_task_creator and profile_pic_task_assignee are available in `issue`
+                        li.innerHTML = `
+                            <img src="${issue.profile_pic_task_creator}" alt="Creator" class="profile-pic">
+                            <img src="${issue.profile_pic_assignee}" alt="Assignee" class="profile-pic">
+                            <strong>${issue.title}</strong> - ${issue.priority}
+                        `;
+                    
                         list.appendChild(li);
                     });
+                    
+                //  till here ----------------------
+
                 });
 
                 enableDragDrop();
@@ -2053,7 +2064,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-// start discussion
+// start discussion ---- (REAL TIME CONVERSATION ABOUT THE ISSUE)
 document.addEventListener("DOMContentLoaded", function () {
     console.log("🔥 Discussion Feature Loaded!");
 
