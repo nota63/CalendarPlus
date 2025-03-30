@@ -764,3 +764,61 @@ function getCSRFToken() {
 document.getElementById("issueDiscussionModal").addEventListener("hidden.bs.modal", () => {
     if (issueFetchInterval) clearInterval(issueFetchInterval);
 });
+
+
+// Filter msgs in real time
+document.getElementById("messageSearch").addEventListener("input", function () {
+    let query = this.value.toLowerCase().trim();
+    let messagesContainer = document.getElementById("discussionMessages");
+
+    if (!messagesContainer) {
+        console.error("❌ Error: messagesContainer not found!");
+        return;
+    }
+
+    let messages = messagesContainer.querySelectorAll(".flex.mb-4");
+
+    if (messages.length === 0) {
+        console.warn("⚠️ No messages found. Waiting for messages to load...");
+        return;
+    }
+
+    console.log(`🔍 Searching for: "${query}"`);
+
+    let matchCount = 0;
+
+    messages.forEach((msg) => {
+        let messageText = msg.querySelector("p")?.textContent.toLowerCase() || "";
+        let senderName = msg.querySelector("strong")?.textContent.toLowerCase() || "";
+
+        if (messageText.includes(query) || senderName.includes(query)) {
+            msg.style.display = "flex";
+            matchCount++;
+        } else {
+            msg.style.display = "none";
+        }
+    });
+
+    console.log(`✅ Matches found: ${matchCount}`);
+});
+
+// Ensure messages are loaded before enabling search
+function ensureMessagesLoaded() {
+    let messagesContainer = document.getElementById("discussionMessages");
+
+    if (!messagesContainer) {
+        console.error("❌ Error: messagesContainer not found!");
+        return;
+    }
+
+    let checkMessages = setInterval(() => {
+        let messages = messagesContainer.querySelectorAll(".flex.mb-4");
+        if (messages.length > 0) {
+            console.log("✅ Messages loaded successfully. Search enabled.");
+            clearInterval(checkMessages);
+        }
+    }, 500); // Check every 500ms
+}
+
+// Call this when opening the modal
+ensureMessagesLoaded();
