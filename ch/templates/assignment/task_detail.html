@@ -41,7 +41,11 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <!-- Link CSS File -->
     <link rel="stylesheet" href="{% static 'tasks/tasks.css' %}">
-    
+    <!-- Quill.js CDN -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+<!---------------------------------------------------------------------------------------------------------------------------------------------------------------  -->
 
     <style>
         :root {
@@ -1708,12 +1712,41 @@ video::-webkit-media-controls-panel {
                 <h5 class="modal-title">Edit Task Description</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
+            <!-- roadmap -->
+            <!-- Button to Trigger Modal -->
+            <button id="openProjectPlanModal" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ProjectPlanModal">
+                Edit Project Plan
+            </button>
+
+
+
             <div class="modal-body">
                 <textarea id="taskDescriptionNew" class="form-control" rows="6"></textarea>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button id="saveTaskDescriptionNew" class="btn btn-success">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Prject Roadmap -->
+<div class="modal fade" id="ProjectPlanModal" tabindex="-1" aria-labelledby="ProjectPlanLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ProjectPlanLabel">Edit Project Plan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Quill Editor -->
+                <div id="quillProjectPlan"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="saveProjectPlanBtn" class="btn btn-success">Save Changes</button>
             </div>
         </div>
     </div>

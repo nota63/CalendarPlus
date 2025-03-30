@@ -6,7 +6,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.utils.timezone import now
 from datetime import timedelta, datetime
-
+from django_quill.fields import QuillField
 # Create your models here.
 
 
@@ -51,7 +51,7 @@ class Task(models.Model):
         null=True,
         help_text="Detailed description of the task."
     )
-    project_plan=models.TextField(null=True, blank=True)
+    project_plan = QuillField(null=True, blank=True)
     priority = models.CharField(
         max_length=20,
         choices=[

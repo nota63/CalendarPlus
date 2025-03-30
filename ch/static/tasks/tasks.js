@@ -892,3 +892,64 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error("Error updating task:", error));
     });
 });
+
+
+// Manage Project Plan
+document.addEventListener("DOMContentLoaded", function () {
+    let quillProjectPlan;
+
+    const orgId = window.djangoData.orgId;
+    const groupId = window.djangoData.groupId;
+    const taskId = window.djangoData.taskId;
+
+    document.getElementById("openProjectPlanModal").addEventListener("click", function () {
+        if (!quillProjectPlan) {
+            quillProjectPlan = new Quill("#quillProjectPlan", {
+                theme: "snow",
+                modules: {
+                    toolbar: [
+                        [{ header: [1, 2, false] }],
+                        ["bold", "italic", "underline"],
+                        ["image", "code-block"],
+                    ],
+                },
+            });
+        }
+        fetchProjectPlan();
+    });
+
+    function fetchProjectPlan() {
+        fetch(`/tasks/project-plan/${orgId}/${groupId}/${taskId}/`)
+            .then(response => response.json())
+            .then(data => {
+                console.log("Fetched Project Plan:", data.project_plan);
+                try {
+                    quillProjectPlan.setContents(JSON.parse(data.project_plan)); // Parse Quill JSON
+                } catch (e) {
+                    console.error("Error parsing Quill JSON, loading as HTML:", e);
+                    quillProjectPlan.root.innerHTML = data.project_plan || ""; // Fallback to HTML
+                }
+            })
+            .catch(error => console.error("Error fetching project plan:", error));
+    }
+
+    document.getElementById("saveProjectPlanBtn").addEventListener("click", function () {
+        const content = JSON.stringify(quillProjectPlan.getContents()); // Save Quill JSON
+
+        fetch(`/tasks/project-plan/${orgId}/${groupId}/${taskId}/`, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ project_plan: content }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                console.log("Success:", data.message);
+                alert("Project Plan Updated!");
+            } else {
+                alert("Error: " + data.error);
+            }
+        })
+        .catch(error => console.error("Error updating project plan:", error));
+    });
+});
