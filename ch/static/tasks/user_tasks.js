@@ -2348,3 +2348,19 @@ data.messages.forEach(msg => {
     window.startDiscussion = startDiscussion;
     window.previewFile = previewFile;
 });
+
+
+// Handle real time messages filter
+// Handle real-time message filtering
+document.getElementById("searchMessages").addEventListener("input", function () {
+    const searchText = this.value.toLowerCase().trim();
+    const messages = document.querySelectorAll("#discussionMessages > div");
+
+    messages.forEach(msg => {
+        const messageText = msg.querySelector(".space-y-2")?.innerText.toLowerCase() || "";
+        const senderName = msg.querySelector(".text-purple-600")?.innerText.toLowerCase() || "";
+
+        // Check if search text is in sender name or message content
+        msg.style.display = messageText.includes(searchText) || senderName.includes(searchText) ? "flex" : "none";
+    });
+});
