@@ -528,25 +528,41 @@ function filterIssues(status) {
     const selectedIssues = window.issueData[status] || [];
 
     let content = selectedIssues
-        .map(issue => `
-            <div class="card mb-2 shadow-sm">
-                <div class="card-body">
-                    <h6 class="card-title d-flex justify-content-between">
-                        ${issue.title} 
-                        <span class="badge bg-primary">${issue.priority}</span>
-                    </h6>
-                    <p class="card-text">${issue.description}</p>
-                    <small class="text-muted d-block mb-2">Reported by: ${issue.reported_by} | ${issue.created_at}</small>
-                    <button class="btn btn-sm btn-outline-primary" 
-                        data-issue-id="${issue.id}" 
-                        onclick="openIssueDiscussion(this)">
-                        💬 Discuss
-                    </button>
-                </div>
+    .map(issue => `
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-4 border border-gray-100 hover:shadow-md transition-shadow">
+            <div class="flex items-start justify-between gap-3 mb-3">
+                <h3 class="font-semibold text-gray-900 text-base truncate">${issue.title}</h3>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    ${issue.priority}
+                </span>
             </div>
-        `)
-        .join("");
-
+            
+            <p class="text-gray-600 text-sm mb-4 line-clamp-2">${issue.description}</p>
+            
+            <div class="flex items-center justify-between text-sm">
+                <div class="text-gray-500">
+                    <span class="inline-flex items-center">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        ${issue.reported_by}
+                    </span>
+                    <span class="mx-2">•</span>
+                    <span>${issue.created_at}</span>
+                </div>
+                
+                <button class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors font-medium text-sm"
+                    data-issue-id="${issue.id}" 
+                    onclick="openIssueDiscussion(this)">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                    </svg>
+                    Discuss
+                </button>
+            </div>
+        </div>
+    `)
+    .join("");
     issuesContainer.innerHTML = content || `<p class="text-muted text-center">No issues found in this category.</p>`;
 
     // Update active tab
