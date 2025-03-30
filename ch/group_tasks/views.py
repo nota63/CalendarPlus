@@ -4606,6 +4606,13 @@ def task_description_view(request, org_id, group_id, task_id):
 def project_plan_view(request, task_id):
     """Fetch and update project plan via AJAX only."""
     task = get_object_or_404(Task, id=task_id)
+    organization = task.organization
+    group=task.group
+
+    # restrict access 
+    if not request.user == task.created_by and not Profile.objects.filter(user=request.user, organization=organization).exists():
+       return JsonResponse({'error': 'Unauthorized access'}, status=400)
+
 
     if request.method == "GET":
         return JsonResponse({"project_plan": task.project_plan}, status=200)
