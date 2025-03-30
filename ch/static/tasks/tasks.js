@@ -898,11 +898,25 @@ document.addEventListener("DOMContentLoaded", function () {
 // Initialize TinyMCE
 tinymce.init({
     selector: "#tiny-editor",
-    menubar: false,
-    readonly: false,  // 🔥 FIXED: Set TinyMCE as editable!
-    plugins: "lists link image charmap preview",
-    toolbar: "undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist outdent indent | link image",
+    menubar: true,  // 🔥 Enables the menu bar
+    plugins: [
+        "advlist autolink lists link image charmap preview anchor",
+        "searchreplace visualblocks code fullscreen",
+        "insertdatetime media table paste code help wordcount",
+        "emoticons hr directionality textpattern codesample"
+    ],
+    toolbar: [
+        "undo redo | formatselect | bold italic underline strikethrough",
+        "alignleft aligncenter alignright alignjustify | bullist numlist outdent indent",
+        "link image media | forecolor backcolor | charmap emoticons | codesample code",
+        "insertdatetime table hr removeformat | fullscreen preview help"
+    ].join(" | "),
+    readonly: false,  // Make it editable 🔥
+    height: 400,  // Set a comfortable height
+    branding: false,  // Remove TinyMCE branding
+    content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }"
 });
+
 
 // Function to get the dynamic task ID
 function getTaskId() {
