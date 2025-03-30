@@ -895,27 +895,115 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // Manage Project Plan
-// Initialize TinyMCE
 tinymce.init({
     selector: "#tiny-editor",
-    menubar: true,  // 🔥 Enables the menu bar
+    menubar: true, // Full menu bar enabled
     plugins: [
         "advlist autolink lists link image charmap preview anchor",
-        "searchreplace visualblocks code fullscreen",
-        "insertdatetime media table paste code help wordcount",
-        "emoticons hr directionality textpattern codesample"
+        "searchreplace visualblocks visualchars code fullscreen",
+        "insertdatetime media table paste help wordcount",
+        "emoticons hr directionality textpattern codesample",
+        "autosave quickbars nonbreaking pagebreak",
+        "imagetools toc textcolor colorpicker",
+        "spellchecker template print autoresize",
+        "importcss advcode powerpaste tinydrive",
+        "a11ychecker mentions casechange checklist",
+        "permanentpen linkchecker",
+        "fullscreen save hr",
+        "bbcode emoticons accordion",
+        "pageembed mediaembed insertdatetime",
+        "export formatpainter noneditable",
+        "autocorrect tinycomments footnotes typography"
     ],
     toolbar: [
-        "undo redo | formatselect | bold italic underline strikethrough",
-        "alignleft aligncenter alignright alignjustify | bullist numlist outdent indent",
-        "link image media | forecolor backcolor | charmap emoticons | codesample code",
-        "insertdatetime table hr removeformat | fullscreen preview help"
+        "undo redo | fontselect fontsizeselect formatselect",
+        "bold italic underline strikethrough forecolor backcolor removeformat",
+        "alignleft aligncenter alignright alignjustify",
+        "bullist numlist checklist outdent indent",
+        "link image media codesample insertdatetime table hr pagebreak",
+        "searchreplace visualblocks visualchars spellchecker",
+        "preview fullscreen print save code help",
+        "charmap emoticons anchor toc",
+        "casechange permanentpen template accordion",
+        "autosave restoredraft importcss formatpainter",
+        "export footnotes typography",
+        "pageembed mediaembed tinycomments"
     ].join(" | "),
-    readonly: false,  // Make it editable 🔥
-    height: 400,  // Set a comfortable height
-    branding: false,  // Remove TinyMCE branding
-    content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }"
+    
+    // General Configurations
+    height: 600,
+    branding: false, // Remove TinyMCE branding
+    contextmenu: "link image table", // Right-click options
+    autoresize_bottom_margin: 50, // Auto resize support
+    quickbars_insert_toolbar: "quicktable image media pageembed",
+    quickbars_selection_toolbar: "bold italic | quicklink h2 h3 blockquote",
+    toolbar_mode: "sliding", // Responsive toolbar
+    content_style: "body { font-family: Arial, sans-serif; font-size: 14px; }",
+
+    // Image & Media Upload
+    image_title: true,
+    automatic_uploads: true,
+    file_picker_types: "image media file",
+    file_picker_callback: function(cb, value, meta) {
+        var input = document.createElement("input");
+        input.setAttribute("type", "file");
+        if (meta.filetype === "image") {
+            input.setAttribute("accept", "image/*");
+        } else if (meta.filetype === "media") {
+            input.setAttribute("accept", "video/*,audio/*");
+        } else {
+            input.setAttribute("accept", "*");
+        }
+        input.onchange = function() {
+            var file = this.files[0];
+            var reader = new FileReader();
+            reader.onload = function() {
+                cb(reader.result, { title: file.name });
+            };
+            reader.readAsDataURL(file);
+        };
+        input.click();
+    },
+
+    // Spellchecker
+    spellchecker_language: "en",
+    spellchecker_dialog: true,
+
+    // File Manager & Drive Integration
+    file_picker_callback: function(callback, value, meta) {
+        var input = document.createElement("input");
+        input.setAttribute("type", "file");
+        input.onchange = function() {
+            var file = this.files[0];
+            var reader = new FileReader();
+            reader.onload = function() {
+                callback(reader.result, { title: file.name });
+            };
+            reader.readAsDataURL(file);
+        };
+        input.click();
+    },
+
+    // Table Configuration
+    table_toolbar: "tableprops cell row column deletetable",
+    
+    // Autosave Configuration
+    autosave_interval: "30s",
+    autosave_restore_when_empty: true,
+    autosave_retention: "2m",
+
+    // Export as PDF, DOCX, etc.
+    export_formats: "pdf docx xlsx",
+    export_background: true,
+
+    // Accessibility
+    a11ychecker_html_version: "html5",
+
+    // Commenting System
+    tinycomments_mode: "embedded",
+    tinycomments_author: "Author Name"
 });
+
 
 
 // Function to get the dynamic task ID
