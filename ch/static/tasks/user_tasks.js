@@ -2138,6 +2138,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const sendMessageButton = document.getElementById("sendDiscussionMessage");
     const issueFilesModal = new bootstrap.Modal(document.getElementById("IssueFilesModal"));
     const filePreviewContent = document.getElementById("filePreviewContent");
+    const currentUser = window.djangoData.currentUser;
 
     let orgId, groupId, taskId, issueId;
     let fetchInterval;
@@ -2167,45 +2168,94 @@ document.addEventListener("DOMContentLoaded", function () {
                     console.error("❌ Error Fetching Messages:", data.error);
                     return;
                 }
-                discussionMessages.innerHTML = "";
-                data.messages.forEach(msg => {
-                    const messageElement = document.createElement("div");
-                    messageElement.classList.add("flex", "items-start", "space-x-2", "p-2", "border-b", "border-gray-700");
-                    const profilePic = document.createElement("img");
-                    profilePic.src = msg.sender_profile_pic || "/static/default-profile.png";
-                    profilePic.alt = "User Pic";
-                    profilePic.classList.add("w-8", "h-8", "rounded-full");
-                    const contentDiv = document.createElement("div");
-                    contentDiv.classList.add("flex-1");
+                
+// from here -----------------------------                
+discussionMessages.innerHTML = "";
+data.messages.forEach(msg => {
+    const isMyMessage = currentUser === msg.sender;
+    const messageElement = document.createElement("div");
+    
+    // Main message container
+    messageElement.classList.add("flex", "items-start", "gap-3", "px-4", "py-2", "group");
+    if (isMyMessage) {
+        messageElement.classList.add("justify-end");
+    }
 
-                    let filePreview = "";
-                    if (msg.files) {
-                        const fileUrl = msg.files;
-                        const fileExtension = fileUrl.split(".").pop().toLowerCase();
+    // Profile picture container
+    const profilePic = document.createElement("img");
+    profilePic.src = msg.sender_profile_pic || "/static/default-profile.png";
+    profilePic.alt = "Profile";
+    profilePic.classList.add(
+        "w-9", "h-9", "rounded-full", "border-2", "border-white",
+        "shadow-md", "object-cover", "mt-1", "flex-shrink-0"
+    );
 
-                        if (["jpg", "jpeg", "png", "gif", "webp"].includes(fileExtension)) {
-                            filePreview = `<img src="${fileUrl}" alt="Image" class="mt-2 w-32 h-32 rounded-lg border border-gray-700 cursor-pointer file-preview" data-url="${fileUrl}" data-type="image">`;
-                        } else if (["mp4", "webm", "ogg"].includes(fileExtension)) {
-                            filePreview = `<video controls class="mt-2 w-64 rounded-lg border border-gray-700 cursor-pointer file-preview" data-url="${fileUrl}" data-type="video"><source src="${fileUrl}" type="video/${fileExtension}"></video>`;
-                        } else if (fileExtension === "pdf") {
-                            filePreview = `<a href="#" class="text-blue-400 text-sm file-preview" data-url="${fileUrl}" data-type="pdf">📎 View PDF</a>`;
-                        } else {
-                            filePreview = `<a href="${fileUrl}" target="_blank" class="text-blue-400 text-sm">📎 View Attachment</a>`;
-                        }
-                    }
+    // Message content container
+    const contentDiv = document.createElement("div");
+    contentDiv.classList.add(
+        "relative", "max-w-[85%]", "lg:max-w-[70%]", "rounded-2xl",
+        "p-3", "shadow-sm", "transition-all", "duration-150"
+    );
 
-                    contentDiv.innerHTML = `
-                        <p class="text-purple-400 font-semibold">${msg.sender}</p>
-                        <p class="text-gray-300">${msg.message || ""}</p>
-                        ${filePreview}
-                        <small class="text-gray-500">${msg.created_at}</small>
-                    `;
+    // Message bubble styling
+    if (isMyMessage) {
+        contentDiv.classList.add(
+            "bg-green-600", "text-white",
+            "rounded-tr-none", "ml-12", "hover:bg-green-700"
+        );
+    } else {
+        contentDiv.classList.add(
+            "bg-white", "text-gray-900",
+            "rounded-tl-none", "mr-12", "hover:bg-gray-50"
+        );
+    }
 
-                    messageElement.appendChild(profilePic);
-                    messageElement.appendChild(contentDiv);
-                    discussionMessages.appendChild(messageElement);
-                });
-                discussionMessages.scrollTop = discussionMessages.scrollHeight;
+    // File preview handling (keep original logic)
+    let filePreview = "";
+    if (msg.files) {
+        const fileUrl = msg.files;
+        const fileExtension = fileUrl.split(".").pop().toLowerCase();
+
+        if (["jpg", "jpeg", "png", "gif", "webp"].includes(fileExtension)) {
+            filePreview = `<img src="${fileUrl}" alt="Image" class="mt-2 w-32 h-32 rounded-lg border border-gray-700 cursor-pointer file-preview" data-url="${fileUrl}" data-type="image">`;
+        } else if (["mp4", "webm", "ogg"].includes(fileExtension)) {
+            filePreview = `<video controls class="mt-2 w-64 rounded-lg border border-gray-700 cursor-pointer file-preview" data-url="${fileUrl}" data-type="video"><source src="${fileUrl}" type="video/${fileExtension}"></video>`;
+        } else if (fileExtension === "pdf") {
+            filePreview = `<a href="#" class="text-blue-400 text-sm file-preview" data-url="${fileUrl}" data-type="pdf">📎 View PDF</a>`;
+        } else {
+            filePreview = `<a href="${fileUrl}" target="_blank" class="text-blue-400 text-sm">📎 View Attachment</a>`;
+        }
+    }
+
+
+
+    // Message content structure
+    contentDiv.innerHTML = `
+        ${!isMyMessage ? `<p class="text-sm font-medium text-purple-600 mb-1">${msg.sender}</p>` : ''}
+        <div class="space-y-2">
+            ${msg.message ? `<p class="text-sm ${isMyMessage ? 'text-white' : 'text-gray-800'} break-words">${msg.message}</p>` : ''}
+            ${filePreview}
+        </div>
+        <div class="flex items-center justify-end gap-2 mt-2">
+            <span class="text-xs ${isMyMessage ? 'text-white/90' : 'text-gray-500'}">${msg.created_at}</span>
+        </div>
+    `;
+
+    // Assemble elements based on message ownership
+    if (isMyMessage) {
+        messageElement.appendChild(contentDiv);
+        messageElement.appendChild(profilePic);
+    } else {
+        messageElement.appendChild(profilePic);
+        messageElement.appendChild(contentDiv);
+    }
+
+    discussionMessages.appendChild(messageElement);
+});
+
+// Auto-scroll to bottom
+// discussionMessages.scrollTop = discussionMessages.scrollHeight;
+// work in progress
             })
             .catch(error => console.error("❌ Error Fetching Messages:", error));
     }
