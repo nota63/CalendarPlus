@@ -1039,3 +1039,29 @@ input:focus, textarea:focus, select:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
 }
+
+
+/* Enable scrolling Issue drag and drop colomns */
+.issue-list {
+    max-height: 300px; /* Adjust height as needed */
+    overflow-y: auto; /* Enables vertical scrolling */
+    padding-right: 10px; /* Prevents content from touching the edge */
+}
+
+/* Hide scrollbar for Webkit browsers (Chrome, Safari) */
+.issue-list::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+
+/* Hide scrollbar for Firefox */
+.issue-list {
+    scrollbar-width: none;
+}
+
+/* Hide scrollbar for Internet Explorer & Edge */
+.issue-list {
+    -ms-overflow-style: none;
+}
+
+
