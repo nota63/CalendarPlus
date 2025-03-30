@@ -4563,4 +4563,39 @@ def fetch_task_issues_manager(request):
     return JsonResponse(categorized_issues)
 
 
+# Roadmap and description
 
+# manage description
+@csrf_exempt
+def task_description_view(request, org_id, group_id, task_id):
+    """View to fetch and update task description."""
+    print(f"Received request: {request.method} for Task ID: {task_id} (Org: {org_id}, Group: {group_id})")
+
+    # Fetch the task
+    try:
+        task = get_object_or_404(Task, organization_id=org_id, group_id=group_id, id=task_id)
+        print(f"Task found: {task.id} - {task.description[:50]}")  # Print first 50 chars of the description
+    except Exception as e:
+        print(f"Error fetching task: {e}")
+        return JsonResponse({"error": "Task not found"}, status=404)
+
+    if request.method == "GET":
+        print("Fetching Task Description:", task.description)
+        return JsonResponse({"description": task.description}, status=200)
+
+    elif request.method == "POST":
+        new_description = request.POST.get("description", "").strip()
+        print(f"Received New Description: {new_description[:50]}")  # Print first 50 chars for safety
+
+        if new_description:
+            try:
+                task.description = new_description
+                task.save()
+                print("Task description updated successfully!")
+                return JsonResponse({"message": "Task description updated!", "description": new_description}, status=200)
+            except Exception as e:
+                print(f"Error saving task: {e}")
+                return JsonResponse({"error": "Failed to update task"}, status=500)
+
+        print("Error: Description cannot be empty!")
+        return JsonResponse({"error": "Description cannot be empty!"}, status=400)

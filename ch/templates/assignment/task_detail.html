@@ -41,8 +41,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <!-- Link CSS File -->
     <link rel="stylesheet" href="{% static 'tasks/tasks.css' %}">
-
-
+    
 
     <style>
         :root {
@@ -1701,6 +1700,26 @@ video::-webkit-media-controls-panel {
     </div>
 </div>
 
+<!-- Edit task description -->
+<div class="modal fade" id="DescriptionTaskNewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Task Description</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <textarea id="taskDescriptionNew" class="form-control" rows="6"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="saveTaskDescriptionNew" class="btn btn-success">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-------------------------------------------------------------------------------------------------------------------------------------------------------  -->
 <!-- Task Deadline -->
 
@@ -1851,6 +1870,19 @@ video::-webkit-media-controls-panel {
                </span>
               <span class="text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity">Raised Issues</span>
             </button>
+
+            <!-- edit task description -->
+            <button id="openTaskNewModal"
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#DescriptionTaskNewModal"
+            data-task-id="123"
+            data-org-id="1"
+            data-group-id="10">
+            Edit Task Description
+        </button>
+        
+        
 
              
         </nav>

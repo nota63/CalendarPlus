@@ -843,3 +843,52 @@ function ensureMessagesLoaded() {
 
 // Call this when opening the modal
 ensureMessagesLoaded();
+
+
+// Edit and manage task description
+document.addEventListener("DOMContentLoaded", function () {
+    const openBtn = document.getElementById("openTaskNewModal");
+    const saveBtn = document.getElementById("saveTaskDescriptionNew");
+    const taskDesc = document.getElementById("taskDescriptionNew");
+
+    let orgId, groupId, taskId;
+
+    // Open Modal & Fetch Description
+    openBtn.addEventListener("click", function () {
+        orgId = window.djangoData.orgId;
+        groupId = window.djangoData.groupId;
+        taskId = window.djangoData.taskId;
+
+        fetch(`/tasks/manage-description/${orgId}/${groupId}/${taskId}/`)
+            .then(response => response.json())
+            .then(data => {
+                taskDesc.value = data.description;
+            })
+            .catch(error => console.error("Error fetching task:", error));
+    });
+
+    // Save Updated Description
+    saveBtn.addEventListener("click", function () {
+        const newDescription = taskDesc.value.trim();
+
+        if (!newDescription) {
+            alert("Description cannot be empty!");
+            return;
+        }
+
+        fetch(`/tasks/manage-description/${orgId}/${groupId}/${taskId}/`, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `description=${encodeURIComponent(newDescription)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert("Task Updated Successfully!");
+                const modal = bootstrap.Modal.getInstance(document.getElementById("DescriptionTaskNewModal"));
+                modal.hide(); // Close the modal after saving
+            }
+        })
+        .catch(error => console.error("Error updating task:", error));
+    });
+});

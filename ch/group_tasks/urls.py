@@ -97,9 +97,8 @@ urlpatterns = [
     path('get-issue-details/<int:issue_id>/',get_issue_details, name='get_issue_details'),
     path('issue-discussion/<int:org_id>/<int:group_id>/<int:task_id>/<int:issue_id>/',issue_discussion_view, name='issue_discussion'),
     # manager side features
-    path('fetch-task-issues/',fetch_task_issues_manager,name='fetch_task_issues')
-
-  
+    path('fetch-task-issues/',fetch_task_issues_manager,name='fetch_task_issues'),
+    path('manage-description/<int:org_id>/<int:group_id>/<int:task_id>/',task_description_view, name='manage_description')
   
   
   
