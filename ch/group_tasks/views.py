@@ -4370,6 +4370,7 @@ def user_tasks_view(request, org_id, group_id, user_id):
 
 
 # Detailed tasks details 
+from django.db.models import Count
 
 class TaskDetailView(View):
     def get(self, request, org_id, group_id, task_id, user_id):
@@ -4393,7 +4394,23 @@ class TaskDetailView(View):
         activity_logs = ActivityLog.objects.filter(task=task).order_by('-timestamp')
         problems = Problem.objects.filter(task=task)
         tags = TaskTag.objects.filter(task=task)
+        # Fetch issues count
+        # Fetch all issue counts in a single query
+        issues_counts = (
+            Issue.objects.filter(task=task, organization=organization, group=group)
+            .values("status")
+            .annotate(count=Count("id"))
+        )
 
+        # Convert results into a dictionary
+        issues_count_dict = {item["status"]: item["count"] for item in issues_counts}
+
+        # Assign values (default to 0 if status is missing)
+        open_issues = issues_count_dict.get("open", 0)
+        closed_issues = issues_count_dict.get("closed", 0)
+        in_progress = issues_count_dict.get("in_progress", 0)
+        resolved_issues = issues_count_dict.get("resolved", 0)
+        
         context = {
             'organization':organization,
             'group':group,
@@ -4407,6 +4424,12 @@ class TaskDetailView(View):
             'user': user,
             'profile_pic':profile_pic,
             "task_assignee_profile":task_assignee_profile,
+            # issues
+            "open_issues":open_issues,
+            'closed_issues':closed_issues,
+            'resolved_issues':resolved_issues,
+            'in_progress':in_progress,
+            
         }
 
         return render(request, 'assignment/task_detail.html', context)

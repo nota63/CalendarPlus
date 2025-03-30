@@ -332,3 +332,41 @@ body {
 .action-buttons button {
   position: relative;
 }
+
+/* Issues modal */
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+.modal-content {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.btn-close {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236b7280'%3E%3Cpath d='M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636l4.95 4.95z'/%3E%3C/svg%3E");
+}
+
+.issue-card {
+  animation: cardEnter 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes cardEnter {
+  from {
+      opacity: 0;
+      transform: translateY(8px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
