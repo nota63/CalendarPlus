@@ -1021,7 +1021,75 @@ body {
 <!-- greeting -->
 <div id="greeting"></div>
 
+<!-- Configure background Checks ------------------------------------------------------------------------------------------ -->
+<!-- force to turn on automations -->
+{% if not automations %}
+<!-- Background Blur Overlay -->
+<div id="automationOverlay" class="fixed inset-0 bg-black/30 backdrop-blur-xl flex items-center justify-center z-50 hidden">
+  
+    <!-- Modal Container -->
+    <div id="automationssModal" class="bg-white/5 backdrop-blur-lg border border-white/20 p-8 rounded-2xl shadow-xl shadow-black/10 max-w-md w-[90%] mx-4 transform transition-all duration-300 opacity-0 scale-90">
+      
+      <!-- Modal Content -->
+      <div class="space-y-6">
+        <!-- Warning Header -->
+        <div class="flex items-center gap-4 animate-fade-in">
+          <div class="neumorphic-icon-container">
+            <span class="material-icons text-red-400 text-3xl">warning_amber</span>
+          </div>
+          <h3 class="text-2xl font-semibold bg-gradient-to-r from-purple-600 to-teal-400 bg-clip-text text-transparent">
+            Automation Paused
+          </h3>
+        </div>
+  
+        <!-- Message -->
+        <p class="text-gray-300/90 leading-relaxed text-md animate-slide-in">
+          Enhance your workflow efficiency by activating smart automations. Unlock seamless integration and time-saving features across your projects.
+        </p>
+  
+        <!-- Action Section -->
+        <div class="space-y-4 animate-fade-in-up">
+          <!-- Enable Button -->
+          <button class="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-br from-teal-400/90 to-teal-500 hover:from-teal-400 hover:to-teal-600 text-white rounded-xl transition-all duration-200 shadow-lg shadow-teal-500/20 hover:shadow-teal-500/40 hover:scale-[1.02] group"  data-bs-toggle="modal" data-bs-target="#automationModal">
+            <span class="material-icons text-xl animate-bounce">auto_awesome</span>
+            <span class="font-medium tracking-wide">Enable Smart Automation</span>
+          </button>
+  
+          <!-- Secondary Action -->
+          <button class="text-sm text-gray-400 hover:text-teal-300 transition-colors flex items-center justify-center gap-1 w-full">
+            <span>Learn More</span>
+            <span class="material-icons text-base">arrow_outward</span>
+          </button>
+        </div>
+      </div>
+  
+      <!-- Close Button -->
+      <button class="absolute top-4 right-4 p-2 hover:bg-white/5 rounded-full transition-colors">
+        <span class="material-icons text-gray-400 hover:text-white">close</span>
+      </button>
+  
+    </div>
+  </div>
+<!-- JavaScript to Show Modal -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("automationssModal");
+    const overlay = document.getElementById("automationOverlay");
 
+    // Show Modal with Animation
+    overlay.classList.remove("hidden");
+    setTimeout(() => {
+      modal.classList.remove("scale-95", "opacity-0");
+    }, 50);
+
+    // Prevent Closing Modal
+   
+  });
+</script>
+{% endif %}
+
+
+<!-- ----------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 <div id="current-date"></div>
 <br>
 <br>
@@ -5411,7 +5479,6 @@ video::-webkit-media-controls-panel {
 <div id="deadline-status" data-deadline-passed="{% if has_deadline_passed %}true{% else %}false{% endif %}"></div>
 
 
-
 <!-- Task completion rewards -->
 {% if calpoints and calpoints.points %}
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Exo+2:wght@600&display=swap" rel="stylesheet">
@@ -5646,8 +5713,8 @@ video::-webkit-media-controls-panel {
         <!-- Main Content -->
         <div class="lg:col-span-3">
 
-            <!-- working on --------------------------------- -->
-            <!-- Task Header -->
+        <!-- working on --------------------------------- -->
+     
              <!-- Task Header -->
   <div class="bg-white/60 backdrop-blur-md rounded-xl shadow-sm p-6 mb-6 border border-white/30">
     <div class="flex items-center gap-3 mb-4">

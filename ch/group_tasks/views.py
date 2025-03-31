@@ -3535,7 +3535,7 @@ def my_day_task_detail(request, org_id, group_id, task_id):
     for field in boolean_fields:
         query |= Q(**{field: True})
 
-        # Apply filter
+    # Apply filter
     automations = AutomationTask.objects.filter(
             task=task,
             organization=organization,
