@@ -152,7 +152,13 @@ def task_calendar(request, org_id, group_id):
 
     if not GroupMember.objects.filter(group=group, user=request.user).exists():
         raise Http404("You are not a member of this group.")
+    
+    # restrict access
+    if not Profile.objects.filter(organization=organization, user=request.user).exists():
+        return HttpResponseBadRequest('unauthorized access')
 
+
+    # Fetch sutasks count
     
     priority_filter = request.GET.get('priority', None)
 

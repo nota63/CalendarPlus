@@ -1,3 +1,7 @@
+{% extends 'custom.html' %}
+
+{% block content %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -158,7 +162,7 @@
                 <div class="space-y-5">
                     <div>
                         <h3 class="text-xl font-semibold text-gray-800 mb-1">{{ task.title }}</h3>
-                        <p class="text-gray-600 text-sm leading-relaxed">{{ task.description }}</p>
+                       
                     </div>
 
                     <!-- Metadata -->
@@ -1450,3 +1454,5 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
+{% endblock %}
