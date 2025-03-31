@@ -4965,7 +4965,47 @@ video::-webkit-media-controls-panel {
     </div>
 </div>
 
-
+<!-- Task settings -->
+ <!-- Bootstrap 5 Modal for Task Settings -->
+<div class="modal fade" id="taskSettingsModal" tabindex="-1" aria-labelledby="taskSettingsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="taskSettingsLabel">Task Settings</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Task Settings Content -->
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Task Deadline</label>
+                        <input type="date" class="form-control" id="taskDeadline">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Priority</label>
+                        <select class="form-select" id="taskPriority">
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" id="taskStatus">
+                            <option value="todo">To Do</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveTaskSettings">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!----------------------------------------------------------------------------------------------------------------------------- -->
 
@@ -5186,7 +5226,8 @@ video::-webkit-media-controls-panel {
 
             <!-- Secondary Navigation -->
             <nav class="p-2 space-y-1">
-                <a href="#" class="flex items-center px-3 py-2.5 rounded-lg text-slate-600 hover:bg-gray-100/50 transition-colors duration-200 group ml-2 mr-2">
+                <a href="#" class="flex items-center px-3 py-2.5 rounded-lg text-slate-600 hover:bg-gray-100/50 transition-colors duration-200 group ml-2 mr-2" 
+                   data-bs-toggle="modal" data-bs-target="#taskSettingsModal">
                     <svg class="w-5 h-5 ml-1 mr-3 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -5197,22 +5238,21 @@ video::-webkit-media-controls-panel {
         </div>
 
         <!-- Profile Section -->
-        <!-- Profile Section -->
-<div class="p-4 border-t border-white/40">
-    <div class="flex items-center gap-3 p-2.5 rounded-xl bg-white/60 backdrop-blur-sm shadow-sm">
-        <div class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center shrink-0 overflow-hidden">
-            {% if profile_picture %}
-                <img src="{{ profile_picture}}" alt="Profile Picture" class="w-full h-full object-cover">
-            {% else %}
-                <span class="text-indigo-600 font-medium text-sm">?</span>
-            {% endif %}
+        <div class="p-4 border-t border-white/40">
+            <div class="flex items-center gap-3 p-2.5 rounded-xl bg-white/60 backdrop-blur-sm shadow-sm">
+                <div class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center shrink-0 overflow-hidden">
+                    {% if profile_picture %}
+                        <img src="{{ profile_picture}}" alt="Profile Picture" class="w-full h-full object-cover">
+                    {% else %}
+                        <span class="text-indigo-600 font-medium text-sm">?</span>
+                    {% endif %}
+                </div>
+                <div class="truncate">
+                    <p class="text-sm font-medium text-slate-800 truncate">{{ request.user.username }}</p>
+                    <p class="text-xs text-slate-500 truncate">{{ request.user.email }}</p>
+                </div>
+            </div>
         </div>
-        <div class="truncate">
-            <p class="text-sm font-medium text-slate-800 truncate">{{ request.user.username }}</p>
-            <p class="text-xs text-slate-500 truncate">{{ request.user.email }}</p>
-        </div>
-    </div>
-</div>
 
 </aside>
 
