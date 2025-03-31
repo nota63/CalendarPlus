@@ -54,7 +54,7 @@ def mini_app_detail(request, app_id, org_id):
     app = get_object_or_404(MiniApp, id=app_id)
 
     # Check if the app is already installed for this organization
-    is_installed = InstalledMiniApp.objects.filter(organization=organization, mini_app=app).exists()
+    is_installed = InstalledMiniApp.objects.filter(user=request.user,organization=organization, mini_app=app).exists()
 
     profile=get_object_or_404(Profile,organization=organization,user=request.user)
     if not profile:
