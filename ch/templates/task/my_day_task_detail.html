@@ -5816,449 +5816,445 @@ video::-webkit-media-controls-panel {
         <!-- Main Content -->
         <div class="lg:col-span-3">
 
-        <!-- working on --------------------------------- -->
+       
      
-             <!-- Task Header -->
-  <div class="bg-white/60 backdrop-blur-md rounded-xl shadow-sm p-6 mb-6 border border-white/30">
-    <div class="flex items-center gap-3 mb-4">
-      <span class="material-icons-round text-3xl text-blue-600/90 bg-blue-50 p-2 rounded-xl">assignment</span>
-      <div>
-        <h1 class="text-2xl font-semibold text-gray-800">{{ task.title }}</h1>
-        <p class="text-gray-500 text-sm mt-0.5">Created {{ task.created_at|date:"M d, Y" }}</p>
-      </div>
-    </div>
+        <!-- Task Header -->
+        <div class="bg-white/60 backdrop-blur-md rounded-xl shadow-sm p-6 mb-6 border border-white/30">
+            <div class="flex items-center gap-3 mb-4">
+            <span class="material-icons-round text-3xl text-blue-600/90 bg-blue-50 p-2 rounded-xl">assignment</span>
+            <div>
+                <h1 class="text-2xl font-semibold text-gray-800">{{ task.title }}</h1>
+                <p class="text-gray-500 text-sm mt-0.5">Created {{ task.created_at|date:"M d, Y" }}</p>
+            </div>
+            </div>
 
-    <!-- Task Details Grid -->
-    <div class="grid md:grid-cols-2 gap-4 mb-6">
-      <div class="bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-white/30">
-        <div class="flex items-center gap-2">
-          <span class="material-icons-round text-red-500/90 text-xl">priority</span>
-          <div>
-            <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wide">Priority</h3>
-            <span class="text-sm font-medium text-red-600/90">
-              {{ task.priority|title }}
-            </span>
-          </div>
-        </div>
-      </div>
-      
-      <div class="bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-white/30">
-        <div class="flex items-center gap-2">
-          <span class="material-icons-round text-purple-500/90 text-xl">schedule</span>
-          <div>
-            <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wide">Deadline</h3>
-            <p class="text-sm font-medium text-gray-700/90">
-              {{ task.deadline|date:"M d, Y H:i" }}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Progress Section (Functionality Preserved) -->
-    <div class="bg-white/60 backdrop-blur-md rounded-xl shadow-sm p-6 border border-white/30">
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="text-lg font-semibold text-gray-700/90">Task Progress</h2>
-        <span class="text-xl font-semibold text-blue-600/90">{{ task.progress }}%</span>
-      </div>
-      
-      <!-- Original Progress Structure Preserved -->
-      <div class="space-y-4">
-        <div class="relative h-2.5 bg-gray-100/50 rounded-full overflow-hidden backdrop-blur-sm">
-          <div id="progressBar" 
-               class="h-full bg-gradient-to-r from-blue-500 to-blue-400 transition-all duration-300 ease-out shadow-inner"
-               style="width: {{ task.progress }}%"
-               aria-valuenow="{{ task.progress }}" 
-               aria-valuemin="0" 
-               aria-valuemax="100">
-            <span class="absolute inset-0 flex items-center justify-center text-[9px] font-medium text-white/90 tracking-tighter">
-              {{ task.progress }}%
-            </span>
-          </div>
-        </div>
-        
-        <!-- Original Control Markup Preserved -->
-        <div class="flex items-center gap-1.5" id="progress-controls">
-            <!-- Decrease Progress Button -->
-            <button id="decreaseProgress" 
-                    class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 
-                           transition-all active:scale-95 shadow-sm border border-gray-300/50"
-                    aria-label="Decrease progress">
-                <span class="material-icons-round text-gray-600 text-base">remove</span>
-            </button>
-        
-            <!-- Increase Progress Button -->
-            <button id="increaseProgress" 
-                    class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-500 hover:bg-blue-600 
-                           transition-all active:scale-95 shadow-sm shadow-blue-100"
-                    aria-label="Increase progress">
-                <span class="material-icons-round text-white text-base">add</span>
-            </button>
-        </div>
-    </div>
-    </div>
-
-<!-- Action Cards -->
-<!-- Action Cards -->
-<div class="grid md:grid-cols-2 gap-6 mb-8">
-
-    <!-- Task Actions -->
-    <div class="bg-white/90 backdrop-blur-md rounded-xl shadow-md p-4">
-        <h3 class="text-sm font-medium text-gray-800 mb-2">Task Actions</h3>
-        <div class="flex flex-col gap-2">
-            <button class="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 
-                    text-white rounded-full transition-all text-xs font-medium shadow-sm active:scale-95"
-                    data-bs-toggle="offcanvas" data-bs-target="#problemsSidebar">
-                <span class="material-icons text-sm">bug_report</span>
-                View Problems
-            </button>
-
-            <button id="activityLogsButton" class="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 
-                    text-white rounded-full transition-all text-xs font-medium shadow-sm active:scale-95">
-                <span class="material-icons text-sm">history</span>
-                Activity Logs
-            </button>
-        </div>
-    </div>
-
-    <!-- Communication -->
-    <div class="bg-white/90 backdrop-blur-md rounded-xl shadow-md p-4">
-        <h3 class="text-sm font-medium text-gray-800 mb-2">Communication</h3>
-        <div class="flex flex-col gap-2">
-            <button class="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 
-                    text-white rounded-full transition-all text-xs font-medium shadow-sm active:scale-95 start-chat-btn"
-                    data-org="{{ organization.id }}" 
-                    data-group="{{ group.id }}" 
-                    data-task="{{ task.id }}">
-                <span class="material-icons text-sm">live_tv</span>
-                Go Live Session
-            </button>
-
-            {% if extend_tasks %}
-            <button class="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 
-                    text-white rounded-full transition-all text-xs font-medium shadow-sm active:scale-95"
-                    data-bs-toggle="modal" 
-                    data-bs-target="#queryModal"
-                    data-org-id="{{ organization.id }}" 
-                    data-group-id="{{ group.id }}" 
-                    data-task-id="{{ task.id }}">
-                <span class="material-icons text-sm">email</span>
-                Send Query
-            </button>
-            {% endif %}
-        </div>
-    </div>
-
-</div>
-
-                <!-- till here ---------------------------------------------------------------------------------------- -->
-
-                <!-- Status Toggle -->
-                <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 mb-8">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-800">Task Status</h3>
-                            <p class="text-sm text-gray-500">Mark as completed when finished</p>
-                        </div>
-                        <div class="relative inline-block w-14 align-middle select-none transition duration-200 ease-in">
-                            <input type="checkbox" 
-                                   id="toggleTaskStatus"
-                                   class="toggle-checkbox absolute block w-7 h-7 rounded-full bg-white border-2 border-gray-300 appearance-none cursor-pointer"
-                                   {% if task.status == 'completed' %} checked {% endif %}
-                                   
-                                   data-group-id="{{ group_id }}">
-                            <label for="toggleTaskStatus" 
-                                   class="toggle-label block overflow-hidden h-7 rounded-full bg-gray-300 cursor-pointer transition-colors duration-200 ease-in"></label>
-                        </div>
-                    </div>
-                </div>
-
-              
-            
-            <!-- Tags & Attachments -->
+            <!-- Task Details Grid -->
             <div class="grid md:grid-cols-2 gap-4 mb-6">
-    
-                <!-- Tags Section -->
-                <div class="bg-white/90 backdrop-blur-md rounded-xl shadow-md p-4">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-sm font-medium text-gray-800">Tags</h3>
-                        <button id="add-tag-btn" 
-                                class="p-1.5 bg-green-100 hover:bg-green-200 text-green-700 rounded-md transition-all"
-                                data-task-id="{{ task.id }}"
-                                data-org-id="{{ org_id }}"
-                                data-group-id="{{ group_id }}">
-                            <span class="material-icons text-sm">add</span>
-                        </button>
-                    </div>
+            <div class="bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-white/30">
+                <div class="flex items-center gap-2">
+                <span class="material-icons-round text-red-500/90 text-xl">priority</span>
+                <div>
+                    <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wide">Priority</h3>
+                    <span class="text-sm font-medium text-red-600/90">
+                    {{ task.priority|title }}
+                    </span>
+                </div>
+                </div>
+            </div>
             
-                    <div class="flex flex-wrap gap-1">
-                        {% if task.tags.all %}
-                            {% for tag in task.tags.all %}
-                            <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-md flex items-center gap-1 text-xs">
-                                {{ tag.name }}
-                                <button class="text-blue-700 hover:text-blue-800 remove-tag"
-                                        data-tag="{{ tag.name }}" 
-                                        data-tag-id="{{ tag.id }}"
+            <div class="bg-white/50 backdrop-blur-sm p-4 rounded-lg border border-white/30">
+                <div class="flex items-center gap-2">
+                <span class="material-icons-round text-purple-500/90 text-xl">schedule</span>
+                <div>
+                    <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wide">Deadline</h3>
+                    <p class="text-sm font-medium text-gray-700/90">
+                    {{ task.deadline|date:"M d, Y H:i" }}
+                    </p>
+                </div>
+                </div>
+            </div>
+            </div>
+
+            <!-- Progress Section (Functionality Preserved) -->
+            <div class="bg-white/60 backdrop-blur-md rounded-xl shadow-sm p-6 border border-white/30">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-lg font-semibold text-gray-700/90">Task Progress</h2>
+                <span class="text-xl font-semibold text-blue-600/90">{{ task.progress }}%</span>
+            </div>
+            
+            <!-- Original Progress Structure Preserved -->
+            <div class="space-y-4">
+                <div class="relative h-2.5 bg-gray-100/50 rounded-full overflow-hidden backdrop-blur-sm">
+                <div id="progressBar" 
+                    class="h-full bg-gradient-to-r from-blue-500 to-blue-400 transition-all duration-300 ease-out shadow-inner"
+                    style="width: {{ task.progress }}%"
+                    aria-valuenow="{{ task.progress }}" 
+                    aria-valuemin="0" 
+                    aria-valuemax="100">
+                    <span class="absolute inset-0 flex items-center justify-center text-[9px] font-medium text-white/90 tracking-tighter">
+                    {{ task.progress }}%
+                    </span>
+                </div>
+                </div>
+                
+                <!-- Original Control Markup Preserved -->
+                <div class="flex items-center gap-1.5" id="progress-controls">
+                    <!-- Decrease Progress Button -->
+                    <button id="decreaseProgress" 
+                            class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 
+                                transition-all active:scale-95 shadow-sm border border-gray-300/50"
+                            aria-label="Decrease progress">
+                        <span class="material-icons-round text-gray-600 text-base">remove</span>
+                    </button>
+                
+                    <!-- Increase Progress Button -->
+                    <button id="increaseProgress" 
+                            class="w-8 h-8 flex items-center justify-center rounded-full bg-blue-500 hover:bg-blue-600 
+                                transition-all active:scale-95 shadow-sm shadow-blue-100"
+                            aria-label="Increase progress">
+                        <span class="material-icons-round text-white text-base">add</span>
+                    </button>
+                </div>
+            </div>
+            </div>
+
+        <!-- Action Cards -->
+        <!-- Action Cards -->
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+
+            <!-- Task Actions -->
+            <div class="bg-white/90 backdrop-blur-md rounded-xl shadow-md p-4">
+                <h3 class="text-sm font-medium text-gray-800 mb-2">Task Actions</h3>
+                <div class="flex flex-col gap-2">
+                    <button class="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 
+                            text-white rounded-full transition-all text-xs font-medium shadow-sm active:scale-95"
+                            data-bs-toggle="offcanvas" data-bs-target="#problemsSidebar">
+                        <span class="material-icons text-sm">bug_report</span>
+                        View Problems
+                    </button>
+
+                   
+                </div>
+            </div>
+
+            <!-- Communication -->
+            <div class="bg-white/90 backdrop-blur-md rounded-xl shadow-md p-4">
+                <h3 class="text-sm font-medium text-gray-800 mb-2">Communication</h3>
+                <div class="flex flex-col gap-2">
+                    <button class="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 
+                            text-white rounded-full transition-all text-xs font-medium shadow-sm active:scale-95 start-chat-btn"
+                            data-org="{{ organization.id }}" 
+                            data-group="{{ group.id }}" 
+                            data-task="{{ task.id }}">
+                        <span class="material-icons text-sm">live_tv</span>
+                        Go Live Session
+                    </button>
+
+                    {% if extend_tasks %}
+                    <button class="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 
+                            text-white rounded-full transition-all text-xs font-medium shadow-sm active:scale-95"
+                            data-bs-toggle="modal" 
+                            data-bs-target="#queryModal"
+                            data-org-id="{{ organization.id }}" 
+                            data-group-id="{{ group.id }}" 
+                            data-task-id="{{ task.id }}">
+                        <span class="material-icons text-sm">email</span>
+                        Send Query
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+                        <!-- till here ---------------------------------------------------------------------------------------- -->
+
+                        <!-- Status Toggle -->
+                        <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 mb-8">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-800">Task Status</h3>
+                                    <p class="text-sm text-gray-500">Mark as completed when finished</p>
+                                </div>
+                                <div class="relative inline-block w-14 align-middle select-none transition duration-200 ease-in">
+                                    <input type="checkbox" 
+                                        id="toggleTaskStatus"
+                                        class="toggle-checkbox absolute block w-7 h-7 rounded-full bg-white border-2 border-gray-300 appearance-none cursor-pointer"
+                                        {% if task.status == 'completed' %} checked {% endif %}
+                                        
+                                        data-group-id="{{ group_id }}">
+                                    <label for="toggleTaskStatus" 
+                                        class="toggle-label block overflow-hidden h-7 rounded-full bg-gray-300 cursor-pointer transition-colors duration-200 ease-in"></label>
+                                </div>
+                            </div>
+                        </div>
+
+                    
+                    
+                    <!-- Tags & Attachments -->
+                    <div class="grid md:grid-cols-2 gap-4 mb-6">
+            
+                        <!-- Tags Section -->
+                        <div class="bg-white/90 backdrop-blur-md rounded-xl shadow-md p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-sm font-medium text-gray-800">Tags</h3>
+                                <button id="add-tag-btn" 
+                                        class="p-1.5 bg-green-100 hover:bg-green-200 text-green-700 rounded-md transition-all"
                                         data-task-id="{{ task.id }}"
                                         data-org-id="{{ org_id }}"
                                         data-group-id="{{ group_id }}">
-                                    ×
+                                    <span class="material-icons text-sm">add</span>
                                 </button>
-                            </span>
-                            {% endfor %}
-                        {% else %}
-                            <p class="text-gray-500 text-xs">No tags added yet</p>
-                        {% endif %}
-                    </div>
-                </div>
-            
-                <!-- Attachments Section -->
-                {% if extend_tasks %}
-                <div class="bg-white/90 backdrop-blur-md rounded-xl shadow-md p-4">
-                    <h3 class="text-sm font-medium text-gray-800 mb-2">Attachments</h3>
-                    <div class="flex flex-col gap-2">
-                        <button class="flex items-center justify-center gap-2 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white 
-                                rounded-lg transition-all text-xs font-medium shadow-sm active:scale-95"
-                                data-bs-toggle="modal" 
-                                data-bs-target="#premiumAttachmentsModal"
-                                data-org-id="{{ org_id }}" 
-                                data-group-id="{{ group.id }}" 
-                                data-task-id="{{ task.id }}">
-                            <span class="material-icons text-xs">attach_file</span>
-                            Manage Files
-                        </button>
-                        
-                        <button class="flex items-center justify-center gap-2 px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white 
-                                rounded-lg transition-all text-xs font-medium shadow-sm active:scale-95"
-                                data-bs-toggle="modal" 
-                                data-bs-target="#fullCalendarModal"
-                                data-org-id="{{ org_id }}" 
-                                data-group-id="{{ group.id }}" 
-                                data-task-id="{{ task.id }}">
-                            <span class="material-icons text-xs">schedule</span>
-                            Schedule Meeting
-                        </button>
-                    </div>
-                </div>
-                {% endif %}
-            
-            </div>
-                <!-- Notes & Comments -->
-                <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6">
-                    <!-- Notes -->
-                    <div class="mb-8">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-semibold text-gray-800">Notes</h3>
-                            <button class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors"
-                                    data-bs-toggle="modal" data-bs-target="#addNoteModal">
-                                <span class="material-icons">add</span>
-                                Add Note
-                            </button>
-                        </div>
-                        {% if task.notes.all %}
-                        <div class="space-y-4">
-                            {% for note in task.notes.all %}
-                            <div class="p-4 bg-gray-50 rounded-xl">
-                                <div class="flex items-start justify-between mb-2">
-                                    <div>
-                                        <h4 class="font-medium text-gray-700">{{ note.user.username }}</h4>
-                                        <p class="text-sm text-gray-500">{{ note.created_at|date:"M d, Y H:i" }}</p>
-                                    </div>
-                                    <div class="dropdown">
-                                        <button class="p-1 hover:bg-gray-200 rounded-lg dropdown-toggle"
-                                                data-bs-toggle="dropdown">
-                                            <span class="material-icons text-gray-600">more_vert</span>
+                            </div>
+                    
+                            <div class="flex flex-wrap gap-1">
+                                {% if task.tags.all %}
+                                    {% for tag in task.tags.all %}
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-md flex items-center gap-1 text-xs">
+                                        {{ tag.name }}
+                                        <button class="text-blue-700 hover:text-blue-800 remove-tag"
+                                                data-tag="{{ tag.name }}" 
+                                                data-tag-id="{{ tag.id }}"
+                                                data-task-id="{{ task.id }}"
+                                                data-org-id="{{ org_id }}"
+                                                data-group-id="{{ group_id }}">
+                                            ×
                                         </button>
-                                        <ul class="dropdown-menu">
-                                            <li><a class="dropdown-item delete-note" data-note-id="{{ note.id }}" 
-                                                data-task-id="{{ task.id }}" 
-                                                data-group-id="{{ task.group.id }}" 
-                                                data-org-id="{{ task.group.organization.id }}">Delete</a>
-                                            </li>
-
-                                            <li><a class="dropdown-item edit-note"data-note-id="{{ note.id }}" 
+                                    </span>
+                                    {% endfor %}
+                                {% else %}
+                                    <p class="text-gray-500 text-xs">No tags added yet</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    
+                        <!-- Attachments Section -->
+                        {% if extend_tasks %}
+                        <div class="bg-white/90 backdrop-blur-md rounded-xl shadow-md p-4">
+                            <h3 class="text-sm font-medium text-gray-800 mb-2">Attachments</h3>
+                            <div class="flex flex-col gap-2">
+                                <button class="flex items-center justify-center gap-2 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white 
+                                        rounded-lg transition-all text-xs font-medium shadow-sm active:scale-95"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#premiumAttachmentsModal"
+                                        data-org-id="{{ org_id }}" 
+                                        data-group-id="{{ group.id }}" 
+                                        data-task-id="{{ task.id }}">
+                                    <span class="material-icons text-xs">attach_file</span>
+                                    Manage Files
+                                </button>
+                                
+                                <button class="flex items-center justify-center gap-2 px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white 
+                                        rounded-lg transition-all text-xs font-medium shadow-sm active:scale-95"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#fullCalendarModal"
+                                        data-org-id="{{ org_id }}" 
+                                        data-group-id="{{ group.id }}" 
+                                        data-task-id="{{ task.id }}">
+                                    <span class="material-icons text-xs">schedule</span>
+                                    Schedule Meeting
+                                </button>
+                            </div>
+                        </div>
+                        {% endif %}
+                    
+                    </div>
+                        <!-- Notes & Comments -->
+                        <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6">
+                            <!-- Notes -->
+                            <div class="mb-8">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-lg font-semibold text-gray-800">Notes</h3>
+                                    <button class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors"
+                                            data-bs-toggle="modal" data-bs-target="#addNoteModal">
+                                        <span class="material-icons">add</span>
+                                        Add Note
+                                    </button>
+                                </div>
+                                {% if task.notes.all %}
+                                <div class="space-y-4">
+                                    {% for note in task.notes.all %}
+                                    <div class="p-4 bg-gray-50 rounded-xl">
+                                        <div class="flex items-start justify-between mb-2">
+                                            <div>
+                                                <h4 class="font-medium text-gray-700">{{ note.user.username }}</h4>
+                                                <p class="text-sm text-gray-500">{{ note.created_at|date:"M d, Y H:i" }}</p>
+                                            </div>
+                                            <div class="dropdown">
+                                                <button class="p-1 hover:bg-gray-200 rounded-lg dropdown-toggle"
+                                                        data-bs-toggle="dropdown">
+                                                    <span class="material-icons text-gray-600">more_vert</span>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item delete-note" data-note-id="{{ note.id }}" 
                                                         data-task-id="{{ task.id }}" 
                                                         data-group-id="{{ task.group.id }}" 
-                                                        data-org-id="{{ task.group.organization.id }}" 
-                                                        data-note-content="{{ note.note }}">Edit</a>
+                                                        data-org-id="{{ task.group.organization.id }}">Delete</a>
                                                     </li>
-                                        </ul>
+
+                                                    <li><a class="dropdown-item edit-note"data-note-id="{{ note.id }}" 
+                                                                data-task-id="{{ task.id }}" 
+                                                                data-group-id="{{ task.group.id }}" 
+                                                                data-org-id="{{ task.group.organization.id }}" 
+                                                                data-note-content="{{ note.note }}">Edit</a>
+                                                            </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <p class="text-gray-600">{{ note.note }}</p>
                                     </div>
+                                    {% endfor %}
                                 </div>
-                                <p class="text-gray-600">{{ note.note }}</p>
+                                {% else %}
+                                <p class="text-gray-500 text-center py-4">No notes available</p>
+                                {% endif %}
                             </div>
-                            {% endfor %}
-                        </div>
-                        {% else %}
-                        <p class="text-gray-500 text-center py-4">No notes available</p>
-                        {% endif %}
-                    </div>
 
-                    <!-- Comments -->
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Comments</h3>
-                        <div class="mb-4">
-                            <textarea id="comment-text" 
-                                      class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                      rows="3" 
-                                      placeholder="Write your comment..."></textarea>
+                            <!-- Comments -->
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4">Comments</h3>
+                                <div class="mb-4">
+                                    <textarea id="comment-text" 
+                                            class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            rows="3" 
+                                            placeholder="Write your comment..."></textarea>
 
-                            <button id="submit-comment" 
-                                    class="mt-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors" data-org-id="{{ org_id }}" 
-                                    data-group-id="{{ group_id }}" 
-                                    data-task-id="{{ task.id }}">
-        
-                                Post Comment
-                            </button>
-                        </div>
-                        {% if task.comments.all %}
-                        <div class="space-y-4">
-                            {% for comment in task.comments.all %}
-                            <div class="p-4 bg-gray-50 rounded-xl">
-                                <div class="flex items-start justify-between mb-2">
-                                    <div>
-                                        <h4 class="font-medium text-gray-700">{{ comment.user.username }}</h4>
-                                        <p class="text-sm text-gray-500">{{ comment.created_at|date:"M d, Y H:i" }}</p>
-                                    </div>
-                                    <div class="dropdown">
-                                        <button class="p-1 hover:bg-gray-200 rounded-lg dropdown-toggle"
-                                                data-bs-toggle="dropdown">
-                                            <span class="material-icons text-gray-600">more_vert</span>
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li><a class="dropdown-item edit-comment" data-comment-id="{{ comment.id }}" 
-                                                        data-org-id="{{ org_id }}" 
-                                                        data-group-id="{{ group_id }}" 
-                                                        data-task-id="{{ task.id }}" 
-                                                        data-comment-content="{{ comment.comment }}">Edit</a>
-                                                    </li>
-
-                                            <li>
-                                                <a class="dropdown-item delete-comment"    data-comment-id="{{ comment.id }}" 
-                                                        data-org-id="{{ org_id }}" 
-                                                        data-group-id="{{ group_id }}" 
-                                                        data-task-id="{{ task.id }}">Delete</a>
-                                                    </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <p class="text-gray-600">{{ comment.comment }}</p>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        {% else %}
-                        <p class="text-gray-500 text-center py-4">No comments yet</p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Sidebar -->
-        <div class="lg:col-span-1">
-            <!-- Quick Actions -->
-            <div class="quick-actions-container   bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 mb-8">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
-                <div class="space-y-3">
-
-
-                    <button id="openShareTaskModal" 
-                      data-org-id="123" 
-                      data-group-id="456" 
-                      data-task-id="789" 
-                      class="w-full flex items-center gap-3 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors">
-                      <span class="material-icons" style="color: dodgerblue;" >share</span>
-                     Share and Help
-                  </button>
-
-                <!-- Task Completion Button -->
-                {% if task.status != 'completed' and task.status != 'pending_approval' %}
-                   <button class="w-full flex items-center gap-3 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors" id="openTaskCompletionModal"
-                    data-org-id="{{ organization.id }}"
-                   data-group-id="{{ group.id }}"
-                   data-task-id="{{ task.id }}">
-                   <span class="material-icons" style="color: dodgerblue;">send</span>
-                   Submit Task for Approval
-                  </button>
-                 {% endif %}
-
-                <!-- Launch CalAI -->
-                <button type="button" class="w-full flex items-center gap-3 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors" data-bs-toggle="modal" data-bs-target="#aiChatModal">
-                    <span class="material-icons" style="color: teal;">android</span>
-                    CalAI
-                </button>
-                <!-- automations -->
-                <button class="w-full flex items-center gap-3 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors" data-bs-toggle="modal" data-bs-target="#automationModal">
-                    <span class="material-icons" style="color: teal;">settings_suggest</span>
-                    Automations
-                </button>
+                                    <button id="submit-comment" 
+                                            class="mt-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors" data-org-id="{{ org_id }}" 
+                                            data-group-id="{{ group_id }}" 
+                                            data-task-id="{{ task.id }}">
                 
-                </div>
-            </div>
+                                        Post Comment
+                                    </button>
+                                </div>
+                                {% if task.comments.all %}
+                                <div class="space-y-4">
+                                    {% for comment in task.comments.all %}
+                                    <div class="p-4 bg-gray-50 rounded-xl">
+                                        <div class="flex items-start justify-between mb-2">
+                                            <div>
+                                                <h4 class="font-medium text-gray-700">{{ comment.user.username }}</h4>
+                                                <p class="text-sm text-gray-500">{{ comment.created_at|date:"M d, Y H:i" }}</p>
+                                            </div>
+                                            <div class="dropdown">
+                                                <button class="p-1 hover:bg-gray-200 rounded-lg dropdown-toggle"
+                                                        data-bs-toggle="dropdown">
+                                                    <span class="material-icons text-gray-600">more_vert</span>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item edit-comment" data-comment-id="{{ comment.id }}" 
+                                                                data-org-id="{{ org_id }}" 
+                                                                data-group-id="{{ group_id }}" 
+                                                                data-task-id="{{ task.id }}" 
+                                                                data-comment-content="{{ comment.comment }}">Edit</a>
+                                                            </li>
 
-            <!-- Status Card -->
-            <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 mb-8">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Task Status</h3>
-                <div class="flex items-center gap-4">
-                    <div class="relative w-16 h-16">
-                        <svg class="w-full h-full" viewBox="0 0 100 100">
-                            <circle class="text-gray-200" stroke-width="8" stroke="currentColor" fill="transparent" r="44" cx="50" cy="50"/>
-                            <circle class="text-blue-500" stroke-width="8" stroke-dasharray="{{ task.progress }} 100" 
-                                    stroke-linecap="round" stroke="currentColor" fill="transparent" r="44" cx="50" cy="50"/>
-                        </svg>
-                        <span class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-lg font-bold text-blue-600">
-                            {{ task.progress }}%
-                        </span>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-600">Deadline:</p>
-                        <p class="font-medium text-gray-800">{{ task.deadline|date:"M d" }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Time Tracking -->
-            <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Time Tracking</h3>
-                <div class="space-y-4">
-                    <div class="text-center p-4 bg-blue-50 rounded-xl">
-                        <p class="text-3xl font-bold text-blue-600 mb-2" id="time-display">00:00:00</p>
-                        <div class="flex gap-2 justify-center">
-                            <button id="start-stop-btn" 
-                                    class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                                    data-task-id="{{ task.id }}" 
-                                    data-org-id="{{ org_id }}" 
-                                    data-group-id="{{ group_id }}"
-                                    >
-                                Start
-                            </button>
-                            <button id="save-time-btn" 
-                                    class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors" 
-                                    style="display: none;">
-                                Save
-                            </button>
+                                                    <li>
+                                                        <a class="dropdown-item delete-comment"    data-comment-id="{{ comment.id }}" 
+                                                                data-org-id="{{ org_id }}" 
+                                                                data-group-id="{{ group_id }}" 
+                                                                data-task-id="{{ task.id }}">Delete</a>
+                                                            </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <p class="text-gray-600">{{ comment.comment }}</p>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                <p class="text-gray-500 text-center py-4">No comments yet</p>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
-                    <div class="text-sm text-gray-600">
-                        <p class="font-medium mb-2">Tracked Time:</p>
-                        {% if task.time_tracking.all %}
-                        <ul class="space-y-2">
-                            {% for time_entry in task.time_tracking.all %}
-                            <li class="flex justify-between items-center">
-                                <span>{{ time_entry.user.username }}</span>
-                                <span class="font-medium">{{ time_entry.time_spent }}h</span>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                        {% else %}
-                        <p class="text-gray-500">No time tracked yet</p>
+                </div>
+
+                <!-- Right Sidebar -->
+                <div class="lg:col-span-1">
+                    <!-- Quick Actions -->
+                    <div class="quick-actions-container   bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 mb-8">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
+                        <div class="space-y-3">
+
+
+                            <button id="openShareTaskModal" 
+                            data-org-id="123" 
+                            data-group-id="456" 
+                            data-task-id="789" 
+                            class="w-full flex items-center gap-3 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors">
+                            <span class="material-icons" style="color: dodgerblue;" >share</span>
+                            Share and Help
+                        </button>
+
+                        <!-- Task Completion Button -->
+                        {% if task.status != 'completed' and task.status != 'pending_approval' %}
+                        <button class="w-full flex items-center gap-3 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors" id="openTaskCompletionModal"
+                            data-org-id="{{ organization.id }}"
+                        data-group-id="{{ group.id }}"
+                        data-task-id="{{ task.id }}">
+                        <span class="material-icons" style="color: dodgerblue;">send</span>
+                        Submit Task for Approval
+                        </button>
                         {% endif %}
+
+                        <!-- Launch CalAI -->
+                        <button type="button" class="w-full flex items-center gap-3 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors" data-bs-toggle="modal" data-bs-target="#aiChatModal">
+                            <span class="material-icons" style="color: teal;">android</span>
+                            CalAI
+                        </button>
+                        <!-- automations -->
+                        <button class="w-full flex items-center gap-3 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors" data-bs-toggle="modal" data-bs-target="#automationModal">
+                            <span class="material-icons" style="color: teal;">settings_suggest</span>
+                            Automations
+                        </button>
+                        
+                        </div>
+                    </div>
+
+                    <!-- Status Card -->
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 mb-8">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Task Status</h3>
+                        <div class="flex items-center gap-4">
+                            <div class="relative w-16 h-16">
+                                <svg class="w-full h-full" viewBox="0 0 100 100">
+                                    <circle class="text-gray-200" stroke-width="8" stroke="currentColor" fill="transparent" r="44" cx="50" cy="50"/>
+                                    <circle class="text-blue-500" stroke-width="8" stroke-dasharray="{{ task.progress }} 100" 
+                                            stroke-linecap="round" stroke="currentColor" fill="transparent" r="44" cx="50" cy="50"/>
+                                </svg>
+                                <span class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-lg font-bold text-blue-600">
+                                    {{ task.progress }}%
+                                </span>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">Deadline:</p>
+                                <p class="font-medium text-gray-800">{{ task.deadline|date:"M d" }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Time Tracking -->
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Time Tracking</h3>
+                        <div class="space-y-4">
+                            <div class="text-center p-4 bg-blue-50 rounded-xl">
+                                <p class="text-3xl font-bold text-blue-600 mb-2" id="time-display">00:00:00</p>
+                                <div class="flex gap-2 justify-center">
+                                    <button id="start-stop-btn" 
+                                            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                                            data-task-id="{{ task.id }}" 
+                                            data-org-id="{{ org_id }}" 
+                                            data-group-id="{{ group_id }}"
+                                            >
+                                        Start
+                                    </button>
+                                    <button id="save-time-btn" 
+                                            class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors" 
+                                            style="display: none;">
+                                        Save
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                <p class="font-medium mb-2">Tracked Time:</p>
+                                {% if task.time_tracking.all %}
+                                <ul class="space-y-2">
+                                    {% for time_entry in task.time_tracking.all %}
+                                    <li class="flex justify-between items-center">
+                                        <span>{{ time_entry.user.username }}</span>
+                                        <span class="font-medium">{{ time_entry.time_spent }}h</span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                {% else %}
+                                <p class="text-gray-500">No time tracked yet</p>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
 <style>
     .toggle-checkbox:checked {
@@ -6283,8 +6279,8 @@ video::-webkit-media-controls-panel {
     }
 </style>
 <!-------------------------------------------------------------------------------------------------------------------------------------------------------------  -->
-    <!-- Activity Logs Sidebar -->
-     <!-- Sidebar for Activity Logs -->
+<!-- Activity Logs Sidebar -->
+<!-- Sidebar for Activity Logs -->
 <div id="activityLogsSidebar" class="activity-logs-sidebar">
     <div class="sidebar-content">
         <button id="closeSidebarButton" class="btn btn-light">Close</button>
