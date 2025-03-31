@@ -5197,18 +5197,23 @@ video::-webkit-media-controls-panel {
         </div>
 
         <!-- Profile Section -->
-        <div class="p-4 border-t border-white/40">
-            <div class="flex items-center gap-3 p-2.5 rounded-xl bg-white/60 backdrop-blur-sm shadow-sm">
-                <div class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
-                    <span class="text-indigo-600 font-medium text-sm">JD</span>
-                </div>
-                <div class="truncate">
-                    <p class="text-sm font-medium text-slate-800 truncate">John Doe</p>
-                    <p class="text-xs text-slate-500 truncate">admin@example.com</p>
-                </div>
-            </div>
+        <!-- Profile Section -->
+<div class="p-4 border-t border-white/40">
+    <div class="flex items-center gap-3 p-2.5 rounded-xl bg-white/60 backdrop-blur-sm shadow-sm">
+        <div class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center shrink-0 overflow-hidden">
+            {% if profile_picture %}
+                <img src="{{ profile_picture}}" alt="Profile Picture" class="w-full h-full object-cover">
+            {% else %}
+                <span class="text-indigo-600 font-medium text-sm">?</span>
+            {% endif %}
+        </div>
+        <div class="truncate">
+            <p class="text-sm font-medium text-slate-800 truncate">{{ request.user.username }}</p>
+            <p class="text-xs text-slate-500 truncate">{{ request.user.email }}</p>
         </div>
     </div>
+</div>
+
 </aside>
 
 

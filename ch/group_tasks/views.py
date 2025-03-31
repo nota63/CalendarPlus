@@ -3497,6 +3497,9 @@ def my_day_task_detail(request, org_id, group_id, task_id):
 
     task = get_object_or_404(Task, id=task_id, group=group,assigned_to=request.user)
     problems = Problem.objects.filter(task=task,organization=organization,group=group)
+    # profile_picture 
+    profile_query=Profile.objects.filter(user=task.assigned_to,organization=organization).first()
+    profile_picture=profile_query.profile_picture.url if profile_query and profile_query.profile_picture.url else None
 
     # remained queries
     queries=task.queries_sent
@@ -3556,6 +3559,7 @@ def my_day_task_detail(request, org_id, group_id, task_id):
         'calpoints':calpoints,
         'automations':automations,
         "subtasks":subtasks,
+        'profile_picture':profile_picture,
     })
 
 
