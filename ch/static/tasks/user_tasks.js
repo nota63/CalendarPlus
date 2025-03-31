@@ -2364,4 +2364,87 @@ document.getElementById("searchMessages").addEventListener("input", function () 
 });
 
 
-// Task Settings Controls
+// Task Overdue Status
+document.addEventListener("DOMContentLoaded", function () {
+    let deadlineStatus = document.getElementById("deadline-status").getAttribute("data-deadline-passed");
+
+    if (deadlineStatus === "true") {
+        // Add global styles for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes alert-pulse {
+                0%, 100% { box-shadow: 0 0 25px rgba(239,68,68,0.3); }
+                50% { box-shadow: 0 0 35px rgba(239,68,68,0.6); }
+            }
+            .alert-pulse-animation {
+                animation: alert-pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Body background effect
+        setInterval(() => {
+            document.body.classList.toggle("bg-red-500/10");
+        }, 500);
+
+        function createPopup() {
+            const popup = document.createElement('div');
+            popup.innerHTML = `
+                <div class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div class="relative alert-pulse-animation bg-black rounded-xl border-2 border-red-500 p-8 max-w-md w-full transform transition-all">
+                        <div class="absolute -top-2 -right-2">
+                            <span class="flex h-5 w-5">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-5 w-5 bg-red-500"></span>
+                            </span>
+                        </div>
+                        
+                        <div class="text-center space-y-4">
+                            <h2 class="text-2xl font-bold text-red-500 mb-4 font-sans tracking-tight">
+                                🚨 CRIME ALERT! 🚨
+                            </h2>
+                            <div class="space-y-3">
+                                <p class="text-red-200 font-medium text-lg leading-tight">
+                                    ❌ Violation of CalAI Task Policy ❌
+                                </p>
+                                <p class="text-gray-300 text-base">
+                                    Task deadline expired without completion!
+                                </p>
+                                <p class="text-red-400 font-semibold text-lg mt-4">
+                                    ⚠️ 5 CalPoints Deducted! ⚠️
+                                </p>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <button onclick="this.parentElement.parentElement.parentElement.remove()" 
+                                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg transition-colors duration-200 transform hover:scale-105">
+                                    Acknowledge
+                                </button>
+                            </div>
+                            
+                            <div class="mt-6 border-t border-red-900/50 pt-4">
+                                <p class="text-xs text-red-900/80 font-mono tracking-wide">
+                                    🔹 CALAI TASK ENFORCEMENT SYSTEM v3.14 🔹
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add entrance animation
+            popup.querySelector('.relative').classList.add(
+                'animate-[slideIn_0.3s_ease-out]', 
+                'hover:scale-102', 
+                'transition-transform', 
+                'duration-300'
+            );
+            
+            document.body.appendChild(popup);
+        }
+
+        // Show initial popup and repeat every 30 seconds
+        createPopup();
+        setInterval(createPopup, 30000);
+    }
+});

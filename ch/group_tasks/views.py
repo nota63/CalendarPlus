@@ -3373,9 +3373,8 @@ def get_issue_details(request, issue_id):
 # Chat In real time issue room
 from .models import IssueRoom
 from django.utils.decorators import method_decorator
+
 # Fetch and handle saving messages
-
-
 
 @csrf_exempt  
 def issue_discussion_view(request, org_id, group_id, task_id, issue_id):
@@ -3491,6 +3490,8 @@ def add_to_my_day(request, org_id , group_id, task_id):
     return JsonResponse({'error':'Invalid request method'}, status = 400)
 
 
+
+
 # Bring the task to perform the actions
 @check_org_membership
 def my_day_task_detail(request, org_id, group_id, task_id):
@@ -3502,6 +3503,10 @@ def my_day_task_detail(request, org_id, group_id, task_id):
     # profile_picture 
     profile_query=Profile.objects.filter(user=task.assigned_to,organization=organization).first()
     profile_picture=profile_query.profile_picture.url if profile_query and profile_query.profile_picture.url else None
+
+
+    # check if deadline has passed
+    has_deadline_passed = task.deadline < now() and task.status != "completed"
 
     # remained queries
     queries=task.queries_sent
@@ -3562,6 +3567,7 @@ def my_day_task_detail(request, org_id, group_id, task_id):
         'automations':automations,
         "subtasks":subtasks,
         'profile_picture':profile_picture,
+        "has_deadline_passed":has_deadline_passed,
     })
 
 

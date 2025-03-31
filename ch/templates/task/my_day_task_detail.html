@@ -1026,7 +1026,7 @@ body {
 <br>
 <br>
 
-    
+
 <div id="uploadStatus" class="relative flex items-center justify-center mt-4"></div>
 
 <!-- PREMIUM MODALS TASKS EXTEND APP  ----------------------------------------------------------------------------------------------->
@@ -5401,6 +5401,16 @@ video::-webkit-media-controls-panel {
 
 
 <!-- TILL HERE --------------------------------------------------------------------------------------------------------------- -->
+<!-- notify if task is due -->
+{% if has_deadline_passed %}
+    <div id="deadline-warning" class="fixed top-0 left-0 w-full bg-red-600 text-white text-center font-bold p-2 animate-blink">
+        🚨 Task deadline has passed! 🚨
+    </div>
+{% endif %}
+<!-- Add a hidden div with a data attribute -->
+<div id="deadline-status" data-deadline-passed="{% if has_deadline_passed %}true{% else %}false{% endif %}"></div>
+
+
 
 <!-- Task completion rewards -->
 {% if calpoints and calpoints.points %}
