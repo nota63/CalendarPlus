@@ -1096,3 +1096,38 @@ input:focus, textarea:focus, select:focus {
                -4px -4px 8px rgba(255,255,255,0.05);
   }
 
+
+
+/* Extend tasks modal */
+/* Custom Animations */
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slide-in {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-fade-in { animation: fade-in 0.6s ease-out forwards; }
+  .animate-slide-in { animation: slide-in 0.5s ease-out forwards; }
+  .animate-fade-in-up { animation: fade-in-up 0.7s ease-out forwards; }
+
+  /* Neumorphic Elements */
+  .neumorphic-icon-bg {
+    background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+    box-shadow: 4px 4px 8px rgba(0,0,0,0.1),
+               -4px -4px 8px rgba(255,255,255,0.05);
+  }
+
+  .feature-card {
+    @apply flex items-center gap-3 p-4 bg-white/5 rounded-xl transition-all hover:bg-white/10;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.1);
+  }

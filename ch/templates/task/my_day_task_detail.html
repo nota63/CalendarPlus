@@ -1091,47 +1091,82 @@ body {
 <!-- check if user has installed miniapp (Extends Tasks)-->
 {% if not extend_tasks %}
 <!-- Background Blur Overlay -->
-<div id="extendTasksOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-lg flex items-center justify-center z-50 hidden">
+<div id="extendTasksOverlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 hidden transition-all">
+    <!-- Modal Container -->
+    <div id="extendTasksModal" class="bg-white p-6 rounded-2xl shadow-2xl max-w-lg w-full mx-4 transform scale-95 opacity-0 transition-all duration-300 relative border border-gray-100">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
+        <div class="flex items-center space-x-3">
+          <div class="bg-purple-100 p-2 rounded-lg">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 font-[600]">Unlock Premium Features</h3>
+        </div>
+        <button id="closeExtendTasksModal" class="p-1 hover:bg-gray-100 rounded-full transition-colors">
+          <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
   
-  <!-- Modal Container -->
-  <div id="extendTasksModal" class="bg-white p-6 rounded-xl shadow-lg max-w-md w-full transform scale-95 opacity-0 transition-all duration-300">
-    
-    <!-- Modal Header -->
-    <div class="flex items-center justify-between">
-      <h3 class="text-lg font-semibold text-gray-800">🚀 Unlock More Features</h3>
-      <button id="closeExtendTasksModal" class="text-gray-500 hover:text-gray-700">
-        <span class="material-icons">close</span>
-      </button>
-    </div>
-
-    <!-- Modal Content -->
-    <p class="text-sm text-gray-600 mt-2">
-      You are missing out on **most of our powerful task features**!  
-      Install the **Extend Tasks App** from **CalApp Store** to enjoy **seamless workflow automation** and extra **flawless features**.
-    </p>
-
-    <!-- App Preview -->
-    <img src="https://th.bing.com/th/id/OIP.ryzwn0k0OLh3i3hzFEk6awHaEK?w=1920&h=1079&rs=1&pid=ImgDetMain" class="rounded-lg shadow-md mt-3" alt="Extend Tasks Preview">
-
-    <!-- Features List -->
-    <ul class="mt-3 space-y-2 text-gray-700 text-sm">
-      <li>✅ Advanced Task Automations</li>
-      <li>✅ Seamless Team Collaboration</li>
-      <li>✅ AI-Powered Task Suggestions</li>
-      <li>✅ Deadline Tracking & Notifications</li>
-      <li>✅ Full Calendar & Kanban Board Integration</li>
-    </ul>
-
-    <!-- Install Button -->
-    <div class="mt-4">
-      <a href="{% url 'install' app_id=11 org_id=organization.id %}"
-         class="block text-center w-full px-4 py-2.5 bg-teal-600 text-white font-medium rounded-lg shadow-md hover:bg-teal-700 transition-all duration-200 focus:outline-none focus:ring focus:ring-teal-300">
-        🚀 Install Extend Tasks Now
-      </a>
+      <!-- Modal Content -->
+      <div class="overflow-y-auto max-h-[70vh] pr-2">
+        <p class="text-gray-600 text-base leading-relaxed mb-6">
+          Elevate your workflow with <span class="font-semibold text-purple-600">Extend Tasks Pro</span>. 
+          Unlock advanced automation, team collaboration, and intelligent features through the CalApp Store.
+        </p>
+  
+        <!-- App Preview -->
+        <div class="relative mb-6 overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+          <img src="https://th.bing.com/th/id/OIP.ryzwn0k0OLh3i3hzFEk6awHaEK?w=1920&h=1079&rs=1&pid=ImgDetMain" 
+               class="w-full h-auto object-cover mx-auto"
+               alt="App Preview"
+               loading="lazy">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+        </div>
+  
+        <!-- Features Grid -->
+        <div class="grid grid-cols-2 gap-4 mb-8">
+          <div class="flex items-start space-x-2 p-3 bg-gray-50 rounded-lg">
+            <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+            </svg>
+            <span class="text-gray-700 text-sm font-medium">Workflow Automation</span>
+          </div>
+          <div class="flex items-start space-x-2 p-3 bg-gray-50 rounded-lg">
+            <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+            </svg>
+            <span class="text-gray-700 text-sm font-medium">AI Suggestions</span>
+          </div>
+          <div class="flex items-start space-x-2 p-3 bg-gray-50 rounded-lg">
+            <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+            </svg>
+            <span class="text-gray-700 text-sm font-medium">Team Collaboration</span>
+          </div>
+          <div class="flex items-start space-x-2 p-3 bg-gray-50 rounded-lg">
+            <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+            </svg>
+            <span class="text-gray-700 text-sm font-medium">Smart Deadlines</span>
+          </div>
+        </div>
+  
+        <!-- Install CTA -->
+        <a href="{% url 'install' app_id=11 org_id=organization.id %}"
+           class="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-3.5 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+          </svg>
+          <span>Install Extend Tasks</span>
+        </a>
+      </div>
     </div>
   </div>
-</div>
-
 <!-- JavaScript to Show & Close Modal -->
 <script>
   document.addEventListener("DOMContentLoaded", function () {
@@ -1160,8 +1195,7 @@ body {
 
 <!-- ----------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 <div id="current-date"></div>
-<br>
-<br>
+
 
 
 <div id="uploadStatus" class="relative flex items-center justify-center mt-4"></div>
