@@ -1435,9 +1435,7 @@ video::-webkit-media-controls-panel {
 
 
 
-<!-- TASK SUBMISSION MODAL -->
 
-<!-- TASK SUBMISSION MODAL -->
 <!-- Task Submission Modal -->
 <div class="modal fade" id="taskCompletionModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -4966,166 +4964,192 @@ video::-webkit-media-controls-panel {
 </div>
 
 <!-- Task settings -->
-<div class="modal fade" id="taskSettingsModal" tabindex="-1" aria-labelledby="taskSettingsLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="taskSettingsLabel">⚙️ Advanced Task Settings</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade" id="taskSettingsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl max-w-6xl">
+        <div class="modal-content glass-panel rounded-2xl border-0">
+            <div class="modal-header border-b border-white/10 p-6">
+                <div class="flex items-center space-x-3">
+                    <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <h5 class="modal-title text-xl font-semibold text-white">Advanced Task Configuration</h5>
+                </div>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <form>
-
-                    <!-- AUTOMATIONS -->
-                    <h6 class="text-muted mb-3">🤖 Automations</h6>
-                    
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="autoAssign">
-                        <label class="form-check-label" for="autoAssign">Auto-Assign Users Based on Load</label>
-                    </div>
-                    
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="taskCompletionAI">
-                        <label class="form-check-label" for="taskCompletionAI">Enable AI-Powered Task Completion</label>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Task Trigger Actions</label>
-                        <select class="form-select">
-                            <option>Send Slack Notification</option>
-                            <option>Trigger Webhook</option>
-                            <option>Start a Background Job</option>
-                        </select>
-                    </div>
-
-                    <!-- BACKGROUND JOBS -->
-                    <h6 class="text-muted mb-3 mt-4">⚡ Background Jobs</h6>
-
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="enableJobQueue">
-                        <label class="form-check-label" for="enableJobQueue">Enable Task Queue Processing</label>
-                    </div>
-
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="enableRetryJobs">
-                        <label class="form-check-label" for="enableRetryJobs">Enable Auto-Retry Failed Jobs</label>
+            
+            <div class="modal-body p-0">
+                <div class="grid grid-cols-4 h-[650px]">
+                    <!-- Left Navigation -->
+                    <div class="col-span-1 bg-white/5 border-r border-white/10 p-6">
+                        <nav class="space-y-2">
+                            <a href="#" class="flex items-center space-x-3 p-3 rounded-lg bg-indigo-500/20 text-indigo-400">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                                </svg>
+                                <span class="text-sm font-medium">General</span>
+                            </a>
+                            <a href="#" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/5 text-gray-300 hover:text-white transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                </svg>
+                                <span class="text-sm font-medium">Automation</span>
+                            </a>
+                            <a href="#" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/5 text-gray-300 hover:text-white transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                </svg>
+                                <span class="text-sm font-medium">Security</span>
+                            </a>
+                            <a href="#" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-white/5 text-gray-300 hover:text-white transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/>
+                                </svg>
+                                <span class="text-sm font-medium">Integrations</span>
+                            </a>
+                        </nav>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Job Execution Priority</label>
-                        <select class="form-select">
-                            <option>Normal</option>
-                            <option>High</option>
-                            <option>Critical</option>
-                        </select>
+                    <!-- Main Content -->
+                    <div class="col-span-3 p-8 overflow-y-auto">
+                        <!-- General Settings -->
+                        <div class="space-y-8">
+                            <!-- Task Prioritization -->
+                            <div class="bg-white/5 rounded-xl p-6 border border-white/10">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="font-semibold text-lg text-white">Task Prioritization</h3>
+                                    <span class="px-3 py-1 bg-indigo-500/20 text-indigo-400 rounded-full text-xs">AI Optimized</span>
+                                </div>
+                                <div class="space-y-4">
+                                    <div class="form-group">
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Priority Level</label>
+                                        <input type="range" min="1" max="5" value="3" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                                        <div class="flex justify-between text-xs text-gray-400 mt-2">
+                                            <span>Low</span>
+                                            <span>Critical</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="block text-sm font-medium text-gray-300 mb-2">Weighted Impact</label>
+                                        <div class="grid grid-cols-3 gap-4">
+                                            <div class="bg-white/5 p-4 rounded-lg text-center">
+                                                <span class="block text-2xl font-bold text-indigo-400">8.4</span>
+                                                <span class="text-xs text-gray-400">Complexity Score</span>
+                                            </div>
+                                            <div class="bg-white/5 p-4 rounded-lg text-center">
+                                                <span class="block text-2xl font-bold text-green-400">72%</span>
+                                                <span class="text-xs text-gray-400">Completion Rate</span>
+                                            </div>
+                                            <div class="bg-white/5 p-4 rounded-lg text-center">
+                                                <span class="block text-2xl font-bold text-yellow-400">3.2d</span>
+                                                <span class="text-xs text-gray-400">Avg. Duration</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Automation Triggers -->
+                            <div class="bg-white/5 rounded-xl p-6 border border-white/10">
+                                <h3 class="font-semibold text-lg text-white mb-6">Automation Rules</h3>
+                                <div class="space-y-6">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center">
+                                                <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <h4 class="text-sm font-medium text-white">Status Change Trigger</h4>
+                                                <p class="text-xs text-gray-400">When task moves to Done</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <button class="p-1.5 hover:bg-white/10 rounded-lg">
+                                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                </svg>
+                                            </button>
+                                            <div class="form-switch">
+                                                <input type="checkbox" class="sr-only" id="trigger1">
+                                                <div class="w-8 h-4 bg-gray-600 rounded-full shadow-inner">
+                                                    <div class="w-4 h-4 bg-white rounded-full transition-transform"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Advanced Automation Rule -->
+                                    <div class="bg-white/5 p-4 rounded-lg border border-dashed border-white/20">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center">
+                                                <svg class="w-3 h-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                                </svg>
+                                            </div>
+                                            <span class="text-sm text-gray-300">Add New Automation Rule</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Performance Settings -->
+                            <div class="grid grid-cols-2 gap-6">
+                                <div class="bg-white/5 p-6 rounded-xl border border-white/10">
+                                    <h3 class="text-sm font-semibold text-white mb-4">Resource Allocation</h3>
+                                    <div class="space-y-4">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-sm text-gray-400">CPU Priority</span>
+                                            <span class="text-sm font-medium text-indigo-400">High</span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-sm text-gray-400">Memory Limit</span>
+                                            <span class="text-sm font-medium text-gray-300">4 GB</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white/5 p-6 rounded-xl border border-white/10">
+                                    <h3 class="text-sm font-semibold text-white mb-4">Dependencies</h3>
+                                    <div class="space-y-3">
+                                        <div class="flex items-center space-x-2">
+                                            <div class="w-2 h-2 rounded-full bg-green-400"></div>
+                                            <span class="text-sm text-gray-300">Requires Task #234</span>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <div class="w-2 h-2 rounded-full bg-yellow-400"></div>
+                                            <span class="text-sm text-gray-300">Blocked by PR #45</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
-                    <!-- BACKUP SCHEDULES -->
-                    <h6 class="text-muted mb-3 mt-4">💾 Backup & Recovery</h6>
-
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="enableAutoBackup">
-                        <label class="form-check-label" for="enableAutoBackup">Enable Auto Backup</label>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Backup Frequency</label>
-                        <select class="form-select">
-                            <option>Daily</option>
-                            <option>Weekly</option>
-                            <option>Monthly</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Backup Retention Period</label>
-                        <select class="form-select">
-                            <option>1 Week</option>
-                            <option>1 Month</option>
-                            <option>6 Months</option>
-                        </select>
-                    </div>
-
-                    <!-- SECURITY SETTINGS -->
-                    <h6 class="text-muted mb-3 mt-4">🔒 Security & Compliance</h6>
-
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="enableTwoFA">
-                        <label class="form-check-label" for="enableTwoFA">Enable Two-Factor Authentication</label>
-                    </div>
-
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="logTaskEdits">
-                        <label class="form-check-label" for="logTaskEdits">Log All Task Edits</label>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Data Encryption Level</label>
-                        <select class="form-select">
-                            <option>Standard (AES-256)</option>
-                            <option>Advanced (SHA-512)</option>
-                        </select>
-                    </div>
-
-                    <!-- API & INTEGRATIONS -->
-                    <h6 class="text-muted mb-3 mt-4">🔗 API & Webhooks</h6>
-
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="enableAPIAccess">
-                        <label class="form-check-label" for="enableAPIAccess">Enable API Access</label>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Webhook Trigger Events</label>
-                        <select class="form-select">
-                            <option>Task Created</option>
-                            <option>Task Updated</option>
-                            <option>Task Completed</option>
-                        </select>
-                    </div>
-
-                    <!-- PERFORMANCE SETTINGS -->
-                    <h6 class="text-muted mb-3 mt-4">🚀 Performance Boosters</h6>
-
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="enableLazyLoad">
-                        <label class="form-check-label" for="enableLazyLoad">Enable Lazy Loading for Tasks</label>
-                    </div>
-
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="enableCache">
-                        <label class="form-check-label" for="enableCache">Enable Task Caching</label>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Max Concurrent Tasks</label>
-                        <input type="number" class="form-control" value="5">
-                    </div>
-
-                    <!-- ADVANCED SETTINGS -->
-                    <h6 class="text-muted mb-3 mt-4">💎 Pro Mode Features</h6>
-
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="enableSmartRecommendations">
-                        <label class="form-check-label" for="enableSmartRecommendations">Enable Smart Task Recommendations</label>
-                    </div>
-
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="enableDarkMode">
-                        <label class="form-check-label" for="enableDarkMode">Enable Dark Mode</label>
-                    </div>
-
-                </form>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save Settings</button>
+
+            <div class="modal-footer border-t border-white/10 p-4">
+                <div class="flex items-center justify-between w-full">
+                    <div class="flex items-center space-x-2 text-gray-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span class="text-sm">Settings auto-save every 30 seconds</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button class="px-4 py-2 text-sm font-medium rounded-lg border border-white/10 hover:bg-white/5 transition-colors">
+                            Discard Changes
+                        </button>
+                        <button class="px-4 py-2 text-sm font-medium rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 transition-colors">
+                            Save Configuration
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-
 <!----------------------------------------------------------------------------------------------------------------------------- -->
 
 
@@ -5142,8 +5166,8 @@ video::-webkit-media-controls-panel {
 </head>
 
 <body class="bg-gray-50 min-h-screen p-6 font-['Roboto']">
-    <!-- Notification -->
-    <div id="notification" class="notification hidden fixed top-4 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-3 rounded-lg shadow-md border border-gray-200">
+<!-- Notification -->
+<div id="notification" class="notification hidden fixed top-4 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-3 rounded-lg shadow-md border border-gray-200">
         <span id="notification-text" class="text-sm font-medium text-gray-700"></span>
         <button onclick="closeNotification()" class="material-icons-round text-gray-500 hover:text-gray-700 text-lg">close</button>
     </div>
@@ -5377,6 +5401,8 @@ video::-webkit-media-controls-panel {
 
 
 <!-- TILL HERE --------------------------------------------------------------------------------------------------------------- -->
+
+<!-- Task completion rewards -->
 {% if calpoints and calpoints.points %}
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Exo+2:wght@600&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
@@ -6124,7 +6150,7 @@ video::-webkit-media-controls-panel {
 <!-- sortable.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 <!-- Connect Javascript & Attributes -->
- <!-- Link new js file and configure attributes  -->
+<!-- Link new js file and configure attributes  -->
 <script type="text/javascript">
     // Inject Django variables into the window object
     window.djangoData = {
@@ -6156,6 +6182,7 @@ video::-webkit-media-controls-panel {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
 
+<!-- Fullcalendar Setup -->
 <script>
 $(document).ready(function () {
     let selectedDate = null;
@@ -6509,9 +6536,7 @@ $("#scheduleMeeting").on("click", function () {
 </script>
 
 
-
-
-<!-- Script -->
+<!-- Script  continue-->
 <script>
        $(document).ready(function() {
     $('#submit-comment').click(function() {
@@ -8245,7 +8270,7 @@ function startCountdown(deadline) {
 startStopBtn.addEventListener('click', toggleStopwatch);
 resetBtn.addEventListener('click', resetStopwatch);
 
-    </script>
+</script>
 
     
 

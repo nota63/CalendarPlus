@@ -2349,8 +2349,6 @@ data.messages.forEach(msg => {
     window.previewFile = previewFile;
 });
 
-
-// Handle real time messages filter
 // Handle real-time message filtering
 document.getElementById("searchMessages").addEventListener("input", function () {
     const searchText = this.value.toLowerCase().trim();
@@ -2364,3 +2362,6 @@ document.getElementById("searchMessages").addEventListener("input", function () 
         msg.style.display = messageText.includes(searchText) || senderName.includes(searchText) ? "flex" : "none";
     });
 });
+
+
+// Task Settings Controls

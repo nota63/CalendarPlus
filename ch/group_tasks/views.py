@@ -144,7 +144,7 @@ def create_task(request, org_id, group_id):
 from .models import AddDay,SubTask,AttachmentsTasksApp
 from app_marketplace.models import InstalledMiniApp
 
-
+# task calendar and check if user has Extend Task app installed
 @login_required
 def task_calendar(request, org_id, group_id):
     group = get_object_or_404(Group, id=group_id, organization_id=org_id)
@@ -649,6 +649,7 @@ def send_task_email(request, org_id, group_id, task_id):
 from datetime import datetime, timedelta
 from accounts.models import Availability,MeetingOrganization
 
+# get available slots
 @login_required
 def get_available_slots(request):
     org_id = request.GET.get("org_id")
@@ -740,7 +741,7 @@ def generate_meet_link():
     random_code = "".join(random.choices(string.ascii_lowercase + string.digits, k=10))
     return f"https://meet.google.com/{random_code}"
 
-
+# schedule the meeting
 @csrf_exempt 
 def schedule_meeting(request):
     if request.method != "POST":
@@ -1304,6 +1305,7 @@ import logging
 # Set up logger
 logger = logging.getLogger(__name__)
 
+# notify task clone
 def notify_task_cloned(org_id, group_id, task_id):
     try:
         # Fetch required objects
@@ -1889,7 +1891,7 @@ def send_task_to_members(request):
 
 # TASK RE-ASSIGNMENT
 from .utils import *
-
+# re-ssign the task
 def reassign_task(request, org_id, group_id, task_id):
     """Reassigns a task to a new user if they belong to the organization & group."""
     if request.method == "POST":
@@ -4289,7 +4291,7 @@ from django.http import HttpResponseForbidden
 from django.db import models
 from django.core.paginator import Paginator
 
-
+# view task assigned users (Manager)
 class AssignedUsersListView(ListView):
     template_name = 'assignment/assigned_users_list.html'
     context_object_name = 'assigned_users'
@@ -4390,6 +4392,7 @@ def user_tasks_view(request, org_id, group_id, user_id):
 # Detailed tasks details 
 from django.db.models import Count
 
+# Task detail & Collaborate
 class TaskDetailView(View):
     def get(self, request, org_id, group_id, task_id, user_id):
 
