@@ -4966,46 +4966,165 @@ video::-webkit-media-controls-panel {
 </div>
 
 <!-- Task settings -->
- <!-- Bootstrap 5 Modal for Task Settings -->
 <div class="modal fade" id="taskSettingsModal" tabindex="-1" aria-labelledby="taskSettingsLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="taskSettingsLabel">Task Settings</h5>
+                <h5 class="modal-title" id="taskSettingsLabel">⚙️ Advanced Task Settings</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <!-- Task Settings Content -->
                 <form>
-                    <div class="mb-3">
-                        <label class="form-label">Task Deadline</label>
-                        <input type="date" class="form-control" id="taskDeadline">
+
+                    <!-- AUTOMATIONS -->
+                    <h6 class="text-muted mb-3">🤖 Automations</h6>
+                    
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="autoAssign">
+                        <label class="form-check-label" for="autoAssign">Auto-Assign Users Based on Load</label>
                     </div>
+                    
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="taskCompletionAI">
+                        <label class="form-check-label" for="taskCompletionAI">Enable AI-Powered Task Completion</label>
+                    </div>
+                    
                     <div class="mb-3">
-                        <label class="form-label">Priority</label>
-                        <select class="form-select" id="taskPriority">
-                            <option value="low">Low</option>
-                            <option value="medium">Medium</option>
-                            <option value="high">High</option>
+                        <label class="form-label">Task Trigger Actions</label>
+                        <select class="form-select">
+                            <option>Send Slack Notification</option>
+                            <option>Trigger Webhook</option>
+                            <option>Start a Background Job</option>
                         </select>
                     </div>
+
+                    <!-- BACKGROUND JOBS -->
+                    <h6 class="text-muted mb-3 mt-4">⚡ Background Jobs</h6>
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="enableJobQueue">
+                        <label class="form-check-label" for="enableJobQueue">Enable Task Queue Processing</label>
+                    </div>
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="enableRetryJobs">
+                        <label class="form-check-label" for="enableRetryJobs">Enable Auto-Retry Failed Jobs</label>
+                    </div>
+
                     <div class="mb-3">
-                        <label class="form-label">Status</label>
-                        <select class="form-select" id="taskStatus">
-                            <option value="todo">To Do</option>
-                            <option value="in-progress">In Progress</option>
-                            <option value="completed">Completed</option>
+                        <label class="form-label">Job Execution Priority</label>
+                        <select class="form-select">
+                            <option>Normal</option>
+                            <option>High</option>
+                            <option>Critical</option>
                         </select>
                     </div>
+
+                    <!-- BACKUP SCHEDULES -->
+                    <h6 class="text-muted mb-3 mt-4">💾 Backup & Recovery</h6>
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="enableAutoBackup">
+                        <label class="form-check-label" for="enableAutoBackup">Enable Auto Backup</label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Backup Frequency</label>
+                        <select class="form-select">
+                            <option>Daily</option>
+                            <option>Weekly</option>
+                            <option>Monthly</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Backup Retention Period</label>
+                        <select class="form-select">
+                            <option>1 Week</option>
+                            <option>1 Month</option>
+                            <option>6 Months</option>
+                        </select>
+                    </div>
+
+                    <!-- SECURITY SETTINGS -->
+                    <h6 class="text-muted mb-3 mt-4">🔒 Security & Compliance</h6>
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="enableTwoFA">
+                        <label class="form-check-label" for="enableTwoFA">Enable Two-Factor Authentication</label>
+                    </div>
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="logTaskEdits">
+                        <label class="form-check-label" for="logTaskEdits">Log All Task Edits</label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Data Encryption Level</label>
+                        <select class="form-select">
+                            <option>Standard (AES-256)</option>
+                            <option>Advanced (SHA-512)</option>
+                        </select>
+                    </div>
+
+                    <!-- API & INTEGRATIONS -->
+                    <h6 class="text-muted mb-3 mt-4">🔗 API & Webhooks</h6>
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="enableAPIAccess">
+                        <label class="form-check-label" for="enableAPIAccess">Enable API Access</label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Webhook Trigger Events</label>
+                        <select class="form-select">
+                            <option>Task Created</option>
+                            <option>Task Updated</option>
+                            <option>Task Completed</option>
+                        </select>
+                    </div>
+
+                    <!-- PERFORMANCE SETTINGS -->
+                    <h6 class="text-muted mb-3 mt-4">🚀 Performance Boosters</h6>
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="enableLazyLoad">
+                        <label class="form-check-label" for="enableLazyLoad">Enable Lazy Loading for Tasks</label>
+                    </div>
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="enableCache">
+                        <label class="form-check-label" for="enableCache">Enable Task Caching</label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Max Concurrent Tasks</label>
+                        <input type="number" class="form-control" value="5">
+                    </div>
+
+                    <!-- ADVANCED SETTINGS -->
+                    <h6 class="text-muted mb-3 mt-4">💎 Pro Mode Features</h6>
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="enableSmartRecommendations">
+                        <label class="form-check-label" for="enableSmartRecommendations">Enable Smart Task Recommendations</label>
+                    </div>
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="enableDarkMode">
+                        <label class="form-check-label" for="enableDarkMode">Enable Dark Mode</label>
+                    </div>
+
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="saveTaskSettings">Save Changes</button>
+                <button type="button" class="btn btn-primary">Save Settings</button>
             </div>
         </div>
     </div>
 </div>
+
 
 <!----------------------------------------------------------------------------------------------------------------------------- -->
 
