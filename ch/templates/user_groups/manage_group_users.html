@@ -617,10 +617,59 @@
               <label for="meetingLink" class="form-label">Meeting Link</label>
               <input type="url" class="form-control" id="meetingLink" required>
             </div>
+            <!-- modfying location -->
             <div class="mb-3">
-              <label for="eventLocation" class="form-label">Location</label>
-              <input type="text" class="form-control" id="eventLocation" required>
-            </div>
+                <label for="eventLocation" class="form-label">Location</label>
+                <input type="text" class="form-control" id="eventLocation" list="locationOptions" required>
+                <datalist id="locationOptions">
+                  <option value="Zoom">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-camera-video" viewBox="0 0 16 16">
+                      <path d="M8 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h5z"/>
+                      <path d="M14 4v8l3-4-3-4z"/>
+                    </svg> Zoom
+                  </option>
+                  <option value="Google Meet">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-google" viewBox="0 0 16 16">
+                      <path d="M8.293 3.293a1 1 0 0 1 1.414 0L14 7.586a1 1 0 0 1 0 1.414L9.707 13.707a1 1 0 0 1-1.414-1.414L11.586 9H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h8.586L8.293 3.293z"/>
+                    </svg> Google Meet
+                  </option>
+                  <option value="Organization">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-house-door" viewBox="0 0 16 16">
+                      <path d="M6.5 0a.5.5 0 0 1 .5.5v2.4l4-2.5a.5.5 0 0 1 .8.4v10a.5.5 0 0 1-.8.4l-4-2.5v2.4a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5V7.5a.5.5 0 0 1 .5-.5h3V2.5a.5.5 0 0 1 .5-.5z"/>
+                    </svg> Organization
+                  </option>
+                  <option value="Salesforce">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cloud" viewBox="0 0 16 16">
+                      <path d="M9.5 2a4.5 4.5 0 0 1 4.5 4.5c0 1.5-.75 2.825-1.875 3.625a4.5 4.5 0 0 1-5.75 6.25c-1.244 0-2.356-.532-3.187-1.385a5.5 5.5 0 0 1-7.092-8.49A4.5 4.5 0 0 1 5.5 2h4z"/>
+                    </svg> Salesforce
+                  </option>
+                  <option value="Microsoft Teams">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-text" viewBox="0 0 16 16">
+                      <path d="M10.5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1-.5-.5V.5a.5.5 0 0 1 .5-.5h4z"/>
+                      <path d="M12 3a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H4a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3h8z"/>
+                    </svg> Microsoft Teams
+                  </option>
+                  <option value="Skype">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-telephone" viewBox="0 0 16 16">
+                      <path d="M1 3.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-3z"/>
+                      <path d="M6.84 0C5.462 0 4.167.49 3.23 1.352l-.5.5C2.14 2.566 2 3.082 2 3.5v5c0 .418.14.934.23 1.148l.5.5C4.167 10.51 5.462 11 6.84 11h2.32c1.378 0 2.673-.49 3.61-1.352l.5-.5c.09-.214.23-.73.23-1.148v-5c0-.418-.14-.934-.23-1.148l-.5-.5C9.51.49 8.215 0 6.84 0z"/>
+                    </svg> Skype
+                  </option>
+                  <option value="Webex">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
+                      <path d="M8 1a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0z"/>
+                    </svg> Webex
+                  </option>
+                  <option value="Slack">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-slack" viewBox="0 0 16 16">
+                      <path d="M3.004 2.295A1 1 0 0 0 2.288 2.83a.5.5 0 0 1 .004.537l1.04 1.76a.5.5 0 0 1-.015.53l-.842 1.402a.5.5 0 0 1-.533.196l-.44-.256a.5.5 0 0 0-.661.007L.858 9.108a1 1 0 0 0 .04 1.475l5.323 3.078A.5.5 0 0 1 6 13h7a.5.5 0 0 1 .36-.84L14.1 11.358a1 1 0 0 0-.04-1.475l-5.304-3.07a.5.5 0 0 0-.661-.007l-.44.256a.5.5 0 0 1-.533-.196l-.841-1.402a.5.5 0 0 1-.015-.53l1.04-1.76a.5.5 0 0 1 .004-.537A1 1 0 0 0 8.162.36l-3.58 2.093z"/>
+                    </svg> Slack
+                  </option>
+                </datalist>
+              </div>
+              
+              
+
             <div class="mb-3">
               <label for="eventSlots" class="form-label">Slots</label>
               <input type="number" class="form-control" id="eventSlots" value="0">
