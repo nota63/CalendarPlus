@@ -237,6 +237,13 @@ body {
                 <span class="material-icons-round text-lg">help_outline</span>
                 Quick Guide
             </button>
+
+            <!-- Group details and the team -->
+            <button id="fetchGroupDetailsBtn" class="btn btn-primary" data-org-id="{{organization.id}}" data-group-id="{{group.id}}">
+                View Group Details
+            </button>
+            
+            
             
              <!-- Controls Bar -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
@@ -982,6 +989,25 @@ body {
     </div>
 </div>
 
+<!-- Group[ and team details modal] -->
+<div class="modal fade" id="groupDetailsModal" tabindex="-1" aria-labelledby="groupDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="groupDetailsModalLabel">Group Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="groupDetailsContent">
+                    <p class="text-center">Loading...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 
 
 <!-- Bootstrap 5 JS (with Popper.js) -->
@@ -1565,6 +1591,58 @@ document.addEventListener("DOMContentLoaded", () => {
         return document.cookie.split("; ").find(row => row.startsWith("csrftoken"))?.split("=")[1] || "";
     }
 });
+
+// Group and team details
+document.addEventListener("DOMContentLoaded", function () {
+    const fetchGroupDetailsBtn = document.getElementById("fetchGroupDetailsBtn");
+    const modalContent = document.getElementById("groupDetailsContent");
+
+    fetchGroupDetailsBtn.addEventListener("click", function () {
+        const orgId = this.getAttribute("data-org-id");
+        const groupId = this.getAttribute("data-group-id");
+
+        modalContent.innerHTML = `<p class="text-center">Loading...</p>`;
+
+        fetch(`/groups/get-group-details/${orgId}/${groupId}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.group) {
+                    const { id, name, description, team_leader, created_at } = data.group;
+                    let membersHTML = '';
+
+                    data.members.forEach(member => {
+                        membersHTML += `
+                            <div class="d-flex align-items-center mb-2">
+                                <img src="${member.profile_picture || 'https://via.placeholder.com/40'}" class="rounded-circle me-2" width="40" height="40">
+                                <span>${member.name}</span>
+                            </div>`;
+                    });
+
+                    modalContent.innerHTML = `
+                        <h5>${name}</h5>
+                        <p>${description}</p>
+                        <p><strong>Created At:</strong> ${created_at}</p>
+                        <h6>Team Leader:</h6>
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="${team_leader?.profile_picture || 'https://via.placeholder.com/50'}" class="rounded-circle me-2" width="50" height="50">
+                            <span>${team_leader?.name || "No Leader"}</span>
+                        </div>
+                        <h6>Members:</h6>
+                        ${membersHTML || '<p>No members found.</p>'}
+                    `;
+
+                    // Open the modal
+                    new bootstrap.Modal(document.getElementById("groupDetailsModal")).show();
+                } else {
+                    modalContent.innerHTML = `<p class="text-danger text-center">Error fetching details.</p>`;
+                }
+            })
+            .catch(() => {
+                modalContent.innerHTML = `<p class="text-danger text-center">Failed to load group details.</p>`;
+            });
+    });
+});
+
 
 
 </script>

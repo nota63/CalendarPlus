@@ -1290,12 +1290,13 @@ class GroupActivityLogView(View):
 def fetch_group_details(request, org_id, group_id):
     # Get the group
     group = get_object_or_404(Group, organization_id=org_id, id=group_id)
+    organization = get_object_or_404(Organization, id=org_id)
 
     # Get group leader's profile (if exists)
-    leader_profile = Profile.objects.filter(user=group.team_leader).first()
+    leader_profile = Profile.objects.filter(user=group.team_leader, organization=organization).first()
     leader_data = {
         "id": group.team_leader.id if group.team_leader else None,
-        "name": group.team_leader.get_full_name() if group.team_leader else "No Leader",
+        "name": group.team_leader.username if group.team_leader else group.team_leader.username,
         "profile_picture": leader_profile.profile_picture.url if leader_profile and leader_profile.profile_picture else None
     } if group.team_leader else None
 
@@ -1304,9 +1305,10 @@ def fetch_group_details(request, org_id, group_id):
     members_data = [
         {
             "id": member.user.id,
-            "name": member.user.get_full_name(),
-            "profile_picture": (Profile.objects.filter(user=member.user).first().profile_picture.url
-                                if Profile.objects.filter(user=member.user).exists() and Profile.objects.get(user=member.user).profile_picture
+            "name": member.user.username,
+            "profile_picture": (Profile.objects.filter(user=member.user, organization=organization).first().profile_picture.url
+                                if Profile.objects.filter(user=member.user, organization=organization).exists() and 
+                                Profile.objects.filter(user=member.user, organization=organization).first().profile_picture
                                 else None)
         }
         for member in members
@@ -1323,8 +1325,3 @@ def fetch_group_details(request, org_id, group_id):
         },
         "members": members_data
     }, safe=False)
-
-
-
-
-
