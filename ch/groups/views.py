@@ -37,7 +37,7 @@ from django.utils.html import format_html
 from .models import AbsentEvent
 from django.utils import timezone
 from django.utils.timezone import localtime
-
+from group_tasks.models import Task
 # Create your views here.
 FORMS = [
     ("name", GroupNameForm),
@@ -1467,3 +1467,63 @@ def group_details_ajax(request, org_id, group_id):
     }
 
     return JsonResponse(response_data)
+
+
+# Assign The Task (Ajax New)
+import json 
+
+def assign_task(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            org_id = data.get("org_id")
+            group_id = data.get("group_id")
+            email = data.get("email")
+            title = data.get("title")
+            description = data.get("description", "")
+            priority = data.get("priority", "medium")
+            deadline = data.get("deadline")
+            start_date = data.get("start_date", None)
+            end_date = data.get("end_date", None)
+            is_recurring = data.get("is_recurring", False)
+            recurrence_pattern = data.get("recurrence_pattern", None)
+            recurrence_end_date = data.get("recurrence_end_date", None)
+            notify_assignee = data.get("notify_assignee", True)
+            
+            # Validate Organization & Group
+            organization = get_object_or_404(Organization, id=org_id)
+            group = get_object_or_404(Group, id=group_id, organization=organization)
+            
+            # Validate User
+            user = get_object_or_404(User, email=email)
+            
+            # Check if the user is a group member
+            if not GroupMember.objects.filter(group=group, user=user).exists():
+                return JsonResponse({"error": "User is not a member of this group."}, status=400)
+            
+            # Create Task
+            task = Task.objects.create(
+                organization=organization,
+                group=group,
+                created_by=request.user,
+                assigned_to=user,
+                title=title,
+                description=description,
+                priority=priority,
+                deadline=deadline,
+                start_date=start_date,
+                end_date=end_date,
+                is_recurring=is_recurring,
+                recurrence_pattern=recurrence_pattern,
+                recurrence_end_date=recurrence_end_date,
+                notify_assignee=notify_assignee,
+            )
+            
+            return JsonResponse({"success": "Task assigned successfully!", "task_id": task.id})
+        
+        except ValidationError as e:
+            return JsonResponse({"error": str(e)}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+    
+    return JsonResponse({"error": "Invalid request method."}, status=405)

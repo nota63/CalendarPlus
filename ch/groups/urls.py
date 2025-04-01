@@ -90,7 +90,8 @@ urlpatterns = [
     path('groups/<int:org_id>/<int:group_id>/activities/',GroupActivityLogView.as_view(), name='activities'),
     # new features
     path('get-group-details/<int:org_id>/<int:group_id>/',fetch_group_details, name='get_group_details'),
-    path('group-overview/<int:org_id>/<int:group_id>/',group_details_ajax, name='group_overview')
+    path('group-overview/<int:org_id>/<int:group_id>/',group_details_ajax, name='group_overview'),
+    path('assign-task/',assign_task, name='assign_task')
     
 
     
