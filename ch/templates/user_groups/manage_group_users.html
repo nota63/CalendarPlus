@@ -721,23 +721,66 @@
         </div>
     </div>
 </div>
+
 <!-- Modal for displaying Booking Details -->
 <div class="modal fade" id="bookingDetailsModal" tabindex="-1" aria-labelledby="bookingDetailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="bookingDetailsModalLabel">Booking Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered max-w-xl">
+        <div class="modal-content rounded-xl shadow-2xl">
+            <!-- Header -->
+            <div class="modal-header p-6 pb-4 border-b border-gray-200">
+                <div class="flex items-center justify-between w-full">
+                    <h3 class="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                        <i class="mdi mdi-calendar-check text-blue-600"></i>
+                        Booking Details
+                    </h3>
+                    <button type="button" 
+                            class="p-2 hover:bg-gray-100 rounded-lg text-gray-500"
+                            data-bs-dismiss="modal">
+                        <i class="mdi mdi-close text-xl"></i>
+                    </button>
+                </div>
             </div>
-            <div class="modal-body">
-                <ul id="booking-list" class="list-group">
-                    <!-- List of bookings will be populated here dynamically -->
+
+            <!-- Body -->
+            <div class="modal-body p-6">
+                <!-- Helper Text -->
+                <div class="flex items-center gap-2 text-sm text-gray-500 mb-4">
+                    <i class="mdi mdi-information-outline text-blue-500"></i>
+                    <span>Bookings are listed here for the event</span>
+                </div>
+
+                <!-- Scrollable Booking List -->
+                <ul id="booking-list" class="space-y-3 max-h-[60vh] overflow-y-auto pr-4">
+                    <!-- Sample Booking Item -->
+                    <li class="group flex items-start gap-4 p-3 hover:bg-gray-50 rounded-lg transition-colors border border-gray-100">
+                        <!-- Profile Picture -->
+                        <div class="relative">
+                            <img src="profile-placeholder.jpg" 
+                                 class="w-10 h-10 rounded-full border-2 border-white shadow-sm">
+                            <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white"></div>
+                        </div>
+                        
+                        <!-- Booking Details -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between gap-2">
+                                <h4 class="font-medium text-gray-900 truncate">John Doe</h4>
+                                <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
+                                    Confirmed
+                                </span>
+                            </div>
+                            <div class="mt-1.5 text-sm text-gray-500">
+                                <div class="flex items-center gap-2">
+                                    <i class="mdi mdi-calendar-blank text-gray-400"></i>
+                                    <span>Booked on 2023-08-15 at 14:00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>
     </div>
 </div>
-
 
 
 <!-- -------------------------------------------------------------------------------------------------------------------------------------------- -->
