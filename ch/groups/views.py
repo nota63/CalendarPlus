@@ -1471,6 +1471,7 @@ def group_details_ajax(request, org_id, group_id):
 
 # Assign The Task (Ajax New)
 import json 
+from .utils import *
 
 @login_required
 def assign_task(request):
@@ -1519,6 +1520,9 @@ def assign_task(request):
                 recurrence_end_date=recurrence_end_date,
                 notify_assignee=notify_assignee,
             )
+            # Send email to assigned user
+            send_task_assigned_email(user, task, organization, group)
+            
             
             return JsonResponse({"success": "Task assigned successfully!", "task_id": task.id})
         

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Assigned</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2D7FF9;
+            --secondary: #6B7280;
+            --background: #F9FAFB;
+            --surface: #FFFFFF;
+            --border: #E5E7EB;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px 0;
+            background-color: var(--background);
+            color: #111827;
+        }
+
+        .email-container {
+            max-width: 640px;
+            margin: 0 auto;
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+        }
+
+        .header {
+            padding: 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .content {
+            padding: 32px;
+        }
+
+        .task-card {
+            background: var(--background);
+            border-radius: 8px;
+            padding: 24px;
+            margin: 20px 0;
+            border: 1px solid var(--border);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .priority-low { background: #ECFDF5; color: #059669; }
+        .priority-medium { background: #FFFBEB; color: #D97706; }
+        .priority-high { background: #FEF2F2; color: #DC2626; }
+
+        .footer {
+            padding: 24px 32px;
+            border-top: 1px solid var(--border);
+            font-size: 0.875rem;
+            color: var(--secondary);
+        }
+
+        .detail-item {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .detail-label {
+            width: 120px;
+            color: var(--secondary);
+            font-weight: 500;
+        }
+
+        .detail-value {
+            flex: 1;
+            color: #111827;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <img src="your-logo.svg" alt="Logo" style="height: 32px;">
+            <h1 style="margin: 24px 0 0 0; font-size: 1.5rem; font-weight: 700; color: #111827;">
+                New Task Assigned: {{ task.title }}
+            </h1>
+        </div>
+
+        <div class="content">
+            <p style="margin: 0 0 24px 0; color: var(--secondary); line-height: 1.5;">
+                Hello <strong>{{ user.username }}</strong>, a new task has been added to your workflow in 
+                <strong>{{ organization.name }}</strong> / <strong>{{ group.name }}</strong>.
+            </p>
+
+            <div class="task-card">
+                <div class="detail-item">
+                    <span class="detail-label">Priority</span>
+                    <span class="badge priority-{{ task.priority }}">
+                        {{ task.get_priority_display }}
+                    </span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Deadline</span>
+                    <span class="detail-value">{{ task.deadline }}</span>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">Dates</span>
+                    <span class="detail-value">
+                        {{ task.start_date }} – {{ task.end_date }}
+                    </span>
+                </div>
+
+                {% if task.is_recurring %}
+                <div class="detail-item">
+                    <span class="detail-label">Recurrence</span>
+                    <span class="detail-value">
+                        {{ task.get_recurrence_pattern_display }} until {{ task.recurrence_end_date }}
+                    </span>
+                </div>
+                {% endif %}
+
+                <div class="detail-item">
+                    <span class="detail-label">Description</span>
+                    <span class="detail-value" style="color: var(--secondary);">
+                        {{ task.description }}
+                    </span>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 12px; margin-top: 32px; padding: 16px; background: var(--background); border-radius: 8px;">
+                <div style="width: 40px; height: 40px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    {{ task.created_by.username|first|upper }}
+                </div>
+                <div>
+                    <p style="margin: 0; font-weight: 500;">Assigned by {{ task.created_by.username }}</p>
+                    <p style="margin: 0; color: var(--secondary); font-size: 0.875rem;">{{ task.created_by.email }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p style="margin: 0 0 8px 0;">Need help with this task? Contact the assigner directly or</p>
+            <p style="margin: 0;">
+                <a href="mailto:support@yourapp.com" style="color: var(--primary); text-decoration: none; font-weight: 500;">
+                    Contact Support →
+                </a>
+            </p>
+            <p style="margin: 16px 0 0 0; color: var(--secondary); font-size: 0.875rem;">
+                © {{ organization.name }}. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
