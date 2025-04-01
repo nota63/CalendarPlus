@@ -977,9 +977,38 @@ document.addEventListener("DOMContentLoaded", function () {
                             const profilePicture = booking.profile_picture || 'default_profile_picture.jpg';
 
                             bookingItem.innerHTML = `
-                                <img src="${profilePicture}" class="rounded-circle me-2" width="40" height="40">
-                                ${booking.full_name} - ${booking.status} (Booked on: ${booking.booking_date} at ${booking.booking_time})
-                            `;
+  <div class="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors group">
+    <div class="relative">
+      <img src="${profilePicture}" 
+           class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm">
+      <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white"></div>
+    </div>
+    
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-2">
+        <span class="font-semibold text-gray-900 truncate">${booking.full_name}</span>
+        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium 
+                  ${booking.status === 'Confirmed' 
+                    ? 'bg-green-100 text-green-700' 
+                    : 'bg-gray-100 text-gray-600'}">
+          ${booking.status}
+        </span>
+      </div>
+      <div class="flex items-center gap-1.5 text-sm text-gray-500">
+        <span>Booked on</span>
+        <time class="font-medium">${booking.booking_date}</time>
+        <span class="text-gray-300">•</span>
+        <time class="font-medium">${booking.booking_time}</time>
+      </div>
+    </div>
+    
+    <button class="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-gray-600 p-1 rounded-lg">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+      </svg>
+    </button>
+  </div>
+`;
                             bookingListContainer.appendChild(bookingItem);
                         });
                         // Automatically open the booking modal using Bootstrap's data-bs-toggle mechanism
