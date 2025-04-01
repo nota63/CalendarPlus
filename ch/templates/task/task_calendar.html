@@ -373,7 +373,7 @@ body {
                             <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
                                 <span class="material-icons-round text-lg">search</span>
                             </span>
-                            <input type="text" placeholder="Search tasks, projects, or people..." 
+                            <input type="text" id="taskSearch" placeholder="Search tasks, projects, or people..." 
                                    class="w-full py-2 pl-12 pr-4 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:bg-white transition-all">
                         </div>
                     </div>
@@ -472,7 +472,7 @@ body {
                 </div>
 
                 <!-- Tasks Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12" id="tasksGrid">
                     {% for task in tasks %}
                     <div class="glass-card group relative rounded-2xl p-6 border border-gray-100/60 shadow-lg hover:shadow-xl transition-all duration-300 hover:translate-y-[-2px]">
                         <!-- Priority Indicator -->
@@ -1868,7 +1868,66 @@ modalContent.innerHTML = `
     });
 });
 
+// SEARCH AND FILTER TASKS IN REAL TIME
+// Wait for the DOM to load
+document.addEventListener('DOMContentLoaded', function () {
+        // Get the search input field
+        const searchInput = document.querySelector('input[type="text"][placeholder="Search tasks, projects, or people..."]');
+        const tasksGrid = document.getElementById('tasksGrid');
+        const taskCards = tasksGrid.getElementsByClassName('glass-card');
 
+        // Function to filter tasks based on search query
+        function filterTasks(query) {
+            console.log("Search query:", query); // Debugging: Log the search query
+
+            // Convert the query to lowercase for case-insensitive search
+            const lowerCaseQuery = query.toLowerCase();
+
+            // Loop through all task cards and filter them
+            Array.from(taskCards).forEach((card, index) => {
+                // Get the task title
+                const taskTitle = card.querySelector('h3') ? card.querySelector('h3').textContent.toLowerCase() : '';
+                console.log(`Task #${index + 1} - Title:`, taskTitle);
+
+                // Get task priority (if exists)
+                const priorityBadge = card.querySelector('.priority-badge');
+                const taskPriority = priorityBadge ? priorityBadge.textContent.toLowerCase().trim() : '';
+                console.log(`Task #${index + 1} - Priority:`, taskPriority);
+
+                // Get task start date (if exists)
+                const taskStart = card.querySelector('.text-sm') ? card.querySelector('.text-sm').textContent.toLowerCase() : '';
+                console.log(`Task #${index + 1} - Start Date:`, taskStart);
+
+                // Get task people (if exists)
+                const taskPeople = card.querySelector('.text-xs') ? card.querySelector('.text-xs').textContent.toLowerCase() : '';
+                console.log(`Task #${index + 1} - People:`, taskPeople);
+
+                // Debugging: Display which fields will be searched
+                console.log(`Task #${index + 1} - Fields for search:`, {
+                    taskTitle,
+                    taskPriority,
+                    taskStart,
+                    taskPeople
+                });
+
+                // Check if the query matches any of the fields
+                const isMatch = taskTitle.includes(lowerCaseQuery) || taskPriority.includes(lowerCaseQuery) || taskStart.includes(lowerCaseQuery) || taskPeople.includes(lowerCaseQuery);
+                if (isMatch) {
+                    card.style.display = ''; // Show the task if it matches
+                    console.log(`Task #${index + 1} matches the search!`); // Debugging: Task matches
+                } else {
+                    card.style.display = 'none'; // Hide the task if it does not match
+                    console.log(`Task #${index + 1} does not match the search.`); // Debugging: Task doesn't match
+                }
+            });
+        }
+
+        // Add event listener to the search input
+        searchInput.addEventListener('input', function () {
+            const query = searchInput.value.trim();
+            filterTasks(query); // Call the function to filter tasks
+        });
+    });
 
 </script>
 </body>
