@@ -561,6 +561,7 @@
                 <button type="button" id="assignTaskBtn"
                         class="px-6 py-2.5 text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm">
                     Assign Task
+                    <span id="submitSpinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;"></span>
                 </button>
             </div>
         </div>
@@ -616,6 +617,7 @@
         });
 
 // Assign Task 
+// Assign Task 
 // 💖 Assign Task Button Click Event
 document.getElementById("assignTaskBtn").addEventListener("click", function() {
     let org_id = document.getElementById("org_id").value;
@@ -650,6 +652,14 @@ document.getElementById("assignTaskBtn").addEventListener("click", function() {
 
     let apiUrl = `/groups/assign-task/`; // 💖 Replace with your actual endpoint
 
+    // Get the submit button and spinner elements
+    let submitBtn = document.getElementById("assignTaskBtn");
+    let spinner = document.getElementById("submitSpinner");
+
+    // Show the spinner and disable the button to prevent multiple submissions
+    submitBtn.disabled = true;
+    spinner.style.display = "inline-block";  // Show the spinner
+
     fetch(apiUrl, {
         method: "POST",
         headers: {
@@ -660,6 +670,10 @@ document.getElementById("assignTaskBtn").addEventListener("click", function() {
     })
     .then(response => response.json())
     .then(data => {
+        // Hide the spinner and enable the button
+        submitBtn.disabled = false;
+        spinner.style.display = "none";  // Hide the spinner
+
         if (data.success) {
             alert("✅ Task assigned successfully!");
             location.reload(); // Refresh to update UI
@@ -668,6 +682,10 @@ document.getElementById("assignTaskBtn").addEventListener("click", function() {
         }
     })
     .catch(error => {
+        // Hide the spinner and enable the button
+        submitBtn.disabled = false;
+        spinner.style.display = "none";  // Hide the spinner
+
         console.error("⚠️ Error:", error);
         alert("Something went wrong!");
     });
