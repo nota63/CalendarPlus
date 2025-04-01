@@ -153,10 +153,11 @@ class GroupEvent(models.Model):
     )
     recurrence_end_date = models.DateField(null=True, blank=True)  
     recurrence_days = models.CharField(
-        max_length=50,
-        blank=True,
-        help_text="Comma-separated days for weekly recurrence, e.g., 'Monday, Wednesday'."
-    )
+    max_length=50,
+    null=True,  # ✅ Allows NULL values in the database
+    blank=True,  # ✅ Allows empty values in Django forms/admin
+    help_text="Comma-separated days for weekly recurrence, e.g., 'Monday, Wednesday'."
+)
 
 
 # Group Event Booking

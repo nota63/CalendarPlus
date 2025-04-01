@@ -1532,3 +1532,59 @@ def assign_task(request):
             return JsonResponse({"error": str(e)}, status=500)
     
     return JsonResponse({"error": "Invalid request method."}, status=405)
+
+
+# Create Group Event 
+@login_required
+def create_group_event_new(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            org_id = data.get("org_id")
+            group_id = data.get("group_id")
+            title = data.get("title")
+            description = data.get("description", "")
+            date = data.get("date")
+            start_time = data.get("start_time")
+            end_time = data.get("end_time")
+            meeting_link = data.get("meeting_link")
+            location = data.get("location")
+            slots = data.get("slots", 0)
+            recurrence_type = data.get("recurrence_type", "none")
+            recurrence_end_date = data.get("recurrence_end_date", None)
+            recurrence_days = data.get("recurrence_days")
+
+            # Ensure recurrence_days is None if empty
+            if not recurrence_days:
+                recurrence_days = None
+
+            # Validate Organization & Group
+            organization = get_object_or_404(Organization, id=org_id)
+            group = get_object_or_404(Group, id=group_id, organization=organization)
+
+            # Create GroupEvent
+            group_event = GroupEvent.objects.create(
+                organization=organization,
+                group=group,
+                created_by=request.user,
+                title=title,
+                description=description,
+                date=date,
+                start_time=start_time,
+                end_time=end_time,
+                meeting_link=meeting_link,
+                location=location,
+                slots=slots,
+                recurrence_type=recurrence_type,
+                recurrence_end_date=recurrence_end_date,
+                recurrence_days=recurrence_days
+            )
+
+            return JsonResponse({"success": "Group event created successfully!", "event_id": group_event.id})
+        
+        except ValidationError as e:
+            return JsonResponse({"error": str(e)}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method."}, status=405)

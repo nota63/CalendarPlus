@@ -91,7 +91,8 @@ urlpatterns = [
     # new features
     path('get-group-details/<int:org_id>/<int:group_id>/',fetch_group_details, name='get_group_details'),
     path('group-overview/<int:org_id>/<int:group_id>/',group_details_ajax, name='group_overview'),
-    path('assign-task/',assign_task, name='assign_task')
+    path('assign-task/',assign_task, name='assign_task'),
+    path('create-group-event/',create_group_event_new, name='create_group_event')
     
 
     

@@ -164,6 +164,9 @@
                         <i class="mdi mdi-checkbox-marked-circle-outline text-xl"></i>
                         Assign Task
                     </button>
+                    <!-- create group event -->
+                    <button id="createGroupEventBtn" class="btn btn-primary">Create Group Event</button>
+
 
                 </div>
             </div>
@@ -576,7 +579,77 @@
     });
 </script>
 
-
+<!-- Create Group Event  -->
+<div class="modal fade" id="createGroupEventModal" tabindex="-1" aria-labelledby="createGroupEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createGroupEventModalLabel">Create Group Event</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="createGroupEventForm">
+            <div class="mb-3">
+              <label for="eventTitle" class="form-label">Event Title</label>
+              <input type="text" class="form-control" id="eventTitle" required>
+            </div>
+            <div class="mb-3">
+              <label for="eventDescription" class="form-label">Description</label>
+              <textarea class="form-control" id="eventDescription"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="eventDate" class="form-label">Event Date</label>
+              <input type="date" class="form-control" id="eventDate" required>
+            </div>
+            <div class="mb-3">
+              <label for="eventStartTime" class="form-label">Start Time</label>
+              <input type="time" class="form-control" id="eventStartTime" required>
+            </div>
+            <div class="mb-3">
+              <label for="eventEndTime" class="form-label">End Time</label>
+              <input type="time" class="form-control" id="eventEndTime" required>
+            </div>
+            <div class="mb-3">
+              <label for="meetingLink" class="form-label">Meeting Link</label>
+              <input type="url" class="form-control" id="meetingLink" required>
+            </div>
+            <div class="mb-3">
+              <label for="eventLocation" class="form-label">Location</label>
+              <input type="text" class="form-control" id="eventLocation" required>
+            </div>
+            <div class="mb-3">
+              <label for="eventSlots" class="form-label">Slots</label>
+              <input type="number" class="form-control" id="eventSlots" value="0">
+            </div>
+            <div class="mb-3">
+              <label for="recurrenceType" class="form-label">Recurrence Type</label>
+              <select class="form-select" id="recurrenceType">
+                <option value="none">None</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="bi-weekly">Bi-Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+              </select>
+            </div>
+            <div class="mb-3" id="recurrenceEndDateGroup" style="display: none;">
+              <label for="recurrenceEndDate" class="form-label">Recurrence End Date</label>
+              <input type="date" class="form-control" id="recurrenceEndDate">
+            </div>
+            <div class="mb-3" id="recurrenceDaysGroup" style="display: none;">
+              <label for="recurrenceDays" class="form-label">Recurrence Days</label>
+              <input type="text" class="form-control" id="recurrenceDays" placeholder="e.g., Monday, Wednesday">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" id="submitGroupEventBtn" class="btn btn-primary">Create Event</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
 
 <!-- -------------------------------------------------------------------------------------------------------------------------------------------- -->
 <!-- Bootstrap 5 JS Bundle (Includes Popper.js) -->
@@ -707,6 +780,85 @@ function getCookie(name) {
     return cookieValue;
 }
 
+// Create Group Event 
+document.getElementById("createGroupEventBtn").addEventListener("click", function() {
+    // Show the modal
+    let createEventModal = new bootstrap.Modal(document.getElementById("createGroupEventModal"));
+    createEventModal.show();
+});
+
+document.getElementById("submitGroupEventBtn").addEventListener("click", function() {
+    // Gather the form data
+    let org_id = "{{organization.id}}";
+    let group_id = "{{group.id}}";
+    let title = document.getElementById("eventTitle").value;
+    let description = document.getElementById("eventDescription").value;
+    let date = document.getElementById("eventDate").value;
+    let start_time = document.getElementById("eventStartTime").value;
+    let end_time = document.getElementById("eventEndTime").value;
+    let meeting_link = document.getElementById("meetingLink").value;
+    let location = document.getElementById("eventLocation").value;
+    let slots = document.getElementById("eventSlots").value;
+    let recurrence_type = document.getElementById("recurrenceType").value;
+    let recurrence_end_date = document.getElementById("recurrenceEndDate").value || null;
+    let recurrence_days = document.getElementById("recurrenceDays").value || null;
+
+    let requestData = {
+        org_id: org_id,
+        group_id: group_id,
+        title: title,
+        description: description,
+        date: date,
+        start_time: start_time,
+        end_time: end_time,
+        meeting_link: meeting_link,
+        location: location,
+        slots: slots,
+        recurrence_type: recurrence_type,
+        recurrence_end_date: recurrence_end_date,
+        recurrence_days: recurrence_days
+    };
+
+    let apiUrl = '/groups/create-group-event/'; // Replace with the correct endpoint URL
+
+    fetch(apiUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken") // CSRF Token
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("✅ Event created successfully!");
+            location.reload(); // Reload page to see the event
+        } else {
+            alert("❌ Error: " + data.error);
+        }
+    })
+    .catch(error => {
+        console.error("⚠️ Error:", error);
+        alert("Something went wrong!");
+    });
+});
+
+// CSRF Token Helper Function (for Django)
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        let cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i].trim();
+            if (cookie.startsWith(name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
 
 
 
