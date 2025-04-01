@@ -403,91 +403,177 @@
 </main>
 <!-- New modals ---------------------------------------------------------------------------------------------------------------- -->
 <!-- Assign Task -->
-<!-- 🏆 Bootstrap 5 Task Assignment Modal -->
+<!-- Add this in your head section -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Modern Task Assignment Modal -->
 <div class="modal fade" id="assignTaskModal" tabindex="-1" aria-labelledby="assignTaskModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="assignTaskModalLabel">Assign Task</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered max-w-3xl">
+        <div class="modal-content rounded-xl">
+            <!-- Header -->
+            <div class="modal-header p-6 border-b border-gray-200">
+                <div class="flex items-center justify-between w-full">
+                    <h3 class="text-xl font-semibold text-gray-900">Assign New Task</h3>
+                    <button type="button" class="p-2 hover:bg-gray-100 rounded-lg" data-bs-dismiss="modal">
+                        <i class="mdi mdi-close text-xl text-gray-500"></i>
+                    </button>
+                </div>
             </div>
-            <div class="modal-body">
-                <!-- 🚀 Task Fields -->
+
+            <!-- Body -->
+            <div class="modal-body p-6 space-y-6">
                 <input type="hidden" id="org_id" value="{{ organization.id }}">
                 <input type="hidden" id="group_id" value="{{ group.id }}">
 
-                <div class="mb-3">
-                    <label class="form-label">Assignee Email</label>
-                    <input type="email" class="form-control" id="email" placeholder="Enter user email" required>
+                <!-- Assignee Section -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Assignee Email
+                            <span class="text-gray-400 font-normal">(Required)</span>
+                        </label>
+                        <input type="email" id="email" 
+                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                               placeholder="team.member@company.com">
+                        <p class="mt-2 text-sm text-gray-500">User must be a group member</p>
+                    </div>
+
+                    <!-- Task Details Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Left Column -->
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Task Title
+                                    <span class="text-gray-400 font-normal">(Required)</span>
+                                </label>
+                                <input type="text" id="title" 
+                                       class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="e.g., Update Marketing Strategy">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Description
+                                </label>
+                                <textarea id="description" rows="3"
+                                          class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                          placeholder="Add detailed task description..."></textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Task Priority
+                                </label>
+                                <select id="priority" 
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    <option value="low" class="text-green-600">Low</option>
+                                    <option value="medium" selected class="text-yellow-600">Medium</option>
+                                    <option value="high" class="text-red-600">High</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Deadline
+                                    <span class="text-gray-400 font-normal">(Required)</span>
+                                </label>
+                                <input type="date" id="deadline" 
+                                       class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            </div>
+
+                            <!-- Date Range -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Start Date
+                                    </label>
+                                    <input type="date" id="start_date" 
+                                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        End Date
+                                    </label>
+                                    <input type="date" id="end_date" 
+                                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+
+                            <!-- Recurrence Section -->
+                            <div class="pt-4 border-t border-gray-200 space-y-4">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" id="is_recurring" 
+                                           class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                    <label class="text-sm font-medium text-gray-700">
+                                        Recurring Task
+                                    </label>
+                                </div>
+
+                                <div id="recurrenceOptions" class="space-y-4 hidden">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Recurrence Pattern
+                                        </label>
+                                        <select id="recurrence_pattern" 
+                                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                            <option value="daily">Daily</option>
+                                            <option value="weekly">Weekly</option>
+                                            <option value="monthly">Monthly</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            End Recurrence
+                                        </label>
+                                        <input type="date" id="recurrence_end_date" 
+                                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Task Title</label>
-                    <input type="text" class="form-control" id="title" placeholder="Task title" required>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Description</label>
-                    <textarea class="form-control" id="description" placeholder="Task description"></textarea>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Priority</label>
-                    <select class="form-select" id="priority">
-                        <option value="low">Low</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="high">High</option>
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Deadline</label>
-                    <input type="date" class="form-control" id="deadline" required>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Start Date</label>
-                    <input type="date" class="form-control" id="start_date">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">End Date</label>
-                    <input type="date" class="form-control" id="end_date">
-                </div>
-
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="is_recurring">
-                    <label class="form-check-label">Recurring Task</label>
-                </div>
-
-                <div class="mb-3 mt-2">
-                    <label class="form-label">Recurrence Pattern</label>
-                    <select class="form-select" id="recurrence_pattern">
-                        <option value="" selected>None</option>
-                        <option value="daily">Daily</option>
-                        <option value="weekly">Weekly</option>
-                        <option value="monthly">Monthly</option>
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Recurrence End Date</label>
-                    <input type="date" class="form-control" id="recurrence_end_date">
-                </div>
-
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="notify_assignee" checked>
-                    <label class="form-check-label">Notify Assignee</label>
+                <!-- Notification Settings -->
+                <div class="flex items-center gap-3 pt-4 border-t border-gray-200">
+                    <input type="checkbox" id="notify_assignee" 
+                           class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" checked>
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">
+                            Send Notification
+                        </label>
+                        <p class="text-sm text-gray-500">Email notification will be sent to the assignee</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="assignTaskBtn">Assign Task</button>
+            <!-- Footer -->
+            <div class="modal-footer p-6 border-t border-gray-200 flex justify-end gap-3">
+                <button type="button" 
+                        class="px-6 py-2.5 text-gray-700 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg transition-colors"
+                        data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <button type="button" id="assignTaskBtn"
+                        class="px-6 py-2.5 text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm">
+                    Assign Task
+                </button>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    // Toggle recurrence options visibility
+    document.getElementById('is_recurring').addEventListener('change', function(e) {
+        const recurrenceOptions = document.getElementById('recurrenceOptions');
+        recurrenceOptions.classList.toggle('hidden', !e.target.checked);
+    });
+</script>
 
 
 

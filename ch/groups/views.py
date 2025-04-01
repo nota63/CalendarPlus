@@ -1472,6 +1472,7 @@ def group_details_ajax(request, org_id, group_id):
 # Assign The Task (Ajax New)
 import json 
 
+@login_required
 def assign_task(request):
     if request.method == "POST":
         try:
