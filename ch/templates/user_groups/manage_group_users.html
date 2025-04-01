@@ -657,23 +657,70 @@
 <!-- Manage The Events -->
 
 <!-- Modal 1: Group Events List -->
-<!-- Modal for displaying Group Events -->
 <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="eventModalLabel">Group Events</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered max-w-xl">
+        <div class="modal-content rounded-xl shadow-2xl">
+            <!-- Header -->
+            <div class="modal-header p-6 pb-4 border-b border-gray-200">
+                <div class="flex items-center justify-between w-full">
+                    <h3 class="text-xl font-semibold text-gray-900">
+                        <i class="mdi mdi-calendar-multiple text-blue-600 mr-2"></i>
+                        Group Events
+                    </h3>
+                    <button type="button" 
+                            class="p-2 hover:bg-gray-100 rounded-lg text-gray-500"
+                            data-bs-dismiss="modal">
+                        <i class="mdi mdi-close text-xl"></i>
+                    </button>
+                </div>
             </div>
-            <div class="modal-body">
-                <ul id="event-list" class="list-group">
-                    <!-- List of events will be populated here dynamically -->
+
+            <!-- Body with Scrollable Content -->
+            <div class="modal-body p-6">
+                <!-- Action Bar -->
+                <div class="flex items-center justify-between mb-6">
+                    <button id="createGroupEventBtn" 
+                            class="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all">
+                        <i class="mdi mdi-plus-circle-outline text-lg"></i>
+                        Create Group Event
+                    </button>
+                    
+                    <div class="flex items-center gap-2 text-sm text-gray-500">
+                        <i class="mdi mdi-information-outline text-blue-500"></i>
+                        <span>Tap event row to view bookings</span>
+                    </div>
+                </div>
+
+                <!-- Scrollable Event List -->
+                <ul id="event-list" class="space-y-2 max-h-[calc(100vh-12rem)] overflow-y-auto pr-4">
+                    <!-- List items will maintain original structure -->
+                    <!-- Sample Event Item -->
+                    <li class="group flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors border border-gray-100">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <h4 class="font-medium text-gray-900 truncate">Team Planning Session</h4>
+                            </div>
+                            <div class="flex items-center gap-3 mt-1 text-sm text-gray-500">
+                                <span class="flex items-center gap-1.5">
+                                    <i class="mdi mdi-calendar-blank text-gray-400"></i>
+                                    2023-08-15
+                                </span>
+                                <span class="text-gray-300">•</span>
+                                <span class="flex items-center gap-1.5">
+                                    <i class="mdi mdi-clock-outline text-gray-400"></i>
+                                    14:00 - 16:00
+                                </span>
+                            </div>
+                        </div>
+                        <i class="mdi mdi-chevron-right text-gray-400 group-hover:text-blue-600 transition-colors"></i>
+                    </li>
+                    <!-- Repeat list items as needed -->
                 </ul>
             </div>
         </div>
     </div>
 </div>
-
 <!-- Modal for displaying Booking Details -->
 <div class="modal fade" id="bookingDetailsModal" tabindex="-1" aria-labelledby="bookingDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog">
