@@ -1283,6 +1283,46 @@ class GroupActivityLogView(View):
 
 # MORE FEATURES ARE PENDING........
 
+# manager side features ---------------------------------------------------------------------------------------------------------------
+
+# Fetch group details and the team members
+@login_required
+def fetch_group_details(request, org_id, group_id):
+    # Get the group
+    group = get_object_or_404(Group, organization_id=org_id, id=group_id)
+
+    # Get group leader's profile (if exists)
+    leader_profile = Profile.objects.filter(user=group.team_leader).first()
+    leader_data = {
+        "id": group.team_leader.id if group.team_leader else None,
+        "name": group.team_leader.get_full_name() if group.team_leader else "No Leader",
+        "profile_picture": leader_profile.profile_picture.url if leader_profile and leader_profile.profile_picture else None
+    } if group.team_leader else None
+
+    # Get group members
+    members = GroupMember.objects.filter(group=group).select_related("user")
+    members_data = [
+        {
+            "id": member.user.id,
+            "name": member.user.get_full_name(),
+            "profile_picture": (Profile.objects.filter(user=member.user).first().profile_picture.url
+                                if Profile.objects.filter(user=member.user).exists() and Profile.objects.get(user=member.user).profile_picture
+                                else None)
+        }
+        for member in members
+    ]
+
+    # Return JSON response
+    return JsonResponse({
+        "group": {
+            "id": group.id,
+            "name": group.name,
+            "description": group.description,
+            "team_leader": leader_data,
+            "created_at": group.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+        },
+        "members": members_data
+    }, safe=False)
 
 
 

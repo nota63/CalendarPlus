@@ -4,11 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team Spaces | Next-gen Collaboration</title>
+    <!-- Headless UI CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@headlessui/react@1.4.2/dist/headlessui.production.min.js"></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js"></script>
+   
     <style>
         @keyframes float {
             0%, 100% { transform: translateY(0); }
@@ -154,11 +158,8 @@
 
                             <!-- Group Actions -->
                             <div class="w-full space-y-2 border-t border-slate-100 pt-2">
-                                <a href="{% url 'display_groups' org_id=group.organization.id %}" 
-                                class="flex items-center w-full p-2 text-sm rounded-lg hover:bg-slate-50 text-slate-700">
-                                    <i class="bi bi-eye mr-2 text-blue-500"></i>
-                                    View Group
-                                </a>
+                                <!-- Trigger Button -->
+                                
                                 <a href="{% url 'display_group_events' org_id=group.organization.id group_id=group.id %}" 
                                 class="flex items-center w-full p-2 text-sm rounded-lg hover:bg-slate-50 text-slate-700">
                                     <i class="bi bi-calendar-event mr-2 text-purple-500"></i>
@@ -200,31 +201,56 @@
                 </div>
                 {% endfor %}
 
-                <!-- Add New Space Card -->
-                
-              
-               
-
             <!-- Empty State -->
-            {% if not user_groups %}
-            <div class="text-center py-20">
-                <div class="inline-block animate-float">
-                    <img src="https://assets.calendly.com/assets/frontend/media/groups_icon-952bb436e7c3f1352ab9.svg" 
-                         class="w-48 h-48 mx-auto">
-                </div>
-                <h3 class="text-2xl font-semibold text-slate-800 mt-8 mb-2">No Team Spaces Found</h3>
-                <p class="text-slate-600 max-w-md mx-auto">Create your first space to start collaborating with your team members.</p>
-                <button class="mt-6 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
-                    Create New Space
-                </button>
+                    {% if not user_groups %}
+                    <div class="text-center py-20">
+                        <div class="inline-block animate-float">
+                            <img src="https://assets.calendly.com/assets/frontend/media/groups_icon-952bb436e7c3f1352ab9.svg" 
+                                class="w-48 h-48 mx-auto">
+                        </div>
+                        <h3 class="text-2xl font-semibold text-slate-800 mt-8 mb-2">No Team Spaces Found</h3>
+                        <p class="text-slate-600 max-w-md mx-auto">Create your first space to start collaborating with your team members.</p>
+                        <button class="mt-6 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                            Create New Space
+                        </button>
+                    </div>
+                    {% endif %}
+                </main>
             </div>
-            {% endif %}
-        </main>
-    </div>
-    
+<!-- MODALS ------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
+<!-- Group Details Modal -->
+<!-- Modal Container -->
+<div x-data="{ open: false }" x-init="open = false" @keydown.escape.window="open = false">
+    <!-- Modal Trigger (handled via button) -->
+    <div>
+        <!-- Triggering the modal with JS -->
+        <template x-if="open">
+            <div class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md z-50 flex justify-center items-center">
+                <div class="bg-white rounded-xl shadow-xl w-80 p-4 relative">
+                    <!-- Close Button -->
+                    <button @click="open = false" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+                        <i class="material-icons-round">close</i>
+                    </button>
 
-    <script>
-       gsap.registerPlugin(ScrollTrigger);
+                    <!-- Modal Content -->
+                    <div id="modalContent">
+                        <!-- Group Details will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</div>
+
+
+
+
+<!-- ------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- Bootstrap 5 JS Bundle (Popper included) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
 
 // Animate cards with proper viewport detection
 gsap.utils.toArray('.group').forEach((card, i) => {
@@ -255,6 +281,8 @@ gsap.utils.toArray('.group').forEach((card, i) => {
                 button.classList.toggle('text-blue-600');
             });
         });
-    </script>
+// Get Group Details and the team
+
+</script>
 </body>
 </html>

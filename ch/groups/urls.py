@@ -88,6 +88,8 @@ urlpatterns = [
     path('groups/<int:org_id>/<int:group_id>/fetch_group_members/',fetch_group_members, name='fetch_group_members'),
     path('groups/<int:org_id>/<int:group_id>/delete_group/',delete_group, name='delete_group'),
     path('groups/<int:org_id>/<int:group_id>/activities/',GroupActivityLogView.as_view(), name='activities'),
+    # new features
+    path('get-group-details/<int:org_id>/<int:group_id>/',fetch_group_details, name='get_group_details')
     
 
     
