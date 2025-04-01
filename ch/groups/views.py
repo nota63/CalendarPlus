@@ -121,6 +121,10 @@ class GroupListView(ListView):
         
    
         organization = get_object_or_404(Organization, id=org_id)
+        # restrict access
+        if not Profile.objects.filter(user=self.request.user, organization=organization):
+            return HttpResponseForbidden("Unauthorized Accesss")
+
         
         if not self.request.user.profiles.filter(organization=organization, is_admin=True).exists():
             raise Http404("You are not an admin of this organization.")
@@ -147,6 +151,10 @@ def invite_members_to_group(request, org_id, group_id):
         
         organization = Organization.objects.get(id=org_id)
         group = Group.objects.get(id=group_id, organization=organization)
+        # restrict access
+        if not Profile.objects.filter(user=request.user, organization=organization):
+            return HttpResponseForbidden("Unauthorized Accesss")
+
 
     
     
@@ -211,10 +219,13 @@ def invite_members_to_group(request, org_id, group_id):
 
 
 # Accept or reject the invitation
-
 def accept_or_reject_invitation(request, org_id, group_id, invitation_id):
     invitation = get_object_or_404(GroupInvitation, id=invitation_id, group_id=group_id)
     organization = get_object_or_404(Organization, id=org_id)
+    # restrict access
+    if not Profile.objects.filter(user=request.user, organization=organization):
+        return HttpResponseForbidden("Unauthorized Accesss")
+
 
    
     if invitation.group.organization.id != org_id:
@@ -291,6 +302,10 @@ from django.db.models import Q
 @login_required
 def user_groups(request, org_id):
     organization = get_object_or_404(Organization, id=org_id)
+    # restrict access
+    if not Profile.objects.filter(user=request.user, organization=organization):
+        return HttpResponseForbidden("Unauthorized Accesss")
+
 
 
     if not organization.profiles.filter(user=request.user).exists():
@@ -322,6 +337,10 @@ def manage_group_users(request, org_id, group_id):
    
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id, organization=organization)
+    # restrict access
+    if not Profile.objects.filter(user=request.user, organization=organization):
+        return HttpResponseForbidden("Unauthorized Accesss")
+
 
    
     if group.team_leader != request.user:
@@ -350,6 +369,10 @@ def remove_user_from_group(request, org_id, group_id, user_id):
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id, organization=organization)
     user_to_remove = get_object_or_404(User, id=user_id)
+    # restrict access
+    if not Profile.objects.filter(user=request.user, organization=organization):
+        return HttpResponseForbidden("Unauthorized Accesss")
+
 
     if group.team_leader != request.user:
         return HttpResponseForbidden("You are not authorized to remove members from this group.")
@@ -380,6 +403,10 @@ def create_group_event(request, org_id, group_id):
    
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id, organization=organization)
+    # restrict access
+    if not Profile.objects.filter(user=request.user, organization=organization):
+        return HttpResponseForbidden("Unauthorized Accesss")
+
 
     if group.team_leader != request.user:
         return HttpResponseForbidden("You do not have permission to create events for this group.")
@@ -474,6 +501,10 @@ def display_group_events(request, org_id, group_id):
  
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id, organization=organization)
+    # restrict access
+    if not Profile.objects.filter(user=request.user, organization=organization):
+        return HttpResponseForbidden("Unauthorized Accesss")
+
 
     if not GroupMember.objects.filter(group=group, organization=organization, user=request.user).exists():
         return HttpResponseForbidden("You do not have permission to view events for this group.")
@@ -506,6 +537,10 @@ def book_group_event(request, org_id, group_id, event_id):
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id, organization=organization)
     event = get_object_or_404(GroupEvent, id=event_id, group=group, organization=organization)
+    # restrict access
+    if not Profile.objects.filter(user=request.user, organization=organization):
+        return HttpResponseForbidden("Unauthorized Accesss")
+
 
     
     if not GroupMember.objects.filter(group=group, organization=organization, user=request.user).exists():
@@ -644,6 +679,10 @@ def mark_absent(request, org_id, group_id, event_id):
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id, organization=organization)
     event = get_object_or_404(GroupEvent, id=event_id, group=group, organization=organization)
+    # restrict access
+    if not Profile.objects.filter(user=request.user, organization=organization):
+        return HttpResponseForbidden("Unauthorized Accesss")
+
 
   
     if not GroupMember.objects.filter(group=group, organization=organization, user=request.user).exists():
@@ -699,8 +738,10 @@ def set_event_reminder(request, org_id, group_id, event_id):
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id, organization=organization)
     event = get_object_or_404(GroupEvent, id=event_id, group=group, organization=organization)
+    # restrict access
+    if not Profile.objects.filter(user=request.user, organization=organization):
+        return HttpResponseForbidden("Unauthorized Accesss")
 
-    
     if not GroupMember.objects.filter(group=group, organization=organization, user=request.user).exists():
         return JsonResponse({"error": "You are not a member of this group or organization."}, status=400)
 
@@ -777,6 +818,10 @@ def fetch_event_bookings(request, org_id, group_id, event_id):
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id, organization=organization)
     event = get_object_or_404(GroupEvent, id=event_id, group=group, organization=organization)
+    # restrict access
+    if not Profile.objects.filter(user=request.user, organization=organization):
+        return HttpResponseForbidden("Unauthorized Accesss")
+
 
 
     if not GroupMember.objects.filter(group=group, organization=organization, user=request.user).exists():
@@ -810,6 +855,11 @@ from django.db.models import Count
 def event_analytics(request, org_id, group_id, event_id):
     
     event = get_object_or_404(GroupEvent, id=event_id, organization_id=org_id, group_id=group_id)
+    organization = get_object_or_404(Organization, id=org_id)
+    # restrict access
+    if not Profile.objects.filter(user=request.user, organization=organization):
+        return HttpResponseForbidden("Unauthorized Accesss")
+
 
     # Total bookings
     total_bookings = GroupEventBooking.objects.filter(group_event=event).count()
@@ -859,6 +909,11 @@ def event_analytics(request, org_id, group_id, event_id):
 def user_group_event_analytics(request, org_id, group_id, event_id):
    
     event = get_object_or_404(GroupEvent, id=event_id, organization_id=org_id)
+    organization = get_object_or_404(Organization, id=org_id)
+    # restrict access
+    if not Profile.objects.filter(user=request.user, organization=organization):
+        return HttpResponseForbidden("Unauthorized Accesss")
+
 
 
     bookings = GroupEventBooking.objects.filter(
@@ -920,6 +975,10 @@ def delete_group_event(request, org_id, group_id, event_id):
         organization = get_object_or_404(Organization, id=org_id)
         group = get_object_or_404(Group, id=group_id, organization=organization)
         event = get_object_or_404(GroupEvent, id=event_id, group=group, organization=organization)
+        # restrict access
+        if not Profile.objects.filter(user=request.user, organization=organization):
+            return HttpResponseForbidden("Unauthorized Accesss")
+
 
   
         if request.user != group.team_leader:
@@ -962,7 +1021,11 @@ class SaveRecurrenceInfoView(View):
 
            
             group = get_object_or_404(Group, id=group_id, organization=organization)
+            # restrict access
+            if not Profile.objects.filter(user=request.user, organization=organization):
+                return HttpResponseForbidden("Unauthorized Accesss")
 
+    
           
             event = get_object_or_404(GroupEvent, id=event_id, group=group, organization=organization)
 
@@ -1015,6 +1078,12 @@ def search_events(request, org_id, group_id):
     search_title = request.GET.get('search_title', '')
     filter_date = request.GET.get('filter_date', '')
     filter_location = request.GET.get('filter_location', '')
+    organization = get_object_or_404(Organization,id=org_id)
+
+    # restrict access
+    if not Profile.objects.filter(user=request.user, organization=organization):
+        return HttpResponseForbidden("Unauthorized Accesss")
+
 
     events = GroupEvent.objects.filter(
         organization_id=org_id,
@@ -1069,6 +1138,11 @@ class GroupDetailsView(LoginRequiredMixin, View):
 
         if request.user != group.created_by and request.user != group.team_leader:
             return render(request, '403.html', {"message": "Access Denied"})
+        
+        # restrict access
+        if not Profile.objects.filter(user=request.user, organization=organization):
+          return HttpResponseForbidden("Unauthorized Accesss")
+
 
         members = GroupMember.objects.filter(group=group)
         events = GroupEvent.objects.filter(group=group)
@@ -1126,6 +1200,10 @@ class GroupEventView(LoginRequiredMixin, View):
         organization = get_object_or_404(Organization, id=org_id)
         if not GroupMember.objects.filter(group=group, user=request.user).exists():
             return JsonResponse({'error': 'You are not a member of this group.'}, status=403)
+        # restrict access
+        if not Profile.objects.filter(user=request.user, organization=organization):
+           return HttpResponseForbidden("Unauthorized Accesss")
+
 
        
         events = GroupEvent.objects.filter(group=group, organization=organization)
@@ -1151,7 +1229,7 @@ class GroupEventView(LoginRequiredMixin, View):
 # More features 
 
 # Fetch user details 
-
+@login_required
 def group_member_details(request, org_id, group_id, user_id):
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id, organization=organization)
@@ -1159,6 +1237,11 @@ def group_member_details(request, org_id, group_id, user_id):
 
     if group.team_leader != request.user:
         raise PermissionDenied("You are not authorized to view this member.")
+    
+    # restrict access
+    if not Profile.objects.filter(user=request.user, organization=organization):
+        return HttpResponseForbidden("Unauthorized Accesss")
+
 
     
     group_member = get_object_or_404(GroupMember, group=group, user__id=user_id)
@@ -1196,6 +1279,11 @@ def fetch_group_members(request, org_id, group_id):
 
         if group.created_by != request.user:
             return JsonResponse({'error': 'You are not authorized to view this group'}, status=403)
+        
+        # restrict access
+        if not Profile.objects.filter(user=request.user, organization=group.organization):
+           return HttpResponseForbidden("Unauthorized Accesss")
+
 
         # Fetch the team leader and group members
         team_leader = group.team_leader
@@ -1230,8 +1318,10 @@ def fetch_group_members(request, org_id, group_id):
 def delete_group(request, org_id, group_id):
     if request.method == 'POST':
         group = get_object_or_404(Group, id=group_id, organization_id=org_id)
+        # restrict access
+        if not Profile.objects.filter(user=request.user, organization=group.organization):
+           return HttpResponseForbidden("Unauthorized Accesss")
 
-      
         if group.created_by == request.user:
           
             GroupActivity.objects.create(
@@ -1261,8 +1351,10 @@ class GroupActivityLogView(View):
         organization = get_object_or_404(Organization, id=org_id)
         group = get_object_or_404(Group, id=group_id, organization=organization)
 
-        
-   
+        # restrict access
+        if not Profile.objects.filter(user=request.user, organization=organization):
+          return HttpResponseForbidden("Unauthorized Accesss")
+
         activities = GroupActivity.objects.filter(group=group).order_by('-timestamp')
         if not group.created_by == request.user:
             return HttpResponseForbidden("You do not have permissions to access this feature! please contact your workspace admin!")
@@ -1291,6 +1383,10 @@ def fetch_group_details(request, org_id, group_id):
     # Get the group
     group = get_object_or_404(Group, organization_id=org_id, id=group_id)
     organization = get_object_or_404(Organization, id=org_id)
+    # restrict access
+    if not Profile.objects.filter(user=request.user, organization=organization):
+        return HttpResponseForbidden("Unauthorized Accesss")
+
 
     # Get group leader's profile (if exists)
     leader_profile = Profile.objects.filter(user=group.team_leader, organization=organization).first()
@@ -1328,15 +1424,20 @@ def fetch_group_details(request, org_id, group_id):
 
 
 # DISPLAY GROUP DETAILS 
+@login_required
 def group_details_ajax(request, org_id, group_id):
     # Fetch the organization and group objects
     organization = get_object_or_404(Organization, pk=org_id)
     group = get_object_or_404(Group, pk=group_id, organization=organization)
 
+    # restrict access
+    if not Profile.objects.filter(user=request.user, organization=organization):
+        return HttpResponseForbidden("Unauthorized Accesss")
+
     # Fetch the group description and other details
     group_description = group.description
     group_name = group.name
-    group_leader = group.team_leader.get_full_name() if group.team_leader else None
+    group_leader = group.team_leader.username if group.team_leader else None
 
     # Count total events related to this group
     total_events = GroupEvent.objects.filter(group=group).count()
