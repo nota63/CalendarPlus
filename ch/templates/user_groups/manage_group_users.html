@@ -10,6 +10,7 @@
     <!-- Bootstrap 5 CSS (Latest CDN) -->
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
 
 
 </head>
@@ -133,6 +134,18 @@
     border-radius: 12px;
   }
 }
+
+/* new styles */
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+.modal-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+.modal-body::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
 </style>
 
 
@@ -165,13 +178,9 @@
                         Assign Task
                     </button>
                     <!-- create group event -->
-                    <button id="createGroupEventBtn" class="btn btn-primary">Create Group Event</button>
-                    <!-- manage events -->
-                    <button id="fetchEventsBtn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#eventModal">
-                        Fetch Group Events
-                    </button>
-
-
+                    <button id="createGroupEventBtn" class="flex items-center gap-3 p-2 text-[#636e72] hover:bg-[#f8f9fa] rounded-lg">
+                        <i class="mdi mdi-calendar-plus text-xl"></i> 
+                        Create Group Event</button>
                 </div>
             </div>
         </nav>
@@ -223,11 +232,7 @@
                             <i class="mdi mdi-dots-horizontal"></i>
                         </button>
                         <div class="absolute right-0 mt-1 w-48 bg-white border border-[#e5e7eb] rounded-lg shadow-lg hidden">
-                            <a href="{% url 'create_group_event' org_id=organization.id group_id=group.id %}" 
-                               class="flex items-center gap-2 px-4 py-2 text-[#636e72] hover:bg-[#f8f9fa]">
-                                <i class="mdi mdi-calendar-plus"></i>
-                                Create Event
-                            </a>
+                           
                             <a href="#" class="flex items-center gap-2 px-4 py-2 text-[#636e72] hover:bg-[#f8f9fa]">
                                 <i class="mdi mdi-cog-outline"></i>
                                 Group Settings
@@ -584,125 +589,280 @@
 </script>
 
 <!-- Create Group Event  -->
+<!-- Create Group Event Modal -->
 <div class="modal fade" id="createGroupEventModal" tabindex="-1" aria-labelledby="createGroupEventModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="createGroupEventModalLabel">Create Group Event</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="createGroupEventForm">
-            <div class="mb-3">
-              <label for="eventTitle" class="form-label">Event Title</label>
-              <input type="text" class="form-control" id="eventTitle" required>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content rounded-xl shadow-2xl border-0">
+            <!-- Header Section -->
+            <div class="modal-header bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between w-full">
+                    <div>
+                        <h3 class="modal-title text-2xl font-bold text-gray-800 font-sans" id="createGroupEventModalLabel">
+                            Create Group Event
+                        </h3>
+                        <p class="text-sm text-gray-500 mt-1">Schedule a new group meeting or session</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="fetchEventsBtn" data-bs-toggle="modal" data-bs-target="#eventModal"
+                                class="btn btn-outline-secondary flex items-center text-sm px-4 py-2 rounded-lg border border-gray-300 hover:border-gray-400">
+                            <span class="material-icons-outlined text-base mr-2">list_alt</span>
+                            View Events
+                        </button>
+                        <button type="button" 
+                                class="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                                data-bs-dismiss="modal" 
+                                aria-label="Close">
+                            <span class="material-icons-outlined text-gray-500">close</span>
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="mb-3">
-              <label for="eventDescription" class="form-label">Description</label>
-              <textarea class="form-control" id="eventDescription"></textarea>
-            </div>
-            <div class="mb-3">
-              <label for="eventDate" class="form-label">Event Date</label>
-              <input type="date" class="form-control" id="eventDate" required>
-            </div>
-            <div class="mb-3">
-              <label for="eventStartTime" class="form-label">Start Time</label>
-              <input type="time" class="form-control" id="eventStartTime" required>
-            </div>
-            <div class="mb-3">
-              <label for="eventEndTime" class="form-label">End Time</label>
-              <input type="time" class="form-control" id="eventEndTime" required>
-            </div>
-            <div class="mb-3">
-              <label for="meetingLink" class="form-label">Meeting Link</label>
-              <input type="url" class="form-control" id="meetingLink" required>
-            </div>
-            <!-- modfying location -->
-            <div class="mb-3">
-                <label for="eventLocation" class="form-label">Location</label>
-                <input type="text" class="form-control" id="eventLocation" list="locationOptions" required>
-                <datalist id="locationOptions">
-                  <option value="Zoom">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-camera-video" viewBox="0 0 16 16">
-                      <path d="M8 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h5z"/>
-                      <path d="M14 4v8l3-4-3-4z"/>
-                    </svg> Zoom
-                  </option>
-                  <option value="Google Meet">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-google" viewBox="0 0 16 16">
-                      <path d="M8.293 3.293a1 1 0 0 1 1.414 0L14 7.586a1 1 0 0 1 0 1.414L9.707 13.707a1 1 0 0 1-1.414-1.414L11.586 9H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h8.586L8.293 3.293z"/>
-                    </svg> Google Meet
-                  </option>
-                  <option value="Organization">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-house-door" viewBox="0 0 16 16">
-                      <path d="M6.5 0a.5.5 0 0 1 .5.5v2.4l4-2.5a.5.5 0 0 1 .8.4v10a.5.5 0 0 1-.8.4l-4-2.5v2.4a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5V7.5a.5.5 0 0 1 .5-.5h3V2.5a.5.5 0 0 1 .5-.5z"/>
-                    </svg> Organization
-                  </option>
-                  <option value="Salesforce">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cloud" viewBox="0 0 16 16">
-                      <path d="M9.5 2a4.5 4.5 0 0 1 4.5 4.5c0 1.5-.75 2.825-1.875 3.625a4.5 4.5 0 0 1-5.75 6.25c-1.244 0-2.356-.532-3.187-1.385a5.5 5.5 0 0 1-7.092-8.49A4.5 4.5 0 0 1 5.5 2h4z"/>
-                    </svg> Salesforce
-                  </option>
-                  <option value="Microsoft Teams">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-text" viewBox="0 0 16 16">
-                      <path d="M10.5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1-.5-.5V.5a.5.5 0 0 1 .5-.5h4z"/>
-                      <path d="M12 3a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H4a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3h8z"/>
-                    </svg> Microsoft Teams
-                  </option>
-                  <option value="Skype">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-telephone" viewBox="0 0 16 16">
-                      <path d="M1 3.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-3z"/>
-                      <path d="M6.84 0C5.462 0 4.167.49 3.23 1.352l-.5.5C2.14 2.566 2 3.082 2 3.5v5c0 .418.14.934.23 1.148l.5.5C4.167 10.51 5.462 11 6.84 11h2.32c1.378 0 2.673-.49 3.61-1.352l.5-.5c.09-.214.23-.73.23-1.148v-5c0-.418-.14-.934-.23-1.148l-.5-.5C9.51.49 8.215 0 6.84 0z"/>
-                    </svg> Skype
-                  </option>
-                  <option value="Webex">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
-                      <path d="M8 1a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0z"/>
-                    </svg> Webex
-                  </option>
-                  <option value="Slack">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-slack" viewBox="0 0 16 16">
-                      <path d="M3.004 2.295A1 1 0 0 0 2.288 2.83a.5.5 0 0 1 .004.537l1.04 1.76a.5.5 0 0 1-.015.53l-.842 1.402a.5.5 0 0 1-.533.196l-.44-.256a.5.5 0 0 0-.661.007L.858 9.108a1 1 0 0 0 .04 1.475l5.323 3.078A.5.5 0 0 1 6 13h7a.5.5 0 0 1 .36-.84L14.1 11.358a1 1 0 0 0-.04-1.475l-5.304-3.07a.5.5 0 0 0-.661-.007l-.44.256a.5.5 0 0 1-.533-.196l-.841-1.402a.5.5 0 0 1-.015-.53l1.04-1.76a.5.5 0 0 1 .004-.537A1 1 0 0 0 8.162.36l-3.58 2.093z"/>
-                    </svg> Slack
-                  </option>
-                </datalist>
-              </div>
-              
-              
 
-            <div class="mb-3">
-              <label for="eventSlots" class="form-label">Slots</label>
-              <input type="number" class="form-control" id="eventSlots" value="0">
+            <!-- Form Content -->
+            <div class="modal-body overflow-y-auto max-h-[calc(100vh-10rem)] px-6 py-4">
+                <form id="createGroupEventForm" class="space-y-5">
+                    <!-- Event Title -->
+                    <div>
+                        <label for="eventTitle" class="block text-sm font-medium text-gray-700 mb-1">
+                            Event Title <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <input type="text" 
+                                   id="eventTitle" 
+                                   class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
+                                   placeholder="Team Sync Meeting"
+                                   required>
+                            <span class="material-icons-outlined absolute right-3 top-3 text-gray-400">title</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">Maximum 60 characters</p>
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label for="eventDescription" class="block text-sm font-medium text-gray-700 mb-1">
+                            Description
+                        </label>
+                        <textarea id="eventDescription" 
+                                  class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
+                                  rows="3"
+                                  placeholder="Add meeting agenda and important details"></textarea>
+                    </div>
+
+                    <!-- Date & Time Section -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Event Date -->
+                        <div>
+                            <label for="eventDate" class="block text-sm font-medium text-gray-700 mb-1">
+                                Date <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <input type="date" 
+                                       id="eventDate" 
+                                       class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                       required>
+                                <span class="material-icons-outlined absolute right-3 top-3 text-gray-400">calendar_today</span>
+                            </div>
+                        </div>
+
+                        <!-- Start Time -->
+                        <div>
+                            <label for="eventStartTime" class="block text-sm font-medium text-gray-700 mb-1">
+                                Start Time <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <input type="time" 
+                                       id="eventStartTime" 
+                                       class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                       required>
+                                <span class="material-icons-outlined absolute right-3 top-3 text-gray-400">schedule</span>
+                            </div>
+                        </div>
+
+                        <!-- End Time -->
+                        <div>
+                            <label for="eventEndTime" class="block text-sm font-medium text-gray-700 mb-1">
+                                End Time <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <input type="time" 
+                                       id="eventEndTime" 
+                                       class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                       required>
+                                <span class="material-icons-outlined absolute right-3 top-3 text-gray-400">timer_off</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Location & Meeting Link -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Location -->
+                        <div>
+                            <label for="eventLocation" class="block text-sm font-medium text-gray-700 mb-1">
+                                Location <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <input type="text" 
+                                       id="eventLocation" 
+                                       list="locationOptions"
+                                       class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
+                                       placeholder="Select or type location"
+                                       required>
+                                <datalist id="locationOptions">
+                                    <!-- Options remain same as original -->
+                                    <option value="Zoom">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-camera-video" viewBox="0 0 16 16">
+                                          <path d="M8 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h5z"/>
+                                          <path d="M14 4v8l3-4-3-4z"/>
+                                        </svg> Zoom
+                                      </option>
+                                      <option value="Google Meet">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-google" viewBox="0 0 16 16">
+                                          <path d="M8.293 3.293a1 1 0 0 1 1.414 0L14 7.586a1 1 0 0 1 0 1.414L9.707 13.707a1 1 0 0 1-1.414-1.414L11.586 9H3a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h8.586L8.293 3.293z"/>
+                                        </svg> Google Meet
+                                      </option>
+                                      <option value="Organization">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-house-door" viewBox="0 0 16 16">
+                                          <path d="M6.5 0a.5.5 0 0 1 .5.5v2.4l4-2.5a.5.5 0 0 1 .8.4v10a.5.5 0 0 1-.8.4l-4-2.5v2.4a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5V7.5a.5.5 0 0 1 .5-.5h3V2.5a.5.5 0 0 1 .5-.5z"/>
+                                        </svg> Organization
+                                      </option>
+                                      <option value="Salesforce">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cloud" viewBox="0 0 16 16">
+                                          <path d="M9.5 2a4.5 4.5 0 0 1 4.5 4.5c0 1.5-.75 2.825-1.875 3.625a4.5 4.5 0 0 1-5.75 6.25c-1.244 0-2.356-.532-3.187-1.385a5.5 5.5 0 0 1-7.092-8.49A4.5 4.5 0 0 1 5.5 2h4z"/>
+                                        </svg> Salesforce
+                                      </option>
+                                      <option value="Microsoft Teams">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-text" viewBox="0 0 16 16">
+                                          <path d="M10.5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1-.5-.5V.5a.5.5 0 0 1 .5-.5h4z"/>
+                                          <path d="M12 3a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H4a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3h8z"/>
+                                        </svg> Microsoft Teams
+                                      </option>
+                                      <option value="Skype">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-telephone" viewBox="0 0 16 16">
+                                          <path d="M1 3.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-3z"/>
+                                          <path d="M6.84 0C5.462 0 4.167.49 3.23 1.352l-.5.5C2.14 2.566 2 3.082 2 3.5v5c0 .418.14.934.23 1.148l.5.5C4.167 10.51 5.462 11 6.84 11h2.32c1.378 0 2.673-.49 3.61-1.352l.5-.5c.09-.214.23-.73.23-1.148v-5c0-.418-.14-.934-.23-1.148l-.5-.5C9.51.49 8.215 0 6.84 0z"/>
+                                        </svg> Skype
+                                      </option>
+                                      <option value="Webex">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
+                                          <path d="M8 1a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0z"/>
+                                        </svg> Webex
+                                      </option>
+                                      <option value="Slack">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-slack" viewBox="0 0 16 16">
+                                          <path d="M3.004 2.295A1 1 0 0 0 2.288 2.83a.5.5 0 0 1 .004.537l1.04 1.76a.5.5 0 0 1-.015.53l-.842 1.402a.5.5 0 0 1-.533.196l-.44-.256a.5.5 0 0 0-.661.007L.858 9.108a1 1 0 0 0 .04 1.475l5.323 3.078A.5.5 0 0 1 6 13h7a.5.5 0 0 1 .36-.84L14.1 11.358a1 1 0 0 0-.04-1.475l-5.304-3.07a.5.5 0 0 0-.661-.007l-.44.256a.5.5 0 0 1-.533-.196l-.841-1.402a.5.5 0 0 1-.015-.53l1.04-1.76a.5.5 0 0 1 .004-.537A1 1 0 0 0 8.162.36l-3.58 2.093z"/>
+                                        </svg> Slack
+                                      </option>
+                    
+                                </datalist>
+                                <span class="material-icons-outlined absolute right-3 top-3 text-gray-400">location_on</span>
+                            </div>
+                        </div>
+
+                        <!-- Meeting Link -->
+                        <div>
+                            <label for="meetingLink" class="block text-sm font-medium text-gray-700 mb-1">
+                                Meeting Link <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <input type="url" 
+                                       id="meetingLink" 
+                                       class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
+                                       placeholder="https://"
+                                       required>
+                                <span class="material-icons-outlined absolute right-3 top-3 text-gray-400">link</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slots & Recurrence -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Slots -->
+                        <div>
+                            <label for="eventSlots" class="block text-sm font-medium text-gray-700 mb-1">
+                                Available Slots
+                            </label>
+                            <div class="relative">
+                                <input type="number" 
+                                       id="eventSlots" 
+                                       value="0"
+                                       class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                       min="0">
+                                <span class="material-icons-outlined absolute right-3 top-3 text-gray-400">people_alt</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Configure the seats in the event</p>
+                        </div>
+
+                        <!-- Recurrence Type -->
+                        <div>
+                            <label for="recurrenceType" class="block text-sm font-medium text-gray-700 mb-1">
+                                Recurrence
+                            </label>
+                            <div class="relative">
+                                <select id="recurrenceType" 
+                                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-no-repeat">
+                                    <option value="none">No recurrence</option>
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="bi-weekly">Bi-Weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                    <option value="yearly">Yearly</option>
+                                </select>
+                                <span class="material-icons-outlined absolute right-3 top-3 text-gray-400 pointer-events-none">arrow_drop_down</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recurrence Details -->
+                    <div class="space-y-4" id="recurrenceDetails" style="display: none;">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- End Date -->
+                            <div id="recurrenceEndDateGroup">
+                                <label for="recurrenceEndDate" class="block text-sm font-medium text-gray-700 mb-1">
+                                    End Date
+                                </label>
+                                <div class="relative">
+                                    <input type="date" 
+                                           id="recurrenceEndDate" 
+                                           class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <span class="material-icons-outlined absolute right-3 top-3 text-gray-400">event_available</span>
+                                </div>
+                            </div>
+
+                            <!-- Days -->
+                            <div id="recurrenceDaysGroup">
+                                <label for="recurrenceDays" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Specific Days
+                                </label>
+                                <input type="text" 
+                                       id="recurrenceDays" 
+                                       class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                       placeholder="E.g. Monday, Wednesday">
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
-            <div class="mb-3">
-              <label for="recurrenceType" class="form-label">Recurrence Type</label>
-              <select class="form-select" id="recurrenceType">
-                <option value="none">None</option>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="bi-weekly">Bi-Weekly</option>
-                <option value="monthly">Monthly</option>
-                <option value="yearly">Yearly</option>
-              </select>
+
+            <!-- Footer -->
+            <div class="modal-footer bg-gray-50 px-6 py-4 border-t border-gray-200">
+                <div class="flex items-center justify-between w-full">
+                    <button type="button" 
+                            class="btn btn-outline-gray flex items-center px-5 py-2.5 rounded-lg border border-gray-300 hover:border-gray-400 text-gray-700"
+                            data-bs-dismiss="modal">
+                        <span class="material-icons-outlined text-base mr-2">close</span>
+                        Cancel
+                    </button>
+                    <button type="button" 
+                            id="submitGroupEventBtn" 
+                            class="btn btn-primary bg-blue-600 hover:bg-blue-700 text-white flex items-center px-5 py-2.5 rounded-lg transition-all">
+                        <span class="material-icons-outlined text-base mr-2">event_add</span>
+                        Create Event
+                    </button>
+                </div>
             </div>
-            <div class="mb-3" id="recurrenceEndDateGroup" style="display: none;">
-              <label for="recurrenceEndDate" class="form-label">Recurrence End Date</label>
-              <input type="date" class="form-control" id="recurrenceEndDate">
-            </div>
-            <div class="mb-3" id="recurrenceDaysGroup" style="display: none;">
-              <label for="recurrenceDays" class="form-label">Recurrence Days</label>
-              <input type="text" class="form-control" id="recurrenceDays" placeholder="e.g., Monday, Wednesday">
-            </div>
-          </form>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" id="submitGroupEventBtn" class="btn btn-primary">Create Event</button>
-        </div>
-      </div>
     </div>
-  </div>
-  
+</div>
 <!-- Manage The Events -->
 
 <!-- Modal 1: Group Events List -->
