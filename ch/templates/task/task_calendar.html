@@ -1200,16 +1200,67 @@ body {
 </div>
 
 <!-- Group[ and team details modal] -->
+<!-- Add this in your head section for fonts -->
+<!-- Add Inter font in your head section -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <div class="modal fade" id="groupDetailsModal" tabindex="-1" aria-labelledby="groupDetailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="groupDetailsModalLabel">Group Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content rounded-xl shadow-2xl" style="font-family: 'Inter', sans-serif;">
+            <div class="modal-header border-b border-gray-200 px-6 py-4">
+                <div class="flex flex-col gap-1">
+                    <h5 class="modal-title text-xl font-semibold text-gray-900" id="groupDetailsModalLabel">Group Overview</h5>
+                    <p class="text-sm text-gray-500 mt-1">Team members and leadership details</p>
+                </div>
+                <button type="button" class="btn-close p-2 hover:bg-gray-100 rounded-lg" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div id="groupDetailsContent">
-                    <p class="text-center">Loading...</p>
+            
+            <div class="modal-body p-6">
+                <div id="groupDetailsContent" class="h-[500px] overflow-y-auto pr-4">
+                    <!-- Loading State -->
+                    <div class="loading-state text-center py-8">
+                        <div class="spinner-border text-primary-500" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="text-gray-500 text-sm mt-3">Fetching team details...</p>
+                    </div>
+
+                    <!-- Content Template (Hidden by default) -->
+                    <div class="content-template hidden">
+                        <!-- Team Leader Section -->
+                        <div class="mb-8">
+                            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">Team Leader</h3>
+                            <div class="flex items-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                    <span class="text-blue-600 font-medium">TL</span>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="text-base font-semibold text-gray-900">John Doe</h4>
+                                    <p class="text-sm text-gray-500">john@example.com</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Team Members Section -->
+                        <div class="mb-8">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Team Members (3)</h3>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Member Card -->
+                                <div class="group flex items-center p-4 hover:bg-gray-50 rounded-lg border border-gray-200 transition-colors">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
+                                        <span class="text-gray-600 font-medium">JD</span>
+                                    </div>
+                                    <div class="ml-4">
+                                        <h4 class="text-base font-medium text-gray-900">Jane Doe</h4>
+                                        <p class="text-sm text-gray-500">jane@example.com</p>
+                                    </div>
+                                </div>
+                                <!-- Repeat member cards -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1217,10 +1268,7 @@ body {
 </div>
 
 
-
-
-
-<!-- Bootstrap 5 JS (with Popper.js) -->
+<!-- Bootstrap 5 JS (with Popper.js) ------------------------------------------------------------------------------------------------------------->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
