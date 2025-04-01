@@ -1268,21 +1268,28 @@ body {
 </div>
 
 <!-- Group Overview -->
-<!-- Group Overview Modal -->
 <div class="modal fade" id="groupOverviewPlusModal" tabindex="-1" aria-labelledby="groupOverviewPlusModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="groupOverviewPlusModalLabel">Group Overview</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-scrollable max-w-3xl relative w-full">
+        <div class="modal-content rounded-xl shadow-2xl border border-gray-100 overflow-hidden">
+            <!-- Header -->
+            <div class="modal-header bg-white px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between w-full">
+                    <h5 class="modal-title text-2xl font-semibold text-gray-900">Group Overview</h5>
+                    <button type="button" class="btn-close p-2 hover:bg-gray-100 rounded-lg transition-colors" data-bs-dismiss="modal" aria-label="Close">
+                        <span class="material-icons text-gray-500 text-lg">close</span>
+                    </button>
+                </div>
             </div>
-            <div class="modal-body" id="groupDetailsContentt">
-                <!-- Dynamic Content will be inserted here -->
+
+            <!-- Body -->
+            <div class="modal-body p-6 bg-gray-50">
+                <div id="groupDetailsContentt" class="space-y-6 max-h-[80vh] overflow-y-auto pr-4">
+                    <!-- Dynamic content will maintain existing structure -->
+                </div>
             </div>
         </div>
     </div>
 </div>
-
 
 <!-- Bootstrap 5 JS (with Popper.js) ------------------------------------------------------------------------------------------------------------->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
