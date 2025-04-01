@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,96 +7,61 @@
     <title>{{ group.name }} Tasks</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <!-- Modern Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Plus Jakarta Sans', 'sans-serif'],
+                        'display': ['Manrope', 'sans-serif']
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0f7ff',
+                            100: '#e0eefe',
+                            200: '#bae0fd',
+                            300: '#7dccfc',
+                            400: '#36b3f9',
+                            500: '#0c98eb',
+                            600: '#0271c9',
+                            700: '#0262b0',
+                            800: '#065393',
+                            900: '#0a4479',
+                        },
+                        secondary: {
+                            50: '#f8f5ff',
+                            100: '#f1ebfe',
+                            200: '#e4d9fd',
+                            300: '#d0b9fc',
+                            400: '#b68ef9',
+                            500: '#9e65f5',
+                            600: '#8647e8',
+                            700: '#7834ca',
+                            800: '#602ca1',
+                            900: '#4e257c',
+                        }
+                    },
+                    boxShadow: {
+                        'neumorph': '20px 20px 60px #d9d9d9, -20px -20px 60px #ffffff',
+                        'neumorph-sm': '10px 10px 30px #d9d9d9, -10px -10px 30px #ffffff',
+                        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #f8fafc;
-        }
-        .font-display {
-            font-family: 'Space Grotesk', sans-serif;
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        .priority-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-          /* Material Design Inspired Buttons */
-    .btn-material-primary {
-      @apply px-5 py-2.5 rounded-lg font-medium text-white bg-blue-600 
-             hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 
-             transition-all shadow-sm hover:shadow-md
-             flex items-center gap-2;
-    }
-  
-    .btn-icon {
-      @apply p-2 rounded-full transition-colors;
-    }
-  
-    .btn-icon-close {
-      @apply p-2 rounded-full text-gray-500 hover:bg-gray-100 transition-colors;
-    }
-
-    .animate-spin {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
- /* Custom Styles */
- #dropArea:hover {
-        background: rgba(255, 255, 255, 0.7) !important;
-        border-color: rgba(156, 39, 176, 0.5) !important;
-    }
-
-    .checkbox-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-    }
-
-    .form-check-input:checked + .form-check-label .checkbox-icon {
-        display: block !important;
-    }
-
-    .form-check-input:checked + .form-check-label .checkbox-icon-outline {
-        display: none !important;
-    }
-
-    .bg-primary-gradient {
-        background: linear-gradient(45deg, #9c27b0, #673ab7);
-    }
-
-    .file-preview-content {
-        transition: transform 0.3s ease;
-    }
-
-    #filePreview:hover .file-preview-content {
-        transform: translateY(-3px);
-    }
-
-    /* dropdown menu styles */
-   /* Base Styles */
+        /* all modal styles and animations */
+          /* Base Styles */
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
@@ -214,248 +178,474 @@ body {
     border-radius: 12px;
   }
 }
+        /* Glassomorphism and other custom styles */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .glass-sidebar {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(15px);
+            border-right: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .priority-badge {
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        
+        .sidebar-menu-item:hover .sidebar-icon,
+        .sidebar-menu-item.active .sidebar-icon {
+            transform: translateX(4px);
+        }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background-color: rgba(241, 245, 249, 0.5);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background-color: rgba(148, 163, 184, 0.5);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(100, 116, 139, 0.5);
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50/50 to-purple-50/50 min-h-screen">
-    <!-- Header -->
-    <header class="bg-gradient-to-r from-blue-600 to-purple-600 text-white pt-16 pb-24 px-4 shadow-xl">
-        <div class="max-w-6xl mx-auto">
-            <div class="text-center space-y-4">
-                <h1 class="font-display text-4xl font-bold tracking-tight">{{ group.name }} Tasks</h1>
-                <p class="text-lg text-blue-100/90 max-w-2xl mx-auto leading-relaxed">
-                    Manage your assigned tasks efficiently. Track progress, meet deadlines, and collaborate seamlessly with your team.
-                </p>
-            </div>
-        </div>
-    </header>
-
-    <main class="max-w-6xl mx-auto -mt-12 px-4">
-        <!-- Controls Section -->
-        <div class="glass-card rounded-2xl p-6 mb-8 shadow-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <button class="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-6 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-all transform hover:scale-[1.02]"
-                data-bs-toggle="offcanvas" data-bs-target="#learnMoreSidebar">
-                <span class="material-icons-round text-lg">help_outline</span>
-                Quick Guide
-            </button>
-
-            <!-- Group details and the team -->
-            <button id="fetchGroupDetailsBtn" class="btn btn-primary" data-org-id="{{organization.id}}" data-group-id="{{group.id}}">
-                View Group Details
-            </button>
-            
-            
-            
-             <!-- Controls Bar -->
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-            
-            
-            <div class="glass-effect bg-white/80 p-2 rounded-xl">
-                <form method="get" class="flex items-center gap-3">
-                    <span class="text-sm font-medium text-gray-600">Priority Filter:</span>
-                    <select class="form-select bg-transparent border-none focus:ring-2 focus:ring-blue-500/30 rounded-lg px-4 py-2 text-gray-700"
-                            name="priority" onchange="this.form.submit()">
-                        <option value="">All</option>
-                        <option value="low" {% if request.GET.priority == 'low' %}selected{% endif %}>Low</option>
-                        <option value="medium" {% if request.GET.priority == 'medium' %}selected{% endif %}>Medium</option>
-                        <option value="high" {% if request.GET.priority == 'high' %}selected{% endif %}>High</option>
-                        <option value="urgent" {% if request.GET.priority == 'urgent' %}selected{% endif %}>Urgent</option>
-                    </select>
-                </form>
-            </div>
-        </div>
-
-        </div>
-
-        <!-- Tasks Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {% for task in tasks %}
-            <div class="glass-card group relative rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
-                <!-- Priority Indicator -->
-                <div class="absolute top-6 right-6">
-                    <span class="priority-badge 
-                        {% if task.priority == 'urgent' %}bg-red-100 text-red-800
-                        {% elif task.priority == 'high' %}bg-orange-100 text-orange-800
-                        {% elif task.priority == 'medium' %}bg-yellow-100 text-yellow-800
-                        {% else %}bg-green-100 text-green-800{% endif %}">
-                        {{ task.priority }}
-                    </span>
+<body class="bg-gradient-to-br from-gray-50 to-blue-50/30 min-h-screen font-sans text-gray-800 overflow-hidden">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="glass-sidebar hidden md:flex flex-col w-64 h-screen fixed z-20 transition-all duration-300 ease-in-out shadow-glass">
+            <!-- Logo -->
+            <div class="p-6 border-b border-gray-100">
+                <div class="flex items-center">
+                    <div class="h-9 w-9 flex items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 shadow-lg">
+                        <span class="material-icons-round text-white">bolt</span>
+                    </div>
+                    <span class="ml-3 text-xl font-display font-bold text-gray-800">{{organization.name}}</span>
                 </div>
-
-                <!-- Task Content -->
-                <div class="space-y-5">
+            </div>
+            
+            <!-- User Profile -->
+            <div class="p-4 border-b border-gray-100">
+                <div class="flex items-center space-x-3">
+                    <div class="h-10 w-10 rounded-full bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center">
+                        <span class="font-medium text-primary-700">{{ user.first_name|first }}{{ user.last_name|first }}</span>
+                    </div>
                     <div>
-                        <h3 class="text-xl font-semibold text-gray-800 mb-1">{{ task.title }}</h3>
-                       
+                        <h3 class="text-sm font-medium">{{ user.first_name }} {{ user.last_name }}</h3>
+                        <p class="text-xs text-gray-500">{{ user.email }}</p>
                     </div>
+                </div>
+            </div>
+            
+            <!-- Navigation Menu -->
+            <nav class="flex-1 px-2 py-4 overflow-y-auto">
+                <div class="mb-6">
+                    <h3 class="ml-4 text-xs uppercase font-semibold text-gray-500 tracking-wider">Dashboard</h3>
+                    <ul class="mt-3 space-y-1">
+                        <li>
+                            <a href="#" class="sidebar-menu-item flex items-center px-4 py-3 text-primary-600 rounded-xl bg-primary-50">
+                                <span class="material-icons-round sidebar-icon mr-3 text-primary-500 transition-transform duration-200">dashboard</span>
+                                <span class="font-medium">Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-menu-item flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl">
+                                <span class="material-icons-round sidebar-icon mr-3 text-gray-500 transition-transform duration-200">check_circle</span>
+                                <span>My Tasks</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-menu-item flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl">
+                                <span class="material-icons-round sidebar-icon mr-3 text-gray-500 transition-transform duration-200">today</span>
+                                <span>My Day</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-menu-item flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl">
+                                <span class="material-icons-round sidebar-icon mr-3 text-gray-500 transition-transform duration-200">calendar_month</span>
+                                <span>Calendar</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="ml-4 text-xs uppercase font-semibold text-gray-500 tracking-wider">Workspaces</h3>
+                    <ul class="mt-3 space-y-1">
+                        <li>
+                            <a href="#" class="sidebar-menu-item flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl">
+                                <span class="material-icons-round sidebar-icon mr-3 text-gray-500 transition-transform duration-200">group</span>
+                                <span>Team Alpha</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-menu-item flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl">
+                                <span class="material-icons-round sidebar-icon mr-3 text-gray-500 transition-transform duration-200">group</span>
+                                <span>Marketing</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-menu-item flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl">
+                                <span class="material-icons-round sidebar-icon mr-3 text-gray-500 transition-transform duration-200">group</span>
+                                <span>Development</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="ml-4 text-xs uppercase font-semibold text-gray-500 tracking-wider">Settings</h3>
+                    <ul class="mt-3 space-y-1">
+                        <li>
+                            <a href="#" class="sidebar-menu-item flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl">
+                                <span class="material-icons-round sidebar-icon mr-3 text-gray-500 transition-transform duration-200">settings</span>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-menu-item flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-xl">
+                                <span class="material-icons-round sidebar-icon mr-3 text-gray-500 transition-transform duration-200">help_outline</span>
+                                <span>Help & Support</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+            <!-- Footer -->
+            <div class="p-4 border-t border-gray-100">
+                <a href="#" class="flex items-center text-gray-700">
+                    <span class="material-icons-round mr-3 text-gray-500">logout</span>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
 
-                    <!-- Metadata -->
-                    <div class="space-y-3">
-                        <div class="flex items-center gap-3 text-gray-500">
-                            <span class="material-icons-round text-blue-500">calendar_today</span>
-                            <span class="text-sm">{{ task.start }}</span>
-                        </div>
-                        <div class="flex items-center gap-3 text-gray-500">
-                            <span class="material-icons-round text-purple-500">schedule</span>
-                            <span class="text-sm">Coming soon</span>
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto ml-0 md:ml-64">
+            <!-- Top Navbar -->
+            <header class="sticky top-0 z-10 glass-card shadow-sm">
+                <div class="flex items-center justify-between px-6 h-16">
+                    <!-- Sidebar Toggle Button -->
+                    <button class="md:hidden text-gray-500 hover:text-gray-900 focus:outline-none">
+                        <span class="material-icons-round">menu</span>
+                    </button>
+                    
+                    <!-- Search Bar -->
+                    <div class="flex-1 max-w-xl mx-4">
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                                <span class="material-icons-round text-lg">search</span>
+                            </span>
+                            <input type="text" placeholder="Search tasks, projects, or people..." 
+                                   class="w-full py-2 pl-12 pr-4 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-primary-500/30 focus:bg-white transition-all">
                         </div>
                     </div>
-
-                    <!-- Progress Bar -->
-                    <div>
-                        <div class="flex justify-between text-sm mb-2">
-                            <span class="text-gray-600">Progress</span>
-                            <span class="font-medium text-blue-600">{{ task.progress }}%</span>
-                        </div>
-                        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-blue-400 to-purple-400 rounded-full transition-all duration-500" 
-                                 style="width: {{ task.progress }}%"></div>
-                        </div>
+                    
+                    <!-- Right Side Icons -->
+                    <div class="flex items-center space-x-4">
+                        <button class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full">
+                            <span class="material-icons-round">notifications</span>
+                        </button>
+                        <button class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full">
+                            <span class="material-icons-round">help_outline</span>
+                        </button>
+                        <button class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full" id="fetchGroupDetailsBtn" data-org-id="{{organization.id}}" data-group-id="{{group.id}}">
+                            <span class="material-icons-round">group</span>
+                        </button>
                     </div>
+                </div>
+            </header>
 
-                    <!-- Actions -->
-                    <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-                        <div class="flex items-center gap-2">
-                            <button class="p-2 hover:bg-gray-100 rounded-lg text-gray-500 hover:text-gray-700 transition-colors"
-                                onclick="toggleDropdown('{{ task.id }}')">
-                                <span class="material-icons-round">more_vert</span>
+            <!-- Content Area -->
+            <div class="p-6">
+                <!-- Page Header -->
+                <div class="mb-8">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <h1 class="text-3xl font-display font-bold text-gray-900">{{ group.name }} Tasks</h1>
+                            <p class="mt-2 text-gray-600">Manage your assigned tasks efficiently and collaborate with your team.</p>
+                        </div>
+                        <div class="mt-4 md:mt-0">
+                            <button class="bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white px-6 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-all transform hover:scale-[1.02] shadow-md"
+                                data-bs-toggle="offcanvas" data-bs-target="#learnMoreSidebar">
+                                <span class="material-icons-round text-lg">help_outline</span>
+                                Quick Guide
                             </button>
-                            <div class="flex items-center gap-1 text-sm text-gray-500">
-                                <span class="material-icons-round text-sm">comment</span>
-                                5
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Controls & Filters -->
+                <div class="glass-card rounded-2xl p-6 mb-8 shadow-lg">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <!-- View Options -->
+                        <div class="flex items-center space-x-2">
+                            <button class="p-2 bg-primary-50 text-primary-600 rounded-lg flex items-center gap-1 font-medium">
+                                <span class="material-icons-round text-sm">grid_view</span>
+                                <span>Grid</span>
+                            </button>
+                            <button class="p-2 hover:bg-gray-100 text-gray-600 rounded-lg flex items-center gap-1 font-medium">
+                                <span class="material-icons-round text-sm">view_list</span>
+                                <span>List</span>
+                            </button>
+                            <button class="p-2 hover:bg-gray-100 text-gray-600 rounded-lg flex items-center gap-1 font-medium">
+                                <span class="material-icons-round text-sm">view_kanban</span>
+                                <span>Board</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Filters -->
+                        <div class="flex flex-wrap gap-3">
+                            <!-- Priority Filter -->
+                            <div class="glass-effect bg-white/80 rounded-xl">
+                                <form method="get" class="flex items-center">
+                                    <span class="pl-4 text-sm font-medium text-gray-600">Priority:</span>
+                                    <select class="form-select bg-transparent border-none focus:ring-2 focus:ring-primary-500/30 rounded-lg px-4 py-2 text-gray-700"
+                                            name="priority" onchange="this.form.submit()">
+                                        <option value="">All</option>
+                                        <option value="low" {% if request.GET.priority == 'low' %}selected{% endif %}>Low</option>
+                                        <option value="medium" {% if request.GET.priority == 'medium' %}selected{% endif %}>Medium</option>
+                                        <option value="high" {% if request.GET.priority == 'high' %}selected{% endif %}>High</option>
+                                        <option value="urgent" {% if request.GET.priority == 'urgent' %}selected{% endif %}>Urgent</option>
+                                    </select>
+                                </form>
+                            </div>
+                            
+                            <!-- Date Filter -->
+                            <div class="glass-effect bg-white/80 rounded-xl px-4 py-2 flex items-center gap-2">
+                                <span class="material-icons-round text-gray-500">date_range</span>
+                                <span class="text-sm font-medium text-gray-600">Date</span>
+                                <span class="material-icons-round text-gray-500 text-sm">arrow_drop_down</span>
+                            </div>
+                            
+                            <!-- Assignee Filter -->
+                            <div class="glass-effect bg-white/80 rounded-xl px-4 py-2 flex items-center gap-2">
+                                <span class="material-icons-round text-gray-500">person</span>
+                                <span class="text-sm font-medium text-gray-600">Assignee</span>
+                                <span class="material-icons-round text-gray-500 text-sm">arrow_drop_down</span>
                             </div>
                         </div>
                         
-                        <div class="flex items-center gap-2">
-                            {% if task.in_my_day %}
-                            <button class="px-4 py-1.5 bg-green-100 text-green-700 rounded-full text-sm font-medium flex items-center gap-2">
-                                <span class="material-icons-round text-sm">check_circle</span>
-                                Added
-                            </button>
-                            {% else %}
-                            <button class="px-4 py-1.5 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-full text-sm font-medium flex items-center gap-2 transition-colors"
-                                    onclick="addToMyDay('{{ group.organization.id }}', '{{ group.id }}', '{{ task.id }}')">
-                                <span class="material-icons-round text-sm">add_task</span>
-                                Add to Day
-                            </button>
-                            {% endif %}
-                        </div>
+                        <!-- Add Task Button -->
+                        <button class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-xl font-medium flex items-center gap-2 transition-all transform hover:scale-[1.02] shadow-md">
+                            <span class="material-icons-round">add</span>
+                            <span>New Task</span>
+                        </button>
                     </div>
                 </div>
 
-                <!-- Dropdown Menu -->
-                <div id="dropdownMenu{{ task.id }}" class="absolute right-6 top-16 hidden w-48 bg-white border border-gray-200 rounded-xl shadow-xl z-10 overflow-hidden">
-                    <ul class="py-1.5">
-                        <li>
-                            <button class="w-full text-left px-4 py-2.5 hover:bg-gray-50 flex items-center gap-3 text-gray-700 text-sm font-medium transition-colors duration-200 ease-out">
-                                <i class="material-icons-round text-blue-600 text-[20px]">visibility</i>
-                                View Details
-                            </button>
-                        </li>
-                        
-                        {% if task.in_my_day %}
-                            <li>
-                                <a href="{% url 'task_detail' org_id=group.organization.id group_id=group.id task_id=task.id %}" 
-                                   class="w-full text-left px-4 py-2.5 hover:bg-gray-50 flex items-center gap-3 text-green-600 text-sm font-medium transition-colors duration-200 ease-out">
-                                    <i class="material-icons-round text-green-600 text-[20px]">launch</i>
-                                    Launch Task
-                                </a>
-                            </li>
-                        {% else %}
-                            <li>
-                                <button class="w-full text-left px-4 py-2.5 hover:bg-gray-50 flex items-center gap-3 text-amber-600 text-sm font-medium transition-colors duration-200 ease-out" 
-                                        onclick="addToMyDay('{{ group.organization.id }}', '{{ group.id }}', '{{ task.id }}')">
-                                    <i class="material-icons-round text-amber-600 text-[20px]">add_task</i>
-                                    Add to My Day
+                <!-- Tasks Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                    {% for task in tasks %}
+                    <div class="glass-card group relative rounded-2xl p-6 border border-gray-100/60 shadow-lg hover:shadow-xl transition-all duration-300 hover:translate-y-[-2px]">
+                        <!-- Priority Indicator -->
+                        <div class="absolute top-6 right-6">
+                            <span class="priority-badge 
+                                {% if task.priority == 'urgent' %}bg-red-100 text-red-800
+                                {% elif task.priority == 'high' %}bg-orange-100 text-orange-800
+                                {% elif task.priority == 'medium' %}bg-yellow-100 text-yellow-800
+                                {% else %}bg-green-100 text-green-800{% endif %}">
+                                {{ task.priority }}
+                            </span>
+                        </div>
+
+                        <!-- Task Content -->
+                        <div class="space-y-5">
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800 mb-1">{{ task.title }}</h3>
+                            </div>
+
+                            <!-- Metadata -->
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3 text-gray-600">
+                                    <span class="material-icons-round text-primary-500">calendar_today</span>
+                                    <span class="text-sm">{{ task.start }}</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-gray-600">
+                                    <span class="material-icons-round text-secondary-500">schedule</span>
+                                    <span class="text-sm">Coming soon</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-gray-600">
+                                    <span class="material-icons-round text-green-500">person</span>
+                                    <div class="flex -space-x-2">
+                                        <div class="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center text-xs text-blue-600 border-2 border-white">JD</div>
+                                        <div class="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center text-xs text-green-600 border-2 border-white">AK</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Progress Bar -->
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span class="text-gray-600">Progress</span>
+                                    <span class="font-medium text-primary-600">{{ task.progress }}%</span>
+                                </div>
+                                <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-primary-400 to-secondary-400 rounded-full transition-all duration-500" 
+                                         style="width: {{ task.progress }}%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                                <div class="flex items-center gap-2">
+                                    <button class="p-2 hover:bg-gray-100 rounded-lg text-gray-500 hover:text-gray-700 transition-colors"
+                                        onclick="toggleDropdown('{{ task.id }}')">
+                                        <span class="material-icons-round">more_vert</span>
+                                    </button>
+                                    <div class="flex items-center gap-1 text-sm text-gray-500">
+                                        <span class="material-icons-round text-sm">comment</span>
+                                        5
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center gap-2">
+                                    {% if task.in_my_day %}
+                                    <button class="px-4 py-1.5 bg-green-100 text-green-700 rounded-full text-sm font-medium flex items-center gap-2">
+                                        <span class="material-icons-round text-sm">check_circle</span>
+                                        Added
+                                    </button>
+                                    {% else %}
+                                    <button class="px-4 py-1.5 bg-primary-100 text-primary-700 hover:bg-primary-200 rounded-full text-sm font-medium flex items-center gap-2 transition-colors"
+                                            onclick="addToMyDay('{{ group.organization.id }}', '{{ group.id }}', '{{ task.id }}')">
+                                        <span class="material-icons-round text-sm">add_task</span>
+                                        Add to Day
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown Menu -->
+                        <div id="dropdownMenu{{ task.id }}" class="absolute right-6 top-16 hidden w-48 glass-card rounded-xl shadow-xl z-10 overflow-hidden">
+                            <ul class="py-1.5">
+                                <li>
+                                    <button class="w-full text-left px-4 py-2.5 hover:bg-gray-50 flex items-center gap-3 text-gray-700 text-sm font-medium transition-colors duration-200 ease-out">
+                                        <i class="material-icons-round text-primary-600 text-[20px]">visibility</i>
+                                        View Details
+                                    </button>
+                                </li>
+                                
+                                {% if task.in_my_day %}
+                                    <li>
+                                        <a href="{% url 'task_detail' org_id=group.organization.id group_id=group.id task_id=task.id %}" 
+                                           class="w-full text-left px-4 py-2.5 hover:bg-gray-50 flex items-center gap-3 text-green-600 text-sm font-medium transition-colors duration-200 ease-out">
+                                            <i class="material-icons-round text-green-600 text-[20px]">launch</i>
+                                            Launch Task
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li>
+                                        <button class="w-full text-left px-4 py-2.5 hover:bg-gray-50 flex items-center gap-3 text-amber-600 text-sm font-medium transition-colors duration-200 ease-out" 
+                                                onclick="addToMyDay('{{ group.organization.id }}', '{{ group.id }}', '{{ task.id }}')">
+                                            <i class="material-icons-round text-amber-600 text-[20px]">add_task</i>
+                                            Add to My Day
+                                        </button>
+                                    </li>
+                                {% endif %}
+                                {% if extend_tasks %}
+                                  <li>
+                                      <button class="w-full text-left px-4 py-2.5 hover:bg-gray-50 flex items-center gap-3 text-red-600 text-sm font-medium transition-colors duration-200 ease-out" 
+                                       data-bs-toggle="modal" data-bs-target="#cancelTaskModal" 
+                                       onclick="setCancelTaskData('{{ organization.id }}', '{{ group.id }}', '{{ task.id }}', '{{ task.title }}')">
+                                       <i class="material-icons-round text-red-600 text-[20px]">cancel</i>
+                                        Cancel Task
+                                     </button>
+                                 </li>
+
+                                 <li>
+                                    <button class="w-full text-left px-4 py-2.5 hover:bg-gray-50 flex items-center gap-3 text-primary-600 text-sm font-medium transition-colors duration-200 ease-out" 
+                                    data-bs-toggle="modal" data-bs-target="#subTaskModal" 
+                                     onclick="setSubTaskData('{{ organization.id }}', '{{ group.id }}', '{{ task.id }}')">
+                                    <i class="material-icons-round text-primary-600 text-[20px]">add_task</i>
+                                    Create SubTask
+                                     </button>
+                                 </li>
+                                 <li>
+                                    <button class="w-full text-left px-4 py-2.5 hover:bg-gray-50 flex items-center gap-3 text-secondary-600 text-sm font-medium transition-colors duration-200 ease-out"
+                                      data-bs-toggle="modal" data-bs-target="#manageSubTaskModal"
+                                     onclick="loadSubTasks('{{ organization.id }}', '{{ group.id }}', '{{ task.id }}')">
+                                   <i class="material-icons-round text-secondary-600 text-[20px]">playlist_add_check</i>
+                                   Manage SubTasks
+                                  </button>
+                                </li>
+                                <li>
+                                    <button class="w-full text-left px-4 py-2.5 hover:bg-gray-50 flex items-center gap-3 text-secondary-600 text-sm font-medium transition-colors duration-200 ease-out" 
+                                      data-bs-toggle="modal" data-bs-target="#exportTaskModal" 
+                                     onclick="exportTask('{{ organization.id }}', '{{ group.id }}', '{{ task.id }}')"> 
+                                   <i class="material-icons-round text-secondary-600 text-[20px]">file_download</i>
+                                    Export 
+                                  </button>
+                                </li>
+
+                                <li>
+                                    <button class="w-full text-left px-4 py-2.5 hover:bg-gray-50 flex items-center gap-3 text-secondary-600 text-sm font-medium transition-colors duration-200 ease-out" 
+                                     data-bs-toggle="modal" 
+                                     data-bs-target="#attachFileModal"
+                                     data-org-id="{{ organization.id }}"
+                                     data-group-id="{{ group.id }}"
+                                     data-task-id="{{ task.id }}">
+                                    <i class="material-icons-round text-secondary-600 text-[20px]">attach_file</i>
+                                    Attach Files
                                 </button>
-                            </li>
+
+                                </li>
+                                {% endif %} 
+                            </ul>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+            <!-- Pagination -->
+            <div class="glass-card rounded-2xl p-4 mb-12 shadow-md neuro-element">
+                <nav class="flex items-center justify-between">
+                    <div class="flex items-center gap-1 text-slate-600">
+                        <span class="text-sm font-medium">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        {% if page_obj.has_previous %}
+                        <a href="?page=1" class="p-2 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-primary-600 transition-colors">
+                            <span class="material-icons-round">first_page</span>
+                        </a>
+                        <a href="?page={{ page_obj.previous_page_number }}" class="p-2 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-primary-600 transition-colors">
+                            <span class="material-icons-round">chevron_left</span>
+                        </a>
                         {% endif %}
-                        {% if extend_tasks %}
-                          <li>
-                              <button class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-red-600" 
-                               data-bs-toggle="modal" data-bs-target="#cancelTaskModal" 
-                               onclick="setCancelTaskData('{{ organization.id }}', '{{ group.id }}', '{{ task.id }}', '{{ task.title }}')">
-                               <i class="material-icons-round">cancel</i>
-                                Cancel Task
-                             </button>
-                         </li>
 
-                         <li>
-                            <button class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-blue-600" 
-                            data-bs-toggle="modal" data-bs-target="#subTaskModal" 
-                             onclick="setSubTaskData('{{ organization.id }}', '{{ group.id }}', '{{ task.id }}')">
-                            <i class="material-icons-round">add_task</i>
-                            Create SubTask
-                             </button>
-                         </li>
-                         <li>
-                            <button class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-purple-600"
-                              data-bs-toggle="modal" data-bs-target="#manageSubTaskModal"
-                             onclick="loadSubTasks('{{ organization.id }}', '{{ group.id }}', '{{ task.id }}')">
-                           <i class="material-icons-round">playlist_add_check</i>
-                           Manage SubTasks
-                          </button>
-                        </li>
-                        <li>
-                            <button class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-purple-600" 
-                              data-bs-toggle="modal" data-bs-target="#exportTaskModal" 
-                             onclick="exportTask('{{ organization.id }}', '{{ group.id }}', '{{ task.id }}')"> 
-                           <i class="material-icons-round">playlist_add_check</i>
-                            Export 
-                          </button>
-                        </li>
-
-                        <li>
-                            <button class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-purple-600" 
-                             data-bs-toggle="modal" 
-                             data-bs-target="#attachFileModal"
-                             data-org-id="{{ organization.id }}"
-                             data-group-id="{{ group.id }}"
-                             data-task-id="{{ task.id }}">
-                            <i class="material-icons-round">playlist_add_check</i>
-                            Attach Files
-                        </button>
-
-                        </li>
-                        {% endif %} 
-                    </ul>
-
-                </div>
+                        {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" class="p-2 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-primary-600 transition-colors">
+                            <span class="material-icons-round">chevron_right</span>
+                        </a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}" class="p-2 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-primary-600 transition-colors">
+                            <span class="material-icons-round">last_page</span>
+                        </a>
+                        {% endif %}
+                    </div>
+                </nav>
             </div>
-            {% endfor %}
-        </div>
+        </main>
+    </div>
 
-        <br><br><br><br><br>
-
-        <!-- Pagination -->
-        <div class="glass-card rounded-2xl p-4 mb-12 shadow-md">
-            <nav class="flex items-center justify-between">
-                <div class="flex items-center gap-1 text-gray-600">
-                    <span class="text-sm">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-                </div>
-                
-                <div class="flex items-center gap-2">
-                    {% if page_obj.has_previous %}
-                    <a href="?page=1" class="p-2 hover:bg-gray-100 rounded-lg text-gray-500 hover:text-blue-600 transition-colors">
-                        <span class="material-icons-round">first_page</span>
-                    </a>
-                    <a href="?page={{ page_obj.previous_page_number }}" class="p-2 hover:bg-gray-100 rounded-lg text-gray-500 hover:text-blue-600 transition-colors">
-                        <span class="material-icons-round">chevron_left</span>
-                    </a>
-                    {% endif %}
-
-                    {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}" class="p-2 hover:bg-gray-100 rounded-lg text-gray-500 hover:text-blue-600 transition-colors">
-                        <span class="material-icons-round">chevron_right</span>
-                    </a>
-                    <a href="?page={{ page_obj.paginator.num_pages }}" class="p-2 hover:bg-gray-100 rounded-lg text-gray-500 hover:text-blue-600 transition-colors">
-                        <span class="material-icons-round">last_page</span>
-                    </a>
-                    {% endif %}
-                </div>
-            </nav>
-        </div>
-    </main>
-
+<!---------------------------------------------------------------------------------------------------------------------------------  -->
     <!-- Learn More Sidebar -->
     <div class="fixed inset-0 bg-black/50 z-50 hidden" id="learnMoreOverlay"></div>
     <div class="fixed top-0 right-0 h-full w-96 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50" 
@@ -1610,27 +1800,42 @@ document.addEventListener("DOMContentLoaded", function () {
                     const { id, name, description, team_leader, created_at } = data.group;
                     let membersHTML = '';
 
-                    data.members.forEach(member => {
-                        membersHTML += `
-                            <div class="d-flex align-items-center mb-2">
-                                <img src="${member.profile_picture || 'https://via.placeholder.com/40'}" class="rounded-circle me-2" width="40" height="40">
-                                <span>${member.name}</span>
-                            </div>`;
-                    });
+                    data.members.forEach(member => { 
+  membersHTML += `
+    <div class="flex items-center p-2 rounded-lg hover:bg-gray-50 transition-colors">
+      <img src="${member.profile_picture || 'https://via.placeholder.com/40'}" 
+           class="rounded-full object-cover w-10 h-10 border border-gray-200 shadow-sm" 
+           alt="${member.name}">
+      <span class="ml-3 font-medium text-gray-700">${member.name}</span>
+    </div>`;
+});
 
-                    modalContent.innerHTML = `
-                        <h5>${name}</h5>
-                        <p>${description}</p>
-                        <p><strong>Created At:</strong> ${created_at}</p>
-                        <h6>Team Leader:</h6>
-                        <div class="d-flex align-items-center mb-3">
-                            <img src="${team_leader?.profile_picture || 'https://via.placeholder.com/50'}" class="rounded-circle me-2" width="50" height="50">
-                            <span>${team_leader?.name || "No Leader"}</span>
-                        </div>
-                        <h6>Members:</h6>
-                        ${membersHTML || '<p>No members found.</p>'}
-                    `;
-
+modalContent.innerHTML = `
+  <div class="p-6 max-w-2xl mx-auto bg-white rounded-xl shadow-md">
+    <h5 class="text-xl font-bold text-gray-800 mb-2">${name}</h5>
+    <p class="text-gray-600 mb-4">${description}</p>
+    <p class="text-sm text-gray-500 mb-6"><span class="font-medium">Created At:</span> ${created_at}</p>
+    
+    <div class="mb-6">
+      <h6 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3">Team Leader</h6>
+      <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+        <img src="${team_leader?.profile_picture || 'https://via.placeholder.com/50'}" 
+             class="rounded-full object-cover w-12 h-12 border-2 border-white shadow-md" 
+             alt="${team_leader?.name || 'No Leader'}">
+        <span class="ml-3 font-semibold text-gray-800">${team_leader?.name || "No Leader"}</span>
+      </div>
+    </div>
+    
+    <div>
+      <h6 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3">Members</h6>
+      ${membersHTML ? 
+        `<div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+          ${membersHTML}
+        </div>` : 
+        '<p class="text-gray-500 italic">No members found.</p>'}
+    </div>
+  </div>
+`;
                     // Open the modal
                     new bootstrap.Modal(document.getElementById("groupDetailsModal")).show();
                 } else {
