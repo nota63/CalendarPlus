@@ -166,6 +166,10 @@
                     </button>
                     <!-- create group event -->
                     <button id="createGroupEventBtn" class="btn btn-primary">Create Group Event</button>
+                    <!-- manage events -->
+                    <button id="fetchEventsBtn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#eventModal">
+                        Fetch Group Events
+                    </button>
 
 
                 </div>
@@ -650,6 +654,44 @@
     </div>
   </div>
   
+<!-- Manage The Events -->
+
+<!-- Modal 1: Group Events List -->
+<!-- Modal for displaying Group Events -->
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventModalLabel">Group Events</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="event-list" class="list-group">
+                    <!-- List of events will be populated here dynamically -->
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for displaying Booking Details -->
+<div class="modal fade" id="bookingDetailsModal" tabindex="-1" aria-labelledby="bookingDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookingDetailsModalLabel">Booking Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="booking-list" class="list-group">
+                    <!-- List of bookings will be populated here dynamically -->
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <!-- -------------------------------------------------------------------------------------------------------------------------------------------- -->
 <!-- Bootstrap 5 JS Bundle (Includes Popper.js) -->
@@ -860,7 +902,98 @@ function getCookie(name) {
     return cookieValue;
 }
 
+// Manage Events And Bookings
+document.addEventListener("DOMContentLoaded", function () {
+    // Fetch data from Django template
+    const orgId = "{{ organization.id }}";
+    const groupId = "{{ group.id }}";
+    
+    const eventListContainer = document.getElementById("event-list");
+    const bookingListContainer = document.getElementById("booking-list");
 
+    // Button to trigger event fetch
+    const fetchEventsBtn = document.getElementById("fetchEventsBtn");
+
+    // Debugging output
+    console.log(`Organization ID: ${orgId}, Group ID: ${groupId}`);
+
+    // Bootstrap Modals initialization (they will be opened using data-bs-toggle)
+    const eventModal = new bootstrap.Modal(document.getElementById("eventModal"));
+    const bookingModal = new bootstrap.Modal(document.getElementById("bookingDetailsModal"));
+
+    // Fetch Group Events
+    fetchEventsBtn.addEventListener("click", function () {
+        console.log("Fetching group events...");
+
+        // Use the original URL to fetch events
+        fetch(`/groups/fetch-group-events-new/?org_id=${orgId}&group_id=${groupId}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log("Events fetched:", data);
+
+                if (data && data.events) {
+                    eventListContainer.innerHTML = ""; // Clear previous events
+                    data.events.forEach(event => {
+                        console.log("Event:", event); // Debugging individual events
+
+                        let eventItem = document.createElement("li");
+                        eventItem.className = "list-group-item event-item";
+                        eventItem.dataset.eventId = event.id;  // Store event ID
+                        eventItem.innerText = `${event.title} - ${event.date}`;
+                        eventListContainer.appendChild(eventItem);
+                    });
+                    // Automatically open the modal using Bootstrap's data-bs-toggle mechanism
+                    $('#eventModal').modal('show');
+                } else {
+                    console.error("No events found in the response.");
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching events:", error);
+            });
+    });
+
+    // Fetch Bookings when an Event is clicked
+    eventListContainer.addEventListener("click", function (event) {
+        if (event.target.classList.contains("event-item")) {
+            let eventId = event.target.dataset.eventId;
+            console.log(`Fetching bookings for event ID: ${eventId}`);
+
+            // Use the original URL to fetch bookings for the selected event
+            fetch(`/groups/fetch-bookings-new/?org_id=${orgId}&group_id=${groupId}&event_id=${eventId}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Bookings fetched:", data);
+
+                    if (data && data.bookings) {
+                        bookingListContainer.innerHTML = ""; // Clear previous bookings
+                        data.bookings.forEach(booking => {
+                            console.log("Booking:", booking); // Debugging individual bookings
+
+                            let bookingItem = document.createElement("li");
+                            bookingItem.className = "list-group-item";
+
+                            // Handle profile picture (fallback to a default if none exists)
+                            const profilePicture = booking.profile_picture || 'default_profile_picture.jpg';
+
+                            bookingItem.innerHTML = `
+                                <img src="${profilePicture}" class="rounded-circle me-2" width="40" height="40">
+                                ${booking.user_full_name} - ${booking.status} (Booked on: ${booking.booking_date} at ${booking.booking_time})
+                            `;
+                            bookingListContainer.appendChild(bookingItem);
+                        });
+                        // Automatically open the booking modal using Bootstrap's data-bs-toggle mechanism
+                        $('#bookingDetailsModal').modal('show');
+                    } else {
+                        console.error("No bookings found in the response.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching bookings:", error);
+                });
+        }
+    });
+});
 
 </script>
 </body>

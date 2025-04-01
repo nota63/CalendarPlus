@@ -92,7 +92,9 @@ urlpatterns = [
     path('get-group-details/<int:org_id>/<int:group_id>/',fetch_group_details, name='get_group_details'),
     path('group-overview/<int:org_id>/<int:group_id>/',group_details_ajax, name='group_overview'),
     path('assign-task/',assign_task, name='assign_task'),
-    path('create-group-event/',create_group_event_new, name='create_group_event')
+    path('create-group-event/',create_group_event_new, name='create_group_event'),
+    path('fetch-group-events-new/',fetch_group_events_new, name='fetch_group_events_new'),
+    path('fetch-bookings-new/',fetch_event_bookings_new, name='fetch_bookings_new')
     
 
     

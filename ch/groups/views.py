@@ -1588,3 +1588,49 @@ def create_group_event_new(request):
             return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
+
+
+# Fetch Events and Bookings
+def get_profile_picture(user, org_id):
+    profile = Profile.objects.filter(user=user, organization_id=org_id).first()
+    return profile.profile_picture.url if profile and profile.profile_picture else None
+
+@login_required
+def fetch_group_events_new(request):
+    org_id = request.GET.get("org_id")
+    group_id = request.GET.get("group_id")
+
+    if not org_id or not group_id:
+        return JsonResponse({"error": "Missing organization or group ID."}, status=400)
+
+    events = GroupEvent.objects.filter(organization_id=org_id, group_id=group_id).values(
+        "id", "title", "date", "start_time", "end_time", "location", "meeting_link"
+    )
+
+    return JsonResponse({"events": list(events)})
+
+@login_required
+def fetch_event_bookings_new(request):
+    org_id = request.GET.get("org_id")
+    event_id = request.GET.get("event_id")
+
+    if not org_id or not event_id:
+        return JsonResponse({"error": "Missing organization or event ID."}, status=400)
+
+    bookings = GroupEventBooking.objects.filter(
+        group_event_id=event_id, organization_id=org_id
+    ).select_related("user")
+
+    booking_data = [
+        {
+            "user_id": booking.user.id,
+            "full_name": booking.user.get_full_name(),
+            "profile_picture": get_profile_picture(booking.user, org_id),
+            "booking_date": booking.booking_date,
+            "booking_time": booking.booking_time,
+            "status": booking.status,
+        }
+        for booking in bookings
+    ]
+
+    return JsonResponse({"bookings": booking_data})
