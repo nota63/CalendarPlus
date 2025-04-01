@@ -1624,7 +1624,7 @@ def fetch_event_bookings_new(request):
     booking_data = [
         {
             "user_id": booking.user.id,
-            "full_name": booking.user.get_full_name(),
+            "full_name": booking.user.username,
             "profile_picture": get_profile_picture(booking.user, org_id),
             "booking_date": booking.booking_date,
             "booking_time": booking.booking_time,
