@@ -158,8 +158,10 @@ def task_calendar(request, org_id, group_id):
         return HttpResponseBadRequest('unauthorized access')
 
 
-    # Fetch sutasks count
-    
+    # Fetch user groups
+    groups = Group.objects.filter(members__user=request.user, members__organization=organization)
+
+
     priority_filter = request.GET.get('priority', None)
 
 
@@ -203,6 +205,7 @@ def task_calendar(request, org_id, group_id):
         'organization': organization,
         'page_obj': page_obj,
         'extend_tasks':extend_tasks,
+        "groups":groups,
     })
 
 # EXTENDED TASKS CONTROLS APP ------------------------------------------------------------------------------------------------------------------
