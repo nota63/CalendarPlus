@@ -75,7 +75,8 @@
             </header>
 
             <!-- Content Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 min-h-[400px]">
+
                 {% for group in user_groups %}
                 <!-- Team Space Card -->
                 <div class="group relative bg-white rounded-xl border border-slate-200 hover:border-blue-200 shadow-sm hover:shadow-lg transition-all duration-300">
@@ -122,62 +123,62 @@
 
                         <!-- Hover Actions Overlay -->
                         <!-- Inside the card body (replace the existing hover overlay section) -->
-<div class="absolute inset-0 bg-white/90 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex flex-col items-center justify-center p-4 space-y-2">
-    <!-- Leader Actions -->
-    {% if group.team_leader == request.user %}
-    <div class="w-full space-y-2">
-        <a href="{% url 'manage_group_users' org_id=group.organization.id group_id=group.id %}" 
-           class="flex items-center w-full p-2 text-sm rounded-lg hover:bg-slate-50 text-slate-700">
-            <i class="bi bi-people mr-2 text-blue-500"></i>
-            Manage Members
-        </a>
-        <a href="{% url 'group_details' org_id=group.organization.id group_id=group.id %}" 
-           class="flex items-center w-full p-2 text-sm rounded-lg hover:bg-slate-50 text-slate-700">
-            <i class="bi bi-info-circle mr-2 text-purple-500"></i>
-            Group Info
-        </a>
-        <a href="{% url 'create_task' org_id=group.organization.id group_id=group.id %}" 
-           class="flex items-center w-full p-2 text-sm rounded-lg hover:bg-slate-50 text-slate-700">
-            <i class="bi bi-list-check mr-2 text-green-500"></i>
-            Create Task
-        </a>
-        
-        <a href="{% url 'assigned_users_list' org_id=organization.id group_id=group.id%}" class="flex items-center w-full p-2 text-sm rounded-lg hover:bg-slate-50 text-slate-700"
-        >
-        <i class="bi bi-list-check mr-2 text-green-500"></i>
-         Monitor Workflow
-        </a>
+                        <div class="absolute inset-0 bg-white/90 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex flex-col items-center justify-center p-4 space-y-2">
+                            <!-- Leader Actions -->
+                            {% if group.team_leader == request.user %}
+                            <div class="w-full space-y-2">
+                                <a href="{% url 'manage_group_users' org_id=group.organization.id group_id=group.id %}" 
+                                class="flex items-center w-full p-2 text-sm rounded-lg hover:bg-slate-50 text-slate-700">
+                                    <i class="bi bi-people mr-2 text-blue-500"></i>
+                                    Manage Members
+                                </a>
+                                <a href="{% url 'group_details' org_id=group.organization.id group_id=group.id %}" 
+                                class="flex items-center w-full p-2 text-sm rounded-lg hover:bg-slate-50 text-slate-700">
+                                    <i class="bi bi-info-circle mr-2 text-purple-500"></i>
+                                    Group Info
+                                </a>
+                                <a href="{% url 'create_task' org_id=group.organization.id group_id=group.id %}" 
+                                class="flex items-center w-full p-2 text-sm rounded-lg hover:bg-slate-50 text-slate-700">
+                                    <i class="bi bi-list-check mr-2 text-green-500"></i>
+                                    Create Task
+                                </a>
+                                
+                                <a href="{% url 'assigned_users_list' org_id=organization.id group_id=group.id%}" class="flex items-center w-full p-2 text-sm rounded-lg hover:bg-slate-50 text-slate-700"
+                                >
+                                <i class="bi bi-list-check mr-2 text-green-500"></i>
+                                Monitor Workflow
+                                </a>
 
-    </div>
-    {% endif %}
+                            </div>
+                            {% endif %}
 
-    <!-- Group Actions -->
-    <div class="w-full space-y-2 border-t border-slate-100 pt-2">
-        <a href="{% url 'display_groups' org_id=group.organization.id %}" 
-           class="flex items-center w-full p-2 text-sm rounded-lg hover:bg-slate-50 text-slate-700">
-            <i class="bi bi-eye mr-2 text-blue-500"></i>
-            View Group
-        </a>
-        <a href="{% url 'display_group_events' org_id=group.organization.id group_id=group.id %}" 
-           class="flex items-center w-full p-2 text-sm rounded-lg hover:bg-slate-50 text-slate-700">
-            <i class="bi bi-calendar-event mr-2 text-purple-500"></i>
-            Group Events
-        </a>
-        <a href="{% url 'group_event_calendar' org_id=group.organization.id group_id=group.id %}" 
-           class="flex items-center w-full p-2 text-sm rounded-lg hover:bg-slate-50 text-slate-700">
-            <i class="bi bi-calendar2-week mr-2 text-green-500"></i>
-            Group Calendar
-        </a>
-        <a href="{% url 'task_calendar' org_id=organization.id group_id=group.id%}"
-           class="flex items-center w-full p-2 text-sm rounded-lg hover:bg-slate-50 text-slate-700">
-           <i class="bi bi-calendar2-week mr-2 text-green-500"></i>
-           Tasks & Calendar
+                            <!-- Group Actions -->
+                            <div class="w-full space-y-2 border-t border-slate-100 pt-2">
+                                <a href="{% url 'display_groups' org_id=group.organization.id %}" 
+                                class="flex items-center w-full p-2 text-sm rounded-lg hover:bg-slate-50 text-slate-700">
+                                    <i class="bi bi-eye mr-2 text-blue-500"></i>
+                                    View Group
+                                </a>
+                                <a href="{% url 'display_group_events' org_id=group.organization.id group_id=group.id %}" 
+                                class="flex items-center w-full p-2 text-sm rounded-lg hover:bg-slate-50 text-slate-700">
+                                    <i class="bi bi-calendar-event mr-2 text-purple-500"></i>
+                                    Group Events
+                                </a>
+                                <a href="{% url 'group_event_calendar' org_id=group.organization.id group_id=group.id %}" 
+                                class="flex items-center w-full p-2 text-sm rounded-lg hover:bg-slate-50 text-slate-700">
+                                    <i class="bi bi-calendar2-week mr-2 text-green-500"></i>
+                                    Group Calendar
+                                </a>
+                                <a href="{% url 'task_calendar' org_id=organization.id group_id=group.id%}"
+                                class="flex items-center w-full p-2 text-sm rounded-lg hover:bg-slate-50 text-slate-700">
+                                <i class="bi bi-calendar2-week mr-2 text-green-500"></i>
+                                Tasks & Calendar
 
-        </a>
-    </div>
-</div>
+                                </a>
+                            </div>
+                        </div>
 
-</div>
+
 
                     <!-- Card Footer -->
                     <div class="px-4 pb-4">
@@ -200,16 +201,8 @@
                 {% endfor %}
 
                 <!-- Add New Space Card -->
-            
-                <div class="border-2 border-dashed border-slate-200 hover:border-blue-200 rounded-xl flex items-center justify-center cursor-pointer transition-colors h-[250px]">
-                    <div class="text-center p-6">
-                        <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="bi bi-plus-lg text-blue-600 text-xl"></i>
-                        </div>
-                        <p class="text-slate-700 font-medium">Join New Group</p>
-                        <p class="text-slate-500 text-sm mt-1">Start collaborating with Another team Also</p>
-                    </div>
-                </div>
+                
+              
                
 
             <!-- Empty State -->
@@ -228,25 +221,32 @@
             {% endif %}
         </main>
     </div>
+    
 
     <script>
-        gsap.registerPlugin(ScrollTrigger);
+       gsap.registerPlugin(ScrollTrigger);
 
-        // Animate cards
-        gsap.utils.toArray('.group').forEach((card, i) => {
-            gsap.from(card, {
-                scrollTrigger: {
-                    trigger: card,
-                    start: "top bottom-=100",
-                    toggleActions: "play none none reverse"
-                },
-                opacity: 0,
-                y: 30,
-                duration: 0.6,
-                delay: i * 0.1,
-                ease: "power3.out"
-            });
-        });
+// Animate cards with proper viewport detection
+gsap.utils.toArray('.group').forEach((card, i) => {
+    gsap.fromTo(
+        card,
+        { opacity: 0, y: 50 }, // Initial state
+        {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            delay: i * 0.15,
+            ease: "power3.out",
+            scrollTrigger: {
+                trigger: card,
+                start: "top 85%",  // Trigger when the element is near the viewport
+                end: "top 50%",    // Smooth transition zone
+                toggleActions: "play none none reverse",
+                once: false,       // Re-trigger when scrolling back
+            }
+        }
+    );
+});
 
         // Sidebar interaction
         document.querySelectorAll('nav button').forEach(button => {
