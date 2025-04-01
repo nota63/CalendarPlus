@@ -1325,3 +1325,44 @@ def fetch_group_details(request, org_id, group_id):
         },
         "members": members_data
     }, safe=False)
+
+
+# DISPLAY GROUP DETAILS 
+def group_details_ajax(request, org_id, group_id):
+    # Fetch the organization and group objects
+    organization = get_object_or_404(Organization, pk=org_id)
+    group = get_object_or_404(Group, pk=group_id, organization=organization)
+
+    # Fetch the group description and other details
+    group_description = group.description
+    group_name = group.name
+    group_leader = group.team_leader.get_full_name() if group.team_leader else None
+
+    # Count total events related to this group
+    total_events = GroupEvent.objects.filter(group=group).count()
+
+    # Fetch the most recent event
+    most_recent_event = GroupEvent.objects.filter(group=group).order_by('-date', '-start_time').first()
+
+    # Count total bookings for this group
+    total_bookings = GroupEventBooking.objects.filter(group=group).count()
+
+    # Prepare data to send in JSON response
+    response_data = {
+        'group_name': group_name,
+        'group_description': group_description,
+        'group_leader': group_leader,
+        'total_events': total_events,
+        'total_bookings': total_bookings,
+        'most_recent_event': {
+            'title': most_recent_event.title if most_recent_event else None,
+            'description': most_recent_event.description if most_recent_event else None,
+            'date': most_recent_event.date if most_recent_event else None,
+            'start_time': most_recent_event.start_time if most_recent_event else None,
+            'end_time': most_recent_event.end_time if most_recent_event else None,
+            'location': most_recent_event.location if most_recent_event else None,
+            'meeting_link': most_recent_event.meeting_link if most_recent_event else None,
+        }
+    }
+
+    return JsonResponse(response_data)

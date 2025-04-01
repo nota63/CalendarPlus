@@ -383,7 +383,7 @@ body {
                         <button class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full">
                             <span class="material-icons-round">notifications</span>
                         </button>
-                        <button class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full">
+                        <button id="helpButton" class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full">
                             <span class="material-icons-round">help_outline</span>
                         </button>
                         <button class="p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full" id="fetchGroupDetailsBtn" data-org-id="{{organization.id}}" data-group-id="{{group.id}}">
@@ -1265,6 +1265,22 @@ body {
     </div>
 </div>
 
+<!-- Group Overview -->
+<!-- Group Overview Modal -->
+<div class="modal fade" id="groupOverviewPlusModal" tabindex="-1" aria-labelledby="groupOverviewPlusModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="groupOverviewPlusModalLabel">Group Overview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="groupDetailsContentt">
+                <!-- Dynamic Content will be inserted here -->
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!-- Bootstrap 5 JS (with Popper.js) ------------------------------------------------------------------------------------------------------------->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -1974,6 +1990,68 @@ document.addEventListener('DOMContentLoaded', function () {
             filterTasks(query); // Call the function to filter tasks
         });
     });
+
+// Group Overview 
+document.addEventListener('DOMContentLoaded', function () {
+    // Get the button and modal elements
+    const helpButton = document.getElementById('helpButton');
+    const groupOverviewPlusModal = new bootstrap.Modal(document.getElementById('groupOverviewPlusModal'));
+
+    // Listen for the button click event
+    helpButton.addEventListener('click', function () {
+        // Get the organization and group IDs from the context
+        const orgId = '{{ organization.id }}';
+        const groupId = '{{ group.id }}';
+
+        // Log the IDs to confirm they are correct
+        console.log('Organization ID:', orgId);
+        console.log('Group ID:', groupId);
+
+        // Make AJAX request to fetch group details
+        fetch(`/groups/group-overview/${orgId}/${groupId}/`)
+            .then(response => {
+                console.log('Response received:', response);
+                return response.json();
+            })
+            .then(data => {
+                // Log the data to ensure it's coming through as expected
+                console.log('Fetched group details:', data);
+
+                if (data) {
+                    // Prepare the dynamic content for the modal
+                    let content = `
+                        <h6><strong>Group Name:</strong> ${data.group_name}</h6>
+                        <p><strong>Description:</strong> ${data.group_description || 'No description available'}</p>
+                        <p><strong>Team Leader:</strong> ${data.group_leader || 'No leader assigned'}</p>
+                        <p><strong>Total Events:</strong> ${data.total_events}</p>
+                        <p><strong>Total Bookings:</strong> ${data.total_bookings}</p>
+                        <h6><strong>Most Recent Event:</strong></h6>
+                        <p><strong>Title:</strong> ${data.most_recent_event.title || 'No recent event'}</p>
+                        <p><strong>Description:</strong> ${data.most_recent_event.description || 'No description available'}</p>
+                        <p><strong>Date:</strong> ${data.most_recent_event.date || 'N/A'}</p>
+                        <p><strong>Time:</strong> ${data.most_recent_event.start_time || 'N/A'} - ${data.most_recent_event.end_time || 'N/A'}</p>
+                        <p><strong>Location:</strong> ${data.most_recent_event.location || 'N/A'}</p>
+                        <p><strong>Meeting Link:</strong> <a href="${data.most_recent_event.meeting_link || '#'}" target="_blank">${data.most_recent_event.meeting_link || 'No link available'}</a></p>
+                    `;
+                    // Insert the content into the modal body
+                    document.getElementById('groupDetailsContentt').innerHTML = content;
+
+                    // Log the content being inserted into the modal
+                    console.log('Modal content:', content);
+
+                    // Show the modal
+                    groupOverviewPlusModal.show();
+                } else {
+                    console.error('No data found for the group.');
+                    alert('No data found for the group.');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching group details:', error);
+                alert('There was an error fetching the group details.');
+            });
+    });
+});
 
 </script>
 </body>
