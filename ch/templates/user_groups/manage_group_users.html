@@ -927,30 +927,40 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Use the original URL to fetch events
         fetch(`/groups/fetch-group-events-new/?org_id=${orgId}&group_id=${groupId}`)
-            .then(response => response.json())
-            .then(data => {
-                console.log("Events fetched:", data);
+    .then(response => response.json())
+    .then(data => {
+        console.log("Events fetched:", data);
 
-                if (data && data.events) {
-                    eventListContainer.innerHTML = ""; // Clear previous events
-                    data.events.forEach(event => {
-                        console.log("Event:", event); // Debugging individual events
+        if (data && data.events) {
+            eventListContainer.innerHTML = ""; // Clear previous events
+            data.events.forEach(event => {
+                console.log("Event:", event); // Debugging individual events
 
-                        let eventItem = document.createElement("li");
-                        eventItem.className = "list-group-item event-item";
-                        eventItem.dataset.eventId = event.id;  // Store event ID
-                        eventItem.innerText = `${event.title} - ${event.date}`;
-                        eventListContainer.appendChild(eventItem);
-                    });
-                    // Automatically open the modal using Bootstrap's data-bs-toggle mechanism
-                    $('#eventModal').modal('show');
-                } else {
-                    console.error("No events found in the response.");
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching events:", error);
+                let eventItem = document.createElement("li");
+                eventItem.className = "list-group-item d-flex justify-content-between align-items-center event-item";
+                eventItem.dataset.eventId = event.id;  // Store event ID
+                eventItem.innerText = `${event.title} - ${event.date}`;
+
+                // Create a "Join" button
+                let joinButton = document.createElement("a");
+                joinButton.href = event.meeting_link; // Set the href to the meeting link
+                joinButton.className = "btn btn-primary btn-sm";  // Style the button
+                joinButton.innerText = "Join";
+
+                // Append the "Join" button to the event item
+                eventItem.appendChild(joinButton);
+                eventListContainer.appendChild(eventItem);
             });
+            // Automatically open the modal using Bootstrap's data-bs-toggle mechanism
+            $('#eventModal').modal('show');
+        } else {
+            console.error("No events found in the response.");
+        }
+    })
+    .catch(error => {
+        console.error("Error fetching events:", error);
+    });
+
     });
 
     // Fetch Bookings when an Event is clicked
