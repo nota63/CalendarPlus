@@ -1772,6 +1772,7 @@ def invitation_status_update(request, org_id, group_id):
 from django.db.models import Count, Avg, Sum, Q, F
 import os
 from datetime import timedelta
+from group_tasks.models import TaskTimeTracking
 
 def get_total_attachment_size(tasks):
     """Helper function to calculate total size of all task attachments."""
@@ -1829,13 +1830,16 @@ def task_analytics_view_updated(request, org_id, group_id):
         total_estimated=Sum('estimated_completion_time', default=timedelta())
     )['total_estimated']
 
-    total_actual_time = tasks.exclude(end_date=None).aggregate(
-        total_actual=Sum(F('end_date') - F('start_date'), default=timedelta())
-    )['total_actual']
+    total_actual_time = TaskTimeTracking.objects.filter(task__in=tasks).aggregate(
+        total_tracked=Sum('time_spent', default=0)
+    )['total_tracked']
 
+
+    
     # Convert Timedelta to Seconds
     estimated_seconds = total_estimated_time.total_seconds() if total_estimated_time else 0
-    actual_seconds = total_actual_time.total_seconds() if total_actual_time else 0
+    actual_seconds = float(total_actual_time) * 3600 if total_actual_time else 0
+
 
     # Return JSON Response with All Data
     return JsonResponse({

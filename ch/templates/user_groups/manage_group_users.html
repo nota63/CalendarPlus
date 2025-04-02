@@ -1293,47 +1293,324 @@
 </div>
 
 <!-- Tasks Overview -->
+<!-- Tasks Overview -->
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    
+    .blur-effect {
+      filter: blur(4px);
+      pointer-events: none;
+      user-select: none;
+    }
+    
+    .dashboard-card {
+      transition: all 0.3s ease;
+    }
+    
+    .dashboard-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    .progress-ring-circle {
+      transition: stroke-dashoffset 0.3s;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+    
+    .custom-scrollbar {
+      scrollbar-width: thin;
+      scrollbar-color: #CBD5E0 #F7FAFC;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #F7FAFC;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #CBD5E0;
+      border-radius: 20px;
+    }
+  </style>
+</head>
+<body>
+
 <div class="modal fade" id="taskAnalyticsModal" tabindex="-1" aria-labelledby="taskAnalyticsLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="taskAnalyticsLabel">Task Analytics</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Loader -->
-                <div id="taskLoader" class="text-center">
-                    <div class="spinner-border text-primary" role="status"></div>
-                    <p>Loading analytics...</p>
-                </div>
-
-                <!-- Task Analytics Content -->
-                <div id="taskAnalyticsContent" style="display: none;">
-                    <p><strong>Total Tasks:</strong> <span id="totalTasks"></span></p>
-                    
-                    <h6>Task Status Breakdown</h6>
-                    <ul id="taskStatusList"></ul>
-
-                    <h6>Progress</h6>
-                    <p>Average Progress: <span id="avgProgress"></span>%</p>
-                    <p>Total Progress: <span id="totalProgress"></span>%</p>
-
-                    <h6>Assigned Users</h6>
-                    <ul id="assignedUsersList"></ul>
-
-                    <h6>Storage Used</h6>
-                    <p><span id="storageUsed"></span> MB</p>
-
-                    <h6>Time Analytics</h6>
-                    <p>Estimated Completion Time: <span id="estimatedTime"></span> hours</p>
-                    <p>Actual Completion Time: <span id="actualTime"></span> hours</p>
-                </div>
-            </div>
+  <div class="modal-dialog max-w-6xl">
+    <div class="modal-content bg-gray-50 rounded-xl shadow-lg border-0 overflow-hidden">
+      <!-- Header -->
+      <div class="modal-header flex justify-between items-center bg-white p-5 border-b border-gray-100">
+        <div class="flex items-center space-x-3">
+          <div class="bg-indigo-600 h-10 w-10 rounded-lg flex items-center justify-center">
+            <i class="fas fa-chart-line text-white text-lg"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-800" id="taskAnalyticsLabel">Task Analytics Dashboard</h3>
         </div>
+        <div class="flex items-center">
+          <span class="text-xs text-gray-500 mr-4">Group analytics only</span>
+          <button type="button" class="bg-gray-100 hover:bg-gray-200 rounded-full p-2 transition-colors" data-bs-dismiss="modal" aria-label="Close">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Loader -->
+      <div id="taskLoader" class="py-32 flex flex-col items-center justify-center">
+        <div class="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+        <p class="mt-5 text-gray-600 font-medium">Loading your analytics...</p>
+      </div>
+      
+      <!-- Dashboard Content -->
+      <div id="taskAnalyticsContent" class="p-6" style="display: none;">
+        <!-- Main Dashboard Grid -->
+        <div class="grid grid-cols-12 gap-6">
+          <!-- Left Column -->
+          <div class="col-span-12 lg:col-span-8">
+            <!-- Overview Cards Row -->
+            <div class="grid grid-cols-3 gap-5 mb-6">
+              <!-- Total Tasks -->
+              <div class="dashboard-card bg-white rounded-xl shadow-sm p-5 flex flex-col">
+                <div class="flex justify-between items-center mb-2">
+                  <h4 class="text-sm font-medium text-gray-500">Total Tasks</h4>
+                  <div class="h-8 w-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-tasks text-blue-600"></i>
+                  </div>
+                </div>
+                <p class="text-2xl font-bold text-gray-800" id="totalTasks">--</p>
+                <p class="text-xs text-gray-500 mt-1">Across all team members</p>
+              </div>
+              
+              <!-- Average Progress -->
+              <div class="dashboard-card bg-white rounded-xl shadow-sm p-5 flex flex-col">
+                <div class="flex justify-between items-center mb-2">
+                  <h4 class="text-sm font-medium text-gray-500">Avg Progress</h4>
+                  <div class="h-8 w-8 bg-green-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-chart-line text-green-600"></i>
+                  </div>
+                </div>
+                <p class="text-2xl font-bold text-gray-800"><span id="avgProgress">--</span>%</p>
+                <div class="mt-2 bg-gray-200 rounded-full h-2">
+                  <div class="bg-green-500 h-2 rounded-full" id="avgProgressBar" style="width: 0%"></div>
+                </div>
+              </div>
+              
+              <!-- Time Analytics -->
+              <div class="dashboard-card bg-white rounded-xl shadow-sm p-5 flex flex-col">
+                <div class="flex justify-between items-center mb-2">
+                  <h4 class="text-sm font-medium text-gray-500">Time</h4>
+                  <div class="h-8 w-8 bg-amber-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-clock text-amber-600"></i>
+                  </div>
+                </div>
+                <p class="text-2xl font-bold text-gray-800"><span id="actualTime">--</span> hrs</p>
+                <p class="text-xs text-gray-500 mt-1">Est. <span id="estimatedTime">--</span> hrs</p>
+              </div>
+            </div>
+            
+            <!-- Status Breakdown -->
+            <div class="dashboard-card bg-white rounded-xl shadow-sm p-5 mb-6">
+              <div class="flex justify-between items-center mb-4">
+                <h4 class="font-semibold text-gray-700">Task Status</h4>
+                <button class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
+                  <span>View All</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div class="grid grid-cols-4 gap-4">
+                <!-- Status items will be populated here dynamically -->
+                <div id="taskStatusList" class="col-span-4 grid grid-cols-4 gap-4">
+                  <!-- Sample status cards for layout purposes -->
+                  <div class="bg-indigo-50 rounded-lg p-4 flex flex-col">
+                    <div class="flex justify-between items-center">
+                      <span class="text-xs font-medium text-indigo-700 bg-indigo-100 px-2 py-1 rounded">TO DO</span>
+                      <span class="text-lg font-bold text-gray-800">--</span>
+                    </div>
+                    <div class="mt-2 text-xs text-gray-500">-- % of total</div>
+                  </div>
+                  <div class="bg-blue-50 rounded-lg p-4 flex flex-col">
+                    <div class="flex justify-between items-center">
+                      <span class="text-xs font-medium text-blue-700 bg-blue-100 px-2 py-1 rounded">IN PROGRESS</span>
+                      <span class="text-lg font-bold text-gray-800">--</span>
+                    </div>
+                    <div class="mt-2 text-xs text-gray-500">-- % of total</div>
+                  </div>
+                  <div class="bg-amber-50 rounded-lg p-4 flex flex-col">
+                    <div class="flex justify-between items-center">
+                      <span class="text-xs font-medium text-amber-700 bg-amber-100 px-2 py-1 rounded">REVIEW</span>
+                      <span class="text-lg font-bold text-gray-800">--</span>
+                    </div>
+                    <div class="mt-2 text-xs text-gray-500">-- % of total</div>
+                  </div>
+                  <div class="bg-green-50 rounded-lg p-4 flex flex-col">
+                    <div class="flex justify-between items-center">
+                      <span class="text-xs font-medium text-green-700 bg-green-100 px-2 py-1 rounded">COMPLETED</span>
+                      <span class="text-lg font-bold text-gray-800">--</span>
+                    </div>
+                    <div class="mt-2 text-xs text-gray-500">-- % of total</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Assigned Users -->
+            <div class="dashboard-card bg-white rounded-xl shadow-sm p-5">
+              <div class="flex justify-between items-center mb-4">
+                <h4 class="font-semibold text-gray-700">Assigned Users</h4>
+                <button class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
+                  <span>Manage</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div class="max-h-64 overflow-y-auto custom-scrollbar pr-2">
+                <ul id="assignedUsersList" class="space-y-3">
+                  <!-- Sample user items for layout purposes -->
+                  <li class="flex items-center justify-between bg-gray-50 rounded-lg p-3">
+                    <div class="flex items-center">
+                      <div class="h-10 w-10 rounded-full bg-indigo-200 flex items-center justify-center mr-3">
+                        <span class="font-medium text-indigo-600">--</span>
+                      </div>
+                      <div>
+                        <h5 class="font-medium text-gray-800">--</h5>
+                        <p class="text-xs text-gray-500">-- tasks</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center">
+                      <div class="mr-3 text-right">
+                        <p class="text-sm font-medium text-gray-800">--%</p>
+                        <p class="text-xs text-gray-500">Completion</p>
+                      </div>
+                      <div class="relative h-10 w-10">
+                        <svg class="w-10 h-10" viewBox="0 0 36 36">
+                          <circle cx="18" cy="18" r="16" stroke="#E5E7EB" stroke-width="3" fill="none"></circle>
+                          <circle class="progress-ring-circle" cx="18" cy="18" r="16" stroke="#6366F1" stroke-width="3" fill="none" stroke-dasharray="100" stroke-dashoffset="50"></circle>
+                        </svg>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right Column -->
+          <div class="col-span-12 lg:col-span-4">
+            <!-- Total Progress -->
+            <div class="dashboard-card bg-white rounded-xl shadow-sm p-5 mb-6">
+              <div class="flex justify-between items-center mb-2">
+                <h4 class="font-semibold text-gray-700">Total Progress</h4>
+                <span class="text-xs text-gray-500">Group tasks</span>
+              </div>
+              
+              <div class="flex justify-center my-5">
+                <div class="relative h-32 w-32">
+                  <svg class="w-32 h-32" viewBox="0 0 36 36">
+                    <circle cx="18" cy="18" r="16" stroke="#E5E7EB" stroke-width="3" fill="none"></circle>
+                    <circle class="progress-ring-circle" cx="18" cy="18" r="16" stroke="#6366F1" stroke-width="3" fill="none" stroke-dasharray="100" stroke-dashoffset="65" id="totalProgressRing"></circle>
+                  </svg>
+                  <div class="absolute inset-0 flex items-center justify-center">
+                    <span class="text-3xl font-bold text-gray-800" id="totalProgress">--%</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="text-center text-sm text-gray-500">
+                <p>Based on <span id="totalTaskCount">--</span> tasks</p>
+              </div>
+            </div>
+            
+            <!-- Storage Used -->
+            <div class="dashboard-card bg-white rounded-xl shadow-sm p-5 mb-6">
+              <div class="flex justify-between items-center mb-4">
+                <h4 class="font-semibold text-gray-700">Storage</h4>
+                <div class="h-7 w-7 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <i class="fas fa-database text-purple-600 text-sm"></i>
+                </div>
+              </div>
+              
+              <div class="flex justify-between items-center mb-2">
+                <p class="text-sm text-gray-500">Used Space</p>
+                <p class="text-sm font-medium text-gray-800"><span id="storageUsed">--</span> MB</p>
+              </div>
+              
+              <div class="h-2 bg-gray-200 rounded-full">
+                <div class="h-2 bg-purple-500 rounded-full" style="width: 45%"></div>
+              </div>
+              
+              <div class="mt-3 text-right">
+                <p class="text-xs text-gray-500">45% of available storage</p>
+              </div>
+            </div>
+            
+            <!-- Pro Features -->
+            <div class="dashboard-card bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl shadow-sm p-6 text-white">
+              <div class="flex items-start justify-between mb-6">
+                <div>
+                  <h4 class="font-bold text-lg">Advanced Analytics</h4>
+                  <p class="text-indigo-100 text-sm">Unlock pro features</p>
+                </div>
+                <div class="bg-white bg-opacity-20 rounded-lg p-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                  </svg>
+                </div>
+              </div>
+              
+              <!-- Blurred Content -->
+              <div class="blur-effect mb-6">
+                <div class="bg-white bg-opacity-10 rounded-lg p-4 mb-3">
+                  <div class="flex justify-between items-center">
+                    <p class="text-sm">Task Efficiency</p>
+                    <p class="font-bold" id="taskEfficiency">87%</p>
+                  </div>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-lg p-4 mb-3">
+                  <div class="flex justify-between items-center">
+                    <p class="text-sm">Avg Completion Time</p>
+                    <p class="font-bold" id="avgCompletionTime">3.5 hrs</p>
+                  </div>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                  <div class="flex justify-between items-center">
+                    <p class="text-sm">High Priority Tasks</p>
+                    <p class="font-bold" id="priorityRatio">64%</p>
+                  </div>
+                </div>
+              </div>
+              
+              <button class="w-full bg-white text-indigo-700 hover:bg-opacity-90 rounded-lg py-3 font-medium transition-colors flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+                Upgrade to Pro
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
-
-
+<!-- Add this in your head section for modern font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <!-- -------------------------------------------------------------------------------------------------------------------------------------------- -->
 <!-- Bootstrap 5 JS Bundle (Includes Popper.js) -->
