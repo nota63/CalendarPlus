@@ -96,7 +96,8 @@ urlpatterns = [
     path('fetch-group-events-new/',fetch_group_events_new, name='fetch_group_events_new'),
     path('fetch-bookings-new/',fetch_event_bookings_new, name='fetch_bookings_new'),
     path('invite-members-group-update/<int:org_id>/<int:group_id>/',invite_members_to_group_update, name='invite_members_group_update'),
-    path('invitation-status-group-update/<int:org_id>/<int:group_id>/',invitation_status_update, name='invitation_status_group_update')
+    path('invitation-status-group-update/<int:org_id>/<int:group_id>/',invitation_status_update, name='invitation_status_group_update'),
+    path('task-overview/<int:org_id>/<int:group_id>/',task_analytics_view_updated, name='task_overview'),
     
 
     

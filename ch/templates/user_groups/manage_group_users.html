@@ -198,6 +198,12 @@
                     <button id="createGroupEventBtn" class="flex items-center gap-3 p-2 text-[#636e72] hover:bg-[#f8f9fa] rounded-lg">
                         <i class="mdi mdi-calendar-plus text-xl"></i> 
                         Create Group Event</button>
+                    <!-- Tasks Overview  -->
+                    <button type="button" class="flex items-center gap-3 p-2 text-[#636e72] hover:bg-[#f8f9fa] rounded-lg" data-bs-toggle="modal" data-bs-target="#taskAnalyticsModal">
+                        <i class="mdi mdi-calendar-plus text-xl"></i> 
+                        View Task Analytics
+                    </button>
+                    
                 </div>
             </div>
         </nav>
@@ -1286,6 +1292,47 @@
     </div>
 </div>
 
+<!-- Tasks Overview -->
+<div class="modal fade" id="taskAnalyticsModal" tabindex="-1" aria-labelledby="taskAnalyticsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="taskAnalyticsLabel">Task Analytics</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Loader -->
+                <div id="taskLoader" class="text-center">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p>Loading analytics...</p>
+                </div>
+
+                <!-- Task Analytics Content -->
+                <div id="taskAnalyticsContent" style="display: none;">
+                    <p><strong>Total Tasks:</strong> <span id="totalTasks"></span></p>
+                    
+                    <h6>Task Status Breakdown</h6>
+                    <ul id="taskStatusList"></ul>
+
+                    <h6>Progress</h6>
+                    <p>Average Progress: <span id="avgProgress"></span>%</p>
+                    <p>Total Progress: <span id="totalProgress"></span>%</p>
+
+                    <h6>Assigned Users</h6>
+                    <ul id="assignedUsersList"></ul>
+
+                    <h6>Storage Used</h6>
+                    <p><span id="storageUsed"></span> MB</p>
+
+                    <h6>Time Analytics</h6>
+                    <p>Estimated Completion Time: <span id="estimatedTime"></span> hours</p>
+                    <p>Actual Completion Time: <span id="actualTime"></span> hours</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 <!-- -------------------------------------------------------------------------------------------------------------------------------------------- -->
@@ -1790,6 +1837,68 @@ document.getElementById('invitationStatusModal').addEventListener('show.bs.modal
         });
 });
 
+// Tasks Overview 
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("taskAnalyticsModal");
+
+    modal.addEventListener("show.bs.modal", function () {
+        const orgId = "{{organization.id}}";
+        const groupId = "{{group.id}}";
+
+        // Show Loader & Hide Content
+        document.getElementById("taskLoader").style.display = "block";
+        document.getElementById("taskAnalyticsContent").style.display = "none";
+
+        fetch(`/groups/task-overview/${orgId}/${groupId}/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to fetch data");
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Hide Loader & Show Content
+                document.getElementById("taskLoader").style.display = "none";
+                document.getElementById("taskAnalyticsContent").style.display = "block";
+
+                // Populate Data
+                document.getElementById("totalTasks").textContent = data.total_tasks;
+                document.getElementById("avgProgress").textContent = data.task_progress.average_progress;
+                document.getElementById("totalProgress").textContent = data.task_progress.total_progress;
+                document.getElementById("storageUsed").textContent = (data.total_storage_used / (1024 * 1024)).toFixed(2); // Convert Bytes to MB
+                document.getElementById("estimatedTime").textContent = (data.total_estimated_time / 3600).toFixed(2);
+                document.getElementById("actualTime").textContent = (data.total_actual_time / 3600).toFixed(2);
+
+                // Populate Task Status List
+                const statusList = document.getElementById("taskStatusList");
+                statusList.innerHTML = "";
+                for (const [status, count] of Object.entries(data.task_status)) {
+                    statusList.innerHTML += `<li><strong>${status}:</strong> ${count}</li>`;
+                }
+
+                // Populate Assigned Users
+                const userList = document.getElementById("assignedUsersList");
+                userList.innerHTML = "";
+
+                data.assigned_users.forEach(user => {
+                    let profilePicture = user.profile_picture ? `/media/${user.profile_picture}` : "/static/default-profile.png";
+                    let username = user.user__username || "Unknown User";
+
+                    userList.innerHTML += `
+                        <li class="d-flex align-items-center mb-2">
+                            <img src="${profilePicture}" alt="${username}" width="30" height="30" class="rounded-circle me-2">
+                            <span>${username}</span>
+                        </li>
+                    `;
+                });
+
+            })
+            .catch(error => {
+                console.error("Error fetching task analytics:", error);
+                document.getElementById("taskLoader").innerHTML = `<p class="text-danger">Failed to load data.</p>`;
+            });
+    });
+});
 
 </script>
 </body>

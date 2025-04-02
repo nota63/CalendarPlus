@@ -1766,3 +1766,87 @@ def invitation_status_update(request, org_id, group_id):
         return JsonResponse({'error': 'Group not found'}, status=404)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
+    
+
+# Task Analytics & Overview
+from django.db.models import Count, Avg, Sum, Q, F
+import os
+from datetime import timedelta
+
+def get_total_attachment_size(tasks):
+    """Helper function to calculate total size of all task attachments."""
+    total_size = 0
+    for task in tasks:
+        if task.attachments:  # Assuming attachments is a FileField or ManyToMany
+            attachment_path = os.path.join(settings.MEDIA_ROOT, str(task.attachments))
+            if os.path.exists(attachment_path):
+                total_size += os.path.getsize(attachment_path)
+    return total_size
+
+@login_required
+def task_analytics_view_updated(request, org_id, group_id):
+    # Fetch Organization and Group Securely
+    organization = get_object_or_404(Organization, id=org_id)
+    group = get_object_or_404(Group, id=group_id, organization=organization)
+
+    # Ensure User Has Access
+    try:
+        profile = Profile.objects.get(user=request.user, organization=organization)
+        is_admin = profile.is_admin
+        is_team_leader = group.team_leader == request.user
+        if not (is_admin or is_team_leader):
+            return JsonResponse({'error': 'Permission Denied'}, status=403)
+    except Profile.DoesNotExist:
+        return JsonResponse({'error': 'Unauthorized Access'}, status=403)
+
+    # Query: Fetch all tasks for this group
+    tasks = Task.objects.filter(group=group)
+
+    # Total Tasks Count
+    total_tasks = tasks.count()
+
+    # Task Status Counts (Pending, In Progress, Completed, etc.)
+    task_status_counts = tasks.values('status').annotate(count=Count('status'))
+    task_status = {status['status']: status['count'] for status in task_status_counts}
+
+    # Task Progress Analytics
+    task_progress = tasks.aggregate(
+        avg_progress=Avg('progress', default=0),
+        total_progress=Sum('progress', default=0)
+    )
+
+    # Fetch Assigned Users
+    assigned_users = Profile.objects.filter(
+        user__in=tasks.values_list('assigned_to', flat=True),
+        organization=organization
+    ).values('user__username', 'profile_picture')
+
+    # Get Total Storage Used
+    total_storage_used = get_total_attachment_size(tasks)
+
+    # Time Calculations
+    total_estimated_time = tasks.aggregate(
+        total_estimated=Sum('estimated_completion_time', default=timedelta())
+    )['total_estimated']
+
+    total_actual_time = tasks.exclude(end_date=None).aggregate(
+        total_actual=Sum(F('end_date') - F('start_date'), default=timedelta())
+    )['total_actual']
+
+    # Convert Timedelta to Seconds
+    estimated_seconds = total_estimated_time.total_seconds() if total_estimated_time else 0
+    actual_seconds = total_actual_time.total_seconds() if total_actual_time else 0
+
+    # Return JSON Response with All Data
+    return JsonResponse({
+        'total_tasks': total_tasks,
+        'task_status': task_status,
+        'task_progress': {
+            'average_progress': round(task_progress['avg_progress'], 2) if task_progress['avg_progress'] else 0,
+            'total_progress': task_progress['total_progress'],
+        },
+        'assigned_users': list(assigned_users),
+        'total_storage_used': total_storage_used,  # Now correctly calculated using OS
+        'total_estimated_time': estimated_seconds,
+        'total_actual_time': actual_seconds,
+    })
