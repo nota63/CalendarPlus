@@ -1162,19 +1162,108 @@
 
 <!-- Track Invitations (Updated) -->
 <div class="modal fade" id="invitationStatusModal" tabindex="-1" aria-labelledby="invitationStatusModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="invitationStatusModalLabel">Invitation Status</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div id="loading" style="display: none;">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content rounded-xl shadow-2xl">
+            <!-- Header -->
+            <div class="modal-header px-6 py-4 border-b border-gray-100">
+                <div class="flex items-center justify-between w-full">
+                    <div>
+                        <h5 class="modal-title text-xl font-semibold text-gray-900">Invitation Manager</h5>
+                        <p class="text-sm text-gray-500 mt-1">Track invitation status and manage requests</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <input type="search" 
+                                   class="form-control pl-10 pr-4 py-2 border-gray-200 rounded-lg" 
+                                   placeholder="Search invites...">
+                            <i class="mdi mdi-magnify absolute left-3 top-2.5 text-gray-400"></i>
+                        </div>
+                        <button type="button" class="btn-close p-2" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                 </div>
-                <div id="invitationsContainer"></div>
+            </div>
+
+            <!-- Body Content -->
+            <div class="modal-body p-6">
+                <!-- Status Filters -->
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-sm font-medium text-gray-700">Filter by:</span>
+                    <div class="status-filters flex gap-2">
+                        <button class="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-medium hover:bg-blue-200 transition-colors">
+                            All {{total_invitations}}
+                        </button>
+                        <button class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-sm font-medium hover:bg-yellow-200 transition-colors">
+                            Pending ({{pending_count}})
+                        </button>
+                        <button class="px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm font-medium hover:bg-green-200 transition-colors">
+                            Accepted ({{accepted_count}})
+                        </button>
+                        <button class="px-3 py-1 rounded-full bg-red-100 text-red-800 text-sm font-medium hover:bg-red-200 transition-colors">
+                            Rejected ({{rejected_count}})
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Invitations List -->
+                <div class="space-y-4" id="invitationsContainer">
+                    <!-- Invitation Item -->
+                    <div class="invitation-item flex items-center justify-between p-4 border rounded-lg hover:border-blue-200 transition-all">
+                        <div class="flex items-center gap-4">
+                            <div class="avatar">
+                                <img src="user-avatar.jpg" class="w-10 h-10 rounded-full" alt="User avatar">
+                            </div>
+                            <div>
+                                <h6 class="font-medium text-gray-900">john@company.com</h6>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">Workspace Admin</span>
+                                    <span class="text-xs text-gray-500">Invited 2 days ago</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="status-badge px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-sm">Pending</span>
+                            <div class="dropdown">
+                                <button class="btn btn-icon text-gray-400 hover:text-gray-600" type="button" data-bs-toggle="dropdown">
+                                    <i class="mdi mdi-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu shadow-lg">
+                                    <li><a class="dropdown-item" href="#"><i class="mdi mdi-email-outline mr-2"></i>Resend Invite</a></li>
+                                    <li><a class="dropdown-item text-red-600" href="#"><i class="mdi mdi-delete-outline mr-2"></i>Revoke Access</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- More invitation items... -->
+                </div>
+
+                <!-- Loading Overlay -->
+                <div id="loading" class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center hidden">
+                    <div class="text-center">
+                        <div class="spinner-border text-blue-600 w-12 h-12" role="status"></div>
+                        <p class="mt-3 text-gray-600">Loading invitations...</p>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state text-center py-12 hidden">
+                    <i class="mdi mdi-email-remove-outline text-4xl text-gray-300 mb-4"></i>
+                    <h5 class="text-gray-700 font-medium">No pending invitations</h5>
+                    <p class="text-gray-500 mt-1">All your invitations have been responded to</p>
+                </div>
+
+                <!-- Pagination -->
+                <div class="mt-6 flex items-center justify-between">
+                    <span class="text-sm text-gray-500">Showing 1-10 of 25 invitations</span>
+                    <div class="flex gap-2">
+                        <button class="btn btn-icon text-gray-500 hover:bg-gray-50 rounded">
+                            <i class="mdi mdi-chevron-left"></i>
+                        </button>
+                        <button class="btn btn-icon text-gray-500 hover:bg-gray-50 rounded">
+                            <i class="mdi mdi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

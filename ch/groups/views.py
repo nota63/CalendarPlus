@@ -352,6 +352,18 @@ def manage_group_users(request, org_id, group_id):
     else:
         username = None
         profile_picture = None
+       # Fetch the count of invitations with each status
+    status_counts = GroupInvitation.objects.filter(group=group).values('invitation_status').annotate(count=Count('id'))
+    total_invitations=GroupInvitation.objects.filter(group=group).count()
+
+    # Convert to a dictionary for easy access
+    status_dict = {status['invitation_status']: status['count'] for status in status_counts}
+
+    # Get the count for each status, defaulting to 0 if not found
+    pending_count = status_dict.get('pending', 0)
+    accepted_count = status_dict.get('accepted', 0)
+    rejected_count = status_dict.get('rejected', 0)
+    
 
 
    
@@ -367,6 +379,10 @@ def manage_group_users(request, org_id, group_id):
         'members': members,
         'username': username,
         'profile_picture': profile_picture,
+        'pending_count':pending_count,
+        'accepted_count':accepted_count,
+        'rejected_count':rejected_count,
+        "total_invitations":total_invitations,
        
     })
 
