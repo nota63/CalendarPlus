@@ -1032,8 +1032,10 @@ header {
         </button>
 
         <!-- Apps -->
-        <button class="p-2 rounded hover:bg-gray-100 text-gray-600">
-          <i class="fas fa-th"></i>
+        <!-- Installed Apps Button -->
+        <button id="openAppsModal" class="p-2 rounded hover:bg-gray-100 text-gray-600"
+            data-bs-toggle="modal" data-bs-target="#installedAppsModal" data-org-id="{{ organization.id }}">
+            <i class="fas fa-th"></i>
         </button>
 
         <!-- User Profile -->
@@ -1206,7 +1208,7 @@ header {
 
 
 
-<!-- WORKING ON IT ----------------------------------------------------------------------------------------------------------- -->
+<!-- WORKING ON IT Main dashboard----------------------------------------------------------------------------------------------------------- -->
 <body class="min-h-screen bg-slate-50 font-['Inter'] text-slate-800">
     <div class="max-w-7xl mx-auto p-6">
         <!-- Header -->
@@ -1493,26 +1495,6 @@ header {
 </body>
 
 <!-- ------------------------------------------------------------------------------------------------------------------------------------------ -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <!-- --------------------------------------------------------------------------------------------------------------- -->
 <!-- Popup Buttons (Initially Hidden) -->
@@ -1983,13 +1965,6 @@ header {
     </div>
 </div>
 
-
-
-
-
-
-
-
 <!-- CALENDAR MEETING DETAILS -->
 <!-- Updated Modal Structure -->
 <div class="modal fade" id="meetingDetailsModal" tabindex="-1" aria-labelledby="meetingDetailsLabel" aria-hidden="true">
@@ -2107,9 +2082,6 @@ header {
     </div>
 </div>
 
-
-
-
 <!-- SET REMINDER MODAL -->
 
 <div class="modal fade" id="MeetsReminderModal" tabindex="-1" aria-labelledby="MeetsReminderModalLabel" aria-hidden="true">
@@ -2175,7 +2147,6 @@ header {
     </div>
 </div>
 
-
 <!-- GENERATE EMBED CODE -->
 <!-- Embed Code Modal -->
 <div class="modal fade" id="embedModal" tabindex="-1" aria-hidden="true">
@@ -2217,9 +2188,7 @@ header {
     </div>
 </div>
 
-
 <!-- SHUT DOWN ALL MEETINGS -->
-
 <!-- Delete Meetings Modal -->
 <div class="modal fade" id="DeleteMeetsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -2402,9 +2371,6 @@ header {
     </div>
 </div>
 
-
-<!-- ------------------------------------------------------------------------------------------------------------------------------------------- -->
-<!-- Edit profile -->
 <!-- Edit Profile Modal -->
 <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
@@ -2567,8 +2533,29 @@ header {
     </div>
 </div>
 
+<!-- Preview and launch Installed apps -->
+<!-- Installed Apps Modal -->
+<div class="modal fade" id="installedAppsModal" tabindex="-1" aria-labelledby="installedAppsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="installedAppsLabel">Installed Apps</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="appsContainer" class="grid grid-cols-2 gap-4">
+                    <!-- Installed apps will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
+
+
+
+<!-- ----------------------------------------------------------------------------------------------------------------------------------------------- -->
 <!-- Include Prism.js for syntax highlighting---------------------------------------------------------------------------------------- -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>

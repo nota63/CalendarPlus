@@ -1055,5 +1055,30 @@ def add_bookmark(request, org_id):
 # --------------------------------------------------------------------------------------------------------------------------------------------------
 
 # SHARE - MANIA -- completed
+# -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+
+# AJAX SET-UP PREVIEW UNINSTALL APPS
+@login_required
+def fetch_installed_apps(request, org_id):
+    """Fetch installed apps for a user in the given organization."""
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Unauthorized"}, status=401)
+
+    organization = get_object_or_404(Organization, id=org_id)
+    
+    # Fetch installed apps for the user in the given organization
+    installed_apps = InstalledMiniApp.objects.filter(user=request.user, organization=organization).select_related("mini_app")
+
+    # Prepare JSON response
+    data = [
+        {
+            "name": app.mini_app.name,
+            "icon": app.mini_app.icon.url if app.mini_app.icon else None,
+            "version": app.mini_app.version,
+        }
+        for app in installed_apps
+    ]
+
+    return JsonResponse({"installed_apps": data})
 
