@@ -234,10 +234,16 @@
                         </button>
                         <div class="absolute right-0 mt-1 w-48 bg-white border border-[#e5e7eb] rounded-lg shadow-lg hidden">
                            
-                            <a href="#" class="flex items-center gap-2 px-4 py-2 text-[#636e72] hover:bg-[#f8f9fa]">
+                
+                            <!-- <button type="button" class="flex items-center gap-2 px-4 py-2 text-[#636e72] hover:bg-[#f8f9fa]" data-bs-toggle="modal" data-bs-target="#invitationStatusModal">
                                 <i class="mdi mdi-cog-outline"></i>
-                                Group Settings
-                            </a>
+                                Track Invitations
+                            </button> -->
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#invitationStatusModal">
+                                View Invitations Status
+                            </button>
+                            
+                            
                         </div>
                     </div>
                 </div>
@@ -1022,6 +1028,25 @@
     </div>
 </div>
 
+<!-- Track Invitations (Updated) -->
+<div class="modal fade" id="invitationStatusModal" tabindex="-1" aria-labelledby="invitationStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="invitationStatusModalLabel">Invitation Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="loading" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div id="invitationsContainer"></div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -1441,6 +1466,57 @@ document.getElementById('inviteForm').addEventListener('submit', function (event
         responseMessages.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
     });
 });
+
+// Track Invitations (Update)
+document.getElementById('invitationStatusModal').addEventListener('show.bs.modal', function () {
+    // Use Django template variables properly
+    let orgId = "{{ organization.id }}";  // Ensure these are rendered properly in the template
+    let groupId = "{{ group.id }}";      // Ensure these are rendered properly in the template
+
+    let loading = document.getElementById('loading');
+    let invitationsContainer = document.getElementById('invitationsContainer');
+    
+    // Show loading spinner
+    loading.style.display = "block";
+    invitationsContainer.innerHTML = ""; // Clear existing data
+
+    // Fetch the invitations status via AJAX
+    fetch(`/groups/invitation-status-group-update/${orgId}/${groupId}/`)
+        .then(response => response.json())
+        .then(data => {
+            loading.style.display = "none";  // Hide loading spinner
+
+            if (data.error) {
+                invitationsContainer.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+            } else {
+                let invitations = data.invitations;
+                invitations.forEach(invitation => {
+                    let statusClass = invitation.status === 'accepted' ? 'text-success' : 
+                                      invitation.status === 'rejected' ? 'text-danger' : 'text-warning';
+                    let profilePic = invitation.profile_picture ? 
+                        `<img src="${invitation.profile_picture}" alt="Profile Pic" class="rounded-circle" width="40" height="40">` : 
+                        `<img src="default-profile-pic.jpg" alt="Default Profile Pic" class="rounded-circle" width="40" height="40">`;
+
+                    invitationsContainer.innerHTML += `
+                        <div class="d-flex align-items-center mb-3">
+                            ${profilePic}
+                            <div class="ms-3">
+                                <h6 class="m-0">${invitation.recipient_email}</h6>
+                                <small class="${statusClass}">${invitation.status}</small>
+                                <br>
+                                <small>Sent at: ${new Date(invitation.invitation_sent_at).toLocaleString()}</small>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        })
+        .catch(error => {
+            loading.style.display = "none";
+            invitationsContainer.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+        });
+});
+
 
 </script>
 </body>

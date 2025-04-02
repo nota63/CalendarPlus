@@ -1701,3 +1701,37 @@ def invite_members_to_group_update(request, org_id, group_id):
     
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
+
+
+# Get Invitation status
+@login_required
+def invitation_status_update(request, org_id, group_id):
+    try:
+        # Fetch the organization and group
+        group = Group.objects.get(id=group_id, organization_id=org_id)
+        organization = group.organization
+
+        # Restrict access: user should be part of the organization
+        if not Profile.objects.filter(user=request.user, organization=organization).exists():
+            return JsonResponse({'error': 'Unauthorized Access'}, status=403)
+
+        # Fetch all invitations for the group
+        invitations = GroupInvitation.objects.filter(group=group)
+
+        # Prepare a list of invitation details with user profile picture
+        invitation_details = []
+        for invitation in invitations:
+            profile = Profile.objects.filter(user=invitation.invited_user).first()
+            invitation_details.append({
+                'recipient_email': invitation.recipient_email,
+                'status': invitation.invitation_status,
+                'invitation_sent_at': invitation.invitation_sent_at,
+                'profile_picture': profile.profile_picture.url if profile and profile.profile_picture else None
+            })
+
+        return JsonResponse({'invitations': invitation_details})
+
+    except Group.DoesNotExist:
+        return JsonResponse({'error': 'Group not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
