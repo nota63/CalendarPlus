@@ -44,6 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
     customModal.className = "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden";
     customModal.innerHTML = `
         <div class="bg-white p-5 rounded-lg shadow-lg w-96">
+            <img id="appIcon" class="w-12 h-12 rounded-full object-cover mb-3 hidden" alt="App Icon">
             <h2 class="text-lg font-semibold mb-2" id="appName"></h2>
             <p class="text-gray-700 text-sm mb-4" id="appDescription"></p>
             <p class="text-gray-600 text-xs" id="appVersion"></p>
@@ -86,24 +87,32 @@ document.addEventListener("DOMContentLoaded", function () {
                 data.installed_apps.forEach(app => {
                     const appElement = document.createElement("div");
                     appElement.classList.add("relative", "group", "flex", "items-center", "gap-3", "p-2", "border", "rounded-lg", "bg-white", "shadow", "hover:bg-gray-100", "transition");
-
+                    
+                    const appLink = document.createElement("a");
+                    appLink.href = `/apps/launch_app/${selectedOrgId}/${app.id}/`;
+                    appLink.classList.add("block", "group", "flex", "items-center", "gap-3", "w-full");
+                    
                     const appIcon = app.icon
                         ? `<img src="${app.icon}" alt="${app.name}" class="w-10 h-10 rounded-full object-cover">`
                         : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">📦</div>`;
-
-                    appElement.innerHTML = `
+                    
+                    appLink.innerHTML = `
                         ${appIcon}
                         <div class="flex-1">
                             <h3 class="text-sm font-medium text-gray-800 group-hover:text-blue-600">${app.name}</h3>
                             <p class="text-xs text-gray-500">Version: ${app.version}</p>
                         </div>
-                        <button class="absolute top-2 right-2 hidden group-hover:block bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 transition" data-app-id="${app.id}">
-                            Uninstall
-                        </button>
                     `;
-
-                    appElement.querySelector("button").addEventListener("click", function (event) {
+                    appElement.appendChild(appLink);
+                    
+                    const uninstallButton = document.createElement("button");
+                    uninstallButton.className = "absolute top-2 right-2 hidden group-hover:block bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 transition";
+                    uninstallButton.textContent = "Uninstall";
+                    uninstallButton.dataset.appId = app.id;
+                    
+                    uninstallButton.addEventListener("click", function (event) {
                         event.stopPropagation();
+                        event.preventDefault();
                         selectedAppId = app.id;
 
                         fetch(`/apps/miniapp-details/${selectedOrgId}/${selectedAppId}/`)
@@ -119,6 +128,14 @@ document.addEventListener("DOMContentLoaded", function () {
                                 document.getElementById("appVersion").textContent = `Version: ${data.app_details.version}`;
                                 document.getElementById("appDeveloper").textContent = `Developer: ${data.app_details.developer}`;
                                 document.getElementById("appCategory").textContent = `Category: ${data.app_details.category}`;
+                                
+                                const appIconElement = document.getElementById("appIcon");
+                                if (data.app_details.icon) {
+                                    appIconElement.src = data.app_details.icon;
+                                    appIconElement.classList.remove("hidden");
+                                } else {
+                                    appIconElement.classList.add("hidden");
+                                }
 
                                 customModal.classList.remove("hidden");
                             })
@@ -127,6 +144,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             });
                     });
 
+                    appElement.appendChild(uninstallButton);
                     appsContainer.appendChild(appElement);
                 });
             })
