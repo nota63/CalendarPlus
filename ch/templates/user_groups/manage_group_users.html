@@ -234,13 +234,10 @@
                         </button>
                         <div class="absolute right-0 mt-1 w-48 bg-white border border-[#e5e7eb] rounded-lg shadow-lg hidden">
                            
-                
-                            <!-- <button type="button" class="flex items-center gap-2 px-4 py-2 text-[#636e72] hover:bg-[#f8f9fa]" data-bs-toggle="modal" data-bs-target="#invitationStatusModal">
+            
+                            <button type="button" class="flex items-center gap-2 px-4 py-2 text-[#636e72] hover:bg-[#f8f9fa]" data-bs-toggle="modal" data-bs-target="#invitationStatusModal">
                                 <i class="mdi mdi-cog-outline"></i>
                                 Track Invitations
-                            </button> -->
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#invitationStatusModal">
-                                View Invitations Status
                             </button>
                             
                             
@@ -1000,29 +997,164 @@
 
 <!-- Invite Team-mates into the group -->
 <div class="modal fade" id="inviteModal" tabindex="-1" aria-labelledby="inviteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="inviteModalLabel">Invite Members to Group</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="inviteForm">
-                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-                    <div class="mb-3">
-                        <label for="emailInput" class="form-label">Enter Emails (comma-separated)</label>
-                        <input type="text" class="form-control" id="emailInput" placeholder="user1@example.com, user2@example.com">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content rounded-xl shadow-2xl">
+            <!-- Header Section -->
+            <div class="modal-header px-6 py-4 border-b border-gray-100">
+                <div class="flex items-center justify-between w-full">
+                    <div>
+                        <h5 class="modal-title text-xl font-semibold text-gray-900" id="inviteModalLabel">Invite to {{group.name}}</h5>
+                        <p class="text-sm text-gray-500 mt-1">Collaborate with your team members</p>
                     </div>
-                    <div class="text-center">
-                        <button type="submit" class="btn btn-success">Send Invitations</button>
-                    </div>
-                </form>
-                <div id="loading" class="text-center mt-3" style="display: none;">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
+                    <div class="flex items-center gap-3">
+                        <button type="button" class="btn btn-light px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg flex items-center gap-2 transition-all" data-bs-toggle="modal" data-bs-target="#invitationStatusModal">
+                            <i class="mdi mdi-clock-outline text-lg"></i>
+                            Invitation History
+                        </button>
+                        <button type="button" class="btn-close p-2" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                 </div>
-                <div id="responseMessages" class="mt-3"></div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="modal-body p-6">
+                <form id="inviteForm">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                    
+                    <!-- Email Input Section -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Invite by Email</label>
+                        <div class="email-input-container relative p-3 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition-colors">
+                            <div class="flex flex-wrap gap-2" id="emailTagsContainer">
+                                <div class="email-tag bg-blue-50 text-blue-800 px-3 py-1 rounded-full flex items-center gap-2">
+                                    <img src="placeholder-user.jpg" class="w-5 h-5 rounded-full" alt="">
+                                    user@example.com
+                                    <button type="button" class="remove-email text-blue-600 hover:text-blue-800">×</button>
+                                </div>
+                            </div>
+                            <input type="text" 
+                                   class="flex-1 min-w-[200px] border-0 focus:ring-0 p-1 text-sm" 
+                                   id="emailInput" 
+                                   placeholder="Enter emails or paste multiple..."
+                                   data-role="tagsinput">
+                            <div class="absolute top-2 right-2 flex items-center gap-2">
+                                <button type="button" class="text-gray-400 hover:text-blue-600" title="Import from CSV">
+                                    <i class="mdi mdi-file-import-outline text-lg"></i>
+                                </button>
+                                <button type="button" class="text-gray-400 hover:text-blue-600" title="Recent contacts">
+                                    <i class="mdi mdi-clock-outline text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Role Selection -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Select Role</label>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="role-card p-4 border rounded-lg cursor-pointer hover:border-blue-500 transition-all">
+                                <div class="flex items-center gap-3">
+                                    <i class="mdi mdi-shield-account-outline text-blue-600 text-xl"></i>
+                                    <div>
+                                        <h6 class="font-medium text-gray-900">Admin</h6>
+                                        <p class="text-sm text-gray-500">Full access</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="role-card p-4 border rounded-lg cursor-pointer hover:border-blue-500 transition-all">
+                                <div class="flex items-center gap-3">
+                                    <i class="mdi mdi-account-group-outline text-purple-600 text-xl"></i>
+                                    <div>
+                                        <h6 class="font-medium text-gray-900">Member</h6>
+                                        <p class="text-sm text-gray-500">Limited access</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="role-card p-4 border rounded-lg cursor-pointer hover:border-blue-500 transition-all">
+                                <div class="flex items-center gap-3">
+                                    <i class="mdi mdi-eye-outline text-green-600 text-xl"></i>
+                                    <div>
+                                        <h6 class="font-medium text-gray-900">Guest</h6>
+                                        <p class="text-sm text-gray-500">View-only</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Permissions Section -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Permissions</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
+                                <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600">
+                                <span class="text-sm">Can create tasks</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
+                                <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600">
+                                <span class="text-sm">Can edit workspace settings</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
+                                <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600">
+                                <span class="text-sm">Can manage members</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Recent Contacts -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Recent Collaborators</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="contact-item flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                {% if profile_picture %}
+                                <img src="{{profile_picture.url}}" class="w-8 h-8 rounded-full" alt="">
+                                {% endif %}
+                                <div>
+                                    <h6 class="text-sm font-medium">{{username.username}}</h6>
+                                    <!-- <p class="text-xs text-gray-500">{{email}}</p> -->
+                                </div>
+                                <input type="checkbox" class="ml-auto form-checkbox h-4 w-4 text-blue-600">
+                            </div>
+                            <!-- Repeat contact items -->
+                        </div>
+                    </div>
+
+                    <!-- Custom Message -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Custom Message</label>
+                        <textarea class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500" 
+                                  rows="3" 
+                                  placeholder="Add a personal message..."></textarea>
+                    </div>
+
+                    <!-- Footer Actions -->
+                    <div class="modal-footer bg-gray-50 px-6 py-4 border-t border-gray-100">
+                        <div class="flex items-center justify-between w-full">
+                            <div class="text-sm text-gray-500">
+                                <i class="mdi mdi-information-outline mr-2"></i>
+                                Invitations expire in 7 days
+                            </div>
+                            <div class="flex gap-3">
+                                <button type="button" class="btn btn-light px-5 py-2 rounded-lg">Preview Invite</button>
+                                <button type="submit" class="btn btn-primary px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white">
+                                    Send Invites
+                                    <i class="mdi mdi-send-outline ml-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Loading State -->
+                <div id="loading" class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center hidden">
+                    <div class="text-center">
+                        <div class="spinner-border text-blue-600 w-12 h-12" role="status"></div>
+                        <p class="mt-3 text-gray-600">Sending invitations...</p>
+                    </div>
+                </div>
+
+                <!-- Response Messages -->
+                <div id="responseMessages" class="mt-4 space-y-2"></div>
             </div>
         </div>
     </div>

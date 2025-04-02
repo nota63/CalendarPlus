@@ -340,6 +340,18 @@ def manage_group_users(request, org_id, group_id):
     # restrict access
     if not Profile.objects.filter(user=request.user, organization=organization):
         return HttpResponseForbidden("Unauthorized Accesss")
+    
+    # Fetch the most recent invitation for the group
+    most_recent_invitation = GroupInvitation.objects.filter(group=group_id).order_by('-invitation_sent_at').first()
+
+    if most_recent_invitation:
+        invited_user = most_recent_invitation.invited_user
+        username = invited_user.username if invited_user else None
+        profile = Profile.objects.filter(user=invited_user, organization=organization).first()
+        profile_picture = profile.profile_picture if profile else None
+    else:
+        username = None
+        profile_picture = None
 
 
    
@@ -353,6 +365,9 @@ def manage_group_users(request, org_id, group_id):
         'organization': organization,
         'group': group,
         'members': members,
+        'username': username,
+        'profile_picture': profile_picture,
+       
     })
 
 
