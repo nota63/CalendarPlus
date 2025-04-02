@@ -1083,3 +1083,54 @@ def fetch_installed_apps(request, org_id):
 
     return JsonResponse({"installed_apps": data})
 
+# Uninstall the app
+@login_required
+def uninstall_app(request, org_id, app_id):
+    """
+    View to uninstall an app for a user within an organization.
+    """
+    user = request.user
+
+    # Check if the app is installed
+    installed_app = InstalledMiniApp.objects.filter(
+        user=user, 
+        organization_id=org_id, 
+        id=app_id
+    ).first()
+
+    if not installed_app:
+        return JsonResponse({"error": "App is not installed or already removed."}, status=400)
+
+    # Delete the installation record
+    installed_app.delete()
+
+    return JsonResponse({"success": True, "message": "App uninstalled successfully!"})
+
+
+# fetch details during uninstallation
+@login_required
+def fetch_app_details(request,org_id,app_id):
+    """
+    Fetch the details of a MiniApp before installation using filter().
+    """
+    app = InstalledMiniApp.objects.filter(id=app_id).first()
+
+    if not app:
+        return JsonResponse({"error": "App not found."}, status=404)
+
+    app_data = {
+        "name": app.mini_app.name,
+        "description": app.mini_app.description,
+        "icon": app.mini_app.icon.url if app.mini_app.icon else None,
+        "category": app.mini_app.get_category_display(),
+        "developer": app.mini_app.developer,
+        "version": app.mini_app.version,
+        "size": app.mini_app.size,
+        "is_premium": app.mini_app.is_premium,
+        "install_count": app.mini_app.install_count,
+        "requirements": app.mini_app.requirements,
+        "ratings": app.mini_app.ratings,
+     
+    }
+
+    return JsonResponse({"success": True, "app_details": app_data})

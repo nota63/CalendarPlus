@@ -41,7 +41,9 @@ urlpatterns=[
     path('fetch-file-details/<uuid:unique_link>/',fetch_file_details,name='fetch_file_details'),
     path('delete_file/<int:org_id>/<int:file_id>/<int:app_id>/',delete_file_upload, name='delete_file'),
     # ajax set-up to preview and uninstall the apps
-    path('fetch-installed-apps/<int:org_id>/',fetch_installed_apps, name='fetch_installed_apps')
+    path('fetch-installed-apps/<int:org_id>/',fetch_installed_apps, name='fetch_installed_apps'),
+    path("uninstall/<int:org_id>/<int:app_id>/", uninstall_app, name="uninstall_app"),
+    path("miniapp-details/<int:org_id>/<int:app_id>/", fetch_app_details, name="fetch_app_details"),
     
 
 ]

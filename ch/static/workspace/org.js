@@ -34,20 +34,41 @@ document.addEventListener("DOMContentLoaded", function () {
 document.addEventListener("DOMContentLoaded", function () {
     const openAppsModalBtn = document.getElementById("openAppsModal");
     const appsContainer = document.getElementById("appsContainer");
+    const uninstallAppBtn = document.createElement("button");
+    let selectedAppId = null;
+    let selectedOrgId = window.djangoData.orgId;
+
+    // Create custom modal dynamically
+    const customModal = document.createElement("div");
+    customModal.id = "customUninstallModal";
+    customModal.className = "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden";
+    customModal.innerHTML = `
+        <div class="bg-white p-5 rounded-lg shadow-lg w-96">
+            <h2 class="text-lg font-semibold mb-2" id="appName"></h2>
+            <p class="text-gray-700 text-sm mb-4" id="appDescription"></p>
+            <p class="text-gray-600 text-xs" id="appVersion"></p>
+            <p class="text-gray-600 text-xs" id="appDeveloper"></p>
+            <p class="text-gray-600 text-xs" id="appCategory"></p>
+            <div class="flex justify-end mt-4">
+                <button id="cancelUninstall" class="mr-2 px-4 py-2 text-gray-700 bg-gray-200 rounded">Cancel</button>
+                <button id="confirmUninstall" class="px-4 py-2 bg-red-500 text-white rounded">Uninstall</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(customModal);
+
+    const confirmUninstallBtn = document.getElementById("confirmUninstall");
+    const cancelUninstallBtn = document.getElementById("cancelUninstall");
 
     openAppsModalBtn.addEventListener("click", function () {
-        const orgId = window.djangoData.orgId;  // Assuming orgId is available globally
-
-        if (!orgId) {
+        if (!selectedOrgId) {
             console.error("Organization ID is missing.");
             return;
         }
 
-        // Clear previous data
         appsContainer.innerHTML = `<p class="text-gray-500">Loading apps...</p>`;
 
-        // Fetch installed apps
-        fetch(`/apps/fetch-installed-apps/${orgId}/`)
+        fetch(`/apps/fetch-installed-apps/${selectedOrgId}/`)
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
@@ -55,7 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     return;
                 }
 
-                appsContainer.innerHTML = ""; // Clear loading message
+                appsContainer.innerHTML = "";
 
                 if (data.installed_apps.length === 0) {
                     appsContainer.innerHTML = `<p class="text-gray-500">No apps installed.</p>`;
@@ -63,9 +84,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
                 data.installed_apps.forEach(app => {
-                    const appElement = document.createElement("a");
-                    appElement.href = `/apps/launch_app/${orgId}/${app.id}/`;  // Redirect on click
-                    appElement.classList.add("block", "group", "flex", "items-center", "gap-3", "p-2", "border", "rounded-lg", "bg-white", "shadow", "hover:bg-gray-100", "transition");
+                    const appElement = document.createElement("div");
+                    appElement.classList.add("relative", "group", "flex", "items-center", "gap-3", "p-2", "border", "rounded-lg", "bg-white", "shadow", "hover:bg-gray-100", "transition");
 
                     const appIcon = app.icon
                         ? `<img src="${app.icon}" alt="${app.name}" class="w-10 h-10 rounded-full object-cover">`
@@ -77,7 +97,35 @@ document.addEventListener("DOMContentLoaded", function () {
                             <h3 class="text-sm font-medium text-gray-800 group-hover:text-blue-600">${app.name}</h3>
                             <p class="text-xs text-gray-500">Version: ${app.version}</p>
                         </div>
+                        <button class="absolute top-2 right-2 hidden group-hover:block bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 transition" data-app-id="${app.id}">
+                            Uninstall
+                        </button>
                     `;
+
+                    appElement.querySelector("button").addEventListener("click", function (event) {
+                        event.stopPropagation();
+                        selectedAppId = app.id;
+
+                        fetch(`/apps/miniapp-details/${selectedOrgId}/${selectedAppId}/`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.error) {
+                                    console.error("Error fetching app details:", data.error);
+                                    return;
+                                }
+
+                                document.getElementById("appName").textContent = data.app_details.name;
+                                document.getElementById("appDescription").textContent = data.app_details.description;
+                                document.getElementById("appVersion").textContent = `Version: ${data.app_details.version}`;
+                                document.getElementById("appDeveloper").textContent = `Developer: ${data.app_details.developer}`;
+                                document.getElementById("appCategory").textContent = `Category: ${data.app_details.category}`;
+
+                                customModal.classList.remove("hidden");
+                            })
+                            .catch(error => {
+                                console.error("Error fetching app details:", error);
+                            });
+                    });
 
                     appsContainer.appendChild(appElement);
                 });
@@ -87,4 +135,40 @@ document.addEventListener("DOMContentLoaded", function () {
                 appsContainer.innerHTML = `<p class="text-red-500">Failed to load apps.</p>`;
             });
     });
+
+    confirmUninstallBtn.addEventListener("click", function () {
+        if (!selectedAppId || !selectedOrgId) {
+            console.error("Missing app or org ID.");
+            return;
+        }
+
+        fetch(`/apps/uninstall/${selectedOrgId}/${selectedAppId}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCSRFToken(),
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("App uninstalled successfully!");
+                customModal.classList.add("hidden");
+                openAppsModalBtn.click();
+            } else {
+                alert("Error: " + data.error);
+            }
+        })
+        .catch(error => {
+            console.error("Error uninstalling app:", error);
+        });
+    });
+
+    cancelUninstallBtn.addEventListener("click", function () {
+        customModal.classList.add("hidden");
+    });
+
+    function getCSRFToken() {
+        return document.querySelector("[name=csrfmiddlewaretoken]").value;
+    }
 });
