@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const appsContainer = document.getElementById("appsContainer");
 
     openAppsModalBtn.addEventListener("click", function () {
-        const orgId = window.djangoData.orgId;
+        const orgId = window.djangoData.orgId;  // Assuming orgId is available globally
 
         if (!orgId) {
             console.error("Organization ID is missing.");
@@ -63,8 +63,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
                 data.installed_apps.forEach(app => {
-                    const appElement = document.createElement("div");
-                    appElement.classList.add("flex", "items-center", "gap-3", "p-2", "border", "rounded-lg", "bg-white", "shadow");
+                    const appElement = document.createElement("a");
+                    appElement.href = `/apps/launch_app/${orgId}/${app.id}/`;  // Redirect on click
+                    appElement.classList.add("block", "group", "flex", "items-center", "gap-3", "p-2", "border", "rounded-lg", "bg-white", "shadow", "hover:bg-gray-100", "transition");
 
                     const appIcon = app.icon
                         ? `<img src="${app.icon}" alt="${app.name}" class="w-10 h-10 rounded-full object-cover">`
@@ -73,7 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     appElement.innerHTML = `
                         ${appIcon}
                         <div class="flex-1">
-                            <h3 class="text-sm font-medium text-gray-800">${app.name}</h3>
+                            <h3 class="text-sm font-medium text-gray-800 group-hover:text-blue-600">${app.name}</h3>
                             <p class="text-xs text-gray-500">Version: ${app.version}</p>
                         </div>
                     `;

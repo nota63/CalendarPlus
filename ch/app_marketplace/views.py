@@ -1073,6 +1073,7 @@ def fetch_installed_apps(request, org_id):
     # Prepare JSON response
     data = [
         {
+            "id":app.id,
             "name": app.mini_app.name,
             "icon": app.mini_app.icon.url if app.mini_app.icon else None,
             "version": app.mini_app.version,
