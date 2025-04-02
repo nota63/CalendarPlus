@@ -537,7 +537,7 @@ def display_group_events(request, org_id, group_id):
         return HttpResponseForbidden("Unauthorized Accesss")
 
 
-    if not GroupMember.objects.filter(group=group, organization=organization, user=request.user).exists():
+    if not GroupMember.objects.filter(group=group, organization=organization, user=request.user).exists() and not group.team_leader == request.user:
         return HttpResponseForbidden("You do not have permission to view events for this group.")
 
     events = GroupEvent.objects.filter(group=group).order_by('-created_at')

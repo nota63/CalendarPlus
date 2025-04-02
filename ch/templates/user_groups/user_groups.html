@@ -141,11 +141,7 @@
                                     <i class="bi bi-info-circle mr-2 text-purple-500"></i>
                                     Group Info
                                 </a>
-                                <a href="{% url 'create_task' org_id=group.organization.id group_id=group.id %}" 
-                                class="flex items-center w-full p-2 text-sm rounded-lg hover:bg-slate-50 text-slate-700">
-                                    <i class="bi bi-list-check mr-2 text-green-500"></i>
-                                    Create Task
-                                </a>
+                               
                                 
                                 <a href="{% url 'assigned_users_list' org_id=organization.id group_id=group.id%}" class="flex items-center w-full p-2 text-sm rounded-lg hover:bg-slate-50 text-slate-700"
                                 >
