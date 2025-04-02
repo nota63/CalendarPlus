@@ -146,6 +146,23 @@
     background: #c1c1c1;
     border-radius: 4px;
 }
+/* Invitation modal enable scrolling */
+#invitationStatusModal .modal-body {
+    max-height: 600px; /* Adjust as needed */
+    overflow-y: auto; /* Enable vertical scrolling */
+    scrollbar-width: thin; /* For Firefox */
+    scrollbar-color: transparent transparent; /* For Firefox (invisible scrollbar) */
+}
+
+#invitationStatusModal .modal-body::-webkit-scrollbar {
+    width: 0px; /* For Chrome, Safari, and Edge */
+    background: transparent; /* Transparent scrollbar */
+}
+
+#invitationStatusModal .modal-body::-webkit-scrollbar-thumb {
+    background: transparent; /* Transparent thumb */
+}
+
 </style>
 
 
