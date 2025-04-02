@@ -1634,3 +1634,70 @@ def fetch_event_bookings_new(request):
     ]
 
     return JsonResponse({"bookings": booking_data})
+
+
+# Invite Members into the group (Updated Ajax)
+@login_required
+def invite_members_to_group_update(request, org_id, group_id):
+    if not request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+    
+    try:
+        organization = get_object_or_404(Organization, id=org_id)
+        group = get_object_or_404(Group, id=group_id, organization=organization)
+        profile = get_object_or_404(Profile, user=request.user, organization=organization)
+        
+        is_admin = profile.is_admin
+        is_team_leader = group.team_leader == request.user
+        
+        if not (is_admin or is_team_leader):
+            return JsonResponse({'error': 'Unauthorized access'}, status=403)
+        
+        if request.method == 'POST':
+            emails = request.POST.get('emails', '').split(',')
+            response_data = {'sent': [], 'warnings': [], 'errors': []}
+            
+            for email in emails:
+                email = email.strip()
+                try:
+                    user = User.objects.get(email=email)
+                    if not Profile.objects.filter(user=user, organization=organization).exists():
+                        raise ValidationError(f"Email {email} does not belong to an organization member.")
+                except User.DoesNotExist:
+                    response_data['errors'].append(f"No user found with email: {email}")
+                    continue
+                except ValidationError as e:
+                    response_data['errors'].append(str(e))
+                    continue
+
+                if GroupInvitation.objects.filter(recipient_email=email, group=group).exists():
+                    response_data['warnings'].append(f"An invitation to {email} has already been sent.")
+                else:
+                    invitation = GroupInvitation.objects.create(
+                        group=group,
+                        sender=request.user,
+                        recipient_email=email
+                    )
+                    GroupActivity.objects.create(
+                        organization=group.organization,
+                        group=group,
+                        user=invitation.sender,
+                        action_type='INVITED_MEMBER',
+                        details=f"{invitation.sender} invited {invitation.recipient_email} in group {group.name}"
+                    )
+                    
+                    invite_link = request.build_absolute_uri(
+                        f'/groups/invite/{org_id}/{group_id}/{invitation.id}/accept/'
+                    )
+                    send_mail(
+                        subject=f"Invitation to join {group.name}",
+                        message=f"Hello! You are invited to join the group {group.name}. Click the link to accept or reject the invitation:\n{invite_link}",
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[email],
+                    )
+                    response_data['sent'].append(f"Invitation sent to {email}.")
+            
+            return JsonResponse(response_data)
+    
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)

@@ -222,11 +222,12 @@
                     </div>
                 </div>
                 <div class="flex gap-3">
-                    <a href="{% url 'invite_members_to_group' org_id=organization.id group_id=group.id %}" 
-                       class="flex items-center gap-2 bg-[#3498db] hover:bg-[#2980b9] text-white px-4 py-2 rounded-lg transition-all">
+                  
+                    <button type="button" class="flex items-center gap-2 bg-[#3498db] hover:bg-[#2980b9] text-white px-4 py-2 rounded-lg transition-all" data-bs-toggle="modal" data-bs-target="#inviteModal">
                         <i class="mdi mdi-account-plus"></i>
                         Invite Members
-                    </a>
+                    </button>
+                    
                     <div class="relative">
                         <button class="flex items-center gap-2 bg-white hover:bg-[#f8f9fa] text-[#636e72] px-4 py-2 rounded-lg border border-[#e5e7eb] transition-all">
                             <i class="mdi mdi-dots-horizontal"></i>
@@ -931,7 +932,7 @@
     </div>
 </div>
 
-<!-- Modal for displaying Booking Details -->
+<!-- Modal 2 for displaying Booking Details -->
 <div class="modal fade" id="bookingDetailsModal" tabindex="-1" aria-labelledby="bookingDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered max-w-xl">
         <div class="modal-content rounded-xl shadow-2xl">
@@ -990,6 +991,38 @@
         </div>
     </div>
 </div>
+
+<!-- Invite Team-mates into the group -->
+<div class="modal fade" id="inviteModal" tabindex="-1" aria-labelledby="inviteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="inviteModalLabel">Invite Members to Group</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="inviteForm">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                    <div class="mb-3">
+                        <label for="emailInput" class="form-label">Enter Emails (comma-separated)</label>
+                        <input type="text" class="form-control" id="emailInput" placeholder="user1@example.com, user2@example.com">
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-success">Send Invitations</button>
+                    </div>
+                </form>
+                <div id="loading" class="text-center mt-3" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div id="responseMessages" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 
 <!-- -------------------------------------------------------------------------------------------------------------------------------------------- -->
@@ -1364,6 +1397,48 @@ document.addEventListener("DOMContentLoaded", function () {
                     console.error("Error fetching bookings:", error);
                 });
         }
+    });
+});
+
+// Invite Members into the group
+
+document.getElementById('inviteForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    let emails = document.getElementById('emailInput').value;
+    let loading = document.getElementById('loading');
+    let responseMessages = document.getElementById('responseMessages');
+    let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    responseMessages.innerHTML = "";
+    loading.style.display = "block";
+
+    fetch(`/groups/invite-members-group-update/{{ organization.id }}/{{ group.id }}/`, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({ emails: emails }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        loading.style.display = "none";
+
+        if (data.sent) {
+            responseMessages.innerHTML += `<div class="alert alert-success">${data.sent.join('<br>')}</div>`;
+        }
+        if (data.warnings) {
+            responseMessages.innerHTML += `<div class="alert alert-warning">${data.warnings.join('<br>')}</div>`;
+        }
+        if (data.errors) {
+            responseMessages.innerHTML += `<div class="alert alert-danger">${data.errors.join('<br>')}</div>`;
+        }
+    })
+    .catch(error => {
+        loading.style.display = "none";
+        responseMessages.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
     });
 });
 
