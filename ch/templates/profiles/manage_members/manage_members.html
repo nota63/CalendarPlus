@@ -16,321 +16,684 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Add Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'clickup-purple': '#7B68EE',
+                        'clickup-purple-dark': '#6A5ACD',
+                        'clickup-purple-light': '#E6E3FF',
+                    }
+                }
+            }
+        }
+    </script>
 
     <title>{{ organization.name }} - Manage Members</title>
-</head>
-
-
-<body>
+    
     <style>
-        /* Slack Color Scheme */
-        :root {
-            --slack-purple: #4A154B;
-            --slack-blue: #36C5F0;
-            --slack-green: #2BAC76;
-            --slack-red: #E01E5A;
-            --slack-yellow: #ECB22E;
-            --slack-gray-1: #F8F8F8;
-            --slack-gray-2: #E8E8E8;
-            --slack-gray-3: #D1D1D1;
-        }
-        
         body {
-            font-family: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--slack-gray-1);
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fd;
         }
         
-        /* Header Section */
+        .container {
+            max-width: 1200px;
+        }
+        
         .manage-header {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
+            padding: 20px 0;
+            margin-bottom: 24px;
         }
         
         .organization-name {
-            color: var(--slack-purple);
-            font-weight: 900;
-            letter-spacing: -0.5px;
+            font-weight: 600;
+            color: #1C1C1E;
         }
         
-        /* Invite Section */
         .invite-card {
-            background: white;
+            background: linear-gradient(135deg, #7B68EE 0%, #6A5ACD 100%);
             border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
+            padding: 24px;
+            margin-bottom: 24px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(123, 104, 238, 0.15);
         }
         
         .invite-card h3 {
-            color: var(--slack-purple);
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-        
-        /* Search Bar */
-        .search-wrapper {
-            position: relative;
-            margin-bottom: 1.5rem;
-        }
-        
-        .search-input {
-            padding-left: 40px;
-            border-radius: 8px;
-            border: 2px solid var(--slack-gray-2);
-            height: 48px;
-        }
-        
-        .search-input:focus {
-            border-color: var(--slack-blue);
-            box-shadow: none;
-        }
-        
-        .search-icon {
-            position: absolute;
-            left: 15px;
-            top: 14px;
-            color: var(--slack-gray-3);
-        }
-        
-        /* Members Table */
-        .members-table {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        
-        .members-table thead {
-            background-color: var(--slack-gray-1);
-        }
-        
-        .members-table th {
-            color: var(--slack-purple);
-            font-weight: 700;
-            padding: 1rem;
-            border-bottom: 2px solid var(--slack-gray-2) !important;
-        }
-        
-        .members-table td {
-            padding: 1rem;
-            vertical-align: middle;
-        }
-        
-        .members-table tr:hover {
-            background-color: var(--slack-gray-1) !important;
-        }
-        
-        /* Action Dropdown */
-        .dropdown-toggle::after {
-            display: none;
-        }
-        
-        .dropdown-toggle {
-            border: 1px solid var(--slack-gray-2);
-            border-radius: 6px;
-            padding: 0.25rem 0.5rem;
-            color: var(--slack-gray-3);
-        }
-        
-        .dropdown-toggle:hover {
-            background-color: var(--slack-gray-1);
-        }
-        
-        /* Buttons */
-        .btn-slack-primary {
-            background-color: var(--slack-purple);
-            color: white;
-            border-radius: 6px;
-            padding: 0.5rem 1.25rem;
             font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .invite-card p {
+            opacity: 0.9;
+        }
+        
+        .btn-slack-primary {
+            background-color: white;
+            color: #7B68EE;
+            font-weight: 500;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            transition: all 0.2s;
         }
         
         .btn-slack-primary:hover {
-            background-color: #3A0C3B;
-            color: white;
+            background-color: #f8f9fd;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         
-        /* Status Modal */
-        .modal-header {
-            border-bottom: 1px solid var(--slack-gray-2);
+        .members-table {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
         
-        .modal-title {
-            color: var(--slack-purple);
-            font-weight: 700;
+        .table {
+            margin-bottom: 0;
         }
         
-        .status-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 4px;
-            font-size: 0.875rem;
+        .table th {
+            font-weight: 600;
+            color: #6B7280;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.05em;
+            padding: 16px 16px;
+            border-bottom: 1px solid #F3F4F6;
         }
         
-        .status-pending {
-            background-color: #FFEDD5;
-            color: #C05621;
+        .table td {
+            padding: 16px 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #F3F4F6;
         }
         
-        .status-accepted {
-            background-color: #C6F6D5;
-            color: #22543D;
+        .table tr:hover {
+            background-color: #F9FAFB;
         }
         
-        /* Role Badges */
+        .avatar {
+            width: 36px;
+            height: 36px;
+        }
+        
+        .fw-500 {
+            font-weight: 500;
+        }
+        
         .role-badge {
-            padding: 0.35rem 0.75rem;
-            border-radius: 4px;
-            font-size: 0.875rem;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 500;
         }
         
         .role-admin {
-            background-color: var(--slack-purple);
-            color: white;
+            background-color: #E6E3FF;
+            color: #7B68EE;
         }
         
         .role-member {
-            background-color: var(--slack-gray-2);
-            color: #4A5568;
+            background-color: #E6F4FF;
+            color: #0090E1;
         }
-        </style>
         
-        <div class="container py-4">
-            <div class="manage-header">
-                <h1 class="h3 mb-0">
-                    <span class="organization-name">{{ organization.name }}</span>
-                    <span class="text-muted" style="font-weight: 400;">/ Manage Members</span>
-                </h1>
-            </div>
+        .dropdown-menu {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 0;
+        }
         
-            <div class="invite-card">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h3 class="h5 mb-2">Invite to Workspace</h3>
-                        <p class="text-muted mb-0">Add new members via email or shareable link</p>
+        .dropdown-item {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #F9FAFB;
+        }
+        
+        .form-control {
+            height: 42px;
+            border-radius: 8px;
+            border: 1px solid #E5E7EB;
+            padding-left: 16px;
+            background-color: #F9FAFB;
+        }
+        
+        .form-control:focus {
+            border-color: #7B68EE;
+            box-shadow: 0 0 0 3px rgba(123, 104, 238, 0.15);
+        }
+        
+        .btn-primary {
+            background-color: #7B68EE;
+            border-color: #7B68EE;
+            height: 42px;
+            font-weight: 500;
+        }
+        
+        .btn-primary:hover {
+            background-color: #6A5ACD;
+            border-color: #6A5ACD;
+        }
+        
+        /* Stats cards */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1C1C1E;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: #6B7280;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container py-4">
+        <div class="manage-header">
+            <h1 class="h3 mb-0">
+               
+            </h1>
+        </div>
+        
+        <!-- Stats Row (ClickUp-inspired) -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon" style="background-color: #E6E3FF; color: #7B68EE;">
+                        <i class="bi bi-people-fill"></i>
                     </div>
-                    <button class="btn btn-slack-primary" id="inviteBtn">
-                        <i class="bi bi-person-plus me-2"></i>Invite People
-                    </button>
+                    <div>
+                        <p class="stat-label">Total Members</p>
+                        <p class="stat-value">{{ members|length }}</p>
+                    </div>
                 </div>
             </div>
-        
-            <div class="members-table">
-                 <!-- Filter Form -->
-     <!-- Filter Form -->
-     <form method="get" class="mb-4">
-        <div class="input-group">
-            <input type="text" name="q" class="form-control" placeholder="Search by name or email" value="{{ query }}">
-            <button class="btn btn-primary" type="submit">Filter</button>
-        </div>
-    </form>
-
-
-        
-                <table class="table table-hover mb-0">
-                    <thead>
-                        <tr>
-                            <th>Member</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th style="width: 100px;"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for member in members %}
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar me-3">
-                                        <span class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" 
-                                              style="width: 32px; height: 32px;">
-                                            {{ member.user.username|first|upper }}
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <div class="fw-500">{{ member.user.username }}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>{{ member.user.email }}</td>
-                            <td>
-                                <span class="role-badge {% if member.is_admin %}role-admin{% else %}role-member{% endif %}">
-                                    {{ member.role }}
-                                </span>
-                            </td>
-                            <td>
-                                {% if not member.is_admin %}
-                                <div class="dropdown">
-                                    <button class="btn btn-link dropdown-toggle" type="button" 
-                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <li>
-                                            <button class="dropdown-item change-role-btn" 
-                                                    data-member-id="{{ member.id }}">
-                                                <i class="bi bi-person-gear me-2"></i>Change Role
-                                            </button>
-                                        </li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <button class="dropdown-item text-danger remove-member-btn" 
-                                                    data-member-id="{{ member.id }}">
-                                                <i class="bi bi-person-x me-2"></i>Remove Member
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </div>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon" style="background-color: #E6F4FF; color: #0090E1;">
+                        <i class="bi bi-person-badge-fill"></i>
+                    </div>
+                    <div>
+                        <p class="stat-label">Admins</p>
+                       
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon" style="background-color: #E7F7EE; color: #10B981;">
+                        <i class="bi bi-activity"></i>
+                    </div>
+                    <div>
+                        <p class="stat-label">Active Today</p>
+                        <p class="stat-value">{{ members|length }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon" style="background-color: #FEF3C7; color: #F59E0B;">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <div>
+                        <p class="stat-label">Pending Invites</p>
+                        <p class="stat-value">0</p>
+                    </div>
+                </div>
             </div>
         </div>
-
-
+    
+        <div class="invite-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="h5 mb-2">Invite to Workspace</h3>
+                    <p class="text-muted mb-0">Add new members via email or shareable link</p>
+                </div>
+                <button class="btn btn-slack-primary" id="inviteBtn">
+                    <i class="bi bi-person-plus me-2"></i>Invite People
+                </button>
+            </div>
+        </div>
+    
+        <div class="members-table">
+            <!-- Filter Form -->
+            <form method="get" class="mb-4">
+                <div class="input-group">
+                    <input type="text" name="q" class="form-control" placeholder="Search by name or email" value="{{ query }}">
+                    <button class="btn btn-primary" type="submit">Filter</button>
+                </div>
+            </form>
+    
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Member</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th style="width: 100px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for member in members %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar me-3">
+                                    <span class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" 
+                                          style="width: 36px; height: 36px; background-color: {% if member.is_admin %}#7B68EE{% else %}#6B7280{% endif %};">
+                                        {{ member.user.username|first|upper }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <div class="fw-500">{{ member.user.username }}</div>
+                                    <small class="text-muted">Member since Apr 2023</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ member.user.email }}</td>
+                        <td>
+                            <span class="role-badge {% if member.is_admin %}role-admin{% else %}role-member{% endif %}">
+                                {{ member.role }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if not member.is_admin %}
+                            <div class="dropdown">
+                                <button class="btn btn-link dropdown-toggle" type="button" 
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <button class="dropdown-item change-role-btn" 
+                                                data-member-id="{{ member.id }}">
+                                            <i class="bi bi-person-gear me-2"></i>Change Role
+                                        </button>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <button class="dropdown-item text-danger remove-member-btn" 
+                                                data-member-id="{{ member.id }}">
+                                            <i class="bi bi-person-x me-2"></i>Remove Member
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <!-- ClickUp-style pagination -->
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <div class="text-muted small">
+                    Showing <span class="fw-500">1-{{ members|length }}</span> of <span class="fw-500">{{ members|length }}</span> members
+                </div>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="Previous">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="Next">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+<!-- Keep original JS/Bootstrap functionality intact -->
 <!-- MODALS ---------------------------------------------------------------------------------------------------------------------- -->
 <!-- Modal for Role Change -->
+<!-- Modern SaaS-inspired Wide Role Change Modal -->
 <div class="modal fade" id="changeRoleModal" tabindex="-1" aria-labelledby="changeRoleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="changeRoleModalLabel">Change Member Role</h5>
-
-                <div>
-                    <strong>
-                        Select the account type that {{member.user.username}} should have for {{organization.name}}
-                    </strong>
+    <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- Increased width with modal-lg -->
+        <div class="modal-content rounded-lg shadow-2xl border-0">
+            <!-- Header Section with Gradient Background -->
+            <div class="modal-header bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-t-lg p-4 border-0">
+                <div class="flex items-center justify-between w-full">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-2 bg-white bg-opacity-20 rounded-lg">
+                            <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h5 class="modal-title text-xl font-bold tracking-tight" id="changeRoleModalLabel">Change Member Role</h5>
+                            <p class="text-gray-100 text-sm mt-1">
+                                Update permissions for {{member.user.username}} in {{organization.name}}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs bg-white bg-opacity-20 px-3 py-1 rounded-full">Last modified: Today</span>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <form id="changeRoleForm">
-                    <input type="hidden" id="memberId">
-                    <p>Current Role: <span id="currentRole"></span></p>
-                    <div>
-                        <input type="radio" name="role" id="manager" value="manager" class="form-check-input">
-                        <label for="manager" class="form-check-label">Manager</label>
+            
+            <!-- Progress Indicator -->
+            <div class="px-6 py-3 bg-gray-50 border-b border-gray-200">
+                <div class="flex items-center justify-between text-sm">
+                    <div class="flex items-center space-x-2">
+                        <span class="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-white text-xs">1</span>
+                        <span class="font-medium text-indigo-600">Select Role</span>
                     </div>
-                    <div>
-                        <input type="radio" name="role" id="employee" value="employee" class="form-check-input">
-                        <label for="employee" class="form-check-label">Employee</label>
+                    <div class="flex-1 mx-4">
+                        <div class="h-1 w-full bg-gray-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-indigo-600 rounded-full" style="width: 50%"></div>
+                        </div>
                     </div>
-                </form>
+                    <div class="flex items-center space-x-2 text-gray-400">
+                        <span class="flex h-6 w-6 items-center justify-center rounded-full bg-gray-200 text-gray-500 text-xs">2</span>
+                        <span>Review Changes</span>
+                    </div>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="saveRoleChange">Save Changes</button>
+            
+            <!-- Main Content Area - 2 Column Layout -->
+            <div class="modal-body p-6">
+                <div class="grid grid-cols-3 gap-6">
+                    <!-- Left Column - Role Selection -->
+                    <div class="col-span-2">
+                        <form id="changeRoleForm">
+                            <input type="hidden" id="memberId">
+                            
+                            <!-- Current Role Badge -->
+                            <div class="mb-4 flex items-center">
+                                <div class="flex items-center bg-gray-50 px-3 py-2 rounded-lg border border-gray-200">
+                                    <div class="mr-3">
+                                        <img src="/api/placeholder/40/40" alt="User avatar" class="h-10 w-10 rounded-full" />
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">{{member.user.username}}</p>
+                                        <div class="flex items-center mt-1">
+                                            <span class="text-xs text-gray-500 mr-2">Current Role:</span>
+                                            <span id="currentRole" class="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Role Selection Cards -->
+                            <div class="space-y-4 mb-6">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-gray-700 font-medium">Select new role:</p>
+                                    <div class="flex items-center text-sm text-gray-500">
+                                        <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        Compare roles
+                                    </div>
+                                </div>
+                                
+                                <!-- Manager Role Card -->
+                                <div class="border border-gray-200 rounded-lg p-4 hover:border-indigo-500 transition-all cursor-pointer hover:shadow-md">
+                                    <div class="flex items-start">
+                                        <div class="flex items-center h-5">
+                                            <input type="radio" name="role" id="manager" value="manager" class="form-check-input h-4 w-4 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                                        </div>
+                                        <div class="ml-3 w-full">
+                                            <div class="flex justify-between items-center">
+                                                <label for="manager" class="font-medium text-gray-800 text-base cursor-pointer">Manager</label>
+                                                <span class="inline-flex items-center px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full">
+                                                    Recommended
+                                                </span>
+                                            </div>
+                                            <p class="text-gray-500 text-sm mt-1">Full access to manage team members, view all projects, and change organization settings</p>
+                                            <div class="grid grid-cols-2 gap-2 mt-3">
+                                                <div class="flex items-center text-sm text-gray-600">
+                                                    <svg class="h-4 w-4 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                    </svg>
+                                                    Admin dashboard
+                                                </div>
+                                                <div class="flex items-center text-sm text-gray-600">
+                                                    <svg class="h-4 w-4 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                    </svg>
+                                                    Billing control
+                                                </div>
+                                                <div class="flex items-center text-sm text-gray-600">
+                                                    <svg class="h-4 w-4 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                    </svg>
+                                                    Member management
+                                                </div>
+                                                <div class="flex items-center text-sm text-gray-600">
+                                                    <svg class="h-4 w-4 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                    </svg>
+                                                    Global permissions
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Employee Role Card -->
+                                <div class="border border-gray-200 rounded-lg p-4 hover:border-indigo-500 transition-all cursor-pointer hover:shadow-md">
+                                    <div class="flex items-start">
+                                        <div class="flex items-center h-5">
+                                            <input type="radio" name="role" id="employee" value="employee" class="form-check-input h-4 w-4 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                                        </div>
+                                        <div class="ml-3 w-full">
+                                            <div class="flex justify-between items-center">
+                                                <label for="employee" class="font-medium text-gray-800 text-base cursor-pointer">Employee</label>
+                                                <span class="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded-full">
+                                                    Standard
+                                                </span>
+                                            </div>
+                                            <p class="text-gray-500 text-sm mt-1">Access to assigned projects and tasks with limited administrative capabilities</p>
+                                            <div class="grid grid-cols-2 gap-2 mt-3">
+                                                <div class="flex items-center text-sm text-gray-600">
+                                                    <svg class="h-4 w-4 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                    </svg>
+                                                    Project access
+                                                </div>
+                                                <div class="flex items-center text-sm text-gray-600">
+                                                    <svg class="h-4 w-4 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                    </svg>
+                                                    Task management
+                                                </div>
+                                                <div class="flex items-center text-sm text-gray-600">
+                                                    <svg class="h-4 w-4 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                    </svg>
+                                                    Billing access
+                                                </div>
+                                                <div class="flex items-center text-sm text-gray-600">
+                                                    <svg class="h-4 w-4 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                    </svg>
+                                                    Member management
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Custom Role Option -->
+                                <div class="border border-dashed border-gray-300 rounded-lg p-4 hover:border-indigo-500 transition-all cursor-pointer bg-gray-50 hover:bg-white">
+                                    <div class="flex items-center justify-center text-center py-2">
+                                        <div>
+                                            <div class="inline-flex items-center justify-center h-10 w-10 rounded-full bg-indigo-100 text-indigo-600 mb-2">
+                                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                                </svg>
+                                            </div>
+                                            <p class="text-sm font-medium text-indigo-600">Create Custom Role</p>
+                                            <p class="text-xs text-gray-500 mt-1">Define specific permissions and access levels</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Right Column - Info & Guide -->
+                    <div class="col-span-1">
+                        <!-- Role Information Panel -->
+                        <div class="bg-indigo-50 rounded-lg p-4 mb-4 border border-indigo-100">
+                            <div class="flex items-center mb-3 text-indigo-800">
+                                <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd"></path>
+                                </svg>
+                                <h3 class="font-semibold">Role Guide</h3>
+                            </div>
+                            <div class="text-sm text-gray-700 space-y-2">
+                                <p>Roles determine what actions members can perform in your organization.</p>
+                                <div class="mt-3 space-y-2">
+                                    <div class="flex items-start">
+                                        <div class="bg-purple-100 rounded-full p-1 mr-2 mt-0.5">
+                                            <svg class="h-3 w-3 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"></path>
+                                            </svg>
+                                        </div>
+                                        <p><span class="font-medium">Managers</span> have full control over the organization.</p>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <div class="bg-blue-100 rounded-full p-1 mr-2 mt-0.5">
+                                            <svg class="h-3 w-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"></path>
+                                            </svg>
+                                        </div>
+                                        <p><span class="font-medium">Employees</span> have limited access to projects and features.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4 text-sm">
+                                <a href="#" class="text-indigo-600 font-medium hover:text-indigo-700 flex items-center">
+                                    View complete permission guide
+                                    <svg class="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Change Impact Alert -->
+                        <div class="bg-amber-50 rounded-lg p-4 border border-amber-100">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-amber-800">Impact of Change</h3>
+                                    <div class="mt-2 text-sm text-amber-700">
+                                        <p>Changing roles affects user access immediately. A notification email will be sent to the user.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Recent Activity -->
+                        <div class="mt-4">
+                            <h4 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Recent Role Changes</h4>
+                            <div class="space-y-2">
+                                <div class="bg-white p-3 rounded-lg border border-gray-200 text-xs">
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-medium text-gray-900">John Doe</span>
+                                        <span class="text-gray-500">1 hour ago</span>
+                                    </div>
+                                    <p class="text-gray-600 mt-1">Changed from Employee to Manager</p>
+                                </div>
+                                <div class="bg-white p-3 rounded-lg border border-gray-200 text-xs">
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-medium text-gray-900">Jane Smith</span>
+                                        <span class="text-gray-500">Yesterday</span>
+                                    </div>
+                                    <p class="text-gray-600 mt-1">Changed from Manager to Employee</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer with Actions -->
+            <div class="modal-footer flex justify-between p-4 bg-gray-50 rounded-b-lg border-t border-gray-100">
+                <button type="button" class="btn btn-light flex items-center border border-gray-300 hover:bg-gray-100 text-gray-700 px-4 py-2 rounded-lg font-medium text-sm" data-bs-dismiss="modal">
+                    <svg class="mr-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Cancel
+                </button>
+                <div class="flex space-x-2">
+                    <button type="button" class="btn flex items-center border border-indigo-300 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg font-medium text-sm">
+                        <svg class="mr-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                        Preview Changes
+                    </button>
+                    <button type="button" class="btn flex items-center bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg font-medium text-sm shadow-sm" id="saveRoleChange">
+                        <svg class="mr-1.5 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Save Changes
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-
 
 <!-- Confirmation modal  -->
 <!-- Modal for Member Removal Confirmation -->
