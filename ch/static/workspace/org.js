@@ -197,13 +197,26 @@ document.addEventListener("DOMContentLoaded", function () {
 document.addEventListener("DOMContentLoaded", function () {
     const visibilitySelect = document.getElementById("visibility");
     const membersContainer = document.getElementById("membersContainer");
-    const allowedMembersSelect = document.getElementById("allowedMembers");
+    const allowedMembersContainer = document.getElementById("allowedMembers");
     const channelForm = document.getElementById("channelForm");
-    
+    const channelTypeInput = document.getElementById("channelType");
+
+    // Handle Channel Type Selection
+    document.querySelectorAll(".channel-type").forEach(el => {
+        el.addEventListener("click", function () {
+            if (!this.classList.contains("pro")) {
+                document.querySelectorAll(".channel-type").forEach(el => el.classList.remove("selected"));
+                this.classList.add("selected");
+                channelTypeInput.value = this.getAttribute("data-value");
+            }
+        });
+    });
+
+    // Handle Visibility Change
     visibilitySelect.addEventListener("change", function () {
         if (this.value === "PRIVATE") {
             membersContainer.classList.remove("d-none");
-            fetchMembers(); // Fetch members when 'Private' is selected
+            fetchMembers();
         } else {
             membersContainer.classList.add("d-none");
         }
@@ -215,12 +228,22 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch(`/organizations/fetch-org-members-updated/${orgId}/`)
             .then(response => response.json())
             .then(data => {
-                allowedMembersSelect.innerHTML = ""; // Clear previous options
+                allowedMembersContainer.innerHTML = "";
                 data.members.forEach(member => {
-                    let option = document.createElement("option");
-                    option.value = member.id;
-                    option.textContent = member.name;
-                    allowedMembersSelect.appendChild(option);
+                    let memberCard = document.createElement("div");
+                    memberCard.classList.add("member-card");
+                    memberCard.setAttribute("data-id", member.id);
+
+                    memberCard.innerHTML = `
+                        <img src="${member.profile_picture}" alt="${member.name}">
+                        <span>${member.name}</span>
+                    `;
+
+                    memberCard.addEventListener("click", function () {
+                        this.classList.toggle("selected");
+                    });
+
+                    allowedMembersContainer.appendChild(memberCard);
                 });
             })
             .catch(error => console.error("Error fetching members:", error));
@@ -228,12 +251,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     channelForm.addEventListener("submit", function (e) {
         e.preventDefault();
-        
+
         const orgId = window.djangoData.orgId;
         const channelName = document.getElementById("channelName").value;
         const channelType = document.getElementById("channelType").value;
         const visibility = document.getElementById("visibility").value;
-        const allowedMembers = Array.from(allowedMembersSelect.selectedOptions).map(opt => opt.value);
+        const allowedMembers = Array.from(allowedMembersContainer.querySelectorAll(".member-card.selected"))
+            .map(el => el.getAttribute("data-id"));
 
         if (visibility === "PRIVATE" && allowedMembers.length === 0) {
             alert("Please select allowed members for a Private channel.");
@@ -254,7 +278,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(data => {
             if (data.success) {
                 alert("Channel created successfully!");
-                location.reload(); // Refresh the page to show new channel
+                location.reload();
             } else {
                 alert("Error creating channel: " + data.message);
             }
@@ -266,4 +290,3 @@ document.addEventListener("DOMContentLoaded", function () {
         return document.cookie.split("; ").find(row => row.startsWith("csrftoken="))?.split("=")[1];
     }
 });
-

@@ -4350,38 +4350,50 @@ body {
           </div>
           <div class="modal-body">
               <form id="channelForm">
-                  <input type="hidden" id="org_id" value="1"> <!-- Org ID will be set dynamically -->
+                  <input type="hidden" id="org_id" value="1"> <!-- Org ID dynamically set -->
 
+                  <!-- Channel Name -->
                   <div class="mb-3">
                       <label class="form-label">Channel Name</label>
                       <input type="text" class="form-control" id="channelName" required>
                   </div>
 
+                  <!-- Channel Type Selector -->
                   <div class="mb-3">
                       <label class="form-label">Channel Type</label>
-                      <select class="form-control" id="channelType">
-                          <option value="BLANK">Blank Channel</option>
-                          <option value="PROJECT_STARTER">Project Starter Kit</option>
-                          <option value="HELP_REQUESTS">Help Requests</option>
-                          <option value="TEAM_SUPPORT">Team Support</option>
-                          <option value="FEEDBACK">Feedback</option>
-                          <option value="ONBOARDING">New Hire Onboarding</option>
-                          <option value="COACHING">1:1 Coaching</option>
-                          <option value="SALES_TRACKING">Sales Tracking</option>
-                      </select>
+                      <div class="list-group" id="channelTypeSelector">
+                          <button type="button" class="list-group-item list-group-item-action active" data-value="BLANK">
+                              <img src="/static/icons/blank.svg" alt="Blank" class="me-2" width="20"> 📝 Blank Channel
+                          </button>
+                          <button type="button" class="list-group-item list-group-item-action disabled">
+                              <img src="/static/icons/project.svg" alt="Project" class="me-2" width="20"> 🚀 Project Starter
+                              <span class="badge bg-warning text-dark ms-2">Pro</span>
+                          </button>
+                          <button type="button" class="list-group-item list-group-item-action disabled">
+                              <img src="/static/icons/help.svg" alt="Help" class="me-2" width="20"> 💡 Help Requests
+                              <span class="badge bg-warning text-dark ms-2">Pro</span>
+                          </button>
+                          <button type="button" class="list-group-item list-group-item-action disabled">
+                              <img src="/static/icons/team.svg" alt="Team" class="me-2" width="20"> 🤝 Team Support
+                              <span class="badge bg-warning text-dark ms-2">Pro</span>
+                          </button>
+                      </div>
+                      <input type="hidden" id="channelType" value="BLANK">
                   </div>
 
+                  <!-- Visibility -->
                   <div class="mb-3">
                       <label class="form-label">Visibility</label>
-                      <select class="form-control" id="visibility">
-                          <option value="PUBLIC">Public - Anyone in Organization</option>
-                          <option value="PRIVATE">Private - Specific People Only</option>
+                      <select class="form-select" id="visibility">
+                          <option value="PUBLIC">🌍 Public - Anyone in Organization</option>
+                          <option value="PRIVATE">🔒 Private - Specific People Only</option>
                       </select>
                   </div>
 
+                  <!-- Allowed Members (Only for Private Channels) -->
                   <div class="mb-3 d-none" id="membersContainer">
                       <label class="form-label">Allowed Members</label>
-                      <select class="form-control" id="allowedMembers" multiple></select>
+                      <select class="form-select" id="allowedMembers" multiple></select>
                   </div>
 
                   <button type="submit" class="btn btn-primary w-100">Create Channel</button>
@@ -4390,6 +4402,8 @@ body {
       </div>
   </div>
 </div>
+
+
 
 
 
