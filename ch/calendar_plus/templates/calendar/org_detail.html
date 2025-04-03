@@ -1803,102 +1803,205 @@ header {
 
 
 <!-- SCHEDULE RECURRING MEETING -->
+
+<!-- SCHEDULE RECURRING MEETING -->
 <div class="modal fade" id="ScheduleMeetsModal" tabindex="-1" aria-labelledby="ScheduleMeetsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content shadow-sm rounded-3 border-0">
-            <div class="modal-header bg-light border-bottom">
-                <h5 class="modal-title fw-semibold text-primary" id="ScheduleMeetsModalLabel">
+        <div class="modal-content rounded-lg border-0 shadow-xl">
+            <!-- Header with gradient background -->
+            <div class="modal-header bg-gradient-to-r from-indigo-600 to-purple-600 border-0 rounded-t-lg">
+                <h5 class="modal-title text-white font-bold flex items-center" id="ScheduleMeetsModalLabel">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
                     Schedule a Recurring Meeting
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <div class="modal-body p-3">
-                <p class="text-muted small text-center">
-                    We will check user and workspace availability. If unavailable, booking will be prevented.
-                </p>
+            <div class="modal-body p-0">
+                <!-- Status bar with availability info -->
+                <div class="bg-blue-50 text-blue-700 px-4 py-2 flex items-center text-sm border-b border-blue-100">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    We'll check availability for all participants before scheduling
+                </div>
 
-                <form id="scheduleMeetingForm">
+                <form id="scheduleMeetingForm" class="p-5">
                     <input type="hidden" id="org_id" name="org_id">
                     <input type="hidden" id="user_id" name="user_id">
 
-                    <div class="mb-2">
-                        <label for="recurrence_type" class="form-label fw-medium">Recurrence Type</label>
-                        <select class="form-select shadow-none" id="recurrence_type" name="recurrence_type">
-                            <option value="daily">Daily</option>
-                            <option value="weekly">Weekly</option>
-                            <option value="monthly">Monthly</option>
-                            <option value="yearly">Yearly</option>
-                            <option value="custom">Custom Days</option>
-                        </select>
+                    <!-- Meeting details section -->
+                    <div class="mb-5">
+                        <div class="flex items-center mb-4">
+                            <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 mr-3">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Meeting Details</h3>
+                        </div>
+
+                        <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+                            <div class="mb-4">
+                                <label for="recurrence_type" class="block text-sm font-medium text-gray-700 mb-1">Recurrence Pattern</label>
+                                <div class="relative">
+                                    <select class="appearance-none block w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200" id="recurrence_type" name="recurrence_type">
+                                        <option value="daily">Daily</option>
+                                        <option value="weekly">Weekly</option>
+                                        <option value="monthly">Monthly</option>
+                                        <option value="yearly">Yearly</option>
+                                        <option value="custom">Custom Days</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="customDaysContainer" class="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-100" style="display: none;">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Select Days</label>
+                                <div class="grid grid-cols-7 gap-2">
+                                    <div class="flex flex-col items-center">
+                                        <div class="form-check">
+                                            <input class="form-check-input appearance-none h-5 w-5 border border-gray-300 rounded-md bg-white checked:bg-purple-600 checked:border-purple-600 focus:outline-none transition duration-200 align-top bg-no-repeat bg-center bg-contain cursor-pointer" type="checkbox" value="monday" id="monday">
+                                        </div>
+                                        <label class="text-xs font-medium text-gray-700 mt-1" for="monday">Mon</label>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <div class="form-check">
+                                            <input class="form-check-input appearance-none h-5 w-5 border border-gray-300 rounded-md bg-white checked:bg-purple-600 checked:border-purple-600 focus:outline-none transition duration-200 align-top bg-no-repeat bg-center bg-contain cursor-pointer" type="checkbox" value="tuesday" id="tuesday">
+                                        </div>
+                                        <label class="text-xs font-medium text-gray-700 mt-1" for="tuesday">Tue</label>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <div class="form-check">
+                                            <input class="form-check-input appearance-none h-5 w-5 border border-gray-300 rounded-md bg-white checked:bg-purple-600 checked:border-purple-600 focus:outline-none transition duration-200 align-top bg-no-repeat bg-center bg-contain cursor-pointer" type="checkbox" value="wednesday" id="wednesday">
+                                        </div>
+                                        <label class="text-xs font-medium text-gray-700 mt-1" for="wednesday">Wed</label>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <div class="form-check">
+                                            <input class="form-check-input appearance-none h-5 w-5 border border-gray-300 rounded-md bg-white checked:bg-purple-600 checked:border-purple-600 focus:outline-none transition duration-200 align-top bg-no-repeat bg-center bg-contain cursor-pointer" type="checkbox" value="thursday" id="thursday">
+                                        </div>
+                                        <label class="text-xs font-medium text-gray-700 mt-1" for="thursday">Thu</label>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <div class="form-check">
+                                            <input class="form-check-input appearance-none h-5 w-5 border border-gray-300 rounded-md bg-white checked:bg-purple-600 checked:border-purple-600 focus:outline-none transition duration-200 align-top bg-no-repeat bg-center bg-contain cursor-pointer" type="checkbox" value="friday" id="friday">
+                                        </div>
+                                        <label class="text-xs font-medium text-gray-700 mt-1" for="friday">Fri</label>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <div class="form-check">
+                                            <input class="form-check-input appearance-none h-5 w-5 border border-gray-300 rounded-md bg-white checked:bg-purple-600 checked:border-purple-600 focus:outline-none transition duration-200 align-top bg-no-repeat bg-center bg-contain cursor-pointer" type="checkbox" value="saturday" id="saturday">
+                                        </div>
+                                        <label class="text-xs font-medium text-gray-700 mt-1" for="saturday">Sat</label>
+                                    </div>
+                                    <div class="flex flex-col items-center">
+                                        <div class="form-check">
+                                            <input class="form-check-input appearance-none h-5 w-5 border border-gray-300 rounded-md bg-white checked:bg-purple-600 checked:border-purple-600 focus:outline-none transition duration-200 align-top bg-no-repeat bg-center bg-contain cursor-pointer" type="checkbox" value="sunday" id="sunday">
+                                        </div>
+                                        <label class="text-xs font-medium text-gray-700 mt-1" for="sunday">Sun</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">Start Date & Time</label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <svg class="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                        </div>
+                                        <input type="datetime-local" class="pl-10 bg-gray-50 border border-gray-200 text-gray-700 py-2.5 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent block w-full transition-all duration-200" id="start_date" name="start_date" required>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="end_date" class="block text-sm font-medium text-gray-700 mb-1">End Date & Time (Optional)</label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <svg class="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                        </div>
+                                        <input type="datetime-local" class="pl-10 bg-gray-50 border border-gray-200 text-gray-700 py-2.5 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent block w-full transition-all duration-200" id="end_date" name="end_date">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-2">
-                            <label for="start_date" class="form-label fw-medium">Start Date</label>
-                            <input type="datetime-local" class="form-control shadow-none" id="start_date" name="start_date" required>
+                    <!-- Notification settings section -->
+                    <div class="mb-5">
+                        <div class="flex items-center mb-4">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Notification Settings</h3>
                         </div>
-                        <div class="col-md-6 mb-2">
-                            <label for="end_date" class="form-label fw-medium">End Date (Optional)</label>
-                            <input type="datetime-local" class="form-control shadow-none" id="end_date" name="end_date">
-                        </div>
-                    </div>
 
-                    <div id="customDaysContainer" class="mb-3" style="display: none;">
-                        <label class="form-label fw-medium">Select Custom Days</label>
-                        <div class="d-flex flex-wrap gap-2">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="monday" id="monday">
-                                <label class="form-check-label small" for="monday">Monday</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="tuesday" id="tuesday">
-                                <label class="form-check-label small" for="tuesday">Tuesday</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="wednesday" id="wednesday">
-                                <label class="form-check-label small" for="wednesday">Wednesday</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="thursday" id="thursday">
-                                <label class="form-check-label small" for="thursday">Thursday</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="friday" id="friday">
-                                <label class="form-check-label small" for="friday">Friday</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="saturday" id="saturday">
-                                <label class="form-check-label small" for="saturday">Saturday</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="sunday" id="sunday">
-                                <label class="form-check-label small" for="sunday">Sunday</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-2">
-                            <label for="remind_before" class="form-label fw-medium">Remind Before (Minutes)</label>
-                            <input type="number" class="form-control shadow-none" id="remind_before" name="remind_before" value="15" min="1">
-                        </div>
-                        <div class="col-md-6 mb-2">
-                            <label class="form-label fw-medium">Notification Preferences</label>
-                            <div class="form-check small">
-                                <input type="checkbox" class="form-check-input" id="send_email_reminder" checked>
-                                <label class="form-check-label" for="send_email_reminder">Send Email Reminder</label>
-                            </div>
-                            <div class="form-check small">
-                                <input type="checkbox" class="form-check-input" id="send_push_notification" checked>
-                                <label class="form-check-label" for="send_push_notification">Send Push Notification</label>
+                        <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="remind_before" class="block text-sm font-medium text-gray-700 mb-1">Remind Before</label>
+                                    <div class="flex rounded-lg">
+                                        <input type="number" class="flex-grow rounded-l-lg px-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent" id="remind_before" name="remind_before" value="15" min="1">
+                                        <span class="inline-flex items-center px-4 py-2.5 rounded-r-lg border border-l-0 border-gray-200 bg-gray-100 text-gray-700">minutes</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Notification Methods</label>
+                                    <div class="space-y-2 mt-2">
+                                        <div class="flex items-center">
+                                            <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                                <input type="checkbox" id="send_email_reminder" checked class="checked:bg-purple-600 checked:right-0 absolute block w-6 h-6 rounded-full bg-white border-4 border-gray-300 appearance-none cursor-pointer">
+                                                <label for="send_email_reminder" class="block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                                            </div>
+                                            <label for="send_email_reminder" class="text-sm text-gray-700 flex items-center">
+                                                <svg class="w-4 h-4 mr-1.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                                </svg>
+                                                Email Notification
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                                <input type="checkbox" id="send_push_notification" checked class="checked:bg-purple-600 checked:right-0 absolute block w-6 h-6 rounded-full bg-white border-4 border-gray-300 appearance-none cursor-pointer">
+                                                <label for="send_push_notification" class="block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                                            </div>
+                                            <label for="send_push_notification" class="text-sm text-gray-700 flex items-center">
+                                                <svg class="w-4 h-4 mr-1.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                                                </svg>
+                                                Push Notification
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 mt-2 shadow-sm">
-                        Schedule Meeting
-                    </button>
+                    <!-- Footer buttons -->
+                    <div class="flex justify-end space-x-3 mt-6">
+                        <button type="button" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-lg transition-all duration-200 flex items-center" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium rounded-lg shadow-sm hover:shadow transition-all duration-200 flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            Schedule Meeting
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
