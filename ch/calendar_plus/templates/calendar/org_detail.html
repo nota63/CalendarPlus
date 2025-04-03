@@ -1906,19 +1906,63 @@ header {
 </div>
 
 <!-- MANAGE RECURRING MEETINGS -->
-<div class="modal fade" id="ManageRecurringModal" tabindex="-1" aria-labelledby="ManageRecurringModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="ManageRecurringModalLabel">Manage Recurring Meetings</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade fixed inset-0 z-50 bg-black/30 backdrop-blur-sm" id="ManageRecurringModal" tabindex="-1" aria-labelledby="ManageRecurringModalLabel" aria-hidden="true">
+    <div class="modal-dialog mx-auto my-8 max-w-2xl p-4">
+        <div class="modal-content rounded-xl bg-white shadow-2xl">
+            <div class="modal-header flex items-center justify-between border-b border-gray-200 p-6">
+                <div class="flex items-center space-x-3">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <h5 class="modal-title text-lg font-semibold text-gray-900" id="ManageRecurringModalLabel">Manage Recurring Meetings</h5>
+                </div>
+                <button type="button" class="btn-close h-8 w-8 rounded-full p-1.5 text-gray-400 hover:bg-gray-100" data-bs-dismiss="modal" aria-label="Close">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
             </div>
-            <strong>
-                Manage recurring meetings instantly | or prevent them
-            </strong>
-            <div class="modal-body">
-                <div id="meetings-container" class="list-group">
-                    <p class="text-center text-muted">Loading meetings...</p>
+
+            <div class="border-b border-gray-200 px-6 py-4">
+                <div class="flex items-center space-x-2 text-sm text-gray-600">
+                    <svg class="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span>Manage recurring meetings instantly | or prevent them</span>
+                </div>
+            </div>
+
+            <div class="modal-body p-6">
+                <div id="meetings-container" class="space-y-4">
+                    <!-- Loading State -->
+                    <div class="flex h-32 items-center justify-center rounded-lg bg-gray-50">
+                        <p class="text-sm text-gray-500">Loading meetings...</p>
+                    </div>
+
+                    <!-- Example Meeting Item (would be generated dynamically) -->
+                    <div class="group flex items-center justify-between rounded-lg border border-gray-200 p-4 hover:border-blue-200 hover:shadow-sm transition-all">
+                        <div class="flex-1">
+                            <h4 class="text-sm font-medium text-gray-900">Weekly Team Sync</h4>
+                            <div class="mt-1 flex items-center space-x-3 text-xs text-gray-500">
+                                <span>Every Monday at 2:00 PM</span>
+                                <span class="px-1.5 py-0.5 rounded-full bg-green-100 text-green-800">Active</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button class="text-gray-400 hover:text-blue-600 p-2 rounded-lg transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                </svg>
+                            </button>
+                            <button class="text-gray-400 hover:text-red-600 p-2 rounded-lg transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1926,10 +1970,7 @@ header {
 </div>
 
 
-
 <!-- Bootstrap Modal for FullCalendar -->
-
-<!-- Updated Modal Structure -->
 <!-- ClickUp-Inspired Calendar Modal (Preserving Calendar Logic) -->
 <div class="modal fade" id="calendarModal" tabindex="-1" aria-labelledby="calendarModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
@@ -2066,7 +2107,7 @@ header {
         <div class="modal-footer bg-light border-0 p-3">
           <div class="d-flex align-items-center w-100 justify-content-between">
             <div class="d-flex align-items-center text-sm text-gray-600">
-              <span class="me-3"><i class="fas fa-calendar-check text-success me-1"></i> 48 Total Meetings</span>
+              <span class="me-3"><i class="fas fa-calendar-check text-success me-1"></i> {{total_meetings}} Total Meetings</span>
               <span><i class="fas fa-clock text-info me-1"></i> 36 Hours Scheduled</span>
             </div>
             <div>

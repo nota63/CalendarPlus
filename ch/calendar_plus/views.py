@@ -478,7 +478,10 @@ class OrgDetailView(LoginRequiredMixin, View):
         # Fetch members 
 
         members = Profile.objects.filter(organization=organization)
-
+        # total meetings
+        total_meetings = MeetingOrganization.objects.filter(
+            Q(organization=organization) & (Q(user=request.user) | Q(invitee=request.user))
+        ).count()
         # restrict suspended members
         is_suspended = Suspend.objects.filter(user=request.user, organization_id=organization, is_suspended=True).exists()
 
@@ -540,6 +543,7 @@ class OrgDetailView(LoginRequiredMixin, View):
             'recent_events':recent_events,
             'members':members,
             'installed_apps':installed_apps,
+            'total_meetings':total_meetings,
         }
 
         return render(request, self.template_name, context)
