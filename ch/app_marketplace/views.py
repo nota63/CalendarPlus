@@ -801,6 +801,11 @@ from django.contrib.auth.models import User
 def get_dashboard_data(request, org_id):
     """Fetch all dashboard-related data for the given organization and user."""
     user = request.user
+    organization = get_object_or_404(Organization, id=org_id)
+    # check access
+    if not Profile.objects.filter(user=request.user, organization=organization).exists():
+        return JsonResponse({'error:':'Unauthorized access'},status=400)
+
     
     # Upcoming Meetings
     upcoming_meetings = MeetingOrganization.objects.filter(
@@ -903,6 +908,11 @@ def get_dashboard_data(request, org_id):
 def fetch_user_meetings(request, org_id, user_id):
     """Fetch all meetings where the user is a host, invitee, or participant and categorize them."""
     now = timezone.now().date()
+    # check access
+    organization = get_object_or_404(Organization, id=org_id)
+    if not Profile.objects.filter(user=request.user, organization=organization).exists():
+        return JsonResponse({'error:':'Unauthorized access'},status=400)
+
 
     user_meetings = MeetingOrganization.objects.filter(
         Q(organization_id=org_id) & (
@@ -949,6 +959,10 @@ def add_meeting_note(request):
             meeting = MeetingOrganization.objects.get(id=meeting_id, organization_id=org_id)
             organization = Organization.objects.get(id=org_id)
             user = User.objects.get(id=user_id)
+            # check access
+            if not Profile.objects.filter(user=request.user, organization=organization).exists():
+                return JsonResponse({'error:':'Unauthorized access'},status=400)
+
 
             # Check if a note already exists for this meeting
             note, created = MeetingNotes.objects.get_or_create(
@@ -996,6 +1010,9 @@ def fetch_bookmarks(request, org_id):
     """Fetch all bookmarks for the given organization."""
     organization = get_object_or_404(Organization, id=org_id)
     bookmarks = Bookmark.objects.filter(organization=organization, created_by=request.user)
+    if not Profile.objects.filter(user=request.user, organization=organization).exists():
+        return JsonResponse({'error:':'Unauthorized access'},status=400)
+
     
     data = [
         {
@@ -1017,6 +1034,9 @@ def fetch_bookmarks(request, org_id):
 def delete_bookmark(request, org_id, bookmark_id):
     """Delete a bookmark only if it belongs to the correct organization."""
     organization = get_object_or_404(Organization, id=org_id)
+    if not Profile.objects.filter(user=request.user, organization=organization).exists():
+        return JsonResponse({'error:':'Unauthorized access'},status=400)
+
     bookmark = get_object_or_404(Bookmark, id=bookmark_id, organization=organization, created_by=request.user)
     
     bookmark.delete()
@@ -1028,6 +1048,9 @@ def delete_bookmark(request, org_id, bookmark_id):
 def add_bookmark(request, org_id):
     """Add a new bookmark under the specified organization."""
     organization = get_object_or_404(Organization, id=org_id)
+    if not Profile.objects.filter(user=request.user, organization=organization).exists():
+        return JsonResponse({'error:':'Unauthorized access'},status=400)
+
 
     if request.method == "POST":
         title = request.POST.get("title")
@@ -1066,6 +1089,9 @@ def fetch_installed_apps(request, org_id):
         return JsonResponse({"error": "Unauthorized"}, status=401)
 
     organization = get_object_or_404(Organization, id=org_id)
+    if not Profile.objects.filter(user=request.user, organization=organization).exists():
+        return JsonResponse({'error:':'Unauthorized access'},status=400)
+
     
     # Fetch installed apps for the user in the given organization
     installed_apps = InstalledMiniApp.objects.filter(user=request.user, organization=organization).select_related("mini_app")
@@ -1090,6 +1116,10 @@ def uninstall_app(request, org_id, app_id):
     View to uninstall an app for a user within an organization.
     """
     user = request.user
+    organization = get_object_or_404(Organization, id=org_id)
+    if not Profile.objects.filter(user=request.user, organization=organization).exists():
+        return JsonResponse({'error:':'Unauthorized access'},status=400)
+
 
     # Check if the app is installed
     installed_app = InstalledMiniApp.objects.filter(
@@ -1113,7 +1143,11 @@ def fetch_app_details(request,org_id,app_id):
     """
     Fetch the details of a MiniApp before installation using filter().
     """
+    organization = get_object_or_404(Organization, id=org_id)
     app = InstalledMiniApp.objects.filter(id=app_id).first()
+
+    if not Profile.objects.filter(user=request.user, organization=organization).exists():
+        return JsonResponse({'error:':'Unauthorized access'},status=400)
 
     if not app:
         return JsonResponse({"error": "App not found."}, status=404)
