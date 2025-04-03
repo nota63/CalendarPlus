@@ -235,9 +235,33 @@ document.addEventListener("DOMContentLoaded", function () {
                     memberCard.setAttribute("data-id", member.id);
 
                     memberCard.innerHTML = `
-                        <img src="${member.profile_picture}" alt="${member.name}">
-                        <span>${member.full_name}</span>
-                    `;
+                    <div class="flex items-center space-x-4 p-2 hover:bg-gray-50 rounded-lg transition-colors duration-200 group">
+                      <div class="relative">
+                        <img 
+                          src="${member.profile_picture}" 
+                          alt="${member.name}" 
+                          class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
+                        >
+                        <!-- Online status indicator -->
+                        <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-900 truncate">
+                          ${member.full_name}
+                        </p>
+                        <p class="text-xs text-gray-500 truncate">
+                          ${member.role} • Last active 2h ago
+                        </p>
+                      </div>
+                      <div class="flex items-center space-x-2">
+                        <button class="p-1.5 hover:bg-gray-100 rounded-full transition-colors">
+                          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  `;
 
                     memberCard.addEventListener("click", function () {
                         this.classList.toggle("selected");

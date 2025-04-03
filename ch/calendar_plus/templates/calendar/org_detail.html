@@ -4340,6 +4340,7 @@ body {
 
 </style>
 
+
 <!-- Create Channel (Admin Only) -->
 <div class="modal fade" id="createChannelModal" tabindex="-1" aria-labelledby="createChannelLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -4348,12 +4349,14 @@ body {
               <h5 class="modal-title" id="createChannelLabel">Create Channel</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
+
           <div class="modal-body">
               <form id="channelForm">
                   <input type="hidden" id="org_id" value="1"> <!-- Org ID dynamically set -->
 
                   <!-- Channel Name -->
                   <div class="mb-3">
+                    <h3>Channels are where conversations happen around a topic. Use a name that is easy to find and understand.</h3>
                       <label class="form-label">Channel Name</label>
                       <input type="text" class="form-control" id="channelName" required>
                   </div>
