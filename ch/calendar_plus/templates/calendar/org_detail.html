@@ -4342,74 +4342,267 @@ body {
 
 
 <!-- Create Channel (Admin Only) -->
+<!-- Create Channel Modal (Admin Only) -->
+<!-- Create Channel Modal (Admin Only) -->
 <div class="modal fade" id="createChannelModal" tabindex="-1" aria-labelledby="createChannelLabel" aria-hidden="true">
-  <div class="modal-dialog">
-      <div class="modal-content">
-          <div class="modal-header">
-              <h5 class="modal-title" id="createChannelLabel">Create Channel</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- Increased width with modal-lg -->
+    <div class="modal-content border-0 shadow-lg rounded-lg overflow-hidden">
+      <!-- Header -->
+      <div class="modal-header bg-white border-bottom-0 px-6 py-4">
+        <div class="flex items-center">
+          <div class="bg-purple-500 text-white rounded-md p-2 mr-3">
+            <!-- Direct SVG icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 10h12"></path>
+              <path d="M4 14h9"></path>
+              <path d="M4 18h6"></path>
+              <path d="M18 15l3 3-3 3"></path>
+            </svg>
           </div>
-
-          <div class="modal-body">
-              <form id="channelForm">
-                  <input type="hidden" id="org_id" value="1"> <!-- Org ID dynamically set -->
-
-                  <!-- Channel Name -->
-                  <div class="mb-3">
-                    <h3>Channels are where conversations happen around a topic. Use a name that is easy to find and understand.</h3>
-                      <label class="form-label">Channel Name</label>
-                      <input type="text" class="form-control" id="channelName" required>
-                  </div>
-
-                  <!-- Channel Type Selector -->
-                  <div class="mb-3">
-                      <label class="form-label">Channel Type</label>
-                      <div class="list-group" id="channelTypeSelector">
-                          <button type="button" class="list-group-item list-group-item-action active" data-value="BLANK">
-                              <img src="/static/icons/blank.svg" alt="Blank" class="me-2" width="20"> 📝 Blank Channel
-                          </button>
-                          <button type="button" class="list-group-item list-group-item-action disabled">
-                              <img src="/static/icons/project.svg" alt="Project" class="me-2" width="20"> 🚀 Project Starter
-                              <span class="badge bg-warning text-dark ms-2">Pro</span>
-                          </button>
-                          <button type="button" class="list-group-item list-group-item-action disabled">
-                              <img src="/static/icons/help.svg" alt="Help" class="me-2" width="20"> 💡 Help Requests
-                              <span class="badge bg-warning text-dark ms-2">Pro</span>
-                          </button>
-                          <button type="button" class="list-group-item list-group-item-action disabled">
-                              <img src="/static/icons/team.svg" alt="Team" class="me-2" width="20"> 🤝 Team Support
-                              <span class="badge bg-warning text-dark ms-2">Pro</span>
-                          </button>
-                      </div>
-                      <input type="hidden" id="channelType" value="BLANK">
-                  </div>
-
-                  <!-- Visibility -->
-                  <div class="mb-3">
-                      <label class="form-label">Visibility</label>
-                      <select class="form-select" id="visibility">
-                          <option value="PUBLIC">🌍 Public - Anyone in Organization</option>
-                          <option value="PRIVATE">🔒 Private - Specific People Only</option>
-                      </select>
-                  </div>
-
-                  <!-- Allowed Members (Only for Private Channels) -->
-                  <div class="mb-3 d-none" id="membersContainer">
-                      <label class="form-label">Allowed Members</label>
-                      <select class="form-select" id="allowedMembers" multiple></select>
-                  </div>
-
-                  <button type="submit" class="btn btn-primary w-100">Create Channel</button>
-              </form>
-          </div>
+          <h5 class="modal-title text-lg font-semibold" id="createChannelLabel">Create New Channel</h5>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+      
+      <!-- Body -->
+      <div class="modal-body px-6 py-0">
+        <form id="channelForm" class="space-y-5">
+          <input type="hidden" id="org_id" value="1">
+          
+          <!-- Channel Name Section -->
+          <div class="mb-4">
+            <div class="mb-2">
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Channel Name</label>
+              <input type="text" class="form-control border border-gray-300 rounded-md w-full py-2 px-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500" id="channelName" placeholder="e.g. product-dev, marketing, design" required>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Channels are where conversations happen around a topic. Use a name that is easy to find and understand.</p>
+          </div>
+          
+          <!-- Channel Type Section -->
+          <div class="mb-4">
+            <label class="text-sm font-medium text-gray-700 mb-2 block">Channel Type</label>
+            <div class="grid grid-cols-2 gap-3" id="channelTypeSelector"> <!-- Changed to 2 columns -->
+              <!-- Blank Channel -->
+              <div class="relative">
+                <button type="button" class="w-full text-left px-4 py-3 border rounded-lg flex items-center border-purple-500 bg-purple-50" data-value="BLANK">
+                  <div class="flex-shrink-0 mr-3 bg-purple-100 rounded-md p-2">
+                    <!-- Direct SVG icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                  </div>
+                  <div class="flex-grow">
+                    <span class="font-medium text-gray-800">Blank Channel</span>
+                    <p class="text-xs text-gray-500 mt-1">Start with a clean slate for any type of conversation</p>
+                  </div>
+                  <div class="flex-shrink-0 text-purple-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                    </svg>
+                  </div>
+                </button>
+              </div>
+              
+              <!-- Project Starter -->
+              <div class="relative">
+                <button type="button" class="w-full text-left px-4 py-3 border rounded-lg flex items-center border-gray-200 opacity-75 cursor-not-allowed" data-value="PROJECT">
+                  <div class="flex-shrink-0 mr-3 bg-blue-100 rounded-md p-2">
+                    <!-- Direct SVG icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="3" y1="9" x2="21" y2="9"></line>
+                      <line x1="9" y1="21" x2="9" y2="9"></line>
+                    </svg>
+                  </div>
+                  <div class="flex-grow">
+                    <div class="flex items-center">
+                      <span class="font-medium text-gray-800">Project Starter</span>
+                      <span class="ml-2 px-2 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-800">Pro</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Kickstart projects with goals, milestones and templates</p>
+                  </div>
+                </button>
+                <div class="absolute top-0 left-0 w-full h-full bg-gray-100 opacity-10 rounded-lg"></div>
+              </div>
+              
+              <!-- Help Requests -->
+              <div class="relative">
+                <button type="button" class="w-full text-left px-4 py-3 border rounded-lg flex items-center border-gray-200 opacity-75 cursor-not-allowed" data-value="HELP">
+                  <div class="flex-shrink-0 mr-3 bg-green-100 rounded-md p-2">
+                    <!-- Direct SVG icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                  </div>
+                  <div class="flex-grow">
+                    <div class="flex items-center">
+                      <span class="font-medium text-gray-800">Help Requests</span>
+                      <span class="ml-2 px-2 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-800">Pro</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Structured help desk with priority levels and status tracking</p>
+                  </div>
+                </button>
+                <div class="absolute top-0 left-0 w-full h-full bg-gray-100 opacity-10 rounded-lg"></div>
+              </div>
+              
+              <!-- Team Support -->
+              <div class="relative">
+                <button type="button" class="w-full text-left px-4 py-3 border rounded-lg flex items-center border-gray-200 opacity-75 cursor-not-allowed" data-value="TEAM">
+                  <div class="flex-shrink-0 mr-3 bg-orange-100 rounded-md p-2">
+                    <!-- Direct SVG icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="9" cy="7" r="4"></circle>
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                  </div>
+                  <div class="flex-grow">
+                    <div class="flex items-center">
+                      <span class="font-medium text-gray-800">Team Support</span>
+                      <span class="ml-2 px-2 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-800">Pro</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Collaborative space with team roles and shared resources</p>
+                  </div>
+                </button>
+                <div class="absolute top-0 left-0 w-full h-full bg-gray-100 opacity-10 rounded-lg"></div>
+              </div>
+            </div>
+            <input type="hidden" id="channelType" value="BLANK">
+          </div>
+          
+          <!-- Channel Preview -->
+          <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 mb-4">
+            <h6 class="text-xs uppercase font-semibold text-gray-500 mb-2">Preview</h6>
+            <div class="flex items-center">
+              <div class="bg-purple-500 text-white rounded-md p-1 mr-2">
+                <!-- Hash icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="4" y1="9" x2="20" y2="9"></line>
+                  <line x1="4" y1="15" x2="20" y2="15"></line>
+                  <line x1="10" y1="3" x2="8" y2="21"></line>
+                  <line x1="16" y1="3" x2="14" y2="21"></line>
+                </svg>
+              </div>
+              <span id="previewChannelName" class="font-medium">channel-name</span>
+            </div>
+          </div>
+          
+          <!-- Visibility Section with enhanced toggles -->
+          <div class="mb-4">
+            <label class="text-sm font-medium text-gray-700 mb-2 block">Visibility</label>
+            <div class="grid grid-cols-2 gap-3"> <!-- Changed to 2 columns -->
+              <!-- Public Option -->
+              <label class="cursor-pointer">
+                <input type="radio" name="visibility" value="PUBLIC" class="sr-only" checked>
+                <div class="border rounded-lg px-4 py-3 flex items-center hover:bg-gray-50 transition-all visibility-option border-purple-500">
+                  <div class="flex-shrink-0 mr-3 bg-green-100 text-green-600 rounded-full p-2">
+                    <!-- Globe icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="2" y1="12" x2="22" y2="12"></line>
+                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                  </div>
+                  <div class="flex-grow">
+                    <span class="font-medium text-gray-800">Public</span>
+                    <p class="text-xs text-gray-500 mt-1">Anyone in your organization can join and view this channel</p>
+                  </div>
+                  <div class="flex-shrink-0 visibility-indicator">
+                    <div class="w-5 h-5 rounded-full border-2 border-purple-500 flex items-center justify-center">
+                      <div class="w-3 h-3 rounded-full bg-purple-500"></div>
+                    </div>
+                  </div>
+                </div>
+              </label>
+              
+              <!-- Private Option -->
+              <label class="cursor-pointer">
+                <input type="radio" name="visibility" value="PRIVATE" class="sr-only">
+                <div class="border rounded-lg px-4 py-3 flex items-center hover:bg-gray-50 transition-all visibility-option">
+                  <div class="flex-shrink-0 mr-3 bg-amber-100 text-amber-600 rounded-full p-2">
+                    <!-- Lock icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                  </div>
+                  <div class="flex-grow">
+                    <span class="font-medium text-gray-800">Private</span>
+                    <p class="text-xs text-gray-500 mt-1">Only invited members can join and view this channel</p>
+                  </div>
+                  <div class="flex-shrink-0 visibility-indicator">
+                    <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                      <div class="w-3 h-3 rounded-full bg-white"></div>
+                    </div>
+                  </div>
+                </div>
+              </label>
+            </div>
+            <input type="hidden" id="visibility" value="PUBLIC">
+          </div>
+          
+          <!-- Allowed Members (Only for Private Channels) - Enhanced and larger -->
+          <div class="mb-5 d-none rounded-lg border border-gray-200 p-5" id="membersContainer">
+            <label class="text-sm font-medium text-gray-700 mb-2 block">Allowed Members</label>
+            <div class="relative">
+              <div class="flex items-center border border-gray-300 rounded-md px-3 py-2 bg-white">
+                <!-- Search icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 mr-2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" class="form-control border-0 p-0 w-full focus:ring-0 focus:outline-none" placeholder="Search members...">
+              </div>
+              <!-- Larger select with increased height -->
+              <select class="form-select mt-2 h-40" id="allowedMembers" multiple style="height: 140px;"></select>
+            </div>
+            
+            <!-- Enhanced selected members section -->
+            <div class="mt-4">
+              <div class="flex justify-between">
+                <div class="text-sm text-gray-700 font-medium">Selected members</div>
+                <div class="text-xs text-purple-600 cursor-pointer">Select all</div>
+              </div>
+              <div class="p-3 border border-gray-200 rounded-lg mt-2 min-h-10 bg-gray-50">
+                <div id="selectedMembers" class="flex flex-wrap gap-2"></div>
+                <div class="text-gray-400 text-sm italic">No members selected</div>
+              </div>
+            </div>
+            
+            <!-- Quick filters -->
+            <div class="mt-4">
+              <div class="text-sm text-gray-700 font-medium mb-2">Quick filters</div>
+              <div class="flex flex-wrap gap-2">
+                <div class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs cursor-pointer hover:bg-gray-200">Marketing team</div>
+                <div class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs cursor-pointer hover:bg-gray-200">Development</div>
+                <div class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs cursor-pointer hover:bg-gray-200">Design</div>
+                <div class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs cursor-pointer hover:bg-gray-200">+ Add filter</div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Footer -->
+      <div class="modal-footer border-top-0 px-6 py-4 flex justify-between items-center">
+        <button type="button" class="btn btn-light border border-gray-300 px-4 py-2 rounded-md text-sm font-medium" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" form="channelForm" class="btn btn-primary bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-md text-sm font-medium flex items-center">
+          <!-- Plus icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Create Channel
+        </button>
+      </div>
+    </div>
   </div>
 </div>
-
-
-
-
-
 
 
 <!-- ----------------------------------------------------------------------------------------------------------------------------------------------- -->

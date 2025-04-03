@@ -195,7 +195,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Create Channel (Admin Only)
 document.addEventListener("DOMContentLoaded", function () {
-    const visibilitySelect = document.getElementById("visibility");
+    const visibilityOptions = document.querySelectorAll("input[name='visibility']");
+    const visibilityHiddenInput = document.getElementById("visibility");
     const membersContainer = document.getElementById("membersContainer");
     const allowedMembersContainer = document.getElementById("allowedMembers");
     const channelForm = document.getElementById("channelForm");
@@ -213,15 +214,19 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Handle Visibility Change
-    visibilitySelect.addEventListener("change", function () {
-        if (this.value === "PRIVATE") {
-            membersContainer.classList.remove("d-none");
-            fetchMembers();
-        } else {
-            membersContainer.classList.add("d-none");
-        }
-    });
+      // Handle Visibility Change (Radio Buttons)
+      visibilityOptions.forEach(option => {
+        option.addEventListener("change", function () {
+            visibilityHiddenInput.value = this.value; // Update hidden input
 
+            if (this.value === "PRIVATE") {
+                membersContainer.classList.remove("d-none");
+                fetchMembers();
+            } else {
+                membersContainer.classList.add("d-none");
+            }
+        });
+    });
     function fetchMembers() {
         const orgId = window.djangoData.orgId;
 
