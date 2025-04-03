@@ -1663,33 +1663,80 @@ header {
 
 
 <!-- HANDLE AND MANAGE SUSPENSIONS -->
-
 <div class="modal fade" id="suspendUsersModal" tabindex="-1" aria-labelledby="suspendUsersLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="suspendUsersLabel">Manage Suspensions</h5>
-               
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                <br>
+  <div class="modal-dialog modal-xl">
+      <div class="modal-content border-0 shadow-lg">
+          <!-- Slimmer Header -->
+          <div class="modal-header px-6 py-4 border-b border-gray-100">
+              <div class="flex-1">
+                  <div class="flex items-center gap-3">
+                      <svg class="w-5 h-5 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14.5a6.5 6.5 0 110-13 6.5 6.5 0 010 13zM10 7a1 1 0 00-1 1v3a1 1 0 002 0V8a1 1 0 00-1-1zm0-1a1 1 0 100-2 1 1 0 000 2z"/>
+                      </svg>
+                      <h5 class="modal-title text-lg font-semibold text-gray-900" id="suspendUsersLabel">
+                          Manage User Suspensions
+                      </h5>
+                  </div>
+                  <p class="mt-2 text-sm text-gray-500">
+                      Suspended users lose access to <span class="font-medium text-indigo-600">{{ organization.name }}</span>.
+                      <a href="#" class="ml-2 text-indigo-600 hover:text-indigo-900 font-medium transition-colors">
+                          Manage permanent removals →
+                      </a>
+                  </p>
+              </div>
+              <button type="button" class="btn-close p-2 transition-colors hover:bg-gray-100 rounded-lg" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
 
-                <p style="font-size: 14px; font-weight: 500; line-height: 1.7; color: #dc3545;">
-                    Suspended users cannot access <strong>{{ organization.name }}</strong> until you lift their suspension.  
-                    | To permanently remove their account,  
-                    <a href="#" style="color: #007bff; font-weight: bold; text-decoration: none;">click here</a>.
-                </p>
-                
-                
-            </div>
-            <div class="modal-body">
-                <div id="userListContainer">
-                    <p>Loading users...</p>
-                </div>
-            </div>
-        </div>
-    </div>
+          <!-- Scrollable Content -->
+          <div class="modal-body p-0 overflow-hidden">
+              <div class="h-[500px] overflow-y-auto">
+                  <div id="userListContainer" class="divide-y divide-gray-100">
+                      <!-- Loading State -->
+                      <div class="p-6 text-center text-gray-500">
+                          <div class="animate-spin w-6 h-6 border-2 border-gray-400 border-t-transparent rounded-full mx-auto mb-3"></div>
+                          Loading team members...
+                      </div>
+
+                      <!-- User Item Template (example) -->
+                      <div class="hidden p-4 hover:bg-gray-50 transition-colors">
+                          <div class="flex items-center gap-4">
+                              <img src="[USER_AVATAR]" 
+                                   class="w-10 h-10 rounded-full bg-gray-100" 
+                                   alt="User avatar">
+                              <div class="min-w-0 flex-1">
+                                  <h4 class="text-sm font-semibold text-gray-900 truncate">John Doe</h4>
+                                  <p class="text-sm text-gray-500 truncate">john@company.com</p>
+                              </div>
+                              <div class="flex items-center gap-3">
+                                  <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
+                                      Suspended
+                                  </span>
+                                  <button type="button" 
+                                          class="text-sm font-medium text-indigo-600 hover:text-indigo-900 transition-colors">
+                                      Unsuspend
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Footer Actions -->
+          <div class="modal-footer px-6 py-4 border-t border-gray-100 bg-gray-50">
+              <button type="button" 
+                      class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                      data-bs-dismiss="modal">
+                  Close
+              </button>
+              <button type="button" 
+                      class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors">
+                  Save Changes
+              </button>
+          </div>
+      </div>
+  </div>
 </div>
-
 
 <!-- CREATE MEETING VIA NLP -->
 <!-- Meeting Creation Modal -->
