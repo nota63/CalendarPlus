@@ -2342,7 +2342,7 @@ def fetch_org_members_updated(request, org_id):
     members_data = [
         {
             'id': member.user.id,
-            'full_name': member.user.username,
+            'full_name': member.full_name if member.full_name else member.user.username,
             'profile_picture': member.profile_picture.url if member.profile_picture else None
         }
         for member in members

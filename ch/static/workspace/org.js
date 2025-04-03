@@ -236,7 +236,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     memberCard.innerHTML = `
                         <img src="${member.profile_picture}" alt="${member.name}">
-                        <span>${member.name}</span>
+                        <span>${member.full_name}</span>
                     `;
 
                     memberCard.addEventListener("click", function () {
