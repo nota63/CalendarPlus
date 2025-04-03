@@ -1535,26 +1535,38 @@ def delete_recurring_meeting(request, org_id, meeting_id):
 from django.db import models
 
 
+# Configure logging
+logger = logging.getLogger(__name__)
+
 @login_required
 def get_meetings(request, org_id):
-    organization = get_object_or_404(Organization,id=org_id)
-    
-    user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
-    if not user_profile:
-        return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+    logger.info("Fetching meetings for org_id: %s", org_id)  # Track function call
 
     try:
-        
+        # Validate organization
+        organization = get_object_or_404(Organization, id=org_id)
+        logger.info("Organization found: %s", organization.name)
+
+        # Validate user profile
+        user_profile = Profile.objects.filter(user=request.user, organization=organization).first()
+        if not user_profile:
+            logger.warning("User %s is not part of organization %s", request.user.username, organization.name)
+            return JsonResponse({'error': 'You are not part of this organization.'}, status=403)
+
+        logger.info("User %s is a valid member of the organization", request.user.username)
+
+        # Fetch meetings where the user is either the creator, invitee, or participant
         meetings = MeetingOrganization.objects.filter(
-            organization_id=org_id,
+            organization_id=org_id
         ).filter(
             models.Q(user=request.user) | models.Q(invitee=request.user) | models.Q(participants=request.user)
         ).distinct()
 
-        
+        logger.info("Total meetings fetched: %d", meetings.count())
+
         meetings_data = []
         for meeting in meetings:
-            meetings_data.append({
+            meeting_info = {
                 "id": meeting.id,
                 "title": meeting.meeting_title,
                 "description": meeting.meeting_description,
@@ -1564,15 +1576,19 @@ def get_meetings(request, org_id):
                 "meeting_link": meeting.meeting_link if meeting.meeting_link else "",
                 "meeting_type": meeting.meeting_type,
                 "meeting_location": meeting.meeting_location,
-                "user":meeting.user.username,
-                'invitee':meeting.invitee.username
-            })
-        print("MEETINGS DATA:",meetings_data)    
+                "user": meeting.user.username if meeting.user else "N/A",
+                "invitee": meeting.invitee.username if meeting.invitee else "N/A",
+            }
+            logger.debug("Meeting Data: %s", meeting_info)  # Debug each meeting entry
+            meetings_data.append(meeting_info)
 
         return JsonResponse({"meetings": meetings_data}, safe=False)
 
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+        logger.error("Error in get_meetings view: %s", str(e), exc_info=True)
+        return JsonResponse({"error": "Something went wrong. Check server logs for details."}, status=500)
+
+
 
 
 
