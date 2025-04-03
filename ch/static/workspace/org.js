@@ -191,3 +191,79 @@ document.addEventListener("DOMContentLoaded", function () {
         return document.querySelector("[name=csrfmiddlewaretoken]").value;
     }
 });
+
+
+// Create Channel (Admin Only)
+document.addEventListener("DOMContentLoaded", function () {
+    const visibilitySelect = document.getElementById("visibility");
+    const membersContainer = document.getElementById("membersContainer");
+    const allowedMembersSelect = document.getElementById("allowedMembers");
+    const channelForm = document.getElementById("channelForm");
+    
+    visibilitySelect.addEventListener("change", function () {
+        if (this.value === "PRIVATE") {
+            membersContainer.classList.remove("d-none");
+            fetchMembers(); // Fetch members when 'Private' is selected
+        } else {
+            membersContainer.classList.add("d-none");
+        }
+    });
+
+    function fetchMembers() {
+        const orgId = window.djangoData.orgId;
+
+        fetch(`/organizations/fetch-org-members-updated/${orgId}/`)
+            .then(response => response.json())
+            .then(data => {
+                allowedMembersSelect.innerHTML = ""; // Clear previous options
+                data.members.forEach(member => {
+                    let option = document.createElement("option");
+                    option.value = member.id;
+                    option.textContent = member.name;
+                    allowedMembersSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error("Error fetching members:", error));
+    }
+
+    channelForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        
+        const orgId = window.djangoData.orgId;
+        const channelName = document.getElementById("channelName").value;
+        const channelType = document.getElementById("channelType").value;
+        const visibility = document.getElementById("visibility").value;
+        const allowedMembers = Array.from(allowedMembersSelect.selectedOptions).map(opt => opt.value);
+
+        if (visibility === "PRIVATE" && allowedMembers.length === 0) {
+            alert("Please select allowed members for a Private channel.");
+            return;
+        }
+
+        fetch(`/organizations/create-channel-updated/${orgId}/`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
+            body: JSON.stringify({
+                name: channelName,
+                type: channelType,
+                visibility: visibility,
+                allowed_members: allowedMembers
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Channel created successfully!");
+                location.reload(); // Refresh the page to show new channel
+            } else {
+                alert("Error creating channel: " + data.message);
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+
+    function getCSRFToken() {
+        return document.cookie.split("; ").find(row => row.startsWith("csrftoken="))?.split("=")[1];
+    }
+});
+

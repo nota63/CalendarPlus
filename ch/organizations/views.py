@@ -50,7 +50,7 @@ from .models import Organization, OrganizationProtection
 from django.utils.timezone import localtime
 from groups.models import Group
 from group_tasks.models import GroupEvent,Task
-from organization_channels.models import AbusedMessage,Ban
+from organization_channels.models import AbusedMessage,Ban,Channel
 
 
 # Load the same SECRET_KEY used in models
@@ -2302,3 +2302,50 @@ def workspace_admin_dashboard(request, org_id):
     
     return render(request, "organizations/dashboards/admin_dashboard.html", context)
 
+
+# Create Channel (Admin Only) - Updated
+
+
+@login_required
+def create_channel_updated(request, org_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        organization = get_object_or_404(Organization, id=org_id)
+        name = data.get('name')
+        channel_type = data.get('type', 'BLANK')
+        visibility = data.get('visibility', 'PUBLIC')
+        allowed_members_ids = data.get('allowed_members', [])
+        
+        # Create channel
+        channel = Channel.objects.create(
+            organization=organization,
+            created_by=request.user,
+            name=name,
+            type=channel_type,
+            visibility=visibility
+        )
+        
+        # Assign allowed members if private
+        if visibility == 'PRIVATE' and allowed_members_ids:
+            allowed_members = User.objects.filter(id__in=allowed_members_ids)
+            channel.allowed_members.set(allowed_members)
+        
+        return JsonResponse({'success': True, 'channel_id': channel.id})
+    
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@login_required
+def fetch_org_members_updated(request, org_id):
+    organization = get_object_or_404(Organization, id=org_id)
+    members = Profile.objects.filter(organization=organization)
+    
+    members_data = [
+        {
+            'id': member.user.id,
+            'full_name': member.user.username,
+            'profile_picture': member.profile_picture.url if member.profile_picture else None
+        }
+        for member in members
+    ]
+    
+    return JsonResponse({'members': members_data})

@@ -996,6 +996,24 @@ header {
               <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Custom Reports</a>
             </div>
           </div>
+
+          {% if is_admin %}
+          <div class="dropdown">
+            <button class="px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md font-medium flex items-center">
+              Channels
+              <i class="fas fa-chevron-down ml-1 text-xs text-gray-500"></i>
+            </button>
+            <div class="dropdown-content bg-white rounded-md mt-1 py-1 border border-gray-200">
+              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" 
+                data-bs-toggle="modal" data-bs-target="#createChannelModal">
+                Create
+              </a>
+              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Shutdown</a>
+              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Custom Reports</a>
+            </div>
+          </div>
+          {% endif %}
+          
         </nav>
       </div>
 
@@ -4321,6 +4339,59 @@ body {
 }
 
 </style>
+
+<!-- Create Channel (Admin Only) -->
+<div class="modal fade" id="createChannelModal" tabindex="-1" aria-labelledby="createChannelLabel" aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="createChannelLabel">Create Channel</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <form id="channelForm">
+                  <input type="hidden" id="org_id" value="1"> <!-- Org ID will be set dynamically -->
+
+                  <div class="mb-3">
+                      <label class="form-label">Channel Name</label>
+                      <input type="text" class="form-control" id="channelName" required>
+                  </div>
+
+                  <div class="mb-3">
+                      <label class="form-label">Channel Type</label>
+                      <select class="form-control" id="channelType">
+                          <option value="BLANK">Blank Channel</option>
+                          <option value="PROJECT_STARTER">Project Starter Kit</option>
+                          <option value="HELP_REQUESTS">Help Requests</option>
+                          <option value="TEAM_SUPPORT">Team Support</option>
+                          <option value="FEEDBACK">Feedback</option>
+                          <option value="ONBOARDING">New Hire Onboarding</option>
+                          <option value="COACHING">1:1 Coaching</option>
+                          <option value="SALES_TRACKING">Sales Tracking</option>
+                      </select>
+                  </div>
+
+                  <div class="mb-3">
+                      <label class="form-label">Visibility</label>
+                      <select class="form-control" id="visibility">
+                          <option value="PUBLIC">Public - Anyone in Organization</option>
+                          <option value="PRIVATE">Private - Specific People Only</option>
+                      </select>
+                  </div>
+
+                  <div class="mb-3 d-none" id="membersContainer">
+                      <label class="form-label">Allowed Members</label>
+                      <select class="form-control" id="allowedMembers" multiple></select>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary w-100">Create Channel</button>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
+
+
 
 
 
