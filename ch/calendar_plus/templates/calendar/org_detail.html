@@ -1693,116 +1693,520 @@ header {
 
 <!-- CREATE MEETING VIA NLP -->
 <!-- Bootstrap 5 Modal -->
+
+<!-- Meeting Creation Modal -->
+ <!-- Meeting Creation Modal -->
 <div class="modal fade" id="meetingModal" tabindex="-1" aria-labelledby="meetingModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="meetingModalLabel">Create Meeting via Natural Language</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Guide -->
-                <p>💡 Example inputs:</p>
-                <ul>
-                    <li>Meeting with John tomorrow at 3 PM</li>
-                    <li>Schedule a meeting with Sarah next Monday at 10 AM</li>
-                    <li>Natural Language processing meetings will be having 1 hour of duration</li>
-                    <li>We will check the available slot | Workspace availability before scheduling</li>
-                </ul>
-
-                <!-- Input Field -->
-                <label for="nlpInput">Enter Meeting Details:</label>
-                <input type="text" id="nlpInput" class="form-control" placeholder="Type here..." />
-
-                <!-- Error Message -->
-                <div id="errorMessage" class="text-danger mt-2" style="display: none;"></div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="createMeetingBtnn">Create Meeting</button>
-            </div>
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content rounded-lg shadow-xl border-0">
+        <!-- Header with gradient background -->
+        <div class="modal-header bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-t-lg">
+          <div class="flex items-center">
+            <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12z"></path>
+              <path d="M10 4a1 1 0 100 2 1 1 0 000-2zM9 8a1 1 0 112 0v4a1 1 0 11-2 0V8z"></path>
+            </svg>
+            <h5 class="modal-title font-sans text-lg font-semibold" id="meetingModalLabel">Create Meeting</h5>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+        
+        <!-- Body with modern layout -->
+        <div class="modal-body p-0">
+          <!-- Tabs for different meeting types -->
+          <div class="bg-gray-50 border-b px-4 py-2">
+            <ul class="nav nav-tabs nav-tabs-clickup flex border-0" role="tablist">
+              <li class="nav-item mr-4" role="presentation">
+                <button class="nav-link active px-1 py-2 border-0 border-b-2 border-purple-600 font-medium text-purple-600" data-bs-toggle="tab" data-bs-target="#quickCreate" type="button" role="tab">Quick Create</button>
+              </li>
+              <li class="nav-item mr-4" role="presentation">
+                <button class="nav-link px-1 py-2 border-0 text-gray-500 hover:text-purple-600" data-bs-toggle="tab" data-bs-target="#detailedCreate" type="button" role="tab">Detailed</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link px-1 py-2 border-0 text-gray-500 hover:text-purple-600" data-bs-toggle="tab" data-bs-target="#templateCreate" type="button" role="tab">From Template</button>
+              </li>
+            </ul>
+          </div>
+  
+          <!-- Tab content -->
+          <div class="tab-content p-4">
+            <!-- Quick Create Tab (Natural Language) -->
+            <div class="tab-pane fade show active" id="quickCreate" role="tabpanel">
+              <div class="mb-4">
+                <label for="nlpInput" class="font-medium text-gray-700 mb-1 flex items-center">
+                  <svg class="h-4 w-4 mr-1 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                    <path fill-rule="evenodd" d="M5 5a5 5 0 1110 0A5 5 0 015 5z"></path>
+                  </svg>
+                  Natural Language Input
+                </label>
+                <div class="relative">
+                  <input type="text" id="nlpInput" class="form-control pl-4 pr-10 py-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-purple-600 focus:border-transparent shadow-sm" placeholder="e.g. 'Meeting with John tomorrow at 3 PM'" />
+                  <button class="absolute right-2 top-1/2 transform -translate-y-1/2 text-purple-600 hover:text-purple-800">
+                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M7 9a2 2 0 114 0 2 2 0 01-4 0z"></path>
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a4 4 0 00-3.446 6.032l-2.261 2.26a1 1 0 101.414 1.415l2.261-2.261A4 4 0 1011 5z"></path>
+                    </svg>
+                  </button>
+                </div>
+                <!-- Error message container -->
+                <div id="errorMessage" class="mt-2 text-sm text-red-600 font-medium" style="display: none;"></div>
+              </div>
+  
+              <!-- Examples Section -->
+              <div class="bg-gray-50 rounded-lg p-3 mb-4">
+                <h6 class="text-sm font-medium text-gray-700 mb-2 flex items-center">
+                  <svg class="h-4 w-4 mr-1 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"></path>
+                  </svg>
+                  Examples
+                </h6>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <div class="example-chip bg-white rounded px-3 py-2 border border-gray-200 text-sm text-gray-600 cursor-pointer hover:bg-purple-50 hover:border-purple-200 transition-all">Meeting with John tomorrow at 3 PM</div>
+                  <div class="example-chip bg-white rounded px-3 py-2 border border-gray-200 text-sm text-gray-600 cursor-pointer hover:bg-purple-50 hover:border-purple-200 transition-all">Schedule a meeting with Sarah next Monday at 10 AM</div>
+                  <div class="example-chip bg-white rounded px-3 py-2 border border-gray-200 text-sm text-gray-600 cursor-pointer hover:bg-purple-50 hover:border-purple-200 transition-all">Natural Language processing meetings with 1 hour duration</div>
+                  <div class="example-chip bg-white rounded px-3 py-2 border border-gray-200 text-sm text-gray-600 cursor-pointer hover:bg-purple-50 hover:border-purple-200 transition-all">Check availability before scheduling</div>
+                </div>
+              </div>
+  
+              <!-- Preview Section (Initially Hidden) -->
+              <div id="meetingPreview" class="border border-gray-200 rounded-lg p-4 mb-4" style="display: none;">
+                <h6 class="font-medium text-gray-700 mb-2">Meeting Preview</h6>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p class="text-sm text-gray-500">Title</p>
+                    <p class="font-medium" id="previewTitle">--</p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500">Time</p>
+                    <p class="font-medium" id="previewTime">--</p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500">Duration</p>
+                    <p class="font-medium" id="previewDuration">--</p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500">Attendees</p>
+                    <p class="font-medium" id="previewAttendees">--</p>
+                  </div>
+                </div>
+              </div>
+  
+              <!-- Options Section -->
+              <div class="border-t pt-4 mt-2">
+                <div class="flex flex-wrap justify-between items-center">
+                  <div class="flex items-center space-x-4 text-sm">
+                    <label class="flex items-center text-gray-600 cursor-pointer">
+                      <input type="checkbox" class="form-checkbox h-4 w-4 text-purple-600 rounded focus:ring-purple-500" />
+                      <span class="ml-2">Check availability</span>
+                    </label>
+                    <label class="flex items-center text-gray-600 cursor-pointer">
+                      <input type="checkbox" class="form-checkbox h-4 w-4 text-purple-600 rounded focus:ring-purple-500" />
+                      <span class="ml-2">Add reminder</span>
+                    </label>
+                  </div>
+                  <div class="space-x-2 mt-2 sm:mt-0">
+                    <button class="btn btn-sm bg-gray-200 text-gray-700 hover:bg-gray-300 border-0 rounded px-3 py-1">
+                      <svg class="h-4 w-4 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"></path>
+                      </svg>
+                      More options
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Additional Tabs (Placeholders) -->
+            <div class="tab-pane fade" id="detailedCreate" role="tabpanel">
+              <p class="text-gray-500 text-center py-4">Detailed meeting creation form would go here</p>
+            </div>
+            <div class="tab-pane fade" id="templateCreate" role="tabpanel">
+              <p class="text-gray-500 text-center py-4">Meeting templates would go here</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Footer with actions -->
+        <div class="modal-footer flex justify-between bg-gray-50 rounded-b-lg border-t-0 px-4 py-3">
+          <div>
+            <button type="button" class="btn btn-sm text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-lg px-3 py-1.5">
+              <svg class="h-4 w-4 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"></path>
+              </svg>
+              Help
+            </button>
+          </div>
+          <div>
+            <button type="button" class="btn btn-outline-secondary border-gray-300 text-gray-700 hover:bg-gray-100 rounded-lg mr-2" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 border-0 rounded-lg shadow-sm" id="createMeetingBtnn">
+              Create Meeting
+              <svg class="h-4 w-4 inline-block ml-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
+  
+<!-- Additional JavaScript for functionality -->
+<script>
+    // Existing logic would be preserved here
+    document.addEventListener('DOMContentLoaded', function() {
+      // Example chips functionality
+      const exampleChips = document.querySelectorAll('.example-chip');
+      const nlpInput = document.getElementById('nlpInput');
+      
+      exampleChips.forEach(chip => {
+        chip.addEventListener('click', function() {
+          nlpInput.value = this.textContent;
+          // Simulate focus
+          nlpInput.focus();
+        });
+      });
+      
+      // Add any other required JavaScript here
+    });
+</script>
 
 
 <!-- MEETING ANALYTICS AND OVERVIEW -->
-<!-- Updated Modal Structure -->
 <div class="modal fade" id="OverviewMeetingModal" tabindex="-1" aria-labelledby="analyticsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">📊 Meeting Overview</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-xl max-w-6xl">
+      <div class="modal-content bg-slate-50 shadow-2xl border-0 rounded-xl overflow-hidden">
+        <!-- Modal Header with modern gradient -->
+        <div class="modal-header border-0 bg-gradient-to-r from-indigo-600 to-purple-600 p-6">
+          <div class="flex items-center gap-3">
+            <div class="bg-white/20 p-2 rounded-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
             </div>
-
-           <p style="font-family: 'Inter', sans-serif; font-size: 16px; color: #6c757d; font-weight: 500; line-height: 1.6;">
-            Gain insights into your meeting interactions within  
-           <strong style="color: #22c55e;">{{ organization.name }}</strong>.  
-            Track your productivity and performance with this detailed overview.
-          </p>
-
-            
-            <div class="modal-body">
-                <!-- Summary Stats -->
-                <div class="summary-stats">
-                    <h4>Meeting Statistics</h4>
-                    <div class="d-flex flex-wrap justify-content-center gap-3">
-                        <div class="stat-item">
-                            <span>Total:</span>
-                            <strong id="totalMeetings">0</strong>
-                        </div>
-                        <div class="stat-item">
-                            <span>✅ Completed:</span>
-                            <strong id="completedMeetings">0</strong>
-                        </div>
-                        <div class="stat-item">
-                            <span>❌ Canceled:</span>
-                            <strong id="canceledMeetings">0</strong>
-                        </div>
-                        <div class="stat-item">
-                            <span>📅 Upcoming:</span>
-                            <strong id="upcomingMeetings">0</strong>
-                        </div>
-                        <div class="stat-item">
-                            <span>⏳ Avg Duration:</span>
-                            <strong id="avgDuration">0</strong>m
-                        </div>
-                        <div class="stat-item">
-                            <span>👥 Avg Attendees:</span>
-                            <strong id="avgAttendees">0</strong>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Charts -->
-                <div class="chart-container">
-                    <div class="chart-title">Meeting Types Distribution</div>
-                    <canvas id="meetingTypeChart"></canvas>
-                </div>
-
-                <div class="chart-container">
-                    <div class="chart-title">Meeting Modes</div>
-                    <canvas id="meetingModeChart"></canvas>
-                </div>
-
-                <div class="chart-container">
-                    <div class="chart-title">Peak Meeting Hours</div>
-                    <canvas id="peakHoursChart"></canvas>
-                </div>
-
-                <div class="chart-container">
-                    <div class="chart-title">Top Hosts</div>
-                    <canvas id="topHostsChart"></canvas>
-                </div>
+            <h5 class="modal-title text-white text-2xl font-bold tracking-tight">Meeting Analytics</h5>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="bg-white/10 hover:bg-white/20 transition-all rounded-lg p-2 cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+              </svg>
             </div>
+            <div class="bg-white/10 hover:bg-white/20 transition-all rounded-lg p-2 cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+            </div>
+            <button type="button" class="bg-white/10 hover:bg-white/20 transition-all rounded-lg p-2" data-bs-dismiss="modal" aria-label="Close">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
-    </div>
-</div>
+        
+        <!-- Organization context bar -->
+        <div class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-slate-500 font-medium">Organization:</span>
+            <span class="text-indigo-600 font-semibold">{{ organization.name }}</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+              <span class="text-slate-500 text-sm">Date Range:</span>
+              <select class="bg-slate-100 border border-slate-200 rounded-md text-sm px-2 py-1">
+                <option>Last 30 days</option>
+                <option>Last quarter</option>
+                <option>Year to date</option>
+                <option>Custom range</option>
+              </select>
+            </div>
+            <button class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm rounded-md px-3 py-1 flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              Filter
+            </button>
+            <button class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm rounded-md px-3 py-1 flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Add View
+            </button>
+          </div>
+        </div>
+        
+        <!-- Modal Body with enhanced styling -->
+        <div class="modal-body p-6">
+          <!-- KPI Cards Row -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 hover:shadow-md transition-all">
+              <div class="flex items-center justify-between">
+                <span class="text-slate-500 text-sm font-medium">Total Meetings</span>
+                <div class="bg-indigo-100 rounded-md p-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+              </div>
+              <h2 class="text-3xl font-bold mt-2" id="totalMeetings">0</h2>
+              <div class="flex items-center mt-2 text-xs font-medium text-emerald-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                </svg>
+                12% vs last month
+              </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 hover:shadow-md transition-all">
+              <div class="flex items-center justify-between">
+                <span class="text-slate-500 text-sm font-medium">Completed</span>
+                <div class="bg-emerald-100 rounded-md p-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              </div>
+              <h2 class="text-3xl font-bold mt-2" id="completedMeetings">0</h2>
+              <div class="flex items-center mt-2 text-xs font-medium text-emerald-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                </svg>
+                8% vs last month
+              </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 hover:shadow-md transition-all">
+              <div class="flex items-center justify-between">
+                <span class="text-slate-500 text-sm font-medium">Canceled</span>
+                <div class="bg-red-100 rounded-md p-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              </div>
+              <h2 class="text-3xl font-bold mt-2" id="canceledMeetings">0</h2>
+              <div class="flex items-center mt-2 text-xs font-medium text-red-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
+                3% vs last month
+              </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 hover:shadow-md transition-all">
+              <div class="flex items-center justify-between">
+                <span class="text-slate-500 text-sm font-medium">Upcoming</span>
+                <div class="bg-amber-100 rounded-md p-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              </div>
+              <h2 class="text-3xl font-bold mt-2" id="upcomingMeetings">0</h2>
+              <div class="flex items-center mt-2 text-xs font-medium text-amber-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                </svg>
+                5% vs last month
+              </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 hover:shadow-md transition-all">
+              <div class="flex items-center justify-between">
+                <span class="text-slate-500 text-sm font-medium">Avg Duration</span>
+                <div class="bg-sky-100 rounded-md p-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              </div>
+              <div class="flex items-center mt-2">
+                <h2 class="text-3xl font-bold" id="avgDuration">0</h2>
+                <span class="ml-1 text-lg font-medium text-slate-500">min</span>
+              </div>
+              <div class="flex items-center mt-2 text-xs font-medium text-red-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
+                2% vs last month
+              </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 hover:shadow-md transition-all">
+              <div class="flex items-center justify-between">
+                <span class="text-slate-500 text-sm font-medium">Avg Attendees</span>
+                <div class="bg-purple-100 rounded-md p-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                </div>
+              </div>
+              <h2 class="text-3xl font-bold mt-2" id="avgAttendees">0</h2>
+              <div class="flex items-center mt-2 text-xs font-medium text-emerald-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                </svg>
+                1% vs last month
+              </div>
+            </div>
+          </div>
+          
+          <!-- Charts Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Meeting Types Chart -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+              <div class="flex items-center justify-between p-4 border-b border-slate-200">
+                <div class="flex items-center gap-2">
+                  <div class="bg-indigo-100 p-1.5 rounded-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                    </svg>
+                  </div>
+                  <h3 class="font-semibold text-slate-800">Meeting Types Distribution</h3>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button class="text-slate-400 hover:text-slate-600 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                    </svg>
+                  </button>
+                  <button class="text-slate-400 hover:text-slate-600 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="p-4 h-72">
+                <canvas id="meetingTypeChart"></canvas>
+              </div>
+            </div>
+            
+            <!-- Meeting Modes Chart -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+              <div class="flex items-center justify-between p-4 border-b border-slate-200">
+                <div class="flex items-center gap-2">
+                  <div class="bg-emerald-100 p-1.5 rounded-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <h3 class="font-semibold text-slate-800">Meeting Modes</h3>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button class="text-slate-400 hover:text-slate-600 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                    </svg>
+                  </button>
+                  <button class="text-slate-400 hover:text-slate-600 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="p-4 h-72">
+                <canvas id="meetingModeChart"></canvas>
+              </div>
+            </div>
+            
+            <!-- Peak Hours Chart -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+              <div class="flex items-center justify-between p-4 border-b border-slate-200">
+                <div class="flex items-center gap-2">
+                  <div class="bg-purple-100 p-1.5 rounded-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <h3 class="font-semibold text-slate-800">Peak Meeting Hours</h3>
+                </div>
+                <div class="flex items-center gap-2">
+                  <div class="flex items-center">
+                    <span class="text-xs text-slate-500 mr-2">View:</span>
+                    <select class="bg-slate-100 border border-slate-200 rounded-md text-xs px-2 py-1">
+                      <option>Daily</option>
+                      <option>Weekly</option>
+                      <option>Monthly</option>
+                    </select>
+                  </div>
+                  <button class="text-slate-400 hover:text-slate-600 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="p-4 h-72">
+                <canvas id="peakHoursChart"></canvas>
+              </div>
+            </div>
+            
+            <!-- Top Hosts Chart -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+              <div class="flex items-center justify-between p-4 border-b border-slate-200">
+                <div class="flex items-center gap-2">
+                  <div class="bg-amber-100 p-1.5 rounded-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+                  <h3 class="font-semibold text-slate-800">Top Hosts</h3>
+                </div>
+                <div class="flex items-center gap-2">
+                  <div class="flex items-center">
+                    <span class="text-xs text-slate-500 mr-2">Show:</span>
+                    <select class="bg-slate-100 border border-slate-200 rounded-md text-xs px-2 py-1">
+                      <option>Top 5</option>
+                      <option>Top 10</option>
+                      <option>All</option>
+                    </select>
+                  </div>
+                  <button class="text-slate-400 hover:text-slate-600 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="p-4 h-72">
+                <canvas id="topHostsChart"></canvas>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Additional Features Section -->
+          <div class="mt-6">
+            <h3 class="text-slate-700 font-semibold text-lg mb-4">Additional Insights</h3>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <!-- Meeting Efficiency Score -->
+              <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden p-4">
+                <div class="flex items-center justify-between mb-4">
+                  <h4 class="text-slate-700 font-medium">Meeting Efficiency Score</h4>
+                  <div class="bg-blue-100 p-1.5 rounded-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="flex items-center justify-center">
+                  <div class="relative w-32 h-32">
+                    <!-- This would be a gauge chart in the real implementation -->
+                    <div class="absolute inset-0 flex items-center justify-center">
+                      <span class="text-3xl font-bold text-indigo-600">83%</span>
+                    </div>
+                    <svg class="w-full h-full" viewBox="0 0 100 100">
+                      <circle cx="50" cy="50" r="45" fill="none" stroke="#e2e8f0" stroke-width="10" />
+                      <circle cx="50" cy="50" r="45" fill="none" stroke="#4f46e5" stroke-width="10" stroke-dasharray="282.7" stroke-dashoffset="48.1" transform="rotate(-90 50 50)" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="text-center mt-2 text-sm text-slate-500">
+                  8% improvement from last month
 
-
-
-<!-- SCHEDULE RECURRING MEETING -->
 
 <!-- SCHEDULE RECURRING MEETING -->
 <div class="modal fade" id="ScheduleMeetsModal" tabindex="-1" aria-labelledby="ScheduleMeetsModalLabel" aria-hidden="true">
