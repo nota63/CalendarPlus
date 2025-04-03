@@ -93,38 +93,18 @@ document.addEventListener("DOMContentLoaded", function () {
                     appLink.classList.add("block", "group", "flex", "items-center", "gap-3", "w-full");
                     
                     const appIcon = app.icon
-  ? `<img src="${app.icon}" alt="${app.name}" class="w-12 h-12 rounded-xl border border-gray-100 shadow-sm object-cover transition-transform duration-200 group-hover:scale-105">`
-  : `<div class="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-2xl shadow-sm">📦</div>`;
+                    ? `<img src="${app.icon}" alt="${app.name}" class="w-10 h-10 rounded-full object-cover">`
+                    : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">📦</div>`;
+                
+                appLink.innerHTML = `
+                    ${appIcon}
+                    <div class="flex-1">
+                        <h3 class="text-sm font-medium text-gray-800 group-hover:text-blue-600">${app.name}</h3>
+                        <p class="text-xs text-gray-500">Version: ${app.version}</p>
+                    </div>
+                `;
+                appElement.appendChild(appLink);
 
-appLink.innerHTML = `
-  <div class="flex items-start gap-4 w-full">
-    ${appIcon}
-    <div class="flex-1 space-y-1.5">
-      <div class="flex items-baseline justify-between gap-2">
-        <h3 class="text-base font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">${app.name}</h3>
-        <span class="text-xs font-medium px-1.5 py-1 rounded bg-green-100 text-green-800">${app.version}</span>
-      </div>
-      ${app.description ? `<p class="text-sm text-gray-600 line-clamp-2">${app.description}</p>` : ''}
-      <div class="flex items-center gap-2 text-xs text-gray-500">
-        <span class="flex items-center gap-1">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-          </svg>
-          ${app.category || 'General'}
-        </span>
-      </div>
-    </div>
-  </div>
-`;
-
-appLink.className = `
-  group block p-4 bg-white rounded-xl border border-gray-200
-  hover:border-blue-200 hover:shadow-lg transition-all duration-200
-  ease-in-out hover:transform hover:-translate-y-0.5
-`;
-
-appElement.className = "w-full md:w-1/2 xl:w-1/3 p-2"; // For grid layout container
-appElement.appendChild(appLink);
                     
                     const uninstallButton = document.createElement("button");
                     uninstallButton.className = "absolute top-2 right-2 hidden group-hover:block bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 transition";
