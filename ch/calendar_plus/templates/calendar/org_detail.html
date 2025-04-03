@@ -487,15 +487,7 @@ header {
                     </span>
                 </a>
                 <!-- organization channels -->
-                <a href="{% url 'create_channel' organization.id %}" 
-                    class="flex items-center space-x-2 text-gray-800 transition duration-300 hover:text-blue-500">
-                    <span class="font-medium text-[14px]" style="font-family: 'Inter', sans-serif;">
-                    <button type="button" class="w-full text-left flex items-center px-3 py-1.5 mx-2 rounded-md text-gray-700 hover:bg-blue-50 hover:text-blue-600 group transition-colors duration-150 active:bg-blue-100 sidebar-btn">
-                        <div class="w-2 h-2 rounded-full bg-blue-500 mr-2.5"></div>
-                        <span class="text-sm font-medium">Channels</span>
-                    </button>
-                    </span>
-                </a>
+              
                 <!-- workspace channels -->
                 <a href="{% url 'channels_list' organization.id %}" 
                     class="flex items-center space-x-2 text-gray-800 transition duration-300 hover:text-blue-500">
@@ -854,7 +846,7 @@ header {
   
       <!-- Space for additional sections -->
       <div class="h-8"></div>
-    </div>
+</div>
   
     <!-- Bottom Action Bar -->
     <div class="border-t border-gray-100 bg-gray-50">
@@ -4342,8 +4334,6 @@ body {
 
 
 <!-- Create Channel (Admin Only) -->
-<!-- Create Channel Modal (Admin Only) -->
-<!-- Create Channel Modal (Admin Only) -->
 <div class="modal fade" id="createChannelModal" tabindex="-1" aria-labelledby="createChannelLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- Increased width with modal-lg -->
     <div class="modal-content border-0 shadow-lg rounded-lg overflow-hidden">

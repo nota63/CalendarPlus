@@ -2304,8 +2304,6 @@ def workspace_admin_dashboard(request, org_id):
 
 
 # Create Channel (Admin Only) - Updated
-
-
 @login_required
 def create_channel_updated(request, org_id):
     if request.method == 'POST':
@@ -2315,7 +2313,9 @@ def create_channel_updated(request, org_id):
         channel_type = data.get('type', 'BLANK')
         visibility = data.get('visibility', 'PUBLIC')
         allowed_members_ids = data.get('allowed_members', [])
-        
+        if not Profile.objects.filter(user=request.user, organization=organization, is_admin=True).exists():
+            return HttpResponseForbidden('Unauthorized access')
+                
         # Create channel
         channel = Channel.objects.create(
             organization=organization,
@@ -2334,10 +2334,13 @@ def create_channel_updated(request, org_id):
     
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
+# Fetch members within the workspace
 @login_required
 def fetch_org_members_updated(request, org_id):
     organization = get_object_or_404(Organization, id=org_id)
     members = Profile.objects.filter(organization=organization)
+    if not Profile.objects.filter(user=request.user, organization=organization, is_admin=True).exists():
+      return HttpResponseForbidden('Unauthorized access')
     
     members_data = [
         {

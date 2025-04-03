@@ -194,6 +194,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // Create Channel (Admin Only)
+
+// Create Channel (Admin Only)
 document.addEventListener("DOMContentLoaded", function () {
     const visibilityOptions = document.querySelectorAll("input[name='visibility']");
     const visibilityHiddenInput = document.getElementById("visibility");
