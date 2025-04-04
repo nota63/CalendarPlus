@@ -4598,7 +4598,6 @@ body {
 
 <!-- Delete Channels -->
 <!-- ClickUp-style Modal with Enhanced SaaS Features -->
-<!-- Full-sized Modal -->
 <div class="modal fade" id="deleteChannelsModal" tabindex="-1">
   <div class="modal-dialog modal-xl max-w-6xl my-10">
     <div class="modal-content border-0 shadow-lg rounded-lg overflow-hidden">
@@ -4829,27 +4828,88 @@ body {
 
 
 <!-- Enter password confirmation -->
+<!-- Confirmation Modal -->
+<!-- Confirmation Modal -->
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1">
-  <div class="modal-dialog">
-      <div class="modal-content">
-          <div class="modal-header">
-              <h5 class="modal-title">Confirm Deletion</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content border-0 shadow-lg rounded-lg overflow-hidden">
+      <!-- Header -->
+      <div class="modal-header bg-white border-0 shadow-sm py-3 px-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-md bg-red-100 flex items-center justify-center">
+            <i class="fas fa-exclamation-triangle text-red-600"></i>
           </div>
-          <div class="modal-body">
-              <p class="text-sm text-gray-700">You are about to delete the following channels:</p>
-              <ul id="selectedChannelsList" class="list-disc pl-5 mt-2"></ul>
-              <label class="block mt-4 text-sm">Enter your password:</label>
-              <input type="password" id="deletePasswordd" class="form-control" placeholder="Your password">
-          </div>
-          <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-              <button id="confirmDeleteBtn" class="btn btn-danger">Delete Channels</button>
-          </div>
+          <h5 class="modal-title font-semibold text-gray-800 m-0">Confirm Deletion</h5>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
+      
+      <!-- Body -->
+      <div class="modal-body p-4">
+        <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4 rounded-md">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <i class="fas fa-exclamation-circle text-red-600"></i>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-red-600">
+                This action cannot be undone. All data associated with these channels will be permanently deleted.
+              </p>
+            </div>
+          </div>
+        </div>
+      
+        <div class="mb-5">
+          <p class="text-sm text-gray-700 font-medium mb-2">You are about to delete the following channels:</p>
+          <div class="bg-gray-50 rounded-md p-3 max-h-48 overflow-y-auto">
+            <ul id="selectedChannelsList" class="list-none p-0 m-0">
+              <!-- Your existing JavaScript will populate this list -->
+            </ul>
+          </div>
+        </div>
+        
+        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+          <div class="mb-3">
+            <label for="deletePasswordd" class="block text-sm font-medium text-gray-700 mb-1">
+              Enter your password:
+            </label>
+            
+            <div class="relative rounded-md">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-lock text-gray-400"></i>
+              </div>
+              <input 
+                type="password" 
+                id="deletePasswordd" 
+                name="password" 
+                class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 py-2 sm:text-sm border-gray-300 rounded-md" 
+                placeholder="Your password"
+              >
+            </div>
+            
+            <p class="text-xs text-gray-500 mt-2">
+              For security reasons, we require your password to confirm this action.
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Footer -->
+      <div class="modal-footer py-3 px-4 border-t border-gray-200">
+        <div class="flex w-full items-center justify-between">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            Cancel
+          </button>
+          <button id="confirmDeleteBtn" class="btn px-4 text-white bg-[#FF0000] hover:bg-[#CC0000]">
+            <i class="fas fa-trash-alt me-1"></i>
+            Delete Channels
+        </button>
+        
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-
 
 
 

@@ -2311,3 +2311,31 @@ a {
     stroke-dashoffset: 0;
     animation: check 0.2s ease-out forwards;
   }
+
+/* Channels list */
+.channel-list-item {
+    border-left: 3px solid transparent;
+  }
+  .channel-list-item:hover {
+    border-left-color: #4f46e5;
+    background-color: rgba(243, 244, 246, 1);
+  }
+
+  /* Apply these styles to dynamically created list items */
+  #selectedChannelsList li {
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.25rem;
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  #selectedChannelsList li::before {
+    content: "#";
+    color: #6b7280;
+    margin-right: 0.5rem;
+    font-weight: 400;
+  }
