@@ -5,6 +5,7 @@
     <div class="border shadow-md p-4 rounded-lg">
         <h3 class="text-xl font-semibold text-indigo-600">{{ plan.get_name_display }}</h3>
         <p class="text-gray-600 my-2">{{ plan.description }}</p>
+        <p class="text-gray-600 my-2">{{ plan.features }}</p>
         <p class="text-lg font-bold text-green-700">₹{{ plan.price }}</p>
         <p class="text-sm text-gray-500">Valid for {{ plan.duration_days }} days</p>
 

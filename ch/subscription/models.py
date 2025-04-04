@@ -22,14 +22,15 @@ class Payment(models.Model):
 class PremiumPlan(models.Model):
     PLAN_CHOICES = [
         ('starter', 'Starter'),
-        ('pro', 'Pro'),
-        ('enterprise', 'Enterprise'),
+        ('business+', 'Business +'),
+        ('enterprise_grid', 'Enterprise Grid'),
     ]
 
     name = models.CharField(max_length=50, choices=PLAN_CHOICES, unique=True)
     price = models.DecimalField(max_digits=8, decimal_places=2)  # ₹ or $
     duration_days = models.PositiveIntegerField(help_text="Plan validity in days")
     description = models.TextField(help_text="Short feature summary or highlights")
+    features=models.TextField(help_text="List of features included in the plan", null=True, blank=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
