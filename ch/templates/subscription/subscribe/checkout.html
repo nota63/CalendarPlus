@@ -1,22 +1,327 @@
-<h2 class="text-xl font-bold mb-4">
-    You’ve selected: {{ plan.get_name_display }} - ₹{{ plan.price }}
-</h2>
-<p class="mb-4 text-gray-700">{{ plan.description }}</p>
-
-<form action="{% url 'payment_success' %}" method="POST" target="_self">
-    {% csrf_token %}
-    <script
-        src="https://checkout.razorpay.com/v1/checkout.js"
-        data-key="{{ razorpay_key_id }}"
-        data-amount="{{ amount }}"
-        data-currency="INR"
-        data-order_id="{{ order_id }}"
-        data-buttontext="Pay ₹{{ plan.price }}"
-        data-name="CalendarPlus"
-        data-description="{{ plan.get_name_display }}"
-        data-prefill.name="{{ user.username }}"
-        data-prefill.email="{{ user.email }}"
-        data-theme.color="#4f46e5">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CalendarPlus - Premium Subscription</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#fdf4ff',
+                            100: '#fae8ff',
+                            200: '#f5d0fe',
+                            300: '#f0abfc',
+                            400: '#e879f9',
+                            500: '#d946ef',
+                            600: '#c026d3',
+                            700: '#a21caf',
+                            800: '#86198f',
+                            900: '#701a75',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
     </script>
-    <input type="hidden" name="hidden">
-</form>
+
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 min-h-screen flex">
+    <!-- Left Sidebar -->
+    <div class="hidden md:flex md:flex-col bg-sidebar-dark text-white w-16 min-h-screen flex-shrink-0 border-r border-sidebar-light">
+        <!-- Logo Icon -->
+        <div class="flex items-center justify-center h-16 border-b border-sidebar-light">
+            <div class="bg-primary rounded-lg w-8 h-8 flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+            </div>
+        </div>
+        
+        <!-- Nav Icons -->
+        <div class="flex flex-col items-center pt-4 space-y-4">
+            <div class="p-2 rounded-lg hover:bg-sidebar-light cursor-pointer group transition-all duration-200">
+                <svg class="w-6 h-6 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+            </div>
+            <div class="p-2 rounded-lg hover:bg-sidebar-light cursor-pointer group transition-all duration-200">
+                <svg class="w-6 h-6 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+            </div>
+            <div class="p-2 rounded-lg bg-primary cursor-pointer group transition-all duration-200">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+            </div>
+            <div class="p-2 rounded-lg hover:bg-sidebar-light cursor-pointer group transition-all duration-200">
+                <svg class="w-6 h-6 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                </svg>
+            </div>
+            <div class="p-2 rounded-lg hover:bg-sidebar-light cursor-pointer group transition-all duration-200">
+                <svg class="w-6 h-6 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+            </div>
+        </div>
+        
+        <!-- Bottom user icon -->
+        <div class="mt-auto mb-4 flex justify-center">
+            <div class="p-2 rounded-lg hover:bg-sidebar-light cursor-pointer group transition-all duration-200">
+                <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                    <span class="text-xs font-semibold text-white">{{ user.username.0|upper }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Secondary navigation sidebar -->
+    <div class="hidden lg:flex lg:flex-col bg-white w-56 min-h-screen flex-shrink-0 border-r border-slate-200">
+        <!-- Secondary Nav Header -->
+        <div class="flex items-center h-16 px-4 border-b border-slate-200">
+            <h2 class="font-bold text-slate-800">Billing & Plans</h2>
+        </div>
+        
+        <!-- Sub-nav items -->
+        <div class="py-4">
+            <div class="px-3 mb-2">
+                <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Account</p>
+            </div>
+            
+            <a href="#" class="flex items-center px-4 py-2 mb-1 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                <svg class="w-5 h-5 mr-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+                Profile Settings
+            </a>
+            
+            <a href="#" class="flex items-center px-4 py-2 mb-1 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                <svg class="w-5 h-5 mr-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+                Security
+            </a>
+            
+            <div class="px-3 pt-5 mb-2">
+                <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Billing</p>
+            </div>
+            
+            <a href="#" class="flex items-center px-4 py-2 mb-1 text-sm font-semibold text-primary bg-indigo-50">
+                <svg class="w-5 h-5 mr-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                </svg>
+                Subscription Plans
+            </a>
+            
+            <a href="#" class="flex items-center px-4 py-2 mb-1 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                <svg class="w-5 h-5 mr-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                Payment Methods
+            </a>
+            
+            <a href="#" class="flex items-center px-4 py-2 mb-1 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                <svg class="w-5 h-5 mr-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                </svg>
+                Billing History
+            </a>
+            
+            <div class="px-3 pt-5 mb-2">
+                <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Support</p>
+            </div>
+            
+            <a href="#" class="flex items-center px-4 py-2 mb-1 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                <svg class="w-5 h-5 mr-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Help Center
+            </a>
+            
+            <a href="#" class="flex items-center px-4 py-2 mb-1 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+                <svg class="w-5 h-5 mr-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+                Contact Support
+            </a>
+        </div>
+    </div>
+    
+    <!-- Main Content Area -->
+  <!-- Main Content -->
+  <main class="flex-grow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <!-- Left Column: Plan Details -->
+            <div class="space-y-8">
+                <div>
+                    <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">Complete your purchase</h1>
+                    <p class="mt-2 text-lg text-gray-600">You're just one step away from supercharging your productivity.</p>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+                    <div class="px-6 py-6 bg-gradient-to-r from-primary-600 to-secondary-500">
+                        <h2 class="text-2xl font-bold text-white">{{ plan.get_name_display }}</h2>
+                    </div>
+                    <div class="p-6 space-y-5">
+                        <div class="flex items-baseline">
+                            <span class="text-4xl font-extrabold text-gray-900">₹{{ plan.price }}</span>
+                            <span class="ml-2 text-gray-500">/month</span>
+                        </div>
+                        
+                        <p class="text-gray-700">{{ plan.description }}</p>
+                        
+                        <ul class="space-y-3">
+                            <li class="flex items-center">
+                                <svg class="h-5 w-5 text-primary-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                                <span class="ml-2">Unlimited calendar integrations</span>
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="h-5 w-5 text-primary-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                                <span class="ml-2">AI-powered scheduling</span>
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="h-5 w-5 text-primary-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                                <span class="ml-2">Advanced time analytics</span>
+                            </li>
+                            <li class="flex items-center">
+                                <svg class="h-5 w-5 text-primary-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                                <span class="ml-2">Premium support</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+                    <h3 class="font-semibold text-lg text-gray-900 mb-3">Why users love CalendarPlus</h3>
+                    <div class="flex items-start space-x-3">
+                        <div class="flex-shrink-0">
+                            <div class="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
+                                <svg class="h-6 w-6 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-gray-700">Our users save an average of <span class="font-semibold">7 hours per week</span> with automated scheduling and smart calendar management.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column: Payment Form -->
+            <div>
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+                    <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900">Payment Details</h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="mb-6">
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-600">{{ plan.get_name_display }}</span>
+                                <span class="font-medium">₹{{ plan.price }}</span>
+                            </div>
+                            <div class="flex justify-between mb-2 pb-3 border-b border-gray-200">
+                                <span class="text-gray-600">Tax</span>
+                                <span class="font-medium">₹0</span>
+                            </div>
+                            <div class="flex justify-between mt-3">
+                                <span class="font-semibold text-gray-900">Total</span>
+                                <span class="font-bold text-gray-900">₹{{ plan.price }}</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <div class="bg-primary-50 rounded-lg p-3 border border-primary-200">
+                                <div class="flex items-center">
+                                    <svg class="h-5 w-5 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span class="ml-2 text-primary-800 font-medium">Secure payment via Razorpay</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4 mb-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1" for="cardName">Name on card</label>
+                                <input type="text" id="cardName" name="cardName" value="{{ user.username }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1" for="email">Email</label>
+                                <input type="email" id="email" name="email" value="{{ user.email }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            </div>
+                        </div>
+
+                        <form action="{% url 'payment_success' %}" method="POST" target="_self" class="w-full">
+                            {% csrf_token %}
+                            <button 
+                                id="rzp-button"
+                                type="button" 
+                                class="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white font-medium py-3 px-4 rounded-lg shadow-md hover:from-primary-700 hover:to-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200"
+                            >
+                                Pay ₹{{ plan.price }}
+                            </button>
+                            <script
+                                src="https://checkout.razorpay.com/v1/checkout.js"
+                                data-key="{{ razorpay_key_id }}"
+                                data-amount="{{ amount }}"
+                                data-currency="INR"
+                                data-order_id="{{ order_id }}"
+                                data-buttontext="Pay ₹{{ plan.price }}"
+                                data-name="CalendarPlus"
+                                data-description="{{ plan.get_name_display }}"
+                                data-prefill.name="{{ user.username }}"
+                                data-prefill.email="{{ user.email }}"
+                                data-theme.color="#0284c7">
+                            </script>
+                            <input type="hidden" name="hidden">
+                        </form>
+
+                        <div class="mt-6 flex items-center justify-center space-x-3">
+                            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                            <span class="text-sm text-gray-500">Your payment is secured with SSL encryption</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-gray-500">Have questions? <a href="#" class="text-primary-600 font-medium hover:text-primary-700">Contact support</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+

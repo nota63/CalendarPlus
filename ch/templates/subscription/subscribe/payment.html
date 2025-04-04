@@ -2,74 +2,348 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CalendarPlus Premium Plans</title>
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome for better icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            400: '#F06292',
+                            500: '#E91E63',
+                            600: '#D81B60',
+                        },
+                        accent: {
+                            400: '#9575CD',
+                            500: '#7E57C2',
+                            600: '#673AB7',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #0ea5e9 0%, #7e57c2 100%);
+        }
+        .feature-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .plan-card {
+            transition: all 0.3s ease;
+        }
+        .plan-card:hover {
+            transform: translateY(-8px);
+        }
+        .special-offer-banner {
+            background: linear-gradient(90deg, #FF416C 0%, #FF4B2B 100%);
+        }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans">
-
-    <div class="max-w-7xl mx-auto px-4 py-12">
-        <h2 class="text-3xl font-bold text-center mb-10">
-            Choose Your <span class="text-indigo-600">CalendarPlus</span> Premium Plan
-        </h2>
-
-    
-            
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {% for plan in plans %}
-            <div class="bg-white border border-gray-200 shadow-md p-6 rounded-2xl relative hover:shadow-xl transition duration-300">
-
-                {% if plan.name == 'enterprise_grid' %}
-                <span class="absolute top-4 right-4 bg-yellow-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                    Most Powerful
-                </span>
-                {% elif plan.name == 'starter' %}
-                <span class="absolute top-4 right-4 bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                    Most Popular
-                </span>
-                {% endif %}
-
-                <h3 class="text-2xl font-bold text-indigo-700 mb-2">{{ plan.get_name_display }}</h3>
-                <p class="text-sm italic text-gray-600 mb-4">{{ plan.description }}</p>
-
-                <div class="mb-4">
-                    <p class="text-3xl font-extrabold text-gray-800">
-                        ₹{{ plan.price }}
-                        <span class="text-sm font-medium text-gray-500">/user/month</span>
-                    </p>
-                    <p class="text-sm text-gray-400">Billed monthly • Valid for {{ plan.duration_days }} days</p>
-                </div>
-
-                <ul class="text-sm text-gray-700 space-y-3 mt-6 mb-6">
-                    {% for feature in plan.features.splitlines %}
-                    <li class="flex items-start">
-                        <svg class="w-5 h-5 text-green-500 mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor"
-                             stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span>{{ feature }}</span>
-                    </li>
-                    {% endfor %}
-                </ul>
-
-                <form action="{% url 'initiate_payment_for_plan' %}" method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="plan_id" value="{{ plan.id }}">
-                    <button type="submit"
-                            class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition duration-200">
-                        Subscribe Now
-                    </button>
-                </form>
-
-                {% if plan.name == 'enterprise_grid' %}
-                <p class="mt-4 text-xs text-center text-gray-500">
-                    Need more? <a href="#" class="text-indigo-600 underline">Contact sales</a>
-                </p>
-                {% endif %}
+<body class="bg-gray-50 text-gray-800">
+    <!-- Special Offer Banner -->
+    <div class="special-offer-banner w-full py-3 px-4 text-white">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <i class="fas fa-gift mr-2"></i>
+                <h3 class="font-medium">Special offer for teams in India:
+                    <span>55% off Pro and Business+ subscriptions.</span>
+                    <a href="#" class="underline ml-2 hover:text-white/80">See details</a>
+                </h3>
             </div>
-            {% endfor %}
         </div>
     </div>
 
+    <!-- Navbar Placeholder -->
+    <nav class="bg-white shadow-sm py-4">
+        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <span class="text-2xl font-bold text-primary-600">Calendar<span class="text-secondary-500">Plus</span></span>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#" class="text-gray-600 hover:text-primary-600 font-medium">Features</a>
+                <a href="#" class="text-gray-600 hover:text-primary-600 font-medium">Solutions</a>
+                <a href="#" class="text-gray-600 hover:text-primary-600 font-medium">Resources</a>
+                <a href="#" class="text-primary-600 font-medium">Pricing</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="#" class="text-gray-700 font-medium hover:text-primary-600">Log in</a>
+                <a href="#" class="bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-all">Try for free</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="text-4xl md:text-5xl font-extrabold mb-4">
+                Choose Your <span class="text-white">CalendarPlus</span> Premium Plan
+            </h2>
+            <p class="text-lg md:text-xl opacity-90 max-w-3xl mx-auto mb-8">Select the perfect plan for your team and transform how you manage time, tasks, and projects.</p>
+            <div class="inline-flex items-center bg-white/10 p-1 rounded-lg backdrop-blur-sm">
+                <button class="py-2 px-6 bg-white text-primary-600 font-medium rounded-md">Monthly</button>
+                <button class="py-2 px-6 text-white font-medium rounded-md">Annual <span class="bg-secondary-500 text-white text-xs py-0.5 px-2 rounded-full ml-1">Save 20%</span></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Plans Section - Using Original Template Logic -->
+    <section class="py-16 -mt-10">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Dynamic Plan Generation - Preserving Original Logic -->
+                {% for plan in plans %}
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden plan-card relative hover:shadow-xl transition duration-300 {% if plan.name == 'enterprise_grid' %}border-2 border-accent-600{% elif plan.name == 'starter' %}border-2 border-primary-600{% endif %}">
+                    
+                    {% if plan.name == 'enterprise_grid' %}
+                    <div class="absolute top-0 right-0 left-0 bg-accent-600 text-white text-center py-1 font-medium text-sm">
+                        MOST POWERFUL
+                    </div>
+                    {% elif plan.name == 'starter' %}
+                    <div class="absolute top-0 right-0 left-0 bg-primary-600 text-white text-center py-1 font-medium text-sm">
+                        MOST POPULAR
+                    </div>
+                    {% endif %}
+                    
+                    <div class="p-8 {% if plan.name == 'enterprise_grid' or plan.name == 'starter' %}pt-12{% endif %}">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-2xl font-bold {% if plan.name == 'enterprise_grid' %}text-accent-700{% elif plan.name == 'starter' %}text-primary-700{% else %}text-gray-800{% endif %}">
+                                    {{ plan.get_name_display }}
+                                </h3>
+                                <p class="text-sm italic text-gray-600 mb-2">{{ plan.description }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <p class="text-3xl font-extrabold text-gray-800">
+                                ₹{{ plan.price }}
+                                <span class="text-sm font-medium text-gray-500">/user/month</span>
+                            </p>
+                            <p class="text-sm text-gray-400">Billed monthly • Valid for {{ plan.duration_days }} days</p>
+                        </div>
+                        
+                        <form action="{% url 'initiate_payment_for_plan' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="plan_id" value="{{ plan.id }}">
+                            <button type="submit" 
+                                class="w-full {% if plan.name == 'enterprise_grid' %}bg-accent-600 hover:bg-accent-700{% elif plan.name == 'starter' %}bg-primary-600 hover:bg-primary-700{% else %}bg-indigo-600 hover:bg-indigo-700{% endif %} text-white py-3 px-4 rounded-lg font-semibold transition duration-200">
+                                Subscribe Now
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-6">
+                        <p class="font-medium text-gray-700 mb-4">Plan features:</p>
+                        <ul class="text-sm text-gray-700 space-y-3">
+                            {% for feature in plan.features.splitlines %}
+                            <li class="flex items-start">
+                                <i class="fas fa-check {% if plan.name == 'enterprise_grid' %}text-accent-600{% elif plan.name == 'starter' %}text-primary-600{% else %}text-green-500{% endif %} mt-1 mr-3"></i>
+                                <span>{{ feature }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        
+                        {% if plan.name == 'enterprise_grid' %}
+                        <p class="mt-6 text-center text-gray-500">
+                            Need more? <a href="#" class="text-accent-600 underline">Contact sales</a>
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Highlights -->
+    <section class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Why teams love <span class="text-primary-600">CalendarPlus</span></h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-white p-6 rounded-xl shadow-md feature-hover transition-all">
+                    <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-calendar-check text-primary-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Smart Scheduling</h3>
+                    <p class="text-gray-600">AI-powered scheduling that learns your preferences and optimizes your calendar automatically.</p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="bg-white p-6 rounded-xl shadow-md feature-hover transition-all">
+                    <div class="w-12 h-12 bg-secondary-100 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-tasks text-secondary-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Seamless Integration</h3>
+                    <p class="text-gray-600">Connect with over 100+ apps including Slack, Google Suite, and Microsoft Teams.</p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="bg-white p-6 rounded-xl shadow-md feature-hover transition-all">
+                    <div class="w-12 h-12 bg-accent-100 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-chart-line text-accent-600 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Time Analytics</h3>
+                    <p class="text-gray-600">Gain insights into how your team spends time with powerful analytics and reports.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-16">
+        <div class="max-w-4xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+            
+            <div class="space-y-4">
+                <!-- FAQ Item 1 -->
+                <div class="border border-gray-200 rounded-lg">
+                    <button class="flex justify-between items-center w-full p-4 text-left font-medium">
+                        <span>Can I change my plan later?</span>
+                        <i class="fas fa-chevron-down text-gray-400"></i>
+                    </button>
+                    <div class="p-4 pt-0 text-gray-600">
+                        <p>Yes, you can upgrade or downgrade your plan at any time. Changes will be prorated and applied to your next billing cycle.</p>
+                    </div>
+                </div>
+                
+                <!-- FAQ Item 2 -->
+                <div class="border border-gray-200 rounded-lg">
+                    <button class="flex justify-between items-center w-full p-4 text-left font-medium">
+                        <span>Is there a free trial available?</span>
+                        <i class="fas fa-chevron-down text-gray-400"></i>
+                    </button>
+                    <div class="p-4 pt-0 text-gray-600">
+                        <p>Yes, all paid plans come with a 14-day free trial. No credit card required to start exploring premium features.</p>
+                    </div>
+                </div>
+                
+                <!-- FAQ Item 3 -->
+                <div class="border border-gray-200 rounded-lg">
+                    <button class="flex justify-between items-center w-full p-4 text-left font-medium">
+                        <span>What payment methods do you accept?</span>
+                        <i class="fas fa-chevron-down text-gray-400"></i>
+                    </button>
+                    <div class="p-4 pt-0 text-gray-600">
+                        <p>We accept all major credit cards, UPI payments, and net banking for Indian customers. Enterprise customers can request invoice payment.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="gradient-bg py-16 text-white">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-4">Ready to transform your productivity?</h2>
+            <p class="text-lg opacity-90 mb-8">Join thousands of teams already saving time with CalendarPlus</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="#" class="bg-white text-primary-600 font-semibold py-3 px-8 rounded-lg hover:bg-gray-100 transition duration-200">Start Your Free Trial</a>
+                <a href="#" class="bg-transparent border-2 border-white text-white font-semibold py-3 px-8 rounded-lg hover:bg-white/10 transition duration-200">Schedule a Demo</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-300 py-12">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h4 class="font-bold text-white mb-4">Product</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white transition">Features</a></li>
+                        <li><a href="#" class="hover:text-white transition">Pricing</a></li>
+                        <li><a href="#" class="hover:text-white transition">Integrations</a></li>
+                        <li><a href="#" class="hover:text-white transition">What's New</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold text-white mb-4">Resources</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white transition">Blog</a></li>
+                        <li><a href="#" class="hover:text-white transition">Guides</a></li>
+                        <li><a href="#" class="hover:text-white transition">Help Center</a></li>
+                        <li><a href="#" class="hover:text-white transition">API Docs</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold text-white mb-4">Company</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white transition">About Us</a></li>
+                        <li><a href="#" class="hover:text-white transition">Careers</a></li>
+                        <li><a href="#" class="hover:text-white transition">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-white transition">Legal</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold text-white mb-4">Connect</h4>
+                    <div class="flex space-x-4 mb-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                    <p class="text-sm">Subscribe to our newsletter</p>
+                    <div class="flex mt-2">
+                        <input type="email" class="bg-gray-700 px-4 py-2 rounded-l-lg w-full" placeholder="Email address">
+                        <button class="bg-primary-600 text-white px-4 py-2 rounded-r-lg">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <span class="text-xl font-bold text-white">Calendar<span class="text-primary-400">Plus</span></span>
+                </div>
+                <div class="text-sm">
+                    &copy; 2025 CalendarPlus Inc. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>

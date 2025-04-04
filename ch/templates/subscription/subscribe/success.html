@@ -1,2 +1,171 @@
-<h2>🎉 Payment Successful</h2>
-<p>Thank you, {{ payment.user.username }}! Your payment of ₹{{ payment.amount|divisibleby:100 }} is successful.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - CalendarPlus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        secondary: {
+                            50: '#fdf4ff',
+                            100: '#fae8ff',
+                            200: '#f5d0fe',
+                            300: '#f0abfc',
+                            400: '#e879f9',
+                            500: '#d946ef',
+                            600: '#c026d3',
+                            700: '#a21caf',
+                            800: '#86198f',
+                            900: '#701a75',
+                        },
+                        success: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            200: '#a7f3d0',
+                            300: '#6ee7b7',
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-white border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-4">
+                    <div class="flex items-center">
+                        <svg class="h-8 w-8 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <span class="ml-2 text-xl font-bold text-gray-900">CalendarPlus</span>
+                    </div>
+                    <nav class="flex space-x-6">
+                        <a href="#" class="text-gray-500 hover:text-gray-900 font-medium">Features</a>
+                        <a href="#" class="text-gray-500 hover:text-gray-900 font-medium">Pricing</a>
+                        <a href="#" class="text-gray-500 hover:text-gray-900 font-medium">Help</a>
+                    </nav>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow flex items-center justify-center">
+            <div class="max-w-lg w-full mx-auto px-4 py-12">
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+                    <!-- Success Header with Gradient -->
+                    <div class="px-6 py-8 bg-gradient-to-r from-success-600 to-primary-600 flex flex-col items-center">
+                        <div class="h-16 w-16 bg-white rounded-full flex items-center justify-center mb-4">
+                            <svg class="h-10 w-10 text-success-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white text-center">🎉 Payment Successful</h2>
+                    </div>
+                    
+                    <!-- Success Content -->
+                    <div class="p-6">
+                        <div class="text-center mb-6">
+                            <p class="text-lg text-gray-700">Thank you, <span class="font-semibold">{{ payment.user.username }}</span>!</p>
+                            <p class="text-lg text-gray-700">Your payment of <span class="font-semibold">₹{{ payment.amount|divisibleby:100 }}</span> is successful.</p>
+                        </div>
+                        
+                        <div class="border border-gray-200 rounded-lg p-4 bg-gray-50 mb-6">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-gray-600">Payment ID</span>
+                                <span class="font-medium text-gray-900">{{ payment.id }}</span>
+                            </div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-gray-600">Date</span>
+                                <span class="font-medium text-gray-900">{{ payment.created_at|date:"F j, Y" }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Status</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success-100 text-success-800">
+                                    Paid
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col gap-4">
+                            <a href="#" class="w-full inline-flex justify-center items-center px-4 py-3 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                Go to Dashboard
+                            </a>
+                            <a href="#" class="w-full inline-flex justify-center items-center px-4 py-3 border border-gray-300 text-sm font-medium rounded-lg shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                View Payment Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Additional info -->
+                <div class="mt-8 text-center">
+                    <p class="text-sm text-gray-600">A confirmation email has been sent to your registered email address.</p>
+                    <p class="text-sm text-gray-600 mt-2">Need help? <a href="#" class="text-primary-600 font-medium hover:text-primary-700">Contact our support team</a></p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white border-t border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="flex items-center">
+                        <svg class="h-6 w-6 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <span class="ml-2 text-gray-900 font-medium">CalendarPlus</span>
+                    </div>
+                    <div class="mt-4 md:mt-0">
+                        <div class="flex space-x-6">
+                            <a href="#" class="text-gray-500 hover:text-gray-700">
+                                <span class="sr-only">Privacy</span>
+                                <span class="text-sm">Privacy Policy</span>
+                            </a>
+                            <a href="#" class="text-gray-500 hover:text-gray-700">
+                                <span class="sr-only">Terms</span>
+                                <span class="text-sm">Terms of Service</span>
+                            </a>
+                            <a href="#" class="text-gray-500 hover:text-gray-700">
+                                <span class="sr-only">Help</span>
+                                <span class="text-sm">Help Center</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 text-center">
+                    <p class="text-sm text-gray-500">&copy; 2025 CalendarPlus. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
