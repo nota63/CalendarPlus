@@ -4597,24 +4597,236 @@ body {
 </div>
 
 <!-- Delete Channels -->
-<!-- select channels to delete -->
+<!-- ClickUp-style Modal with Enhanced SaaS Features -->
+<!-- Full-sized Modal -->
 <div class="modal fade" id="deleteChannelsModal" tabindex="-1">
-  <div class="modal-dialog">
-      <div class="modal-content">
-          <div class="modal-header">
-              <h5 class="modal-title">Select Channels to Delete</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  <div class="modal-dialog modal-xl max-w-6xl my-10">
+    <div class="modal-content border-0 shadow-lg rounded-lg overflow-hidden">
+      <!-- Header with Tabs -->
+      <div class="modal-header bg-white border-0 shadow-sm py-3 px-4">
+        <div class="flex items-center space-x-4">
+          <div class="flex items-center gap-2">
+            <i class="fas fa-layer-group text-indigo-600"></i>
+            <h5 class="modal-title font-semibold text-gray-800 m-0">Workspace Management</h5>
           </div>
-          <div class="modal-body">
-              <div id="channelsContainer" class="space-y-2"></div>
+          <div class="hidden md:flex space-x-1 text-sm">
+            <span class="px-3 py-1 rounded-md bg-indigo-600 text-white font-medium">Channels</span>
+            <span class="px-3 py-1 rounded-md text-gray-600 hover:bg-gray-100 cursor-pointer">Users</span>
+            <span class="px-3 py-1 rounded-md text-gray-600 hover:bg-gray-100 cursor-pointer">Integrations</span>
+            <span class="px-3 py-1 rounded-md text-gray-600 hover:bg-gray-100 cursor-pointer">Settings</span>
           </div>
-          <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-              <button id="nextStep" class="btn btn-danger" disabled>Next</button>
-          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+      
+      <div class="modal-body p-0 flex flex-row">
+        <!-- Sidebar -->
+        <div class="hidden md:block w-56 bg-gray-50 border-r border-gray-200">
+          <div class="py-3">
+            <div class="px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">WORKSPACE</div>
+            
+            <ul class="space-y-1 mt-2">
+              <li class="sidebar-item px-4 py-2.5 flex items-center text-sm font-medium text-gray-700 cursor-pointer">
+                <i class="fas fa-tachometer-alt w-5 text-gray-500"></i>
+                <span class="ml-2">Dashboard</span>
+              </li>
+              <li class="sidebar-item px-4 py-2.5 flex items-center text-sm font-medium text-indigo-600 bg-indigo-50 cursor-pointer border-l-3 border-indigo-600">
+                <i class="fas fa-hashtag w-5"></i>
+                <span class="ml-2">Channels</span>
+                <span class="ml-auto bg-indigo-100 text-indigo-600 text-xs font-medium px-2 py-0.5 rounded-full">12</span>
+              </li>
+              <li class="sidebar-item px-4 py-2.5 flex items-center text-sm font-medium text-gray-700 cursor-pointer">
+                <i class="fas fa-users w-5 text-gray-500"></i>
+                <span class="ml-2">Members</span>
+              </li>
+              <li class="sidebar-item px-4 py-2.5 flex items-center text-sm font-medium text-gray-700 cursor-pointer">
+                <i class="fas fa-puzzle-piece w-5 text-gray-500"></i>
+                <span class="ml-2">Integrations</span>
+              </li>
+              <li class="sidebar-item px-4 py-2.5 flex items-center text-sm font-medium text-gray-700 cursor-pointer">
+                <i class="fas fa-chart-line w-5 text-gray-500"></i>
+                <span class="ml-2">Analytics</span>
+              </li>
+            </ul>
+            
+            <div class="px-4 py-2 mt-4 text-xs font-medium text-gray-500 uppercase tracking-wider">CONFIGURATION</div>
+            <ul class="space-y-1 mt-2">
+              <li class="sidebar-item px-4 py-2.5 flex items-center text-sm font-medium text-gray-700 cursor-pointer">
+                <i class="fas fa-cog w-5 text-gray-500"></i>
+                <span class="ml-2">Settings</span>
+              </li>
+              <li class="sidebar-item px-4 py-2.5 flex items-center text-sm font-medium text-gray-700 cursor-pointer">
+                <i class="fas fa-shield-alt w-5 text-gray-500"></i>
+                <span class="ml-2">Security</span>
+              </li>
+              <li class="sidebar-item px-4 py-2.5 flex items-center text-sm font-medium text-gray-700 cursor-pointer">
+                <i class="fas fa-bell w-5 text-gray-500"></i>
+                <span class="ml-2">Notifications</span>
+              </li>
+              <li class="sidebar-item px-4 py-2.5 flex items-center text-sm font-medium text-gray-700 cursor-pointer">
+                <i class="fas fa-exchange-alt w-5 text-gray-500"></i>
+                <span class="ml-2">Automations</span>
+              </li>
+              <li class="sidebar-item px-4 py-2.5 flex items-center text-sm font-medium text-gray-700 cursor-pointer">
+                <i class="fas fa-archive w-5 text-gray-500"></i>
+                <span class="ml-2">Archived</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col">
+          <!-- Action Bar -->
+          <div class="bg-white border-b border-gray-200 p-4 flex justify-between items-center">
+            <div class="flex items-center">
+              <h6 class="text-gray-800 font-semibold m-0">Select Channels to Delete</h6>
+              <span class="ml-2 text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-medium">Batch Action</span>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+              <div class="relative">
+                <input type="text" placeholder="Search channels..." class="form-control pl-8 py-1.5 text-sm bg-gray-50 border-gray-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                <i class="fas fa-search absolute left-3 top-2.5 text-gray-400 text-sm"></i>
+              </div>
+              <button class="btn btn-sm btn-outline-secondary d-flex align-items-center">
+                <i class="fas fa-filter me-1"></i> Filter
+              </button>
+            </div>
+          </div>
+          
+          <!-- Channels List -->
+          <div id="channelsContainer" class="flex-1 p-4 overflow-y-auto invisible-scrollbar" style="max-height: 60vh;">
+            <div class="space-y-2">
+              <!-- Channels will be populated here by JS -->
+              <!-- Sample Channels for Demo -->
+              <div class="channel-item flex items-center p-3 bg-white rounded-md border border-gray-200 hover:shadow-sm transition-all duration-200">
+                <div class="flex-shrink-0">
+                  <input type="checkbox" class="form-check-input channel-checkbox border-gray-300 rounded text-indigo-600 focus:ring-indigo-500">
+                </div>
+                <div class="ml-3 flex-1">
+                  <div class="flex items-center justify-between">
+                    <span class="font-medium text-gray-800"># general</span>
+                    <span class="text-xs text-gray-500">Created 3 months ago</span>
+                  </div>
+                  <p class="text-sm text-gray-500 mt-0.5">Company-wide announcements and work-based matters</p>
+                </div>
+                <div class="flex items-center space-x-2 ml-4">
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">24 members</span>
+                  <div class="flex -space-x-2">
+                    <div class="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs">JD</div>
+                    <div class="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white text-xs">KL</div>
+                    <div class="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs">+4</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="channel-item flex items-center p-3 bg-white rounded-md border border-gray-200 hover:shadow-sm transition-all duration-200">
+                <div class="flex-shrink-0">
+                  <input type="checkbox" class="form-check-input channel-checkbox border-gray-300 rounded text-indigo-600 focus:ring-indigo-500">
+                </div>
+                <div class="ml-3 flex-1">
+                  <div class="flex items-center justify-between">
+                    <span class="font-medium text-gray-800"># random</span>
+                    <span class="text-xs text-gray-500">Created 3 months ago</span>
+                  </div>
+                  <p class="text-sm text-gray-500 mt-0.5">Non-work banter and water cooler conversation</p>
+                </div>
+                <div class="flex items-center space-x-2 ml-4">
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">18 members</span>
+                  <div class="flex -space-x-2">
+                    <div class="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center text-white text-xs">TG</div>
+                    <div class="w-6 h-6 rounded-full bg-pink-500 flex items-center justify-center text-white text-xs">BN</div>
+                    <div class="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center text-white text-xs">+2</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="channel-item flex items-center p-3 bg-white rounded-md border border-gray-200 hover:shadow-sm transition-all duration-200">
+                <div class="flex-shrink-0">
+                  <input type="checkbox" class="form-check-input channel-checkbox border-gray-300 rounded text-indigo-600 focus:ring-indigo-500">
+                </div>
+                <div class="ml-3 flex-1">
+                  <div class="flex items-center justify-between">
+                    <span class="font-medium text-gray-800"># marketing</span>
+                    <span class="text-xs text-gray-500">Created 2 months ago</span>
+                  </div>
+                  <p class="text-sm text-gray-500 mt-0.5">Marketing team discussions and campaigns</p>
+                </div>
+                <div class="flex items-center space-x-2 ml-4">
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">9 members</span>
+                  <div class="flex -space-x-2">
+                    <div class="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center text-white text-xs">MK</div>
+                    <div class="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center text-white text-xs">+3</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Add more sample channels as needed -->
+              <div class="channel-item flex items-center p-3 bg-white rounded-md border border-gray-200 hover:shadow-sm transition-all duration-200">
+                <div class="flex-shrink-0">
+                  <input type="checkbox" class="form-check-input channel-checkbox border-gray-300 rounded text-indigo-600 focus:ring-indigo-500">
+                </div>
+                <div class="ml-3 flex-1">
+                  <div class="flex items-center justify-between">
+                    <span class="font-medium text-gray-800"># engineering</span>
+                    <span class="text-xs text-gray-500">Created 1 month ago</span>
+                  </div>
+                  <p class="text-sm text-gray-500 mt-0.5">Technical discussions and development updates</p>
+                </div>
+                <div class="flex items-center space-x-2 ml-4">
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">15 members</span>
+                </div>
+              </div>
+              
+              <div class="channel-item flex items-center p-3 bg-white rounded-md border border-gray-200 hover:shadow-sm transition-all duration-200">
+                <div class="flex-shrink-0">
+                  <input type="checkbox" class="form-check-input channel-checkbox border-gray-300 rounded text-indigo-600 focus:ring-indigo-500">
+                </div>
+                <div class="ml-3 flex-1">
+                  <div class="flex items-center justify-between">
+                    <span class="font-medium text-gray-800"># product</span>
+                    <span class="text-xs text-gray-500">Created 3 weeks ago</span>
+                  </div>
+                  <p class="text-sm text-gray-500 mt-0.5">Product development and feature discussions</p>
+                </div>
+                <div class="flex items-center space-x-2 ml-4">
+                  <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">12 members</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Summary Bar -->
+          <div class="bg-gray-50 border-t border-gray-200 p-3">
+            <div class="flex items-center text-sm">
+              <span class="selected-count">0</span>
+              <span class="ml-1 text-gray-600">channels selected</span>
+              <button class="ml-3 text-indigo-600 hover:text-indigo-800 text-sm font-medium">Select All</button>
+              <button class="ml-3 text-indigo-600 hover:text-indigo-800 text-sm font-medium">Clear Selection</button>
+            </div>
+          </div>
+          
+          <!-- Footer -->
+          <div class="modal-footer bg-white border-t border-gray-200 py-3 px-4 flex justify-between">
+            <div class="flex items-center">
+              <i class="fas fa-info-circle text-gray-500 mr-2"></i>
+              <span class="text-sm text-gray-600">Deleting channels cannot be undone</span>
+            </div>
+            <div>
+              <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+              <button id="nextStep" class="btn btn-danger px-4" disabled>
+                <i class="fas fa-trash-alt me-1"></i> Delete Selected
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
+
+
 
 <!-- Enter password confirmation -->
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1">

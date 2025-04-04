@@ -2298,3 +2298,16 @@ a {
 .bg-teal-10 {
     background: rgba(128, 203, 196, 0.1);
 }
+
+
+/* channels selection animation */
+@keyframes check {
+    0% { stroke-dashoffset: 20; }
+    100% { stroke-dashoffset: 0; }
+  }
+  
+  .animate-check path {
+    stroke-dasharray: 20;
+    stroke-dashoffset: 0;
+    animation: check 0.2s ease-out forwards;
+  }
