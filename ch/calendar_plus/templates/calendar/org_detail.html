@@ -947,7 +947,7 @@ header {
               <i class="fas fa-chevron-down ml-1 text-xs text-gray-500"></i>
             </button>
             <div class="dropdown-content bg-white rounded-md mt-1 py-1 border border-gray-200">
-              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</a>
+              <a href="{% url 'initiate_payment' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Pro</a>
               <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Activity</a>
               <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Recent</a>
             </div>
@@ -4825,10 +4825,7 @@ body {
   </div>
 </div>
 
-
-
 <!-- Enter password confirmation -->
-<!-- Confirmation Modal -->
 <!-- Confirmation Modal -->
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1">
   <div class="modal-dialog modal-lg">

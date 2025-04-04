@@ -110,6 +110,7 @@ INSTALLED_APPS = [
     'formtools',
     'cal_ai',
     'django_quill',
+    'subscription',
 
     #  Unfold admin configurations
     "unfold",  # before django.contrib.admin
@@ -368,6 +369,11 @@ GOOGLE_REDIRECT_URI = "http://localhost:8000/oauth/callback/"
 
 # AXES_FAILURE_LIMIT = 2  
 # AXES_COOLOFF_TIME = 30  
+
+
+# RAZORPAY PAYMENT GATEWAY 
+
+
 
 
 
