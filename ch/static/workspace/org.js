@@ -367,10 +367,31 @@ document.addEventListener("DOMContentLoaded", function () {
                     channelItem.setAttribute("data-id", channel.id);
 
                     channelItem.innerHTML = `
-                        <span class="text-sm text-gray-900">${channel.name}</span>
-                        <input type="checkbox" class="channel-checkbox" data-id="${channel.id}">
-                    `;
-
+    <div class="flex items-center justify-between p-3 hover:bg-gray-50 group rounded-lg cursor-pointer transition-colors duration-200 border border-transparent hover:border-gray-200">
+        <div class="flex items-center space-x-3">
+            <div class="w-5 h-5 rounded bg-gradient-to-br from-blue-400 to-indigo-600"></div>
+            <span class="text-sm font-medium text-gray-700 truncate max-w-[200px]">${channel.name}</span>
+        </div>
+        
+        <!-- Fixed checkbox structure -->
+        <label class="relative flex items-center cursor-pointer">
+            <input 
+                type="checkbox" 
+                class="channel-checkbox absolute h-5 w-5 opacity-0 cursor-pointer"
+                data-id="${channel.id}"
+            >
+            <div class="w-5 h-5 border-2 border-gray-300 rounded-md bg-white transition-all 
+                      peer-checked:border-indigo-600 peer-checked:bg-indigo-600 
+                      peer-focus:ring-2 peer-focus:ring-indigo-200
+                      flex items-center justify-center">
+                <svg class="hidden w-3 h-3 text-white stroke-current peer-checked:block" 
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <path d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+        </label>
+    </div>
+`;
                     channelsContainer.appendChild(channelItem);
                 });
             })
