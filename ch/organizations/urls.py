@@ -56,7 +56,9 @@ urlpatterns=[
     path('gateways/<int:org_id>/',gateways, name='gateways'),
     path('workspace_admin_dashboard/<int:org_id>/',workspace_admin_dashboard, name='workspace_admin_dashboard'),
     path('create-channel-updated/<int:org_id>/',create_channel_updated, name='create_channel_updated'),
-    path('fetch-org-members-updated/<int:org_id>/',fetch_org_members_updated, name='fetch_org_members_updated')
+    path('fetch-org-members-updated/<int:org_id>/',fetch_org_members_updated, name='fetch_org_members_updated'),
+    path('fetch-channels-updated/<int:org_id>/',fetch_channels, name='fetch_channels_updated'),
+    path('delete-channels-updated/<int:org_id>/',delete_channels, name='delete_channels_updated'),
     
 ]
 

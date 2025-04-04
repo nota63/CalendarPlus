@@ -321,3 +321,138 @@ document.addEventListener("DOMContentLoaded", function () {
         return document.cookie.split("; ").find(row => row.startsWith("csrftoken="))?.split("=")[1];
     }
 });
+
+// Delete Channels (Bulk Action)
+// Delete Channels (Bulk Action)
+document.addEventListener("DOMContentLoaded", function () {
+    const shutdownBtn = document.querySelector("#shutdownBtn"); // Trigger button
+    const deleteChannelsModalEl = document.getElementById("deleteChannelsModal");
+    const confirmDeleteModalEl = document.getElementById("confirmDeleteModal");
+
+    const deleteChannelsModal = new bootstrap.Modal(deleteChannelsModalEl);
+    const confirmDeleteModal = new bootstrap.Modal(confirmDeleteModalEl);
+
+    const channelsContainer = document.getElementById("channelsContainer");
+    const selectedChannelsContainer = document.getElementById("selectedChannelsList");
+    const nextBtn = document.getElementById("nextStep");
+    const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+    const passwordInput = document.getElementById("deletePasswordd");
+
+    let selectedChannels = [];
+
+    /** Open Delete Channels Modal */
+    shutdownBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        deleteChannelsModal.show();
+        fetchChannels();
+    });
+
+    /** Fetch Channels from Backend */
+    function fetchChannels() {
+        const orgId = window.djangoData.orgId;
+
+        fetch(`/organizations/fetch-channels-updated/${orgId}/`)
+            .then(response => response.json())
+            .then(data => {
+                channelsContainer.innerHTML = "";
+
+                if (data.channels.length === 0) {
+                    channelsContainer.innerHTML = `<p class="text-gray-500 text-sm">No channels available.</p>`;
+                    return;
+                }
+
+                data.channels.forEach(channel => {
+                    let channelItem = document.createElement("div");
+                    channelItem.classList.add("channel-item", "flex", "items-center", "justify-between", "p-2", "hover:bg-gray-50", "rounded-md", "cursor-pointer");
+                    channelItem.setAttribute("data-id", channel.id);
+
+                    channelItem.innerHTML = `
+                        <span class="text-sm text-gray-900">${channel.name}</span>
+                        <input type="checkbox" class="channel-checkbox" data-id="${channel.id}">
+                    `;
+
+                    channelsContainer.appendChild(channelItem);
+                });
+            })
+            .catch(error => {
+                console.error("Error fetching channels:", error);
+                channelsContainer.innerHTML = `<p class="text-red-500 text-sm">Failed to load channels. Please try again.</p>`;
+            });
+    }
+
+    /** Event Delegation: Handle Channel Selection */
+    channelsContainer.addEventListener("click", function (event) {
+        let target = event.target;
+
+        if (target.classList.contains("channel-item") || target.tagName === "SPAN") {
+            let checkbox = target.closest(".channel-item").querySelector(".channel-checkbox");
+            checkbox.checked = !checkbox.checked;
+            updateSelectedChannels();
+        } else if (target.classList.contains("channel-checkbox")) {
+            updateSelectedChannels();
+        }
+    });
+
+    /** Update Selected Channels List */
+    function updateSelectedChannels() {
+        selectedChannels = Array.from(document.querySelectorAll(".channel-checkbox:checked"))
+            .map(cb => cb.getAttribute("data-id"));
+
+        nextBtn.disabled = selectedChannels.length === 0;
+    }
+
+    /** Open Password Confirmation Modal */
+    nextBtn.addEventListener("click", function () {
+        deleteChannelsModal.hide();
+
+        selectedChannelsContainer.innerHTML = selectedChannels.length
+            ? selectedChannels.map(id => `<li class="text-gray-900">${document.querySelector(`[data-id="${id}"] span`).innerText}</li>`).join("")
+            : `<p class="text-gray-500 text-sm">No channels selected.</p>`;
+
+        confirmDeleteModal.show();
+    });
+
+    /** Confirm Deletion with Password */
+    confirmDeleteBtn.addEventListener("click", function () {
+        const password = passwordInput.value.trim();
+        if (!password) {
+            alert("Please enter your password.");
+            return;
+        }
+        console.log("Selected channels:", selectedChannels); // Debug here 💡
+
+        confirmDeleteBtn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Deleting...`;
+        confirmDeleteBtn.disabled = true;
+
+        const orgId = window.djangoData.orgId;
+
+        fetch(`/organizations/delete-channels-updated/${orgId}/`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
+            body: JSON.stringify({ channel_ids: selectedChannels, password: password })
+
+        })
+        .then(response => response.json())
+        .then(data => {
+            confirmDeleteBtn.innerHTML = "Delete Channels";
+            confirmDeleteBtn.disabled = false;
+
+            if (data.success) {
+                alert("Channels deleted successfully!");
+                location.reload();
+            } else {
+                alert("Error: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Error deleting channels:", error);
+            confirmDeleteBtn.innerHTML = "Delete Channels";
+            confirmDeleteBtn.disabled = false;
+        });
+    });
+
+    /** Get CSRF Token */
+    function getCSRFToken() {
+        return document.cookie.split("; ").find(row => row.startsWith("csrftoken="))?.split("=")[1];
+    }
+});

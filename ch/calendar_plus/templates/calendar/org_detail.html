@@ -1000,7 +1000,9 @@ header {
                 data-bs-toggle="modal" data-bs-target="#createChannelModal">
                 Create
               </a>
-              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Shutdown</a>
+              <a href="#" id="shutdownBtn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                Shutdown
+              </a> 
               <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Custom Reports</a>
             </div>
           </div>
@@ -4593,6 +4595,52 @@ body {
     </div>
   </div>
 </div>
+
+<!-- Delete Channels -->
+<!-- select channels to delete -->
+<div class="modal fade" id="deleteChannelsModal" tabindex="-1">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title">Select Channels to Delete</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+              <div id="channelsContainer" class="space-y-2"></div>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button id="nextStep" class="btn btn-danger" disabled>Next</button>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Enter password confirmation -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title">Confirm Deletion</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+              <p class="text-sm text-gray-700">You are about to delete the following channels:</p>
+              <ul id="selectedChannelsList" class="list-disc pl-5 mt-2"></ul>
+              <label class="block mt-4 text-sm">Enter your password:</label>
+              <input type="password" id="deletePasswordd" class="form-control" placeholder="Your password">
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button id="confirmDeleteBtn" class="btn btn-danger">Delete Channels</button>
+          </div>
+      </div>
+  </div>
+</div>
+
+
+
+
 
 
 <!-- ----------------------------------------------------------------------------------------------------------------------------------------------- -->

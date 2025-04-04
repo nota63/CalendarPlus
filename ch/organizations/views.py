@@ -2352,3 +2352,76 @@ def fetch_org_members_updated(request, org_id):
     ]
     
     return JsonResponse({'members': members_data})
+
+
+# Bulk Channel Deletion
+# 1️⃣ Fetch all channels for a given organization (Admin Only)
+@login_required
+def fetch_channels(request, org_id):
+    profile=get_object_or_404(Profile, user=request.user, organization_id=org_id)
+    if not profile.is_admin:
+        return JsonResponse({"error": "Unauthorized access"}, status=403)
+
+    channels = Channel.objects.filter(organization_id=org_id).values("id", "name")
+
+    return JsonResponse({"channels": list(channels)}, safe=False)
+
+
+# 2️⃣ Handle Bulk Deletion (With Password Check & org_id)
+# Setup logger for debugging
+logger = logging.getLogger(__name__)
+
+@csrf_exempt  # Remove this if you are handling CSRF tokens properly
+@login_required
+def delete_channels(request, org_id):
+    if request.method != "POST":
+        logger.warning(f"Invalid request method: {request.method}")
+        return JsonResponse({"error": "Invalid request method"}, status=400)
+
+    try:
+        # Parse request body
+        data = json.loads(request.body)
+        channel_ids = data.get("channel_ids", [])
+        password = data.get("password", "").strip()
+
+        logger.info(f"Received delete request: {channel_ids} for Org {org_id}")
+
+        # Validate input
+        if not channel_ids:
+            logger.error("No channels selected for deletion.")
+            return JsonResponse({"error": "No channels selected"}, status=400)
+
+        if not password:
+            logger.error("Password is required for authentication.")
+            return JsonResponse({"error": "Password is required"}, status=400)
+
+        # Authenticate user with password
+        user = authenticate(username=request.user.username, password=password)
+        if not user:
+            logger.error(f"Authentication failed for user {request.user.username}")
+            return JsonResponse({"error": "Invalid password"}, status=400)
+
+        # Check if user is an admin in the organization
+        profile = get_object_or_404(Profile, user=request.user, organization_id=org_id)
+        if not profile.is_admin:
+            logger.warning(f"Unauthorized delete attempt by user {request.user.username} in Org {org_id}")
+            return JsonResponse({"error": "Unauthorized access"}, status=403)
+
+        # Fetch and delete channels
+        channels_to_delete = Channel.objects.filter(id__in=channel_ids, organization_id=org_id)
+        deleted_count, _ = channels_to_delete.delete()
+
+        if deleted_count == 0:
+            logger.warning(f"No channels deleted. Possible wrong IDs or organization mismatch.")
+            return JsonResponse({"error": "No channels deleted. Check selection or permissions."}, status=400)
+
+        logger.info(f"Deleted {deleted_count} channels successfully in Org {org_id} by {request.user.username}")
+        return JsonResponse({"success": True, "message": f"{deleted_count} channels deleted successfully!"})
+
+    except json.JSONDecodeError:
+        logger.exception("JSON decoding error in delete_channels request.")
+        return JsonResponse({"error": "Invalid JSON format"}, status=400)
+
+    except Exception as e:
+        logger.exception(f"Unexpected error in delete_channels: {str(e)}")
+        return JsonResponse({"error": "An unexpected error occurred"}, status=500)
