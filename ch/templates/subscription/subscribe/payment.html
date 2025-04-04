@@ -1,22 +1,75 @@
-<h2 class="text-2xl font-bold mb-6">Choose Your CalendarPlus Premium Plan</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CalendarPlus Premium Plans</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    {% for plan in plans %}
-    <div class="border shadow-md p-4 rounded-lg">
-        <h3 class="text-xl font-semibold text-indigo-600">{{ plan.get_name_display }}</h3>
-        <p class="text-gray-600 my-2">{{ plan.description }}</p>
-        <p class="text-gray-600 my-2">{{ plan.features }}</p>
-        <p class="text-lg font-bold text-green-700">₹{{ plan.price }}</p>
-        <p class="text-sm text-gray-500">Valid for {{ plan.duration_days }} days</p>
+    <div class="max-w-7xl mx-auto px-4 py-12">
+        <h2 class="text-3xl font-bold text-center mb-10">
+            Choose Your <span class="text-indigo-600">CalendarPlus</span> Premium Plan
+        </h2>
 
-        <form action="{% url 'initiate_payment_for_plan' %}" method="post" class="mt-4">
-            {% csrf_token %}
-            <input type="hidden" name="plan_id" value="{{ plan.id }}">
-            <button type="submit"
-                class="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition">
-                Subscribe Now
-            </button>
-        </form>
+    
+            
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {% for plan in plans %}
+            <div class="bg-white border border-gray-200 shadow-md p-6 rounded-2xl relative hover:shadow-xl transition duration-300">
+
+                {% if plan.name == 'enterprise_grid' %}
+                <span class="absolute top-4 right-4 bg-yellow-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                    Most Powerful
+                </span>
+                {% elif plan.name == 'starter' %}
+                <span class="absolute top-4 right-4 bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                    Most Popular
+                </span>
+                {% endif %}
+
+                <h3 class="text-2xl font-bold text-indigo-700 mb-2">{{ plan.get_name_display }}</h3>
+                <p class="text-sm italic text-gray-600 mb-4">{{ plan.description }}</p>
+
+                <div class="mb-4">
+                    <p class="text-3xl font-extrabold text-gray-800">
+                        ₹{{ plan.price }}
+                        <span class="text-sm font-medium text-gray-500">/user/month</span>
+                    </p>
+                    <p class="text-sm text-gray-400">Billed monthly • Valid for {{ plan.duration_days }} days</p>
+                </div>
+
+                <ul class="text-sm text-gray-700 space-y-3 mt-6 mb-6">
+                    {% for feature in plan.features.splitlines %}
+                    <li class="flex items-start">
+                        <svg class="w-5 h-5 text-green-500 mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor"
+                             stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>{{ feature }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                <form action="{% url 'initiate_payment_for_plan' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="plan_id" value="{{ plan.id }}">
+                    <button type="submit"
+                            class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition duration-200">
+                        Subscribe Now
+                    </button>
+                </form>
+
+                {% if plan.name == 'enterprise_grid' %}
+                <p class="mt-4 text-xs text-center text-gray-500">
+                    Need more? <a href="#" class="text-indigo-600 underline">Contact sales</a>
+                </p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
     </div>
-    {% endfor %}
-</div>
+
+</body>
+</html>
