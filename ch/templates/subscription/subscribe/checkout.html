@@ -1,0 +1,22 @@
+<h2 class="text-xl font-bold mb-4">
+    You’ve selected: {{ plan.get_name_display }} - ₹{{ plan.price }}
+</h2>
+<p class="mb-4 text-gray-700">{{ plan.description }}</p>
+
+<form action="{% url 'payment_success' %}" method="POST" target="_self">
+    {% csrf_token %}
+    <script
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        data-key="{{ razorpay_key_id }}"
+        data-amount="{{ amount }}"
+        data-currency="INR"
+        data-order_id="{{ order_id }}"
+        data-buttontext="Pay ₹{{ plan.price }}"
+        data-name="CalendarPlus"
+        data-description="{{ plan.get_name_display }}"
+        data-prefill.name="{{ user.username }}"
+        data-prefill.email="{{ user.email }}"
+        data-theme.color="#4f46e5">
+    </script>
+    <input type="hidden" name="hidden">
+</form>

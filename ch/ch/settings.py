@@ -373,6 +373,8 @@ GOOGLE_REDIRECT_URI = "http://localhost:8000/oauth/callback/"
 
 # RAZORPAY PAYMENT GATEWAY 
 
+RAZORPAY_KEY_ID = "rzp_test_jJJrl2JogIrKeo"
+RAZORPAY_KEY_SECRET = "oqJBApRaO4rOYdd4cTcUc7m4"
 
 
 

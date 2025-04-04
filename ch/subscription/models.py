@@ -16,3 +16,25 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - ₹{self.amount / 100}"
+
+
+# Premium Plan
+class PremiumPlan(models.Model):
+    PLAN_CHOICES = [
+        ('starter', 'Starter'),
+        ('pro', 'Pro'),
+        ('enterprise', 'Enterprise'),
+    ]
+
+    name = models.CharField(max_length=50, choices=PLAN_CHOICES, unique=True)
+    price = models.DecimalField(max_digits=8, decimal_places=2)  # ₹ or $
+    duration_days = models.PositiveIntegerField(help_text="Plan validity in days")
+    description = models.TextField(help_text="Short feature summary or highlights")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.get_name_display()} - ₹{self.price}"
+
+    class Meta:
+        ordering = ['price']

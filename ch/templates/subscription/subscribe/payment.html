@@ -1,19 +1,21 @@
-<h2>Subscribe to CalendarPlus Premium - ₹100</h2>
+<h2 class="text-2xl font-bold mb-6">Choose Your CalendarPlus Premium Plan</h2>
 
-<form action="/subscription/payment-success/" method="POST" target="_self">
-    {% csrf_token %}
-    <script
-        src="https://checkout.razorpay.com/v1/checkout.js"
-        data-key="{{ razorpay_key_id }}"
-        data-amount="{{ amount }}"
-        data-currency="INR"
-        data-order_id="{{ order_id }}"
-        data-buttontext="Pay ₹100"
-        data-name="CalendarPlus"
-        data-description="Premium Plan"
-        data-prefill.name="{{ user.username }}"
-        data-prefill.email="{{ user.email }}"
-        data-theme.color="#F37254">
-    </script>
-    <input type="hidden" name="hidden">
-</form>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    {% for plan in plans %}
+    <div class="border shadow-md p-4 rounded-lg">
+        <h3 class="text-xl font-semibold text-indigo-600">{{ plan.get_name_display }}</h3>
+        <p class="text-gray-600 my-2">{{ plan.description }}</p>
+        <p class="text-lg font-bold text-green-700">₹{{ plan.price }}</p>
+        <p class="text-sm text-gray-500">Valid for {{ plan.duration_days }} days</p>
+
+        <form action="{% url 'initiate_payment_for_plan' %}" method="post" class="mt-4">
+            {% csrf_token %}
+            <input type="hidden" name="plan_id" value="{{ plan.id }}">
+            <button type="submit"
+                class="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition">
+                Subscribe Now
+            </button>
+        </form>
+    </div>
+    {% endfor %}
+</div>

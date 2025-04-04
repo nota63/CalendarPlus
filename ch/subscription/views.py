@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.conf import settings
 import razorpay
-from .models import Payment
+from .models import Payment,PremiumPlan
 from django.views.decorators.csrf import csrf_exempt
 import logging
 from django.http import HttpResponseBadRequest
@@ -9,11 +9,32 @@ from django.http import HttpResponseBadRequest
 
 client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
+
 def initiate_payment(request):
-    amount = 10000  # ₹100 in paise
+    plans = PremiumPlan.objects.filter(is_active=True)
+
+    context = {
+        'plans': plans,
+        'razorpay_key_id': settings.RAZORPAY_KEY_ID,
+        'user': request.user,
+    }
+
+    return render(request, 'subscription/subscribe/payment.html', context)
+
+
+# step 2 - Initiate payment for plan
+# @require_POST
+def initiate_payment_for_plan(request):
+    plan_id = request.POST.get('plan_id')
+    try:
+        plan = PremiumPlan.objects.get(id=plan_id, is_active=True)
+    except PremiumPlan.DoesNotExist:
+        return redirect('subscription:initiate_payment')  # fallback
+
+    amount_paise = int(plan.price * 100)
 
     order = client.order.create({
-        'amount': amount,
+        'amount': amount_paise,
         'currency': 'INR',
         'payment_capture': '1'
     })
@@ -21,18 +42,26 @@ def initiate_payment(request):
     payment = Payment.objects.create(
         user=request.user,
         razorpay_order_id=order['id'],
-        amount=amount
+        amount=amount_paise
     )
 
     context = {
         'payment': payment,
+        'plan': plan,
         'razorpay_key_id': settings.RAZORPAY_KEY_ID,
         'order_id': order['id'],
-        'amount': amount,
+        'amount': amount_paise,
         'user': request.user,
     }
 
-    return render(request, 'subscription/subscribe/payment.html', context)
+    return render(request, 'subscription/subscribe/checkout.html', context)
+
+
+
+
+
+
+
 
 
 logger = logging.getLogger(__name__)  # Setup logger for debug tracking
