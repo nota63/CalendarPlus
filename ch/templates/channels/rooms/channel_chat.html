@@ -2820,171 +2820,254 @@ p {
 
 <!-- sidebar --------------------------------------------------------------------------------------------------------------------------------------- -->
 <!-- re-initialized channels sidebar -->
-
-<div class="sidebar">
-    <div class="sidebar-header">
-        <h2># {{channel.name}}</h2>
+<div class="sidebar-pro fixed left-0 top-0 bottom-0 w-64 bg-white shadow-lg flex flex-col h-screen border-r border-gray-100 z-10 overflow-hidden">
+    <!-- Header -->
+    <div class="sidebar-pro-header p-4 border-b border-gray-100">
+        <div class="flex items-center space-x-2">
+            <div class="w-6 h-6 rounded bg-purple-500 flex items-center justify-center text-white">
+                <span class="text-xs font-bold">#</span>
+            </div>
+            <h2 class="font-inter text-base font-medium text-gray-800 truncate">{{channel.name}}</h2>
+        </div>
     </div>
     
-    <div class="sidebar-menu">
+    <!-- Content -->
+    <div class="sidebar-pro-menu flex-1 overflow-y-auto px-2 py-3 space-y-1">
+        <!-- Section: Channel Overview -->
+        <div class="mb-4">
+            <div class="text-xs font-medium text-gray-400 uppercase tracking-wider px-3 mb-2">Channel</div>
+            
+            <button id="show-calendar-btn" class="sidebar-pro-item group w-full">
+                <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                    <i class="fas fa-calendar-alt text-gray-400 group-hover:text-purple-500 w-5"></i>
+                    <span class="ml-3 truncate">Channel Events Overview</span>
+                </div>
+            </button>
+            
+            <button id="fetchEventDetailsBtn" class="sidebar-pro-item group w-full" 
+                   data-org-id="{{ channel.organization.id }}" 
+                   data-channel-id="{{ channel.id }}" 
+                   data-bs-toggle="modal" 
+                   data-bs-target="#eventDetailsModalPremium">
+                <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                    <i class="fas fa-database text-gray-400 group-hover:text-purple-500 w-5"></i>
+                    <span class="ml-3 truncate">{{channel.organization.name}} Handbook Info</span>
+                </div>
+            </button>
+        </div>
 
-        <button
-        id="show-calendar-btn"
-        class="menu-item"
-    >
-    <i class="fas fa-calendar-alt"></i>
-
-    Channel Events Overview
-    </button>
-
+        <!-- Video Section -->
+        <div id="screenShareContainer" class="mb-4 px-3">
+            <video id="localVideo" autoplay muted class="w-full rounded-md mb-2 bg-gray-100"></video>
+            <div id="remoteVideos" class="w-full rounded-md bg-gray-100"></div>
+        </div>
         
-  
-        <!-- Button to trigger the modal -->
-<button id="fetchEventDetailsBtn" class="menu-item" data-org-id="{{ channel.organization.id }}" data-channel-id="{{ channel.id }}" data-bs-toggle="modal" data-bs-target="#eventDetailsModalPremium">
-    <i class="fas fa-database"></i>
-    {{channel.organization.name}} Handbook Info
-</button>
-
-       
-<div id="screenShareContainer">
-    <!-- Local video stream -->
-    <video id="localVideo" autoplay muted></video>
-
-    <!-- Remote video streams -->
-    <div id="remoteVideos"></div>
-</div>
-
-
-
-
-
+        <!-- Section: Tools & Integration -->
+        <div class="mb-4">
+            <div class="text-xs font-medium text-gray-400 uppercase tracking-wider px-3 mb-2">Tools</div>
+            
+            <button class="sidebar-pro-item group w-full">
+                <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                    <i class="fas fa-plug text-gray-400 group-hover:text-purple-500 w-5"></i>
+                    <span class="ml-3 truncate">Integrate Slack & Other Tools</span>
+                </div>
+            </button>
+            
+            <button id="monitor-recurring-messages-btn" class="sidebar-pro-item group w-full">
+                <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                    <i class="fas fa-random text-gray-400 group-hover:text-purple-500 w-5"></i>
+                    <span class="ml-3 truncate">Track Recurring Messages</span>
+                </div>
+            </button>
+        </div>
         
-
-
-
-<button class="menu-item"><i class="fas fa-plug"></i></i>Integrate Slack & Other Tools for This Channel</button>
-<!-- Button to open Recurring Messages Modal -->
-
-<button id="monitor-recurring-messages-btn" class="menu-item">
-    <i class="fas fa-random"></i>
-
-    Track Recurring Messages</button>
-
-
-        <!-- Button to trigger fetching logs -->
-        <button id="fetchLogsButton" class="menu-item"><i class="fas fa-history"></i> Access Channel Activity</button>
+        <!-- Section: Analytics & Activities -->
+        <div class="mb-4">
+            <div class="text-xs font-medium text-gray-400 uppercase tracking-wider px-3 mb-2">Analytics</div>
+            
+            <button id="fetchLogsButton" class="sidebar-pro-item group w-full">
+                <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                    <i class="fas fa-history text-gray-400 group-hover:text-purple-500 w-5"></i>
+                    <span class="ml-3 truncate">Access Channel Activity</span>
+                </div>
+            </button>
+            
+            <button type="button" class="sidebar-pro-item group w-full" data-bs-toggle="modal" data-bs-target="#statisticsModal">
+                <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                    <i class="fas fa-chart-line text-gray-400 group-hover:text-purple-500 w-5"></i>
+                    <span class="ml-3 truncate">Check Channel Metrics</span>
+                </div>
+            </button>
+            
+            <button id="showStatsButton" class="sidebar-pro-item group w-full" data-bs-toggle="modal" data-bs-target="#statsModal">
+                <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                    <i class="fas fa-database text-gray-400 group-hover:text-purple-500 w-5"></i>
+                    <span class="ml-3 truncate">Monitor My Storage</span>
+                </div>
+            </button>
+        </div>
         
-        <!-- Button to open the user list modal -->
-        <button id="userListButton" class="menu-item"><i class="fas fa-users"></i> Browse Users</button>
-
-        <!-- VIEW CHANNEL DETAILS -->
-        <button id="viewChannelDetailsButton" class="menu-item"><i class="fas fa-info-circle"></i> Channel Info</button>
-
-        <!-- Export Data Link -->
-        <a href="{% url 'export_data' org_id=channel.organization.id channel_id=channel.id %}" 
-           class="menu-item" id="exportDataButton"><i class="fas fa-download"></i> Export Files</a>
-
-        <!-- Button to Trigger the Modal -->
-        <button type="button" class="menu-item" data-bs-toggle="modal" data-bs-target="#statisticsModal">
-            <i class="fas fa-chart-line"></i> Check Channel Metrics
-        </button>
-
+        <!-- Section: Users & Members -->
+        <div class="mb-4">
+            <div class="text-xs font-medium text-gray-400 uppercase tracking-wider px-3 mb-2">Users</div>
+            
+            <button id="userListButton" class="sidebar-pro-item group w-full">
+                <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                    <i class="fas fa-users text-gray-400 group-hover:text-purple-500 w-5"></i>
+                    <span class="ml-3 truncate">Browse Users</span>
+                </div>
+            </button>
+            
+            {% if channel.created_by == request.user %}
+            <button class="sidebar-pro-item group w-full" data-bs-toggle="modal" data-bs-target="#userSelectionModal">
+                <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                    <i class="fas fa-ban text-gray-400 group-hover:text-purple-500 w-5"></i>
+                    <span class="ml-3 truncate">Restrict User</span>
+                </div>
+            </button>
+            
+            <button type="button" class="sidebar-pro-item group w-full" data-bs-toggle="modal" data-bs-target="#shareModal">
+                <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                    <i class="fas fa-share-alt text-gray-400 group-hover:text-purple-500 w-5"></i>
+                    <span class="ml-3 truncate">Grant Channel Access</span>
+                </div>
+            </button>
+            {% endif %}
+        </div>
         
-        <button id="filterButton" class="menu-item" data-bs-toggle="modal" data-bs-target="">
-            <i class="fas fa-location-arrow"></i>
-            Navigate To
-        </button>
-
-        <button id="filterButton" class="menu-item" data-bs-toggle="modal" data-bs-target="">
-            <i class="fas fa-building"></i>
-                    <a href="{% url 'org_detail' org_id=channel.organization.id%}">
-                {{channel.organization.name}}
+        <!-- Section: Channel Information -->
+        <div class="mb-4">
+            <div class="text-xs font-medium text-gray-400 uppercase tracking-wider px-3 mb-2">Information</div>
+            
+            <button id="viewChannelDetailsButton" class="sidebar-pro-item group w-full">
+                <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                    <i class="fas fa-info-circle text-gray-400 group-hover:text-purple-500 w-5"></i>
+                    <span class="ml-3 truncate">Channel Info</span>
+                </div>
+            </button>
+            
+            <a href="{% url 'export_data' org_id=channel.organization.id channel_id=channel.id %}" 
+               class="sidebar-pro-item group w-full block" id="exportDataButton">
+                <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                    <i class="fas fa-download text-gray-400 group-hover:text-purple-500 w-5"></i>
+                    <span class="ml-3 truncate">Export Files</span>
+                </div>
             </a>
-        </button>
-
-        <button id="filterButton" class="menu-item" data-bs-toggle="modal" data-bs-target="">
-            <i class="fas fa-sync"></i>
-                    <a href="{% url 'channel_chat' channel_id=channel.id%}">
+        </div>
+        
+        <!-- Section: Navigation -->
+        <div class="mb-4">
+            <div class="text-xs font-medium text-gray-400 uppercase tracking-wider px-3 mb-2">Navigation</div>
+            
+            <button id="filterButton" class="sidebar-pro-item group w-full" data-bs-toggle="modal" data-bs-target="">
+                <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                    <i class="fas fa-location-arrow text-gray-400 group-hover:text-purple-500 w-5"></i>
+                    <span class="ml-3 truncate">Navigate To</span>
+                </div>
+            </button>
+            
+            <button id="filterButton" class="sidebar-pro-item group w-full" data-bs-toggle="modal" data-bs-target="">
+                <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                    <i class="fas fa-building text-gray-400 group-hover:text-purple-500 w-5"></i>
+                    <a href="{% url 'org_detail' org_id=channel.organization.id%}" class="ml-3 hover:text-purple-600 truncate">
+                        {{channel.organization.name}}
+                    </a>
+                </div>
+            </button>
+            
+            <button id="filterButton" class="sidebar-pro-item group w-full" data-bs-toggle="modal" data-bs-target="">
+                <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                    <i class="fas fa-sync text-gray-400 group-hover:text-purple-500 w-5"></i>
+                    <a href="{% url 'channel_chat' channel_id=channel.id%}" class="ml-3 hover:text-purple-600 truncate">
                         Sync
-            </a>
-        </button>
+                    </a>
+                </div>
+            </button>
+        </div>
+        
+        <!-- Section: Data Management -->
+        <div class="mb-4">
+            <div class="text-xs font-medium text-gray-400 uppercase tracking-wider px-3 mb-2">Data Management</div>
+            
+            <button id="deleteMessagesButton" class="sidebar-pro-item group w-full" data-bs-toggle="modal" data-bs-target="">
+                <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                    <i class="fas fa-trash-alt text-gray-400 group-hover:text-purple-500 w-5"></i>
+                    <span class="ml-3 truncate">Wipe My Messages</span>
+                </div>
+            </button>
+            
+            {% if channel.created_by == request.user %}
+            <button id="deleteChannelDataBtn" class="sidebar-pro-item group w-full" data-bs-toggle="modal" data-bs-target="">
+                <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                    <i class="fas fa-times-circle text-gray-400 group-hover:text-purple-500 w-5"></i>
+                    <span class="ml-3 truncate">Clear All Channel Data</span>
+                </div>
+            </button>
+            {% endif %}
+        </div>
+        
+        <!-- Admin Options (Only for channel creators) -->
+        {% if channel.created_by == request.user %}
+        <div class="mb-4">
+            <div class="text-xs font-medium text-gray-400 uppercase tracking-wider px-3 mb-2">Admin Settings</div>
+            
+            <button type="button" class="sidebar-pro-item group w-full" data-bs-toggle="modal" data-bs-target="#retentionPolicyModal">
+                <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                    <i class="fas fa-shield-alt text-gray-400 group-hover:text-purple-500 w-5"></i>
+                    <span class="ml-3 truncate">Configure Retention Settings</span>
+                </div>
+            </button>
+            
+            <button type="button" class="sidebar-pro-item group w-full" data-bs-toggle="modal" data-bs-target="#warnModal">
+                <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                    <i class="fas fa-flag text-gray-400 group-hover:text-purple-500 w-5"></i>
+                    <span class="ml-3 truncate">Flagged Texts & Warn</span>
+                </div>
+            </button>
+            
+            <button type="button" class="sidebar-pro-item group w-full" data-bs-toggle="modal" data-bs-target="#EventHandleModal">
+                <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                    <i class="fas fa-building text-gray-400 group-hover:text-purple-500 w-5"></i>
+                    <span class="ml-3 truncate">Company Handbook</span>
+                </div>
+            </button>
 
-        <!-- Delete All My Messages Button -->
-      <button id="deleteMessagesButton" class="menu-item" data-bs-toggle="modal" data-bs-target="">
-         <i class="fas fa-trash-alt"></i> Wipe My Messages
-      </button>
+            <button type="button" class="sidebar-pro-item group w-full" data-bs-toggle="modal" data-bs-target="#shareModal">
+                <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                    <i class="fas fa-building text-gray-400 group-hover:text-purple-500 w-5"></i>
+                    <span class="ml-3 truncate">Grant Channel Access</span>
+                </div>
+            </button>
+               
+            
+            <button type="button" class="sidebar-pro-item group w-full" data-bs-toggle="modal" data-bs-target="#settingsModal">
+                <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                    <i class="fas fa-sliders-h text-gray-400 group-hover:text-purple-500 w-5"></i>
+                    <span class="ml-3 truncate">Open {{channel.name}} Settings</span>
+                </div>
+            </button>
 
-      <!-- Button to Trigger Modal -->
-<!-- Button to Trigger Modal -->
-<button 
-    id="showStatsButton" 
-    class="menu-item"
-    data-bs-toggle="modal" 
-    data-bs-target="#statsModal"
->
-<i class="fas fa-database"></i>
-Monitor My Storage
-</button>
-
-
-{% if channel.created_by == request.user %}
-
-<!-- Delete Data Button -->
-   <button id="deleteChannelDataBtn" class="menu-item" data-bs-toggle="modal" data-bs-target="">
-    <i class="fas fa-times-circle"></i>
-    Clear All Channel Data</button>
-
-    <!-- First Modal: User Selection -->
-    <button class="menu-item" data-bs-toggle="modal" data-bs-target="#userSelectionModal">
-        <i class="fas fa-ban"></i>
-        Restrict User</button>
-
-    <!-- Set retention policy -->
-<button type="button" class="menu-item" data-bs-toggle="modal" data-bs-target="#retentionPolicyModal">
-    <i class="fas fa-shield-alt"></i>
-    Configure Retention Settings
-  </button>    
-
-
-  <!-- Button to trigger the modal warn modal -->
-<button type="button" class="menu-item" data-bs-toggle="modal" data-bs-target="#warnModal">
-    <i class="fas fa-flag"></i>
-    flagged texts & warn
-</button>
-
-<!-- Manage events -->
-<button type="button" class="menu-item" data-bs-toggle="modal" data-bs-target="#EventHandleModal">
-    <i class="fas fa-building"></i>
-    Company Handbook
-</button>
-
-<!-- Button to open modal -->
-<button type="button" class="menu-item" data-bs-toggle="modal" data-bs-target="#settingsModal">
-    <i class="fas fa-sliders-h"></i>
-    Open {{channel.name}} Settings
-</button>
-
-
-
-       <!-- Button to Open Modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shareModal">
-    Grant Channel Access to Another Organization
-  </button>
-   
-
-
-{% endif %}
-
-
-</div>
+        </div>
+        {% endif %}
+    </div>
     
-    <div class="sidebar-footer">
-        <button class="menu-item"><i class="fas fa-cogs"></i> Settings</button>
-        <button class="menu-item"><i class="fas fa-plug"></i></i>Integrate Slack & Other Tools for This Channel</button>
+    <!-- Footer -->
+    <div class="sidebar-pro-footer border-t border-gray-100 px-2 py-3 space-y-1">
+        <button class="sidebar-pro-item group w-full">
+            <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                <i class="fas fa-cogs text-gray-400 group-hover:text-purple-500 w-5"></i>
+                <span class="ml-3 truncate">Settings</span>
+            </div>
+        </button>
+        
+        <button class="sidebar-pro-item group w-full">
+            <div class="flex items-center px-3 py-2 text-sm text-gray-600 rounded-md hover:bg-gray-50 group-hover:text-purple-600 transition-all">
+                <i class="fas fa-plug text-gray-400 group-hover:text-purple-500 w-5"></i>
+                <span class="ml-3 truncate">Integrate Slack & Other Tools</span>
+            </div>
+        </button>
     </div>
 </div>
-
-
 <!-- ------------------------------------------------------------------------------------------------- -->
 
 <body class="bg-gray-100">
@@ -6313,4 +6396,4 @@ function showNotification(message, linkText, linkUrl) {
 </html>
 
 
-{% endblock %}
+
