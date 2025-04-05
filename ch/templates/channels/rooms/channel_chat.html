@@ -1,4 +1,4 @@
-
+{% load static%}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -19,1831 +19,35 @@
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
     <!-- Include jQuery from a CDN -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-
     <title>Chat in Channel: {{ channel.name }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-
+    <link href="{% static 'assets/channels/channels.css'%}" rel="stylesheet">
     <!-- Add Bootstrap 5 CSS in your <head> section -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<style>
 
-#calendar-container {
-    background-color: #ffffff; /* White background for a clean look */
-    border-radius: 12px; /* Rounded corners for a premium feel */
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
-    padding: 15px; /* Padding around the calendar */
-    width: 70%; /* Smaller width to make it compact */
-    max-width: 800px; /* Limit the maximum width */
-    margin: 0 auto; /* Center align the container */
-    font-family: 'Arial', sans-serif; /* Clean, professional font */
-}
 
-#calendar {
-    font-size: 0.85rem; /* Smaller font size for compact view */
-}
-
-.fc-header-toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.fc-toolbar-title {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #333333; /* Darker shade for premium contrast */
-}
-
-.fc-button {
-    background-color: #4A90E2; /* Premium blue button color */
-    color: #ffffff;
-    border: none;
-    border-radius: 8px; /* Rounded buttons */
-    padding: 5px 10px;
-    font-size: 0.85rem;
-    transition: background-color 0.3s ease;
-}
-
-.fc-button:hover {
-    background-color: #357ABD; /* Darker blue on hover */
-}
-
-.fc-daygrid-day-number {
-    color: #4A90E2; /* Highlighted date numbers */
-    font-weight: bold;
-}
-
-.fc-daygrid-event {
-    background-color: #F5F7FA; /* Light gray background for events */
-    color: #333333;
-    border-radius: 6px; /* Rounded event items */
-    padding: 2px 5px;
-    font-size: 0.8rem;
-}
-
-.fc-day-today {
-    background-color: rgba(74, 144, 226, 0.1); /* Light blue highlight for today */
-}
-
-.fc-scrollgrid {
-    border: 1px solid #E0E0E0; /* Subtle border for a polished look */
-    border-radius: 12px; /* Match the outer container's radius */
-}
-
-
-    /* settings Modal Styles */
-  /* Specific styles for Settings Modal */
-  #settingsModal .modal-content {
-    background-color: #ffffff; /* White background for a clean look */
-    color: #333333; /* Dark text for contrast */
-    border-radius: 12px; /* Smooth rounded corners */
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-  }
-
-  /* Modal Header */
-  #settingsModal .modal-header {
-    background-color: #f7f7f7; /* Light gray for a soft, neutral background */
-    padding: 20px 30px; /* Ample padding for spaciousness */
-    border-radius: 12px 12px 0 0; /* Rounded corners at the top */
-  }
-
-  /* Modal Title */
-  #settingsModal .modal-title {
-    font-size: 1.5rem;
-    font-weight: 600; /* Bold and prominent title */
-    color: #007bff; /* Soft blue for a modern touch */
-    text-transform: uppercase; /* Uppercase letters for emphasis */
-  }
-
-  /* Form Labels */
-  #settingsModal .form-label {
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: #555; /* Slightly muted text for labels */
-    margin-bottom: 8px; /* Space between label and input */
-  }
-
-  /* Switches */
-  #settingsModal .form-check-input {
-    border-radius: 20px; /* Rounded switch for a modern appearance */
-    background-color: #007bff; /* Blue switch for a premium look */
-    border-color: #007bff; /* Matching border color */
-  }
-
-  #settingsModal .form-check-input:checked {
-    background-color: #28a745; /* Green color for the active state */
-    border-color: #28a745; /* Matching border color */
-  }
-
-  /* Form Select */
-  #settingsModal .form-select {
-    border-radius: 8px;
-    border: 1px solid #007bff;
-    background-color: #f8f9fa;
-    padding: 10px;
-    font-size: 1.1rem;
-  }
-
-  #settingsModal .form-select:focus {
-    border-color: #0056b3; /* Darker blue on focus */
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Blue shadow on focus */
-  }
-
-  /* Modal Footer */
-  #settingsModal .modal-footer {
-    background-color: #f7f7f7;
-    border-top: 1px solid #ececec;
-    padding: 15px 30px; /* Slightly more space for footer */
-  }
-
-  /* Close Button */
-  #settingsModal .btn-close {
-    background-color: transparent;
-    border: none;
-    font-size: 1.2rem;
-  }
-
-  /* Modal Body */
-  #settingsModal .modal-body {
-    padding: 30px; /* More padding for a spacious feel */
-  }
-
-  /* Form Input/Checkbox Styling */
-  #settingsModal .form-check {
-    margin-bottom: 20px; /* Extra space between options */
-  }
-
-
-
-
-
-
-
-
-
-
-    /* Modal Dialog - Thinner and Lightweight */
-#eventDetailsModalPremium .modal-dialog.modal-lg {
-    max-width: 60%; /* Thinner modal for Slack-like look */
-    border-radius: 10px;
-    transition: transform 0.3s ease-in-out;
-    margin: 20px auto;
-}
-
-/* Modal Content */
-#eventDetailsModalPremium .modal-content {
-    background: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    transition: box-shadow 0.3s ease;
-}
-
-/* Modal Header */
-#eventDetailsModalPremium .modal-header {
-    background-color: #1E2A38;
-    color: #ffffff;
-    border-bottom: 1px solid #e0e0e0;
-    padding: 15px 25px;
-    border-radius: 10px 10px 0 0;
-    font-size: 1.25rem;
-    font-weight: 600;
-}
-
-/* Modal Body - Enable Scroll */
-#eventDetailsModalPremium .modal-body {
-    background-color: #f9f9f9;
-    padding: 20px;
-    font-size: 1rem;
-    color: #333;
-    max-height: 400px; /* Restrict height to allow scrolling */
-    overflow-y: auto;
-    border-radius: 0 0 10px 10px;
-}
-
-/* Custom Scrollbar Styling */
-#eventDetailsModalPremium .modal-body::-webkit-scrollbar {
-    width: 6px; /* Thin scrollbar */
-}
-
-#eventDetailsModalPremium .modal-body::-webkit-scrollbar-thumb {
-    background-color: #2980b9; /* Stylish thumb color */
-    border-radius: 3px;
-}
-
-#eventDetailsModalPremium .modal-body::-webkit-scrollbar-thumb:hover {
-    background-color: #1abc9c; /* Change color on hover */
-}
-
-#eventDetailsModalPremium .modal-body::-webkit-scrollbar-track {
-    background-color: #ecf0f1; /* Light background for scrollbar track */
-}
-
-/* Table Styling - Thin Look */
-#eventDetailsModalPremium .table {
-    width: 100%;
-    margin-top: 15px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
-#eventDetailsModalPremium .table th,
-#eventDetailsModalPremium .table td {
-    padding: 12px 15px; /* Reduce padding for thinner look */
-    text-align: left;
-    vertical-align: middle;
-    font-size: 0.95rem;
-    color: #2C3E50;
-    border: none;
-}
-
-#eventDetailsModalPremium .table th {
-    background-color: #34495e;
-    color: #ffffff;
-    font-weight: 700;
-}
-
-#eventDetailsModalPremium .table td {
-    background-color: #f7f9fb;
-    color: #2d3e50;
-    font-size: 0.9rem;
-    border-radius: 4px;
-}
-
-/* Footer Styling */
-#eventDetailsModalPremium .modal-footer {
-    background-color: #f4f6f8;
-    padding: 15px 25px;
-    text-align: right;
-    border-top: 1px solid #e0e0e0;
-    border-radius: 0 0 10px 10px;
-}
-
-/* Buttons */
-#eventDetailsModalPremium .btn-secondary {
-    background-color: #2980b9;
-    color: #ffffff;
-    padding: 8px 20px;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    transition: background-color 0.3s ease;
-}
-
-#eventDetailsModalPremium .btn-secondary:hover {
-    background-color: #1abc9c;
-    cursor: pointer;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-.user-tooltip {
-    max-width: 250px;
-    font-size: 14px;
-    border-radius: 8px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    display: none;
-    padding: 10px;
-}
-
-.user-tooltip .user-icon {
-    width: 40px;
-    height: 40px;
-    background-color: #ccc;
-    border-radius: 50%;
-    display: inline-block;
-    margin-bottom: 10px;
-}
-
-.user-tooltip p {
-    margin: 0;
-    padding: 5px 0;
-}
-
-.mentioned-user {
-    color: #007bff;
-    cursor: pointer;
-}
-
-.mentioned-user:hover {
-    text-decoration: underline;
-}
-
-
-
-/* Styling for the user list dropdown */
-.user-list {
-    position: absolute;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    max-height: 200px;
-    overflow-y: auto;
-    width: 100%;
-    z-index: 1000; /* Make sure it appears above other elements */
-    margin-top: 2px;
-    padding: 5px 0;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    color: #333;
-}
-
-/* Styling for each user in the list */
-.user-list li {
-    padding: 8px 12px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-/* Hover effect for list items */
-.user-list li:hover {
-    background-color: #f0f0f0;
-}
-
-/* Highlight the selected user */
-.user-list li.selected {
-    background-color: #e0e0e0;
-}
-
-/* Make sure to position the user list correctly */
-td[contenteditable="true"] {
-    position: relative; /* Ensure the user list is positioned relative to the cell */
-}
-
-.user-list li {
-    white-space: nowrap; /* Prevent text from wrapping */
-    text-overflow: ellipsis; /* Add an ellipsis if the name is too long */
-    overflow: hidden;
-}
-
-/* Style for the mentioned username */
-.mentioned-user {
-    color: green; /* Change the color to green */
-    font-weight: bold;
-    background-color: #e0f7e0; /* Light green background for emphasis */
-    border-radius: 3px;
-    padding: 2px 5px;
-    display: inline-block;
-    margin-right: 5px;
-}
-
-/* Style for the contenteditable column when a user is mentioned */
-td[contenteditable="true"] .mentioned-user {
-    color: green; /* Color of the mentioned username */
-    font-weight: bold;
-    background-color: #e0f7e0; /* Light green background */
-    padding: 2px 5px;
-    border-radius: 3px;
-}
-
-/* Optional: Style for empty contenteditable fields (to show placeholder text) */
-td[contenteditable="true"]:empty {
-    color: #888; /* Light grey placeholder color when the cell is empty */
-}
-
-
-   #screen-share-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    display: none; /* Initially hidden */
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(0, 0, 0, 0.8); /* Dark semi-transparent overlay */
-    z-index: 1000; /* Ensure it appears on top of other elements */
-}
-
-#screen-share-video {
-    max-width: 90%;
-    max-height: 90%;
-    border: 2px solid white;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-
-
-
-
-
-
- /* Default star status text color */
-.star-status {
-    transition: color 0.3s ease, transform 0.3s ease;  /* Added transform for animations */
-}
-
-/* If message is starred, make the text green and apply extra effects */
-.star-status.starred {
-    color: green; /* Green color when starred */
-    font-weight: bold;  /* Make the text bold */
-    text-shadow: 0 2px 4px rgba(0, 255, 0, 0.4);  /* Add glowing green shadow effect */
-    transform: scale(1.1);  /* Slightly enlarge the text */
-    animation: pulse 1s infinite;  /* Pulsing effect */
-}
-
-/* If message is unstarred, keep the text in default color */
-.star-status.unstarred {
-    color: gray; /* Default color when unstarred */
-}
-
-/* Add a pulsing animation when the message is starred */
-@keyframes pulse {
-    0% {
-        transform: scale(1.1);
-    }
-    50% {
-        transform: scale(1.15);
-    }
-    100% {
-        transform: scale(1.1);
-    }
-}
-
-.custom-modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-.custom-modal-content {
-    position: relative;
-    background-color: white;
-    margin: 10% auto;
-    padding: 20px;
-    width: 50%;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.custom-close {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    color: #aaa;
-    font-size: 24px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-
-
-
-/* General Modal Styling */
-#networkStatusModal .modal-content {
-  background-color: #f7f7f7; /* Light background for readability */
-  padding: 20px;
-}
-
-/* Container for the whole network status section */
-#networkStatus {
-  font-family: 'Arial', sans-serif;
-  color: #333;
-}
-
-/* Signal Strength Bar */
-#signalStrengthBar {
-  background-color: #28a745; /* Green by default */
-}
-
-/* Chart Sizing and Styling */
-canvas {
-  width: 100% !important;  /* Ensure charts take up full available width */
-  max-width: 300px; /* Max width of charts to keep them compact */
-  margin: 0 auto;  /* Center charts */
-  display: block;
-}
-
-/* Specific Chart Styles */
-
-/* Network Speed (Line Chart) */
-#networkSpeedChart {
-  max-width: 350px;
-  height: 150px;
-  margin-bottom: 20px;
-}
-
-/* Network Load (Bar Chart) */
-#networkLoadChart {
-  max-width: 350px;
-  height: 100px;
-  margin-bottom: 20px;
-}
-
-/* Bandwidth Usage (Pie Chart) */
-#bandwidthUsageChart {
-  max-width: 250px;
-  height: 250px;
-  margin-bottom: 20px;
-}
-
-/* Server Response Time (Mini Graph) */
-#serverResponseChart {
-  max-width: 250px;
-  height: 100px;
-  margin-bottom: 20px;
-}
-
-/* Latency, Jitter, Packet Loss Section */
-#pingValue,
-#jitterValue,
-#packetLoss {
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-/* Signal Strength Section */
-#signalStrengthText {
-  font-weight: bold;
-  margin-top: 10px;
-}
-
-/* Diagnostic Suggestions Section */
-#diagnosticSuggestions {
-  margin-top: 20px;
-  font-size: 14px;
-}
-
-#diagnosticSuggestions p {
-  margin-bottom: 8px;
-}
-
-/* Activity Log Styling */
-#activityLog {
-  margin-top: 20px;
-  max-height: 200px;
-  overflow-y: auto;
-  font-size: 14px;
-}
-
-/* Tooltip Styling */
-#networkStatus .tooltip-inner {
-  font-size: 12px;
-  background-color: #333;
-  color: #fff;
-}
-
-
-
-
-.hidden {
-    display: none;
-}
-
-  /* Style for the modal */
-  .modal-content {
-        background-color: #f8f9fa; /* Light background for modal */
-        border-radius: 15px;
-        padding: 20px;
-    }
-
-    /* Title of the modal */
-    .modal-title {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #007bff;
-    }
-
-    /* Table style inside modal */
-    .modal-body table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 15px;
-    }
-
-    .modal-body table th,
-    .modal-body table td {
-        padding: 10px;
-        text-align: left;
-        border: 1px solid #ddd;
-    }
-
-    .modal-body table th {
-        background-color: #007bff;
-        color: #fff;
-    }
-
-    .modal-body table td {
-        background-color: #f1f1f1;
-    }
-
-    /* Members List */
-    #membersList {
-        margin-top: 15px;
-        list-style: none;
-        padding: 0;
-    }
-
-    #membersList li {
-        padding: 5px 0;
-        font-size: 1rem;
-        color: #333;
-    }
-
-    #membersList li:hover {
-        background-color: #f1f1f1;
-    }
-
-    /* Footer styling */
-    .modal-footer {
-        background-color: #f1f1f1;
-        border-top: 1px solid #ddd;
-        padding: 10px;
-    }
-
-    .modal-footer .btn-secondary {
-        background-color: #6c757d;
-        color: white;
-    }
-
-    .modal-footer .btn-secondary:hover {
-        background-color: #5a6268;
-    }
-
-
-
-    .popup-message {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border-radius: 5px;
-    font-size: 16px;
-    z-index: 9999;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Emoji Picker Modal Styling */
-#emojiPickerModal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    width: 80%;
-    max-width: 500px;
-    padding: 20px;
-    display: none; /* Initially hidden */
-    opacity: 0;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    z-index: 1000; /* Ensure it's above other content */
-    text-align: center; /* Center content horizontally */
-}
-
-/* When the modal is visible */
-#emojiPickerModal.show {
-    display: block;
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-}
-
-/* Emoji container styling */
-#emojiContainer {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr); /* 6 emojis per row */
-    gap: 10px;
-    justify-items: center; /* Center emojis in the grid */
-    align-items: center;
-    overflow-y: auto;
-    max-height: 250px;
-    padding: 10px;
-}
-
-/* Adjust the grid layout for smaller screens */
-@media (max-width: 600px) {
-    #emojiContainer {
-        grid-template-columns: repeat(4, 1fr); /* 4 emojis per row on smaller screens */
-    }
-}
-
-@media (max-width: 400px) {
-    #emojiContainer {
-        grid-template-columns: repeat(3, 1fr); /* 3 emojis per row on very small screens */
-    }
-}
-
-/* Individual emoji button styling */
-.emoji {
-    font-size: 30px;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 12px;
-    border-radius: 8px;
-    background-color: #f5f5f5;
-    transition: background-color 0.2s ease, transform 0.2s ease;
-    text-align: center;
-}
-
-/* Hover effect on emojis */
-.emoji:hover {
-    background-color: #e0e0e0;
-    transform: scale(1.2);
-}
-
-/* Close button for the modal - Highlighted in red */
-#closeEmojiPickerModal {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    color: red; /* Red color for close button */
-    font-size: 20px;
-    cursor: pointer;
-    transition: color 0.2s ease;
-}
-
-/* Close button hover effect */
-#closeEmojiPickerModal:hover {
-    color: darkred; /* Darker red on hover */
-}
-
-/* Add smooth fade-in animation */
-@keyframes fadeIn {
-    0% {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.9);
-    }
-    100% {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-    }
-}
-
-#emojiPickerModal.show {
-    animation: fadeIn 0.3s ease forwards;
-}
-
-
-
-
-/* Modal Background */
-.hidden {
-    display: none;
-}
-
-.fixed {
-    position: fixed;
-}
-
-.inset-0 {
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-}
-
-.bg-gray-600 {
-    background-color: rgba(0, 0, 0, 0.6);
-}
-
-.bg-opacity-50 {
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-/* Modal Box */
-.bg-white {
-    background-color: #ffffff;
-}
-
-.p-6 {
-    padding: 1.5rem;
-}
-
-.rounded-lg {
-    border-radius: 0.5rem;
-}
-
-.w-1/3 {
-    width: 33.33%;
-}
-
-/* Modal Title */
-.text-xl {
-    font-size: 1.25rem;
-}
-
-.font-bold {
-    font-weight: bold;
-}
-
-.mb-4 {
-    margin-bottom: 1rem;
-}
-
-/* Input and Buttons */
-.border {
-    border: 1px solid #ccc;
-}
-
-.p-2 {
-    padding: 0.5rem;
-}
-
-.w-full {
-    width: 100%;
-}
-
-.mb-4 {
-    margin-bottom: 1rem;
-}
-
-.bg-blue-500 {
-    background-color: #3b82f6;
-}
-
-.text-white {
-    color: #ffffff;
-}
-
-.ml-2 {
-    margin-left: 0.5rem;
-}
-
-.flex {
-    display: flex;
-}
-
-.justify-end {
-    justify-content: flex-end;
-}
-
-/* Modal Animation */
-@keyframes modalFadeIn {
-    0% {
-        opacity: 0;
-        transform: scale(0.8);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-@keyframes modalFadeOut {
-    0% {
-        opacity: 1;
-        transform: scale(1);
-    }
-    100% {
-        opacity: 0;
-        transform: scale(0.8);
-    }
-}
-
-#audioUploadModal, #videoUploadModal {
-    animation: modalFadeIn 0.3s ease-out forwards;
-}
-
-.hidden #audioUploadModal, .hidden #videoUploadModal {
-    animation: modalFadeOut 0.3s ease-in forwards;
-}
-
-
-
-
-
-/* Modal Background */
-.hidden {
-    display: none;
-}
-
-.fixed {
-    position: fixed;
-}
-
-.inset-0 {
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-}
-
-.bg-gray-600 {
-    background-color: rgba(0, 0, 0, 0.6);
-}
-
-.bg-opacity-50 {
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-/* Modal Box */
-.bg-white {
-    background-color: #ffffff;
-}
-
-.p-6 {
-    padding: 1.5rem;
-}
-
-.rounded-lg {
-    border-radius: 0.5rem;
-}
-
-.w-1/3 {
-    width: 33.33%;
-}
-
-/* Modal Title */
-.text-xl {
-    font-size: 1.25rem;
-}
-
-.font-bold {
-    font-weight: bold;
-}
-
-.mb-4 {
-    margin-bottom: 1rem;
-}
-
-/* Input Fields */
-.border {
-    border: 1px solid #ccc;
-}
-
-.p-2 {
-    padding: 0.5rem;
-}
-
-.w-full {
-    width: 100%;
-}
-
-.mb-4 {
-    margin-bottom: 1rem;
-}
-
-/* List of Users (Mention Modal) */
-#mentionList {
-    max-height: 200px;
-    overflow-y: auto;
-    margin-bottom: 1rem;
-}
-
-#mentionList li {
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 0.25rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#mentionList li:hover {
-    background-color: #f0f0f0;
-}
-
-/* Buttons */
-.bg-blue-500 {
-    background-color: #3b82f6;
-}
-
-.bg-gray-500 {
-    background-color: #6b7280;
-}
-
-.text-white {
-    color: #ffffff;
-}
-
-.ml-2 {
-    margin-left: 0.5rem;
-}
-
-.flex {
-    display: flex;
-}
-
-.justify-end {
-    justify-content: flex-end;
-}
-
-/* Modal Animation */
-@keyframes modalFadeIn {
-    0% {
-        opacity: 0;
-        transform: scale(0.8);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-@keyframes modalFadeOut {
-    0% {
-        opacity: 1;
-        transform: scale(1);
-    }
-    100% {
-        opacity: 0;
-        transform: scale(0.8);
-    }
-}
-
-#mentionModal, #sendLinkModal {
-    animation: modalFadeIn 0.3s ease-out forwards;
-}
-
-.hidden #mentionModal, .hidden #sendLinkModal {
-    animation: modalFadeOut 0.3s ease-in forwards;
-}
-
-
-
-
-/* Modal Background */
-.hidden {
-    display: none;
-}
-
-.fixed {
-    position: fixed;
-}
-
-.inset-0 {
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-}
-
-.bg-gray-600 {
-    background-color: rgba(0, 0, 0, 0.6);
-}
-
-.bg-opacity-50 {
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-/* Modal Box */
-.bg-white {
-    background-color: #ffffff;
-}
-
-.p-6 {
-    padding: 1.5rem;
-}
-
-.rounded-lg {
-    border-radius: 0.5rem;
-}
-
-.w-1/3 {
-    width: 33.33%;
-}
-
-/* Modal Title */
-.text-xl {
-    font-size: 1.25rem;
-}
-
-.font-bold {
-    font-weight: bold;
-}
-
-.mb-4 {
-    margin-bottom: 1rem;
-}
-
-/* Coming Soon Icon */
-#comingSoonIcon {
-    font-size: 3rem;
-    color: #ffcc00;
-    margin-bottom: 1rem;
-}
-
-/* Modal Content */
-p {
-    font-size: 1rem;
-    color: #333;
-    margin-bottom: 1.5rem;
-}
-
-/* Button */
-.bg-gray-500 {
-    background-color: #6b7280;
-}
-
-.text-white {
-    color: #ffffff;
-}
-
-.p-2 {
-    padding: 0.5rem;
-}
-
-.rounded-lg {
-    border-radius: 0.5rem;
-}
-
-/* Modal Animation */
-@keyframes modalFadeIn {
-    0% {
-        opacity: 0;
-        transform: scale(0.8);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-@keyframes modalFadeOut {
-    0% {
-        opacity: 1;
-        transform: scale(1);
-    }
-    100% {
-        opacity: 0;
-        transform: scale(0.8);
-    }
-}
-
-#comingSoonModal {
-    animation: modalFadeIn 0.5s ease-out forwards;
-}
-
-.hidden #comingSoonModal {
-    animation: modalFadeOut 0.3s ease-in forwards;
-}
-
-
-
-
-
-
-
-
-
-
-
-/* sidebar styles */
-/* sidebar styles */
-/* Sidebar Style */
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 280px;
-    height: 100%;
-    background: linear-gradient(135deg, #3a3e47, #2c2f38); /* Gradient background */
-    color: #fff;
-    padding-top: 30px;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    border-right: 2px solid #444;
-    box-shadow: 2px 0px 15px rgba(0, 0, 0, 0.3); /* Enhanced shadow for more depth */
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: #444 #2c2f38;
-
-}
-
-/* Scrollbar customization for Webkit browsers */
-.sidebar::-webkit-scrollbar {
-    width: 8px;
-}
-
-.sidebar::-webkit-scrollbar-thumb {
-    background-color: #444;
-    border-radius: 4px;
-}
-
-.sidebar::-webkit-scrollbar-track {
-    background-color: #2c2f38;
-}
-
-/* Header Section */
-.sidebar-header h2 {
-    font-size: 24px;
-    font-weight: 700;
-    margin-left: 20px;
-    color: #f1f1f1;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 20px;
-    transition: color 0.3s ease;
-}
-
-.sidebar-header h2:hover {
-    color: #ffcb05;
-    transform: scale(1.05); /* Slightly scale the header on hover for dynamic feel */
-}
-
-/* Menu Items */
-.sidebar-menu {
-    flex-grow: 1;
-    margin-top: 20px;
-    margin-bottom: 20px;
-}
-
-.menu-item {
-    width: 100%;
-    padding: 12px 20px;
-    font-size: 16px;
-    text-align: left;
-    color: #b9bbbe;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    margin: 5px 0;
-}
-
-.menu-item:hover {
-    background-color: #4f585f; /* Slightly brighter gray on hover */
-    color: #fff;
-    transform: translateX(5px); /* Slick hover transition */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Smooth shadow effect */
-}
-
-/* Active State for Menu Items */
-.menu-item.active {
-    background-color: #00bcd4;
-    color: #fff;
-    transform: translateX(5px); /* Keep the same hover feel for active state */
-    box-shadow: 0 4px 10px rgba(0, 188, 212, 0.4); /* Add subtle glow for active */
-}
-
-/* Icon next to text (optional) */
-.menu-item i {
-    margin-right: 15px;
-    font-size: 20px; /* Slightly larger icons for better visibility */
-    transition: transform 0.3s ease;
-}
-
-.menu-item:hover i {
-    transform: rotate(20deg); /* Slight icon rotation effect on hover */
-}
-
-/* Footer Section */
-.sidebar-footer {
-    margin-top: auto;
-    padding-bottom: 20px;
-    padding-left: 20px;
-}
-
-.sidebar-footer .menu-item {
-    margin-top: 10px;
-    padding: 12px 20px;
-    font-size: 16px;
-    color: #b9bbbe;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-.sidebar-footer .menu-item:hover {
-    background-color: #4f585f;
-    color: #fff;
-    transform: translateX(5px);
-}
-
-/* Responsive Design for smaller screens */
-@media screen and (max-width: 768px) {
-    .sidebar {
-        width: 240px;
-    }
-
-    .sidebar-header h2 {
-        font-size: 20px;
-    }
-
-    .menu-item {
-        font-size: 14px;
-        padding: 10px 15px;
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* Modal Background */
-.hidden {
-    display: none;
-}
-
-.fixed {
-    position: fixed;
-}
-
-.inset-0 {
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-}
-
-.bg-gray-600 {
-    background-color: rgba(0, 0, 0, 0.6);
-}
-
-.bg-opacity-50 {
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-/* Modal Box */
-.bg-white {
-    background-color: #ffffff;
-}
-
-.p-6 {
-    padding: 1.5rem;
-}
-
-.rounded-lg {
-    border-radius: 0.5rem;
-}
-
-.w-1/3 {
-    width: 33.33%;
-}
-
-/* Modal Title */
-.text-xl {
-    font-size: 1.25rem;
-}
-
-.font-bold {
-    font-weight: bold;
-}
-
-.mb-4 {
-    margin-bottom: 1rem;
-}
-
-/* Coming Soon Icon */
-#comingSoonIcon {
-    font-size: 3rem;
-    color: #ffcc00;
-    margin-bottom: 1rem;
-}
-
-/* Modal Content */
-p {
-    font-size: 1rem;
-    color: #333;
-    margin-bottom: 1.5rem;
-}
-
-/* Button */
-.bg-gray-500 {
-    background-color: #6b7280;
-}
-
-.text-white {
-    color: #ffffff;
-}
-
-.p-2 {
-    padding: 0.5rem;
-}
-
-.rounded-lg {
-    border-radius: 0.5rem;
-}
-
-/* Modal Animation */
-@keyframes modalFadeIn {
-    0% {
-        opacity: 0;
-        transform: scale(0.8);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-@keyframes modalFadeOut {
-    0% {
-        opacity: 1;
-        transform: scale(1);
-    }
-    100% {
-        opacity: 0;
-        transform: scale(0.8);
-    }
-}
-
-#filterModal {
-    animation: modalFadeIn 0.5s ease-out forwards;
-}
-
-.hidden #filterModal {
-    animation: modalFadeOut 0.3s ease-in forwards;
-}
-
-
-
-
-
-
-/* Styling the main section */
-.channel-info {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    background-color: #1a1a1a; /* Dark background */
-    color: #fff; /* White text color */
-    border-radius: 8px;
-    width: 70%; /* Reduce width */
-    max-width: 600px; /* Maximum width */
-    margin-top: 40px; /* Space from the top of the page */
-}
-
-/* Styling the container holding image and text */
-.channel-info-container {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    width: 100%;
-}
-
-/* Styling the image */
-.channel-image {
-    width: 60px; /* Reduced image size */
-    height: auto;
-    border-radius: 50%;
-    margin-right: 15px; /* Space between image and text */
-}
-
-/* Styling the text section */
-.channel-text {
-    max-width: 450px; /* Reduced max width of the text section */
-}
-
-/* Heading Style */
-.text-primary {
-    font-size: 1.2rem; /* Smaller heading */
-    color: #4e73df; /* Blue color for title */
-    margin-bottom: 10px;
-}
-
-/* Text Style */
-.text-muted {
-    font-size: 0.9rem; /* Smaller text size */
-    color: #a0a0a0; /* Muted gray for description text */
-}
-
-
-
-
-
-/* Modal Background */
-.hidden {
-    display: none;
-}
-
-.fixed {
-    position: fixed;
-}
-
-.inset-0 {
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-}
-
-.bg-gray-600 {
-    background-color: rgba(0, 0, 0, 0.6);
-}
-
-.bg-opacity-50 {
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-/* Modal Box */
-.bg-white {
-    background-color: #ffffff;
-}
-
-.p-6 {
-    padding: 1.5rem;
-}
-
-.rounded-lg {
-    border-radius: 0.5rem;
-}
-
-.w-1/3 {
-    width: 33.33%;
-}
-
-/* Modal Title */
-.text-xl {
-    font-size: 1.25rem;
-}
-
-.font-bold {
-    font-weight: bold;
-}
-
-.mb-4 {
-    margin-bottom: 1rem;
-}
-
-/* Coming Soon Icon */
-#comingSoonIcon {
-    font-size: 3rem;
-    color: #ffcc00;
-    margin-bottom: 1rem;
-}
-
-/* Modal Content */
-p {
-    font-size: 1rem;
-    color: #333;
-    margin-bottom: 1.5rem;
-}
-
-/* Button */
-.bg-gray-500 {
-    background-color: #6b7280;
-}
-
-.text-white {
-    color: #ffffff;
-}
-
-.p-2 {
-    padding: 0.5rem;
-}
-
-.rounded-lg {
-    border-radius: 0.5rem;
-}
-
-/* Modal Animation */
-@keyframes modalFadeIn {
-    0% {
-        opacity: 0;
-        transform: scale(0.8);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-@keyframes modalFadeOut {
-    0% {
-        opacity: 1;
-        transform: scale(1);
-    }
-    100% {
-        opacity: 0;
-        transform: scale(0.8);
-    }
-}
-
-#deleteMessagesModal {
-    animation: modalFadeIn 0.5s ease-out forwards;
-}
-
-.hidden #deleteMessagesModal {
-    animation: modalFadeOut 0.3s ease-in forwards;
-}
-
-
-.menu-dropdown {
-    display: none;
-}
-
-.menu-button:hover + .menu-dropdown,
-.menu-button:focus + .menu-dropdown {
-    display: block;
-}
-/* Success message styles */
-#successMessage {
-  background: linear-gradient(45deg, #5cb3f7, #7ad9e6); /* Light blue gradient */
-  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2); /* Soft shadow for depth */
-  color: #fff; /* White text for contrast */
-  border-radius: 8px;
-  padding: 16px 20px;
-  font-weight: bold;
-  font-size: 18px;
-  display: inline-block;
-  width: auto;
-  position: relative;
-  opacity: 0;
-  transform: translateX(50px); /* Start from right */
-  transition: all 0.5s ease-out;
-  box-sizing: border-box;
-}
-
-#successMessage.show {
-  opacity: 1;
-  transform: translateX(0); /* Slide in */
-  animation: bounceIn 0.6s ease-out; /* Bounce-in effect */
-}
-
-/* Bounce-in animation */
-@keyframes bounceIn {
-  0% {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  60% {
-    transform: translateY(-10px);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
-
-
-
-
-
-
-/* Centering the content at the top of the page */
-.channel-info-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-color: transparent; /* Make the container background transparent */
-    padding: 0; /* No padding, so no space around */
-    border-radius: 8px; /* Rounded corners for a clean look */
-    margin: 0; /* No margins */
-    position: absolute;
-    top: 20px; /* Align it to the top */
-    left: 50%; /* Center horizontally */
-    transform: translateX(-50%); /* Perfect centering horizontally */
-    width: auto; /* Container should adjust to the content's width */
-    height: auto; /* Container should adjust to the content's height */
-    opacity: 1; /* Keep the content visible */
-    pointer-events: none; /* Disable any interaction with the container */
-}
-
-/* Make only the content inside the container visible */
-.channel-info-container img,
-.channel-info-container strong,
-.channel-info-container p {
-    display: block;
-    opacity: 1; /* Make content visible */
-    pointer-events: auto; /* Allow interaction with content */
-    transition: opacity 0.3s ease; /* Smooth fade-in transition */
-}
-
-/* Image styling */
-.channel-info-container img {
-    width: 100px;
-    height: 70px;
-    object-fit: cover;
-    border-radius: 50%;
-    margin-bottom: 1px;
-}
-
-/* Channel name styling */
-.channel-info-container strong {
-    font-size: 18px;
-    font-weight: 600;
-    color: #007bff; /* Highlighting channel name with a color */
-    margin-bottom: 8px;
-}
-
-/* Description paragraph styling */
-.channel-info-container p {
-    font-size: 14px;
-    color: #555555;
-    line-height: 1.6;
-    margin-top: 0;
-    text-align: center;
-}
-
-/* Optional: Add some margin to the bottom for separation */
-.channel-info-container p:last-child {
-    margin-bottom: 6;
-}
-
-
-
-#screenShareContainer {
-    display: none; /* Hidden by default, shown dynamically */
-    position: fixed;
-    top: 10%;
-    left: 50%;
-    transform: translate(-50%, 0);
-    width: 80%;
-    max-width: 800px;
-    background-color: rgba(0, 0, 0, 0.9); /* Slight transparency for elegance */
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    z-index: 1000; /* Ensure it is on top */
-    overflow: hidden;
-}
-
-#localVideo {
-    width: 100%;
-    height: auto;
-    border: 2px solid #fff; /* Border for better visibility */
-    border-radius: 5px;
-}
-
-#remoteVideos {
-    margin-top: 20px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: center; /* Center remote video elements */
-}
-
-#remoteVideos video {
-    width: calc(33.33% - 10px); /* Three videos per row */
-    height: auto;
-    border: 2px solid #fff;
-    border-radius: 5px;
-}
-
-
-#screenShareContainer {
-    cursor: grab; /* Default cursor for draggable element */
-}
-
-#screenShareContainer:active {
-    cursor: grabbing; /* Cursor while dragging */
-}
-
-</style>
-
-
-
-
-<div class="channel-info-container">
-    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTovgq0biY5SBKW0gKlM26upMZ3GaNc4w0qOg&s" alt="Channel Image">
-    <strong>
-        Everyone’s all here in # {{channel.name}}
-    </strong>
-    <p>
-        Share announcements and updates about company news, upcoming events, or teammates who deserve some kudos. ⭐
-    </p>
-</div>
-<br>
-
-<!-- Success Message -->
-
+<!-- Outer container to center the content on the page -->
 
 <!-- Success message container -->
-<div id="successMessage" class="hidden text-white font-semibold p-4 rounded-lg bg-gradient-to-r from-green-400 via-green-500 to-green-600 mb-4 w-full max-w-4xl transform scale-0 transition-all duration-500 ease-out opacity-0">
-    <span class="text-xl">Success! Your action was completed successfully.</span>
-  </div>
+<div id="successMessage" 
+     class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-50 text-white font-medium px-6 py-4 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 shadow-md border border-green-600/20 backdrop-blur-sm transition-all duration-300 ease-out-back opacity-0 -translate-y-20">
+    <div class="flex items-center gap-3 success-alert-content">
+        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span class="text-base tracking-tight">Action completed successfully</span>
+    </div>
+</div>
   
 
+
+<!---------------------------------------------MODALS ------------------------------------------------------------------------------------------------------------ -->
 <!-- Modal for displaying the user list -->
 <div id="userListModal" class="modal fade" tabindex="-1" aria-labelledby="userListModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -1920,8 +124,6 @@ p {
 <div id="popupMessage" class="popup-message" style="display: none;">
     We'll export the data and send it to {{request.user.email}}. You can proceed with other tasks in the meantime...
 </div>
-
-
 
 
 <!-- Modal to Display the Channel Statistics -->
@@ -2703,7 +905,6 @@ p {
 
 
 <!-- CHANNEL SETTINGS MODAL -->
-<!-- CHANNEL SETTINGS MODAL -->
 <!-- Settings Modal -->
 <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg"> <!-- Increase width to 'modal-lg' for a larger modal -->
@@ -2801,16 +1002,107 @@ p {
 </div>
 
 
+<!-- Modal to mention users -->
+<div id="mentionModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg w-1/3">
+                <h2 class="text-xl font-bold mb-4">Mention a User</h2>
+                <ul id="mentionList" class="space-y-2">
+                    <!-- List of users will be populated here -->
+                </ul>
+                <div class="flex justify-end">
+                    <button id="closeMentionModal" class="bg-gray-500 text-white p-2 rounded-lg">Close</button>
+                </div>
+            </div>
+</div>
 
-  <!-- Include Bootstrap 5 JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Modal to send link -->
+<div id="sendLinkModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg w-1/3">
+                <h2 class="text-xl font-bold mb-4">Send a Link</h2>
+                <input id="linkText" type="text" class="border p-2 w-full mb-4" placeholder="Link Text">
+                <input id="linkUrl" type="url" class="border p-2 w-full mb-4" placeholder="URL">
+                <div class="flex justify-end">
+                    <button id="sendLink" class="bg-blue-500 text-white p-2 rounded-lg">Send Link</button>
+                    <button id="closeLinkModal" class="bg-gray-500 text-white p-2 ml-2 rounded-lg">Cancel</button>
+                </div>
+            </div>
+</div>
+
+<!-- Emoji Picker Modal -->
+<div id="emojiPickerModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg w-1/3 max-h-[80vh] overflow-y-auto">
+                <h2 class="text-xl font-bold mb-4">Pick an Emoji</h2>
+                <div id="emojiContainer" class="grid grid-cols-6 gap-2 max-h-[60vh] overflow-y-auto">
+                    <!-- Emoji options will be populated here -->
+                </div>
+                <div class="flex justify-end mt-4">
+                    <button id="closeEmojiPickerModal" class="bg-gray-500 text-white p-2 rounded-lg hover:bg-gray-600">Close</button>
+                </div>
+            </div>
+</div>
+
+<!-- Audio Upload Modal -->
+<div id="audioUploadModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg w-1/3">
+                <h2 class="text-xl font-bold mb-4">Upload Audio</h2>
+                <input type="file" id="audioFileInput" class="border p-2 w-full mb-4" accept="audio/*">
+                <div class="flex justify-end">
+                    <button id="uploadAudio" class="bg-blue-500 text-white p-2 rounded-lg">Upload</button>
+                    <button id="closeAudioModal" class="bg-gray-500 text-white p-2 ml-2 rounded-lg">Cancel</button>
+                </div>
+            </div>
+</div>
+
+<!-- Video Upload Modal -->
+<div id="videoUploadModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg w-1/3">
+                <h2 class="text-xl font-bold mb-4">Upload Video</h2>
+                <input type="file" id="videoFileInput" class="border p-2 w-full mb-4" accept="video/*">
+                <div class="flex justify-end">
+                    <button id="uploadVideo" class="bg-blue-500 text-white p-2 rounded-lg">Upload</button>
+                    <button id="closeVideoModal" class="bg-gray-500 text-white p-2 ml-2 rounded-lg">Cancel</button>
+                </div>
+            </div>
+</div>
+
+</div>
+
+<!-- Include Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   
  <!-- FullCalendar JavaScript -->
  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 <!-- ---------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 
+<!-- Channel info -->
+<div class="fixed top-2 left-1/2 -translate-x-1/2 z-50 w-full max-w-4xl px-4">
+    <div class="bg-white border-b border-gray-200 rounded-t-xl shadow-header flex items-center gap-3 py-2 px-3">
+        <!-- Channel Icon -->
+        <div class="bg-gradient-to-br from-blue-600 to-purple-500 w-10 h-10 rounded-lg flex items-center justify-center text-lg font-bold text-white">
+            #
+        </div>
 
-<br><br>
+        <!-- Channel Info -->
+        <div class="flex-1 min-w-0">
+            <div class="flex items-baseline gap-2">
+                <h1 class="text-xl font-semibold text-gray-900 truncate">
+                    {{ channel.name }}
+                </h1>
+                <div class="flex items-center gap-1.5 text-xs text-gray-500">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    <span>{{ member_count }} members</span>
+                </div>
+            </div>
+            <p class="text-gray-500 text-xs truncate mt-0.5">
+                ⭐ Central hub for announcements, team updates, and recognition
+            </p>
+        </div>
+    </div>
+</div>
+
+
 <!-- -------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 <div id="calendar-container" class="mt-5 hidden">
     <div id="calendar"></div>
@@ -3071,424 +1363,322 @@ p {
 <!-- ------------------------------------------------------------------------------------------------- -->
 
 <!-- Re-initialized chat window -->
-<body class="bg-gray-100">
+<style>
+   
+  </style>
+</head>
+<body>
+
+
+<div class="clickup-container">
+    <!-- Search bar -->
     
-    <div class="max-w-4xl mx-auto mt-10">
-        <div class="mb-4">
-            <input 
-                type="text" 
-                id="searchInput" 
-                placeholder="🔍 Search messages and links..." 
-                class="form-control form-control-lg w-full p-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-            />
+    <!-- Chat window -->
+    <div class="clickup-card">
+      <!-- Header -->
+      <div class="clickup-header">
+        <div class="clickup-header-title">
+          <div style="width: 32px; height: 32px; background-color: #7b68ee; color: white; border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-comments"></i>
+          </div>
+          <h2 style="font-size: 16px; font-weight: 600;">Team Chat</h2>
+         
         </div>
-<!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  -->
-<div id="chatWindow" class="bg-gradient-to-br from-gray-100 to-white p-4 rounded-xl shadow-2xl mb-4 max-h-[590px] overflow-y-auto border border-gray-300 w-full max-w-4xl">
 
-{% if messages %}
+        <!-- Search bar -->
+        <div class="relative w-full">
+            <!-- Search bar -->
+            <div class="absolute right-0 top-0 clickup-search flex items-center gap-2">
+                <i class="fas fa-search text-gray-500"></i>
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Search messages and links..." 
+                    class="form-control form-control-lg"
+                />
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 8px;">
+          <button style="background: none; border: none; color: #686b78; width: 32px; height: 32px; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-bell"></i>
+          </button>
+          <button style="background: none; border: none; color: #686b78; width: 32px; height: 32px; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-cog"></i>
+          </button>
+        </div>
+      </div>
 
-             <!-- Loop through messages and display them -->
-             {% for message in messages %}
-            
-             <div class="flex items-center border-b border-gray-200 py-3 hover:bg-gray-50 rounded-lg px-2 transition duration-200 relative 
-                 {% if message.is_pinned %} bg-yellow-100 border-yellow-400 {% endif %}">
-                 <!-- User avatar -->
-                 <div class="w-10 h-10 flex-shrink-0 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4">
-                     {{ message.user.username|slice:":1" }}
-                 </div>
-                 <!-- Message content -->
-                 <div class="flex flex-col w-full">
-                     <!-- Parent message display -->
-                     {% if message.parent %}
-                     <div class="text-sm italic text-gray-500 border-l-4 border-gray-300 pl-3 mb-2">
-                         Replied to: <span class="text-gray-800">{{ message.parent.user.username }}</span> - "{{ message.parent.content }}" 
-                     </div> 
-                     {% endif %}
+      <!-- Messages area -->
+      <div id="chatWindow" class="clickup-messages">
+        {% if messages %}
+          <!-- Loop through messages and display them -->
+          {% for message in messages %}
+            <div class="clickup-message {% if message.is_pinned %} pinned {% endif %}">
+              <!-- User avatar -->
+              <div class="clickup-avatar" style="background-image: linear-gradient(135deg, #7b68ee, #9c92f8);">
+                {{ message.user.username|slice:":1" }}
+              </div>
+              
+              <!-- Message content -->
+              <div class="clickup-message-content">
+                <!-- Parent message display - using original template logic -->
+                {% if message.parent %}
+                <div class="clickup-parent-message">
+                  <strong>{{ message.parent.user.username }}</strong> - {{ message.parent.content }}
+                </div>
+                {% endif %}
 
-                     <!-- Current message -->
-                     <span class="font-semibold text-purple-600">{{ message.user.username }}</span>
-                     <span class="text-gray-700">
-                         {% if message.link %}
-                             <a href="{{ message.link }}" target="_blank" class="text-blue-500 hover:underline font-medium">
-                                 {{ message.link }}
-                             </a>
-                         {% else %}
-                         <div style="font-family: 'Montserrat', sans-serif;" class="font-weight-bold">
-                            {{ message.content }}
-                        </div>
-                         {% endif %}
-                     </span>
-                     <span class="text-xs text-gray-500 mt-1 self-end">{{ message.timestamp|date:"H:i" }}</span>
-                     <br>
-
+                <!-- Message header -->
+                <div class="clickup-message-header">
+                  <span class="clickup-username">{{ message.user.username }}</span>
+                  <span class="clickup-timestamp">{{ message.timestamp|date:"H:i" }}</span>
+                </div>
+                
+                <!-- Message text -->
+                <div class="clickup-message-text">
+                  {% if message.link %}
+                    <a href="{{ message.link }}" target="_blank" class="text-blue-500 hover:underline font-medium">
+                      {{ message.link }}
+                    </a>
+                  {% else %}
+                    <div style="font-family: 'Poppins', sans-serif;">
+                      {{ message.content }}
+                    </div>
+                  {% endif %}
+                </div>
+                
+                <!-- Message actions -->
+                <div class="clickup-actions">
+                  <!-- Reply button - preserving original data attributes -->
+                  <button class="clickup-action-button reply-btn" 
+                    data-message-id="{{ message.id }}" 
+                    data-org-id="{{ channel.organization.id }}" 
+                    data-channel-id="{{ channel.id }}">
+                    <i class="fas fa-reply"></i> Reply
+                  </button>
                   
-                 </div>
-       
-    <!-- Star/Unstar icon -->
-<div class="absolute right-2 top-2">
-    <button class="star-icon text-yellow-500 text-xl {% if message.is_starred %}filled{% endif %}" 
-            data-message-id="{{ message.id }}" 
-            data-org-id="{{ channel.organization.id }}" 
-            data-channel-id="{{ channel.id }}">
-        ★
-    </button>
-    <span class="star-status text-xs {% if message.is_starred %}starred{% else %}unstarred{% endif %}">
-        {% if message.is_starred %} Starred {% else %} Unstarred {% endif %}
-    </span>
-</div>  
-<br><br>                                  
- <!-- Reply Button -->
- <div class="absolute right-2 bottom-2">
-    <button class="reply-btn text-sm text-blue-500 hover:underline" 
-            data-message-id="{{ message.id }}" 
-            data-org-id="{{ channel.organization.id }}" 
-            data-channel-id="{{ channel.id }}">
-        Reply
-    </button>
-</div>       
-
-
-        <!-- 3-dot menu -->
-        {% if message.user == request.user %}
-            <div class="relative">
-                <button class="menu-button text-gray-400 hover:text-gray-600 focus:outline-none">
-                    &#x22EE;
-                </button>
-                <div class="menu-options hidden absolute top-6 right-0 bg-white shadow-md rounded-lg text-sm">
-                    <!-- Inside the menu options for links -->
-                    <form action="{% url 'delete_message' org_id=channel.organization.id channel_id=channel.id message_id=message.id %}" method="POST" class="inline-block">
+                  <!-- Star button - preserving original class and data attributes -->
+                  <button class="clickup-action-button star-icon {% if message.is_starred %}starred{% endif %}" 
+                    data-message-id="{{ message.id }}" 
+                    data-org-id="{{ channel.organization.id }}" 
+                    data-channel-id="{{ channel.id }}">
+                    <i class="fas fa-star"></i>
+                    <span class="star-status">
+                      {% if message.is_starred %}Starred{% else %}Star{% endif %}
+                    </span>
+                  </button>
+                  
+                  <!-- Menu - preserving original class structure -->
+                  {% if message.user == request.user %}
+                  <div class="clickup-menu">
+                    <button class="clickup-action-button menu-button">
+                      <i class="fas fa-ellipsis-h"></i>
+                    </button>
+                    <!-- Menu options - keeping the hidden class as in original -->
+                    <div class="clickup-menu-content menu-options hidden">
+                      <!-- Delete form - preserving action URL -->
+                      <form action="{% url 'delete_message' org_id=channel.organization.id channel_id=channel.id message_id=message.id %}" method="POST" class="inline-block">
                         {% csrf_token %}
-                        <button type="submit" class="delete-message text-red-500 px-4 py-2 w-full hover:bg-red-50">
-                            Delete
+                        <button type="submit" class="clickup-menu-item delete delete-message">
+                          <i class="fas fa-trash-alt"></i> Delete
                         </button>
-                    </form>
-                    <!-- edit message button -->
-                    <button class="edit-button text-green-500 px-4 py-2 w-full hover:bg-green-50" data-bs-toggle="modal" data-bs-target="#editMessageModal" data-message-id="{{ message.id }}" data-current-content="{{ message.content }}">
-                        <i class="fas fa-ellipsis-v"></i> Edit
+                      </form>
+                      
+                      <!-- Edit button - preserving data attributes and classes -->
+                      <button class="clickup-menu-item edit-button" data-bs-toggle="modal" data-bs-target="#editMessageModal" 
+                        data-message-id="{{ message.id }}" data-current-content="{{ message.content }}">
+                        <i class="fas fa-edit"></i> Edit
+                      </button>
+                      
+                      <!-- Pin button - preserving onclick function and original logic -->
+                      <button onclick="togglePinMessage({{ message.organization.id }}, {{ message.channel.id }}, {{ message.id }})" class="clickup-menu-item">
+                        <i class="fas fa-thumbtack"></i>
+                        {% if message.is_pinned %}Unpin{% else %}Pin{% endif %}
+                      </button>
+                      
+                      <!-- Set recurring button - preserving data attributes and class -->
+                      <button id="setRecurringButton" 
+                      class="clickup-menu-item" 
+                      data-message-id="{{ message.id }}" 
+                      data-org-id="{{ channel.organization.id }}" 
+                      data-channel-id="{{ channel.id }}">
+                      <i class="fas fa-redo-alt"></i> Set as Recurring
                     </button>
-                    <!-- Pin message -->
-                    <button onclick="togglePinMessage({{ message.organization.id }}, {{ message.channel.id }}, {{ message.id }})" class="edit-button text-green-500 px-4 py-2 w-full hover:bg-green-50">
-                        {% if message.is_pinned %}
-                            Unpin
-                        {% else %}
-                            Pin
-                        {% endif %}
-                    </button>
-                    <!-- recurring message -->
-
-                    <!-- Updated Button with Data Attributes -->
-
-         <button id="setRecurringButton" 
-            class="edt-button text-green-500 px-4 py-2 w-full hover:bg-green-50" 
-            data-message-id="{{ message.id }}" 
-            data-org-id="{{ channel.organization.id }}" 
-            data-channel-id="{{ channel.id }}">
-            Set as Recurring
-        </button>
-
+          
+                    </div>
+                  </div>
+                  {% endif %}
                 </div>
+              </div>
             </div>
+          {% endfor %}
+          
+          <!-- Loop through links - preserving original template logic -->
+          {% for link in links %}
+            <div class="clickup-message">
+              <!-- User avatar -->
+              <div class="clickup-avatar" style="background-image: linear-gradient(135deg, #24b47e, #4ade80);">
+                {{ link.user.username|slice:":1" }}
+              </div>
+              
+              <!-- Link content -->
+              <div class="clickup-message-content">
+                <div class="clickup-message-header">
+                  <span class="clickup-username" style="color: #24b47e;">{{ link.user.username }}</span>
+                  <span class="clickup-timestamp">{{ link.timestamp|date:"H:i" }}</span>
+                </div>
+                
+                <div style="padding: 10px; background-color: var(--clickup-gray); border-radius: 6px; margin-bottom: 8px;">
+                  <a href="{{ link.link }}" target="_blank" style="color: #2563eb; text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-link"></i> {{ link.text }}
+                  </a>
+                  <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">{{ link.link }}</div>
+                </div>
+                
+                <!-- Link actions -->
+                {% if link.user == request.user %}
+                <div class="clickup-actions">
+                  <div class="clickup-menu">
+                    <button class="clickup-action-button menu-button">
+                      <i class="fas fa-ellipsis-h"></i>
+                    </button>
+                    <!-- Menu options - keeping the hidden class -->
+                    <div class="clickup-menu-content menu-options hidden">
+                      <!-- Delete form - preserving action URL -->
+                      <form action="{% url 'delete_link' org_id=channel.organization.id channel_id=channel.id link_id=link.id %}" method="POST" class="inline-block">
+                        {% csrf_token %}
+                        <button type="submit" class="clickup-menu-item delete delete-message">
+                          <i class="fas fa-trash-alt"></i> Delete
+                        </button>
+                      </form>
+                      
+                      <!-- Edit link button - preserving all data attributes -->
+                      <button class="clickup-menu-item edit-link-button" 
+                        data-link-id="{{ link.id }}" 
+                        data-current-text="{{ link.text }}" 
+                        data-current-link="{{ link.link }}" 
+                        type="button" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#editLinkModal">
+                        <i class="fas fa-edit"></i> Edit Link
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <!-- Empty state - styled to match ClickUp -->
+          <div class="clickup-empty-state">
+            <div class="clickup-empty-icon">
+              <i class="fas fa-comment-alt"></i>
+            </div>
+            <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Start a conversation</h3>
+            <p style="color: var(--text-secondary); max-width: 350px; margin-bottom: 20px;">Nothing here! Start a fresh conversation and you will be the first to initiate it. Please reload the page after sending your first message.</p>
+            <button style="background-color: var(--primary-color); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 500;">Send a message</button>
+          </div>
         {% endif %}
-    </div>
-{% endfor %}
-            <!-- Loop through links and display them -->
-            {% for link in links %}
-                <div class="flex items-center border-b border-gray-200 py-3 hover:bg-gray-50 rounded-lg px-2 transition duration-200 relative">
-                    <!-- User avatar placeholder -->
-                    <div class="w-10 h-10 flex-shrink-0 bg-gradient-to-tr from-blue-500 to-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4">
-                        {{ link.user.username|slice:":1" }}
-                    </div>
-                    <!-- Link content -->
-                    <div class="flex flex-col w-full">
-                        <span class="font-semibold text-green-600">{{ link.user.username }}</span>
-                        <span>
-                            <a href="{{ link.link }}" target="_blank" class="text-blue-600 hover:underline font-medium">
-                                {{ link.text }}
-                            </a>
-                        </span>
-                        <span class="text-xs text-gray-500 mt-1 self-end">{{ link.timestamp|date:"H:i" }}</span>
-                    </div>
-                    <!-- 3-dot menu -->
-                    {% if link.user == request.user %}
-                        <div class="relative">
-                            <button class="menu-button text-gray-400 hover:text-gray-600 focus:outline-none">
-                                &#x22EE;
-                            </button>
-                            <div class="menu-options hidden absolute top-6 right-0 bg-white shadow-md rounded-lg text-sm">
-                                <!-- Inside the menu options for links -->
-                                <form action="{% url 'delete_link' org_id=channel.organization.id channel_id=channel.id link_id=link.id %}" method="POST" class="inline-block">
-                                    {% csrf_token %}
-                                    <button type="submit" class="delete-message text-red-500 px-4 py-2 w-full hover:bg-red-50">
-                                        Delete
-                                    </button>
-                                </form>
+      </div>
 
-                               
-                               <!-- Edit Link Button -->
-                               <button class="edit-link-button text-green-500 px-4 py-2 w-full hover:bg-green-50" 
-                               data-link-id="{{ link.id }}" 
-                               data-current-text="{{ link.text }}" 
-                               data-current-link="{{ link.link }}" 
-                               type="button" 
-                               data-bs-toggle="modal" 
-                               data-bs-target="#editLinkModal">
-                           Edit Link
-                       </button>
-                       
-
-                                
-                            </div>
-                        </div>
-                    {% endif %}
-                </div>
-            {% endfor %}
-            {% else %}
-            <div class="text-center">
-                <!-- Image with Bootstrap 5 styling for small size -->
-                <img src="https://img.freepik.com/premium-vector/people_845244-11.jpg?w=740" class="img-fluid rounded-circle mb-3" style="max-width: 150px;">
+      <!-- Input area -->
+      <div class="clickup-input-area">
+        <div class="clickup-input-container">
+          <!-- Mention button - preserving ID -->
+          <button id="mentionButton" style="background: none; border: none; color: #686b78; width: 36px; height: 36px; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-at"></i>
+          </button>
+          
+          <!-- Message input - preserving ID -->
+          <input id="messageInput" type="text" class="clickup-input" placeholder="Type a message...">
+          
+          <div class="clickup-input-actions">
+            <!-- Emoji button - preserving ID -->
+            <button id="emojiPickerButton" style="background: none; border: none; color: #686b78; width: 36px; height: 36px; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+              <i class="fas fa-smile"></i>
+            </button>
             
-                <!-- Welcome text styled with Bootstrap 5 classes -->
-                <p class="lead text-muted">Nothing here! Start a fresh conversation and you will be the first to initiate it. Please reload the page after sending your first message.</p>
-            </div>
-            {% endif %}
-                  
+            <!-- Send button - preserving ID -->
+            <button id="sendMessage" class="clickup-send-button">
+              <i class="fas fa-paper-plane"></i> Send
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toolbar - with all original buttons and IDs -->
+      <div class="clickup-toolbar">
+        <div class="clickup-toolbar-group">
+          <!-- Link button - preserving ID -->
+          <button id="sendLinkButton" class="clickup-tool-button">
+            <i class="fas fa-link"></i>
+          </button>
+          
+          <!-- Audio button - preserving ID -->
+          <button id="uploadAudioButton" class="clickup-tool-button">
+            <i class="fas fa-microphone-alt"></i>
+          </button>
+          
+          <!-- Video button - preserving ID -->
+          <button id="uploadVideoButton" class="clickup-tool-button">
+            <i class="fas fa-video"></i>
+          </button>
+          
+          <!-- Call button - preserving ID -->
+          <button id="callButton" class="clickup-tool-button">
+            <i class="fas fa-phone-alt"></i>
+          </button>
         </div>
         
-        <!-- ------------------------------------------------------------------------------------------ -->
-        <div class="flex items-center space-x-2 bg-gray-100 p-2 rounded-lg">
-            <!-- Mention User Icon -->
-            <button id="mentionButton" class="p-2 text-yellow-500 hover:text-yellow-600">
-                <i class="fas fa-at text-xl"></i>
-            </button>
-        
-            <!-- Message Input -->
-            <input id="messageInput" type="text" 
-                   class="border border-gray-300 p-2 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                   placeholder="Type a message...">
-        
-            <!-- Send Message Icon -->
-            <button id="sendMessage" class="p-2 text-blue-500 hover:text-blue-600">
-                <i class="fas fa-paper-plane text-xl"></i>
-            </button>
-        
-            <!-- Send Link Icon -->
-            <button id="sendLinkButton" class="p-2 text-green-500 hover:text-green-600">
-                <i class="fas fa-link text-xl"></i>
-            </button>
-        
-            <!-- Emoji Picker Icon -->
-            <button id="emojiPickerButton" class="p-2 text-purple-500 hover:text-purple-600">
-                <i class="fas fa-smile text-xl"></i>
-            </button>
-        
-            <!-- Upload Audio Icon -->
-            <button id="uploadAudioButton" class="p-2 text-indigo-500 hover:text-indigo-600">
-                <i class="fas fa-microphone-alt text-xl"></i>
-            </button>
-        
-            <!-- Upload Video Icon -->
-            <button id="uploadVideoButton" class="p-2 text-teal-500 hover:text-teal-600">
-                <i class="fas fa-video text-xl"></i>
-            </button>
-
-
-            <!-- Call Icon -->
-<button id="callButton" class="p-2 text-green-500 hover:text-green-600">
-    <i class="fas fa-phone-alt text-xl"></i>
-</button>
-
-
-<!-- Screen Share Icon -->
-<button id="screenShareButton" class="p-2 text-blue-500 hover:text-blue-600">
-    <i class="fas fa-plus text-xl"></i>
-</button>
-
-<!-- Screen share btn  -->
-<button id="shareScreenBtn" onclick="startScreenShare()" class="p-2 text-blue-500 hover:text-blue-600">
-    
-    <i class="fas fa-desktop text-xl"></i></button>
-
-<!-- Filter by User Button -->
-<button
-    class=" p-2 text-blue-500 hover:text-blue-600 "
-    data-bs-toggle="modal"
-    data-bs-target="#filterByUserModal"
->
-<i class="fas fa-user text-xl"></i>
-</button>
-
-
-<!-- Trigger Button to display the network stats -->
-<button class="p-2 text-blue-500 hover:text-blue-600" data-bs-toggle="modal" data-bs-target="#networkStatusModal" onclick="displayNetworkStatus()"><i class="fas fa-wifi text-xl"></i>
-
-</button>
-<!-- New 
-  -->
-
-<button class="p-2 text-blue-500 hover:text-blue-600" data-bs-toggle="modal" data-bs-target="">
-    <i class="fab fa-slack text-xl"></i>
-
-</button>
-
-
-
-<button class="p-2 text-blue-500 hover:text-blue-600" data-bs-toggle="modal" data-bs-target="">
-    <i class="fas fa-tasks text-xl"></i>
-
-</button>
-
-
-<button class="p-2 text-blue-500 hover:text-blue-600" data-bs-toggle="modal" data-bs-target="">
-    <i class="fas fa-poll text-xl"></i>
-
-
-</button>
-
-
-<button class="p-2 text-blue-500 hover:text-blue-600" data-bs-toggle="modal" data-bs-target="">
-    <i class="fas fa-code text-xl"></i>
-</button>
-
-
-</div>
-
-<!-- ---------------------------------------------------------------------------------------------------------------------------------------- -->
-
-
-       
-
-        
-
-        <!-- Modal to mention users -->
-        <div id="mentionModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white p-6 rounded-lg w-1/3">
-                <h2 class="text-xl font-bold mb-4">Mention a User</h2>
-                <ul id="mentionList" class="space-y-2">
-                    <!-- List of users will be populated here -->
-                </ul>
-                <div class="flex justify-end">
-                    <button id="closeMentionModal" class="bg-gray-500 text-white p-2 rounded-lg">Close</button>
-                </div>
-            </div>
+        <div class="clickup-toolbar-group">
+          <!-- Plus button - preserving ID -->
+          <button id="screenShareButton" class="clickup-tool-button">
+            <i class="fas fa-plus"></i>
+          </button>
+          
+          <!-- Screen share button - preserving ID and onclick -->
+          <button id="shareScreenBtn" onclick="startScreenShare()" class="clickup-tool-button">
+            <i class="fas fa-desktop"></i>
+          </button>
+          
+          <!-- Filter button - preserving data attributes -->
+          <button class="clickup-tool-button" data-bs-toggle="modal" data-bs-target="#filterByUserModal">
+            <i class="fas fa-user"></i>
+          </button>
+          
+          <!-- Network status button - preserving onclick and data attributes -->
+          <button class="clickup-tool-button" data-bs-toggle="modal" data-bs-target="#networkStatusModal" onclick="displayNetworkStatus()">
+            <i class="fas fa-wifi"></i>
+          </button>
+          
+          <!-- Additional buttons from original code -->
+          <button class="clickup-tool-button" data-bs-toggle="modal" data-bs-target="">
+            <i class="fab fa-slack"></i>
+          </button>
+          
+          <button class="clickup-tool-button" data-bs-toggle="modal" data-bs-target="">
+            <i class="fas fa-tasks"></i>
+          </button>
+          
+          <button class="clickup-tool-button" data-bs-toggle="modal" data-bs-target="">
+            <i class="fas fa-poll"></i>
+          </button>
+          
+          <button class="clickup-tool-button" data-bs-toggle="modal" data-bs-target="">
+            <i class="fas fa-code"></i>
+          </button>
         </div>
-
-        <!-- Modal to send link -->
-        <div id="sendLinkModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white p-6 rounded-lg w-1/3">
-                <h2 class="text-xl font-bold mb-4">Send a Link</h2>
-                <input id="linkText" type="text" class="border p-2 w-full mb-4" placeholder="Link Text">
-                <input id="linkUrl" type="url" class="border p-2 w-full mb-4" placeholder="URL">
-                <div class="flex justify-end">
-                    <button id="sendLink" class="bg-blue-500 text-white p-2 rounded-lg">Send Link</button>
-                    <button id="closeLinkModal" class="bg-gray-500 text-white p-2 ml-2 rounded-lg">Cancel</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Emoji Picker Modal -->
-        <div id="emojiPickerModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white p-6 rounded-lg w-1/3 max-h-[80vh] overflow-y-auto">
-                <h2 class="text-xl font-bold mb-4">Pick an Emoji</h2>
-                <div id="emojiContainer" class="grid grid-cols-6 gap-2 max-h-[60vh] overflow-y-auto">
-                    <!-- Emoji options will be populated here -->
-                </div>
-                <div class="flex justify-end mt-4">
-                    <button id="closeEmojiPickerModal" class="bg-gray-500 text-white p-2 rounded-lg hover:bg-gray-600">Close</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Audio Upload Modal -->
-        <div id="audioUploadModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white p-6 rounded-lg w-1/3">
-                <h2 class="text-xl font-bold mb-4">Upload Audio</h2>
-                <input type="file" id="audioFileInput" class="border p-2 w-full mb-4" accept="audio/*">
-                <div class="flex justify-end">
-                    <button id="uploadAudio" class="bg-blue-500 text-white p-2 rounded-lg">Upload</button>
-                    <button id="closeAudioModal" class="bg-gray-500 text-white p-2 ml-2 rounded-lg">Cancel</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Video Upload Modal -->
-        <div id="videoUploadModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white p-6 rounded-lg w-1/3">
-                <h2 class="text-xl font-bold mb-4">Upload Video</h2>
-                <input type="file" id="videoFileInput" class="border p-2 w-full mb-4" accept="video/*">
-                <div class="flex justify-end">
-                    <button id="uploadVideo" class="bg-blue-500 text-white p-2 rounded-lg">Upload</button>
-                    <button id="closeVideoModal" class="bg-gray-500 text-white p-2 ml-2 rounded-lg">Cancel</button>
-                </div>
-            </div>
-        </div>
-
+      </div>
     </div>
+</div>
+<!------------------------------------------------------------------------------------------------------------------------------------------ -->
+
 <!-- ----------------------------------------------------------------------------------------------------------------------------------------------- -->
-    <script>
+
+<script>
      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         // -----------------------------------------------------------------------------------------
       
         const channelId = "{{ channel.id }}";
