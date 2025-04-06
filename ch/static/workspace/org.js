@@ -487,3 +487,68 @@ document.addEventListener("DOMContentLoaded", function () {
         return document.cookie.split("; ").find(row => row.startsWith("csrftoken="))?.split("=")[1];
     }
 });
+
+
+
+// RAISE HELP REQUEST --- USER-Impersonation System
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('helpRequestForm');
+    const msg = document.getElementById('helpResponseMsg');
+    const modalElement = document.getElementById('raiseHelpModal');
+    const bootstrapModal = bootstrap.Modal.getOrCreateInstance(modalElement);
+  
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      msg.textContent = '';
+      msg.classList.remove('text-danger', 'text-success');
+  
+      const orgId =window.djangoData.orgId; // Set this properly in template context
+      const formData = new FormData(form);
+  
+      try {
+        const response = await fetch(`/subscription/raise-help-request-live/${orgId}/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': getCSRFToken(),
+          },
+          body: formData,
+        });
+  
+        const data = await response.json();
+        console.log("📨 Ajax Response:", data);
+  
+        if (data.success) {
+          msg.textContent = data.message;
+          msg.classList.add('text-success');
+          form.reset();
+  
+          setTimeout(() => {
+            bootstrapModal.hide();
+            msg.textContent = '';
+          }, 1500);
+        } else {
+          msg.textContent = data.message || 'Failed to raise request.';
+          msg.classList.add('text-danger');
+        }
+      } catch (err) {
+        console.error("❌ Ajax Error:", err);
+        msg.textContent = 'Something went wrong. Try again.';
+        msg.classList.add('text-danger');
+      }
+    });
+  
+    function getCSRFToken() {
+      const token = document.querySelector('[name=csrfmiddlewaretoken]');
+      if (token) return token.value;
+  
+      const name = 'csrftoken';
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + '=')) {
+          return decodeURIComponent(cookie.substring(name.length + 1));
+        }
+      }
+      return '';
+    }
+  });

@@ -5,11 +5,16 @@ from .models import Payment,PremiumPlan
 from django.views.decorators.csrf import csrf_exempt
 import logging
 from django.http import HttpResponseBadRequest
-
+from accounts.models import Organization
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from .models import HelpRequest
 
 client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
-
+# initiate payment for subscrption plans 
 def initiate_payment(request):
     plans = PremiumPlan.objects.filter(is_active=True)
 
@@ -65,7 +70,7 @@ def initiate_payment_for_plan(request):
 
 
 logger = logging.getLogger(__name__)  # Setup logger for debug tracking
-
+# rdirect after payment success
 @csrf_exempt
 def payment_success(request):
     if request.method == "POST":
@@ -103,3 +108,25 @@ def payment_success(request):
 
     logger.warning("Invalid HTTP method for payment_success view")
     return HttpResponseBadRequest("Invalid request method.")
+
+
+# Help Request set-up
+@csrf_exempt
+@login_required
+def raise_help_request(request, org_id):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        attachment = request.FILES.get('attachment')
+        organization = Organization.objects.get(id=org_id)
+
+        HelpRequest.objects.create(
+            organization=organization,
+            user=request.user,
+            title=title,
+            description=description,
+            attachment=attachment
+        )
+        return JsonResponse({'success': True, 'message': 'Help request raised successfully!'})
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request method'})

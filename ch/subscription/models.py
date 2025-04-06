@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+import uuid
+from accounts.models import Organization
 
 User = get_user_model()
 
@@ -39,3 +41,25 @@ class PremiumPlan(models.Model):
 
     class Meta:
         ordering = ['price']
+
+
+# Help Request Model 
+class HelpRequest(models.Model):
+    STATUS_CHOICES = [
+        ('initiated', 'Initiated'),
+        ('in_progress', 'In Progress'),
+        ('resolved', 'Resolved'),
+        ('rejected', 'Rejected'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='help_requests')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='help_requests')
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    attachment = models.FileField(upload_to='help_attachments/', null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='initiated')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.title} ({self.organization.name})"
