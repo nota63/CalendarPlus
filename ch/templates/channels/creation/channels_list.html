@@ -1,1268 +1,454 @@
 
-{% extends 'custom.html' %}
-
-{% block content %}
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <script src="https://cdn.tiny.cloud/1/yy0fjulqhp7k5kwxs7hgsp6qwytghbz4z0pj45ttxro58zsw/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Bootstrap 5 CSS (for styling the modal and components) -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-
-    <title>Channels - {{ organization.name }}</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Simple spinner for loading indication */
-        #loading {
-            display: none;
-        }
-    </style>
-</head>
-<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-
-<style>
-
-/* Modal Container */
-#ActivityModal .modal-dialog {
-    max-width: 80%; /* Slightly reduce width for a more focused experience */
-    width: 100%;
-    margin: 30px auto; /* Center the modal vertically */
-    border-radius: 15px; /* Modern rounded corners for the modal */
-}
-
-/* Modal Content */
-#ActivityModal .modal-content {
-    border-radius: 12px;
-    background: linear-gradient(145deg, #f8f9fa, #e9ecef); /* Soft gradient for a fresh feel */
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1); /* Subtle, clean shadow for the modal */
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
-}
-
-/* Modal Content Hover Effect */
-#ActivityModal .modal-content:hover {
-    transform: scale(1.03); /* Slightly zoom the modal on hover for a dynamic effect */
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15); /* Stronger shadow on hover */
-}
-
-/* Modal Header */
-#ActivityModal .modal-header {
-    background-color: #f3f8fb; /* Soft blue background */
-    border-bottom: 2px solid #e0e6ed; /* Light, subtle border */
-    padding: 24px;
-}
-
-#ActivityModal .modal-header .modal-title {
-    font-size: 1.75rem; /* Larger title for better readability */
-    color: #2d3e50; /* Deep, professional text color */
-    font-weight: 600; /* Bold title for emphasis */
-    letter-spacing: 0.5px; /* Slight spacing for readability */
-}
-
-/* Modal Close Button */
-#ActivityModal .modal-header .btn-close {
-    font-size: 1.5rem; /* Larger close button */
-    opacity: 0.6;
-    transition: opacity 0.3s ease;
-}
-
-#ActivityModal .modal-header .btn-close:hover {
-    opacity: 1; /* Full opacity on hover */
-}
-
-/* Modal Body */
-#ActivityModal .modal-body {
-    max-height: 450px; /* Increase max-height for better usability */
-    overflow-y: auto; /* Enable smooth scrolling */
-    padding: 20px;
-    background-color: #fff; /* Clean white background for content */
-}
-
-/* Activity List */
-#activityList {
-    list-style-type: none;
-    padding-left: 0;
-    margin-bottom: 0;
-}
-
-/* Activity Items */
-#activityList .list-group-item {
-    border-radius: 10px;
-    padding: 16px;
-    background-color: #f7f9fc; /* Fresh, clean background for items */
-    border: 1px solid #d1d8e1; /* Light border for definition */
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); /* Light shadow for items */
-    margin-bottom: 12px;
-    transition: all 0.3s ease;
-}
-
-/* Hover Effect for Activity Items */
-#activityList .list-group-item:hover {
-    transform: translateY(-3px); /* Lift effect on hover */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12); /* Darker shadow for interactivity */
-    background-color: #f1f5f9; /* Slight background color change on hover */
-}
-
-/* Text Styling for Activity Items */
-#activityList .list-group-item strong {
-    color: #007bff; /* Blue color for the user name */
-    font-weight: 600;
-}
-
-#activityList .list-group-item em {
-    color: #999; /* Light gray for action type */
-    font-style: normal;
-}
-
-#activityList .list-group-item .text-dark {
-    color: #333; /* Dark text for activity details */
-    font-size: 0.875rem; /* Slightly smaller font for details */
-}
-
-/* Modal Footer */
-#ActivityModal .modal-footer {
-    background-color: #f3f8fb; /* Soft background for the footer */
-    border-top: 2px solid #e0e6ed; /* Light border for separation */
-    padding: 15px;
-}
-
-/* Footer Buttons */
-#ActivityModal .btn {
-    font-weight: 500;
-    padding: 12px 20px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-#ActivityModal .btn-secondary {
-    background-color: #6c757d;
-    border-color: #6c757d;
-    color: #fff;
-}
-
-#ActivityModal .btn-secondary:hover {
-    background-color: #5a6268;
-    border-color: #545b62;
-}
-
-#ActivityModal .btn-danger {
-    background-color: #e74c3c; /* Fresh red for clear activities */
-    border-color: #e74c3c;
-    color: #fff;
-}
-
-#ActivityModal .btn-danger:hover {
-    background-color: #c0392b; /* Darker red on hover */
-    border-color: #c0392b;
-}
-
-/* Smooth Scroll for Activity List */
-#ActivityModal .modal-body::-webkit-scrollbar {
-    width: 8px; /* Thin scrollbar */
-}
-
-#ActivityModal .modal-body::-webkit-scrollbar-thumb {
-    background-color: #c6c6c6; /* Light gray for scrollbar thumb */
-    border-radius: 4px;
-    border: 2px solid #f9f9f9;
-}
-
-#ActivityModal .modal-body::-webkit-scrollbar-thumb:hover {
-    background-color: #8a8a8a; /* Darker gray when hovered */
-}
-
-
-
-
-
-#UnscheduleModal .modal-content {
-    border-radius: 15px;
-    border: none;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
-    transform: scale(0.98);
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-#UnscheduleModal .modal-content:hover {
-    transform: scale(1);
-}
-
-#UnscheduleModal .modal-header {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
-    color: white;
-    border-radius: 15px 15px 0 0;
-    padding: 1.2rem;
-}
-
-#UnscheduleModal .modal-title {
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    font-size: 1.25rem;
-}
-
-#UnscheduleModal .btn-close {
-    filter: invert(1);
-    opacity: 0.8;
-    transition: all 0.3s ease;
-}
-
-#UnscheduleModal .btn-close:hover {
-    opacity: 1;
-    transform: rotate(90deg);
-}
-
-#UnscheduleModal .modal-body {
-    padding: 1.5rem;
-}
-
-#unscheduleAlertsList {
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-#unscheduleAlertsList .list-group-item {
-    border: none;
-    background-color: rgba(255, 255, 255, 0.8);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    padding: 1rem 1.25rem;
-    transition: all 0.2s ease;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-#unscheduleAlertsList .list-group-item:hover {
-    background-color: white;
-    transform: translateX(5px);
-    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
-}
-
-#unscheduleAlertsList .list-group-item:last-child {
-    border-bottom: none;
-}
-
-#UnscheduleModal .modal-footer {
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
-    padding: 1rem 1.5rem;
-}
-
-#UnscheduleModal .btn-secondary {
-    background-color: #f8f9fa;
-    color: #2c3e50;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    padding: 0.5rem 1.25rem;
-    border-radius: 8px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-#UnscheduleModal .btn-secondary:hover {
-    background-color: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    transform: translateY(-1px);
-}
-
-/* Custom scrollbar for alert list */
-#unscheduleAlertsList::-webkit-scrollbar {
-    width: 6px;
-}
-
-#unscheduleAlertsList::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.05);
-}
-
-#unscheduleAlertsList::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.15);
-    border-radius: 4px;
-}
-
-
-#unscheduleAlertsList {
-    border-radius: 8px;
-    overflow: hidden;
-    max-height: 300px; /* Set max height to limit the size */
-    overflow-y: auto; /* Enable vertical scrolling */
-}
-
-#unscheduleAlertsList::-webkit-scrollbar {
-    width: 6px;
-}
-
-#unscheduleAlertsList::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.05);
-}
-
-#unscheduleAlertsList::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.15);
-    border-radius: 4px;
-}
-
-
-
-
-
-
-
-
-
-
-/* Alert text styling */
-.alert-message {
-    font-weight: 500;
-    color: #2c3e50;
-    font-size: 0.95rem;
-}
-
-.alert-time {
-    font-size: 0.85rem;
-    color: #7f8c8d;
-    background: rgba(0, 0, 0, 0.05);
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    margin-left: 1rem;
-}
-
-
-
-
-/* Alert buttons container */
-.alert-buttons-container {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-}
-
-.send-alert-btn {
-    position: relative;
-    z-index: 2;
-}
-
-.schedule-alert-btn,
-.unschedule-alert-btn {
-    position: relative;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s, visibility 0.3s;
-    margin-left: 10px; /* Space between the buttons */
-}
-
-/* Make buttons appear when hovering over the container */
-.alert-buttons-container:hover .schedule-alert-btn,
-.alert-buttons-container:hover .unschedule-alert-btn {
-    opacity: 1;
-    visibility: visible;
-}
-
-
-
-
-
-
-
-/* Schedule Alert Modal Styling */
-#scheduleAlertModal .modal-dialog {
-    max-width: 500px;
-}
-
-#scheduleAlertModal .modal-content {
-    border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-    border: none;
-}
-
-#scheduleAlertModal .modal-header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
-    border-radius: 12px 12px 0 0;
-    padding: 1.2rem 1.5rem;
-}
-
-#scheduleAlertModal .modal-title {
-    color: #2c3e50;
-    font-weight: 600;
-    font-size: 1.25rem;
-}
-
-#scheduleAlertModal .btn-close {
-    font-size: 0.75rem;
-    margin-top: 0.25rem;
-}
-
-#scheduleAlertModal .modal-body {
-    padding: 1.5rem;
-}
-
-#scheduleAlertModal .form-label {
-    color: #4a5568;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-}
-
-#scheduleAlertModal .form-control,
-#scheduleAlertModal .form-select {
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-}
-
-#scheduleAlertModal .form-control:focus,
-#scheduleAlertModal .form-select:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-#scheduleAlertModal textarea.form-control {
-    resize: vertical;
-    min-height: 100px;
-}
-
-#scheduleAlertModal #scheduleValueWrapper {
-    margin-top: 1.5rem;
-}
-
-#scheduleAlertModal .modal-footer {
-    border-top: 1px solid #dee2e6;
-    padding: 1rem 1.5rem;
-}
-
-#scheduleAlertModal .btn-primary {
-    background-color: #3b82f6;
-    border: none;
-    padding: 0.5rem 1.25rem;
-    border-radius: 8px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-#scheduleAlertModal .btn-primary:hover {
-    background-color: #2563eb;
-    transform: translateY(-1px);
-}
-
-#scheduleAlertModal .btn-secondary {
-    background-color: #64748b;
-    border: none;
-    padding: 0.5rem 1.25rem;
-    border-radius: 8px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-#scheduleAlertModal .btn-secondary:hover {
-    background-color: #475569;
-}
-
-#scheduleAlertModal #loadingSpinner {
-    padding: 1.5rem 0;
-}
-
-#scheduleAlertModal .spinner-border {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-width: 0.2em;
-}
-
-#scheduleAlertModal #loadingSpinner p {
-    color: #64748b;
-    font-size: 0.9rem;
-    margin-top: 0.75rem;
-    margin-bottom: 0;
-}
-
-/* Input placeholder styling */
-#scheduleAlertModal ::placeholder {
-    color: #94a3b8 !important;
-    opacity: 1;
-}
-
-
-
-
-
-/* CSS specific to the notification modal */
-/* Modal Container */
-#notificationModal .modal-dialog {
-    max-width: 800px; /* Increased width */
-    max-height: 90vh; /* Increased height */
-    margin: auto;
-}
-
-/* Modal Content */
-#notificationModal .modal-content {
-    border-radius: 1rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    overflow-y: auto; /* Allow scrolling */
-}
-
-/* Modal Header */
-#notificationModal .modal-header {
-    background-color: #6b46c1; /* Purple header */
-    color: white;
-    border-bottom: 2px solid #ddd;
-}
-
-#notificationModal .modal-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-/* Modal Body */
-#notificationModal .modal-body {
-    padding: 1.5rem;
-    background-color: #f9f9f9; /* Light gray background */
-    max-height: 60vh; /* Restrict max height to ensure scrolling */
-    overflow-y: auto; /* Enable scrolling when content overflows */
-}
-
-/* Notification Item */
-#notificationModal .notification-item {
-    border: 1px solid #ddd;
-    border-radius: 0.5rem;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    background: white;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-#notificationModal .notification-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Recent Tag */
-#notificationModal .notification-item .recent-tag {
-    display: inline-block;
-    padding: 0.3rem 0.6rem;
-    font-size: 0.75rem;
-    font-weight: bold;
-    color: white;
-    background-color: #f56565; /* Red tag for recent */
-    border-radius: 1rem;
-    margin-bottom: 0.5rem;
-}
-
-/* Mark Read Button */
-#notificationModal .mark-read-btn {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    font-weight: bold;
-    color: white;
-    background-color: #48bb78; /* Green button */
-    border: none;
-    border-radius: 0.5rem;
-    transition: background-color 0.2s, transform 0.2s;
-    cursor: pointer;
-}
-
-#notificationModal .mark-read-btn:hover {
-    background-color: #38a169; /* Darker green on hover */
-    transform: scale(1.05);
-}
-
-#notificationModal .mark-read-btn:disabled {
-    background-color: #a0aec0; /* Gray when disabled */
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* Smooth Scrollbar for Modal Body */
-#notificationModal .modal-body::-webkit-scrollbar {
-    width: 8px; /* Thin scrollbar */
-}
-
-#notificationModal .modal-body::-webkit-scrollbar-thumb {
-    background-color: #c6c6c6; /* Light gray for scrollbar thumb */
-    border-radius: 4px;
-    border: 2px solid #f9f9f9;
-}
-
-#notificationModal .modal-body::-webkit-scrollbar-thumb:hover {
-    background-color: #8a8a8a; /* Darker gray when hovered */
-}
-
-
-
-
- @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .animate-rotate {
-            animation: rotate 20s linear infinite;
-        }
-
-        .shadow-cyber {
-            box-shadow: 0 8px 32px rgba(8, 145, 178, 0.1),
-                        inset 0 4px 12px rgba(255, 255, 255, 0.05);
-        }
-
-        .shadow-cyber-lg {
-            box-shadow: 0 12px 48px rgba(8, 145, 178, 0.15),
-                        inset 0 6px 16px rgba(255, 255, 255, 0.08);
-        }
-
-        @keyframes float-in {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        .animate-float-in {
-            animation: float-in 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-        }
-
-        .animate-fade-in-down {
-            animation: fade-in-down 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-        }
-
-        @keyframes fade-in-down {
-            0% { opacity: 0; transform: translateY(-20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- /* Specific styling for the Send Alert Notification Modal */
- #alertModal .modal-dialog {
-    max-width: 80% !important;  /* Set max-width for this modal */
-    width: 100% !important;     /* Ensure full width */
-    height: 70vh !important;    /* Increase the height of the modal */
-    margin-top: 5vh;            /* Add some margin from the top of the screen */
-  }
-
-  /* Specific styling for modal content */
-  #alertModal .modal-content {
-    border-radius: 10px !important; /* Rounded corners */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Soft shadow */
-  }
-
-  /* Specific styling for modal header */
-  #alertModal .modal-header {
-    background-color: #f5f5f5 !important;
-    border-bottom: 1px solid #ddd !important;
-  }
-
-  #alertModal .modal-title {
-    font-size: 1.25rem;
-    color: #4A4A4A;
-  }
-
-  /* Specific styling for modal footer */
-  #alertModal .modal-footer {
-    background-color: #f9f9f9 !important;
-  }
-
-  /* Specific styling for TinyMCE */
-  #alertModal .tox .tox-editor-container {
-    height: 400px !important; /* Set height of the TinyMCE editor */
-    width: 100% !important;    /* Make editor width 100% of the modal */
-  }
-
-  #alertModal textarea {
-    width: 100% !important; /* Ensure textarea covers full width */
-  }
-
-  .btn-close {
-    color: #6c757d;
-  }
-
-  .btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
-  }
-
-  .btn-primary:hover {
-    background-color: #0056b3;
-    border-color: #004085;
-  }
-
-
-  
-
-
-/* Banned Users Modal Styling */
-#BannedUsersModal .modal-content {
-    border-radius: 10px;
-    border: 1px solid #e0e0e0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-#BannedUsersModal .modal-header {
-    background-color: #2c3e50;
-    color: white;
-    border-bottom: none;
-    border-radius: 9px 9px 0 0;
-    padding: 1rem;
-}
-
-#BannedUsersModal .modal-title {
-    font-weight: 600;
-    font-size: 1.25rem;
-}
-
-#BannedUsersModal .modal-body {
-    padding: 1.5rem;
-    background-color: #f8f9fa;
-}
-
-#BannedUsersModal .modal-body h6 {
-    color: #2c3e50;
-    margin-bottom: 1rem;
-    font-weight: 500;
-}
-
-/* Banned Users List Styling */
-#bannedUsersList .list-group-item {
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: 1px solid #dee2e6;
-    margin-bottom: 0.5rem;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    padding: 0.75rem 1.25rem;
-    background-color: white;
-}
-
-#bannedUsersList .list-group-item:hover {
-    background-color: #f8f9fa;
-    border-color: #007bff;
-    transform: translateX(5px);
-}
-
-#bannedUsersList .list-group-item.selected {
-    background-color: #007bff;
-    color: white;
-    border-color: #007bff;
-}
-
-#bannedUsersList .list-group-item.selected::after {
-    content: "✓";
-    margin-left: auto;
-    font-weight: bold;
-}
-
-/* Modal Footer Styling */
-#BannedUsersModal .modal-footer {
-    border-top: none;
-    padding: 1rem 1.5rem;
-    background-color: #f8f9fa;
-}
-
-#unbanUserBtnModal {
-    background-color: #28a745;
-    border: none;
-    padding: 0.5rem 1.25rem;
-    transition: all 0.3s ease;
-}
-
-#unbanUserBtnModal:hover {
-    background-color: #218838;
-    transform: translateY(-1px);
-}
-
-#unbanUserBtnModal:disabled {
-    background-color: #6c757d;
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
-/* Mobile Responsiveness */
-@media (max-width: 576px) {
-    #BannedUsersModal .modal-dialog {
-        margin: 0.5rem;
-    }
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <script src="https://cdn.tiny.cloud/1/yy0fjulqhp7k5kwxs7hgsp6qwytghbz4z0pj45ttxro58zsw/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
     
-    #BannedUsersModal .modal-content {
-        border-radius: 8px;
-    }
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Bootstrap 5 CSS (for styling the modal and components) -->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+        />
     
-    #BannedUsersModal .modal-body {
-        padding: 1rem;
-    }
-}
+        <title>Channels - {{ organization.name }}</title>
+        <!-- Tailwind CSS CDN -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            /* Simple spinner for loading indication */
+            #loading {
+                display: none;
+            }
+
+        </style>
+    </head>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    
+<!-- ---------------------------------------------------------------------------------------------------------------- -->
+<body class="bg-white font-inter min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+         <!-- Sidebar placeholder - to simulate ClickUp layout -->
+    <div class="fixed left-0 top-0 h-full w-16 bg-gray-50 border-r border-gray-200 flex flex-col items-center py-6 shadow-sm">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg mb-8 flex items-center justify-center">
+            <span class="text-white font-bold text-xs">{{ organization.name|slice:":1" }}</span>
+        </div>
+        <div class="space-y-6">
+            <div class="w-8 h-8 bg-blue-100 rounded-md flex items-center justify-center text-blue-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+            </div>
+            <div class="w-8 h-8 bg-gray-100 rounded-md flex items-center justify-center text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+            </div>
+            <div class="w-8 h-8 bg-gray-100 rounded-md flex items-center justify-center text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+            </div>
+        </div>
+    </div>
+        <!-- Header Section -->
+        <div class="mb-8 flex flex-col items-center sm:flex-row sm:justify-between">
+            <div class="mb-4 sm:mb-0">
+                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">
+                    <span class="bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">
+                        {{ organization.name }} Channels
+                    </span>
+                </h1>
+                <p class="text-gray-500 text-sm mt-1">
+                    Cross-organization communication management
+                </p>
+            </div>
+            
+            <!-- Quick Actions Button -->
+            <button class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                New Channel
+            </button>
+        </div>
+        
+        <!-- Search and Filter Bar -->
+        <div class="mb-6 flex flex-col sm:flex-row gap-4">
+            <!-- Search Input -->
+            <div class="relative flex-grow">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <input 
+                    id="searchInput"
+                    type="text" 
+                    placeholder="Search channels, messages, or users..."
+                    class="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+                >
+                <div id="loading" class="absolute inset-y-0 right-0 pr-3 hidden items-center">
+                    <div class="animate-pulse">
+                        <div class="h-4 w-4 bg-purple-500 rounded-full opacity-60"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filter Buttons -->
+            <div class="flex items-center space-x-2">
+                <button class="inline-flex items-center px-3 py-2 border border-gray-200 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-purple-500">
+                    <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                    </svg>
+                    Filter
+                </button>
+                <button class="inline-flex items-center px-3 py-2 border border-gray-200 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-purple-500">
+                    <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"></path>
+                    </svg>
+                    Sort
+                </button>
+            </div>
+        </div>
+        
+        <!-- View Toggle -->
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center space-x-3">
+                <span class="text-sm font-medium text-gray-500">View:</span>
+                <div class="bg-gray-100 p-1 rounded-md inline-flex">
+                    <button class="px-3 py-1.5 rounded-md bg-white shadow-sm text-sm font-medium text-gray-800 flex items-center">
+                        <svg class="w-4 h-4 mr-1.5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                        </svg>
+                        List
+                    </button>
+                    <button class="px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 flex items-center hover:text-gray-800">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                        </svg>
+                        Board
+                    </button>
+
+                    <button class="px-3 py-1.5 rounded-md text-sm font-medium text-gray-500 flex items-center hover:text-gray-800">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                        </svg>
+                        CLI
+                    </button>
+                </div>
+            </div>
+            
+            <div class="text-sm text-gray-500">
+                <span id="channelCount">{{ channels|length }} channels</span>
+            </div>
+        </div>
+
+        <!-- Channel List -->
+        <div id="channelsList" class="space-y-3">
+            {% for channel in channels %}
+            <div 
+                class="group bg-white rounded-lg border border-gray-200 hover:border-purple-200 hover:shadow-md transition-all duration-200"
+                style="animation-delay: {{ forloop.counter0|divisibleby:2|yesno:'0ms,50ms' }}; animation-fill-mode: backwards;"
+            >
+                <!-- Channel Card Content -->
+                <div class="p-4">
+                    <div class="flex items-start justify-between">
+                        <!-- Left: Channel Info -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center mb-2">
+                                <!-- Channel icon based on type -->
+                                <div class="mr-3 flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-md bg-purple-100 text-purple-600">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 7.125C2.25 6.504 2.754 6 3.375 6h6c.621 0 1.125.504 1.125 1.125v3.75c0 .621-.504 1.125-1.125 1.125h-6a1.125 1.125 0 01-1.125-1.125v-3.75zM14.25 8.625c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125v8.25c0 .621-.504 1.125-1.125 1.125h-5.25a1.125 1.125 0 01-1.125-1.125v-8.25zM3.75 16.125c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125v2.25c0 .621-.504 1.125-1.125 1.125h-5.25a1.125 1.125 0 01-1.125-1.125v-2.25z" />
+                                    </svg>
+                                </div>
+                                
+                                <div class="flex-1 min-w-0">
+                                    <h2 class="text-base font-semibold text-gray-900 truncate leading-6">
+                                        {{ channel.name }}
+                                    </h2>
+                                    <div class="flex items-center mt-1 text-xs text-gray-500 space-x-2">
+                                        <span class="flex items-center">
+                                            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            {{ channel.created_at|date:"M j, Y" }}
+                                        </span>
+                                        <span>•</span>
+                                        <span>{{ channel.get_type_display }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Channel Tags and Metadata -->
+                            <div class="mt-2 flex flex-wrap gap-2">
+                                <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium
+                                    {% if channel.visibility == 'public' %}bg-green-100 text-green-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        {% if channel.visibility == 'public' %}
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        {% else %}
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        {% endif %}
+                                    </svg>
+                                    {{ channel.get_visibility_display }}
+                                </span>
+                                
+                                <!-- Activity indicator -->
+                                <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                                    </svg>
+                                    Active
+                                </span>
+                            </div>
+                            
+                            <!-- Access Indicators -->
+                            {% if channel.accesses.exists %}
+                            <div class="mt-4 space-y-3 relative">
+                                <!-- Vertical connection line -->
+                                <div class="absolute left-5 top-2 bottom-2 w-px bg-gray-200"></div>
+                            
+                                {% for access in channel.accesses.all %}
+                                <div class="relative pl-8 group">
+                                    <!-- Connection node -->
+                                    <div class="absolute left-0 top-2.5 w-3 h-3 bg-white border-2 border-purple-400 rounded-full z-10"></div>
+                                    
+                                    <!-- Animated connection line -->
+                                    <div class="absolute left-[5.5px] top-2.5 h-[calc(100%+1rem)] w-px bg-gray-200 group-last:hidden"></div>
+                            
+                                    <div class="flex items-center gap-2 p-3 bg-white rounded-lg shadow-xs border border-gray-200 hover:border-purple-100 hover:shadow-sm transition-all duration-200">
+                                        <svg class="w-4 h-4 text-purple-500" viewBox="0 0 16 16" fill="currentColor">
+                                            <path d="M6 12.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+                                        </svg>
+                                        
+                                        <div class="flex items-baseline gap-2 text-sm">
+                                            <span class="font-medium text-gray-700">{{ access.owning_organization.name }}</span>
+                                            <span class="text-gray-400">→</span>
+                                            <span class="font-medium text-gray-700">{{ access.granted_to_organization.name }}</span>
+                                        </div>
+                            
+                                        <div class="ml-2 px-1.5 py-0.5 bg-blue-50 text-blue-600 text-xs rounded-md">
+                                            {{ forloop.counter }} hop
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                        </div>
+                        
+                        <!-- Right: Quick Actions -->
+                        <div class="ml-4 flex space-x-2">
+                            <a href="{% url 'channel_chat' channel_id=channel.id%}">
+                                <button class="inline-flex items-center px-2.5 py-1.5 border border-gray-200 text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-purple-500">
+                                    <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                    </svg>
+                                    Open
+                                </button>
+                            </a>
+                            
+                            <!-- Dropdown Menu -->
+                            <div class="relative" id="dotsMenu{{ channel.id }}">
+                                <button class="p-1.5 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                                    </svg>
+                                </button>
+                                
+                                <!-- Dropdown Card (Hidden by default) -->
+                                <div id="menu{{ channel.id }}" class="hidden absolute right-0 z-20 mt-2 w-56 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
+                                    <div class="py-1">
+                                        <a href="{% url 'channel_chat' channel_id=channel.id %}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                            <svg class="w-4 h-4 mr-3 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                            </svg>
+                                            <span>Open Channel</span>
+                                        </a>
+                                        
+                                        <button class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                            id="viewNotificationsBtn"
+                                            data-channel-id="{{channel.id}}"
+                                            data-org-id="{{channel.organization.id}}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#notificationsModal">
+                                            <svg class="w-4 h-4 mr-3 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405M19 13V9a7 7 0 10-14 0v4M9 21h6" />
+                                            </svg>
+                                            <span>View Notifications</span>
+                                        </button>
+                                        
+                                        {% if user_profile.is_admin %}
+                                        <button class="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
+                                            data-channel-id="{{channel.id}}"
+                                            data-org-id="{{channel.organization.id}}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteChannelModal">
+                                            <svg class="w-4 h-4 mr-3 text-red-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                            </svg>
+                                            <span>Secure Wipe</span>
+                                        </button>
+
+                                        <!-- rest of all admin controls -->
+                                        <!-- Download Channel Data Button -->
+                                        <button 
+                                                class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                                id="download-channel-btn"
+                                                data-channel-id="{{channel.id}}"
+                                                data-org-id="{{channel.organization.id}}"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#downloadChannelModal">
+                                                <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75v6a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25v-6m-6 4.5V3m0 13.5l-3-3m3 3l3-3"/>
+                                                  </svg>
+                                                  
+                                                <span>Export Data</span>
+                                        </button>
+                                        <!-- Manage Channel Access Button -->
+                                        <button 
+                                            class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                            id="manage-access-btn"
+                                            data-channel-id="{{channel.id}}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#manageAccessModal">
+                                            <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75A2.25 2.25 0 1115 4.5a2.25 2.25 0 012.25 2.25zM6.75 6.75A2.25 2.25 0 114.5 4.5a2.25 2.25 0 012.25 2.25zM6.75 19.5v-2.25A2.25 2.25 0 019 15h1.5m0 0A2.25 2.25 0 0112.75 17.25V19.5m-2.25-4.5H9a2.25 2.25 0 00-2.25 2.25V19.5M17.25 19.5v-2.25a2.25 2.25 0 00-2.25-2.25h-1.5" />
+                                              </svg>
+                                              
+                                            <span>Manage Access</span>
+                                        </button>
+                                                                                    
+                                        <!-- Manage User Permissions Button -->
+                                        <button 
+                                            class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                            id="managePermissionsBtn"
+                                            data-channel-id="{{channel.id}}"
+                                            data-org-id="{{channel.organization.id}}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#userSelectionModal">
+                                            <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25v-1.5A4.5 4.5 0 019 14.25h3m6.75.75a.75.75 0 01.75.75v1.108a1.5 1.5 0 010 2.784v1.108a.75.75 0 01-.75.75h-.379a1.5 1.5 0 01-2.121 0h-1.108a.75.75 0 01-.75-.75v-1.108a1.5 1.5 0 010-2.784V15.75a.75.75 0 01.75-.75h.379a1.5 1.5 0 012.121 0h1.108z" />
+                                              </svg>
+                                              
+                                            <span></span> User Permissions</span>
+                                        </button>
+                                        <!-- restricted users -->
+                                         
+                                        <button 
+                                            class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                            id="unbanUserBtn"
+                                            data-channel-id="{{channel.id}}"
+                                            data-org-id="{{channel.organization.id}}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#BannedUsersModal">
+                                            <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25v-1.5A4.5 4.5 0 019 14.25h3m6.75.75v-1.125a1.875 1.875 0 10-3.75 0V15a.75.75 0 00-.75.75v3.75a.75.75 0 00.75.75h3.75a.75.75 0 00.75-.75V15.75a.75.75 0 00-.75-.75z" />
+                                              </svg>
+                                              
+                                            <span>Restricted Users</span>
+                                        </button>
+
+                                        <!-- btns container -->
+                                        <!-- push notification -->
+                                        <button 
+                                            class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                            id="sendAlertBtn"
+                                            data-channel-id="{{channel.id}}"
+                                            data-org-id="{{channel.organization.id}}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#alertModal">
+                                            <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.25 17.25h-4.5m7.5-6v-2.25a5.25 5.25 0 10-10.5 0v2.25A3.75 3.75 0 015 15v.75a1.5 1.5 0 001.5 1.5h11.25a1.5 1.5 0 001.5-1.5V15a3.75 3.75 0 01-3.75-3.75z" />
+                                              </svg>
+                                              
+                                          <span>Push Notification</span>
+                                       </button>
+                                       <!-- schedule notification -->
+                                       <button 
+                                            class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                            id="openScheduleModalBtn"
+                                            data-channel-id="{{channel.id}}"
+                                            data-org-id="{{channel.organization.id}}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#scheduleAlertModal">
+                                            <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l3 1.5M14.25 17.25h-4.5m7.5-6V9a5.25 5.25 0 10-10.5 0v2.25A3.75 3.75 0 015 15v.75a1.5 1.5 0 001.5 1.5h11.25a1.5 1.5 0 001.5-1.5V15a3.75 3.75 0 01-3.75-3.75z" />
+                                              </svg>
+                                              
+                                            <span>Schedule Notification</span>
+                                        </button>
+
+                                        <!-- control scheduled notification -->
+                                        <button 
+                                            class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                            id="unscheduleBtn"
+                                            data-channel-id="{{channel.id}}"
+                                            data-org-id="{{channel.organization.id}}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#UnscheduleModal">
+                                            <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17.25h-6m7.5-6V9a5.25 5.25 0 10-10.5 0v2.25A3.75 3.75 0 015 15v.75a1.5 1.5 0 001.5 1.5H12m3.75-4.5a3.75 3.75 0 013.75 3.75v.75a1.5 1.5 0 01-1.5 1.5H17M12 6v3.75l2.25 1.25M18.75 3v2.25M21 6h-2.25M3 6h2.25M5.25 3v2.25" />
+                                              </svg>
+                                              
+                                            <span>Manage Automations</span>
+                                        </button>
+                                        <!-- manage activities -->
+                                        <button 
+                                            class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                            id="viewActivitiesBtn"
+                                            data-channel-id="{{channel.id}}"
+                                            data-org-id="{{channel.organization.id}}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#ActivityModal">
+                                            <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 6.75h15m-15 4.5h9m-9 4.5h15m-9 4.5h3m6-4.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                                              </svg>
+                                              
+                                            <span>Activities</span>
+                                    </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity/Stats Footer -->
+                <div class="bg-gray-50 px-4 py-2 rounded-b-lg border-t border-gray-100 flex items-center justify-between">
+                    <div class="flex items-center space-x-4 text-xs text-gray-500">
+                        <div class="flex items-center">
+                            <svg class="w-3.5 h-3.5 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                            </svg>
+                            <span>24 messages</span>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-3.5 h-3.5 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                            <span>5 members</span>
+                        </div>
+                    </div>
+                    
+                    <!-- User Avatars -->
+                    <div class="flex -space-x-2">
+                        <div class="inline-block h-6 w-6 rounded-full bg-purple-500 text-xs text-white flex items-center justify-center font-medium">JD</div>
+                        <div class="inline-block h-6 w-6 rounded-full bg-blue-500 text-xs text-white flex items-center justify-center font-medium">AK</div>
+                        <div class="inline-block h-6 w-6 rounded-full bg-green-500 text-xs text-white flex items-center justify-center font-medium">TM</div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 
 
-
-
-
-
-
-
-
-
-
-@keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-        @keyframes particle-network {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(3); opacity: 0; }
-        }
-        .particle-network-animation::before {
-            content: '';
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: rgba(99, 102, 241, 0.8);
-            animation: particle-network 2s infinite;
-        }
-        .channel-card {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-        }
-        @keyframes fadeInUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .quantum-menu {
-            opacity: 0;
-            transform: scale(0.95);
-            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-        }
-        .quantum-menu-btn:hover + .quantum-menu,
-        .quantum-menu:hover {
-            opacity: 1;
-            transform: scale(1);
-        }
-        .dot-pulse {
-            position: relative;
-            width: 6px;
-            height: 6px;
-            background: #3B82F6;
-            border-radius: 50%;
-            animation: dot-pulse 1.4s infinite linear;
-        }
-        @keyframes dot-pulse {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
-        }
-        .animate-float { animation: float 6s ease-in-out infinite; }
-
-
-
-
-
-
-
-
-
-
-/* Style for the modal dialog */
-.modal-dialog {
-    max-width: 600px; /* Adjusts the modal width */
-}
-
-/* Style for the modal header */
-.modal-header {
-    background-color: #f8f9fa;
-    border-bottom: 2px solid #dee2e6;
-}
-
-/* Title of the modal */
-.modal-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-}
-
-/* Close button */
-.btn-close {
-    color: #6c757d;
-    font-size: 1.25rem;
-}
-
-/* Style for modal body */
-.modal-body {
-    padding: 20px;
-}
-
-/* Heading inside modal body */
-.modal-body h6 {
-    font-weight: 600;
-    color: #343a40;
-}
-
-/* List of organizations */
-#organizations-list {
-    margin-top: 10px;
-}
-
-/* Style for the list items */
-.list-group-item {
-    font-size: 1rem;
-    padding: 10px 15px;
-    background-color: #f8f9fa;
-    border: 1px solid #e9ecef;
-    transition: background-color 0.3s;
-}
-
-.list-group-item:hover {
-    background-color: #f1f1f1;
-    cursor: pointer;
-}
-
-/* Style for the selected organization (highlighted) */
-.list-group-item.active {
-    background-color: #007bff;
-    color: white;
-}
-
-/* Style for the remove access button */
-#remove-access-btn {
-    background-color: #dc3545;
-    border-color: #dc3545;
-    font-weight: 600;
-}
-
-#remove-access-btn:hover {
-    background-color: #c82333;
-    border-color: #bd2130;
-}
-
-/* Style for modal footer */
-.modal-footer {
-    background-color: #f8f9fa;
-    border-top: 2px solid #dee2e6;
-    padding: 15px;
-}
-
-/* Style for Close button */
-.btn-secondary {
-    background-color: #6c757d;
-    border-color: #6c757d;
-}
-
-.btn-secondary:hover {
-    background-color: #5a6268;
-    border-color: #545b62;
-}
-
-
-
-
-
-
-
-/* General Modal Styles */
-/* Dragging Effect */
-/* Modal Styling */
-#permissionsManagementModal .modal-content {
-    border-radius: 15px;
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
-    background-color: #f9f9f9;
-    color: #333;
-}
-
-#permissionsManagementModal .modal-header {
-    background-color: #007bff;
-    color: #fff;
-    border-bottom: none;
-    border-radius: 15px 15px 0 0;
-    padding: 20px;
-}
-
-#permissionsManagementModal .modal-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-}
-
-#permissionsManagementModal .btn-close {
-    background-color: transparent;
-    color: #fff;
-    opacity: 0.8;
-}
-
-#permissionsManagementModal .btn-close:hover {
-    opacity: 1;
-}
-
-/* Modal Footer */
-#permissionsManagementModal .modal-footer {
-    border-top: none;
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-}
-
-/* Buttons */
-#permissionsManagementModal .btn-secondary {
-    background-color: #6c757d;
-    border-color: #6c757d;
-}
-
-#permissionsManagementModal .btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
-    font-weight: 600;
-}
-
-#permissionsManagementModal .btn-primary:hover {
-    background-color: #0056b3;
-}
-
-/* Permission Containers */
-.permission-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 10px;
-    background-color: #fff;
-    border-radius: 10px;
-    border: 2px dashed #ddd;
-    min-height: 150px;
-    transition: border-color 0.3s ease, background-color 0.3s ease;
-}
-
-.permission-container .permission-item {
-    background-color: #e9ecef;
-    padding: 8px 12px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    cursor: grab;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #333;
-    user-select: none;
-    transition: background-color 0.2s ease, transform 0.2s ease;
-}
-
-.permission-container .permission-item:hover {
-    background-color: #f1f1f1;
-}
-
-.permission-container .permission-item:active {
-    transform: scale(0.95);
-}
-
-/* Dragging Effect */
-.permission-item.dragging {
-    opacity: 0.6;
-    background-color: #cce5ff;
-    color: #0056b3;
-    transform: rotate(-5deg) scale(1.05);
-    box-shadow: 0px 5px 15px rgba(0, 123, 255, 0.4);
-    transition: transform 0.2s ease, background-color 0.2s ease;
-}
-
-/* Drop Zone - Dragging Over */
-#permissions-to-give.dragover,
-#assigned-permissions.dragover {
-    border-color: #28a745;
-    background: linear-gradient(135deg, #d4edda, #c3e6cb);
-    box-shadow: inset 0 0 10px rgba(40, 167, 69, 0.3);
-    animation: pulse-border 1.5s infinite;
-}
-
-/* Drop Zone - Item Dropped */
-#permissions-to-give.drop-complete,
-#assigned-permissions.drop-complete {
-    border-color: #ffc107;
-    background: linear-gradient(135deg, #fff3cd, #ffeeba);
-    animation: glow 0.8s ease-in-out;
-}
-
-/* Animations */
-@keyframes pulse-border {
-    0% {
-        box-shadow: inset 0 0 10px rgba(40, 167, 69, 0.3);
-    }
-    50% {
-        box-shadow: inset 0 0 20px rgba(40, 167, 69, 0.5);
-    }
-    100% {
-        box-shadow: inset 0 0 10px rgba(40, 167, 69, 0.3);
-    }
-}
-
-@keyframes glow {
-    0% {
-        box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
-    }
-    100% {
-        box-shadow: 0 0 30px rgba(255, 193, 7, 0.8);
-    }
-}
-
-/* Scrollbars for Overflow */
-.permission-container {
-    overflow-y: auto;
-    max-height: 200px;
-}
-
-.permission-container::-webkit-scrollbar {
-    width: 6px;
-}
-
-.permission-container::-webkit-scrollbar-thumb {
-    background-color: #007bff;
-    border-radius: 10px;
-}
-
-.permission-container::-webkit-scrollbar-thumb:hover {
-    background-color: #0056b3;
-}
-
-
-
-
-
-
-
-
-
-
-/* Modal Content Styling */
-#userSelectionModal .modal-content {
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-    border: none;
-}
-
-/* Modal Header */
-#userSelectionModal .modal-header {
-    background-color: #007bff;
-    color: #fff;
-    padding: 20px;
-    border-bottom: 2px solid #0056b3;
-}
-
-#userSelectionModal .modal-title {
-    font-weight: 600;
-    font-size: 1.25rem;
-}
-
-#userSelectionModal .btn-close {
-    background-color: #fff;
-    border-radius: 50%;
-    opacity: 1;
-}
-
-/* Modal Body */
-#userSelectionModal .modal-body {
-    padding: 20px;
-    background-color: #f9f9f9;
-    max-height: 400px;
-    overflow-y: auto;
-    border-top: 2px solid #e9ecef;
-    border-bottom: 2px solid #e9ecef;
-}
-
-/* User List Styling */
-#users-list {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-}
-
-#users-list .list-group-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px 20px;
-    border: 1px solid #e0e0e0;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    background: #fff;
-    transition: all 0.3s ease;
-    font-weight: 500;
-    font-size: 0.95rem;
-    color: #333;
-}
-
-#users-list .list-group-item:hover {
-    background-color: #f8f9fa;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-}
-
-/* Selected User Highlight */
-#users-list .list-group-item.active {
-    background-color: #007bff;
-    color: #fff;
-    border-color: #0056b3;
-}
-
-/* Modal Footer */
-#userSelectionModal .modal-footer {
-    padding: 15px;
-    background-color: #f1f1f1;
-    border-top: 2px solid #e9ecef;
-}
-
-#userSelectionModal .btn-secondary {
-    background-color: #6c757d;
-    color: #fff;
-    font-weight: 500;
-    padding: 8px 20px;
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
-}
-
-#userSelectionModal .btn-secondary:hover {
-    background-color: #5a6268;
-}
-
-
-
-@keyframes fade-in-down {
-    0% { opacity: 0; transform: translateY(-10px); }
-    100% { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-in-down {
-    animation: fade-in-down 0.5s ease-out;
-}
-
-.spinner {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-</style>
-
-
-
-
-
-
-
-
-
-
-
-<!-- -----------------------------------------------------re-initialized channels list -->
 <!-- Modals ---------------------------------------------------------------------------------------- -->
 <!-- Delete Confirmation Modal -->
 
@@ -1562,265 +748,6 @@
         </div>
     </div>
 </div>
-
-
-<!-- ---------------------------------------------------------------------------------------------------------------- -->
-<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <!-- Header Section -->
-        <div class="mb-12 text-center space-y-3 animate-fade-in-down">
-            <h1 class="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent tracking-tight mb-2">
-                {{ organization.name }} Channels
-            </h1>
-            <p class="text-gray-600 text-lg font-medium opacity-90">
-                Seamlessly manage cross-organization communication channels
-            </p>
-        </div>
-
-        <!-- Search Container -->
-        <div class="mb-10 relative transform transition-all duration-300 hover:scale-[1.005]">
-            <div class="relative backdrop-blur-lg bg-white/50 ring-1 ring-white/30 rounded-xl shadow-soft-lg">
-                <input 
-                    id="searchInput"
-                    type="text" 
-                    placeholder="Search channels..."
-                    class="w-full px-6 py-4 bg-transparent border-0 focus:ring-0 placeholder-gray-400/80 text-gray-700 text-lg font-medium"
-                >
-                <div id="loading" class="absolute inset-y-0 right-0 pr-5 hidden items-center">
-                    <div class="animate-pulse">
-                        <div class="h-6 w-6 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-60"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Channels List -->
-        <div id="channelsList" class="space-y-4">
-            {% for channel in channels %}
-            <div 
-                class="group relative bg-gradient-to-br from-white to-blue-50/50 p-6 rounded-2xl shadow-soft-lg hover:shadow-xl transition-all duration-300 border border-white/50 hover:border-white/80 animate-card-in"
-                style="animation-delay: {{ forloop.counter0|divisibleby:2|yesno:'0ms,50ms' }}; animation-fill-mode: backwards;"
-            >
-                <div class="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity duration-300"></div>
-                
-                <div class="relative flex items-start justify-between">
-                    <!-- Channel Info -->
-                    <div class="flex-1 min-w-0 space-y-3">
-                        <div class="flex items-center space-x-4">
-                            <h2 class="text-xl font-semibold text-gray-900 truncate tracking-tight">
-                                {{ channel.name }}
-                            </h2>
-                            <span class="px-3 py-1 rounded-full text-sm font-medium bg-opacity-10 backdrop-blur-sm 
-                                    {% if channel.visibility == 'public' %}bg-emerald-500/20 text-emerald-700{% else %}bg-indigo-500/20 text-indigo-700{% endif %}">
-                                {{ channel.get_visibility_display }}
-                            </span>
-                        </div>
-                        
-                        <div class="flex items-center space-x-6 text-sm">
-                            <div class="flex items-center space-x-1.5 text-gray-500/90">
-                                <svg class="w-5 h-5 text-gray-400/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 7.125C2.25 6.504 2.754 6 3.375 6h6c.621 0 1.125.504 1.125 1.125v3.75c0 .621-.504 1.125-1.125 1.125h-6a1.125 1.125 0 01-1.125-1.125v-3.75zM14.25 8.625c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125v8.25c0 .621-.504 1.125-1.125 1.125h-5.25a1.125 1.125 0 01-1.125-1.125v-8.25zM3.75 16.125c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125v2.25c0 .621-.504 1.125-1.125 1.125h-5.25a1.125 1.125 0 01-1.125-1.125v-2.25z" />
-                                </svg>
-                                <span class="font-medium">{{ channel.get_type_display }}</span>
-                            </div>
-                            <span class="text-gray-300">•</span>
-                            <span class="text-gray-500/85 italic font-light">
-                                Created {{ channel.created_at|date:"M j, Y" }}
-                            </span>
-                        </div>
-
-                        <!-- Access Indicators -->
-                        {% if channel.accesses.exists %}
-                        <div class="mt-4 space-y-2">
-                            {% for access in channel.accesses.all %}
-                            <div class="inline-flex items-center px-3 py-1.5 bg-purple-500/10 backdrop-blur-sm rounded-lg text-sm text-purple-700/90 font-medium">
-                                <svg class="w-4 h-4 mr-2 text-purple-500/80" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
-                                </svg>
-                                Shared by {{ access.owning_organization.name }} → {{ access.granted_to_organization.name }}
-                            </div>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <!-- Action Menu -->
-                      <!-- 3-dot menu -->
-                      <div class="relative">
-                        <button class="text-gray-500 hover:text-gray-700 focus:outline-none" id="dotsMenu{{ channel.id }}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 12h12M6 6h12M6 18h12" />
-                            </svg>
-                        </button>
-
-
-                        <!-- Dropdown Card -->
-                        <div id="menu{{ channel.id }}" class="hidden absolute right-0 z-20 mt-2 w-56 origin-top-right bg-white/95 backdrop-blur-xl divide-y divide-gray-100/20 rounded-xl shadow-2xl shadow-blue-100/30 ring-1 ring-black/5">
-                            <div class="py-2">
-                                <a href="{% url 'channel_chat' channel_id=channel.id %}" class="flex items-center px-5 py-3 text-sm text-gray-600 hover:bg-gray-50/80 transition-all duration-200">
-                                    <svg class="w-5 h-5 mr-3 text-blue-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                                    </svg>
-                                    <span class="font-medium">Open Channel</span>
-                                </a>
-                                {% if user_profile.is_admin %}
-                                <button class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200"
-                                    data-channel-id="{{channel.id}}"
-                                    data-org-id="{{channel.organization.id}}"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#deleteChannelModal">
-                                    <svg class="w-5 h-5 mr-3 text-red-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                    </svg>
-                                    <span class="font-medium text-red-600/90">Secure Wipe</span>
-                                </button>
-
-                                <!-- Download Channel Data Button -->
-<button 
-class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200"
-id="download-channel-btn"
-data-channel-id="{{channel.id}}"
-data-org-id="{{channel.organization.id}}"
-data-bs-toggle="modal"
-data-bs-target="#downloadChannelModal">
-<svg class="w-5 h-5 mr-3 text-blue-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-</svg>
-<span class="font-medium text-blue-600/90">Download Channel Data</span>
-</button>
-
-<!-- Manage Channel Access Button -->
-<button 
-class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200"
-id="manage-access-btn"
-data-channel-id="{{channel.id}}"
-data-bs-toggle="modal"
-data-bs-target="#manageAccessModal">
-<svg class="w-5 h-5 mr-3 text-green-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m0-6a9 9 0 11-9 9 9 9 0 019-9z" />
-</svg>
-<span class="font-medium text-green-600/90">Manage Channel Access</span>
-</button>
-
-<!-- Manage User Permissions Button -->
-<button 
-class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200"
-id="managePermissionsBtn"
-data-channel-id="{{channel.id}}"
-data-org-id="{{channel.organization.id}}"
-data-bs-toggle="modal"
-data-bs-target="#userSelectionModal">
-<svg class="w-5 h-5 mr-3 text-purple-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M16 11l4-4m0 0l-4-4m4 4H4m16 4l-4 4m0 0l4 4m-4-4H4" />
-</svg>
-<span class="font-medium text-purple-600/90">Manage User Permissions</span>
-</button>
-<button 
-    class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200"
-    id="unbanUserBtn"
-    data-channel-id="{{channel.id}}"
-    data-org-id="{{channel.organization.id}}"
-    data-bs-toggle="modal"
-    data-bs-target="#BannedUsersModal">
-    <svg class="w-5 h-5 mr-3 text-purple-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M9 9l10 10M9 19L19 9" />
-        <circle cx="12" cy="12" r="9" stroke-width="2" />
-    </svg>
-    <span class="font-medium text-purple-600/90">Manage Restricted Users</span>
-</button>
-
-
-<!-- Button to trigger the modal -->
-<div class="alert-buttons-container">
-    <!-- Button to trigger the modal -->
-    <button 
-        class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200 send-alert-btn"
-        id="sendAlertBtn"
-        data-channel-id="{{channel.id}}"
-        data-org-id="{{channel.organization.id}}"
-        data-bs-toggle="modal"
-        data-bs-target="#alertModal">
-        <svg class="w-5 h-5 mr-3 text-purple-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11l4-4m0 0l-4-4m4 4H4m16 4l-4 4m0 0l4 4m-4-4H4" />
-        </svg>
-        <span class="font-medium text-purple-600/90">Push Notification Now</span>
-    </button>
-
-    <!-- Trigger button to open schedule modal -->
-    <button 
-        class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200 schedule-alert-btn"
-        id="openScheduleModalBtn"
-        data-channel-id="{{channel.id}}"
-        data-org-id="{{channel.organization.id}}"
-        data-bs-toggle="modal"
-        data-bs-target="#scheduleAlertModal">
-        <svg class="w-5 h-5 mr-3 text-blue-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405M19 13V9a7 7 0 10-14 0v4M9 21h6" />
-        </svg>
-        <span class="font-medium text-blue-600/90">Schedule a Notification</span>
-    </button>
-
-
-    <!-- Button to trigger UnscheduleModal -->
-<button 
-class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200 unschedule-alert-btn"
-id="unscheduleBtn"
-data-channel-id="{{channel.id}}"
-data-org-id="{{channel.organization.id}}"
-data-bs-toggle="modal"
-data-bs-target="#UnscheduleModal">
-<svg class="w-5 h-5 mr-3 text-blue-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405M19 13V9a7 7 0 10-14 0v4M9 21h6" />
-</svg>
-<span class="font-medium text-blue-600/90">Control Scheduled Notifications</span>
-</button>
-</div>
-
-<!-- Button to trigger Activity Modal -->
-<button 
-    class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200"
-    id="viewActivitiesBtn"
-    data-channel-id="{{channel.id}}"
-    data-org-id="{{channel.organization.id}}"
-    data-bs-toggle="modal"
-    data-bs-target="#ActivityModal">
-    <svg class="w-5 h-5 mr-3 text-green-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405M19 13V9a7 7 0 10-14 0v4M9 21h6" />
-    </svg>
-    <span class="font-medium text-green-600/90">Manage Activities</span>
-</button>
-
-
-
-{% endif %}
-
-
- <!-- Button to trigger notifications modal -->
-<button 
-class="w-full flex items-center px-5 py-3 text-sm hover:bg-gray-50/80 transition-all duration-200"
-id="viewNotificationsBtn"
-data-channel-id="{{channel.id}}"
-data-org-id="{{channel.organization.id}}"
-data-bs-toggle="modal"
-data-bs-target="#notificationsModal">
-<svg class="w-5 h-5 mr-3 text-blue-500/90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405M19 13V9a7 7 0 10-14 0v4M9 21h6" />
-</svg>
-<span class="font-medium text-blue-600/90">View Notifications</span>
-</button>
-             
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-
-
-
 
 
 <!-------------------------------------------------------------------------------------------------------------------------------------  -->
@@ -2762,4 +1689,4 @@ document.getElementById('clearActivitiesBtn').addEventListener('click', function
 </body>
 </html>
 
-{% endblock %}
+
