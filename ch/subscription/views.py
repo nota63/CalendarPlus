@@ -204,7 +204,7 @@ def fetch_all_help_requests_by_org(request, org_id):
         for help in help_requests:
             profile = Profile.objects.filter(user=help.user, organization=organization).first()
             data.append({
-                'id': help.id,
+                'uuid': help.id,
                 'title': help.title,
                 'user_full_name': profile.full_name if profile else help.user.username,
                 'profile_picture': profile.profile_picture.url if profile and profile.profile_picture else None
@@ -216,4 +216,68 @@ def fetch_all_help_requests_by_org(request, org_id):
         logger.exception(f"[AdminHelpView] Failed to fetch help requests for org {org_id}")
         return JsonResponse({'success': False, 'error': 'Server error occurred.', 'details': str(e)}, status=500)
     
-    
+# Get Help requests detail    
+@login_required
+def fetch_help_request_detail(request, uuid):
+    user = request.user
+    method = request.method
+    ip = request.META.get('REMOTE_ADDR')
+
+    logger.info(f"[HELP REQUEST DETAIL] Request received — Method: {method}, UUID: {uuid}, User: {user.username}, IP: {ip}")
+
+    if method != 'GET':
+        logger.warning(f"[HELP REQUEST DETAIL] Invalid method used — {method} by {user.username}")
+        return JsonResponse({
+            'success': False,
+            'error': 'Invalid request method. Only GET allowed.'
+        }, status=405)
+
+    try:
+        help_request = get_object_or_404(HelpRequest, id=uuid)
+        organization = help_request.organization
+
+        logger.debug(f"[HELP REQUEST DETAIL] Found HelpRequest for UUID: {uuid}, Org: {organization.name}")
+
+        # Check if user is a member of the organization
+        is_member = Profile.objects.filter(user=user, organization=organization).exists()
+
+        if not is_member:
+            logger.warning(f"[HELP REQUEST DETAIL] Access denied — User '{user.username}' is not a member of org '{organization.name}'")
+            return JsonResponse({
+                'success': False,
+                'error': 'Access denied. You do not have permission to view this help request.'
+            }, status=403)
+
+        data = {
+            'uuid': str(help_request.id),
+            'organization': organization.name,
+            'user': {
+                'id': help_request.user.id,
+                'full_name': help_request.user.get_full_name(),
+                'username': help_request.user.username,
+            },
+            'title': help_request.title,
+            'description': help_request.description,
+            'status': help_request.status,
+            'created_at': help_request.created_at.strftime('%Y-%m-%d %H:%M'),
+            'attachment': help_request.attachment.url if help_request.attachment else None,
+        }
+
+        logger.info(f"[HELP REQUEST DETAIL] Help request {uuid} served successfully to {user.username}")
+
+        return JsonResponse({'success': True, 'data': data})
+
+    except HelpRequest.DoesNotExist:
+        logger.error(f"[HELP REQUEST DETAIL] Help request not found for UUID: {uuid}")
+        return JsonResponse({
+            'success': False,
+            'error': 'Help request not found.'
+        }, status=404)
+
+    except Exception as e:
+        logger.exception(f"[HELP REQUEST DETAIL] Unexpected error while fetching help request {uuid} for user {user.username}")
+        return JsonResponse({
+            'success': False,
+            'error': 'Something went wrong while fetching the help request.',
+            'details': str(e)
+        }, status=500)

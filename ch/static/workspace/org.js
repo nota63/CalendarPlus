@@ -658,6 +658,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   
 // Fetch and display help requests of the organization
+
+
 // 🌟 Help Request Loader for Admin Modal
 document.addEventListener("DOMContentLoaded", () => {
     const helpModal = document.getElementById('OrgHelpRequestReviewModal');
@@ -732,22 +734,75 @@ function renderOrgHelpRequests(requests) {
 
         wrapper.innerHTML = `
             <div class="card border-start border-4 border-primary shadow-sm">
-                <div class="card-body d-flex align-items-center">
-                    <img src="${req.profile_picture || '/static/img/default-avatar.png'}"
-                         alt="User Avatar" class="rounded-circle me-3" width="48" height="48">
-                    <div>
-                        <h6 class="mb-0">${sanitizeText(req.title)}</h6>
-                        <small class="text-muted">${sanitizeText(req.user_full_name)}</small>
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <img src="${req.profile_picture || '/static/img/default-avatar.png'}"
+                             alt="User Avatar" class="rounded-circle me-3" width="48" height="48">
+                        <div>
+                            <h6 class="mb-0">${sanitizeText(req.title)}</h6>
+                            <small class="text-muted">${sanitizeText(req.user_full_name)}</small>
+                        </div>
                     </div>
+                    <button class="btn btn-sm btn-outline-primary ms-3"
+                            data-bs-toggle="modal"
+                            data-bs-target="#HelpRequestFullDetailModal"
+                            data-request-id="${req.uuid}">
+                        View
+                    </button>
                 </div>
             </div>
         `;
 
         container.appendChild(wrapper);
     }
+
+    // Attach click listeners for each View button
+    setTimeout(() => {
+        document.querySelectorAll('[data-request-id]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const uuid = e.currentTarget.getAttribute('data-request-id');
+                if (uuid) {
+                    fetchHelpRequestDetail(uuid);
+                }
+            });
+        });
+    }, 0);
 }
 
-// 🚨 Basic output sanitization
+// 💥 Fetch full help request details by UUID
+async function fetchHelpRequestDetail(uuid) {
+    const modalBody = document.getElementById('helpRequestDetailBody');
+    modalBody.innerHTML = `<p class="text-muted">Loading request details...</p>`;
+
+    try {
+        const res = await fetch(`/subscription/get-help-request-detail/${uuid}/`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+
+        const data = await res.json();
+
+        if (!data.success || !data.data) {
+            console.error("[HelpRequestDetail] Invalid or missing data object:", data);
+            modalBody.innerHTML = `<p class="text-danger">${data.error || 'Failed to fetch help request details.'}</p>`;
+            return;
+        }
+
+        const detail = data.data;
+
+        modalBody.innerHTML = `
+            <h5>${sanitizeText(detail.title || 'No title')}</h5>
+            <p><strong>Status:</strong> ${sanitizeText(detail.status || 'N/A')}</p>
+            <p><strong>Description:</strong><br>${sanitizeText(detail.description || 'No description')}</p>
+            ${detail.attachment ? `<p><strong>Attachment:</strong> <a href="${detail.attachment}" target="_blank">View</a></p>` : ''}
+            <p class="text-muted small mt-3">Requested by ${sanitizeText(detail.username || 'Unknown user')}</p>
+        `;
+    } catch (err) {
+        console.error("[HelpRequestDetail] Fetch failed:", err);
+        modalBody.innerHTML = `<p class="text-danger">Something went wrong while loading request details.</p>`;
+    }
+}
+
+// 🚨 Output sanitization to prevent injection
 function sanitizeText(str) {
     const div = document.createElement('div');
     div.textContent = str;
