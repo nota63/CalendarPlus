@@ -5,7 +5,7 @@ from .models import Payment,PremiumPlan
 from django.views.decorators.csrf import csrf_exempt
 import logging
 from django.http import HttpResponseBadRequest
-from accounts.models import Organization
+from accounts.models import Organization, Profile
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
@@ -120,6 +120,11 @@ def raise_help_request(request, org_id):
         attachment = request.FILES.get('attachment')
         organization = Organization.objects.get(id=org_id)
 
+        is_member = Profile.objects.filter(user=request.user, organization_id=organization).exists()
+        if not is_member:
+            return JsonResponse({'success': False, 'error': 'You are not a member of this organization.'}, status=403)
+
+
         HelpRequest.objects.create(
             organization=organization,
             user=request.user,
@@ -146,11 +151,17 @@ def fetch_user_help_requests(request, org_id):
     try:
         organization = get_object_or_404(Organization, id=org_id)
 
+        is_member = Profile.objects.filter(user=request.user, organization=organization).exists()
+        if not is_member:
+            return JsonResponse({'success': False, 'error': 'You are not a member of this organization.'}, status=403)
+
+
         help_requests = HelpRequest.objects.filter(
             organization=organization,
             user=request.user
         ).order_by('-created_at')
 
+    
         data = []
         for help in help_requests:
             data.append({
