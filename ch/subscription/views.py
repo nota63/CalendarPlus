@@ -288,21 +288,11 @@ def fetch_help_request_detail(request, uuid):
 
 
 # Final step - User  Impersonation System ( Login As User)
-
 @login_required
 def login_as_user(request, org_id, uuid, user_id):
-    
-    
     organization = get_object_or_404(Organization, id=org_id)
-
-    # Validate HelpRequest with org and uuid
     help_request = get_object_or_404(HelpRequest, id=uuid, organization_id=org_id)
 
-    # Check if the help request is for the same user we want to impersonate
-    # if str(help_request.user.id) != user_id:
-    #     return HttpResponseForbidden("User mismatch for help request.")
-
-    # Optional: Make sure the request.user is part of the organization as admin
     is_org_admin = Profile.objects.filter(
         user=request.user,
         organization_id=org_id,
@@ -312,13 +302,33 @@ def login_as_user(request, org_id, uuid, user_id):
     if not is_org_admin:
         return HttpResponseForbidden("You must be an admin of this organization.")
 
-    # Perform the actual login switch
     target_user = get_object_or_404(get_user_model(), id=user_id)
-    request.session['impersonator_id'] = request.user.id  # save original admin id
+
+    # 🔐 Save impersonator details temporarily (NOT in session yet)
+    impersonator_id = request.user.id
+    impersonator_name = request.user.username
+
+    # 🔁 Login as target user
     login(request, target_user)
 
-    return redirect('org_detail',org_id=organization.id)  # or user landing page
+    # ✅ Now restore impersonation details in session
+    request.session['impersonator_id'] = impersonator_id
+    request.session['impersonator_name'] = impersonator_name
 
+    return redirect('org_detail', org_id=organization.id)
+
+
+# stop impersonation
+@login_required
+def stop_impersonation(request):
+    impersonator_id = request.session.pop('impersonator_id', None)
+    request.session.pop('impersonator_name', None)
+
+    if impersonator_id:
+        impersonator = get_object_or_404(get_user_model(), id=impersonator_id)
+        login(request, impersonator)
+
+    return redirect('logout')  # or redirect to wherever you want
 
 
 

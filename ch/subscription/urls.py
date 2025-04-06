@@ -14,5 +14,6 @@ urlpatterns=[
         login_as_user,
         name='login_as_user'
     ),
+    path('stop_impersonation/',stop_impersonation, name='stop_impersonation'),
 
 ]

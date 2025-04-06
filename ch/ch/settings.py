@@ -139,10 +139,12 @@ MIDDLEWARE = [
     'ch.middlewares.FirstTimeGuideMiddleware',
     'ch.middlewares.OrgGuideMiddleware',
     'group_tasks.middlewares.RewardRedirectMiddleware',
+    'subscription.middlewares.ImpersonationMiddleware',
     # 'axes.middleware.AxesMiddleware',
     # 'group_tasks.middlewares.RecentActivityMiddleware',
 
 ]
+
 
 # settings.py
 ORG_PASSWORD_SECRET_KEY = "PjLfYgjup0lHhqJXrfaLO4TzjfvG8rDxURhul1qZJ8U="  # Generate once and store securely
