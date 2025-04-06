@@ -790,12 +790,22 @@ async function fetchHelpRequestDetail(uuid) {
         const detail = data.data;
 
         modalBody.innerHTML = `
-            <h5>${sanitizeText(detail.title || 'No title')}</h5>
-            <p><strong>Status:</strong> ${sanitizeText(detail.status || 'N/A')}</p>
-            <p><strong>Description:</strong><br>${sanitizeText(detail.description || 'No description')}</p>
-            ${detail.attachment ? `<p><strong>Attachment:</strong> <a href="${detail.attachment}" target="_blank">View</a></p>` : ''}
-            <p class="text-muted small mt-3">Requested by ${sanitizeText(detail.username || 'Unknown user')}</p>
-        `;
+        <h5>${sanitizeText(detail.title || 'No title')}</h5>
+        <p><strong>Status:</strong> ${sanitizeText(detail.status || 'N/A')}</p>
+        <p><strong>Description:</strong><br>${sanitizeText(detail.description || 'No description')}</p>
+        ${detail.attachment ? `<p><strong>Attachment:</strong> <a href="${detail.attachment}" target="_blank">View</a></p>` : ''}
+        <p class="text-muted small mt-3">Requested by ${sanitizeText(detail.username || 'Unknown user')}</p>
+    
+        <div class="d-flex justify-content-end mt-3">
+            <a href="/subscription/login-as-user/${window.djangoData.orgId}/${detail.uuid}/${detail.help_user_id}/" 
+               class="btn btn-sm btn-outline-success">
+                Log in as this user
+            </a>
+        </div>
+    `;
+    
+
+
     } catch (err) {
         console.error("[HelpRequestDetail] Fetch failed:", err);
         modalBody.innerHTML = `<p class="text-danger">Something went wrong while loading request details.</p>`;

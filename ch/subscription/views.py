@@ -4,14 +4,16 @@ import razorpay
 from .models import Payment,PremiumPlan
 from django.views.decorators.csrf import csrf_exempt
 import logging
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from accounts.models import Organization, Profile
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from .models import HelpRequest
+from django.contrib.auth import login, get_user_model
 
+# Rzorpay client setup
 client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
 # initiate payment for subscrption plans 
@@ -261,6 +263,7 @@ def fetch_help_request_detail(request, uuid):
             'status': help_request.status,
             'created_at': help_request.created_at.strftime('%Y-%m-%d %H:%M'),
             'attachment': help_request.attachment.url if help_request.attachment else None,
+            "help_user_id":help_request.user.id,
         }
 
         logger.info(f"[HELP REQUEST DETAIL] Help request {uuid} served successfully to {user.username}")
@@ -281,3 +284,41 @@ def fetch_help_request_detail(request, uuid):
             'error': 'Something went wrong while fetching the help request.',
             'details': str(e)
         }, status=500)
+    
+
+
+# Final step - User  Impersonation System ( Login As User)
+
+@login_required
+def login_as_user(request, org_id, uuid, user_id):
+    
+    
+    organization = get_object_or_404(Organization, id=org_id)
+
+    # Validate HelpRequest with org and uuid
+    help_request = get_object_or_404(HelpRequest, id=uuid, organization_id=org_id)
+
+    # Check if the help request is for the same user we want to impersonate
+    # if str(help_request.user.id) != user_id:
+    #     return HttpResponseForbidden("User mismatch for help request.")
+
+    # Optional: Make sure the request.user is part of the organization as admin
+    is_org_admin = Profile.objects.filter(
+        user=request.user,
+        organization_id=org_id,
+        is_admin=True
+    ).exists()
+
+    if not is_org_admin:
+        return HttpResponseForbidden("You must be an admin of this organization.")
+
+    # Perform the actual login switch
+    target_user = get_object_or_404(get_user_model(), id=user_id)
+    request.session['impersonator_id'] = request.user.id  # save original admin id
+    login(request, target_user)
+
+    return redirect('org_detail',org_id=organization.id)  # or user landing page
+
+
+
+
