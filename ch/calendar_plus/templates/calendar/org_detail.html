@@ -4926,6 +4926,12 @@ body {
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
 
+        <!-- Trigger Button -->
+      <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#MyHelpRequestsModal">
+        View My Help Requests
+      </button>
+
+
         <div class="modal-body">
           <div class="mb-3">
             <label for="helpTitle" class="form-label">Title</label>
@@ -4953,6 +4959,31 @@ body {
     </div>
   </div>
 </div>
+
+<!-- My Help Requests -->
+<!-- My Help Requests Modal -->
+<div class="modal fade" id="MyHelpRequestsModal" tabindex="-1" aria-labelledby="MyHelpRequestsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content shadow-sm">
+      <div class="modal-header">
+        <h5 class="modal-title" id="MyHelpRequestsModalLabel">My Help Requests</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <div class="modal-body">
+        <div id="helpRequestsContainer" class="row gy-3">
+          <!-- Help requests will be inserted here -->
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <!-- ----------------------------------------------------------------------------------------------------------------------------------------------- -->
 <!-- Include Prism.js for syntax highlighting---------------------------------------------------------------------------------------- -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">

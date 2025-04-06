@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
 import razorpay
 from .models import Payment,PremiumPlan
@@ -130,3 +130,45 @@ def raise_help_request(request, org_id):
         return JsonResponse({'success': True, 'message': 'Help request raised successfully!'})
     
     return JsonResponse({'success': False, 'message': 'Invalid request method'})
+
+
+# Fetch help requests for the user 
+# Set up a logger for this module
+logger = logging.getLogger(__name__)
+
+# Fetch help requests for the user
+@login_required
+def fetch_user_help_requests(request, org_id):
+    if request.method != 'GET':
+        logger.warning(f"[HelpRequest] Invalid request method: {request.method} by user {request.user.id}")
+        return JsonResponse({'success': False, 'error': 'Invalid request method. Only GET is allowed.'}, status=405)
+
+    try:
+        organization = get_object_or_404(Organization, id=org_id)
+
+        help_requests = HelpRequest.objects.filter(
+            organization=organization,
+            user=request.user
+        ).order_by('-created_at')
+
+        data = []
+        for help in help_requests:
+            data.append({
+                'uuid': str(help.id),
+                'title': help.title,
+                'description': help.description,
+                'status': help.status,
+                'created_at': help.created_at.strftime("%Y-%m-%d %H:%M"),
+                'attachment_url': help.attachment.url if help.attachment else None
+            })
+
+        logger.info(f"[HelpRequest] Fetched {len(data)} requests for user {request.user.id} in org {org_id}")
+        return JsonResponse({'success': True, 'requests': data})
+
+    except Exception as e:
+        logger.exception(f"[HelpRequest] Error fetching help requests for user {request.user.id} in org {org_id}")
+        return JsonResponse({
+            'success': False,
+            'error': 'An unexpected error occurred while fetching help requests.',
+            'details': str(e)
+        }, status=500)

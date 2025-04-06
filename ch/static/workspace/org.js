@@ -552,3 +552,106 @@ document.addEventListener('DOMContentLoaded', function () {
       return '';
     }
   });
+
+
+// Fetch users help requests and tickets
+
+// Wait until DOM is fully loaded
+document.addEventListener("DOMContentLoaded", () => {
+    const modal = document.getElementById("MyHelpRequestsModal");
+  
+    if (modal) {
+      modal.addEventListener("show.bs.modal", () => {
+        const orgId = window.djangoData?.orgId;
+  
+        if (!orgId) {
+          console.error("Organization ID not found.");
+          return;
+        }
+  
+        fetchAndRenderHelpRequests(orgId);
+      });
+    }
+  });
+  
+  // Fetch help requests via Ajax
+  async function fetchAndRenderHelpRequests(orgId) {
+    const container = document.getElementById("helpRequestsContainer");
+    if (!container) return;
+  
+    container.innerHTML = `<div class="text-muted">Loading help requests...</div>`;
+  
+    try {
+      const response = await fetch(`/subscription/fetch-my-help-requests/${orgId}/`, {
+        method: "GET",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Server responded with status ${response.status}`);
+      }
+  
+      const data = await response.json();
+  
+      if (data.success) {
+        renderHelpRequests(data.requests, container);
+      } else {
+        container.innerHTML = `<div class="text-danger">Failed to load help requests. Try again later.</div>`;
+      }
+  
+    } catch (error) {
+      console.error("Error fetching help requests:", error);
+      container.innerHTML = `<div class="text-danger">Something went wrong while fetching data.</div>`;
+    }
+  }
+  
+  // Render all help requests
+  function renderHelpRequests(requests, container) {
+    container.innerHTML = "";
+  
+    if (!Array.isArray(requests) || requests.length === 0) {
+      container.innerHTML = `<div class="text-muted">No help requests found.</div>`;
+      return;
+    }
+  
+    requests.forEach((req) => {
+      const card = document.createElement("div");
+      card.className = "col-12 mb-3";
+  
+      card.innerHTML = `
+        <div class="card border-start border-4 border-${getStatusColor(req.status)} shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title mb-1">${escapeHtml(req.title)}</h5>
+            <p class="card-text">${escapeHtml(req.description)}</p>
+            <span class="badge bg-${getStatusColor(req.status)} mb-2">${req.status.toUpperCase()}</span><br>
+            <small class="text-muted">Created at: ${req.created_at}</small><br>
+            ${req.attachment_url 
+              ? `<a href="${req.attachment_url}" class="btn btn-sm btn-outline-secondary mt-2" target="_blank" rel="noopener noreferrer">View Attachment</a>` 
+              : ""}
+          </div>
+        </div>
+      `;
+  
+      container.appendChild(card);
+    });
+  }
+  
+  // Convert status to Bootstrap color class
+  function getStatusColor(status) {
+    switch ((status || "").toLowerCase()) {
+      case "initiated": return "warning";
+      case "pending": return "secondary";
+      case "solved": return "success";
+      default: return "dark";
+    }
+  }
+  
+  // Escape HTML to prevent injection
+  function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
