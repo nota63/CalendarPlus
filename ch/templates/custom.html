@@ -1,11 +1,6 @@
 {% include 'header.html' %}
 
-{% if request.impersonating %}
-<div class="alert alert-warning text-center mb-0 rounded-0" role="alert" style="z-index:9999;">
-    <strong>Notice:</strong> You are impersonating <b>{{ request.user.username }}</b>.
-    <a href="{% url 'stop_impersonation' %}" class="btn btn-sm btn-outline-danger ms-3">Exit Impersonation</a>
-</div>
-{% endif %}
+
 
 
 {% block content %}
