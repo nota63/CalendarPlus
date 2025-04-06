@@ -654,4 +654,102 @@ document.addEventListener("DOMContentLoaded", () => {
     div.textContent = text;
     return div.innerHTML;
   }
+
+
   
+// Fetch and display help requests of the organization
+// 🌟 Help Request Loader for Admin Modal
+document.addEventListener("DOMContentLoaded", () => {
+    const helpModal = document.getElementById('OrgHelpRequestReviewModal');
+
+    if (!helpModal) {
+        console.warn("[HelpReviewModal] Modal element missing.");
+        return;
+    }
+
+    helpModal.addEventListener('show.bs.modal', () => {
+        const orgId = window?.djangoData?.orgId;
+
+        if (!orgId) {
+            console.error("[HelpReviewModal] orgId missing in window.djangoData.");
+            return;
+        }
+
+        console.info(`[HelpReviewModal] Triggered for org ID: ${orgId}`);
+        fetchOrgHelpRequests(orgId);
+    });
+});
+
+async function fetchOrgHelpRequests(orgId) {
+    const displayContainer = document.getElementById('orgHelpRequestsListContainer');
+
+    if (!displayContainer) {
+        console.warn("[HelpReviewModal] Container not found in DOM.");
+        return;
+    }
+
+    displayContainer.innerHTML = `<p class="text-muted">Fetching help requests...</p>`;
+
+    try {
+        const response = await fetch(`/subscription/fetch-all-help-requests/${orgId}/`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`[HelpReviewModal] Server returned ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.debug("[HelpReviewModal] Fetched response:", result);
+
+        if (!result.success) {
+            displayContainer.innerHTML = `<p class="text-danger">${result.error || 'Failed to fetch help requests.'}</p>`;
+            return;
+        }
+
+        renderOrgHelpRequests(result.requests);
+    } catch (err) {
+        console.error("[HelpReviewModal] Fetch error:", err);
+        displayContainer.innerHTML = `<p class="text-danger">Something went wrong while fetching help requests.</p>`;
+    }
+}
+
+function renderOrgHelpRequests(requests) {
+    const container = document.getElementById('orgHelpRequestsListContainer');
+    container.innerHTML = '';
+
+    if (!Array.isArray(requests) || requests.length === 0) {
+        container.innerHTML = `<p class="text-muted">No help requests found for this organization.</p>`;
+        return;
+    }
+
+    for (const req of requests) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'col-12 mb-2';
+
+        wrapper.innerHTML = `
+            <div class="card border-start border-4 border-primary shadow-sm">
+                <div class="card-body d-flex align-items-center">
+                    <img src="${req.profile_picture || '/static/img/default-avatar.png'}"
+                         alt="User Avatar" class="rounded-circle me-3" width="48" height="48">
+                    <div>
+                        <h6 class="mb-0">${sanitizeText(req.title)}</h6>
+                        <small class="text-muted">${sanitizeText(req.user_full_name)}</small>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        container.appendChild(wrapper);
+    }
+}
+
+// 🚨 Basic output sanitization
+function sanitizeText(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}

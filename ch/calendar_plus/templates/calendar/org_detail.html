@@ -1014,6 +1014,27 @@ header {
             </div>
           </div>
           {% endif %}
+
+          <!-- help requests -->
+          {% if is_admin %}
+          <div class="dropdown">
+            <button class="px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md font-medium flex items-center">
+              Helps
+              <i class="fas fa-chevron-down ml-1 text-xs text-gray-500"></i>
+            </button>
+            <div class="dropdown-content bg-white rounded-md mt-1 py-1 border border-gray-200">
+              <!-- Button -->
+              <a href="#" data-bs-toggle="modal" data-bs-target="#OrgHelpRequestReviewModal">
+                <button id="openOrgHelpModalBtn" class="w-full text-left flex items-center px-3 py-1.5 mx-2 rounded-md text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 group transition-colors duration-150 active:bg-indigo-100 sidebar-btn">
+                  <div class="w-2 h-2 rounded-full bg-indigo-500 mr-2.5"></div>
+                  <span class="text-sm font-medium">Review Help Requests</span>
+                </button>
+              </a>
+              
+              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Coming Soon</a>
+            </div>
+          </div>
+          {% endif %}
           
         </nav>
       </div>
@@ -4982,6 +5003,27 @@ body {
     </div>
   </div>
 </div>
+
+<!-- Fetch all help requests for the organization (Admin Only) -->
+<div class="modal fade" id="OrgHelpRequestReviewModal" tabindex="-1" aria-labelledby="OrgHelpRequestReviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-light">
+        <h5 class="modal-title" id="OrgHelpRequestReviewModalLabel">Organization Help Requests</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="orgHelpRequestsListContainer">
+          <p class="text-muted">Fetching help requests...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
 
 
 <!-- ----------------------------------------------------------------------------------------------------------------------------------------------- -->

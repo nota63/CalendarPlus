@@ -183,3 +183,37 @@ def fetch_user_help_requests(request, org_id):
             'error': 'An unexpected error occurred while fetching help requests.',
             'details': str(e)
         }, status=500)
+    
+
+# Admin Side Features - User Impersonation System
+
+# 1) fetch all help requests for the organiztion
+
+
+@login_required
+def fetch_all_help_requests_by_org(request, org_id):
+    if request.method != 'GET':
+        return JsonResponse({'success': False, 'error': 'Only GET method allowed.'}, status=405)
+
+    try:
+        organization = get_object_or_404(Organization, id=org_id)
+
+        help_requests = HelpRequest.objects.filter(organization=organization).select_related('user').order_by('-created_at')
+
+        data = []
+        for help in help_requests:
+            profile = Profile.objects.filter(user=help.user, organization=organization).first()
+            data.append({
+                'id': help.id,
+                'title': help.title,
+                'user_full_name': profile.full_name if profile else help.user.username,
+                'profile_picture': profile.profile_picture.url if profile and profile.profile_picture else None
+            })
+
+        return JsonResponse({'success': True, 'requests': data})
+
+    except Exception as e:
+        logger.exception(f"[AdminHelpView] Failed to fetch help requests for org {org_id}")
+        return JsonResponse({'success': False, 'error': 'Server error occurred.', 'details': str(e)}, status=500)
+    
+    
