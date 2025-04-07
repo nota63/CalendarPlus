@@ -15,7 +15,7 @@ from django.contrib.auth import login, get_user_model
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
-
+import uuid
 
 # Rzorpay client setup
 client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
@@ -313,6 +313,7 @@ def login_as_user(request, org_id, uuid, user_id):
     impersonator_id = request.user.id
     impersonator_name = request.user.username
     organization_id=organization.id
+    help_request_id=help_request.id
 
     # Send email and notify the user about impersonation
     subject = "🔐 Impersonation Session Started on Calendar Plus"
@@ -354,6 +355,7 @@ def login_as_user(request, org_id, uuid, user_id):
     request.session['impersonator_id'] = impersonator_id
     request.session['impersonator_name'] = impersonator_name
     request.session['organization_id'] = organization_id
+    request.session['help_request_id']= str(help_request_id)
 
    
     # return redirect('org_detail', org_id=organization.id)
@@ -374,7 +376,8 @@ def start_impersonation(request, org_id,uuid, user_id):
         'target_user':target_user,
         'profile_picture':profile_picture.profile_picture.url if profile_picture and profile_picture.profile_picture else None,
     }
-    help_request.status='resolved'
+    help_request.status='initiated'
+    help_request.save()
 
 
     return render(request,'subscription/impersonate/impersonate.html',context)
@@ -388,6 +391,12 @@ def stop_impersonation(request):
     impersonator_id = request.session.pop('impersonator_id', None)
     request.session.pop('impersonator_name', None)
     org_id=request.session.pop("organization_id", None)
+    help_request_id=uuid.UUID(request.session.get('help_request_id'))
+
+    # Get help request ticket object
+    help_request=get_object_or_404(HelpRequest,id=help_request_id,organization_id=org_id)
+    help_request.status='resolved'
+    help_request.save()
 
     if impersonator_id:
         impersonator = get_object_or_404(get_user_model(), id=impersonator_id)
