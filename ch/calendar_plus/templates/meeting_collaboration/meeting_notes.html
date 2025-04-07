@@ -1,487 +1,266 @@
+{% extends 'custom.html' %}
 
+{% block content %}
 
-
-<!-- reinitialized collborative meeting notes -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Collaborative Meeting Notes</title>
-    <style>
-
-
-/* Container for screen sharing */
-#screenShareContainer {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-    align-items: center;
-    padding: 10px;
-    height: 100%;
-    overflow: auto;
-    background-color: #2c2f33;
-}
-
-/* Local video (your screen share) */
-#localVideo {
-    width: 100%;
-    max-width: 300px;
-    max-height: 200px;
-    border: 2px solid #7289da;
-    border-radius: 8px;
-    object-fit: cover;
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 10;
-}
-
-/* Remote screens */
-#remoteVideos {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 15px;
-    width: 100%;
-    padding: 10px;
-}
-
-#remoteVideos video {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-/* Buttons for screen sharing */
-button {
-    cursor: pointer;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    color: #fff;
-    background-color: #7289da;
-    margin: 10px;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: #5865f2;
-}
-
-#shareScreenBtn, #stopShareBtn {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    z-index: 20;
-}
-
-/* Typing Indicator and other notes */
-#typingIndicator {
-    text-align: center;
-    color: hsl(118, 72%, 48%);
-    font-size: 14px;
-    margin-top: 10px;
-}
-
-/* Responsiveness */
-@media screen and (max-width: 768px) {
-    #localVideo {
-        width: 150px;
-        max-height: 100px;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collaborative Meeting Notes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    [contenteditable="true"]:focus {
+      outline: none;
+    }
+    .emoji-picker {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .mention-dropdown {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 6px;
+    }
+    #notes {
+      min-height: 300px;
+      resize: vertical;
+    }
+    .typing-indicator {
+      font-style: italic;
+      color: #6B7280;
     }
 
-    button {
-        font-size: 14px;
-        padding: 8px 16px;
-    }
+    /* change log (enable scrolling and reduce the height) */
+    .change-log-list {
+  max-height: 7rem;         /* Set fixed height (adjust as needed) */
+  overflow-y: auto;          /* Enable vertical scrolling */
+  padding-right: 0.5rem;     /* Prevent content cutoff */
+  scrollbar-width: none;     /* Firefox */
 }
 
-
-
-/* Typing Indicator and other notes */
-#typingIndicator {
-    text-align: center;
-    color: hsl(110, 89%, 41%);
-    font-size: 14px;
-    margin-top: 10px;
+.change-log-list::-webkit-scrollbar {
+  display: none;             /* Chrome, Safari, Edge */
 }
 
-/* Responsiveness */
-@media screen and (max-width: 768px) {
-    #localVideo {
-        width: 250px;
-        max-height: 200px;
-    }
-
-    button {
-        font-size: 14px;
-        padding: 8px 16px;
-    }
-}
-
-
-        /* Add your custom styles here */
-        .notes-container {
-            margin-top: 20px;
-        }
-        #notes {
-            width: 100%;
-            height: 200px;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .button {
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        #participants-list {
-            margin-top: 20px;
-            padding: 0;
-            list-style-type: none;
-        }
-        #participants-list li {
-            background-color: #f1f1f1;
-            padding: 5px;
-            margin: 5px 0;
-            border-radius: 3px;
-        }
-        .typing-indicator {
-            color: gray;
-            font-style: italic;
-            margin-top: 10px;
-        }
-        /* Emoji button and picker styles */
-        #emoji-picker {
-            font-size: 20px;
-            cursor: pointer;
-        }
-        #emoji-list {
-            display: none;
-            position: absolute;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 5px;
-            z-index: 1000;
-        }
-        #emoji-list span {
-            cursor: pointer;
-            padding: 5px;
-            font-size: 18px;
-        }
-        #emoji-list span:hover {
-            background-color: #f0f0f0;
-        }
-
-
-        .mention-dropdown {
-    position: absolute;
-    background-color: white;
-    border: 1px solid #ccc;
-    width: 200px; /* Adjust size */
-    z-index: 1000;
-    display: none;
-    max-height: 200px;
-    overflow-y: auto;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.mention-item {
-    padding: 8px;
-    cursor: pointer;
-}
-
-.mention-item:hover {
-    background-color: #f0f0f0;
-}
-
-
-
-.mention {
-    background-color: yellow;
-    font-weight: bold;
-    color: black; /* You can change this to make it more readable */
-    padding: 0 4px;
-    border-radius: 3px;
-}
-
-/* Textarea styling */
-/* Style the overall container */
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-/* Style for the meeting title */
-h2 {
-    font-size: 24px;
-    margin-bottom: 20px;
-}
-
-/* Style the participants section */
-#participants-list {
-    list-style-type: none;
-    padding: 0;
-}
-
-#participants-list li {
-    font-size: 18px;
-    margin: 5px 0;
-}
-
-/* Style the notes container */
-.notes-container {
-    margin-top: 20px;
-}
-
-textarea#notes {
-    width: 100%;
-    height: 300px;
-    padding: 10px;
-    font-size: 16px;
-    line-height: 1.5;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
-}
-
-/* Make sure the save button and emoji button look good */
-button {
-    padding: 10px 20px;
-    margin: 10px 0;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
-
-/* Typing indicator styles */
-.typing-indicator {
-    font-size: 14px;
-    color: gray;
-}
-
-/* Emoji picker styles */
-#emoji-picker {
-    padding: 10px;
-    margin-top: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-#emoji-list {
-    display: none;
-    margin-top: 5px;
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    position: absolute;
-    z-index: 1000;
-    padding: 5px;
-}
-
-#emoji-list span {
-    font-size: 20px;
-    padding: 5px;
-    cursor: pointer;
-}
-
-#emoji-list span:hover {
-    background-color: #f0f0f0;
-}
-
-/* Mention dropdown styling */
-.mention-dropdown {
-    position: absolute;
-    background: white;
-    border: 1px solid #ccc;
-    max-width: 200px;
-    z-index: 1000;
-    padding: 5px;
-}
-
-.mention-item {
-    padding: 5px;
-    cursor: pointer;
-}
-
-.mention-item:hover {
-    background-color: #f0f0f0;
-}
-
-/* Change log styles */
-#change-log {
-    margin-top: 20px;
-    padding: 10px;
-    background: #f9f9f9;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-#change-log li {
-    font-size: 14px;
-    margin-bottom: 5px;
-}
-
-.footer {
-    margin-top: 20px;
-    text-align: center;
-}
-
-.footer a {
-    color: #007bff;
-    text-decoration: none;
-}
-
-.footer a:hover {
-    text-decoration: underline;
-}
-
-
-
-
-       
-    </style>
+  </style>
 </head>
-<body>
-    
-
-<div class="container">
-    <h2>Collaborative Meeting Notes for {{ meeting.meeting_title }}</h2>
-
-    <!-- Participants List -->
-    <div>
-        <h3>Participants in the Room</h3>
-        <ul id="participants-list">
+<body class="bg-gray-50 text-gray-800">
+  <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <div class="w-64 bg-white border-r border-gray-200 flex flex-col">
+      <div class="p-4 border-b border-gray-200">
+        <h1 class="text-lg font-semibold text-purple-600">Meeting Notes</h1>
+      </div>
+      <div class="flex-1 overflow-y-auto p-4">
+        <div class="mb-6">
+          <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">PARTICIPANTS</h3>
+          <ul id="participants-list" class="space-y-1">
             <!-- Participants will be dynamically listed here -->
-        </ul>
-    </div>
-
-    <!-- mention  -->
-
-    <!-- Dropdown for mentions -->
-    <div id="mention-dropdown" class="mention-dropdown" style="display: none; position: absolute; background: #fff; border: 1px solid #ccc; z-index: 1000;"></div>
-
-        <div class="notes-container" contenteditable="true">
-            <h3>Notes:</h3>
-            <textarea id="notes">
-                {% if notes %}
-                    {{ notes.first.content }}
-                {% else %}
-                    <!-- Default content if no notes exist -->
-                    No notes available. You can start typing...
-                {% endif %}
-            </textarea>
-        <p id="typingIndicator" class="typing-indicator"></p>
-
-       
-        
-        <!-- Emoji Picker Button -->
-        <button id="emoji-picker">😊</button>
-        <!-- Emoji Picker List -->
-       
-
-        <div id="emoji-list">
-            <!-- Smileys and People -->
-            <span>😀</span> <span>😂</span> <span>😍</span> <span>😎</span> <span>😢</span> <span>😜</span>
-            <span>😡</span> <span>🥲</span> <span>🤯</span> <span>🤗</span> <span>😇</span> <span>🤔</span>
-            <span>😷</span> <span>🤩</span> <span>🥳</span> <span>🥺</span> <span>😴</span> <span>🤤</span>
-            <span>🥶</span> <span>🥵</span> <span>🤠</span> <span>🙃</span>
-        
-            <!-- Hands and Gestures -->
-            <span>👍</span> <span>👎</span> <span>👏</span> <span>🙌</span> <span>👋</span> <span>🤲</span>
-            <span>🤝</span> <span>✌️</span> <span>🤘</span> <span>👌</span> <span>✋</span> <span>🤞</span>
-            <span>🙏</span> <span>💪</span> <span>🖖</span> <span>🤙</span> <span>🫶</span> <span>🫱</span>
-        
-            <!-- Hearts and Symbols -->
-            <span>❤️</span> <span>💔</span> <span>💖</span> <span>💘</span> <span>💕</span> <span>💞</span>
-            <span>💓</span> <span>💗</span> <span>💙</span> <span>💚</span> <span>💜</span> <span>🖤</span>
-            <span>🤍</span> <span>🤎</span> <span>💌</span> <span>🔥</span> <span>✨</span> <span>🌟</span>
-            <span>🌈</span> <span>💎</span> <span>⚡</span> <span>💥</span>
-        
-            <!-- Premium and Fun -->
-            <span>🦄</span> <span>🎩</span> <span>👑</span> <span>🎉</span> <span>🎂</span> <span>🍾</span>
-            <span>🥂</span> <span>🎁</span> <span>🎃</span> <span>🎄</span> <span>⛄</span> <span>💀</span>
-            <span>👽</span> <span>🤖</span> <span>👻</span> <span>🧞</span> <span>🧚</span> <span>🧙</span>
-            <span>👒</span> <span>🕶</span> <span>🪩</span> <span>🪄</span> <span>📿</span>
-        
-            <!-- Food and Drink -->
-            <span>🍎</span> <span>🍕</span> <span>🍔</span> <span>🍟</span> <span>🌭</span> <span>🍿</span>
-            <span>🍩</span> <span>🎂</span> <span>🧁</span> <span>🍺</span> <span>🍷</span> <span>🥤</span>
-        
-            <!-- Animals -->
-            <span>🐶</span> <span>🐱</span> <span>🐻</span> <span>🦊</span> <span>🐼</span> <span>🐨</span>
-            <span>🐯</span> <span>🐷</span> <span>🐸</span> <span>🐤</span> <span>🦄</span> <span>🐙</span>
-        
-            <!-- Nature and Travel -->
-            <span>🌞</span> <span>🌜</span> <span>⭐</span> <span>🌹</span> <span>🌴</span> <span>🌻</span>
-            <span>🍁</span> <span>🏖️</span> <span>⛰️</span> <span>🚗</span> <span>✈️</span> <span>🚢</span>
-            <span>🏰</span> <span>🗼</span> <span>🏝️</span> <span>🏟️</span> <span>🚀</span> <span>🌌</span>
+          </ul>
         </div>
-        <button class="button" id="saveNotesBtn">Remove Notes</button>
+        
+        <div class="mb-6">
+          <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">EXPORT OPTIONS</h3>
+          <div class="space-y-2">
+            <button id="exportPdfBtn" class="w-full text-left flex items-center px-3 py-2 text-sm rounded-md hover:bg-gray-100 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m-3-3V4" />
+              </svg>
+              Export as PDF
+            </button>
+            <button id="exportEmailBtn" class="w-full text-left flex items-center px-3 py-2 text-sm rounded-md hover:bg-gray-100 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              Send via Email
+            </button>
+          </div>
+        </div>
+        
+        <div>
+          <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">SCREEN SHARING</h3>
+          <div class="space-y-2">
+            <button id="shareScreenBtn" onclick="startScreenShare()" class="w-full flex items-center justify-center px-3 py-2 bg-purple-600 text-white text-sm font-medium rounded-md hover:bg-purple-700 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              Share Screen
+            </button>
+            <button id="stopShareBtn" style="display:none;" onclick="stopScreenShare()" class="w-full flex items-center justify-center px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+              </svg>
+              Stop Sharing
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="p-4 border-t border-gray-200">
+        <a href="javascript:void(0)" onclick="window.history.back();" class="flex items-center text-sm text-gray-600 hover:text-purple-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+          </svg>
+          Back to Meetings
+        </a>
+      </div>
     </div>
+    
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <!-- Header -->
+      <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-semibold text-gray-800">{{ meeting.meeting_title }}</h2>
+          <p class="text-sm text-gray-500">Collaborative notes • Last saved 2 minutes ago</p>
+        </div>
+        <div class="flex gap-2">
+          <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-purple-100 text-purple-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            </svg>
+          </span>
+          <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </span>
+        </div>
+      </header>
+      
+      <!-- Content Area -->
+      <div class="flex-1 overflow-auto">
+        <div class="h-full flex">
+          <div class="flex-1 p-6 flex flex-col">
+            <!-- Notes Container -->
+            <div class="flex-1 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
+              <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-lg font-medium text-gray-900">Notes</h3>
+                  <div class="flex space-x-2">
+                    <button id="emoji-picker" class="p-2 rounded-md hover:bg-gray-100 transition-colors">
+                      <span class="text-xl">😊</span>
+                    </button>
+                    <button id="saveNotesBtn" class="flex items-center px-3 py-1.5 text-sm rounded-md bg-red-50 text-red-600 hover:bg-red-100 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      Remove Notes
+                    </button>
+                  </div>
+                </div>
+                
+                <div id="mention-dropdown" class="mention-dropdown" style="display: none;"></div>
+                
+                <div class="relative">
+                  <textarea id="notes" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors">
+                    {% if notes %}
+                        {{ notes.first.content }}
+                    {% else %}
+                        <!-- Default content if no notes exist -->
+                        No notes available. You can start typing...
+                    {% endif %}
+                  </textarea>
+                  <p id="typingIndicator" class="typing-indicator mt-2 text-sm"></p>
+                </div>
+                
+                <!-- Emoji Picker List -->
+                <div id="emoji-list" class="emoji-picker bg-white border border-gray-200 rounded-lg shadow-lg p-3 mt-2 hidden grid grid-cols-10 gap-2">
+                  <!-- Smileys and People -->
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">😀</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">😂</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">😍</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">😎</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">😢</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">😜</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">😡</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">🥲</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">🤯</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">🤗</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">😇</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">🤔</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">😷</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">🤩</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">🥳</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">🥺</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">😴</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">🤤</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">🥶</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">🥵</span>
+                  <!-- More emojis organized by category... -->
+                  
+                  <!-- Quick access popular emojis -->
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">👍</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">👎</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">👏</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">🙌</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">❤️</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">🔥</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">✨</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">🎉</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">🚀</span>
+                  <span class="cursor-pointer hover:bg-gray-100 p-1 rounded">💯</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Change Log -->
 
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <div class="p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Change Log</h3>
+                <ul id="change-log" class="change-log-list space-y-2 text-sm text-gray-600">
+                    <!-- Log entries will appear here -->
+                </ul>
+                </div>
+            </div>
+            
 
-    <!-- Change Log -->
-    <div class="notes-container">
-        <h3>Change Log:</h3>
-        <ul id="change-log">
-            <!-- Log entries will appear here -->
-        </ul>
+          </div>
+          
+          <!-- Screen Share Container -->
+          <div id="screenShareContainer" class="w-72 bg-gray-50 border-l border-gray-200 p-4 overflow-y-auto">
+            <h3 class="text-sm font-medium text-gray-700 mb-3">Screen Sharing</h3>
+            
+            <!-- Local video stream -->
+            <div class="mb-4">
+              <h4 class="text-xs font-medium text-gray-500 uppercase mb-2">Your Video</h4>
+              <video id="localVideo" class="w-full rounded-lg bg-gray-900 mb-2" autoplay muted></video>
+            </div>
+            
+            <!-- Remote video streams -->
+            <div>
+              <h4 class="text-xs font-medium text-gray-500 uppercase mb-2">Remote Streams</h4>
+              <div id="remoteVideos" class="space-y-2">
+                <!-- Remote videos will be added here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <div class="footer">
-        <p>Share this link with other participants to collaborate in real-time!</p>
-        <p><a href="javascript:void(0)" onclick="window.history.back();">Back to Meetings</a></p>
+  <!-- Sharing modal - would be shown when user shares the meeting -->
+  <div id="sharing-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+      <h3 class="text-lg font-semibold mb-4">Share this meeting</h3>
+      <p class="text-sm text-gray-600 mb-4">Share this link with other participants to collaborate in real-time!</p>
+      <div class="flex">
+        <input type="text" value="https://meeting.app/notes/12345" class="flex-1 border border-gray-300 rounded-l-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" readonly>
+        <button class="bg-purple-600 text-white px-4 py-2 rounded-r-md hover:bg-purple-700">Copy</button>
+      </div>
+      <div class="mt-6 flex justify-end">
+        <button class="text-gray-600 hover:text-gray-800 mr-4">Cancel</button>
+        <button class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">Share</button>
+      </div>
     </div>
-</div>
+  </div>
 
-<!-- export options -->
-<div class="export-options">
-    <button class="button" id="exportPdfBtn">Export as PDF</button>
-    <button class="button" id="exportEmailBtn">Send via Email</button>
-</div>
-
-
-
-<!-- Button to start screen sharing
-<button id="shareScreenBtn" onclick="startScreenShare()">Share Screen</button>
-<!-- Button to stop screen sharing -->
-<!-- <button id="stopShareBtn" onclick="stopScreenShare()" style="display: none;">Stop Sharing</button> -->
-<!-- 
-<video id="localVideo" autoplay muted></video>
-<div id="remoteVideos"></div> --> -->
-
-<div id="screenShareContainer">
-    <!-- Local video stream -->
-    <video id="localVideo" autoplay muted></video>
-
-    <!-- Remote video streams -->
-    <div id="remoteVideos"></div>
-
-    <!-- Screen share buttons -->
-    <button id="shareScreenBtn" onclick="startScreenShare()">Share Screen</button>
-    <button id="stopShareBtn" style="display:none;" onclick="stopScreenShare()">Stop Sharing</button>
-</div>
 
 
 
@@ -777,3 +556,4 @@ emojiList.addEventListener('click', function (e) {
 </body>
 </html>
 
+{% endblock %}
