@@ -16,6 +16,8 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 import uuid
+from django.views.decorators.http import require_GET
+
 
 # Rzorpay client setup
 client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
@@ -403,4 +405,34 @@ def stop_impersonation(request):
 
     return redirect('org_detail',org_id=org_id)  
 
+
+# Fetch the Full audit trail of impersonation activity logs
+@login_required
+@require_GET
+def fetch_impersonation_logs_by_help_id(request, help_id):
+    logger.debug(f"🚀 Received request to fetch impersonation logs for HelpRequest ID: {help_id}")
+
+    try:
+        help_request = get_object_or_404(HelpRequest, id=help_id)
+        logs = ImpersonationActivityLog.objects.filter(help_request=help_request).order_by('-timestamp')
+
+        logger.debug(f"✅ Found {logs.count()} log(s) for HelpRequest ID: {help_id}")
+
+        logs_data = []
+        for log in logs:
+            logs_data.append({
+                'admin': str(log.admin),
+                'organization': str(log.organization),
+                'path': log.path,
+                'method': log.method,
+                'timestamp': log.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+                'request_data': log.request_data,
+                'user_agent': log.user_agent,
+            })
+
+        return JsonResponse({'status': 'success', 'logs': logs_data})
+
+    except Exception as e:
+        logger.exception(f"💥 Error while fetching impersonation logs for help_id: {help_id}")
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 

@@ -15,7 +15,9 @@ urlpatterns=[
         name='login_as_user'
     ),
     path('stop_impersonation/',stop_impersonation, name='stop_impersonation'),
-    path('start_impersonation/<int:org_id>/<uuid:uuid>/<int:user_id>/',start_impersonation, name='start_impersonation')
+    path('start_impersonation/<int:org_id>/<uuid:uuid>/<int:user_id>/',start_impersonation, name='start_impersonation'),
+    path('fetch-impersonation-logs/<uuid:help_id>/',fetch_impersonation_logs_by_help_id, name='fetch_impersonation_logs_by_help_id'),
+
 
 
 

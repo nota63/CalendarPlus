@@ -555,7 +555,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 // Fetch users help requests and tickets
-
 // Wait until DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
     const modal = document.getElementById("MyHelpRequestsModal");
@@ -607,7 +606,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
   
-  // Render all help requests
+  // Render help request cards
   function renderHelpRequests(requests, container) {
     container.innerHTML = "";
   
@@ -627,9 +626,18 @@ document.addEventListener("DOMContentLoaded", () => {
             <p class="card-text">${escapeHtml(req.description)}</p>
             <span class="badge bg-${getStatusColor(req.status)} mb-2">${req.status.toUpperCase()}</span><br>
             <small class="text-muted">Created at: ${req.created_at}</small><br>
+  
             ${req.attachment_url 
               ? `<a href="${req.attachment_url}" class="btn btn-sm btn-outline-secondary mt-2" target="_blank" rel="noopener noreferrer">View Attachment</a>` 
-              : ""}
+              : ""
+            }
+  
+            <button class="btn btn-sm btn-outline-dark mt-2 ms-2" 
+              data-bs-toggle="modal" 
+              data-bs-target="#ImpersonationActivitiesModal"
+              onclick="fetchImpersonationLogs('${req.uuid}')">
+              View Logs
+            </button>
           </div>
         </div>
       `;
@@ -654,12 +662,56 @@ document.addEventListener("DOMContentLoaded", () => {
     div.textContent = text;
     return div.innerHTML;
   }
+  
+  // Fetch impersonation logs for a help request
+  async function fetchImpersonationLogs(helpRequestId) {
+    const logContainer = document.getElementById("impersonationLogContainer");
+    logContainer.innerHTML = `<div class="text-muted p-3">Loading activity logs...</div>`;
+  
+    try {
+      const response = await fetch(`/subscription/fetch-impersonation-logs/${helpRequestId}/`, {
+        method: "GET",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      });
+  
+      const data = await response.json();
+  
+      if (data.success) {
+        const logs = data.logs;
+  
+        if (logs.length === 0) {
+          logContainer.innerHTML = `<div class="text-muted p-3">No activities found for this help request.</div>`;
+          return;
+        }
+  
+        logContainer.innerHTML = logs.map(log => `
+          <div class="border-bottom py-2">
+            <strong>Path:</strong> ${escapeHtml(log.path)}<br>
+            <strong>Method:</strong> ${escapeHtml(log.method)}<br>
+            <strong>Time:</strong> ${log.timestamp}<br>
+            <strong>User Agent:</strong> <code>${escapeHtml(log.user_agent || '')}</code><br>
+            <strong>Data:</strong> <pre>${JSON.stringify(log.request_data || {}, null, 2)}</pre>
+          </div>
+        `).join("");
+      } else {
+        logContainer.innerHTML = `<div class="text-danger p-3">Failed to fetch logs.</div>`;
+      }
+    } catch (error) {
+      console.error("Error fetching impersonation logs:", error);
+      logContainer.innerHTML = `<div class="text-danger p-3">Something went wrong while fetching logs.</div>`;
+    }
+  }
+  
 
 
   
+
+
+
+
 // Fetch and display help requests of the organization
-
-
 // 🌟 Help Request Loader for Admin Modal
 document.addEventListener("DOMContentLoaded", () => {
     const helpModal = document.getElementById('OrgHelpRequestReviewModal');
