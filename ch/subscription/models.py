@@ -69,14 +69,14 @@ class HelpRequest(models.Model):
 
 # Impersonation Summary Model 
 class ImpersonationActivityLog(models.Model):
-    admin = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="impersonation_logs")
-    impersonated_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="impersonated_by_logs")
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
-    help_request = models.ForeignKey(HelpRequest, on_delete=models.SET_NULL, null=True, blank=True)
-    path = models.CharField(max_length=500)
-    method = models.CharField(max_length=10)
-    timestamp = models.DateTimeField(default=now)
-    metadata = models.JSONField(blank=True, null=True)  # Stores headers, params, etc.
+    admin = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,null=True, blank=True)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True, blank=True)
+    help_request = models.ForeignKey(HelpRequest, on_delete=models.CASCADE,null=True, blank=True)
+    path = models.CharField(max_length=512,null=True, blank=True)
+    method = models.CharField(max_length=10,null=True, blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    request_data = models.JSONField(blank=True, null=True)  # stores GET/POST
+    user_agent = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.admin} -> {self.impersonated_user} | {self.path}"
+        return f"{self.admin} - {self.path} @ {self.timestamp}"
