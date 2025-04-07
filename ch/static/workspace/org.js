@@ -663,9 +663,23 @@ document.addEventListener("DOMContentLoaded", () => {
     return div.innerHTML;
   }
   
-  // Fetch impersonation logs for a help request
+// Fetch impersonation logs for a help request
+ // Safe HTML escape helper
+function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
+  // Main function to fetch impersonation logs
   async function fetchImpersonationLogs(helpRequestId) {
     const logContainer = document.getElementById("impersonationLogContainer");
+  
+    if (!logContainer) {
+      console.error("🚫 Log container not found in DOM");
+      return;
+    }
+  
     logContainer.innerHTML = `<div class="text-muted p-3">Loading activity logs...</div>`;
   
     try {
@@ -676,35 +690,53 @@ document.addEventListener("DOMContentLoaded", () => {
         },
       });
   
-      const data = await response.json();
+      const text = await response.text();
+      console.log("🧾 Raw response:", text);
   
-      if (data.success) {
-        const logs = data.logs;
-  
-        if (logs.length === 0) {
-          logContainer.innerHTML = `<div class="text-muted p-3">No activities found for this help request.</div>`;
-          return;
-        }
-  
-        logContainer.innerHTML = logs.map(log => `
-          <div class="border-bottom py-2">
-            <strong>Path:</strong> ${escapeHtml(log.path)}<br>
-            <strong>Method:</strong> ${escapeHtml(log.method)}<br>
-            <strong>Time:</strong> ${log.timestamp}<br>
-            <strong>User Agent:</strong> <code>${escapeHtml(log.user_agent || '')}</code><br>
-            <strong>Data:</strong> <pre>${JSON.stringify(log.request_data || {}, null, 2)}</pre>
-          </div>
-        `).join("");
-      } else {
-        logContainer.innerHTML = `<div class="text-danger p-3">Failed to fetch logs.</div>`;
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (jsonError) {
+        console.error("❌ Failed to parse JSON:", jsonError);
+        logContainer.innerHTML = `<div class="text-danger p-3">Invalid server response format.</div>`;
+        return;
       }
+  
+      // Fallback logic: support both `data.success === true` or `data.status === 'success'`
+      const isSuccess = data.success === true || data.status === 'success';
+  
+      if (!isSuccess) {
+        console.warn("⚠️ Response status not marked as success:", data);
+        logContainer.innerHTML = `<div class="text-danger p-3">Failed to fetch logs from the server.</div>`;
+        return;
+      }
+  
+      const logs = data.logs;
+  
+      if (!Array.isArray(logs) || logs.length === 0) {
+        logContainer.innerHTML = `<div class="text-muted p-3">No activities found for this help request.</div>`;
+        return;
+      }
+  
+      // Render logs
+      logContainer.innerHTML = logs.map(log => `
+        <div class="border-bottom py-2">
+          <strong>Admin:</strong> ${escapeHtml(log.admin || 'N/A')}<br>
+          <strong>Organization:</strong> ${escapeHtml(log.organization || 'N/A')}<br>
+          <strong>Path:</strong> ${escapeHtml(log.path)}<br>
+          <strong>Method:</strong> ${escapeHtml(log.method)}<br>
+          <strong>Time:</strong> ${log.timestamp}<br>
+          <strong>User Agent:</strong> <code>${escapeHtml(log.user_agent || '')}</code><br>
+          <strong>Data:</strong> <pre>${JSON.stringify(log.request_data || {}, null, 2)}</pre>
+        </div>
+      `).join("");
+  
     } catch (error) {
-      console.error("Error fetching impersonation logs:", error);
-      logContainer.innerHTML = `<div class="text-danger p-3">Something went wrong while fetching logs.</div>`;
+      console.error("❌ Network or server error:", error);
+      logContainer.innerHTML = `<div class="text-danger p-3">Something went wrong while fetching logs. Please try again later.</div>`;
     }
   }
   
-
 
   
 
