@@ -617,31 +617,48 @@ document.addEventListener("DOMContentLoaded", () => {
   
     requests.forEach((req) => {
       const card = document.createElement("div");
+
       card.className = "col-12 mb-3";
   
       card.innerHTML = `
-        <div class="card border-start border-4 border-${getStatusColor(req.status)} shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title mb-1">${escapeHtml(req.title)}</h5>
-            <p class="card-text">${escapeHtml(req.description)}</p>
-            <span class="badge bg-${getStatusColor(req.status)} mb-2">${req.status.toUpperCase()}</span><br>
-            <small class="text-muted">Created at: ${req.created_at}</small><br>
-  
-            ${req.attachment_url 
-              ? `<a href="${req.attachment_url}" class="btn btn-sm btn-outline-secondary mt-2" target="_blank" rel="noopener noreferrer">View Attachment</a>` 
-              : ""
-            }
-  
-            <button class="btn btn-sm btn-outline-dark mt-2 ms-2" 
-              data-bs-toggle="modal" 
-              data-bs-target="#ImpersonationActivitiesModal"
-              onclick="fetchImpersonationLogs('${req.uuid}')">
-              View Logs
-            </button>
-          </div>
-        </div>
-      `;
-  
+  <div class="border-l-4 border-${getStatusColor(req.status)} bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+    <div class="p-5 space-y-3">
+      <h3 class="text-gray-800 font-semibold text-lg leading-tight">${escapeHtml(req.title)}</h3>
+      
+      <p class="text-gray-600 text-sm leading-relaxed">${escapeHtml(req.description)}</p>
+
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-${getStatusColor(req.status)}-100 text-${getStatusColor(req.status)}-800">
+          ${req.status.toUpperCase()}
+        </span>
+        <span class="text-gray-400 text-xs">•</span>
+        <span class="text-gray-500 text-sm">${req.created_at}</span>
+      </div>
+
+      <div class="flex flex-wrap gap-2 pt-2">
+        ${req.attachment_url 
+          ? `<a href="${req.attachment_url}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500" target="_blank" rel="noopener noreferrer">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              View Attachment
+            </a>` 
+          : ""
+        }
+
+        <button class="inline-flex items-center px-4 py-2 border border-gray-800 rounded-lg text-sm font-medium text-gray-800 hover:bg-gray-800 hover:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500" 
+          data-bs-toggle="modal" 
+          data-bs-target="#ImpersonationActivitiesModal"
+          onclick="fetchImpersonationLogs('${req.uuid}')">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+          </svg>
+          View Logs
+        </button>
+      </div>
+    </div>
+  </div>
+`;
       container.appendChild(card);
     });
   }
@@ -655,7 +672,6 @@ document.addEventListener("DOMContentLoaded", () => {
       default: return "dark";
     }
   }
-  
   // Escape HTML to prevent injection
   function escapeHtml(text) {
     const div = document.createElement("div");
@@ -719,17 +735,73 @@ function escapeHtml(text) {
       }
   
       // Render logs
-      logContainer.innerHTML = logs.map(log => `
-        <div class="border-bottom py-2">
-          <strong>Admin:</strong> ${escapeHtml(log.admin || 'N/A')}<br>
-          <strong>Organization:</strong> ${escapeHtml(log.organization || 'N/A')}<br>
-          <strong>Path:</strong> ${escapeHtml(log.path)}<br>
-          <strong>Method:</strong> ${escapeHtml(log.method)}<br>
-          <strong>Time:</strong> ${log.timestamp}<br>
-          <strong>User Agent:</strong> <code>${escapeHtml(log.user_agent || '')}</code><br>
-          <strong>Data:</strong> <pre>${JSON.stringify(log.request_data || {}, null, 2)}</pre>
-        </div>
-      `).join("");
+      logContainer.innerHTML = logs.map((log, index) => {
+        const adminInitial = log.admin ? escapeHtml(log.admin.charAt(0).toUpperCase()) : 'N/A';
+        const methodColors = {
+          GET: 'bg-green-500',
+          POST: 'bg-blue-500',
+          PUT: 'bg-yellow-500',
+          DELETE: 'bg-red-500',
+          PATCH: 'bg-purple-500',
+          default: 'bg-gray-500'
+        };
+        const methodColor = methodColors[log.method.toUpperCase()] || methodColors.default;
+      
+        return `
+          <div class="flex group relative">
+            <!-- Timeline line -->
+            <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200 ${index === 0 ? 'top-6' : ''} ${index === logs.length - 1 ? 'h-6' : ''}"></div>
+            
+            <!-- Left avatar/icon column -->
+            <div class="relative z-10 flex-shrink-0 w-8 mr-4">
+              <div class="absolute left-0 top-6 h-6 w-6 ${methodColor} rounded-full flex items-center justify-center text-white font-semibold shadow-sm">
+                ${adminInitial}
+              </div>
+            </div>
+      
+            <!-- Right content card -->
+            <div class="flex-1 pb-8">
+              <div class="relative bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 p-4">
+                <!-- Header -->
+                <div class="flex items-start justify-between mb-2">
+                  <div>
+                    <h3 class="font-semibold text-gray-900">${escapeHtml(log.admin || 'N/A')}</h3>
+                    <p class="text-sm text-gray-500 mt-1">${escapeHtml(log.organization || 'N/A')}</p>
+                  </div>
+                  <span class="text-sm text-gray-500 whitespace-nowrap">${escapeHtml(log.timestamp)}</span>
+                </div>
+      
+                <!-- Method and path -->
+                <div class="flex items-center gap-2 mb-3">
+                  <span class="${methodColor} text-white px-2 py-1 rounded-full text-xs font-medium">${escapeHtml(log.method)}</span>
+                  <code class="text-sm font-mono text-gray-700">${escapeHtml(log.path)}</code>
+                </div>
+      
+                <!-- User Agent -->
+                <div class="mt-3">
+                  <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">User Agent</p>
+                  <div class="bg-gray-50 p-2 rounded-lg text-sm font-mono text-gray-600 break-words">
+                    ${escapeHtml(log.user_agent || 'N/A')}
+                  </div>
+                </div>
+      
+                <!-- Data -->
+                <div class="mt-3">
+                  <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Data</p>
+                  <pre class="bg-gray-50 p-2 rounded-lg text-sm font-mono text-gray-600 overflow-x-auto">${JSON.stringify(log.request_data || {}, null, 2)}</pre>
+                </div>
+      
+                <!-- Decorative corner icon -->
+                <svg class="absolute top-4 right-4 h-5 w-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+
   
     } catch (error) {
       console.error("❌ Network or server error:", error);
@@ -737,11 +809,6 @@ function escapeHtml(text) {
     }
   }
   
-
-  
-
-
-
 
 // Fetch and display help requests of the organization
 // 🌟 Help Request Loader for Admin Modal
@@ -814,29 +881,49 @@ function renderOrgHelpRequests(requests) {
 
     for (const req of requests) {
         const wrapper = document.createElement('div');
-        wrapper.className = 'col-12 mb-2';
+
+        wrapper.className = 'w-full mb-4';
 
         wrapper.innerHTML = `
-            <div class="card border-start border-4 border-primary shadow-sm">
-                <div class="card-body d-flex align-items-center justify-content-between">
-                    <div class="d-flex align-items-center">
-                        <img src="${req.profile_picture || '/static/img/default-avatar.png'}"
-                             alt="User Avatar" class="rounded-circle me-3" width="48" height="48">
-                        <div>
-                            <h6 class="mb-0">${sanitizeText(req.title)}</h6>
-                            <small class="text-muted">${sanitizeText(req.user_full_name)}</small>
-                        </div>
-                    </div>
-                    <button class="btn btn-sm btn-outline-primary ms-3"
-                            data-bs-toggle="modal"
-                            data-bs-target="#HelpRequestFullDetailModal"
-                            data-request-id="${req.uuid}">
-                        View
-                    </button>
+        <div class="bg-white rounded-lg border border-gray-200 shadow-xs hover:shadow-md transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-0.5 group">
+          <div class="p-4 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+              <div class="relative flex-shrink-0">
+                <img src="${req.profile_picture || '/static/img/default-avatar.png'}"
+                     class="rounded-full w-9 h-9 object-cover ring-2 ring-gray-100"
+                     alt="User avatar">
+                <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white"></div>
+              </div>
+              
+              <div class="flex-1 min-w-0 space-y-0.5">
+                <h6 class="font-semibold text-gray-900 text-[15px] leading-tight truncate">
+                  ${sanitizeText(req.title)}
+                </h6>
+                <div class="flex items-center gap-2 text-gray-500">
+                  <span class="text-xs font-medium truncate">${sanitizeText(req.user_full_name)}</span>
+                  <div class="w-1 h-1 bg-gray-300 rounded-full"></div>
+                  <span class="flex items-center gap-1 text-xs font-medium text-purple-600">
+                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12z"/>
+                      <path d="M10 12.5a1 1 0 01-1-1V8a1 1 0 112 0v3.5a1 1 0 01-1 1zm0 1.5a1 1 0 100 2 1 1 0 000-2z"/>
+                    </svg>
+                    Active
+                  </span>
                 </div>
+              </div>
             </div>
+        
+            <button class="p-2 -m-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors duration-150"
+                    data-bs-toggle="modal"
+                    data-bs-target="#HelpRequestFullDetailModal"
+                    data-request-id="${req.uuid}">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
         `;
-
         container.appendChild(wrapper);
     }
 
@@ -874,20 +961,70 @@ async function fetchHelpRequestDetail(uuid) {
         const detail = data.data;
 
         modalBody.innerHTML = `
-        <h5>${sanitizeText(detail.title || 'No title')}</h5>
-        <p><strong>Status:</strong> ${sanitizeText(detail.status || 'N/A')}</p>
-        <p><strong>Description:</strong><br>${sanitizeText(detail.description || 'No description')}</p>
-        ${detail.attachment ? `<p><strong>Attachment:</strong> <a href="${detail.attachment}" target="_blank">View</a></p>` : ''}
-        <p class="text-muted small mt-3">Requested by ${sanitizeText(detail.username || 'Unknown user')}</p>
-    
-        <div class="d-flex justify-content-end mt-3">
-            <a href="/subscription/login-as-user/${window.djangoData.orgId}/${detail.uuid}/${detail.help_user_id}/" 
-               class="btn btn-sm btn-outline-success">
-                Log in as this user
+        <div class="space-y-4">
+          <div class="flex items-center justify-between pb-2 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">
+              ${sanitizeText(detail.title || 'Untitled Request')}
+            </h3>
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium ${detail.status === 'Resolved' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}">
+              ${sanitizeText(detail.status || 'N/A')}
+            </span>
+          </div>
+        
+          <div class="grid grid-cols-3 gap-4 text-sm">
+            <div class="space-y-1">
+              <label class="text-gray-500 font-medium">Requester</label>
+              <div class="flex items-center gap-2">
+                <img src="${detail.profile_picture || '/static/img/default-avatar.png'}" 
+                     class="w-6 h-6 rounded-full object-cover">
+                <span class="text-gray-900">${sanitizeText(detail.username || 'Unknown user')}</span>
+              </div>
+            </div>
+        
+            <div class="space-y-1">
+              <label class="text-gray-500 font-medium">Created</label>
+              <p class="text-gray-900">${detail.created_at || 'N/A'}</p>
+            </div>
+        
+            <div class="space-y-1">
+              <label class="text-gray-500 font-medium">Priority</label>
+              <p class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full ${detail.priority === 'high' ? 'bg-red-500' : 'bg-gray-300'}"></span>
+                <span class="text-gray-900 capitalize">${detail.priority || 'normal'}</span>
+              </p>
+            </div>
+          </div>
+        
+          <div class="space-y-2">
+            <label class="text-gray-500 font-medium text-sm">Description</label>
+            <div class="p-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-700 text-sm">
+              ${sanitizeText(detail.description || 'No description provided')}
+            </div>
+          </div>
+        
+          ${detail.attachment ? `
+          <div class="space-y-2">
+            <label class="text-gray-500 font-medium text-sm">Attachment</label>
+            <a href="${detail.attachment}" target="_blank" 
+               class="group flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800">
+              <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+              <span class="truncate">${detail.attachment.split('/').pop()}</span>
             </a>
+          </div>` : ''}
+        
+          <div class="pt-4 border-t border-gray-200 flex justify-end gap-2">
+            <a href="/subscription/login-as-user/${window.djangoData.orgId}/${detail.uuid}/${detail.help_user_id}/" 
+               class="inline-flex items-center px-3.5 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+              </svg>
+              Start Session
+            </a>
+          </div>
         </div>
-    `;
-    
+        `;
 
 
     } catch (err) {
