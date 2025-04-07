@@ -312,6 +312,7 @@ def login_as_user(request, org_id, uuid, user_id):
     # 🔐 Save impersonator details temporarily (NOT in session yet)
     impersonator_id = request.user.id
     impersonator_name = request.user.username
+    organization_id=organization.id
 
     # Send email and notify the user about impersonation
     subject = "🔐 Impersonation Session Started on Calendar Plus"
@@ -352,6 +353,7 @@ def login_as_user(request, org_id, uuid, user_id):
     # ✅ Now restore impersonation details in session
     request.session['impersonator_id'] = impersonator_id
     request.session['impersonator_name'] = impersonator_name
+    request.session['organization_id'] = organization_id
 
    
     # return redirect('org_detail', org_id=organization.id)
@@ -372,7 +374,7 @@ def start_impersonation(request, org_id,uuid, user_id):
         'target_user':target_user,
         'profile_picture':profile_picture.profile_picture.url if profile_picture and profile_picture.profile_picture else None,
     }
-    help_request.status= 'resolved'
+    help_request.status='resolved'
 
 
     return render(request,'subscription/impersonate/impersonate.html',context)
@@ -385,12 +387,13 @@ def start_impersonation(request, org_id,uuid, user_id):
 def stop_impersonation(request):
     impersonator_id = request.session.pop('impersonator_id', None)
     request.session.pop('impersonator_name', None)
+    org_id=request.session.pop("organization_id", None)
 
     if impersonator_id:
         impersonator = get_object_or_404(get_user_model(), id=impersonator_id)
         login(request, impersonator)
 
-    return redirect('logout')  # or redirect to wherever you want
+    return redirect('org_detail',org_id=org_id)  
 
 
 
