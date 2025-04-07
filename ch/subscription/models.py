@@ -2,7 +2,9 @@ from django.db import models
 from django.contrib.auth import get_user_model
 import uuid
 from accounts.models import Organization
+from django.utils.timezone import now
 
+# get user model
 User = get_user_model()
 
 
@@ -63,3 +65,18 @@ class HelpRequest(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.title} ({self.organization.name})"
+
+
+# Impersonation Summary Model 
+class ImpersonationActivityLog(models.Model):
+    admin = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="impersonation_logs")
+    impersonated_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="impersonated_by_logs")
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    help_request = models.ForeignKey(HelpRequest, on_delete=models.SET_NULL, null=True, blank=True)
+    path = models.CharField(max_length=500)
+    method = models.CharField(max_length=10)
+    timestamp = models.DateTimeField(default=now)
+    metadata = models.JSONField(blank=True, null=True)  # Stores headers, params, etc.
+
+    def __str__(self):
+        return f"{self.admin} -> {self.impersonated_user} | {self.path}"

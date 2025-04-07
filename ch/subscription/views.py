@@ -10,7 +10,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from .models import HelpRequest
+from .models import HelpRequest,ImpersonationActivityLog
 from django.contrib.auth import login, get_user_model
 from django.core.mail import send_mail
 from django.conf import settings
@@ -116,7 +116,7 @@ def payment_success(request):
     return HttpResponseBadRequest("Invalid request method.")
 
 
-# Help Request set-up
+# Help Request set-up-----------------------------------------------------------------------------------------------------------------------------------------------------------
 @csrf_exempt
 @login_required
 def raise_help_request(request, org_id):
@@ -384,7 +384,6 @@ def start_impersonation(request, org_id,uuid, user_id):
 
 
 
-
 # stop impersonation
 @login_required
 def stop_impersonation(request):
@@ -403,6 +402,5 @@ def stop_impersonation(request):
         login(request, impersonator)
 
     return redirect('org_detail',org_id=org_id)  
-
 
 

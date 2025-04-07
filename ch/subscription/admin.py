@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from .models import Payment, PremiumPlan, HelpRequest
+from .models import Payment, PremiumPlan, HelpRequest,ImpersonationActivityLog
 
 @admin.register(Payment)
 class PaymentsAdmin(ModelAdmin):
@@ -18,4 +18,11 @@ class PremiumPlansAdmin(ModelAdmin):
 @admin.register(HelpRequest)
 class HelpRequestsAdmin(ModelAdmin):
     list_display = [field.name for field in HelpRequest._meta.fields]
+
+
+
+
+@admin.register(ImpersonationActivityLog)
+class HelpRequestsSummaryAdmin(ModelAdmin):
+    list_display = [field.name for field in ImpersonationActivityLog._meta.fields]
 
