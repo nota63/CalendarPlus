@@ -15,5 +15,8 @@ urlpatterns=[
         name='login_as_user'
     ),
     path('stop_impersonation/',stop_impersonation, name='stop_impersonation'),
+    path('start_impersonation/<int:org_id>/<uuid:uuid>/<int:user_id>/',start_impersonation, name='start_impersonation')
+
+
 
 ]

@@ -12,6 +12,10 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from .models import HelpRequest
 from django.contrib.auth import login, get_user_model
+from django.core.mail import send_mail
+from django.conf import settings
+from django.utils import timezone
+
 
 # Rzorpay client setup
 client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
@@ -304,9 +308,43 @@ def login_as_user(request, org_id, uuid, user_id):
 
     target_user = get_object_or_404(get_user_model(), id=user_id)
 
+
     # 🔐 Save impersonator details temporarily (NOT in session yet)
     impersonator_id = request.user.id
     impersonator_name = request.user.username
+
+    # Send email and notify the user about impersonation
+    subject = "🔐 Impersonation Session Started on Calendar Plus"
+
+    message = f"""
+    Hi {target_user.first_name or target_user.username},
+
+    We wanted to inform you that an impersonation session has been initiated on your account in the organization: "{organization.name}".
+
+    🔍 Details:
+    - Help Request ID: {help_request.id}
+    -Help Request Title: {help_request.title}
+    - 👤 Admin: {request.user.username}
+    - 🏢 Organization: {organization.name}
+    - 📅 Date & Time: {timezone.now().strftime('%A, %d %B %Y at %I:%M %p')}
+    - 🛡️ Purpose: This impersonation is typically used for support, troubleshooting, or administrative guidance.
+
+    Please note:
+    - ✅ The impersonator cannot access your password or private credentials.
+    - ✅ All actions are securely logged and monitored.
+    - ✅ You can contact your admin for more context.
+
+    If you feel this session was unauthorized, please report it to our support team immediately.
+
+    Thank you for trusting Calendar Plus.
+
+    — The Calendar Plus Team
+    """
+    from_email=settings.DEFAULT_FROM_EMAIL
+
+    # send_mail() or your preferred method
+    send_mail(subject, message, from_email, [target_user.email])
+
 
     # 🔁 Login as target user
     login(request, target_user)
@@ -315,7 +353,30 @@ def login_as_user(request, org_id, uuid, user_id):
     request.session['impersonator_id'] = impersonator_id
     request.session['impersonator_name'] = impersonator_name
 
-    return redirect('org_detail', org_id=organization.id)
+   
+    # return redirect('org_detail', org_id=organization.id)
+    return redirect('start_impersonation',org_id=organization.id, uuid=help_request.id, user_id=target_user.id)
+
+
+# start impersonation
+@login_required
+def start_impersonation(request, org_id,uuid, user_id):
+    organization = get_object_or_404(Organization, id=org_id)
+    help_request=get_object_or_404(HelpRequest, id=uuid,organization_id=org_id)
+    target_user=get_object_or_404(get_user_model(), id=user_id)
+    profile_picture=Profile.objects.filter(user=target_user, organization=organization).first()
+
+    context = {
+        "organization":organization,
+        'help_request':help_request,
+        'target_user':target_user,
+        'profile_picture':profile_picture.profile_picture.url if profile_picture and profile_picture.profile_picture else None,
+    }
+
+
+    return render(request,'subscription/impersonate/impersonate.html',context)
+
+
 
 
 # stop impersonation
