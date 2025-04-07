@@ -197,7 +197,6 @@ def fetch_user_help_requests(request, org_id):
 
 # 1) fetch all help requests for the organiztion
 
-
 @login_required
 def fetch_all_help_requests_by_org(request, org_id):
     if request.method != 'GET':
@@ -207,6 +206,17 @@ def fetch_all_help_requests_by_org(request, org_id):
         organization = get_object_or_404(Organization, id=org_id)
 
         help_requests = HelpRequest.objects.filter(organization=organization).select_related('user').order_by('-created_at')
+
+  
+       # Optimized admin access check
+        is_admin = Profile.objects.filter(
+            user=request.user,
+            organization=organization,
+            is_admin=True
+        ).only('id').exists()
+
+        if not is_admin:
+            return HttpResponseForbidden("You must be an admin of this organization")
 
         data = []
         for help in help_requests:
@@ -321,8 +331,6 @@ def login_as_user(request, org_id, uuid, user_id):
 
         if not is_admin:
             return HttpResponseForbidden("You cannot impersonate this user")
-
-
 
     # 🔐 Save impersonator details temporarily (NOT in session yet)
     impersonator_id = request.user.id
