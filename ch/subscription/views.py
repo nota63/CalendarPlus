@@ -372,6 +372,7 @@ def start_impersonation(request, org_id,uuid, user_id):
         'target_user':target_user,
         'profile_picture':profile_picture.profile_picture.url if profile_picture and profile_picture.profile_picture else None,
     }
+    help_request.status= 'resolved'
 
 
     return render(request,'subscription/impersonate/impersonate.html',context)

@@ -58,7 +58,7 @@ class HelpRequest(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     attachment = models.FileField(upload_to='help_attachments/', null=True, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='initiated')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='in_progress')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
