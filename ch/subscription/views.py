@@ -311,6 +311,19 @@ def login_as_user(request, org_id, uuid, user_id):
     target_user = get_object_or_404(get_user_model(), id=user_id)
 
 
+    # Check user access for impersonation
+    if target_user != help_request.user:
+        is_admin = Profile.objects.filter(
+            user=request.user,
+            organization=organization,
+            is_admin=True
+        ).only('id').exists()
+
+        if not is_admin:
+            return HttpResponseForbidden("You cannot impersonate this user")
+
+
+
     # 🔐 Save impersonator details temporarily (NOT in session yet)
     impersonator_id = request.user.id
     impersonator_name = request.user.username
@@ -372,6 +385,10 @@ def start_impersonation(request, org_id,uuid, user_id):
     target_user=get_object_or_404(get_user_model(), id=user_id)
     profile_picture=Profile.objects.filter(user=target_user, organization=organization).first()
 
+    # check access 
+    if target_user != help_request.user:
+        return HttpResponseForbidden("User mismatch you cannot impersonate this user")
+
     context = {
         "organization":organization,
         'help_request':help_request,
@@ -394,6 +411,17 @@ def stop_impersonation(request):
     org_id=request.session.pop("organization_id", None)
     help_request_id=uuid.UUID(request.session.get('help_request_id'))
 
+    # check the admin access
+    is_admin = Profile.objects.filter(
+        user_id=impersonator_id,
+        organization_id=org_id,
+        is_admin=True
+    ).only('id').exists()
+
+    if not is_admin:
+        return HttpResponseForbidden("You must be an admin of this organization")
+
+
     # Get help request ticket object
     help_request=get_object_or_404(HelpRequest,id=help_request_id,organization_id=org_id)
     help_request.status='resolved'
@@ -412,9 +440,18 @@ def stop_impersonation(request):
 def fetch_impersonation_logs_by_help_id(request, help_id):
     logger.debug(f"🚀 Received request to fetch impersonation logs for HelpRequest ID: {help_id}")
 
+
     try:
         help_request = get_object_or_404(HelpRequest, id=help_id)
         logs = ImpersonationActivityLog.objects.filter(help_request=help_request).order_by('-timestamp')
+
+        # check the access
+        if request.user != help_request.user:
+            if not Profile.objects.filter(user=request.user, organization=help_request.organization).exists():
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'You are not authorized to view this help request'
+                }, status=400)
 
         logger.debug(f"✅ Found {logs.count()} log(s) for HelpRequest ID: {help_id}")
 

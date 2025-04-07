@@ -2339,3 +2339,17 @@ a {
     margin-right: 0.5rem;
     font-weight: 400;
   }
+
+
+/* organization Help requests modal  */
+#OrgHelpRequestReviewModal .modal-dialog {
+    max-width: 950px; /* or 900px+, adjust based on your layout */
+    width: 100%;
+  }
+  
+  @media (min-width: 992px) {
+    #OrgHelpRequestReviewModal .modal-dialog {
+      margin: 1.75rem auto;
+    }
+  }
+  
