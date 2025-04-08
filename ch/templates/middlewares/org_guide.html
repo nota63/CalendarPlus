@@ -1,275 +1,88 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to Calendar Plus</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <style>
-        /* General Styles */
-       /* General Styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
-}
 
-body {
-    display: flex;
-    height: 100vh;
-    background-color: #f4f5f7;
-}
+    <!-- Intro.js CSS -->
+    <link href="https://unpkg.com/intro.js/minified/introjs.min.css" rel="stylesheet">
 
-/* Sidebar Navigation */
-.sidebar {
-    width: 280px;
-    background: linear-gradient(135deg, #5b21b6, #4a148c);
-    padding: 25px;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
-    border-top-right-radius: 15px;
-    border-bottom-right-radius: 15px;
-}
-
-.sidebar h2 {
-    font-size: 24px;
-    font-weight: 600;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.sidebar ul {
-    list-style: none;
-}
-
-.sidebar ul li {
-    padding: 12px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 500;
-    transition: all 0.3s ease-in-out;
-}
-
-.sidebar ul li:hover,
-.sidebar ul li.active {
-    background: rgba(255, 255, 255, 0.15);
-    transform: translateX(5px);
-}
-
-/* Main Content */
-.main-content {
-    flex: 1;
-    padding: 40px;
-    overflow-y: auto;
-}
-
-.section {
-    margin-bottom: 50px;
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.5s ease-in-out;
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-.section.active {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Headings & Text */
-h1 {
-    font-size: 30px;
-    font-weight: 700;
-    color: #333;
-    margin-bottom: 10px;
-}
-
-h2 {
-    font-size: 24px;
-    font-weight: 600;
-    color: #4a148c;
-    margin-bottom: 15px;
-}
-
-p {
-    font-size: 16px;
-    color: #555;
-    margin-bottom: 15px;
-    line-height: 1.6;
-}
-
-/* Modern List */
-.modern-list {
-    list-style: none;
-    padding-left: 0;
-}
-
-.modern-list li {
-    padding: 10px;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: rgba(91, 33, 182, 0.05);
-    border-left: 4px solid #5b21b6;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    transition: all 0.3s ease-in-out;
-}
-
-.modern-list li:hover {
-    background: rgba(91, 33, 182, 0.1);
-    transform: translateX(5px);
-}
-
-.modern-list li i {
-    color: #5b21b6;
-    font-size: 18px;
-}
-
-/* Gradient Divider */
-.gradient-bar {
-    height: 4px;
-    width: 100%;
-    background: linear-gradient(90deg, #5b21b6, #4a148c);
-    border-radius: 2px;
-}
-
-/* Finish Button */
-.finish-btn {
-    display: block;
-    padding: 14px 20px;
-    background: linear-gradient(135deg, #5b21b6, #4a148c);
-    color: white;
-    border: none;
-    cursor: pointer;
-    text-align: center;
-    font-size: 16px;
-    font-weight: 600;
-    border-radius: 8px;
-    width: 220px;
-    margin: auto;
-    transition: all 0.3s ease-in-out;
-    box-shadow: 0 4px 10px rgba(91, 33, 182, 0.2);
-}
-
-.finish-btn:hover {
-    background: linear-gradient(135deg, #4a148c, #5b21b6);
-    transform: scale(1.05);
-}
-
-    </style>
+    <!-- Tailwind (optional if not already in base template) -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100">
 
-    <!-- Sidebar Navigation -->
-    <div class="sidebar">
-        <h2>🚀 Workspace Guide</h2>
-        <ul>
-            <li class="nav-link active" data-target="intro"><i class="fas fa-home"></i> Introduction</li>
-            <li class="nav-link" data-target="team"><i class="fas fa-user-plus"></i> Invite Your Team</li>
-            <li class="nav-link" data-target="channels"><i class="fas fa-comments"></i> Chat Channels</li>
-            <li class="nav-link" data-target="groups"><i class="fas fa-users"></i> Manage Groups</li>
-            <li class="nav-link" data-target="events"><i class="fas fa-calendar"></i> Events & Meetings</li>
-            <li class="nav-link" data-target="tasks"><i class="fas fa-tasks"></i> Task Management</li>
-            <li class="nav-link" data-target="monitoring"><i class="fas fa-chart-line"></i> Task Monitoring</li>
-            <li class="nav-link" data-target="finish"><i class="fas fa-check-circle"></i> Get Started</li>
-        </ul>
-    </div>
+    <!-- Logo -->
+    <header class="text-center py-6" data-intro="This is the Calendar Plus Logo. Your productivity buddy!">
+        <img src="{% static 'images/calendarplus-logo.png' %}" alt="Calendar Plus Logo" class="mx-auto h-12">
+        <h1 class="text-xl font-bold mt-2">Welcome to Calendar Plus</h1>
+    </header>
 
-    <!-- Main Content -->
-    <div class="main-content">
+    <!-- Main Sections -->
+    <main class="max-w-4xl mx-auto space-y-8 p-6">
 
-        <!-- Introduction -->
-        <section id="intro" class="section active">
-            <h1>Initiate the workspace 🎉</h1>
-            <p>Start your workspace journey by setting up your organization, inviting team members, and managing work seamlessly.</p>
+        <section id="workspace-section" data-intro="Workspaces help organize your teams and departments. Create one or join existing.">
+            <h2 class="text-lg font-semibold">Workspaces</h2>
+            <p>Manage your workspace here. Invite members, define roles and collaborate.</p>
         </section>
 
-        <!-- Invite Team -->
-        <section id="team" class="section">
-            <h1>👥 Invite Your Team</h1>
-            <p>Collaboration starts with a team. Send invites, assign roles, and set permissions for your members.</p>
+        <section id="groups-section" data-intro="Groups allow focused conversations and tasks around a topic or goal.">
+            <h2 class="text-lg font-semibold">Groups</h2>
+            <p>Create group channels to manage projects with specific teams.</p>
         </section>
 
-        <!-- Chat Channels -->
-        <section id="channels" class="section">
-            <h1>💬 Chat Channels</h1>
-            <p>Each workspace has a default voice channel. Create private or public channels for better collaboration.</p>
+        <section id="channels-section" data-intro="Channels are topic-based chat areas inside groups. Like Slack!">
+            <h2 class="text-lg font-semibold">Channels</h2>
+            <p>Organize your conversations with channels.</p>
         </section>
 
-        <!-- Manage Groups -->
-        <section id="groups" class="section">
-            <h1>👨‍👩‍👦 Manage Groups</h1>
-            <p>Create project-based or department-specific groups to keep work structured.</p>
+        <section id="dms-section" data-intro="Personal DMs are for private 1-on-1 chats, perfect for fast communication.">
+            <h2 class="text-lg font-semibold">Personal DMs</h2>
+            <p>Send direct messages to other members securely.</p>
         </section>
 
-        <!-- Events & Meetings -->
-        <section id="events" class="section">
-            <h1>📅 Events & Meetings</h1>
-            <p>Schedule events, set reminders, and track all upcoming meetings from a single dashboard.</p>
+        <section id="meetings-section" data-intro="Schedule meetings and track them easily. Auto-notifications keep you alert.">
+            <h2 class="text-lg font-semibold">Meetings</h2>
+            <p>Create and manage meetings linked to events and tasks.</p>
         </section>
 
-        <!-- Task Management -->
-        <section id="tasks" class="section">
-            <h1>✅ Task Management</h1>
-            <p>Assign, track, and complete tasks efficiently with deadlines and progress tracking.</p>
+        <section id="calendar-section" data-intro="Your calendar shows upcoming events, tasks, and meeting schedules.">
+            <h2 class="text-lg font-semibold">Calendar</h2>
+            <p>All your productivity events in one place!</p>
         </section>
 
-        <!-- Task Monitoring -->
-        <section id="monitoring" class="section">
-            <h1>📊 Task Monitoring</h1>
-            <p>Get real-time insights on team activity and ensure work is completed on time.</p>
+        <section id="tasks-section" data-intro="Create, assign, and track tasks using our Kanban-style task manager.">
+            <h2 class="text-lg font-semibold">Tasks</h2>
+            <p>Organize your team’s work with powerful task management tools.</p>
         </section>
 
         <!-- Finish -->
-        <section id="finish" class="section">
-            <h1>🎉 Get Started Now!</h1>
-            <p>You’re all set to use Calendar Plus. Start collaborating with your team today!</p>
+        <section id="finish" class="text-center mt-10" data-intro="You're ready! Click Finish to start using Calendar Plus.">
             <form method="post">
                 {% csrf_token %}
-                <button type="submit" class="finish-btn">Finish</button>
+                <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded">Finish</button>
             </form>
         </section>
+    </main>
 
-    </div>
-
+    <!-- Intro.js & Tour Trigger -->
+    <script src="https://unpkg.com/intro.js/minified/intro.min.js"></script>
     <script>
-        // Sidebar Navigation Click Event
-        document.querySelectorAll('.nav-link').forEach(item => {
-            item.addEventListener('click', function () {
-                document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-                this.classList.add('active');
+        document.addEventListener("DOMContentLoaded", function () {
+            const hasSeenTour = localStorage.getItem("calendarplus_onboarding_done");
 
-                document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
-                document.getElementById(this.getAttribute('data-target')).classList.add('active');
-            });
+            if (!hasSeenTour) {
+                introJs().setOptions({
+                    showProgress: true,
+                    nextLabel: "Next →",
+                    prevLabel: "← Back",
+                    doneLabel: "Finish 🎉"
+                }).oncomplete(() => {
+                    localStorage.setItem("calendarplus_onboarding_done", "yes");
+                }).start();
+            }
         });
-
-        // Fade-in Effect on Scroll
-        const sections = document.querySelectorAll('.section');
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                }
-            });
-        }, { threshold: 0.3 });
-
-        sections.forEach(section => observer.observe(section));
-
     </script>
 
 </body>
