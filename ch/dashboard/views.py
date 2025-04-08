@@ -84,6 +84,8 @@ def all_widgets_snippet_view(request):
     org_id = request.GET.get("org_id")
     org = get_object_or_404(Organization, id=org_id)
 
+    
+
     widgets = DashboardWidget.objects.filter(user=request.user, organization=org)
-    context = {"widgets": widgets}
+    context = {"widgets": widgets,"organization":org}
     return render(request, "widgets/includes/all_widgets.html", context)

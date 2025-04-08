@@ -50,6 +50,7 @@ urlpatterns = [
     path('cal_ai/',include('cal_ai.urls')),
     path('subscription/',include('subscription.urls')),
     path('dashboard/',include('dashboard.urls')),
+    path('widgets/',include('widgets_functionality.urls')),
     # ui components
     path('index/', views.styles, name= 'index'),
     path('weather/',views.weather, name='weather'),

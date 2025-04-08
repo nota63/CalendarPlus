@@ -112,6 +112,7 @@ INSTALLED_APPS = [
     'django_quill',
     'subscription',
     'dashboard',
+    'widgets_functionality',
 
     #  Unfold admin configurations
     "unfold",  # before django.contrib.admin

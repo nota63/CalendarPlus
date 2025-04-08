@@ -1,15 +1,127 @@
-<div class="col-md-6 widget-card" data-widget="calendar">
-    <div class="card shadow-sm p-3">
-      <h5 class="mb-2">📅 Calendar</h5>
-      <div id="calendar-body-{{ widget.id }}">Loading...</div>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Calendar Widget</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FullCalendar CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+
+  <style>
+    .widget-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    .fc {
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+<script>
+  window.djangoData = {
+    orgId: "{{ org.id|default:'' }}",
+    widgetId: "{{ widget.id|default:'calendar' }}"
+  }
+</script>
+
+<div class="container mt-5">
+  <div class="row" id="dashboard-widgets-container">
+
+    <div class="col-md-6 widget-card mb-4" data-widget="calendar">
+      <div class="card shadow-sm p-3">
+        <h5 class="mb-3">📅 Calendar</h5>
+        <div id="calendar-body-{{ widget.id }}">Loading your meetings...</div>
+      </div>
     </div>
+
   </div>
-  
-  <script>
-    (function() {
-      const calendarContainer = document.getElementById("calendar-body-{{ widget.id }}");
-      calendarContainer.innerHTML = "🎉 Your calendar is ready!";
-      // Later replace with real calendar logic
+</div>
+
+<!-- Bootstrap Bundle JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+<script>
+    (function () {
+      const orgId = window.djangoData?.orgId;
+      const widgetId = window.djangoData?.widgetId;
+      const calendarEl = document.getElementById("calendar-body-" + widgetId);
+    
+      if (!calendarEl) {
+        console.error("❌ Calendar container not found!");
+        return;
+      }
+    
+      if (!orgId) {
+        console.warn("⚠️ orgId is missing! Make sure it's passed in context.");
+        calendarEl.innerHTML = "<div class='alert alert-warning'>Organization ID is missing. Cannot load calendar.</div>";
+        return;
+      }
+    
+      console.log("✅ Calendar initializing for org:", orgId, " | widget:", widgetId);
+    
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        height: 'auto',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,listWeek'
+        },
+        events: {
+          url: `/widgets/user-meetings-json/?org_id=${orgId}`,
+          failure: function () {
+            console.error("❌ Failed to load events.");
+            calendarEl.innerHTML = "<div class='alert alert-danger'>Failed to load meetings. Please try again later.</div>";
+          },
+          success: function (data) {
+            console.log("📦 Events fetched:", data);
+            if (!data.length) {
+              console.info("ℹ️ No meetings found for this organization.");
+            }
+          }
+        },
+        loading: function (isLoading) {
+          console.log("🔄 Calendar loading state:", isLoading);
+          if (isLoading) {
+            calendarEl.innerHTML = "<p class='text-muted'>📡 Fetching your meetings...</p>";
+          }
+        },
+        eventClick: function (info) {
+          const { title, extendedProps } = info.event;
+          const detail = `
+    🗓️ ${title}
+    📍 Location: ${extendedProps.location || 'N/A'}
+    📝 Description: ${extendedProps.description || 'None'}
+    🔗 Link: ${extendedProps.link || 'No link provided'}
+    📌 Type: ${extendedProps.type || 'N/A'}
+    ⚡ Status: ${extendedProps.status || 'Unknown'}
+          `;
+          console.log("📌 Event clicked:", info.event);
+          alert(detail); // 👉 Replace this with modal if needed
+        },
+        eventColor: '#4f46e5',
+      });
+    
+      try {
+        calendar.render();
+        console.log("🎉 Calendar rendered successfully.");
+      } catch (err) {
+        console.error("❌ Error rendering calendar:", err);
+        calendarEl.innerHTML = "<div class='alert alert-danger'>Error rendering calendar.</div>";
+      }
     })();
-  </script>
+</script>
+    
+
+</body>
+</html>
+
   
