@@ -99,11 +99,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'workspace_tasks',
     'corsheaders',
-     'tinymce',
-     'contacts',
-     'security',
-     'groups',
-     'group_tasks',
+    'tinymce',
+    'contacts',
+    'security',
+    'groups',
+    'group_tasks',
     'widget_tweaks',
     'ckeditor_uploader',
     'organization_channels',
@@ -111,6 +111,7 @@ INSTALLED_APPS = [
     'cal_ai',
     'django_quill',
     'subscription',
+    'dashboard',
 
     #  Unfold admin configurations
     "unfold",  # before django.contrib.admin

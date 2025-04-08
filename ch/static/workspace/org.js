@@ -1039,3 +1039,43 @@ function sanitizeText(str) {
     div.textContent = str;
     return div.innerHTML;
 }
+
+
+// --------------------------------------------------------------------------------------------------------------------------------------------------------
+// Users widgets (Save Widgets)
+document.querySelectorAll('.add-widget-btn').forEach(btn => {
+  btn.addEventListener('click', function () {
+    const widgetType = this.getAttribute('data-widget');
+    const orgId = '{{ organization.id }}';  // Inject this dynamically in your template
+
+    fetch('/dashboard/save-widget/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}',
+      },
+      body: JSON.stringify({
+        widget_type: widgetType,
+        org_id: orgId
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.message) {
+        alert(data.message); // Swap with toast if needed
+        // Optionally refresh widgets display
+        // Close modal: 
+        const modalEl = document.getElementById('widgetSelectModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        modal.hide();
+      } else if (data.error) {
+        alert('Error: ' + data.error);
+      }
+    })
+    .catch(error => {
+      console.error('Request failed', error);
+      alert('Something went wrong');
+    });
+  });
+});
+

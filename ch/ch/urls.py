@@ -49,6 +49,7 @@ urlpatterns = [
     path('gui_apps/',include('gui_apps.urls')),
     path('cal_ai/',include('cal_ai.urls')),
     path('subscription/',include('subscription.urls')),
+    path('dashboard/',include('dashboard.urls')),
     # ui components
     path('index/', views.styles, name= 'index'),
     path('weather/',views.weather, name='weather'),
