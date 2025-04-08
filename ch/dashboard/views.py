@@ -8,6 +8,7 @@ import json
 from .models import DashboardWidget
 from accounts.models import Organization 
 from django.views.decorators.http import require_POST
+from django.shortcuts import render, redirect, get_object_or_404
 
 
 # Save the widget 
@@ -63,3 +64,26 @@ def save_dashboard_widget(request):
     except Exception as e:
         print("💥 Unexpected error occurred:", str(e))
         return JsonResponse({"error": str(e)}, status=500)
+    
+
+# Display dashboard widgets and send to the frontend 
+@login_required
+def widget_snippet_view(request):
+    widget_type = request.GET.get("widget_type")
+    org_id = request.GET.get("org_id")
+
+    org = get_object_or_404(Organization, id=org_id)
+    widget = DashboardWidget.objects.filter(user=request.user, organization=org, widget_type=widget_type).first()
+
+    return render(request, f"widgets/includes/widget_{widget_type}.html", {"widget": widget})
+
+
+# render all widgets
+@login_required
+def all_widgets_snippet_view(request):
+    org_id = request.GET.get("org_id")
+    org = get_object_or_404(Organization, id=org_id)
+
+    widgets = DashboardWidget.objects.filter(user=request.user, organization=org)
+    context = {"widgets": widgets}
+    return render(request, "widgets/includes/all_widgets.html", context)

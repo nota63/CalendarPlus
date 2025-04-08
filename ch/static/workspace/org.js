@@ -1046,16 +1046,35 @@ function sanitizeText(str) {
 document.addEventListener('DOMContentLoaded', function () {
   const widgetButtons = document.querySelectorAll('.add-widget-btn');
   const modalEl = document.getElementById('widgetSelectModal');
-  const orgId = window.djangoData.orgId;  // Ensure passed in Django context!
+  const widgetsContainer = document.getElementById('dashboard-widgets-container');
+  const orgId = window.djangoData.orgId;  // Make sure this is passed in template via context
 
   function getCSRFToken() {
     const cookieValue = document.cookie
       .split('; ')
       .find(row => row.startsWith('csrftoken='))
       ?.split('=')[1];
-    return cookieValue || '{{ csrf_token }}';
+    return cookieValue || '{{ csrf_token }}';  // Template fallback
   }
 
+  // 🔁 Load all widgets on initial page load
+  function loadAllWidgetsOnPageLoad() {
+    console.log("🌐 Loading saved widgets...");
+    fetch(`/dashboard/all-widget-snippets/?org_id=${orgId}`)
+      .then(response => {
+        if (!response.ok) throw new Error("Failed to fetch all widgets");
+        return response.text();
+      })
+      .then(html => {
+        widgetsContainer.innerHTML = html;
+        console.log("✅ All widgets rendered.");
+      })
+      .catch(error => {
+        console.error("💥 Error loading widgets:", error);
+      });
+  }
+
+  // ➕ Handle "Add Widget" button click
   widgetButtons.forEach(btn => {
     btn.addEventListener('click', function () {
       const widgetType = this.getAttribute('data-widget');
@@ -1063,7 +1082,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
       console.log("👉 Saving widget:", widgetType);
       console.log("📡 Sending to org_id:", orgId);
-      console.log("🔐 CSRF Token:", csrfToken);
 
       fetch('/dashboard/save-widget/', {
         method: 'POST',
@@ -1076,27 +1094,40 @@ document.addEventListener('DOMContentLoaded', function () {
           org_id: orgId
         })
       })
-      .then(response => {
-        console.log("✅ Response status:", response.status);
-        return response.json();
-      })
-      .then(data => {
-        console.log("📦 Response data:", data);
-        if (data.message) {
-          alert(data.message);
-          if (bootstrap && modalEl) {
-            const modal = bootstrap.Modal.getInstance(modalEl);
-            modal?.hide();
+        .then(response => {
+          console.log("✅ Response status:", response.status);
+          return response.json();
+        })
+        .then(data => {
+          console.log("📦 Response data:", data);
+          if (data.message) {
+            alert(data.message);
+            // 👇 Fetch and render the widget immediately after saving
+            fetch(`/dashboard/widget-snippet/?widget_type=${widgetType}&org_id=${orgId}`)
+              .then(res => res.text())
+              .then(html => {
+                widgetsContainer.insertAdjacentHTML('beforeend', html);
+                console.log("🧩 Widget rendered successfully:", widgetType);
+              })
+              .catch(err => {
+                console.error("❌ Failed to render widget snippet:", err);
+              });
+
+            if (bootstrap && modalEl) {
+              const modal = bootstrap.Modal.getInstance(modalEl);
+              modal?.hide();
+            }
+          } else if (data.error) {
+            alert('❌ Error: ' + data.error);
+            console.error("❌ Backend error:", data.error);
           }
-        } else if (data.error) {
-          alert('❌ Error: ' + data.error);
-          console.error("❌ Backend error:", data.error);
-        }
-      })
-      .catch(error => {
-        console.error('💥 Request failed:', error);
-        alert('Something went wrong while saving the widget.');
-      });
+        })
+        .catch(error => {
+          console.error('💥 Request failed:', error);
+          alert('Something went wrong while saving the widget.');
+        });
     });
   });
+
+  loadAllWidgetsOnPageLoad();  // 🔁 Initial call
 });

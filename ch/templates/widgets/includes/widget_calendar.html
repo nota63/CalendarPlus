@@ -1,0 +1,15 @@
+<div class="col-md-6 widget-card" data-widget="calendar">
+    <div class="card shadow-sm p-3">
+      <h5 class="mb-2">📅 Calendar</h5>
+      <div id="calendar-body-{{ widget.id }}">Loading...</div>
+    </div>
+  </div>
+  
+  <script>
+    (function() {
+      const calendarContainer = document.getElementById("calendar-body-{{ widget.id }}");
+      calendarContainer.innerHTML = "🎉 Your calendar is ready!";
+      // Later replace with real calendar logic
+    })();
+  </script>
+  
