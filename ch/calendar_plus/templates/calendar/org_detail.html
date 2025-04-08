@@ -6863,21 +6863,42 @@ document.addEventListener("DOMContentLoaded", function () {
 <!-- onboarding js set-up -->
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-  const hasSeenTour = localStorage.getItem("org_tour_seen1");
+  const hasSeenTour = localStorage.getItem("org_tour_seen8");
 
   if (!hasSeenTour) {
-    introJs()
-      .setOptions({
-        steps: calendarPlusTourSteps,
-        showProgress: true,
-        nextLabel: "Next →",
-        prevLabel: "← Back",
-        doneLabel: "Got it!",
-        tooltipPosition: 'auto'
-      })
-      .oncomplete(() => localStorage.setItem("org_tour_seen1", "yes"))
-      .onexit(() => localStorage.setItem("org_tour_seen1", "yes"))
-      .start();
+    const intro = introJs();
+
+    intro.setOptions({
+      steps: calendarPlusTourSteps,
+      showProgress: true,
+      nextLabel: "Next →",
+      prevLabel: "← Back",
+      doneLabel: "Got it!",
+      tooltipPosition: 'auto'
+    });
+
+    // Apply Tailwind styles to tooltip when it's created
+    intro.onafterchange(() => {
+      const tooltip = document.querySelector('.introjs-tooltip');
+      if (tooltip) {
+        tooltip.classList.add(
+          'max-w-xl', // Wider tooltip
+          'rounded-xl', // Rounded corners
+          'shadow-lg', // Soft shadow
+          'bg-white', // Background color
+          'text-gray-800', // Font color
+          'font-inter', // Modern font (if using Inter)
+          'p-4', // Padding
+          'whitespace-normal' // Wrap text
+        );
+      }
+    });
+
+    // Mark tour as seen
+    intro.oncomplete(() => localStorage.setItem("org_tour_seen8", "yes"));
+    intro.onexit(() => localStorage.setItem("org_tour_seen8", "yes"));
+
+    intro.start();
   }
 });
 
