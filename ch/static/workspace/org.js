@@ -1043,39 +1043,60 @@ function sanitizeText(str) {
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------
 // Users widgets (Save Widgets)
-document.querySelectorAll('.add-widget-btn').forEach(btn => {
-  btn.addEventListener('click', function () {
-    const widgetType = this.getAttribute('data-widget');
-    const orgId = '{{ organization.id }}';  // Inject this dynamically in your template
+document.addEventListener('DOMContentLoaded', function () {
+  const widgetButtons = document.querySelectorAll('.add-widget-btn');
+  const modalEl = document.getElementById('widgetSelectModal');
+  const orgId = window.djangoData.orgId;  // Ensure passed in Django context!
 
-    fetch('/dashboard/save-widget/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': '{{ csrf_token }}',
-      },
-      body: JSON.stringify({
-        widget_type: widgetType,
-        org_id: orgId
+  function getCSRFToken() {
+    const cookieValue = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('csrftoken='))
+      ?.split('=')[1];
+    return cookieValue || '{{ csrf_token }}';
+  }
+
+  widgetButtons.forEach(btn => {
+    btn.addEventListener('click', function () {
+      const widgetType = this.getAttribute('data-widget');
+      const csrfToken = getCSRFToken();
+
+      console.log("👉 Saving widget:", widgetType);
+      console.log("📡 Sending to org_id:", orgId);
+      console.log("🔐 CSRF Token:", csrfToken);
+
+      fetch('/dashboard/save-widget/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify({
+          widget_type: widgetType,
+          org_id: orgId
+        })
       })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.message) {
-        alert(data.message); // Swap with toast if needed
-        // Optionally refresh widgets display
-        // Close modal: 
-        const modalEl = document.getElementById('widgetSelectModal');
-        const modal = bootstrap.Modal.getInstance(modalEl);
-        modal.hide();
-      } else if (data.error) {
-        alert('Error: ' + data.error);
-      }
-    })
-    .catch(error => {
-      console.error('Request failed', error);
-      alert('Something went wrong');
+      .then(response => {
+        console.log("✅ Response status:", response.status);
+        return response.json();
+      })
+      .then(data => {
+        console.log("📦 Response data:", data);
+        if (data.message) {
+          alert(data.message);
+          if (bootstrap && modalEl) {
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            modal?.hide();
+          }
+        } else if (data.error) {
+          alert('❌ Error: ' + data.error);
+          console.error("❌ Backend error:", data.error);
+        }
+      })
+      .catch(error => {
+        console.error('💥 Request failed:', error);
+        alert('Something went wrong while saving the widget.');
+      });
     });
   });
 });
-
