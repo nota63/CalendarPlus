@@ -11,6 +11,7 @@ from django.db import models
 from groups.models import Group, GroupMember
 from group_tasks.models import Task
 from django.db.models import Q
+from django.views.decorators.http import require_GET
 # ** HERE I WILL SET UP THE WIDGETS FUNCTIONALITY 
 
 
@@ -189,4 +190,39 @@ def get_user_tasks_by_group(request):
     except Exception as e:
         logger.exception("💥 Error fetching tasks: %s", str(e))
         return JsonResponse({'error': 'An unexpected error occurred. Please try again later.'}, status=500)
+
+
+
+
+# Display Tasks in fullcalendar
+@require_GET
+@login_required
+def group_tasks_calendar_view(request):
+    org_id = request.GET.get('org_id')
+    group_id = request.GET.get('group_id')
+
+    if not org_id or not group_id:
+        return JsonResponse({'error': 'Missing org_id or group_id'}, status=400)
+
+    organization = get_object_or_404(Organization, id=org_id)
+    group = get_object_or_404(Group, id=group_id, organization=organization)
+
+    tasks = Task.objects.filter(group=group, organization=organization)
+
+    events = []
+    for task in tasks:
+        if task.deadline:
+            events.append({
+                'id': task.id,
+                'title': task.title,
+                'start': task.deadline.isoformat(),
+                'end': task.deadline.isoformat(),
+                'allDay': True,
+                'color': '#4f46e5',  # Tailwind Indigo-600 💅
+            })
+
+    return JsonResponse(events, safe=False)
+
+
+
 

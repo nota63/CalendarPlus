@@ -3,60 +3,82 @@
 
 // Fetch and display the groups
 function fetchAndRenderUserGroups(orgId) {
-    const groupListEl = document.getElementById("group-list");
-    if (!groupListEl) {
-      console.warn("🚫 group-list element not found");
-      return;
-    }
-
-    const endpoint = `/widgets/get-user-groups-json/?org_id=${orgId}`;
-    console.log("📡 Fetching groups from:", endpoint);
-
-    fetch(endpoint)
-      .then(response => {
-        if (!response.ok) throw new Error(`Server returned ${response.status}`);
-        return response.json();
-      })
-      .then(data => {
-        if (data.groups && data.groups.length > 0) {
-
-            const groupHtml = data.groups.map(group => `
-                <div class="bg-white border border-gray-200 rounded-lg p-4 mb-3 shadow-xs hover:shadow-sm transition-shadow group"
-                     data-group-id="${group.id}">
-                  <div class="flex items-center justify-between">
-                    <div class="flex-1">
-                      <h3 class="font-semibold text-gray-800 text-base mb-1">${group.name}</h3>
-                      <div class="flex items-center space-x-2">
-                        <span class="inline-flex items-center justify-center w-8 h-8 bg-indigo-500 text-white rounded-full text-sm font-medium">
-                          ${group.team_leader ? group.team_leader.charAt(0).toUpperCase() : '?'}
-                        </span>
-                        <span class="text-sm text-gray-600">${group.team_leader || 'No leader'}</span>
-                      </div>
-                    </div>
-                    <div class="ml-4 flex items-center space-x-3">
-                      <span class="text-xs font-medium px-2 py-1 rounded-full bg-green-50 text-green-700">
-                        ${group.member_count} members
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              `).join("");
-
-          groupListEl.innerHTML = groupHtml;
-        } else {
-          groupListEl.innerHTML = `<p class="text-muted">No groups found for you in this organization.</p>`;
-        }
-      })
-      .catch(error => {
-        console.error("❌ Error fetching groups:", error);
-        groupListEl.innerHTML = `
-          <div class="alert alert-danger">
-            Failed to load groups.<br><code>${error.message}</code>
-          </div>
-        `;
-      });
+  const groupListEl = document.getElementById("group-list");
+  if (!groupListEl) {
+    console.warn("🚫 group-list element not found");
+    return;
   }
 
+  const endpoint = `/widgets/get-user-groups-json/?org_id=${orgId}`;
+  console.log("📡 Fetching groups from:", endpoint);
+
+  fetch(endpoint)
+    .then(response => {
+      if (!response.ok) throw new Error(`Server returned ${response.status}`);
+      return response.json();
+    })
+    .then(data => {
+      if (data.groups && data.groups.length > 0) {
+        const groupHtml = data.groups.map(group => `
+          <div class="bg-white border border-gray-200 rounded-lg p-4 mb-3 shadow-xs hover:shadow-sm transition-shadow group"
+               data-group-id="${group.id}">
+            <div class="flex items-center justify-between">
+              <div class="flex-1">
+                <h3 class="font-semibold text-gray-800 text-base mb-1">${group.name}</h3>
+                <div class="flex items-center space-x-2">
+                  <span class="inline-flex items-center justify-center w-8 h-8 bg-indigo-500 text-white rounded-full text-sm font-medium">
+                    ${group.team_leader ? group.team_leader.charAt(0).toUpperCase() : '?'}
+                  </span>
+                  <span class="text-sm text-gray-600">${group.team_leader || 'No leader'}</span>
+                </div>
+              </div>
+              <div class="ml-4 flex items-center space-x-3">
+                <span class="text-xs font-medium px-2 py-1 rounded-full bg-green-50 text-green-700">
+                  ${group.member_count} members
+                </span>
+                <!-- 📅 Calendar View trigger -->
+                <button class="btn btn-sm btn-outline-primary calendar-view-btn" 
+                        data-group-id="${group.id}" 
+                        data-org-id="${orgId}"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#groupCalendarModal"
+                        title="View Calendar">
+                  📅
+                </button>
+              </div>
+            </div>
+          </div>
+        `).join("");
+
+        groupListEl.innerHTML = groupHtml;
+
+        // 🎯 Attach click event to calendar view buttons
+        document.querySelectorAll('.calendar-view-btn').forEach(btn => {
+          btn.addEventListener('click', function () {
+            const groupId = this.getAttribute('data-group-id');
+            const orgId = this.getAttribute('data-org-id');
+            loadGroupCalendar(groupId, orgId);
+          });
+        });
+
+      } else {
+        groupListEl.innerHTML = `<p class="text-muted">No groups found for you in this organization.</p>`;
+      }
+    })
+    .catch(error => {
+      console.error("❌ Error fetching groups:", error);
+      groupListEl.innerHTML = `
+        <div class="alert alert-danger">
+          Failed to load groups.<br><code>${error.message}</code>
+        </div>
+      `;
+    });
+}
+
+
+
+
+  
 // ⏳ Wait until DOM is loaded
 document.addEventListener("DOMContentLoaded", function () {
     const orgId = window.djangoData.orgId;
@@ -161,4 +183,29 @@ taskEl.innerHTML = `
         modal.show();
       });
   }
-  
+
+// Initialize Full Calendar
+function loadGroupCalendar(groupId, orgId) {
+  const calendarEl = document.getElementById('groupCalendar');
+  if (!calendarEl) return;
+
+  // Clear previous calendar instance if exists
+  if (calendarEl.innerHTML.trim()) {
+    calendarEl.innerHTML = '';
+  }
+
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    themeSystem: 'bootstrap5',
+    height: 'auto',
+    events: `/widgets/group-tasks-calendar-view/?org_id=${orgId}&group_id=${groupId}`,
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,listWeek'
+    },
+    eventColor: '#4f46e5'
+  });
+
+  calendar.render();
+}
