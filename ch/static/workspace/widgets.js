@@ -40,7 +40,6 @@ function fetchAndRenderUserGroups(orgId) {
   }
 
 // ⏳ Wait until DOM is loaded
-// ⏳ Wait until DOM is loaded
 document.addEventListener("DOMContentLoaded", function () {
     const orgId = window.djangoData.orgId;
     if (orgId) {
@@ -93,21 +92,43 @@ document.addEventListener("DOMContentLoaded", function () {
   
         data.tasks.forEach(task => {
           const taskEl = document.createElement('div');
-          taskEl.className = 'border rounded p-3 mb-2 shadow-sm d-flex justify-content-between align-items-center';
-  
-          taskEl.innerHTML = `
-            <div>
-              <strong>${task.title}</strong><br>
-              <small>Status: ${task.status} | Priority: ${task.priority} | Deadline: ${task.deadline}</small>
-            </div>
-            <div>
-              <a href="/tasks/task_detail/${orgId}/${groupId}/${task.id}/" 
-                 class="btn btn-sm btn-primary" target="_blank">
-                🚀 Launch
-              </a>
-            </div>
-          `;
-  
+          taskEl.className = 'bg-white border border-gray-200 rounded-lg p-4 mb-3 shadow-xs hover:shadow-sm transition-shadow flex items-center justify-between group';
+
+taskEl.innerHTML = `
+  <div class="flex-1 space-y-1.5">
+    <h3 class="font-semibold text-gray-800 text-base leading-tight">${task.title}</h3>
+    <div class="flex items-center space-x-3 text-sm">
+      <span class="inline-flex items-center text-gray-500">
+        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        ${task.status}
+      </span>
+      <span class="inline-flex items-center text-gray-500">
+        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343M7 11h10m-5 5v-5"/>
+        </svg>
+        ${task.priority}
+      </span>
+      <span class="inline-flex items-center text-gray-500">
+        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+        ${task.deadline}
+      </span>
+    </div>
+  </div>
+  <div class="ml-4">
+    <a href="/tasks/task_detail/${orgId}/${groupId}/${task.id}/" 
+       class="p-2 hover:bg-gray-50 rounded-md transition-colors border border-gray-200 hover:border-gray-300"
+       target="_blank"
+       aria-label="Launch task">
+      <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+      </svg>
+    </a>
+  </div>
+`;
           content.appendChild(taskEl);
         });
       })
