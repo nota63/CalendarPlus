@@ -5687,43 +5687,150 @@ body {
 
 
 <!-- User widgets add widgets -->
-<!-- Modal -->
-<div class="modal fade" id="widgetSelectModal" tabindex="-1" aria-labelledby="widgetSelectModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg">
-    <div class="modal-content rounded-4 shadow-lg">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title" id="widgetSelectModalLabel">Choose Widgets to Add</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+ <!-- Widget Select Modal -->
+ <div class="modal fade" id="widgetSelectModal" tabindex="-1" aria-labelledby="widgetSelectModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-lg shadow-lg border-0">
+      <!-- Modal Header with Title -->
+      <div class="modal-header px-4 pt-4 pb-0">
+        <h5 class="modal-title text-lg font-semibold" id="widgetSelectModalLabel">Add Card</h5>
+        <button type="button" class="close-btn" data-bs-dismiss="modal" aria-label="Close">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
-      <div class="modal-body">
-        <div class="row g-3">
-          <!-- Calendar Widget -->
-          <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-              <div class="card-body d-flex flex-column justify-content-between">
-                <h5 class="card-title">🗓️ Calendar</h5>
-                <button class="btn btn-outline-primary mt-3 add-widget-btn" data-widget="calendar">Add</button>
-              </div>
+      
+      <div class="modal-body p-0 d-flex" style="height: calc(100% - 60px);">
+        <!-- ClickUp Sidebar -->
+        <div class="clickup-sidebar h-100">
+          <div class="p-3">
+            <!-- Sidebar Items -->
+            <a href="#" class="sidebar-item active">
+              <i class="fas fa-star"></i>
+              <span>Featured</span>
+            </a>
+            <a href="#" class="sidebar-item">
+              <i class="fas fa-table-columns"></i>
+              <span>Overview</span>
+            </a>
+            <a href="#" class="sidebar-item">
+              <i class="fas fa-pen-to-square"></i>
+              <span>Custom</span>
+            </a>
+            <a href="#" class="sidebar-item">
+              <i class="fas fa-bolt"></i>
+              <span>Sprints</span>
+            </a>
+            <a href="#" class="sidebar-item">
+              <i class="fas fa-chart-line"></i>
+              <span>Statuses</span>
+            </a>
+            <a href="#" class="sidebar-item">
+              <i class="fas fa-tag"></i>
+              <span>Tags</span>
+            </a>
+            <a href="#" class="sidebar-item">
+              <i class="fas fa-user"></i>
+              <span>Assignees</span>
+            </a>
+            <a href="#" class="sidebar-item">
+              <i class="fas fa-arrow-up-short-wide"></i>
+              <span>Priorities</span>
+            </a>
+            <a href="#" class="sidebar-item">
+              <i class="fas fa-clock"></i>
+              <span>Time Tracking</span>
+            </a>
+            <a href="#" class="sidebar-item">
+              <i class="fas fa-table-cells"></i>
+              <span>Tables</span>
+            </a>
+            <a href="#" class="sidebar-item">
+              <i class="fas fa-code"></i>
+              <span>Embeds and Apps</span>
+            </a>
+            
+            <!-- Help Section -->
+            <div class="mt-6 pt-3 border-t border-gray-200">
+              <a href="#" class="sidebar-item">
+                <i class="fas fa-circle-question"></i>
+                <span>Help Docs</span>
+              </a>
+              <a href="#" class="sidebar-item">
+                <i class="fas fa-video"></i>
+                <span>Dashboard Webinar</span>
+              </a>
+              <a href="#" class="sidebar-item">
+                <i class="fas fa-book"></i>
+                <span>Dashboard Guide</span>
+              </a>
             </div>
           </div>
-          <!-- Tasks Widget -->
-          <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-              <div class="card-body d-flex flex-column justify-content-between">
-                <h5 class="card-title">✅ Today’s Tasks</h5>
-                <button class="btn btn-outline-primary mt-3 add-widget-btn" data-widget="tasks">Add</button>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div class="flex-grow-1 d-flex flex-column h-100">
+          <!-- Tab Navigation -->
+          <div class="modal-tabs d-flex">
+            <a href="#" class="modal-tab active">Featured</a>
+          </div>
+          
+          <!-- Scrollable Content -->
+          <div class="scrollable-content">
+            <!-- Search Container -->
+            <div class="mb-5 position-relative">
+              <i class="fas fa-search search-icon"></i>
+              <input type="text" class="clickup-search" placeholder="Search...">
+            </div>
+            
+            <!-- Featured Section Title -->
+            <h3 class="text-xl font-semibold mb-5">Featured</h3>
+            
+            <!-- Widget Grid -->
+            <div class="widget-grid">
+              <!-- Todays Tasks Widget -->
+              <div class="widget-card border-purple">
+                <div class="widget-header bg-purple">
+                  <img src="https://img.freepik.com/free-vector/add-tasks-concept-illustration_114360-4765.jpg?t=st=1744216688~exp=1744220288~hmac=a3446630ac36a8f5ecd7170d7265f2232e910599d62d5a203a0fc075d66980e1&w=740" class="w-100 h-100 object-cover" alt="Task List Widget">
+                </div>
+                <div class="widget-body">
+                  <h4 class="widget-title">Task List</h4>
+                  <p class="widget-description">Instantly Access all the tasks from accross the groups</p>
+                  <button class="add-widget-btn w-100 text-center" data-widget="tasks">
+                    <i class="fas fa-plus"></i> Add widget
+                  </button>
+                </div>
               </div>
+
+              <!-- 2) Calendar widget -->
+              <div class="widget-card border-purple">
+                <div class="widget-header bg-purple">
+                  <img src="https://img.freepik.com/free-vector/appointment-booking-with-calendar_23-2148545993.jpg?t=st=1744216949~exp=1744220549~hmac=9e85ac7b313d9f98774d2973c14e4b91489f237c53df984b708dbb36caa0da3c&w=996" class="w-100 h-100 object-cover" alt="Calendar widget">
+                </div>
+                <div class="widget-body">
+                  <h4 class="widget-title">Calendar</h4>
+                  <p class="widget-description">Categorize and manage all your events, meetings all in one calendar</p>
+                  <button class="add-widget-btn w-100 text-center" data-widget="calendar">
+                    <i class="fas fa-plus"></i> Add widget
+                  </button>
+                </div>
+              </div>
+
+
+
+              
             </div>
           </div>
-          <!-- Add More Widgets Here -->
         </div>
       </div>
     </div>
   </div>
 </div>
 
+
+
+
 <!-- Remove widget from users account -->
- <!-- Confirm Remove Widget Modal -->
+<!-- Confirm Remove Widget Modal -->
 <div class="modal fade" id="confirmRemoveWidgetModal" tabindex="-1" aria-labelledby="removeWidgetModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-danger">
@@ -6982,6 +7089,264 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 </script> 
+
+
+<!-- add widgets styles -->
+<style>
+  /* Add widgets modal  */
+:root {
+    --clickup-purple: #7B68EE;
+    --clickup-purple-light: #9C90ED;
+    --clickup-purple-bg: rgba(123, 104, 238, 0.15);
+    --clickup-teal: #36B37E;
+    --clickup-teal-bg: rgba(54, 179, 126, 0.15);
+    --clickup-blue: #4C9AFF;
+    --clickup-blue-bg: rgba(76, 154, 255, 0.15);
+    --clickup-yellow: #FFAB00;
+    --clickup-yellow-bg: rgba(255, 171, 0, 0.15);
+    --clickup-sidebar-bg: #FFFFFF;
+    --clickup-sidebar-hover: #F5F5F5;
+    --clickup-sidebar-active: #F0F0FF;
+    --clickup-sidebar-text: #444;
+    --clickup-sidebar-active-text: #7B68EE;
+  }
+  
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #292D34;
+  }
+  
+  .modal-dialog {
+    max-width: 85%;
+    height: 85vh;
+  }
+  
+  .modal-content {
+    height: 100%;
+  }
+  
+  /* ClickUp Sidebar Styling */
+  .clickup-sidebar {
+    background-color: var(--clickup-sidebar-bg);
+    width: 260px;
+    border-right: 1px solid #EEEEEE;
+  }
+  
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    color: var(--clickup-sidebar-text);
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.15s ease;
+  }
+  
+  .sidebar-item:hover {
+    background-color: var(--clickup-sidebar-hover);
+  }
+  
+  .sidebar-item.active {
+    background-color: var(--clickup-sidebar-active);
+    color: var(--clickup-sidebar-active-text);
+  }
+  
+  .sidebar-item i {
+    width: 20px;
+    margin-right: 8px;
+    font-size: 15px;
+  }
+  
+  /* ClickUp Search Bar */
+  .clickup-search {
+    background-color: #F7F7F7;
+    border: 1px solid #EEEEEE;
+    border-radius: 6px;
+    padding: 8px 16px 8px 36px;
+    font-size: 14px;
+    width: 100%;
+    transition: all 0.2s ease;
+  }
+  
+  .clickup-search:focus {
+    outline: none;
+    border-color: var(--clickup-purple-light);
+    background-color: #FFFFFF;
+    box-shadow: 0 0 0 2px rgba(123, 104, 238, 0.2);
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6B7280;
+    font-size: 14px;
+  }
+  
+  /* ClickUp Widget Cards */
+  .widget-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+  
+  .widget-card {
+    border-radius: 10px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    transition: all 0.2s ease;
+    height: 100%;
+  }
+  
+  .widget-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  }
+  
+  .widget-header {
+    padding: 0;
+    height: 140px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .widget-body {
+    padding: 16px;
+  }
+  
+  .widget-title {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  
+  .widget-description {
+    font-size: 13px;
+    color: #6B7280;
+    line-height: 1.4;
+  }
+  
+  .add-widget-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 4px;
+    margin-top: 12px;
+    transition: all 0.15s ease;
+    background-color: transparent;
+    border: 1px solid #D1D5DB;
+    color: #4B5563;
+  }
+  
+  .add-widget-btn:hover {
+    background-color: #F9FAFB;
+    border-color: #9CA3AF;
+  }
+  
+  .add-widget-btn i {
+    margin-right: 6px;
+    font-size: 12px;
+  }
+  
+  /* Widget Colors */
+  .bg-purple {
+    background-color: var(--clickup-purple-bg);
+  }
+  
+  .border-purple {
+    border-left: 3px solid var(--clickup-purple);
+  }
+  
+  .bg-teal {
+    background-color: var(--clickup-teal-bg);
+  }
+  
+  .border-teal {
+    border-left: 3px solid var(--clickup-teal);
+  }
+  
+  .bg-blue {
+    background-color: var(--clickup-blue-bg);
+  }
+  
+  .border-blue {
+    border-left: 3px solid var(--clickup-blue);
+  }
+  
+  .bg-yellow {
+    background-color: var(--clickup-yellow-bg);
+  }
+  
+  .border-yellow {
+    border-left: 3px solid var(--clickup-yellow);
+  }
+  
+  /* Modal Header Tabs */
+  .modal-header {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  
+  .modal-tabs {
+    border-bottom: 1px solid #EEEEEE;
+    padding: 0 24px;
+    margin-bottom: 24px;
+  }
+  
+  .modal-tab {
+    padding: 12px 8px;
+    margin: 0 8px;
+    font-weight: 500;
+    font-size: 14px;
+    color: #6B7280;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+  }
+  
+  .modal-tab.active {
+    color: var(--clickup-purple);
+    border-bottom-color: var(--clickup-purple);
+  }
+  
+  /* Scrollable Area */
+  .scrollable-content {
+    height: calc(100% - 60px);
+    overflow-y: auto;
+    padding: 24px;
+  }
+  
+  /* Close Button */
+  .close-btn {
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    color: #6B7280;
+    padding: 4px;
+  }
+  
+  /* Custom Scrollbar */
+  .scrollable-content::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .scrollable-content::-webkit-scrollbar-track {
+    background: #F9FAFB;
+  }
+  
+  .scrollable-content::-webkit-scrollbar-thumb {
+    background-color: #D1D5DB;
+    border-radius: 4px;
+  }
+  
+  .scrollable-content::-webkit-scrollbar-thumb:hover {
+    background-color: #9CA3AF;
+  }
+
+</style>
 
 </body>
 </html>

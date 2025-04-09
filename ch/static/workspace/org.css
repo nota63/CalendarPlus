@@ -2355,10 +2355,12 @@ a {
   
 /* increase tooltip width */
 .introjs-tooltip {
-    max-width: 580px !important;
+    max-width: 5
+    80px !important;
     white-space: normal !important;
     border-radius: 0.75rem !important;
     font-family: 'Inter', 'Segoe UI', sans-serif !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
   }
   
+
