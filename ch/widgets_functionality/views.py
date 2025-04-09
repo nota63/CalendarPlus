@@ -207,7 +207,7 @@ def group_tasks_calendar_view(request):
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id, organization=organization)
 
-    tasks = Task.objects.filter(group=group, organization=organization)
+    tasks = Task.objects.filter(group=group, organization=organization,assigned_to=request.user)
 
     events = []
     for task in tasks:
