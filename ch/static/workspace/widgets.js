@@ -37,15 +37,18 @@ function fetchAndRenderUserGroups(orgId) {
                   ${group.member_count} members
                 </span>
                 <!-- 📅 Calendar View trigger -->
-                <button class="btn btn-sm btn-outline-primary calendar-view-btn" 
-                        data-group-id="${group.id}" 
-                        data-org-id="${orgId}"
-                        data-bs-toggle="modal" 
-                        data-bs-target="#groupCalendarModal"
-                        title="View Calendar">
-                  📅
-                </button>
-              </div>
+            <button class="btn btn-sm btn-outline-primary calendar-view-btn"
+                    data-group-id="${group.id}"
+                    data-org-id="${orgId}"
+                    data-bs-toggle="modal"
+                    data-bs-target="#groupCalendarModal"
+                    title="View Calendar">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="bi bi-calendar">
+                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                <path d="M2.5 5a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5v-1z"/>
+              </svg>
+            </button>
+            </div>
             </div>
           </div>
         `).join("");

@@ -25,23 +25,46 @@
 }
 </style>  
 
-<!-- Tasks widgets -->
+<!-- Tasks widget -->
+<!-- Tasks widget -->
 <div class="col-md-6 col-lg-4 mb-4" data-widget-id="{{ widget.id }}">
-  <div class="card h-100 shadow-sm widget-card">
-    <div class="card-body">
-      <div class="d-flex align-items-start justify-content-between widget-header">
-        <h5 class="card-title">🌟 Task Widget</h5>
+  <div class="rounded-xl bg-white shadow-lg border border-gray-100 h-full">
+    <div class="p-5">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center space-x-2">
+          <!-- High-quality SVG star icon instead of emoji -->
+          <svg class="w-5 h-5 text-purple-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <h3 class="font-semibold text-gray-800 text-lg">Task Widget</h3>
+        </div>
         <!-- Dropdown will be injected here -->
       </div>
-      <hr>
-      <div id="group-list">
-        <p class="text-muted">Loading your groups...</p>
+      
+      <div class="w-full h-px bg-gray-100 my-3"></div>
+      
+      <!-- Added max height and scrolling with hidden scrollbar -->
+      <div id="group-list" class="space-y-2 mt-4 max-h-64 overflow-y-auto scrollbar-hide" style="scrollbar-width: none; -ms-overflow-style: none;">
+        <div class="flex items-center justify-center py-4">
+          <div class="flex items-center space-x-2 text-gray-400">
+            <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="text-sm font-medium">Loading your groups...</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-
+<!-- Style to hide scrollbar for webkit browsers -->
+<style>
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+</style>
 
 <!-- --------------------------------------------MODALS ---------------------------------------------------------- -->
 <!-- 🌈 Modal for showing tasks -->
