@@ -38,6 +38,12 @@ def user_meetings_json(request):
 
         user = request.user
 
+        # access
+        profile = Profile.objects.select_related('user', 'organization').only('id').filter(user=user, organization=org).first()
+        if not profile:
+            return JsonResponse({'error': 'Unauthorized access'})
+
+
         meetings = MeetingOrganization.objects.filter(
             organization=org
         ).filter(
@@ -102,7 +108,12 @@ def get_user_groups_json(request):
     if not org_id:
         logger.warning("❌ Missing org_id in request.")
         return JsonResponse({'error': 'Missing org_id'}, status=400)
-
+    
+    # check access
+    access=get_object_or_404(Profile,user=user,organization_id=org_id)
+    if not access:
+        return JsonResponse({'error:':'Unauthorized Access'},status=400)
+    
     try:
         group_memberships = GroupMember.objects.filter(
             user=user,
@@ -165,6 +176,12 @@ def get_user_tasks_by_group(request):
         logger.warning("❌ Missing org_id or group_id.")
         return JsonResponse({'error': 'Missing org_id or group_id'}, status=400)
 
+    # check access
+    access=get_object_or_404(Profile,user=user,organization_id=org_id)
+    if not access:
+        return JsonResponse({'error:':'Unauthorized Access'},status=400)
+    
+
     try:
         tasks = Task.objects.filter(
             organization_id=org_id,
@@ -206,6 +223,12 @@ def group_tasks_calendar_view(request):
 
     organization = get_object_or_404(Organization, id=org_id)
     group = get_object_or_404(Group, id=group_id, organization=organization)
+
+     # check access
+    access=get_object_or_404(Profile,user=request.user,organization_id=org_id)
+    if not access:
+        return JsonResponse({'error:':'Unauthorized Access'},status=400)
+    
 
     tasks = Task.objects.filter(group=group, organization=organization,assigned_to=request.user)
 
