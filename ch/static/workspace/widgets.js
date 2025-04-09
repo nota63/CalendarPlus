@@ -39,7 +39,8 @@ function fetchAndRenderUserGroups(orgId) {
       });
   }
 
-  // ⏳ Wait until DOM is loaded
+// ⏳ Wait until DOM is loaded
+// ⏳ Wait until DOM is loaded
 document.addEventListener("DOMContentLoaded", function () {
     const orgId = window.djangoData.orgId;
     if (orgId) {
@@ -50,11 +51,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
   
-  // ✨ Attach click events to rendered group elements (without touching original render logic)
+  // ✨ Attach click events to group elements
   function attachGroupClickListeners(orgId) {
     document.querySelectorAll('#group-list .border').forEach(groupEl => {
       groupEl.addEventListener('click', function () {
-        const groupName = this.querySelector('strong')?.innerText;
+        const groupName = this.querySelector('strong')?.innerText || "Group";
         const groupId = this.dataset.groupId || this.getAttribute('data-group-id');
   
         if (!groupId) {
@@ -68,26 +69,57 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
   
-  // 🚀 Fetch and show group tasks in modal
+  // 🚀 Fetch and display tasks inside the modal
   function fetchAndShowGroupTasks(orgId, groupId, groupName) {
     const modalTitle = document.getElementById('groupTasksModalLabel');
+    const content = document.getElementById('groupTasksContent');
+  
     if (modalTitle) modalTitle.textContent = `${groupName} Tasks`;
+    content.innerHTML = `<p class="text-muted">Loading tasks...</p>`;
   
     const endpoint = `/widgets/get-user-tasks-by-group/?org_id=${orgId}&group_id=${groupId}`;
     fetch(endpoint)
       .then(res => {
         if (!res.ok) throw new Error(`Status ${res.status}`);
-        return res.text();
+        return res.json(); // 👉 Expecting JSON now
       })
-      .then(html => {
-        document.getElementById('groupTasksContent').innerHTML = html;
-        const modal = new bootstrap.Modal(document.getElementById('groupTasksModal'));
-        modal.show();
+      .then(data => {
+        content.innerHTML = ''; // Clear previous content
+  
+        if (!data.tasks || data.tasks.length === 0) {
+          content.innerHTML = `<div class="alert alert-info">No tasks assigned to you in this group.</div>`;
+          return;
+        }
+  
+        data.tasks.forEach(task => {
+          const taskEl = document.createElement('div');
+          taskEl.className = 'border rounded p-3 mb-2 shadow-sm d-flex justify-content-between align-items-center';
+  
+          taskEl.innerHTML = `
+            <div>
+              <strong>${task.title}</strong><br>
+              <small>Status: ${task.status} | Priority: ${task.priority} | Deadline: ${task.deadline}</small>
+            </div>
+            <div>
+              <a href="/tasks/task_detail/${orgId}/${groupId}/${task.id}/" 
+                 class="btn btn-sm btn-primary" target="_blank">
+                🚀 Launch
+              </a>
+            </div>
+          `;
+  
+          content.appendChild(taskEl);
+        });
       })
       .catch(err => {
-        document.getElementById('groupTasksContent').innerHTML = `
+        content.innerHTML = `
           <div class="alert alert-danger">
             Could not load tasks.<br><code>${err.message}</code>
           </div>`;
+      })
+      .finally(() => {
+        const modal = new bootstrap.Modal(document.getElementById('groupTasksModal'));
+        modal.show();
       });
   }
+  
