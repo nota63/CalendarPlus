@@ -5,8 +5,21 @@
   <title>Groups and Tasks</title>
   <!-- Bootstrap 5 CDN -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- 🌬️ Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 </head>
 <body>
+
+<style>
+  body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+.modal-content {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+</style>  
 
 <!-- Tasks widgets -->
 <div class="col-md-6 col-lg-4 mb-4" data-widget-id="{{ widget.id }}">
@@ -27,21 +40,187 @@
 
 
 <!-- --------------------------------------------MODALS ---------------------------------------------------------- -->
-  <!-- 🌈 Modal for showing tasks -->
-  <div class="modal fade" id="groupTasksModal" tabindex="-1" aria-labelledby="groupTasksModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="groupTasksModalLabel">Group Tasks</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- 🌈 Modal for showing tasks -->
+<!-- 🌈 Tasks Modal -->
+<div class="modal fade" id="groupTasksModal" tabindex="-1" aria-labelledby="groupTasksModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content border-0 rounded-2xl overflow-hidden shadow-xl">
+      <div class="modal-header bg-[#f9fafb] px-6 py-4 border-b border-gray-200">
+        <div class="flex-1">
+          <h5 class="modal-title text-gray-900 font-semibold text-lg flex items-center gap-2">
+            <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18 15v3H6v-3H4v3c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-3h-2zM7 7l5-3 5 3v5H7V7z"/>
+            </svg>
+            Group Tasks (12)
+          </h5>
         </div>
-        <div class="modal-body" id="groupTasksContent">
-          <p class="text-muted">Loading tasks...</p>
+        <div class="flex items-center gap-4">
+          <button type="button" class="text-gray-500 hover:text-gray-700">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </button>
+          <button type="button" class="btn-close p-2 hover:bg-gray-100 rounded-full" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+
+      <div class="modal-body p-0 bg-white flex">
+        <!-- Sidebar Filters -->
+        <div class="w-64 border-r border-gray-200 bg-gray-50 p-4">
+          <div class="space-y-6">
+            <!-- Quick Filters -->
+            <div>
+              <h4 class="text-xs font-semibold text-gray-500 uppercase mb-3">Views</h4>
+              <ul class="space-y-2">
+                <li class="text-sm font-medium text-gray-700 hover:bg-gray-100 px-2 py-1.5 rounded cursor-pointer">My Tasks</li>
+                <li class="text-sm font-medium text-gray-700 hover:bg-gray-100 px-2 py-1.5 rounded cursor-pointer">Assigned</li>
+                <li class="text-sm font-medium text-gray-700 hover:bg-gray-100 px-2 py-1.5 rounded cursor-pointer">Recent</li>
+              </ul>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="border-t border-gray-200 pt-6">
+              <div class="accordion" id="filterAccordion">
+                <!-- Status Filter -->
+                <div class="mb-4">
+                  <button class="flex justify-between items-center w-full text-sm font-semibold text-gray-700" 
+                          type="button" 
+                          data-bs-toggle="collapse" 
+                          data-bs-target="#statusCollapse">
+                    Status
+                    <svg class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                  </button>
+                  <div id="statusCollapse" class="collapse show mt-2 space-y-2">
+                    <label class="flex items-center space-x-2 text-sm text-gray-600">
+                      <input type="checkbox" class="rounded border-gray-300 text-purple-600">
+                      <span class="flex items-center">
+                        <span class="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
+                        Completed
+                      </span>
+                    </label>
+                    <label class="flex items-center space-x-2 text-sm text-gray-600">
+                      <input type="checkbox" class="rounded border-gray-300 text-purple-600">
+                      <span class="flex items-center">
+                        <span class="w-2 h-2 rounded-full bg-blue-500 mr-2"></span>
+                        In Progress
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Priority Filter -->
+                <div class="mb-4">
+                  <button class="flex justify-between items-center w-full text-sm font-semibold text-gray-700" 
+                          type="button" 
+                          data-bs-toggle="collapse" 
+                          data-bs-target="#priorityCollapse">
+                    Priority
+                    <svg class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                  </button>
+                  <div id="priorityCollapse" class="collapse show mt-2 space-y-2">
+                    <label class="flex items-center space-x-2 text-sm text-gray-600">
+                      <input type="checkbox" class="rounded border-gray-300 text-purple-600">
+                      <span class="text-red-600">High</span>
+                    </label>
+                    <label class="flex items-center space-x-2 text-sm text-gray-600">
+                      <input type="checkbox" class="rounded border-gray-300 text-purple-600">
+                      <span class="text-yellow-600">Medium</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Date Filter -->
+                <div class="mb-4">
+                  <button class="flex justify-between items-center w-full text-sm font-semibold text-gray-700" 
+                          type="button" 
+                          data-bs-toggle="collapse" 
+                          data-bs-target="#dateCollapse">
+                    Date
+                    <svg class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                  </button>
+                  <div id="dateCollapse" class="collapse show mt-2 space-y-2">
+                    <button class="w-full text-left text-sm text-gray-600 hover:bg-gray-100 px-2 py-1 rounded">Today</button>
+                    <button class="w-full text-left text-sm text-gray-600 hover:bg-gray-100 px-2 py-1 rounded">Next 7 Days</button>
+                    <button class="w-full text-left text-sm text-gray-600 hover:bg-gray-100 px-2 py-1 rounded">Overdue</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 min-w-0">
+          <!-- Search Header -->
+          <div class="border-b border-gray-200 p-4 bg-white">
+            <div class="flex items-center justify-between">
+              <div class="relative w-96">
+                <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input type="text" 
+                       class="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500" 
+                       placeholder="Search tasks..."
+                       id="taskSearchInput">
+              </div>
+              <div class="flex items-center gap-3">
+                <button class="flex items-center text-sm text-gray-600 hover:text-gray-800">
+                  <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"/>
+                  </svg>
+                  Sort
+                </button>
+                <button class="flex items-center text-sm text-gray-600 hover:text-gray-800">
+                  <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                  </svg>
+                  View
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Task List -->
+          <div id="groupTasksContent" class="p-4">
+            <!-- Loading State -->
+            <div class="animate-pulse space-y-4 py-8">
+              <div class="h-4 bg-gray-200 rounded w-1/3"></div>
+              <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+              <div class="h-4 bg-gray-200 rounded w-2/3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer bg-gray-50 px-6 py-3 border-t border-gray-200">
+        <div class="flex items-center justify-between w-full">
+          <div class="flex items-center gap-3">
+            <span class="text-sm text-gray-500">🔄 3 updates today</span>
+            <button class="text-sm text-purple-600 hover:text-purple-700 flex items-center">
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+              Refresh
+            </button>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-sm text-gray-500">📊 65% completion rate</span>
+            <button type="button" class="text-sm text-purple-600 hover:text-purple-700 font-medium" data-bs-dismiss="modal">
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
-
+</div>
   <!-- Bootstrap & Script Dependencies -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
