@@ -75,7 +75,7 @@ def widget_snippet_view(request):
     org = get_object_or_404(Organization, id=org_id)
     widget = DashboardWidget.objects.filter(user=request.user, organization=org, widget_type=widget_type).first()
 
-    return render(request, f"widgets/includes/widget_{widget_type}.html", {"widget": widget})
+    return render(request, f"widgets/includes/widget_{widget_type}.html", {"widget": widget,'organization':org})
 
 
 # render all widgets

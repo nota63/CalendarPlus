@@ -1,1 +1,63 @@
 <h1>Task rendered!</h1>
+
+<!-- 🌀 Group Container -->
+<div id="group-list" class="mt-3">
+  <p class="text-muted">Loading your groups...</p>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const groupListEl = document.getElementById("group-list");
+    const orgId = "{{ organization.id|default:'' }}";
+
+    console.log("🚀 DOM Loaded | orgId:", orgId);
+
+    if (!groupListEl) {
+      console.error("❌ #group-list element not found in DOM.");
+      return;
+    }
+
+    if (!orgId) {
+      console.warn("⚠️ Organization ID is missing.");
+      groupListEl.innerHTML = "<div class='alert alert-warning'>Organization ID is missing.</div>";
+      return;
+    }
+
+    const endpoint = `/widgets/get-user-groups-json/?org_id=${orgId}`;
+    console.log("📡 Fetching user groups from:", endpoint);
+
+    fetch(endpoint)
+      .then(response => {
+        console.log("📥 Response received:", response);
+        if (!response.ok) throw new Error(`Server returned ${response.status}`);
+        return response.json();
+      })
+      .then(data => {
+        console.log("✅ JSON parsed:", data);
+
+        if (data.groups && data.groups.length > 0) {
+          console.log(`🎯 Found ${data.groups.length} group(s).`);
+
+          const groupHtml = data.groups.map(group => `
+            <div class="border rounded px-3 py-2 mb-2 shadow-sm bg-light">
+              <strong>${group.name}</strong>
+            </div>
+          `).join("");
+
+          groupListEl.innerHTML = groupHtml;
+        } else {
+          console.warn("ℹ️ No groups returned for user.");
+          groupListEl.innerHTML = `<p class="text-muted">No groups found for you in this organization.</p>`;
+        }
+      })
+      .catch(error => {
+        console.error("❌ Error fetching groups:", error);
+        groupListEl.innerHTML = `
+          <div class="alert alert-danger">
+            Failed to load groups. Please try again later.<br>
+            <code>${error.message}</code>
+          </div>
+        `;
+      });
+  });
+</script>
