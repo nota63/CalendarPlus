@@ -1043,18 +1043,18 @@ function sanitizeText(str) {
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------
 // Users widgets (Save Widgets)
+// 🧩 Main Dashboard Widgets JS
 document.addEventListener('DOMContentLoaded', function () {
   const widgetButtons = document.querySelectorAll('.add-widget-btn');
   const modalEl = document.getElementById('widgetSelectModal');
   const widgetsContainer = document.getElementById('dashboard-widgets-container');
-  const orgId = window.djangoData.orgId;  // Make sure this is passed in template via context
+  const orgId = window.djangoData.orgId;  // Make sure this is passed in via template context
 
   function getCSRFToken() {
     const cookieValue = document.cookie
       .split('; ')
-      .find(row => row.startsWith('csrftoken='))
-      ?.split('=')[1];
-    return cookieValue || '{{ csrf_token }}';  // Template fallback
+      .find(row => row.startsWith('csrftoken='))?.split('=')[1];
+    return cookieValue || '{{ csrf_token }}';  // fallback for safety
   }
 
   // 🔁 Load all widgets on initial page load
@@ -1068,6 +1068,12 @@ document.addEventListener('DOMContentLoaded', function () {
       .then(html => {
         widgetsContainer.innerHTML = html;
         console.log("✅ All widgets rendered.");
+
+        // 🧠 Run specific widget initializers after loading
+        if (widgetsContainer.querySelector('#group-list')) {
+          console.log("🔍 Detected #group-list — initializing group widget...");
+          fetchAndRenderUserGroups(orgId);
+        }
       })
       .catch(error => {
         console.error("💥 Error loading widgets:", error);
@@ -1102,17 +1108,25 @@ document.addEventListener('DOMContentLoaded', function () {
           console.log("📦 Response data:", data);
           if (data.message) {
             alert(data.message);
+
             // 👇 Fetch and render the widget immediately after saving
             fetch(`/dashboard/widget-snippet/?widget_type=${widgetType}&org_id=${orgId}`)
               .then(res => res.text())
               .then(html => {
                 widgetsContainer.insertAdjacentHTML('beforeend', html);
                 console.log("🧩 Widget rendered successfully:", widgetType);
+
+                // ⚙️ Run specific widget logic after rendering
+                if (widgetType === 'group-widget') {
+                  console.log("⚙️ Running group widget init JS...");
+                  fetchAndRenderUserGroups(orgId);
+                }
               })
               .catch(err => {
                 console.error("❌ Failed to render widget snippet:", err);
               });
 
+            // ✨ Close modal
             if (bootstrap && modalEl) {
               const modal = bootstrap.Modal.getInstance(modalEl);
               modal?.hide();

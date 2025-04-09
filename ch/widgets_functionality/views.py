@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.db import models
 from groups.models import Group, GroupMember
+from group_tasks.models import Task
 
 # ** HERE I WILL SET UP THE WIDGETS FUNCTIONALITY 
 
@@ -105,18 +106,20 @@ def get_user_groups_json(request):
         group_memberships = GroupMember.objects.filter(
             user=user,
             organization_id=org_id
-        ).select_related('group')
+        ).select_related('group', 'group__team_leader')
 
         logger.info("👥 Found %d group memberships for user %s in org %s", group_memberships.count(), user.username, org_id)
 
         groups = []
         for gm in group_memberships:
-            logger.debug("📂 Group ID: %s, Name: %s, TL: %s", gm.group.id, gm.group.name, gm.group.team_leader)
+            group = gm.group
+            logger.debug("📂 Group ID: %s, Name: %s, TL: %s", group.id, group.name, group.team_leader)
+
             groups.append({
-                'id': gm.group.id,
-                'name': gm.group.name,
-                'description': gm.group.description,
-                'team_leader': gm.group.team_leader.username if gm.group.team_leader else None,
+                'id': group.id,
+                'name': group.name,
+                'description': group.description,
+                'team_leader': group.team_leader.username if group.team_leader else None,
             })
 
         logger.info("✅ Returning %d groups to frontend.", len(groups))
@@ -125,3 +128,44 @@ def get_user_groups_json(request):
     except Exception as e:
         logger.exception("💥 Error while fetching groups for user %s: %s", user.username, str(e))
         return JsonResponse({'error': 'An unexpected error occurred. Please try again later.'}, status=500)
+    
+# 2)  Display the tasks (assigned to to request.user )
+
+@login_required
+def get_user_tasks_by_group(request):
+    org_id = request.GET.get('org_id')
+    group_id = request.GET.get('group_id')
+    user = request.user
+
+    logger.info("🧩 Task fetch initiated for group_id: %s and org_id: %s by user: %s", group_id, org_id, user.username)
+
+    if not org_id or not group_id:
+        logger.warning("❌ Missing org_id or group_id.")
+        return JsonResponse({'error': 'Missing org_id or group_id'}, status=400)
+
+    try:
+        tasks = Task.objects.filter(
+            organization_id=org_id,
+            group_id=group_id,
+            assigned_to=user
+        ).order_by('-deadline')
+
+        logger.info("📋 Found %d tasks for group %s assigned to user %s", tasks.count(), group_id, user.username)
+
+        task_data = []
+        for task in tasks:
+            task_data.append({
+                'id': task.id,
+                'title': task.title,
+                'description': task.description,
+                'status': task.status,
+                'priority': task.priority,
+                'deadline': task.deadline.strftime("%Y-%m-%d %H:%M"),
+            })
+
+        return JsonResponse({'tasks': task_data}, status=200)
+
+    except Exception as e:
+        logger.exception("💥 Error fetching tasks: %s", str(e))
+        return JsonResponse({'error': 'An unexpected error occurred. Please try again later.'}, status=500)
+
