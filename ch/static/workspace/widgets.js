@@ -19,11 +19,29 @@ function fetchAndRenderUserGroups(orgId) {
       })
       .then(data => {
         if (data.groups && data.groups.length > 0) {
-          const groupHtml = data.groups.map(group => `
-            <div class="border rounded px-3 py-2 mb-2 shadow-sm bg-light" data-group-id="${group.id}">
-              <strong>${group.name}</strong>
-            </div>
-          `).join("");
+
+            const groupHtml = data.groups.map(group => `
+                <div class="bg-white border border-gray-200 rounded-lg p-4 mb-3 shadow-xs hover:shadow-sm transition-shadow group"
+                     data-group-id="${group.id}">
+                  <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                      <h3 class="font-semibold text-gray-800 text-base mb-1">${group.name}</h3>
+                      <div class="flex items-center space-x-2">
+                        <span class="inline-flex items-center justify-center w-8 h-8 bg-indigo-500 text-white rounded-full text-sm font-medium">
+                          ${group.team_leader ? group.team_leader.charAt(0).toUpperCase() : '?'}
+                        </span>
+                        <span class="text-sm text-gray-600">${group.team_leader || 'No leader'}</span>
+                      </div>
+                    </div>
+                    <div class="ml-4 flex items-center space-x-3">
+                      <span class="text-xs font-medium px-2 py-1 rounded-full bg-green-50 text-green-700">
+                        ${group.member_count} members
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              `).join("");
+
           groupListEl.innerHTML = groupHtml;
         } else {
           groupListEl.innerHTML = `<p class="text-muted">No groups found for you in this organization.</p>`;

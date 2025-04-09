@@ -1044,6 +1044,9 @@ function sanitizeText(str) {
 // --------------------------------------------------------------------------------------------------------------------------------------------------------
 // Users widgets (Save Widgets)
 // 🧩 Main Dashboard Widgets JS
+
+
+// 🧩 Main Dashboard Widgets JS
 document.addEventListener('DOMContentLoaded', function () {
   const widgetButtons = document.querySelectorAll('.add-widget-btn');
   const modalEl = document.getElementById('widgetSelectModal');
@@ -1145,3 +1148,5 @@ document.addEventListener('DOMContentLoaded', function () {
 
   loadAllWidgetsOnPageLoad();  // 🔁 Initial call
 });
+
+  

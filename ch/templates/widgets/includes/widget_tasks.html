@@ -7,14 +7,26 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-  <div class="container mt-5">
-    <h1 class="mb-4">🌟 Task Widget</h1>
-    <div id="group-list" class="mt-3">
-      <p class="text-muted">Loading your groups...</p>
-      <p><strong>Debug Org ID:</strong> {{ organization.id }}</p>
+
+<!-- Tasks widgets -->
+<div class="col-md-6 col-lg-4 mb-4" data-widget-id="{{ widget.id }}">
+  <div class="card h-100 shadow-sm widget-card">
+    <div class="card-body">
+      <div class="d-flex align-items-start justify-content-between widget-header">
+        <h5 class="card-title">🌟 Task Widget</h5>
+        <!-- Dropdown will be injected here -->
+      </div>
+      <hr>
+      <div id="group-list">
+        <p class="text-muted">Loading your groups...</p>
+      </div>
     </div>
   </div>
+</div>
 
+
+
+<!-- --------------------------------------------MODALS ---------------------------------------------------------- -->
   <!-- 🌈 Modal for showing tasks -->
   <div class="modal fade" id="groupTasksModal" tabindex="-1" aria-labelledby="groupTasksModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">

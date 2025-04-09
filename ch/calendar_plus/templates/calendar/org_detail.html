@@ -1658,6 +1658,8 @@ header {
 
 
 
+
+
 <!-- ------------------------------------------------------------------------------------------------------------------------- -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 <!-- ------------------------------------------------------------------------------------------------------------------------------------------------------- -->
@@ -5720,6 +5722,27 @@ body {
   </div>
 </div>
 
+<!-- Remove widget from users account -->
+ <!-- Confirm Remove Widget Modal -->
+<div class="modal fade" id="confirmRemoveWidgetModal" tabindex="-1" aria-labelledby="removeWidgetModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-danger">
+      <div class="modal-header">
+        <h5 class="modal-title text-danger">Remove Widget</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to remove this widget from your dashboard? It won’t be deleted from the organization.
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-danger" id="confirmRemoveBtn">Yes, Remove</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
 
 <!-- ----------------------------------------------------------------------------------------------------------------------------------------------- -->
@@ -5739,8 +5762,10 @@ body {
  <!-- Link your JS file -->
  <script src="{% static 'workspace/organization_tasks.js' %}"></script>
  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- link widgets file -->
+<!-- link widgets files----------------------------------------------------------------------------------------- -->
 <script src="{% static 'workspace/widgets.js'%}"></script> 
+
+<!-- ------------------------------------------------------------------------------------------------------------- -->
  
 
 

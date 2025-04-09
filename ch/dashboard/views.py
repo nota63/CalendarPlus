@@ -83,9 +83,30 @@ def widget_snippet_view(request):
 def all_widgets_snippet_view(request):
     org_id = request.GET.get("org_id")
     org = get_object_or_404(Organization, id=org_id)
-
-    
-
     widgets = DashboardWidget.objects.filter(user=request.user, organization=org)
     context = {"widgets": widgets,"organization":org}
     return render(request, "widgets/includes/all_widgets.html", context)
+
+
+# Remove widget 
+@require_POST
+@login_required
+def remove_user_dashboard_widget(request):
+    widget_id = request.POST.get('widget_id')
+    org_id = request.POST.get('org_id')
+
+    if not widget_id or not org_id:
+        return JsonResponse({'error': 'Missing widget ID or organization ID.'}, status=400)
+
+    try:
+        widget = DashboardWidget.objects.get(
+            id=widget_id,
+            organization_id=org_id,
+            user=request.user
+        )
+        widget.delete()  # Remove only from this user's dashboard
+        return JsonResponse({'success': True, 'message': 'Widget removed from your dashboard.'})
+    except DashboardWidget.DoesNotExist:
+        return JsonResponse({'error': 'Widget not found.'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
