@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.db import models
 from groups.models import Group, GroupMember
 from group_tasks.models import Task
-
+from django.db.models import Q
 # ** HERE I WILL SET UP THE WIDGETS FUNCTIONALITY 
 
 
@@ -90,6 +90,47 @@ def user_meetings_json(request):
 # Fetch and display the groups
 logger = logging.getLogger(__name__)  # Set up logging
 
+# @login_required
+# def get_user_groups_json(request):
+#     org_id = request.GET.get('org_id')
+#     user = request.user
+
+#     logger.info("🔍 Group fetch initiated by user: %s (ID: %s)", user.username, user.id)
+#     logger.info("📦 Received org_id: %s", org_id)
+
+#     if not org_id:
+#         logger.warning("❌ Missing org_id in request.")
+#         return JsonResponse({'error': 'Missing org_id'}, status=400)
+
+#     try:
+#         group_memberships = GroupMember.objects.filter(
+#             user=user,
+#             organization_id=org_id
+#         ).select_related('group', 'group__team_leader')
+
+#         logger.info("👥 Found %d group memberships for user %s in org %s", group_memberships.count(), user.username, org_id)
+
+#         groups = []
+#         for gm in group_memberships:
+#             group = gm.group
+#             logger.debug("📂 Group ID: %s, Name: %s, TL: %s", group.id, group.name, group.team_leader)
+
+#             groups.append({
+#                 'id': group.id,
+#                 'name': group.name,
+#                 'description': group.description,
+#                 'team_leader': group.team_leader.username if group.team_leader else None,
+#             })
+
+#         logger.info("✅ Returning %d groups to frontend.", len(groups))
+#         return JsonResponse({'groups': groups}, status=200)
+
+#     except Exception as e:
+#         logger.exception("💥 Error while fetching groups for user %s: %s", user.username, str(e))
+#         return JsonResponse({'error': 'An unexpected error occurred. Please try again later.'}, status=500)
+    
+
+
 @login_required
 def get_user_groups_json(request):
     org_id = request.GET.get('org_id')
@@ -106,15 +147,36 @@ def get_user_groups_json(request):
         group_memberships = GroupMember.objects.filter(
             user=user,
             organization_id=org_id
-        ).select_related('group', 'group__team_leader')
+        ).select_related('group', 'group__team_leader', 'group__created_by')
 
         logger.info("👥 Found %d group memberships for user %s in org %s", group_memberships.count(), user.username, org_id)
 
         groups = []
+        added_group_ids = set()  # To avoid duplicates
+
+        # ✅ Add groups where the user is a member
         for gm in group_memberships:
             group = gm.group
-            logger.debug("📂 Group ID: %s, Name: %s, TL: %s", group.id, group.name, group.team_leader)
+            if group.id not in added_group_ids:
+                logger.debug("📂 (Member) Group ID: %s, Name: %s, TL: %s", group.id, group.name, group.team_leader)
+                groups.append({
+                    'id': group.id,
+                    'name': group.name,
+                    'description': group.description,
+                    'team_leader': group.team_leader.username if group.team_leader else None,
+                })
+                added_group_ids.add(group.id)
 
+        # ✅ Add groups where the user is a team_leader or created_by
+        from groups.models import Group  # update if different model path
+        extra_groups = Group.objects.filter(
+            organization_id=org_id
+        ).filter(
+            Q(team_leader=user) | Q(created_by=user)
+        ).exclude(id__in=added_group_ids)
+
+        for group in extra_groups:
+            logger.debug("📂 (Leader/Creator) Group ID: %s, Name: %s, TL: %s", group.id, group.name, group.team_leader)
             groups.append({
                 'id': group.id,
                 'name': group.name,
@@ -128,9 +190,16 @@ def get_user_groups_json(request):
     except Exception as e:
         logger.exception("💥 Error while fetching groups for user %s: %s", user.username, str(e))
         return JsonResponse({'error': 'An unexpected error occurred. Please try again later.'}, status=500)
-    
-# 2)  Display the tasks (assigned to to request.user )
 
+
+
+
+
+
+
+
+
+# 2)  Display the tasks (assigned to to request.user )
 @login_required
 def get_user_tasks_by_group(request):
     org_id = request.GET.get('org_id')
