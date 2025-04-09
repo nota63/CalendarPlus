@@ -12,6 +12,7 @@ class DashboardWidget(models.Model):
         ('meetings', 'Upcoming Meetings'),
         ('notes', 'Notes'),
         ('leaderboard', 'Leaderboard'),
+        ('calculation','Calculation'),
         # Add more widgets as you scale, my baby 💖
     ]
 
