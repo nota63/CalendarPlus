@@ -1043,7 +1043,43 @@ function sanitizeText(str) {
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------
 // Users widgets (Save Widgets)
-// 🧩 Main Dashboard Widgets JS
+function enableWidgetDragAndSave() {
+  const container = document.getElementById("dashboard-widgets-container");
+
+  // 🕒 Wait until widgets are loaded (for Ajax or dynamic DOM cases)
+  const waitForWidgets = setInterval(() => {
+    if (container.children.length > 0) {
+      clearInterval(waitForWidgets);
+
+      // ✅ Restore widget order from localStorage
+      const savedOrder = JSON.parse(localStorage.getItem("dashboard_widget_order"));
+      if (savedOrder && Array.isArray(savedOrder)) {
+        savedOrder.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) container.appendChild(el);  // Reorder
+        });
+      }
+
+      // ✅ Initialize SortableJS
+      new Sortable(container, {
+        animation: 200,
+        ghostClass: 'bg-indigo-50',
+        onEnd: function () {
+          const order = Array.from(container.children).map(child => child.id);
+          localStorage.setItem("dashboard_widget_order", JSON.stringify(order));
+          console.log("✅ Widget order saved:", order);
+        }
+      });
+
+      console.log("🎯 Drag and drop enabled");
+    }
+  }, 300); // Check every 300ms
+}
+
+// 🔁 Run when DOM is ready
+document.addEventListener("DOMContentLoaded", enableWidgetDragAndSave);
+
+
 
 
 // 🧩 Main Dashboard Widgets JS
