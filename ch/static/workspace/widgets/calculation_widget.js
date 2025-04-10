@@ -28,3 +28,17 @@ function fetchAndRenderCalculationWidget(orgId) {
       });
   }
   
+
+// Open in full screen
+function openFullScreenWidget(widgetId) {
+    const elem = document.getElementById(widgetId);
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) { // Safari
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { // IE11
+      elem.msRequestFullscreen();
+    }
+    console.log("🔍 Widget opened in fullscreen:", widgetId);
+  }
+  

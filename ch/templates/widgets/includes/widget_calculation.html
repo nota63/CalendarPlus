@@ -1,4 +1,12 @@
-<div id="calculation-widget" class="rounded-xl border p-4 shadow bg-white">
+<div id="calculation-widget" class="relative rounded-xl border p-4 shadow bg-white">
+    <!-- Fullscreen Icon -->
+    <button onclick="openFullScreenWidget('calculation-widget')" class="absolute top-2 right-2 text-gray-500 hover:text-indigo-600">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4 4h6M4 4v6M20 20h-6M20 20v-6M4 20h6M4 20v-6M20 4h-6M20 4v6" />
+      </svg>
+    </button>
+  
     <h3 class="text-lg font-semibold mb-3 text-indigo-600">📊 Your Stats Summary</h3>
     <ul class="space-y-1 text-sm">
       <li>✅ Total Tasks: <span id="total-tasks-count" class="font-medium text-gray-800">--</span></li>
@@ -7,4 +15,5 @@
       <li>📌 Total Bookings: <span id="total-bookings-count" class="font-medium text-gray-800">--</span></li>
     </ul>
   </div>
+  
   
