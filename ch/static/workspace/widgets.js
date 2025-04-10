@@ -1,4 +1,5 @@
 
+// 1) Tasks widget
 // Fetch and display the groups
 
 // Fetch and display the groups
@@ -212,3 +213,7 @@ function loadGroupCalendar(groupId, orgId) {
 
   calendar.render();
 }
+
+
+
+

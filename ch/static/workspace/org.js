@@ -1077,6 +1077,12 @@ document.addEventListener('DOMContentLoaded', function () {
           console.log("🔍 Detected #group-list — initializing group widget...");
           fetchAndRenderUserGroups(orgId);
         }
+
+        // 🧠 Run specific widget initializers after loading
+        if (widgetsContainer.querySelector('#calculation-widget')) {
+          console.log("🔍 Detected #calculation widget — initializing calculation widget...");
+          fetchAndRenderCalculationWidget(orgId);
+        }
       })
       .catch(error => {
         console.error("💥 Error loading widgets:", error);
@@ -1124,6 +1130,13 @@ document.addEventListener('DOMContentLoaded', function () {
                   console.log("⚙️ Running group widget init JS...");
                   fetchAndRenderUserGroups(orgId);
                 }
+
+                // calculation widget
+                if (widgetType === 'calculation-widget') {
+                  console.log("⚙️ Running calculation widget init JS...");
+                  fetchAndRenderCalculationWidget(orgId);
+                }
+                
               })
               .catch(err => {
                 console.error("❌ Failed to render widget snippet:", err);

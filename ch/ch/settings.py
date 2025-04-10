@@ -113,6 +113,7 @@ INSTALLED_APPS = [
     'subscription',
     'dashboard',
     'widgets_functionality',
+    'calculation_widget',
 
     #  Unfold admin configurations
     "unfold",  # before django.contrib.admin
