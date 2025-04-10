@@ -32,21 +32,46 @@
 
 
 <!-- MODALS --------------------------------------------------------------------------------------------------------------------------- -->
- <!-- Task Analytics Modal -->
+<!-- Task Analytics Modal -->
+<!-- Task Analytics Modal - ClickUp Style -->
 <div class="modal fade" id="taskAnalyticsModal" tabindex="-1" aria-labelledby="taskAnalyticsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
-      <div class="modal-content rounded-3 shadow">
-        <div class="modal-header bg-indigo-600 text-white">
-          <h5 class="modal-title" id="taskAnalyticsModalLabel">📌 Task Analytics Overview</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content rounded-xl shadow-xl border border-gray-200">
+            <!-- Header with ClickUp-style gradient -->
+            <div class="modal-header border-b-2 border-indigo-500 px-6 py-4">
+                <div class="flex items-center justify-between w-full">
+                    <h5 class="modal-title text-2xl font-semibold text-gray-800 flex items-center">
+                        <svg class="w-6 h-6 text-indigo-600 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 3.055A9.001 9.001 0 0021 12h-9v9a9.001 9.001 0 01-9-9 9 9 0 018-8.945z" />
+                        </svg>
+                        Task overview across all groups in this workspace
+                      </h5>
+                      
+                    <button type="button" class="p-2 hover:bg-gray-100 rounded-lg transition-colors" data-bs-dismiss="modal" aria-label="Close">
+                        <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body p-0 bg-gray-50/50">
+                <div id="task-analytics-modal-body" class="p-6">
+                    <!-- Loading state remains here -->
+                    <div class="h-96 flex items-center justify-center">
+                        <div class="text-center text-gray-400">
+                            <div class="animate-spin mb-4">
+                                <svg class="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/>
+                                </svg>
+                            </div>
+                            <p class="text-sm font-medium">Gathering insights...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="modal-body">
-          <div id="task-analytics-modal-body">
-            <!-- Data gets injected here -->
-            <p class="text-muted">Fetching data...</p>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
-  
+</div>
