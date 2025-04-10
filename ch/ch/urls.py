@@ -52,6 +52,7 @@ urlpatterns = [
     path('dashboard/',include('dashboard.urls')),
     path('widgets/',include('widgets_functionality.urls')),
     path('calculation/',include('calculation_widget.urls')),
+    path('workload/',include('workload.urls')),
     # ui components
     path('index/', views.styles, name= 'index'),
     path('weather/',views.weather, name='weather'),

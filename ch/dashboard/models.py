@@ -13,6 +13,7 @@ class DashboardWidget(models.Model):
         ('notes', 'Notes'),
         ('leaderboard', 'Leaderboard'),
         ('calculation','Calculation'),
+        ('workload','Workload'),
         # Add more widgets as you scale, my baby 💖
     ]
 

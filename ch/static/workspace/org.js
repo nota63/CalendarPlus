@@ -1042,28 +1042,27 @@ function sanitizeText(str) {
 
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------
-// Users widgets (Save Widgets)
+// Users widgets (Re-order (Drag and drop))
 function enableWidgetDragAndSave() {
   const container = document.getElementById("dashboard-widgets-container");
 
-  // 🕒 Wait until widgets are loaded (for Ajax or dynamic DOM cases)
   const waitForWidgets = setInterval(() => {
     if (container.children.length > 0) {
       clearInterval(waitForWidgets);
 
-      // ✅ Restore widget order from localStorage
       const savedOrder = JSON.parse(localStorage.getItem("dashboard_widget_order"));
       if (savedOrder && Array.isArray(savedOrder)) {
         savedOrder.forEach(id => {
           const el = document.getElementById(id);
-          if (el) container.appendChild(el);  // Reorder
+          if (el) container.appendChild(el);
         });
       }
 
-      // ✅ Initialize SortableJS
       new Sortable(container, {
         animation: 200,
-        ghostClass: 'bg-indigo-50',
+        ghostClass: 'drag-ghost',
+        chosenClass: 'drag-chosen',
+        dragClass: 'drag-moving',
         onEnd: function () {
           const order = Array.from(container.children).map(child => child.id);
           localStorage.setItem("dashboard_widget_order", JSON.stringify(order));
@@ -1071,17 +1070,14 @@ function enableWidgetDragAndSave() {
         }
       });
 
-      console.log("🎯 Drag and drop enabled");
+      console.log("🎯 Drag and drop with style enabled");
     }
-  }, 300); // Check every 300ms
+  }, 300);
 }
 
-// 🔁 Run when DOM is ready
 document.addEventListener("DOMContentLoaded", enableWidgetDragAndSave);
 
-
-
-
+// ----------------------------------------------------------------------------------------------------------------------------------------------
 // 🧩 Main Dashboard Widgets JS
 document.addEventListener('DOMContentLoaded', function () {
   const widgetButtons = document.querySelectorAll('.add-widget-btn');
@@ -1108,17 +1104,24 @@ document.addEventListener('DOMContentLoaded', function () {
         widgetsContainer.innerHTML = html;
         console.log("✅ All widgets rendered.");
 
-        // 🧠 Run specific widget initializers after loading
+        // 🧠 Run specific widget initializers after loading (group list)
         if (widgetsContainer.querySelector('#group-list')) {
           console.log("🔍 Detected #group-list — initializing group widget...");
           fetchAndRenderUserGroups(orgId);
         }
 
-        // 🧠 Run specific widget initializers after loading
+        // 🧠 Run specific widget initializers after loading (calculation widget)
         if (widgetsContainer.querySelector('#calculation-widget')) {
           console.log("🔍 Detected #calculation widget — initializing calculation widget...");
           fetchAndRenderCalculationWidget(orgId);
         }
+
+        // workload status
+        if (widgetsContainer.querySelector('#workload-chart-widget')) {
+          console.log("🔍 Detected #workload widget — initializing workload widget...");
+          fetchAndRenderPieChart(orgId);
+        }
+        
       })
       .catch(error => {
         console.error("💥 Error loading widgets:", error);
@@ -1172,6 +1175,12 @@ document.addEventListener('DOMContentLoaded', function () {
                   console.log("⚙️ Running calculation widget init JS...");
                   fetchAndRenderCalculationWidget(orgId);
                 }
+                // workload widget
+                 if (widgetType === 'workload-widget') {
+                  console.log("⚙️ Running calculation widget init JS...");
+                  fetchAndRenderPieChart(orgId);
+                }
+                
                 
               })
               .catch(err => {

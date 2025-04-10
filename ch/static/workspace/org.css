@@ -2364,3 +2364,24 @@ a {
   }
   
 
+/* Drag and drop widgets */
+/* Widget being dragged */
+.drag-chosen {
+    transform: scale(1.05);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease-in-out;
+  }
+  
+  /* Widget dragging ghost (placeholder) */
+  .drag-ghost {
+    opacity: 0.3;
+    background: #e0e7ff !important;
+    border: 2px dashed #6366f1;
+    border-radius: 1rem;
+  }
+  
+  /* Optional: Add slight background lift */
+  .drag-moving {
+    filter: brightness(1.05);
+    z-index: 999;
+  }
