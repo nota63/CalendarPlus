@@ -42,3 +42,43 @@ function openFullScreenWidget(widgetId) {
     console.log("🔍 Widget opened in fullscreen:", widgetId);
   }
   
+
+// Fetch Tasks Analytics
+function fetchAndRenderTaskAnalytics(orgId) {
+    console.log("📡 Fetching task analytics for org:", orgId);
+  
+    // Show the modal first
+    const taskModal = new bootstrap.Modal(document.getElementById("taskAnalyticsModal"));
+    taskModal.show();
+  
+    // Inject temporary loading state
+    document.getElementById("task-analytics-modal-body").innerHTML = `<p class="text-muted">⏳ Loading task stats...</p>`;
+  
+    fetch(`/calculation/get-task-analytics/${orgId}/`)
+      .then((response) => {
+        if (!response.ok) throw new Error("Network response not ok");
+        return response.json();
+      })
+      .then((data) => {
+        console.log("📦 Task Analytics Fetched:", data);
+        const html = `
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">✔️ <strong>Completed Tasks:</strong> ${data.completed_tasks}</li>
+            <li class="list-group-item">⌛ <strong>Pending Tasks:</strong> ${data.pending_tasks}</li>
+            <li class="list-group-item">🚧 <strong>In Progress:</strong> ${data.in_progress_tasks}</li>
+            <li class="list-group-item">🔥 <strong>Overdue Tasks:</strong> ${data.overdue_tasks}</li>
+            <li class="list-group-item">🚨 <strong>Urgent Tasks:</strong> ${data.urgent_tasks}</li>
+            <li class="list-group-item">📅 <strong>Due Today:</strong> ${data.tasks_due_today}</li>
+            <li class="list-group-item">📆 <strong>Due This Week:</strong> ${data.tasks_due_this_week}</li>
+            <li class="list-group-item">📈 <strong>Completion Rate:</strong> ${data.completion_rate}%</li>
+            <li class="list-group-item">📊 <strong>Average Progress:</strong> ${data.average_progress}%</li>
+          </ul>
+        `;
+        document.getElementById("task-analytics-modal-body").innerHTML = html;
+      })
+      .catch((error) => {
+        console.error("❌ Task Analytics Fetch Failed:", error);
+        document.getElementById("task-analytics-modal-body").innerHTML = `<div class="alert alert-danger">Could not load task analytics. Please try again later.</div>`;
+      });
+  }
+  

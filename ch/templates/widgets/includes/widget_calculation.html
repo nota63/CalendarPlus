@@ -1,3 +1,6 @@
+
+
+
 <div id="calculation-widget" class="relative rounded-xl border p-4 shadow bg-white">
     <!-- Fullscreen Icon -->
     <button onclick="openFullScreenWidget('calculation-widget')" class="absolute top-2 right-2 text-gray-500 hover:text-indigo-600">
@@ -14,6 +17,36 @@
       <li>🎉 Total Events: <span id="total-events-count" class="font-medium text-gray-800">--</span></li>
       <li>📌 Total Bookings: <span id="total-bookings-count" class="font-medium text-gray-800">--</span></li>
     </ul>
+    <button onclick="fetchAndRenderTaskAnalytics(window.djangoData.orgId)" class="text-sm mt-3 px-3 py-1.5 bg-rose-600 text-white rounded hover:bg-rose-700 transition">
+        📌 Load Task Analytics
+    </button>
+      
   </div>
   
+<script type="text/javascript">
+    // Inject Django variables into the window object
+    window.djangoData = {
+        orgId: "{{ organization.id }}",
+    };
+</script>
+
+
+<!-- MODALS --------------------------------------------------------------------------------------------------------------------------- -->
+ <!-- Task Analytics Modal -->
+<div class="modal fade" id="taskAnalyticsModal" tabindex="-1" aria-labelledby="taskAnalyticsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content rounded-3 shadow">
+        <div class="modal-header bg-indigo-600 text-white">
+          <h5 class="modal-title" id="taskAnalyticsModalLabel">📌 Task Analytics Overview</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="task-analytics-modal-body">
+            <!-- Data gets injected here -->
+            <p class="text-muted">Fetching data...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   
