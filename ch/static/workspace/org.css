@@ -2385,3 +2385,12 @@ a {
     filter: brightness(1.05);
     z-index: 999;
   }
+
+
+/* Main dashboard */
+.container,
+.wrapper,
+#main-dashboard-tooltip {
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}
