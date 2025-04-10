@@ -3,7 +3,7 @@ from accounts.models import Profile, Organization, MeetingOrganization
 from django.contrib.auth.models import User
 from group_tasks.models import Task
 from django.http import JsonResponse
-from django.db.models import Count, F, ExpressionWrapper, DurationField
+from django.db.models import Count, F, ExpressionWrapper, DurationField,Q
 from django.db.models.functions import TruncDate, ExtractHour
 from datetime import timedelta
 from django.utils.timezone import now
@@ -27,7 +27,13 @@ def categorize_hour(hour):
 
 def meeting_analytics_view_widget(request, org_id):
     # Base queryset
-    qs = MeetingOrganization.objects.filter(organization_id=org_id)
+    qs = MeetingOrganization.objects.filter(
+        organization_id=org_id
+        ).filter(
+            Q(user=request.user) |
+            Q(invitee=request.user) |
+            Q(participants=request.user)
+        )
 
     # --- 1. Count by Status ---
     by_status = qs.values('status').annotate(count=Count('id'))
