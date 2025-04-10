@@ -1119,9 +1119,9 @@ document.addEventListener('DOMContentLoaded', function () {
         // workload status
         if (widgetsContainer.querySelector('#workload-chart-widget')) {
           console.log("🔍 Detected #workload widget — initializing workload widget...");
-          fetchAndRenderPieChart(orgId);
+          fetchAndRenderUnifiedPieChart(orgId);
         }
-        
+
       })
       .catch(error => {
         console.error("💥 Error loading widgets:", error);
@@ -1178,7 +1178,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // workload widget
                  if (widgetType === 'workload-widget') {
                   console.log("⚙️ Running calculation widget init JS...");
-                  fetchAndRenderPieChart(orgId);
+                  fetchAndRenderUnifiedPieChart(orgId);
                 }
                 
                 
