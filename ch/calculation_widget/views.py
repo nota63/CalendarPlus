@@ -16,6 +16,12 @@ def get_sum_calculation(request, org_id):
         return JsonResponse({'error': 'Unauthorized'}, status=401)
 
     user = request.user
+    # check access 
+    try:
+        profile = Profile.objects.only("id").get(user=user, organization_id=org_id)
+    except Profile.DoesNotExist:
+        return JsonResponse({'error': 'Unauthorized access'}, status=400)
+
 
     # Fetch all at once if possible
     total_tasks = Task.objects.filter(assigned_to=user, organization_id=org_id).count()
@@ -39,6 +45,14 @@ def get_task_analytics(request, org_id):
     user = request.user
     today = now().date()
     end_of_week = today + timedelta(days=7)
+
+    # check access 
+    try:
+        profile = Profile.objects.only("id").get(user=user, organization_id=org_id)
+    except Profile.DoesNotExist:
+        return JsonResponse({'error': 'Unauthorized access'}, status=400)
+
+
 
     tasks = Task.objects.filter(organization_id=org_id, assigned_to=user)
 
