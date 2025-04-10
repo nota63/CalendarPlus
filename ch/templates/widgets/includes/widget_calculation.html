@@ -1,28 +1,70 @@
-
-
-
-<div id="calculation-widget" class="relative rounded-xl border p-4 shadow bg-white">
+<div id="calculation-widget" class="group relative rounded-2xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow duration-200">
     <!-- Fullscreen Icon -->
-    <button onclick="openFullScreenWidget('calculation-widget')" class="absolute top-2 right-2 text-gray-500 hover:text-indigo-600">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M4 4h6M4 4v6M20 20h-6M20 20v-6M4 20h6M4 20v-6M20 4h-6M20 4v6" />
-      </svg>
+    <button onclick="openFullScreenWidget('calculation-widget')" class="absolute top-3 right-3 p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 group-hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+        </svg>
     </button>
-  
-    <h3 class="text-lg font-semibold mb-3 text-indigo-600">📊 Your Stats Summary</h3>
-    <ul class="space-y-1 text-sm">
-      <li>✅ Total Tasks: <span id="total-tasks-count" class="font-medium text-gray-800">--</span></li>
-      <li>📅 Total Meetings: <span id="total-meetings-count" class="font-medium text-gray-800">--</span></li>
-      <li>🎉 Total Events: <span id="total-events-count" class="font-medium text-gray-800">--</span></li>
-      <li>📌 Total Bookings: <span id="total-bookings-count" class="font-medium text-gray-800">--</span></li>
-    </ul>
-    <button onclick="fetchAndRenderTaskAnalytics(window.djangoData.orgId)" class="text-sm mt-3 px-3 py-1.5 bg-rose-600 text-white rounded hover:bg-rose-700 transition">
-        📌 Load Task Analytics
+
+    <div class="flex items-center gap-2 mb-4">
+        <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+        </svg>
+        <h3 class="text-lg font-semibold text-gray-800">Activity Summary</h3>
+    </div>
+
+    <div class="space-y-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3 text-gray-600">
+                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <span>Tasks</span>
+            </div>
+            <span id="total-tasks-count" class="font-medium text-gray-800">--</span>
+        </div>
+
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3 text-gray-600">
+                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <span>Meetings</span>
+            </div>
+            <span id="total-meetings-count" class="font-medium text-gray-800">--</span>
+        </div>
+
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3 text-gray-600">
+                <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>Events</span>
+            </div>
+            <span id="total-events-count" class="font-medium text-gray-800">--</span>
+        </div>
+
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3 text-gray-600">
+                <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                <span>Bookings</span>
+            </div>
+            <span id="total-bookings-count" class="font-medium text-gray-800">--</span>
+        </div>
+    </div>
+
+    <button onclick="fetchAndRenderTaskAnalytics(window.djangoData.orgId)" 
+            class="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+        Generate Analytics Report
     </button>
-      
-  </div>
-  
+</div>
+
+
 <script type="text/javascript">
     // Inject Django variables into the window object
     window.djangoData = {
