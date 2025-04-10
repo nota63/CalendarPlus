@@ -43,42 +43,184 @@ function openFullScreenWidget(widgetId) {
   }
   
 
+
+// Fetch Tasks Analytics
 // Fetch Tasks Analytics
 function fetchAndRenderTaskAnalytics(orgId) {
-    console.log("📡 Fetching task analytics for org:", orgId);
-  
-    // Show the modal first
-    const taskModal = new bootstrap.Modal(document.getElementById("taskAnalyticsModal"));
-    taskModal.show();
-  
-    // Inject temporary loading state
-    document.getElementById("task-analytics-modal-body").innerHTML = `<p class="text-muted">⏳ Loading task stats...</p>`;
-  
-    fetch(`/calculation/get-task-analytics/${orgId}/`)
-      .then((response) => {
-        if (!response.ok) throw new Error("Network response not ok");
-        return response.json();
-      })
-      .then((data) => {
-        console.log("📦 Task Analytics Fetched:", data);
-        const html = `
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item">✔️ <strong>Completed Tasks:</strong> ${data.completed_tasks}</li>
-            <li class="list-group-item">⌛ <strong>Pending Tasks:</strong> ${data.pending_tasks}</li>
-            <li class="list-group-item">🚧 <strong>In Progress:</strong> ${data.in_progress_tasks}</li>
-            <li class="list-group-item">🔥 <strong>Overdue Tasks:</strong> ${data.overdue_tasks}</li>
-            <li class="list-group-item">🚨 <strong>Urgent Tasks:</strong> ${data.urgent_tasks}</li>
-            <li class="list-group-item">📅 <strong>Due Today:</strong> ${data.tasks_due_today}</li>
-            <li class="list-group-item">📆 <strong>Due This Week:</strong> ${data.tasks_due_this_week}</li>
-            <li class="list-group-item">📈 <strong>Completion Rate:</strong> ${data.completion_rate}%</li>
-            <li class="list-group-item">📊 <strong>Average Progress:</strong> ${data.average_progress}%</li>
-          </ul>
-        `;
-        document.getElementById("task-analytics-modal-body").innerHTML = html;
-      })
-      .catch((error) => {
-        console.error("❌ Task Analytics Fetch Failed:", error);
-        document.getElementById("task-analytics-modal-body").innerHTML = `<div class="alert alert-danger">Could not load task analytics. Please try again later.</div>`;
-      });
-  }
-  
+  console.log("📡 Fetching task analytics for org:", orgId);
+
+  // Show the modal first
+  const taskModal = new bootstrap.Modal(document.getElementById("taskAnalyticsModal"));
+  taskModal.show();
+
+  // Inject temporary loading state
+  document.getElementById("task-analytics-modal-body").innerHTML = `
+    <div class="flex justify-center items-center p-8">
+      <div class="text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mx-auto mb-4"></div>
+        <p class="text-gray-500 font-medium">Loading task analytics...</p>
+      </div>
+    </div>
+  `;
+
+  fetch(`/calculation/get-task-analytics/${orgId}/`)
+    .then((response) => {
+      if (!response.ok) throw new Error("Network response not ok");
+      return response.json();
+    })
+    .then((data) => {
+      console.log("📦 Task Analytics Fetched:", data);
+      
+      const html = `
+        <div class="bg-gray-50 rounded-lg shadow-sm p-4">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">Task Overview</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <!-- Key Metrics Cards -->
+            <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-green-500">
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="text-sm font-medium text-gray-500">Completion Rate</p>
+                  <p class="text-2xl font-bold text-gray-800">${data.completion_rate}%</p>
+                </div>
+                <div class="bg-green-100 p-3 rounded-full">
+                  <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-blue-500">
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="text-sm font-medium text-gray-500">Average Progress</p>
+                  <p class="text-2xl font-bold text-gray-800">${data.average_progress}%</p>
+                </div>
+                <div class="bg-blue-100 p-3 rounded-full">
+                  <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white rounded-lg shadow-sm p-5 mb-6">
+            <h4 class="text-md font-medium text-gray-700 mb-4">Task Status Distribution</h4>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div class="text-center">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 mb-2">
+                  <span class="text-green-600 text-lg">✓</span>
+                </div>
+                <h5 class="text-2xl font-semibold text-gray-800">${data.completed_tasks}</h5>
+                <p class="text-xs text-gray-500 font-medium">Completed</p>
+              </div>
+
+               <div class="text-center">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-100 mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                </div>
+
+                <h5 class="text-2xl font-semibold text-gray-800">${data.total_tasks}</h5>
+                <p class="text-xs text-gray-500 font-medium">Total Tasks</p>
+              </div>
+              
+              <div class="text-center">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-yellow-100 mb-2">
+                  <span class="text-yellow-600 text-lg">⌛</span>
+                </div>
+                <h5 class="text-2xl font-semibold text-gray-800">${data.pending_tasks}</h5>
+                <p class="text-xs text-gray-500 font-medium">Pending</p>
+              </div>
+              
+              <div class="text-center">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 mb-2">
+                  <span class="text-blue-600 text-lg">🚧</span>
+                </div>
+                <h5 class="text-2xl font-semibold text-gray-800">${data.in_progress_tasks}</h5>
+                <p class="text-xs text-gray-500 font-medium">In Progress</p>
+              </div>
+              
+              <div class="text-center">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mb-2">
+                  <span class="text-red-600 text-lg">🔥</span>
+                </div>
+                <h5 class="text-2xl font-semibold text-gray-800">${data.overdue_tasks}</h5>
+                <p class="text-xs text-gray-500 font-medium">Overdue</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white rounded-lg shadow-sm mb-2">
+            <div class="p-4 border-b border-gray-100">
+              <h4 class="text-md font-medium text-gray-700">Timeline Overview</h4>
+            </div>
+            
+            <div class="p-4">
+              <div class="flex items-center py-2 border-b border-gray-100">
+                <div class="bg-red-100 p-2 rounded-md mr-3">
+                  <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <div class="flex-grow">
+                  <span class="text-gray-600 font-medium">Urgent Tasks</span>
+                </div>
+                <div class="text-xl font-bold text-gray-800">${data.urgent_tasks}</div>
+              </div>
+              
+              <div class="flex items-center py-2 border-b border-gray-100">
+                <div class="bg-amber-100 p-2 rounded-md mr-3">
+                  <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                </div>
+                <div class="flex-grow">
+                  <span class="text-gray-600 font-medium">Due Today</span>
+                </div>
+                <div class="text-xl font-bold text-gray-800">${data.tasks_due_today}</div>
+              </div>
+              
+              <div class="flex items-center py-2">
+                <div class="bg-indigo-100 p-2 rounded-md mr-3">
+                  <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                  </svg>
+                </div>
+                <div class="flex-grow">
+                  <span class="text-gray-600 font-medium">Due This Week</span>
+                </div>
+                <div class="text-xl font-bold text-gray-800">${data.tasks_due_this_week}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById("task-analytics-modal-body").innerHTML = html;
+    })
+    .catch((error) => {
+      console.error("❌ Task Analytics Fetch Failed:", error);
+      document.getElementById("task-analytics-modal-body").innerHTML = `
+        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">Error Loading Analytics</h3>
+              <div class="mt-2 text-sm text-red-700">
+                <p>Could not load task analytics. Please try again later.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+}
