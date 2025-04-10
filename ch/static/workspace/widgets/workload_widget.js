@@ -292,3 +292,56 @@ function fetchAndRenderUnifiedPieChart(orgId) {
       document.head.appendChild(tailwindScript);
     }
   });
+
+
+
+
+//Refresh widget for each widget
+function refreshWidgetById(widgetId) {
+    const widgetEl = document.getElementById(widgetId);
+    if (!widgetEl) return console.warn(`🔍 Widget "${widgetId}" not found.`);
+  
+    let urlTemplate = widgetEl.dataset.refreshUrl;
+    if (!urlTemplate) return console.warn(`❌ No URL provided for "${widgetId}"`);
+  
+    // Replace all placeholders in the URL dynamically
+    urlTemplate = urlTemplate.replace(/{(\w+)}/g, (_, key) => {
+      return widgetEl.dataset[key] || `{${key}}`;
+    });
+  
+    // Optional loading placeholder
+    widgetEl.innerHTML = '<div class="text-center py-4">Refreshing...</div>';
+  
+    fetch(urlTemplate)
+      .then(res => {
+        if (!res.ok) throw new Error("Fetch failed");
+        return res.text();
+      })
+      .then(html => {
+        widgetEl.innerHTML = html;
+        console.log(`✅ Refreshed ${widgetId}`);
+      })
+      .catch(err => {
+        console.error(`❌ Failed to refresh "${widgetId}":`, err);
+        widgetEl.innerHTML = '<div class="text-red-500 text-center py-4">Failed to refresh 💔</div>';
+      });
+  }
+  
+
+// Take screenshot of the widget
+function takeScreenshot(widgetId) {
+    const widget = document.getElementById(widgetId);
+
+    html2canvas(widget, {
+        backgroundColor: null,  // Keeps transparency if needed
+        scale: 2,               // Higher scale = better quality
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `${widgetId}-screenshot.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }).catch(err => {
+        console.error("Screenshot failed:", err);
+        alert("Oops! Couldn't take a screenshot.");
+    });
+}
