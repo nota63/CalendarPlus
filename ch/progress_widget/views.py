@@ -2,13 +2,17 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from group_tasks.models import Task, SubTask
 from django.shortcuts import redirect, get_object_or_404
-from accounts.models import Organization
+from accounts.models import Organization, Profile
 from django.utils.timezone import now
 
 # Fetch tasks progress along with group names
 @login_required
 def user_task_progress_widget(request, org_id):
     user = request.user
+
+    # check access
+    if not Profile.objects.filter(user_id=user.id, organization_id=org_id).exists():
+        return JsonResponse({'error': 'Access denied'}, status=403)
 
     tasks = Task.objects.filter(
         organization_id=org_id,
@@ -30,6 +34,10 @@ def user_task_progress_widget(request, org_id):
 def get_task_progress_details(request, org_id, task_id):
     org = get_object_or_404(Organization, id=org_id)
     task = get_object_or_404(Task, id=task_id, organization=org)
+
+    if not Profile.objects.filter(user_id=request.user.id, organization_id=org_id).exists():
+      return JsonResponse({'error': 'Access denied'}, status=403)
+
 
     created_by = task.created_by.get_full_name() or task.created_by.username
     deadline = task.deadline
