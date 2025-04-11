@@ -1220,10 +1220,16 @@ document.addEventListener('DOMContentLoaded', function () {
               });
 
             // ✨ Close modal
+            // ✨ Close modal and cleanup backdrop/blur
             if (bootstrap && modalEl) {
               const modal = bootstrap.Modal.getInstance(modalEl);
               modal?.hide();
+
+              // ⛑️ Fix: Remove leftover modal-backdrop and blur class
+              document.body.classList.remove('modal-open');
+              document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
             }
+
           } else if (data.error) {
             alert('❌ Error: ' + data.error);
             console.error("❌ Backend error:", data.error);
