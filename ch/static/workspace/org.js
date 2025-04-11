@@ -1119,6 +1119,10 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log("⚙️ Running due soon tasks widget init JS...");
         fetchAndRenderDueSoonTasks(orgId);
         break;
+      //bookmarks widget
+      case 'bookmarks-widget':
+        fetchAndRenderBookmarks(orgId);
+        break;
       default:
         console.warn("❓ No init logic defined for widget type:", widgetType);
     }
@@ -1144,6 +1148,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '#progress-widget': 'progress-widget',
           '#overdue-tasks-widget': 'overdue-tasks-widget',
           '#due-soon-tasks-widget': 'due-soon-tasks-widget',
+          '#bookmarks-widget': 'bookmarks-widget',
         };
 
         Object.entries(widgetMap).forEach(([selector, widgetType]) => {
@@ -1158,9 +1163,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
   }
 
-// ➕ Handle "Add Widget" button click
 
-// ➕ Handle "Add Widget" button click
 // ➕ Handle "Add Widget" button click
 widgetButtons.forEach(btn => {
   btn.addEventListener('click', function () {
