@@ -1158,70 +1158,73 @@ document.addEventListener('DOMContentLoaded', function () {
       });
   }
 
-  // ➕ Handle "Add Widget" button click
-  widgetButtons.forEach(btn => {
-    btn.addEventListener('click', function () {
-      const widgetType = this.getAttribute('data-widget');
-      const csrfToken = getCSRFToken();
+// ➕ Handle "Add Widget" button click
 
-      console.log("👉 Saving widget:", widgetType);
-      console.log("📡 Sending to org_id:", orgId);
+// ➕ Handle "Add Widget" button click
+// ➕ Handle "Add Widget" button click
+widgetButtons.forEach(btn => {
+  btn.addEventListener('click', function () {
+    const widgetType = this.getAttribute('data-widget');
+    const csrfToken = getCSRFToken();
 
-      fetch('/dashboard/save-widget/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken,
-        },
-        body: JSON.stringify({
-          widget_type: widgetType,
-          org_id: orgId
-        })
+    console.log("👉 Saving widget:", widgetType);
+    console.log("📡 Sending to org_id:", orgId);
+
+    fetch('/dashboard/save-widget/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+      },
+      body: JSON.stringify({
+        widget_type: widgetType,
+        org_id: orgId
       })
-        .then(response => {
-          console.log("✅ Response status:", response.status);
-          return response.json();
-        })
-        .then(data => {
-          console.log("📦 Response data:", data);
-          if (data.message) {
-            alert(data.message);
+    })
+      .then(response => {
+        console.log("✅ Response status:", response.status);
+        return response.json();
+      })
+      .then(data => {
+        console.log("📦 Response data:", data);
+        if (data.message) {
+          alert(data.message);
 
-            // 👇 Fetch and render the widget immediately after saving
-            fetch(`/dashboard/widget-snippet/?widget_type=${widgetType}&org_id=${orgId}`)
-              .then(res => res.text())
-              .then(html => {
-                widgetsContainer.insertAdjacentHTML('beforeend', html);
-                console.log("🧩 Widget rendered successfully:", widgetType);
+          // 👇 Fetch and render the widget immediately after saving
+          fetch(`/dashboard/widget-snippet/?widget_type=${widgetType}&org_id=${orgId}`)
+            .then(res => res.text())
+            .then(html => {
+              widgetsContainer.insertAdjacentHTML('beforeend', html);
+              console.log("🧩 Widget rendered successfully:", widgetType);
 
-                // ✅ Initialize it dynamically now
-                initializeWidget(widgetType);
-              })
-              .catch(err => {
-                console.error("❌ Failed to render widget snippet:", err);
-              });
+              // ✅ Initialize it dynamically now
+              initializeWidget(widgetType);
+            })
+            .catch(err => {
+              console.error("❌ Failed to render widget snippet:", err);
+            });
 
-            // ✨ Close modal and cleanup backdrop/blur
-            if (bootstrap && modalEl) {
-              const modal = bootstrap.Modal.getInstance(modalEl);
-              modal?.hide();
+          // ✨ Close modal and cleanup backdrop/blur
+          if (bootstrap && modalEl) {
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            modal?.hide();
 
-              // ⛑️ Fix: Remove leftover modal-backdrop and blur class
-              document.body.classList.remove('modal-open');
-              document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-            }
-
-          } else if (data.error) {
-            alert('❌ Error: ' + data.error);
-            console.error("❌ Backend error:", data.error);
+            // ⛑️ Fix: Remove leftover modal-backdrop and blur class
+            document.body.classList.remove('modal-open');
+            document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
           }
-        })
-        .catch(error => {
-          console.error('💥 Request failed:', error);
-          alert('Something went wrong while saving the widget.');
-        });
-    });
-  });
 
-  loadAllWidgetsOnPageLoad();  // 🔁 Initial call
+        } else if (data.error) {
+          alert('❌ Error: ' + data.error);
+          console.error("❌ Backend error:", data.error);
+        }
+      })
+      .catch(error => {
+        console.error('💥 Request failed:', error);
+        alert('Something went wrong while saving the widget.');
+      });
+  });
+});
+
+loadAllWidgetsOnPageLoad();  // 🔁 Initial call
 });

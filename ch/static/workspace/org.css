@@ -2394,3 +2394,21 @@ a {
   margin-left: 0 !important;
   margin-right: auto !important;
 }
+
+
+/* display add widget btn on hover */
+/* Hide button by default and prepare for animation */
+.widget-card .add-widget-btn {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none; /* Prevent accidental click when hidden */
+  }
+  
+  /* Fade and slide in on hover */
+  .widget-card:hover .add-widget-btn {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  
