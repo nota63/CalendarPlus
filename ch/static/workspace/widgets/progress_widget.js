@@ -458,3 +458,48 @@ function fetchAndRenderOverdueTasks(orgId) {
       `;
     });
 }
+
+
+
+// Widget 3) Due Soon Tasks in next 14 days ---------------------------------------------------------------------------------------------------------
+function fetchAndRenderDueSoonTasks(orgId) {
+  const widget = document.getElementById('due-soon-tasks-widget');
+  if (!widget) return;
+
+  const container = widget.querySelector(".due-soon-task-container");
+  container.innerHTML = "<p class='text-sm text-gray-400'>Loading tasks...</p>";
+
+  fetch(`/progress/get-due-soon-tasks/${orgId}/`)
+    .then(response => response.json())
+    .then(data => {
+      container.innerHTML = "";
+
+      if (!data.due_soon_tasks || data.due_soon_tasks.length === 0) {
+        container.innerHTML = "<p class='text-sm text-gray-400'>No tasks due in the next 14 days 🎉</p>";
+        return;
+      }
+
+      data.due_soon_tasks.forEach(task => {
+        const taskDiv = document.createElement("div");
+        taskDiv.className = "mb-3 p-3 rounded-lg bg-yellow-50 border border-yellow-200 group relative";
+
+        taskDiv.innerHTML = `
+          <div class="text-sm font-medium text-gray-800">${task.title}</div>
+          <div class="text-xs text-gray-500 mt-0.5">Group: ${task.group__name}</div>
+          <div class="text-xs text-yellow-700 mt-0.5">Deadline: ${new Date(task.deadline).toLocaleString()}</div>
+          <a href="http://127.0.0.1:8000/tasks/task_detail/${orgId}/${task.group_id}/${task.id}/"
+             class="hidden group-hover:inline-block text-xs mt-1 text-blue-600 hover:underline transition"
+             style="position: absolute; top: 10px; right: 12px;">Check</a>
+        `;
+
+        container.appendChild(taskDiv);
+      });
+    })
+    .catch(error => {
+      console.error("Error fetching due soon tasks:", error);
+      container.innerHTML = "<p class='text-sm text-red-500'>Failed to load tasks.</p>";
+    });
+}
+
+
+

@@ -4,6 +4,8 @@ from group_tasks.models import Task, SubTask
 from django.shortcuts import redirect, get_object_or_404
 from accounts.models import Organization, Profile
 from django.utils.timezone import now
+from datetime import timedelta
+
 
 # Fetch tasks progress along with group names
 @login_required
@@ -79,3 +81,29 @@ def get_overdue_tasks(request, org_id):
     ).order_by('deadline')
 
     return JsonResponse({'overdue_tasks': list(overdue_tasks)})
+
+
+# Widget 3) Tasks Due Soon in 14 days -----------------------------------------------------------------------------------------------
+@login_required
+def get_due_soon_tasks(request, org_id):
+    user = request.user
+
+    # Check access via Profile
+    if not Profile.objects.filter(user=user, organization_id=org_id).exists():
+        return JsonResponse({'error': 'Access denied.'}, status=403)
+
+    # Fetch tasks due in next 14 days, not completed or cancelled
+    today = now().date()
+    two_weeks_later = today + timedelta(days=14)
+
+    due_soon_tasks = Task.objects.select_related('group').filter(
+        organization_id=org_id,
+        assigned_to=user,
+        deadline__date__gte=today,
+        deadline__date__lte=two_weeks_later,
+        status__in=['pending', 'in_progress', 'overdue', 'pending_approval', 'need_changes']
+    ).values(
+        'id', 'title', 'deadline', 'group__name', 'group_id'
+    ).order_by('deadline')
+
+    return JsonResponse({'due_soon_tasks': list(due_soon_tasks)})

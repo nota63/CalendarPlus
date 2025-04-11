@@ -1131,6 +1131,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (widgetsContainer.querySelector('#overdue-tasks-widget')) {
           fetchAndRenderOverdueTasks(orgId);
         }
+        // due soon tasks widget
+        if (widgetsContainer.querySelector('#due-soon-tasks-widget')) {
+          fetchAndRenderDueSoonTasks(orgId);
+        }
 
       })
       .catch(error => {
@@ -1201,6 +1205,12 @@ document.addEventListener('DOMContentLoaded', function () {
                   console.log("⚙️ Running overdue tasks widget init JS...");
                   fetchAndRenderOverdueTasks(orgId);
                 }
+                // due soon tasks widget
+                if (widgetType === 'due-soon-tasks-widget') {
+                  console.log("⚙️ Running due soon tasks widget init JS...");
+                  fetchAndRenderDueSoonTasks(orgId);
+                }
+                
                 
                 
                 
