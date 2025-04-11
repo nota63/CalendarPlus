@@ -1092,6 +1092,38 @@ document.addEventListener('DOMContentLoaded', function () {
     return cookieValue || '{{ csrf_token }}';  // fallback for safety
   }
 
+  // ✨ Centralized initializer
+  function initializeWidget(widgetType) {
+    switch (widgetType) {
+      case 'group-widget':
+        console.log("⚙️ Running group widget init JS...");
+        fetchAndRenderUserGroups(orgId);
+        break;
+      case 'calculation-widget':
+        console.log("⚙️ Running calculation widget init JS...");
+        fetchAndRenderCalculationWidget(orgId);
+        break;
+      case 'workload-widget':
+        console.log("⚙️ Running workload widget init JS...");
+        fetchAndRenderUnifiedPieChart(orgId);
+        break;
+      case 'progress-widget':
+        console.log("⚙️ Running progress widget init JS...");
+        fetchAndRenderProgress(orgId);
+        break;
+      case 'overdue-tasks-widget':
+        console.log("⚙️ Running overdue tasks widget init JS...");
+        fetchAndRenderOverdueTasks(orgId);
+        break;
+      case 'due-soon-tasks-widget':
+        console.log("⚙️ Running due soon tasks widget init JS...");
+        fetchAndRenderDueSoonTasks(orgId);
+        break;
+      default:
+        console.warn("❓ No init logic defined for widget type:", widgetType);
+    }
+  }
+
   // 🔁 Load all widgets on initial page load
   function loadAllWidgetsOnPageLoad() {
     console.log("🌐 Loading saved widgets...");
@@ -1104,38 +1136,22 @@ document.addEventListener('DOMContentLoaded', function () {
         widgetsContainer.innerHTML = html;
         console.log("✅ All widgets rendered.");
 
-        // 🧠 Run specific widget initializers after loading (group list)
-        if (widgetsContainer.querySelector('#group-list')) {
-          console.log("🔍 Detected #group-list — initializing group widget...");
-          fetchAndRenderUserGroups(orgId);
-        }
+        // 🧠 Initialize widgets by detecting their presence
+        const widgetMap = {
+          '#group-list': 'group-widget',
+          '#calculation-widget': 'calculation-widget',
+          '#workload-chart-widget': 'workload-widget',
+          '#progress-widget': 'progress-widget',
+          '#overdue-tasks-widget': 'overdue-tasks-widget',
+          '#due-soon-tasks-widget': 'due-soon-tasks-widget',
+        };
 
-        // 🧠 Run specific widget initializers after loading (calculation widget)
-        if (widgetsContainer.querySelector('#calculation-widget')) {
-          console.log("🔍 Detected #calculation widget — initializing calculation widget...");
-          fetchAndRenderCalculationWidget(orgId);
-        }
-
-        // workload status
-        if (widgetsContainer.querySelector('#workload-chart-widget')) {
-          console.log("🔍 Detected #workload widget — initializing workload widget...");
-          fetchAndRenderUnifiedPieChart(orgId);
-        }
-
-        //progress widget  
-        if (widgetsContainer.querySelector('#progress-widget')) {
-          console.log("🔍 Detected #progress widget — initializing progress widget...");
-          fetchAndRenderProgress(orgId);
-        }
-        // overdue tasks widget
-        if (widgetsContainer.querySelector('#overdue-tasks-widget')) {
-          fetchAndRenderOverdueTasks(orgId);
-        }
-        // due soon tasks widget
-        if (widgetsContainer.querySelector('#due-soon-tasks-widget')) {
-          fetchAndRenderDueSoonTasks(orgId);
-        }
-
+        Object.entries(widgetMap).forEach(([selector, widgetType]) => {
+          if (widgetsContainer.querySelector(selector)) {
+            console.log(`🔍 Detected ${selector} — initializing ${widgetType}...`);
+            initializeWidget(widgetType);
+          }
+        });
       })
       .catch(error => {
         console.error("💥 Error loading widgets:", error);
@@ -1178,48 +1194,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 widgetsContainer.insertAdjacentHTML('beforeend', html);
                 console.log("🧩 Widget rendered successfully:", widgetType);
 
-                // ⚙️ Run specific widget logic after rendering
-                if (widgetType === 'group-widget') {
-                  console.log("⚙️ Running group widget init JS...");
-                  fetchAndRenderUserGroups(orgId);
-                }
-
-                // calculation widget
-                if (widgetType === 'calculation-widget') {
-                  console.log("⚙️ Running calculation widget init JS...");
-                  fetchAndRenderCalculationWidget(orgId);
-                }
-                // workload widget
-                 if (widgetType === 'workload-widget') {
-                  console.log("⚙️ Running calculation widget init JS...");
-                  fetchAndRenderUnifiedPieChart(orgId);
-                }
-
-                // progress widget
-                if (widgetType === 'progress-widget') {
-                  console.log("⚙️ Running progress widget init JS...");
-                  fetchAndRenderProgress(orgId);
-                }
-                // overdue tasks widget
-                if (widgetType === 'overdue-tasks-widget') {
-                  console.log("⚙️ Running overdue tasks widget init JS...");
-                  fetchAndRenderOverdueTasks(orgId);
-                }
-                // due soon tasks widget
-                if (widgetType === 'due-soon-tasks-widget') {
-                  console.log("⚙️ Running due soon tasks widget init JS...");
-                  fetchAndRenderDueSoonTasks(orgId);
-                }
-                
-                
-                
-                
+                // ✅ Initialize it dynamically now
+                initializeWidget(widgetType);
               })
               .catch(err => {
                 console.error("❌ Failed to render widget snippet:", err);
               });
 
-            // ✨ Close modal
             // ✨ Close modal and cleanup backdrop/blur
             if (bootstrap && modalEl) {
               const modal = bootstrap.Modal.getInstance(modalEl);
@@ -1244,4 +1225,3 @@ document.addEventListener('DOMContentLoaded', function () {
 
   loadAllWidgetsOnPageLoad();  // 🔁 Initial call
 });
-
