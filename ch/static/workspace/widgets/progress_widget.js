@@ -11,7 +11,7 @@ function fetchAndRenderProgress(orgId) {
       header = document.createElement('div');
       header.className = 'progress-header flex justify-between items-center mb-4 pb-3 border-b border-gray-200';
       header.innerHTML = `
-        <h3 class="text-base font-semibold text-indigo-700">Task Progress</h3>
+        <h3 class="text-base font-semibold text-indigo-700">Tasks Portfolio Accross All Groups</h3>
         <span class="text-xs font-medium text-indigo-600 bg-indigo-50 px-2 py-1 rounded-full">Active</span>
       `;
       widget.prepend(header);
