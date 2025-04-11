@@ -75,7 +75,7 @@ def get_overdue_tasks(request, org_id):
         deadline__lt=now(),
         status__in=['pending', 'in_progress', 'pending_approval', 'need_changes']
     ).values(
-        'id', 'title', 'deadline', 'group__name', 'status'
+        'id', 'title', 'deadline', 'group__name','group__id','status'
     ).order_by('deadline')
 
     return JsonResponse({'overdue_tasks': list(overdue_tasks)})

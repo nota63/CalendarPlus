@@ -232,7 +232,6 @@ function fetchAndRenderProgress(orgId) {
 
 
 // Widget 2 -------------------------------------Overdue tasks ---------------------------------------------------------------
-
 function fetchAndRenderOverdueTasks(orgId) {
   const widget = document.getElementById('overdue-tasks-widget');
   if (!widget) return;
@@ -249,13 +248,23 @@ function fetchAndRenderOverdueTasks(orgId) {
       }
 
       data.overdue_tasks.forEach(task => {
+        const checkUrl = `http://127.0.0.1:8000/tasks/task_detail/${orgId}/${task.group__id}/${task.id}/`;
+
         const taskDiv = document.createElement("div");
-        taskDiv.className = "mb-3 p-3 rounded-lg bg-red-50 border border-red-200";
+        taskDiv.className = `
+          relative mb-3 rounded-lg border border-red-100 bg-red-50 p-3 
+          hover:shadow-sm group transition-shadow
+        `;
 
         taskDiv.innerHTML = `
           <div class="text-sm font-medium text-gray-700">${task.title}</div>
           <div class="text-xs text-gray-500 mt-0.5">Group: ${task.group__name}</div>
-          <div class="text-xs text-red-600 mt-0.5">Deadline: ${task.deadline}</div>
+          <div class="text-xs text-red-600 mt-0.5">Deadline: ${new Date(task.deadline).toLocaleString()}</div>
+
+          <a href="${checkUrl}"
+            class="absolute top-2 right-2 hidden group-hover:inline-block text-xs px-2 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700 transition">
+            Check
+          </a>
         `;
 
         container.appendChild(taskDiv);
@@ -265,5 +274,3 @@ function fetchAndRenderOverdueTasks(orgId) {
       console.error("Error fetching overdue tasks:", error);
     });
 }
-
-  
