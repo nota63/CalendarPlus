@@ -235,42 +235,226 @@ function fetchAndRenderProgress(orgId) {
 function fetchAndRenderOverdueTasks(orgId) {
   const widget = document.getElementById('overdue-tasks-widget');
   if (!widget) return;
+  
+  // Add ClickUp-inspired styling to the container
+  widget.classList.add('bg-white', 'rounded-lg', 'shadow-md', 'border', 'border-gray-200', 'p-4');
+  
+  // Create header if it doesn't exist
+  let header = widget.querySelector('.overdue-header');
+  if (!header) {
+    header = document.createElement('div');
+    header.className = 'overdue-header flex justify-between items-center mb-4 pb-3 border-b border-gray-200';
+    header.innerHTML = `
+      <div class="flex items-center">
+        <svg class="w-4 h-4 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <h3 class="text-base font-semibold text-red-700">Overdue Tasks</h3>
+      </div>
+      <span class="text-xs font-medium text-red-600 bg-red-50 px-2 py-1 rounded-full flex items-center">
+        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        Attention Required
+      </span>
+    `;
+    widget.prepend(header);
+  }
+  
+  // Ensure the task container has max height and scrolling
+  let container = widget.querySelector(".overdue-task-container");
+  if (!container) {
+    container = document.createElement('div');
+    container.className = "overdue-task-container";
+    widget.appendChild(container);
+  }
+  container.classList.add('max-h-80', 'overflow-y-auto', 'pr-1', 'scrollbar-thin', 'scrollbar-thumb-gray-300', 'scrollbar-track-gray-100');
+  
+  // Add custom scrollbar styling if not already added
+  if (!document.getElementById('scrollbar-style')) {
+    const style = document.createElement('style');
+    style.id = 'scrollbar-style';
+    style.textContent = `
+      .scrollbar-thin::-webkit-scrollbar {
+        width: 6px;
+      }
+      .scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
+        background-color: #d1d5db;
+        border-radius: 3px;
+      }
+      .scrollbar-track-gray-100::-webkit-scrollbar-track {
+        background-color: #f3f4f6;
+      }
+      .card-appear {
+        animation: cardAppear 0.3s ease-out forwards;
+      }
+      @keyframes cardAppear {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .overdue-pulse {
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2); }
+        70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  // Show loading state
+  container.innerHTML = `
+    <div class="flex justify-center items-center py-6">
+      <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-red-500"></div>
+      <span class="ml-3 text-sm text-gray-500">Loading overdue tasks...</span>
+    </div>
+  `;
 
   fetch(`/progress/get-overdue-tasks/${orgId}/`)
     .then(response => response.json())
     .then(data => {
-      const container = widget.querySelector(".overdue-task-container");
       container.innerHTML = "";
-
+      
       if (!data.overdue_tasks || data.overdue_tasks.length === 0) {
-        container.innerHTML = "<p class='text-sm text-gray-400'>No overdue tasks 🎉</p>";
+        container.innerHTML = `
+          <div class="flex flex-col items-center justify-center py-8 text-center">
+            <div class="bg-green-100 rounded-full p-3 mb-3">
+              <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <p class='text-sm font-medium text-gray-700'>No overdue tasks 🎉</p>
+            <p class='text-xs text-gray-400 mt-1'>You're all caught up!</p>
+          </div>
+        `;
         return;
       }
-
-      data.overdue_tasks.forEach(task => {
+      
+      // Update header count
+      const countBadge = widget.querySelector('.overdue-count');
+      if (!countBadge) {
+        const headerTitle = widget.querySelector('.overdue-header h3');
+        if (headerTitle) {
+          const badge = document.createElement('span');
+          badge.className = 'overdue-count ml-2 bg-red-100 text-red-700 text-xs font-medium px-2 py-0.5 rounded-full';
+          badge.textContent = data.overdue_tasks.length;
+          headerTitle.appendChild(badge);
+        }
+      } else {
+        countBadge.textContent = data.overdue_tasks.length;
+      }
+      
+      // Sort tasks by most overdue first
+      data.overdue_tasks.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+      
+      data.overdue_tasks.forEach((task, index) => {
         const checkUrl = `http://127.0.0.1:8000/tasks/task_detail/${orgId}/${task.group__id}/${task.id}/`;
-
+        
+        // Calculate days overdue
+        const deadlineDate = new Date(task.deadline);
+        const today = new Date();
+        const daysOverdue = Math.floor((today - deadlineDate) / (1000 * 60 * 60 * 24));
+        
         const taskDiv = document.createElement("div");
         taskDiv.className = `
-          relative mb-3 rounded-lg border border-red-100 bg-red-50 p-3 
-          hover:shadow-sm group transition-shadow
+          relative mb-3 rounded-lg border border-red-200 bg-red-50 p-3
+          hover:shadow-md group transition-all duration-200 card-appear
+          ${daysOverdue > 3 ? 'overdue-pulse' : ''}
         `;
-
-        taskDiv.innerHTML = `
-          <div class="text-sm font-medium text-gray-700">${task.title}</div>
-          <div class="text-xs text-gray-500 mt-0.5">Group: ${task.group__name}</div>
-          <div class="text-xs text-red-600 mt-0.5">Deadline: ${new Date(task.deadline).toLocaleString()}</div>
-
-          <a href="${checkUrl}"
-            class="absolute top-2 right-2 hidden group-hover:inline-block text-xs px-2 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700 transition">
-            Check
-          </a>
+        
+        // Set animation delay for staggered appearance
+        taskDiv.style.animationDelay = `${index * 0.1}s`;
+        
+        // Left border indicator
+        const urgencyLevel = daysOverdue > 7 ? 'bg-red-600' : daysOverdue > 3 ? 'bg-red-500' : 'bg-red-400';
+        const indicator = document.createElement('div');
+        indicator.className = `absolute top-0 left-0 w-1 h-full ${urgencyLevel} rounded-l-lg`;
+        taskDiv.appendChild(indicator);
+        
+        // Task content
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'pl-3';
+        
+        const formattedDate = new Intl.DateTimeFormat('en-US', {
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true
+        }).format(deadlineDate);
+        
+        contentDiv.innerHTML = `
+          <div class="flex items-center">
+            <svg class="w-3 h-3 text-red-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div class="text-sm font-medium text-gray-800">${task.title}</div>
+          </div>
+          
+          <div class="flex items-center text-xs text-gray-500 mt-1">
+            <svg class="w-3 h-3 text-gray-400 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+            <span>${task.group__name}</span>
+          </div>
+          
+          <div class="flex justify-between items-center mt-2">
+            <div class="flex items-center text-xs font-medium ${daysOverdue > 7 ? 'text-red-600' : 'text-red-500'}">
+              <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>Due ${formattedDate} (${daysOverdue} ${daysOverdue === 1 ? 'day' : 'days'} overdue)</span>
+            </div>
+            
+            <div class="hidden group-hover:block">
+              <a href="${checkUrl}" 
+                class="inline-flex items-center text-xs px-2 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700 transition-colors duration-200">
+                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+                View
+              </a>
+            </div>
+          </div>
         `;
-
+        
+        taskDiv.appendChild(contentDiv);
         container.appendChild(taskDiv);
       });
+      
+      // Add urgency summary at the bottom
+      const criticalCount = data.overdue_tasks.filter(t => new Date() - new Date(t.deadline) > 7 * 24 * 60 * 60 * 1000).length;
+      const highCount = data.overdue_tasks.filter(t => {
+        const diff = new Date() - new Date(t.deadline);
+        return diff <= 7 * 24 * 60 * 60 * 1000 && diff > 3 * 24 * 60 * 60 * 1000;
+      }).length;
+      const normalCount = data.overdue_tasks.length - criticalCount - highCount;
+      
+      const summaryDiv = document.createElement('div');
+      summaryDiv.className = 'mt-4 pt-3 border-t border-gray-200 flex justify-between items-center text-xs text-gray-500';
+      summaryDiv.innerHTML = `
+        <div class="flex space-x-3">
+          ${criticalCount > 0 ? `<span class="inline-flex items-center"><span class="w-2 h-2 rounded-full bg-red-600 mr-1"></span> ${criticalCount} critical</span>` : ''}
+          ${highCount > 0 ? `<span class="inline-flex items-center"><span class="w-2 h-2 rounded-full bg-red-500 mr-1"></span> ${highCount} high</span>` : ''}
+          ${normalCount > 0 ? `<span class="inline-flex items-center"><span class="w-2 h-2 rounded-full bg-red-400 mr-1"></span> ${normalCount} normal</span>` : ''}
+        </div>
+        <a href="#" class="text-indigo-600 hover:text-indigo-800 font-medium">View All</a>
+      `;
+      container.appendChild(summaryDiv);
     })
     .catch(error => {
       console.error("Error fetching overdue tasks:", error);
+      container.innerHTML = `
+        <div class="text-center py-6">
+          <svg class="w-12 h-12 text-red-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <p class="text-sm font-medium text-gray-600">Error loading overdue tasks</p>
+          <p class="text-xs text-gray-500 mt-1">Please try again later</p>
+        </div>
+      `;
     });
 }
