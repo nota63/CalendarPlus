@@ -1127,6 +1127,10 @@ document.addEventListener('DOMContentLoaded', function () {
           console.log("🔍 Detected #progress widget — initializing progress widget...");
           fetchAndRenderProgress(orgId);
         }
+        // overdue tasks widget
+        if (widgetsContainer.querySelector('#overdue-tasks-widget')) {
+          fetchAndRenderOverdueTasks(orgId);
+        }
 
       })
       .catch(error => {
@@ -1191,6 +1195,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (widgetType === 'progress-widget') {
                   console.log("⚙️ Running progress widget init JS...");
                   fetchAndRenderProgress(orgId);
+                }
+                // overdue tasks widget
+                if (widgetType === 'overdue-tasks-widget') {
+                  console.log("⚙️ Running overdue tasks widget init JS...");
+                  fetchAndRenderOverdueTasks(orgId);
                 }
                 
                 

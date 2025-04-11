@@ -229,3 +229,41 @@ function fetchAndRenderProgress(orgId) {
         `;
       });
   }
+
+
+// Widget 2 -------------------------------------Overdue tasks ---------------------------------------------------------------
+
+function fetchAndRenderOverdueTasks(orgId) {
+  const widget = document.getElementById('overdue-tasks-widget');
+  if (!widget) return;
+
+  fetch(`/progress/get-overdue-tasks/${orgId}/`)
+    .then(response => response.json())
+    .then(data => {
+      const container = widget.querySelector(".overdue-task-container");
+      container.innerHTML = "";
+
+      if (!data.overdue_tasks || data.overdue_tasks.length === 0) {
+        container.innerHTML = "<p class='text-sm text-gray-400'>No overdue tasks 🎉</p>";
+        return;
+      }
+
+      data.overdue_tasks.forEach(task => {
+        const taskDiv = document.createElement("div");
+        taskDiv.className = "mb-3 p-3 rounded-lg bg-red-50 border border-red-200";
+
+        taskDiv.innerHTML = `
+          <div class="text-sm font-medium text-gray-700">${task.title}</div>
+          <div class="text-xs text-gray-500 mt-0.5">Group: ${task.group__name}</div>
+          <div class="text-xs text-red-600 mt-0.5">Deadline: ${task.deadline}</div>
+        `;
+
+        container.appendChild(taskDiv);
+      });
+    })
+    .catch(error => {
+      console.error("Error fetching overdue tasks:", error);
+    });
+}
+
+  

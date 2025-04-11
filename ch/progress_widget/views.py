@@ -56,3 +56,26 @@ def get_task_progress_details(request, org_id, task_id):
             "total": total,
         }
     })
+
+
+
+# Widget 2 ) Overdue Tasks
+@login_required
+def get_overdue_tasks(request, org_id):
+    user = request.user
+
+    # Check if user is part of the org
+    if not Profile.objects.filter(user=user, organization_id=org_id).exists():
+        return JsonResponse({'error': 'Access denied.'}, status=403)
+
+    # Fetch tasks assigned to user, past deadline, and not completed/cancelled
+    overdue_tasks = Task.objects.select_related('group').filter(
+        assigned_to=user,
+        organization_id=org_id,
+        deadline__lt=now(),
+        status__in=['pending', 'in_progress', 'pending_approval', 'need_changes']
+    ).values(
+        'id', 'title', 'deadline', 'group__name', 'status'
+    ).order_by('deadline')
+
+    return JsonResponse({'overdue_tasks': list(overdue_tasks)})

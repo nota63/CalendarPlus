@@ -15,6 +15,7 @@ class DashboardWidget(models.Model):
         ('calculation','Calculation'),
         ('workload','Workload'),
         ('progress','Progress'),
+        ('overdue_tasks','Overdue tasks'),
         # Add more widgets as you scale, my baby 💖
     ]
 
