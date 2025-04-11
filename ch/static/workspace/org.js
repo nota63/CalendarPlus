@@ -1207,4 +1207,3 @@ document.addEventListener('DOMContentLoaded', function () {
   loadAllWidgetsOnPageLoad();  // 🔁 Initial call
 });
 
-  

@@ -345,3 +345,18 @@ function takeScreenshot(widgetId) {
         alert("Oops! Couldn't take a screenshot.");
     });
 }
+
+
+// Hover 
+document.addEventListener("DOMContentLoaded", function () {
+  const widget = document.getElementById("workload-chart-widget");
+  const actions = widget.querySelector(".action-buttons");
+
+  widget.addEventListener("mouseenter", () => {
+    actions.classList.remove("opacity-0", "pointer-events-none");
+  });
+
+  widget.addEventListener("mouseleave", () => {
+    actions.classList.add("opacity-0", "pointer-events-none");
+  });
+});

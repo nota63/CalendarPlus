@@ -2,3 +2,4 @@
 {% for widget in widgets %}
   {% include "widgets/includes/widget_"|add:widget.widget_type|add:".html" with widget=widget %}
 {% endfor %}
+
