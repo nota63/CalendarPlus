@@ -14,6 +14,7 @@ class DashboardWidget(models.Model):
         ('leaderboard', 'Leaderboard'),
         ('calculation','Calculation'),
         ('workload','Workload'),
+        ('progress','Progress'),
         # Add more widgets as you scale, my baby 💖
     ]
 

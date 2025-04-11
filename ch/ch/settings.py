@@ -115,6 +115,7 @@ INSTALLED_APPS = [
     'widgets_functionality',
     'calculation_widget',
     'workload',
+    'progress_widget',
 
     #  Unfold admin configurations
     "unfold",  # before django.contrib.admin

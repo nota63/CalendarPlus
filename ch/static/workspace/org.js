@@ -1122,6 +1122,12 @@ document.addEventListener('DOMContentLoaded', function () {
           fetchAndRenderUnifiedPieChart(orgId);
         }
 
+        //progress widget  
+        if (widgetsContainer.querySelector('#progress-widget')) {
+          console.log("🔍 Detected #progress widget — initializing progress widget...");
+          fetchAndRenderProgress(orgId);
+        }
+
       })
       .catch(error => {
         console.error("💥 Error loading widgets:", error);
@@ -1180,6 +1186,13 @@ document.addEventListener('DOMContentLoaded', function () {
                   console.log("⚙️ Running calculation widget init JS...");
                   fetchAndRenderUnifiedPieChart(orgId);
                 }
+
+                // progress widget
+                if (widgetType === 'progress-widget') {
+                  console.log("⚙️ Running progress widget init JS...");
+                  fetchAndRenderProgress(orgId);
+                }
+                
                 
                 
               })
