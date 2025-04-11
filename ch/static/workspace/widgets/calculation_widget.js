@@ -31,20 +31,77 @@ function fetchAndRenderCalculationWidget(orgId) {
 
 // Open in full screen
 function openFullScreenWidget(widgetId) {
-    const elem = document.getElementById(widgetId);
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen();
-    } else if (elem.webkitRequestFullscreen) { // Safari
-      elem.webkitRequestFullscreen();
-    } else if (elem.msRequestFullscreen) { // IE11
-      elem.msRequestFullscreen();
-    }
-    console.log("🔍 Widget opened in fullscreen:", widgetId);
+  const widget = document.getElementById(widgetId);
+
+  // Overlay setup
+  let overlay = document.getElementById('widgetOverlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'widgetOverlay';
+    overlay.className = 'fixed inset-0 bg-gray-800 bg-opacity-30 backdrop-blur-sm z-[900] opacity-0 transition-opacity duration-300';
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.add('opacity-100'));
+  } else {
+    overlay.classList.remove('hidden');
+    overlay.classList.add('opacity-100');
   }
+
+  // Style the widget as a fullscreen modal
+  widget.classList.add(
+    'fixed', 'top-[5%]', 'left-1/2', 'transform', '-translate-x-1/2',
+    'w-[99%]', 'h-[90%]', 'bg-white', 'z-[100]', 'rounded-xl', 'shadow-2xl',
+    'overflow-y-auto', 'transition-all', 'duration-300', 'p-6'
+  );
+
+  // Set highest z-index and escape any nesting issues
+  widget.style.position = 'fixed';
+  widget.style.zIndex = '1000';
+  widget.style.maxWidth = '1280px';
   
+  // Animate in
+  requestAnimationFrame(() => {
+    widget.classList.remove('scale-95', 'opacity-0');
+    widget.classList.add('scale-100', 'opacity-100');
+  });
+
+  // Add close button if not there
+  if (!document.getElementById('fullscreenCloseBtn')) {
+    const closeBtn = document.createElement('button');
+    closeBtn.id = 'fullscreenCloseBtn';
+    closeBtn.innerHTML = '&times;';
+    closeBtn.className = 'absolute top-4 right-5 text-3xl text-gray-400 hover:text-black z-[1010]';
+    closeBtn.onclick = () => closeFullScreenWidget(widgetId);
+    widget.appendChild(closeBtn);
+  }
+
+  // Lock background scroll
+  document.body.classList.add('overflow-hidden');
+
+  console.log("✨ Fullscreen modal opened:", widgetId);
+}
+
+function closeFullScreenWidget(widgetId) {
+  const widget = document.getElementById(widgetId);
+  const overlay = document.getElementById('widgetOverlay');
+  const closeBtn = document.getElementById('fullscreenCloseBtn');
+
+  widget.classList.remove(
+    'fixed', 'top-[5%]', 'left-1/2', 'transform', '-translate-x-1/2',
+    'w-[95%]', 'h-[90%]', 'bg-white', 'z-[100]', 'rounded-xl', 'shadow-2xl',
+    'overflow-y-auto', 'transition-all', 'duration-300', 'p-6'
+  );
+  widget.style.position = '';
+  widget.style.zIndex = '';
+
+  if (overlay) overlay.classList.add('hidden');
+  if (closeBtn) closeBtn.remove();
+  document.body.classList.remove('overflow-hidden');
+
+  console.log("🛑 Fullscreen modal closed:", widgetId);
+}
 
 
-// Fetch Tasks Analytics
+  
 // Fetch Tasks Analytics
 function fetchAndRenderTaskAnalytics(orgId) {
   console.log("📡 Fetching task analytics for org:", orgId);
