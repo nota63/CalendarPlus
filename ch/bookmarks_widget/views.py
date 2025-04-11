@@ -8,6 +8,8 @@ from django.utils.timezone import now
 import json
 from django.views import View
 from django.utils import timezone
+from django.views.decorators.http import require_http_methods
+from django.http import HttpResponseBadRequest
 # Fetch bookmarks
 
 class UserBookmarksView(View):
@@ -67,3 +69,25 @@ def add_bookmark(request, org_id):
         return JsonResponse({'error': 'Organization not found.'}, status=404)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+# Delete the bookmarks
+@csrf_exempt
+@login_required
+@require_http_methods(["POST"])
+def delete_bookmark(request, org_id, bookmark_id):
+    try:
+        widget = BookMarksWidget.objects.get(organization_id=org_id, created_by=request.user)
+        bookmark_id = int(bookmark_id)
+
+        if bookmark_id < 0 or bookmark_id >= len(widget.data):
+            return HttpResponseBadRequest("Invalid bookmark ID.")
+
+        # Remove the bookmark from the list
+        widget.data.pop(bookmark_id)
+        widget.save()
+
+        return JsonResponse({'success': True, 'message': 'Bookmark deleted successfully'})
+    except BookMarksWidget.DoesNotExist:
+        return HttpResponseBadRequest("Bookmarks widget not found.")
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
