@@ -30,6 +30,7 @@ function fetchAndRenderCalculationWidget(orgId) {
   
 
 // Open in full screen
+// Open in full screen
 function openFullScreenWidget(widgetId) {
   const widget = document.getElementById(widgetId);
 
@@ -99,6 +100,11 @@ function closeFullScreenWidget(widgetId) {
 
   console.log("🛑 Fullscreen modal closed:", widgetId);
 }
+
+
+
+
+
 
 
   

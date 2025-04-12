@@ -1,51 +1,158 @@
 <div id="channels-widget" class="w-full p-4 bg-gray-50 rounded-xl border border-gray-200 shadow-sm">
-    <div class="mb-2 flex items-center justify-between">
-      <h2 class="text-sm font-semibold text-gray-700">📡 Channels</h2>
-    </div>
-  
-    <!-- Dedicated container where channels will be injected -->
-    <div id="channels-list-container" class="space-y-3">
-      <!-- Channels will be dynamically rendered here -->
-    </div>
-  </div>
+    <!-- Action Buttons -->
+ <div class="absolute top-3 right-3 flex gap-1.5 z-10">
+ <!-- Refresh Button -->
+ <button onclick="refreshWidgetById('channels-widget')" title="Refresh" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+   <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500 hover:text-indigo-600 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+     <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.406 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m-15.406-2a8.001 8.001 0 0015.406 2m0 0H15"/>
+   </svg>
+ </button>
 
+ <!-- Fullscreen Button -->
+ <button onclick="openFullScreenWidget('channels-widget')" title="Fullscreen" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+   <svg class="w-5 h-5 text-gray-400 hover:text-indigo-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+           d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+   </svg>
+ </button>
+
+ <!-- Screenshot Button -->
+ <button onclick="takeScreenshot('channels-widget')" title="Download Screenshot"
+   class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+   <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none"
+       viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+       <path stroke-linecap="round" stroke-linejoin="round"
+           d="M3 8l2-2h4l2-2h2l2 2h4l2 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+       <circle cx="12" cy="13" r="3" />
+   </svg>
+ </button>
+</div>
+ 
+   <!-- Dedicated container where channels will be injected -->
+   <div id="channels-list-container" class="space-y-3">
+     <!-- Channels will be dynamically rendered here -->
+   </div>
+</div>
   
 
 <!-- -------------------------------------------------------------------------------------------------------------------------------Modals -->
 <!-- Fetch and send channel messages  -->
 <!-- Channel Messages Modal -->
 <div class="modal fade" id="channelMessagesModal" tabindex="-1" aria-labelledby="channelMessagesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable modal-lg">
-      <div class="modal-content">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl">
+      <div class="modal-content rounded-2xl shadow-xl overflow-hidden">
   
-        <div class="modal-header bg-indigo-600 text-white">
-          <h5 class="modal-title" id="channelMessagesModalLabel">#Channel Messages</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <!-- Premium Upgrade Alert -->
+        <div class="bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-700 text-white px-6 py-4 flex justify-between items-center">
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M13 16h-1v-4h-1m0-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="text-sm font-medium">Upgrade to Premium to enable real-time dashboard messaging.</span>
+          </div>
+          <a href="{% url 'initiate_payment'%}">
+            <button
+            class="bg-white text-indigo-700 text-sm font-semibold px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition">
+            Upgrade Now
+          </button>
+          </a>
+         
         </div>
   
-        <div class="modal-body p-3" id="channel-messages-container">
-          <div class="text-sm text-muted">Loading messages...</div>
+        <!-- Header -->
+        <div class="modal-header bg-white border-b px-6 py-4">
+          <h5 class="modal-title text-lg font-semibold text-gray-800 flex items-center gap-2" id="channelMessagesModalLabel">
+            <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" stroke-width="2"
+              viewBox="0 0 24 24">
+              <path d="M7 8h10M7 12h4m1 8a9 9 0 100-18 9 9 0 000 18z" />
+            </svg>
+            #Channel Messages
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
   
-        <div class="modal-footer flex-column gap-2 align-items-stretch">
-          <!-- Floating Textarea -->
-          <div class="form-floating">
-            <textarea id="channel-message-textarea" class="form-control" placeholder="Type your message..." style="height: 80px;"></textarea>
-            <label for="channel-message-textarea">Type a message...</label>
+        <!-- Messages Container -->
+        <div class="modal-body bg-gray-50 p-6 max-h-[60vh] overflow-y-auto" id="channel-messages-container">
+          <div class="text-sm text-gray-400">Loading messages...</div>
+        </div>
+  
+        <!-- Footer Actions -->
+        <div class="modal-footer bg-white border-t flex flex-col gap-4 px-6 py-4">
+  
+          <!-- Message Textarea -->
+          <div class="relative w-full">
+            <textarea id="channel-message-textarea"
+              class="form-control w-full rounded-lg px-4 py-3 pr-40 border text-sm focus:ring-2 focus:ring-indigo-500"
+              placeholder="Type your message..." style="height: 90px;"></textarea>
+            <label for="channel-message-textarea"
+              class="absolute -top-2 left-3 bg-white text-xs text-indigo-600 px-1">Your Message</label>
           </div>
   
-          <div class="d-flex justify-content-between align-items-center w-100 mt-2">
-            <div class="d-flex gap-2 align-items-center">
-              <input type="file" id="channel-audio-input" accept="audio/*" class="form-control form-control-sm">
-              <input type="file" id="channel-video-input" accept="video/*" class="form-control form-control-sm">
+          <!-- Attachments & Tools -->
+          <div class="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+  
+            <!-- Upload Inputs -->
+            <div class="flex items-center gap-4">
+              <label for="channel-audio-input" class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24">
+                  <path d="M9 19V6a3 3 0 016 0v13a3 3 0 01-6 0z" />
+                </svg>
+                Audio
+                <input type="file" id="channel-audio-input" accept="audio/*" class="hidden">
+              </label>
+  
+              <label for="channel-video-input" class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24">
+                  <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14m-6 0h6a2 2 0 002-2V8a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2z" />
+                </svg>
+                Video
+                <input type="file" id="channel-video-input" accept="video/*" class="hidden">
+              </label>
+            </div>
+  
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap justify-end gap-3">
+              <button class="flex items-center gap-2 text-sm px-3 py-2 bg-gray-100 rounded hover:bg-gray-200 transition">
+                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24">
+                  <path d="M16 18H7a2 2 0 01-2-2V8a2 2 0 012-2h3l2-2h4a2 2 0 012 2v12a2 2 0 01-2 2z" />
+                </svg>
+                Send File
+              </button>
+  
+              <button class="flex items-center gap-2 text-sm px-3 py-2 bg-gray-100 rounded hover:bg-gray-200 transition">
+                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24">
+                  <path d="M9.75 17L8 20l-1.75-3m1.75-6a3 3 0 100 6 3 3 0 000-6zm5.25-5.25L16 4l1.75 3M15 7.5a3 3 0 100 6 3 3 0 000-6z" />
+                </svg>
+                Start Video Call
+              </button>
+  
+              <button class="flex items-center gap-2 text-sm px-3 py-2 bg-gray-100 rounded hover:bg-gray-200 transition">
+                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24">
+                  <path d="M9 19V6a3 3 0 016 0v13a3 3 0 01-6 0z" />
+                </svg>
+                Start Audio Call
+              </button>
+  
+              <button class="flex items-center gap-2 text-sm px-3 py-2 bg-indigo-600 text-white font-semibold rounded hover:bg-indigo-700 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24">
+                  <path d="M5 13l4 4L19 7" />
+                </svg>
+                Send Message
+              </button>
             </div>
           </div>
   
-          <!-- Dynamic Button Placeholder -->
-          <div id="dynamic-send-btn-container" class="mt-2 w-100"></div>
+          <!-- Dynamic Send Btn (Preserve logic) -->
+          <div id="dynamic-send-btn-container" class="hidden"></div>
   
         </div>
-  
       </div>
     </div>
   </div>
