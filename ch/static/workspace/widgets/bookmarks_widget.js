@@ -182,63 +182,172 @@ function getCSRFToken() {
 // Widget 2 ) - Resources Widget ----------------------------------------------------------------------------------------------------
 
 // fetch and display the resources uploaded by the user accross the workspace
+// fetch and display the resources uploaded by the user across the workspace
 async function fetchAndRenderResources(orgId) {
   const container = document.getElementById("resources-widget");
-  container.innerHTML = `<div class="text-gray-500 text-sm">Loading your resources...</div>`;
-
+  container.innerHTML = `
+    <div class="flex justify-center items-center p-6 min-h-20 bg-gray-50 rounded-lg border border-gray-100">
+      <div class="flex items-center space-x-2">
+        <svg class="animate-spin h-4 w-4 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span class="text-gray-500 font-medium text-sm">Loading your resources...</span>
+      </div>
+    </div>`;
+    
   try {
     const response = await fetch(`/bookmarks/user-resources/${orgId}/`, {
       headers: {
         "X-Requested-With": "XMLHttpRequest",
       },
     });
-
+    
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
+    
     const result = await response.json();
-
+    
     if (result.data.length === 0) {
-      container.innerHTML = `<div class="text-gray-400 text-sm">No resources uploaded yet 💭</div>`;
+      container.innerHTML = `
+        <div class="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-lg border border-gray-100 text-center">
+          <svg class="w-10 h-10 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+          </svg>
+          <div class="text-gray-400 font-medium">No resources uploaded yet 💭</div>
+          <p class="text-gray-400 text-xs mt-2">Upload files to see them here</p>
+        </div>`;
       return;
     }
-
+    
     const itemsHTML = result.data.map(item => {
       const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(item.file_name);
       const isPDF = /\.pdf$/i.test(item.file_name);
-
+      const isDoc = /\.(doc|docx)$/i.test(item.file_name);
+      const isExcel = /\.(xls|xlsx)$/i.test(item.file_name);
+      
       let previewHTML = '';
-
+      let iconBgClass = 'bg-blue-50';
+      let iconTextClass = 'text-blue-500';
+      
       if (isImage) {
-        previewHTML = `<img src="${item.file_url}" alt="${item.file_name}" class="w-28 h-28 object-cover rounded shadow">`;
+        previewHTML = `<img src="${item.file_url}" alt="${item.file_name}" class="w-full h-full object-cover rounded">`;
       } else if (isPDF) {
-        previewHTML = `<div class="text-red-500"><i class="fa-solid fa-file-pdf fa-2x"></i></div>`;
+        iconBgClass = 'bg-red-50';
+        iconTextClass = 'text-red-500';
+        previewHTML = `
+          <div class="flex items-center justify-center w-full h-full ${iconBgClass} rounded">
+            <svg class="w-8 h-8 ${iconTextClass}" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+              <path d="M320 464c8.8 0 16-7.2 16-16V160H256c-17.7 0-32-14.3-32-32V48H64c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16H320zM0 64C0 28.7 28.7 0 64 0H229.5c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V64z"/>
+            </svg>
+          </div>`;
+      } else if (isDoc) {
+        iconBgClass = 'bg-blue-50';
+        iconTextClass = 'text-blue-600';
+        previewHTML = `
+          <div class="flex items-center justify-center w-full h-full ${iconBgClass} rounded">
+            <svg class="w-8 h-8 ${iconTextClass}" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+              <path d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM112 256H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16z"/>
+            </svg>
+          </div>`;
+      } else if (isExcel) {
+        iconBgClass = 'bg-green-50';
+        iconTextClass = 'text-green-600';
+        previewHTML = `
+          <div class="flex items-center justify-center w-full h-full ${iconBgClass} rounded">
+            <svg class="w-8 h-8 ${iconTextClass}" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+              <path d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM155.7 250.2L192 302.1l36.3-51.9c7.6-10.9 22.6-13.5 33.4-5.9s13.5 22.6 5.9 33.4L221.3 344l46.4 66.2c7.6 10.9 5 25.8-5.9 33.4s-25.8 5-33.4-5.9L192 385.8l-36.3 51.9c-7.6 10.9-22.6 13.5-33.4 5.9s-13.5-22.6-5.9-33.4L162.7 344l-46.4-66.2c-7.6-10.9-5-25.8 5.9-33.4s25.8-5 33.4 5.9z"/>
+            </svg>
+          </div>`;
       } else {
-        previewHTML = `<div class="text-gray-400"><i class="fa-solid fa-file fa-2x"></i></div>`;
+        previewHTML = `
+          <div class="flex items-center justify-center w-full h-full bg-gray-50 rounded">
+            <svg class="w-8 h-8 text-gray-400" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+              <path d="M0 64C0 28.7 28.7 0 64 0H224V128c0 17.7 14.3 32 32 32H384V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V64zm384 64H256V0L384 128z"/>
+            </svg>
+          </div>`;
       }
-
+      
+      const fileType = item.type.replace('_', ' ').toUpperCase();
+      const typeColorClass = 
+        fileType.includes('IMAGE') ? 'bg-purple-100 text-purple-700' :
+        fileType.includes('PDF') ? 'bg-red-100 text-red-700' :
+        fileType.includes('DOC') ? 'bg-blue-100 text-blue-700' :
+        fileType.includes('EXCEL') ? 'bg-green-100 text-green-700' :
+        'bg-indigo-100 text-indigo-700';
+      
       return `
-        <div class="border rounded-lg p-3 flex items-center space-x-4 bg-white shadow-sm hover:shadow-md transition">
-          <a href="${item.file_url}" target="_blank" class="flex-shrink-0">
+        <div class="group flex flex-col bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 hover:border-indigo-300">
+          <a href="${item.file_url}" target="_blank" class="block h-36 overflow-hidden">
             ${previewHTML}
           </a>
-          <div class="flex flex-col overflow-hidden">
-            <p class="text-sm font-medium text-gray-700 truncate">${item.file_name}</p>
-            <p class="text-xs text-gray-400">${item.uploaded_at || '—'}</p>
-            <p class="text-xs text-indigo-500 mt-1">${item.type.replace('_', ' ').toUpperCase()}</p>
+          <div class="p-3 flex flex-col flex-grow">
+            <div class="flex items-center justify-between mb-2">
+              <span class="px-2 py-1 text-xs font-medium rounded-full ${typeColorClass}">
+                ${fileType}
+              </span>
+              <span class="text-xs text-gray-400">${item.uploaded_at || '—'}</span>
+            </div>
+            <p class="text-sm font-medium text-gray-700 line-clamp-2 mb-2" title="${item.file_name}">
+              ${item.file_name}
+            </p>
+            <div class="mt-auto">
+              <a href="${item.file_url}" target="_blank" class="inline-flex items-center text-xs font-medium text-indigo-600 hover:text-indigo-800 transition-colors">
+                <span>View file</span>
+                <svg class="ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                </svg>
+              </a>
+            </div>
           </div>
         </div>
       `;
     }).join("");
-
+    
     container.innerHTML = `
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        ${itemsHTML}
+      <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div class="flex justify-between items-center p-4 border-b border-gray-200">
+          <h2 class="text-lg font-semibold text-gray-800">Resources</h2>
+          <div class="flex space-x-2">
+            <button class="p-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors flex items-center">
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+              </svg>
+              Filter
+            </button>
+            <button class="p-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md transition-colors flex items-center">
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              Add New
+            </button>
+          </div>
+        </div>
+        
+        <div class="p-4 max-h-96 overflow-y-auto">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            ${itemsHTML}
+          </div>
+        </div>
       </div>
     `;
-
   } catch (error) {
     console.error("Failed to load resources:", error);
-    container.innerHTML = `<div class="text-red-500 text-sm">Oops! Could not load resources.</div>`;
+    container.innerHTML = `
+      <div class="flex flex-col items-center justify-center p-8 bg-white rounded-lg border border-gray-200 text-center">
+        <div class="bg-red-100 p-3 rounded-full mb-3">
+          <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-700 mb-1">Oops! Something went wrong</h3>
+        <p class="text-gray-500 text-sm mb-4">Could not load your resources</p>
+        <button onclick="fetchAndRenderResources('${orgId}')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors flex items-center">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          Try Again
+        </button>
+      </div>
+    `;
   }
 }
- 
