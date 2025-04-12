@@ -1135,6 +1135,10 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('channels widget initialized')
         fetchAndRenderChannels(orgId);
         break;
+      case 'time-traced-widget':
+        console.log('time traced widget initialized')
+        fetchTimeTracing(orgId);
+        break; 
       default:
         console.warn("❓ No init logic defined for widget type:", widgetType);
     }
@@ -1164,6 +1168,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '#resources-widget':'resources-widget',
           '#recent-activity-widget':'recent-activity-widget',
           '#channels-widget':'channels-widget',
+          '#time-traced-widget':'time-traced-widget',
         };
 
         Object.entries(widgetMap).forEach(([selector, widgetType]) => {
