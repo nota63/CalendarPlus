@@ -47,6 +47,7 @@ def high_priority_tasks_widget(request, org_id):
             "id": task.id,
             "title": task.title,
             "group_name": task.group.name,
+            'progress':task.progress,
             "status": task.status.replace("_", " ").title(),
             "deadline": task.deadline.strftime('%Y-%m-%d %H:%M')
         }

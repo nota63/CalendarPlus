@@ -94,13 +94,54 @@ function fetchHighPriorityTasks(orgId) {
           taskCard.className = "p-3 rounded-lg bg-white border border-red-100 shadow-sm hover:bg-red-50 transition-all duration-150";
   
           taskCard.innerHTML = `
-            <div class="font-semibold text-red-700">${task.title}</div>
-            <div class="text-xs text-gray-500">Group: ${task.group_name}</div>
-            <div class="flex justify-between items-center mt-1 text-xs">
-              <span class="px-2 py-0.5 rounded-full bg-red-100 text-red-600">${task.status}</span>
-              <span class="text-gray-600">Deadline: ${task.deadline}</span>
-            </div>
-          `;
+  <div class="p-3 border border-gray-100 rounded-lg bg-white shadow-sm hover:shadow-md transition-all duration-200">
+    <div class="flex items-start justify-between mb-2">
+      <div class="font-medium text-sm text-gray-800 line-clamp-2">${task.title}</div>
+      <div class="ml-2 flex-shrink-0">
+        <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
+          task.status === 'Completed' ? 'bg-green-100 text-green-700' :
+          task.status === 'In Progress' ? 'bg-blue-100 text-blue-700' :
+          task.status === 'Overdue' ? 'bg-red-100 text-red-700' :
+          'bg-gray-100 text-gray-700'
+        }">${task.status}</span>
+      </div>
+    </div>
+    
+    <div class="flex items-center mb-2">
+      <div class="w-full">
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-xs font-medium text-gray-500">Progress</span>
+          <span class="text-xs font-medium text-indigo-600">${task.progress}%</span>
+        </div>
+        <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+          <div class="bg-indigo-500 h-full transition-all duration-500 ease-in-out" style="width: ${task.progress}%"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mt-3 space-y-1.5">
+      <div class="flex items-center text-xs">
+        <svg class="w-3 h-3 mr-1.5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 2h8a2 2 0 0 1 2 2v18a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"></path>
+          <path d="M10 18h4"></path>
+        </svg>
+        <span class="text-gray-600">Group: </span>
+        <span class="ml-1 font-medium text-gray-700">${task.group_name}</span>
+      </div>
+      <div class="flex items-center text-xs">
+        <svg class="w-3 h-3 mr-1.5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        <span class="text-gray-600">Deadline: </span>
+        <span class="ml-1 font-medium ${
+          new Date(task.deadline) < new Date() ? 'text-red-600' : 'text-gray-700'
+        }">${task.deadline}</span>
+      </div>
+    </div>
+  </div>`;
   
           container.appendChild(taskCard);
         });
