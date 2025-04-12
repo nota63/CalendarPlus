@@ -146,6 +146,7 @@ MIDDLEWARE = [
     'ch.middlewares.OrgGuideMiddleware',
     'group_tasks.middlewares.RewardRedirectMiddleware',
     'subscription.middlewares.ImpersonationMiddleware',
+    'bookmarks_widget.middlewares.ActivityCaptureMiddleware',
     # 'axes.middleware.AxesMiddleware',
     # 'group_tasks.middlewares.RecentActivityMiddleware',
 

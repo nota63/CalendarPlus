@@ -141,3 +141,4 @@ def user_resources_view(request, org_id):
 
 
   
+# // Widget 3 ) - Recent activities widget ----------------------------------------------------------------------------------------------------

@@ -350,3 +350,4 @@ async function fetchAndRenderResources(orgId) {
     `;
   }
 }
+

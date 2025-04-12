@@ -19,6 +19,7 @@ class DashboardWidget(models.Model):
         ('due_soon','Due soon'),
         ('bookmarks','Bookmarks'),
         ('resources','Resources'),
+        ('recent_activity','Recent activity'),
         # Add more widgets as you scale, my baby 💖
     ]
 
