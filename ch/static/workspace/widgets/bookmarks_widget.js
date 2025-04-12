@@ -357,83 +357,272 @@ const activityCache = {};
 
 async function fetchAndRenderRecentActivity(orgId) {
   const container = document.getElementById('recent-activity-widget');
-  container.innerHTML = `<div class="text-gray-500 text-sm">Loading recent activities...</div>`;
-
+  container.innerHTML = `
+    <div class="flex items-center justify-center py-6 text-slate-500">
+      <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" fill="currentColor"></path>
+      </svg>
+      <span class="font-medium">Loading recent activities...</span>
+    </div>`;
+  
   try {
     const response = await fetch(`/bookmarks/fetch-recent-activity-methods/${orgId}/`);
     const data = await response.json();
-
+    
     if (!data.activities || data.activities.length === 0) {
-      container.innerHTML = `<div class="text-gray-400 text-sm">No recent activity found.</div>`;
+      container.innerHTML = `
+        <div class="flex flex-col items-center justify-center py-10 text-slate-400">
+          <svg class="w-12 h-12 mb-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+          </svg>
+          <p class="font-medium">No recent activity found</p>
+        </div>`;
       return;
     }
-
-    const cardsHTML = data.activities.map((activity) => {
-      return `
-        <div class="activity-card bg-white border border-gray-200 rounded-xl shadow-sm p-4 hover:border-indigo-300 transition-all duration-200"
-             data-activity-id="${activity.id}" data-org-id="${orgId}" style="position: relative; cursor: pointer;">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-medium px-2 py-1 rounded-full bg-indigo-50 text-indigo-600">${activity.method}</span>
-            <span class="text-xs text-gray-400">#${activity.id}</span>
-          </div>
-          <div class="text-sm text-gray-700 font-medium">
-            Recent activity using <span class="font-bold text-indigo-600">${activity.method}</span> method
-          </div>
+    
+    container.innerHTML = `
+      <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 p-4 rounded-t-lg shadow-md">
+        <h3 class="text-white font-semibold text-lg">Recent Activity</h3>
+        <p class="text-indigo-100 text-sm">Track your latest interactions</p>
+      </div>
+      <div class="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-indigo-300 scrollbar-track-slate-100">
+        <div class="activity-list p-2 space-y-3">
+          ${data.activities.map(activity => `
+            <div class="activity-card bg-white border border-slate-200 rounded-lg shadow-sm p-4 hover:border-indigo-400 hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5"
+                data-activity-id="${activity.id}" data-org-id="${orgId}">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-semibold px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100">${activity.method}</span>
+                <span class="text-xs text-slate-400 font-mono">#${activity.id}</span>
+              </div>
+              <div class="text-sm text-slate-700">
+                Recent activity using <span class="font-semibold text-indigo-600">${activity.method}</span> method
+              </div>
+              <div class="absolute -right-2 top-1/2 transform -translate-y-1/2 opacity-0 activity-tooltip">
+                <div class="tooltip-arrow"></div>
+              </div>
+            </div>
+          `).join('')}
         </div>
-      `;
-    }).join("");
+      </div>
+    `;
 
-    container.innerHTML = cardsHTML;
+    // Add custom scrollbar styles
+    const style = document.createElement('style');
+    style.textContent = `
+      .scrollbar-thin::-webkit-scrollbar {
+        width: 6px;
+      }
+      .scrollbar-thin::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 10px;
+      }
+      .scrollbar-thin::-webkit-scrollbar-thumb {
+        background: #a5b4fc;
+        border-radius: 10px;
+      }
+      .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+        background: #818cf8;
+      }
+      .activity-card {
+        cursor: pointer;
+        position: relative;
+      }
+      .activity-tooltip {
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .tooltip-content {
+        min-width: 280px;
+        transform-origin: left center;
+        animation: tooltipEnter 0.2s forwards cubic-bezier(0.26, 1.04, 0.54, 1.04);
+      }
+      @keyframes tooltipEnter {
+        0% { opacity: 0; transform: scale(0.95) translateX(-10px); }
+        100% { opacity: 1; transform: scale(1) translateX(0); }
+      }
+      .tooltip-arrow {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: white;
+        transform: rotate(45deg);
+        left: -5px;
+        top: calc(50% - 5px);
+        border-left: 1px solid #e2e8f0;
+        border-bottom: 1px solid #e2e8f0;
+        z-index: 1;
+      }
+    `;
+    document.head.appendChild(style);
 
-    // Attach dynamic tooltip logic
+    // Setup tooltips and click handlers
     document.querySelectorAll('.activity-card').forEach(card => {
-      const activityId = card.dataset.activityId;
-      const orgId = card.dataset.orgId;
-
-      let tooltip;
-
-      card.addEventListener('mouseenter', async (e) => {
-        tooltip = document.createElement('div');
-        tooltip.className = "z-50 absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 text-xs text-gray-600";
-        tooltip.innerHTML = `<div>Loading details...</div>`;
-        card.appendChild(tooltip);
-
+      let tooltipActive = false;
+      let tooltip = null;
+      
+      card.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const activityId = card.dataset.activityId;
+        const orgId = card.dataset.orgId;
+        
+        // Hide any existing tooltips
+        document.querySelectorAll('.activity-tooltip').forEach(t => {
+          if (t !== tooltip) {
+            t.innerHTML = '';
+            t.classList.remove('opacity-100');
+            t.classList.add('opacity-0');
+          }
+        });
+        
+        // Toggle tooltip
+        const tooltipContainer = card.querySelector('.activity-tooltip');
+        
+        if (tooltipActive) {
+          tooltipContainer.innerHTML = '';
+          tooltipContainer.classList.remove('opacity-100');
+          tooltipContainer.classList.add('opacity-0');
+          tooltipActive = false;
+          tooltip = null;
+          return;
+        }
+        
+        tooltipActive = true;
+        tooltip = tooltipContainer;
+        
+        tooltipContainer.innerHTML = `
+          <div class="absolute left-2 top-1/2 transform -translate-y-1/2 tooltip-content bg-white border border-slate-200 rounded-lg shadow-lg p-4 z-50">
+            <div class="tooltip-arrow"></div>
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
+              <span class="text-indigo-600 font-semibold">Activity Details</span>
+              <span class="text-xs bg-indigo-50 px-2 py-1 rounded text-indigo-600">#${activityId}</span>
+            </div>
+            <div class="text-center py-8">
+              <div class="inline-block animate-spin rounded-full h-6 w-6 border-2 border-indigo-500 border-t-transparent"></div>
+              <p class="text-sm text-slate-500 mt-2">Loading details...</p>
+            </div>
+          </div>
+        `;
+        
+        tooltipContainer.classList.remove('opacity-0');
+        tooltipContainer.classList.add('opacity-100');
+        
+        // Position tooltip
+        const tooltipContent = tooltipContainer.querySelector('.tooltip-content');
+        tooltipContent.style.right = '-20px';
+        
         if (activityCache[activityId]) {
-          tooltip.innerHTML = formatActivityTooltip(activityCache[activityId]);
+          tooltipContent.innerHTML = formatActivityTooltip(activityCache[activityId]);
         } else {
           try {
             const res = await fetch(`/bookmarks/recent-activity-detail/${orgId}/${activityId}/`);
             const { activity } = await res.json();
             activityCache[activityId] = activity;
-            tooltip.innerHTML = formatActivityTooltip(activity);
+            
+            if (tooltipActive) {
+              tooltipContent.innerHTML = formatActivityTooltip(activity);
+            }
           } catch (err) {
-            tooltip.innerHTML = `<div class="text-red-500">Error loading details.</div>`;
+            tooltipContent.innerHTML = `
+              <div class="tooltip-arrow"></div>
+              <div class="text-red-500 p-4">
+                <svg class="w-8 h-8 text-red-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="text-center">Error loading activity details</p>
+              </div>
+            `;
           }
         }
       });
-
-      card.addEventListener('mouseleave', () => {
-        if (tooltip && tooltip.parentNode) {
-          tooltip.remove();
-        }
+      
+      // Close tooltips when clicking outside
+      document.addEventListener('click', () => {
+        document.querySelectorAll('.activity-tooltip').forEach(tooltip => {
+          tooltip.innerHTML = '';
+          tooltip.classList.remove('opacity-100');
+          tooltip.classList.add('opacity-0');
+          tooltipActive = false;
+        });
       });
     });
-
+    
   } catch (error) {
     console.error("Failed to fetch recent activity:", error);
-    container.innerHTML = `<div class="text-red-500 text-sm">Error loading activity.</div>`;
+    container.innerHTML = `
+      <div class="flex items-center bg-red-50 p-4 rounded-lg border border-red-200 text-red-700">
+        <svg class="w-5 h-5 mr-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span class="font-medium">Error loading activity data.</span>
+      </div>
+    `;
   }
 }
 
 function formatActivityTooltip(activity) {
   return `
-    <div><strong>User:</strong> ${activity.user || '—'}</div>
-    <div><strong>Path:</strong> ${activity.path || '—'}</div>
-    <div><strong>Type:</strong> ${activity.activity_type || '—'}</div>
-    <div><strong>Model:</strong> ${activity.model_name || '—'}</div>
-    <div><strong>Object ID:</strong> ${activity.object_id || '—'}</div>
-    <div><strong>IP:</strong> ${activity.ip_address || '—'}</div>
-    <div><strong>Agent:</strong> <span class="break-words">${activity.user_agent?.slice(0, 60) || '—'}</span></div>
-    <div><strong>Time:</strong> ${activity.timestamp}</div>
+    <div class="tooltip-arrow"></div>
+    <div class="max-w-xs">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
+        <span class="text-indigo-600 font-semibold">Activity Details</span>
+        <span class="text-xs bg-indigo-50 px-2 py-1 rounded text-indigo-600">#${activity.id || '—'}</span>
+      </div>
+      
+      <div class="space-y-2 max-h-72 overflow-y-auto scrollbar-thin pr-1">
+        <div class="flex">
+          <div class="w-1/3 text-slate-500 text-sm font-medium">User</div>
+          <div class="w-2/3 text-slate-700 font-medium">${activity.user || '—'}</div>
+        </div>
+        
+        <div class="flex">
+          <div class="w-1/3 text-slate-500 text-sm font-medium">Path</div>
+          <div class="w-2/3 text-slate-700 text-sm break-words">${activity.path || '—'}</div>
+        </div>
+        
+        <div class="flex">
+          <div class="w-1/3 text-slate-500 text-sm font-medium">Type</div>
+          <div class="w-2/3">
+            <span class="text-xs font-medium px-2 py-1 rounded-full bg-emerald-50 text-emerald-600">
+              ${activity.activity_type || '—'}
+            </span>
+          </div>
+        </div>
+        
+        <div class="flex">
+          <div class="w-1/3 text-slate-500 text-sm font-medium">Model</div>
+          <div class="w-2/3 text-slate-700 text-sm">${activity.model_name || '—'}</div>
+        </div>
+        
+        <div class="flex">
+          <div class="w-1/3 text-slate-500 text-sm font-medium">Object ID</div>
+          <div class="w-2/3 text-slate-700 font-mono text-xs">${activity.object_id || '—'}</div>
+        </div>
+        
+        <div class="flex">
+          <div class="w-1/3 text-slate-500 text-sm font-medium">IP</div>
+          <div class="w-2/3 text-slate-700 font-mono text-xs">${activity.ip_address || '—'}</div>
+        </div>
+        
+        <div class="flex">
+          <div class="w-1/3 text-slate-500 text-sm font-medium">Agent</div>
+          <div class="w-2/3 text-slate-700 text-xs break-words">${activity.user_agent?.slice(0, 100) || '—'}</div>
+        </div>
+        
+        <div class="flex">
+          <div class="w-1/3 text-slate-500 text-sm font-medium">Time</div>
+          <div class="w-2/3">
+            <span class="text-xs font-medium px-2 py-1 rounded bg-slate-100 text-slate-600">
+              ${activity.timestamp || '—'}
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="pt-3 mt-2 border-t border-slate-100 flex justify-end">
+        <button class="text-xs px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-md transition-colors duration-200 font-medium">
+          View Details
+        </button>
+      </div>
+    </div>
   `;
 }

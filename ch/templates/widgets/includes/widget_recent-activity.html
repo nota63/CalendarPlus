@@ -1,4 +1,75 @@
-<div id="recent-activity-widget" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    <!-- Activity cards will be injected here -->
+<div id="recent-activity-widget" widget-name="recent-activity-widget"
+  class="group relative rounded-2xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow duration-200">
+
+  <!-- Action Buttons -->
+  <div class="absolute top-3 right-3 flex gap-1.5 z-10">
+    <!-- Refresh Button -->
+    <button onclick="refreshWidgetById('recent-activity-widget')" title="Refresh" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500 hover:text-indigo-600 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.406 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m-15.406-2a8.001 8.001 0 0015.406 2m0 0H15"/>
+      </svg>
+    </button>
+
+    <!-- Fullscreen Button -->
+    <button onclick="openFullScreenWidget('recent-activity-widget')" title="Fullscreen" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+      <svg class="w-5 h-5 text-gray-400 hover:text-indigo-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+      </svg>
+    </button>
+
+    <!-- Screenshot Button -->
+    <button onclick="takeScreenshot('recent-activity-widget')" title="Download Screenshot"
+      class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round"
+              d="M3 8l2-2h4l2-2h2l2 2h4l2 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+          <circle cx="12" cy="13" r="3" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Title -->
+  <div class="flex items-start justify-between mb-4">
+    <div class="flex items-center gap-2.5">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-indigo-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 17v-6a3 3 0 013-3h9M9 17l3-3m0 0l3 3m-3-3v12" />
+      </svg>
+      <h4 class="text-[15px] font-medium text-gray-800 leading-tight">
+        Recent Activity
+        <span class="block text-xs font-normal text-gray-400 mt-0.5">Latest actions across your workspace</span>
+      </h4>
+    </div>
+  </div>
+
+  <!-- Content Area -->
+  <div id="recent-activity-content" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="text-sm text-gray-400">Loading recent activities...</div>
+  </div>
 </div>
-  
+
+
+
+
+
+
+
+<!-- Activity detail modal -->
+<div class="modal fade" id="activityDetailModal" tabindex="-1" aria-labelledby="activityDetailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content rounded-2xl border-0 shadow-lg">
+      <div class="modal-header">
+        <h5 class="modal-title" id="activityDetailModalLabel">Activity Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="activityDetailModalBody">
+        <!-- Dynamic details will appear here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
