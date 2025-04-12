@@ -275,9 +275,9 @@ async function fetchAndRenderResources(orgId) {
         fileType.includes('EXCEL') ? 'bg-green-100 text-green-700' :
         'bg-indigo-100 text-indigo-700';
       
-      return `
-        <div class="group flex flex-col bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 hover:border-indigo-300">
-          <a href="${item.file_url}" target="_blank" class="block h-36 overflow-hidden">
+        return `
+        <div class="group flex flex-col bg-white rounded-md border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 hover:border-indigo-300">
+          <a href="${item.file_url}" target="_blank" class="block h-36 overflow-hidden rounded-md">
             ${previewHTML}
           </a>
           <div class="p-3 flex flex-col flex-grow">
@@ -302,7 +302,6 @@ async function fetchAndRenderResources(orgId) {
         </div>
       `;
     }).join("");
-    
     container.innerHTML = `
       <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
         <div class="flex justify-between items-center p-4 border-b border-gray-200">
