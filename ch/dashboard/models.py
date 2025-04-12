@@ -18,6 +18,7 @@ class DashboardWidget(models.Model):
         ('overdue_tasks','Overdue tasks'),
         ('due_soon','Due soon'),
         ('bookmarks','Bookmarks'),
+        ('resources','Resources'),
         # Add more widgets as you scale, my baby 💖
     ]
 

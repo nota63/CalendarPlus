@@ -1,7 +1,7 @@
 from django.http import JsonResponse,Http404
 from django.contrib.auth.decorators import login_required
 from .models import BookMarksWidget
-from accounts.models import Organization
+from accounts.models import Organization, Profile
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.utils.timezone import now
@@ -10,6 +10,7 @@ from django.views import View
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponseBadRequest
+from group_tasks.models import CommunicateTask
 # Fetch bookmarks
 
 class UserBookmarksView(View):
@@ -91,3 +92,52 @@ def delete_bookmark(request, org_id, bookmark_id):
         return HttpResponseBadRequest("Bookmarks widget not found.")
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    
+
+# // Widget 2 ) - Resources Widget ----------------------------------------------------------------------------------------------------
+
+# // fetch and display the resources uploaded by the user accross the workspace
+
+@login_required
+def user_resources_view(request, org_id):
+    user = request.user
+
+    # Fetch task communication files by the user in this organization
+    task_files = CommunicateTask.objects.filter(
+        organization_id=org_id,
+        sender=user,
+        files__isnull=False
+    ).exclude(files='')
+
+    task_files_data = [
+        {
+            "file_url": task_file.files.url,
+            "uploaded_at": task_file.created_at.strftime('%Y-%m-%d %H:%M'),
+            "file_name": task_file.files.name.split('/')[-1],
+            "type": "task_file"
+        }
+        for task_file in task_files
+    ]
+
+    # Fetch profile picture if uploaded
+    try:
+        profile_pic = Profile.objects.get(user=user, organization_id=org_id).profile_picture
+        if profile_pic:
+            profile_data = [{
+                "file_url": profile_pic.url,
+                "uploaded_at": None,
+                "file_name": profile_pic.name.split('/')[-1],
+                "type": "profile_picture"
+            }]
+        else:
+            profile_data = []
+    except Profile.DoesNotExist:
+        profile_data = []
+
+    return JsonResponse({
+        "status": "success",
+        "data": task_files_data + profile_data
+    })
+
+
+  

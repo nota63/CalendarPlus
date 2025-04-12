@@ -177,3 +177,68 @@ function getCSRFToken() {
       addButton.addEventListener('click', openAddBookmarkModal);
     }
   });
+
+
+// Widget 2 ) - Resources Widget ----------------------------------------------------------------------------------------------------
+
+// fetch and display the resources uploaded by the user accross the workspace
+async function fetchAndRenderResources(orgId) {
+  const container = document.getElementById("resources-widget");
+  container.innerHTML = `<div class="text-gray-500 text-sm">Loading your resources...</div>`;
+
+  try {
+    const response = await fetch(`/bookmarks/user-resources/${orgId}/`, {
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+      },
+    });
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const result = await response.json();
+
+    if (result.data.length === 0) {
+      container.innerHTML = `<div class="text-gray-400 text-sm">No resources uploaded yet 💭</div>`;
+      return;
+    }
+
+    const itemsHTML = result.data.map(item => {
+      const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(item.file_name);
+      const isPDF = /\.pdf$/i.test(item.file_name);
+
+      let previewHTML = '';
+
+      if (isImage) {
+        previewHTML = `<img src="${item.file_url}" alt="${item.file_name}" class="w-28 h-28 object-cover rounded shadow">`;
+      } else if (isPDF) {
+        previewHTML = `<div class="text-red-500"><i class="fa-solid fa-file-pdf fa-2x"></i></div>`;
+      } else {
+        previewHTML = `<div class="text-gray-400"><i class="fa-solid fa-file fa-2x"></i></div>`;
+      }
+
+      return `
+        <div class="border rounded-lg p-3 flex items-center space-x-4 bg-white shadow-sm hover:shadow-md transition">
+          <a href="${item.file_url}" target="_blank" class="flex-shrink-0">
+            ${previewHTML}
+          </a>
+          <div class="flex flex-col overflow-hidden">
+            <p class="text-sm font-medium text-gray-700 truncate">${item.file_name}</p>
+            <p class="text-xs text-gray-400">${item.uploaded_at || '—'}</p>
+            <p class="text-xs text-indigo-500 mt-1">${item.type.replace('_', ' ').toUpperCase()}</p>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    container.innerHTML = `
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        ${itemsHTML}
+      </div>
+    `;
+
+  } catch (error) {
+    console.error("Failed to load resources:", error);
+    container.innerHTML = `<div class="text-red-500 text-sm">Oops! Could not load resources.</div>`;
+  }
+}
+ 

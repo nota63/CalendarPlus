@@ -1123,6 +1123,10 @@ document.addEventListener('DOMContentLoaded', function () {
       case 'bookmarks-widget':
         fetchAndRenderBookmarks(orgId);
         break;
+      case 'resources-widget':
+        console.log('resources widget initialized')
+        fetchAndRenderResources(orgId);
+        break;
       default:
         console.warn("❓ No init logic defined for widget type:", widgetType);
     }
@@ -1149,6 +1153,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '#overdue-tasks-widget': 'overdue-tasks-widget',
           '#due-soon-tasks-widget': 'due-soon-tasks-widget',
           '#bookmarks-widget': 'bookmarks-widget',
+          '#resources-widget':'resources-widget',
         };
 
         Object.entries(widgetMap).forEach(([selector, widgetType]) => {
