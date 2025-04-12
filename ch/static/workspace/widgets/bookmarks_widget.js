@@ -351,3 +351,44 @@ async function fetchAndRenderResources(orgId) {
   }
 }
 
+
+// Widget 3 ) Fetch recent activity (Recent activity widget)----------------------------------------------------------------------------------------------------------
+async function fetchAndRenderRecentActivity(orgId) {
+  const container = document.getElementById('recent-activity-widget');
+  container.innerHTML = `<div class="text-gray-500 text-sm">Loading recent activities...</div>`;
+
+  try {
+    const response = await fetch(`/bookmarks/fetch-recent-activity-methods/${orgId}/`);
+    const data = await response.json();
+
+    if (!data.activities || data.activities.length === 0) {
+      container.innerHTML = `<div class="text-gray-400 text-sm">No recent activity found.</div>`;
+      return;
+    }
+
+    const cardsHTML = data.activities.map((activity) => {
+      return `
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 hover:border-indigo-300 transition-all duration-200">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-medium px-2 py-1 rounded-full bg-indigo-50 text-indigo-600">${activity.method}</span>
+            <span class="text-xs text-gray-400">#${activity.id}</span>
+          </div>
+          <div class="text-sm text-gray-700 font-medium">
+            Recent activity using <span class="font-bold text-indigo-600">${activity.method}</span> method
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    container.innerHTML = cardsHTML;
+
+  } catch (error) {
+    console.error("Failed to fetch recent activity:", error);
+    container.innerHTML = `<div class="text-red-500 text-sm">Error loading activity.</div>`;
+  }
+}
+
+
+
+
+

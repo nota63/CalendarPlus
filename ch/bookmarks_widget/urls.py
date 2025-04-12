@@ -6,5 +6,6 @@ urlpatterns = [
     path('add-bookmark/<int:org_id>/',add_bookmark, name='add_bookmark'),
     path('delete-bookmark/<int:org_id>/<int:bookmark_id>/',delete_bookmark, name='delete_bookmark'),
     path('user-resources/<int:org_id>/',user_resources_view, name='user_resources'),
+    path('fetch-recent-activity-methods/<int:org_id>/',fetch_recent_activity_methods, name='fetch_recent_activity_methods'),
   
 ]

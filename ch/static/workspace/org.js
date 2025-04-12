@@ -1127,6 +1127,10 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('resources widget initialized')
         fetchAndRenderResources(orgId);
         break;
+      case 'recent-activity-widget':
+        console.log('recent activity widget initialized')
+        fetchAndRenderRecentActivity(orgId);
+        break;
       default:
         console.warn("❓ No init logic defined for widget type:", widgetType);
     }
@@ -1154,6 +1158,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '#due-soon-tasks-widget': 'due-soon-tasks-widget',
           '#bookmarks-widget': 'bookmarks-widget',
           '#resources-widget':'resources-widget',
+          '#recent-activity-widget':'recent-activity-widget',
         };
 
         Object.entries(widgetMap).forEach(([selector, widgetType]) => {

@@ -1,6 +1,6 @@
 from django.http import JsonResponse,Http404
 from django.contrib.auth.decorators import login_required
-from .models import BookMarksWidget
+from .models import BookMarksWidget,RecentActivity
 from accounts.models import Organization, Profile
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -142,3 +142,26 @@ def user_resources_view(request, org_id):
 
   
 # // Widget 3 ) - Recent activities widget ----------------------------------------------------------------------------------------------------
+
+# Fetch recent activities
+@login_required
+def fetch_recent_activity_methods(request, org_id):
+    """
+    Fetch recent activity entries with ID and method for the logged-in user.
+    Note: org_id is accepted but not used for filtering currently.
+    """
+    user = request.user
+
+    recent_activities = RecentActivity.objects.filter(
+        user=user
+    ).order_by('-timestamp')[:50]
+
+    data = [
+        {
+            "id": activity.id,
+            "method": activity.method
+        }
+        for activity in recent_activities
+    ]
+
+    return JsonResponse({"activities": data}, status=200)
