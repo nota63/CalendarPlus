@@ -93,12 +93,7 @@ async function fetchAndRenderChannels(orgId) {
           }).join("")}
         </div>
         <div class="mt-4 px-3">
-          <button class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-sm font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center">
-            <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            Create Channel
-          </button>
+         
         </div>`;
         
       // Add hover effects after rendering
