@@ -55,6 +55,7 @@ urlpatterns = [
     path('workload/',include('workload.urls')),
     path('progress/',include('progress_widget.urls')),
     path('bookmarks/',include('bookmarks_widget.urls')),
+    path('channels_widget/',include('channels_widget.urls')),
     # ui components
     path('index/', views.styles, name= 'index'),
     path('weather/',views.weather, name='weather'),

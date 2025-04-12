@@ -20,6 +20,7 @@ class DashboardWidget(models.Model):
         ('bookmarks','Bookmarks'),
         ('resources','Resources'),
         ('recent_activity','Recent activity'),
+        ('channels','Channels'),
         # Add more widgets as you scale, my baby 💖
     ]
 
