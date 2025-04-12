@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponseBadRequest
 from group_tasks.models import CommunicateTask
+from django.views.decorators.http import require_GET
 # Fetch bookmarks
 
 class UserBookmarksView(View):
@@ -165,3 +166,29 @@ def fetch_recent_activity_methods(request, org_id):
     ]
 
     return JsonResponse({"activities": data}, status=200)
+
+# Fetch recent activity detail
+@require_GET
+def fetch_recent_activity_detail(request, org_id, activity_id):
+    try:
+        activity = RecentActivity.objects.get(id=activity_id)
+    except RecentActivity.DoesNotExist:
+        raise Http404("Activity not found.")
+
+    # Prepare data
+    data = {
+        "id": activity.id,
+        "user": activity.user.get_full_name() if activity.user else None,
+        "method": activity.method,
+        "activity_type": activity.activity_type,
+        "path": activity.path,
+        "model_name": activity.model_name,
+        "object_id": activity.object_id,
+        "description": activity.description,
+        "ip_address": activity.ip_address,
+        "user_agent": activity.user_agent,
+        "extra_data": activity.extra_data,
+        "timestamp": activity.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+    return JsonResponse({"activity": data})

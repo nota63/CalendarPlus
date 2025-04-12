@@ -353,6 +353,8 @@ async function fetchAndRenderResources(orgId) {
 
 
 // Widget 3 ) Fetch recent activity (Recent activity widget)----------------------------------------------------------------------------------------------------------
+const activityCache = {};
+
 async function fetchAndRenderRecentActivity(orgId) {
   const container = document.getElementById('recent-activity-widget');
   container.innerHTML = `<div class="text-gray-500 text-sm">Loading recent activities...</div>`;
@@ -368,7 +370,8 @@ async function fetchAndRenderRecentActivity(orgId) {
 
     const cardsHTML = data.activities.map((activity) => {
       return `
-        <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 hover:border-indigo-300 transition-all duration-200">
+        <div class="activity-card bg-white border border-gray-200 rounded-xl shadow-sm p-4 hover:border-indigo-300 transition-all duration-200"
+             data-activity-id="${activity.id}" data-org-id="${orgId}" style="position: relative; cursor: pointer;">
           <div class="flex items-center justify-between mb-2">
             <span class="text-xs font-medium px-2 py-1 rounded-full bg-indigo-50 text-indigo-600">${activity.method}</span>
             <span class="text-xs text-gray-400">#${activity.id}</span>
@@ -382,13 +385,55 @@ async function fetchAndRenderRecentActivity(orgId) {
 
     container.innerHTML = cardsHTML;
 
+    // Attach dynamic tooltip logic
+    document.querySelectorAll('.activity-card').forEach(card => {
+      const activityId = card.dataset.activityId;
+      const orgId = card.dataset.orgId;
+
+      let tooltip;
+
+      card.addEventListener('mouseenter', async (e) => {
+        tooltip = document.createElement('div');
+        tooltip.className = "z-50 absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 text-xs text-gray-600";
+        tooltip.innerHTML = `<div>Loading details...</div>`;
+        card.appendChild(tooltip);
+
+        if (activityCache[activityId]) {
+          tooltip.innerHTML = formatActivityTooltip(activityCache[activityId]);
+        } else {
+          try {
+            const res = await fetch(`/bookmarks/recent-activity-detail/${orgId}/${activityId}/`);
+            const { activity } = await res.json();
+            activityCache[activityId] = activity;
+            tooltip.innerHTML = formatActivityTooltip(activity);
+          } catch (err) {
+            tooltip.innerHTML = `<div class="text-red-500">Error loading details.</div>`;
+          }
+        }
+      });
+
+      card.addEventListener('mouseleave', () => {
+        if (tooltip && tooltip.parentNode) {
+          tooltip.remove();
+        }
+      });
+    });
+
   } catch (error) {
     console.error("Failed to fetch recent activity:", error);
     container.innerHTML = `<div class="text-red-500 text-sm">Error loading activity.</div>`;
   }
 }
 
-
-
-
-
+function formatActivityTooltip(activity) {
+  return `
+    <div><strong>User:</strong> ${activity.user || '—'}</div>
+    <div><strong>Path:</strong> ${activity.path || '—'}</div>
+    <div><strong>Type:</strong> ${activity.activity_type || '—'}</div>
+    <div><strong>Model:</strong> ${activity.model_name || '—'}</div>
+    <div><strong>Object ID:</strong> ${activity.object_id || '—'}</div>
+    <div><strong>IP:</strong> ${activity.ip_address || '—'}</div>
+    <div><strong>Agent:</strong> <span class="break-words">${activity.user_agent?.slice(0, 60) || '—'}</span></div>
+    <div><strong>Time:</strong> ${activity.timestamp}</div>
+  `;
+}
