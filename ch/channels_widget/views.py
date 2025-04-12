@@ -6,6 +6,8 @@ from accounts.models import Profile, Organization
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.timezone import now
 import json
+from django.views.decorators.http import require_POST
+from django.core.files.storage import default_storage
 # Create your views here.
 
 # fetch channels 
@@ -80,39 +82,37 @@ def fetch_channel_messages(request, org_id, channel_id):
 
 
 # save channel message 
-@csrf_exempt
-def post_channel_message(request, channel_id):
-    if request.method == 'POST':
-        try:
-            user = request.user
-            channel = get_object_or_404(Channel, id=channel_id)
+@require_POST
+@login_required
+def send_message_widget(request):
+    try:
+        org_id = request.POST.get('org_id')
+        channel_id = request.POST.get('channel_id')
+        content = request.POST.get('content', '').strip()
 
-            content = request.POST.get('content', '').strip()
-            parent_id = request.POST.get('parent')
-            audio = request.FILES.get('audio')
-            video = request.FILES.get('video')
+        channel = get_object_or_404(Channel, id=channel_id, organization_id=org_id)
+        organization = get_object_or_404(Organization, id=org_id)
 
-            if not content and not audio and not video:
-                return JsonResponse({'error': 'Message content or media required'}, status=400)
+        audio_file = request.FILES.get('audio')
+        video_file = request.FILES.get('video')
 
-            parent_msg = None
-            if parent_id:
-                parent_msg = Message.objects.filter(id=parent_id, channel=channel).first()
+        if not content and not audio_file and not video_file:
+            return JsonResponse({'status': 'error', 'message': 'Empty message not allowed'}, status=400)
 
-            msg = Message.objects.create(
-                channel=channel,
-                organization=channel.organization,
-                user=user,
-                content=content,
-                parent=parent_msg,
-                audio=audio,
-                video=video,
-                timestamp=now()
-            )
+        message = Message.objects.create(
+            channel=channel,
+            user=request.user,
+            content=content,
+            organization=organization,
+            audio=audio_file,
+            video=video_file
+        )
 
-            return JsonResponse({'success': True, 'message_id': msg.id})
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Message sent',
+            'message_id': message.id
+        })
 
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
-
-    return JsonResponse({'error': 'Invalid method'}, status=405)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)

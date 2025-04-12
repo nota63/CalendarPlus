@@ -1,4 +1,4 @@
-
+// Fetch and render workspace channels 
 // Fetch and render workspace channels 
 async function fetchAndRenderChannels(orgId) {
     const container = document.getElementById('channels-list-container');
@@ -39,68 +39,98 @@ async function fetchAndRenderChannels(orgId) {
     }
   }
   
-
-  document.addEventListener("DOMContentLoaded", () => {
-    document.body.addEventListener("click", async function (e) {
-      const channelCard = e.target.closest(".channel-card");
-      if (!channelCard) return;
+  // Channel card click handler
+  document.body.addEventListener("click", async function (e) {
+    const channelCard = e.target.closest(".channel-card");
+    if (!channelCard) return;
   
-      const channelId = channelCard.dataset.channelId;
-      const orgId = window.currentOrgId; // You must define this from backend context
+    const channelId = channelCard.dataset.channelId;
+    const orgId = window.currentOrgId;
   
-      // Update modal title
-      const modalTitle = document.getElementById("channelMessagesModalLabel");
-      modalTitle.textContent = `#${channelId} Messages`;
+    // Update modal title
+    const modalTitle = document.getElementById("channelMessagesModalLabel");
+    modalTitle.textContent = `#${channelId} Messages`;
   
-      // Show the modal
-      const modal = new bootstrap.Modal(document.getElementById("channelMessagesModal"));
-      modal.show();
+    // Show the modal
+    const modal = new bootstrap.Modal(document.getElementById("channelMessagesModal"));
+    modal.show();
   
-      // Fetch and render messages
-      await fetchAndRenderChannelMessages(orgId, channelId);
+    // Fetch and render messages
+    await fetchAndRenderChannelMessages(orgId, channelId);
   
-      // Store current channel info globally for sending messages
-      window.activeChannel = { channelId, orgId };
-    });
+    // Store active channel globally
+    window.activeChannel = { channelId, orgId };
+  });
   
-    // Handle message send
-    document.getElementById("send-channel-message-btn").addEventListener("click", async () => {
-      const text = document.getElementById("channel-message-textarea").value.trim();
-      const audioFile = document.getElementById("channel-audio-input").files[0];
-      const videoFile = document.getElementById("channel-video-input").files[0];
+// Handle sending a channel message
+document.addEventListener("DOMContentLoaded", function () {
+    const textarea = document.getElementById("channel-message-textarea");
   
-      if (!text && !audioFile && !videoFile) return;
+    if (!textarea) {
+      console.error("[DEBUG] #channel-message-textarea not found!");
+      return;
+    }
   
-      const formData = new FormData();
-      formData.append("content", text);
-      if (audioFile) formData.append("audio", audioFile);
-      if (videoFile) formData.append("video", videoFile);
+    textarea.addEventListener("keydown", async function (event) {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();  // Prevent newline
   
-      try {
-        const response = await fetch(`/channels_widget/send-channel-message/${window.activeChannel.channelId}/`, {
-          method: "POST",
-          headers: {
-            "X-CSRFToken": getCSRFToken(), // make sure this function is defined globally
-          },
-          body: formData,
-        });
+        const text = textarea.value.trim();
+        const audioFile = document.getElementById("channel-audio-input").files[0];
+        const videoFile = document.getElementById("channel-video-input").files[0];
   
-        const data = await response.json();
-        if (data.status === "success") {
-          document.getElementById("channel-message-textarea").value = "";
-          document.getElementById("channel-audio-input").value = "";
-          document.getElementById("channel-video-input").value = "";
-          fetchAndRenderChannelMessages(window.activeChannel.orgId, window.activeChannel.channelId);
-        } else {
-          alert("Failed to send message!");
+        console.log("[DEBUG] Text:", text);
+        console.log("[DEBUG] Audio File:", audioFile);
+        console.log("[DEBUG] Video File:", videoFile);
+  
+        if (!text && !audioFile && !videoFile) {
+          alert("Please enter a message or attach media.");
+          return;
         }
-      } catch (error) {
-        console.error("Message send error:", error);
+  
+        const formData = new FormData();
+        formData.append("content", text);
+        if (audioFile) formData.append("audio", audioFile);
+        if (videoFile) formData.append("video", videoFile);
+  
+        const channelId = window.activeChannel?.channelId;
+        const orgId = window.activeChannel?.orgId;
+  
+        if (!channelId || !orgId) {
+          alert("Cannot send message. Channel not active.");
+          return;
+        }
+  
+        try {
+          const response = await fetch(`/channels_widget/send-channel-message/${channelId}/`, {
+            method: "POST",
+            headers: {
+              "X-CSRFToken": getCSRFToken(),
+            },
+            body: formData,
+          });
+  
+          const data = await response.json();
+          console.log("[DEBUG] Server response:", data);
+  
+          if (data.status === "success") {
+            textarea.value = "";
+            document.getElementById("channel-audio-input").value = "";
+            document.getElementById("channel-video-input").value = "";
+            fetchAndRenderChannelMessages(orgId, channelId);
+          } else {
+            alert("Failed to send message: " + (data.message || "Unknown error"));
+          }
+        } catch (error) {
+          console.error("[DEBUG] Error:", error);
+          alert("Error sending message.");
+        }
       }
     });
   });
   
-  // Fetch messages and render
+  
+  // Fetch messages and render them
   async function fetchAndRenderChannelMessages(orgId, channelId) {
     const container = document.getElementById("channel-messages-container");
     container.innerHTML = `<div class="text-sm text-gray-500">Loading messages...</div>`;
@@ -127,7 +157,8 @@ async function fetchAndRenderChannels(orgId) {
               <div class="ms-4 mt-2 p-2 bg-white border rounded-sm">
                 <small><strong>${reply.user.full_name || reply.user.username}</strong>: ${reply.content}</small>
               </div>`).join('') : ''}
-          </div>`;
+          </div>
+        `;
       }).join("");
     } catch (error) {
       console.error("Error fetching messages:", error);
@@ -135,9 +166,11 @@ async function fetchAndRenderChannels(orgId) {
     }
   }
   
-  // CSRF Token utility (just in case you're using Django’s CSRF protection)
+  // CSRF token getter for Django
   function getCSRFToken() {
-    const cookieValue = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+    const cookieValue = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('csrftoken='));
     return cookieValue ? cookieValue.split('=')[1] : '';
   }
   
