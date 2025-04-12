@@ -181,7 +181,7 @@ function getCSRFToken() {
 
 // Widget 2 ) - Resources Widget ----------------------------------------------------------------------------------------------------
 
-// fetch and display the resources uploaded by the user accross the workspace
+// fetch and display the resources uploaded by the user across the workspace
 // fetch and display the resources uploaded by the user across the workspace
 async function fetchAndRenderResources(orgId) {
   const container = document.getElementById("resources-widget");
