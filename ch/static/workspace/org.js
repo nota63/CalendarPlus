@@ -1138,7 +1138,11 @@ document.addEventListener('DOMContentLoaded', function () {
       case 'time-traced-widget':
         console.log('time traced widget initialized')
         fetchTimeTracing(orgId);
-        break; 
+        break;
+      case 'high-priority-tasks-widget':
+          console.log('high priority tasks widget initialized')
+          fetchHighPriorityTasks(orgId);
+          break;  
       default:
         console.warn("❓ No init logic defined for widget type:", widgetType);
     }
@@ -1169,6 +1173,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '#recent-activity-widget':'recent-activity-widget',
           '#channels-widget':'channels-widget',
           '#time-traced-widget':'time-traced-widget',
+          '#high-priority-tasks-widget':'high-priority-tasks-widget',
         };
 
         Object.entries(widgetMap).forEach(([selector, widgetType]) => {

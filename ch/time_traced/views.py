@@ -1,12 +1,13 @@
 from group_tasks.models import Task, TaskTimeTracking
 from accounts.models import Organization , Profile
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
-
-
+# 1)Fetch time traced
 def task_time_tracking_summary(request, org_id):
     user = request.user
-    
+
     # check access
     if not Profile.objects.filter(user=user,organization_id=org_id).exists():
         return JsonResponse({'error:':'You are not authorized to view this!'}, status=400)
@@ -28,3 +29,29 @@ def task_time_tracking_summary(request, org_id):
         })
 
     return JsonResponse({'success': True, 'data': response_data})
+
+
+# Widget 2) High priority tasks widget ---------------------------------------------------------------------------------------------------------------
+
+@login_required
+def high_priority_tasks_widget(request, org_id):
+    tasks = Task.objects.filter(
+        organization_id=org_id,
+        assigned_to=request.user,
+        priority__in=['high', 'urgent'],
+        status__in=['pending', 'in_progress', 'overdue', 'pending_approval', 'need_changes']
+    ).select_related('group')
+
+    task_data = [
+        {
+            "id": task.id,
+            "title": task.title,
+            "group_name": task.group.name,
+            "status": task.status.replace("_", " ").title(),
+            "deadline": task.deadline.strftime('%Y-%m-%d %H:%M')
+        }
+        for task in tasks
+    ]
+
+    return JsonResponse({"tasks": task_data})
+

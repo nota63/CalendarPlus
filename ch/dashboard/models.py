@@ -22,6 +22,7 @@ class DashboardWidget(models.Model):
         ('recent_activity','Recent activity'),
         ('channels','Channels'),
         ('time_traced','Time traced'),
+        ('high_priority_tasks','High priority tasks'),
         # Add more widgets as you scale, my baby 💖
     ]
 

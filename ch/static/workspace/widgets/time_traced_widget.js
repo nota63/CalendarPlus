@@ -74,3 +74,42 @@ function fetchTimeTracing(orgId) {
             console.error('Time Tracking Widget Error:', error);
         });
 }
+
+
+// Widget 2) List high priority tasks -------------------------------------------------------------------------------------------------------------------------------------------
+function fetchHighPriorityTasks(orgId) {
+    fetch(`/time_traced/high-priority-tasks/${orgId}/`)
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById('high-priority-task-list');
+        container.innerHTML = '';
+  
+        if (data.tasks.length === 0) {
+          container.innerHTML = `<p class="text-gray-500 text-sm">No high priority tasks 😌</p>`;
+          return;
+        }
+  
+        data.tasks.forEach(task => {
+          const taskCard = document.createElement('div');
+          taskCard.className = "p-3 rounded-lg bg-white border border-red-100 shadow-sm hover:bg-red-50 transition-all duration-150";
+  
+          taskCard.innerHTML = `
+            <div class="font-semibold text-red-700">${task.title}</div>
+            <div class="text-xs text-gray-500">Group: ${task.group_name}</div>
+            <div class="flex justify-between items-center mt-1 text-xs">
+              <span class="px-2 py-0.5 rounded-full bg-red-100 text-red-600">${task.status}</span>
+              <span class="text-gray-600">Deadline: ${task.deadline}</span>
+            </div>
+          `;
+  
+          container.appendChild(taskCard);
+        });
+      })
+      .catch(error => {
+        console.error("Failed to fetch high priority tasks:", error);
+      });
+  }
+  
+
+
+
