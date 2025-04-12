@@ -2412,3 +2412,62 @@ a {
     pointer-events: auto;
   }
   
+/* Modal level styles  */
+/* Light theme for the widget select modal */
+#widgetSelectModal .modal-content {
+    background-color: #ffffff; /* Light background */
+    color: #333333; /* Dark text color for readability */
+    border-radius: 0.75rem; /* Rounded corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+#widgetSelectModal .modal-header {
+    background-color: #f7fafc; /* Soft light background for header */
+    color: #4a5568; /* Darker text color for header */
+    border-bottom: 1px solid #e2e8f0; /* Light border separating header */
+    padding: 1rem 1.5rem;
+}
+
+#widgetSelectModal .modal-title {
+    font-size: 1.25rem; /* Larger font size for the modal title */
+    font-weight: 600; /* Slightly bold title */
+}
+
+#widgetSelectModal .btn-close {
+    background-color: transparent; /* Transparent background for close button */
+    color: #4a5568; /* Close button color */
+    border: none; /* Remove border */
+    font-size: 1.25rem; /* Larger close button */
+}
+
+#widgetSelectModal .modal-body {
+    background-color: #ffffff; /* White background for body */
+    color: #4a5568; /* Dark text color */
+    padding: 1rem 1.5rem;
+}
+
+#widgetSelectModal .modal-footer {
+    background-color: #f7fafc; /* Light footer background */
+    border-top: 1px solid #e2e8f0; /* Light border on top */
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+#widgetSelectModal .btn {
+    background-color: #4c51bf; /* Primary blue button color */
+    color: #ffffff; /* White text for the button */
+    border-radius: 0.375rem; /* Rounded corners for buttons */
+    padding: 0.5rem 1rem; /* Adequate padding */
+    transition: background-color 0.3s ease; /* Smooth transition on hover */
+}
+
+#widgetSelectModal .btn:hover {
+    background-color: #434190; /* Darker shade on hover */
+}
+
+/* Additional focus styles for accessibility */
+#widgetSelectModal .btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(72, 130, 255, 0.5); /* Focus outline for buttons */
+}
