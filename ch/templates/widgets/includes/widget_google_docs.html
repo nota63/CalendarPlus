@@ -1,14 +1,68 @@
-<div id="google-docs-widget" class="p-4 bg-white rounded-xl border border-gray-200 shadow-sm space-y-4">
-    <!-- Input for Google Doc URL -->
-    <div class="mb-4">
-        <label for="doc-url" class="block text-sm font-medium text-gray-700">Enter Google Doc URL:</label>
-        <input type="text" id="doc-url" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="https://docs.google.com/document/d/...">
+<div id="google-docs-widget" class="bg-white rounded-xl shadow-[0_2px_16px_rgba(0,0,0,0.04)] w-full max-w-md">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-3 border-b border-gray-100">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+          <i class="fab fa-google-drive text-white text-base"></i>
+        </div>
+        <div>
+          <h3 class="text-sm font-semibold text-gray-900">Embed Document</h3>
+          <p class="text-xs text-gray-500 mt-0.5">Secure collaboration portal</p>
+        </div>
+      </div>
     </div>
-
-    <!-- Submit Button -->
-    <button onclick="fetchGoogleDocEmbed()" class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors">
-        Embed Google Doc
-    </button>
+  
+    <!-- Content -->
+    <div class="p-4 space-y-4">
+      <!-- URL Input -->
+      <div class="space-y-1.5">
+        <label class="text-xs font-medium text-gray-600 flex items-center gap-1.5">
+          <i class="fas fa-link text-gray-400 text-xs"></i>
+          Document URL
+        </label>
+        <div class="relative">
+          <input type="text" 
+                 id="doc-url"
+                 class="w-full px-3 py-2 pr-10 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-blue-200 focus:border-blue-400 placeholder-gray-400 transition-all"
+                 placeholder="Paste Docs link">
+          <i class="fas fa-file-import absolute right-3 top-2.5 text-gray-400 text-sm"></i>
+        </div>
+      </div>
+  
+      <!-- Action Section -->
+      <div class="space-y-2.5">
+        <button onclick="fetchGoogleDocEmbed()" 
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all">
+          <i class="fab fa-google-drive text-sm"></i>
+          Embed Document
+        </button>
+        
+        <!-- Preview Area -->
+        <div class="border border-dashed border-gray-200 rounded-lg p-3 bg-gray-50/50 min-h-[160px] flex items-center justify-center">
+          <div class="text-center text-gray-400 text-xs">
+            <i class="fas fa-file-alt text-xl mb-1.5"></i>
+            <p>Document preview</p>
+          </div>
+        </div>
+  
+        <!-- Recent Docs -->
+        <div class="pt-3 border-t border-gray-100">
+          <h4 class="text-[0.7rem] font-semibold text-gray-500 uppercase tracking-wide mb-2">Recent</h4>
+          <div class="space-y-1.5">
+            <a href="#" class="flex items-center gap-2 p-1.5 hover:bg-gray-50 rounded-md transition-colors">
+              <i class="fab fa-google-drive text-blue-600 text-sm"></i>
+              <span class="text-xs text-gray-700 truncate">Project_Specs.docx</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Status -->
+    <div id="doc-status" class="hidden px-4 py-2 bg-green-50/80 text-xs text-green-700 border-t border-green-100">
+      <i class="fas fa-check-circle mr-1.5 text-xs"></i>
+      Document embedded
+    </div>
 </div>
 
 <!-- Bootstrap Modal -->
