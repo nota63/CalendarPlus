@@ -152,5 +152,21 @@ function fetchHighPriorityTasks(orgId) {
   }
   
 
+//  Widget 3) Total Calpoints Earned --------------------------------------------------------------------------------------------------------
+function fetchCalPoints(orgId) {
+  fetch(`/time_traced/get-calpoints-balance/${orgId}/`)
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('user-name').textContent = data.username;
+      document.getElementById('org-name').textContent = data.organization_name;
+      document.getElementById('total-points').textContent = `${data.total_points} pts`;
+
+      const avatar = document.getElementById('user-avatar');
+      avatar.src = data.profile_pic || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(data.username);
+    })
+    .catch(error => {
+      console.error('Error loading CalPoints widget:', error);
+    });
+}
 
 

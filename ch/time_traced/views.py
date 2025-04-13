@@ -1,8 +1,8 @@
-from group_tasks.models import Task, TaskTimeTracking
+from group_tasks.models import Task, TaskTimeTracking,CalPoints
 from accounts.models import Organization , Profile
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Q,Sum
 
 # 1)Fetch time traced
 def task_time_tracking_summary(request, org_id):
@@ -56,3 +56,23 @@ def high_priority_tasks_widget(request, org_id):
 
     return JsonResponse({"tasks": task_data})
 
+
+# //  Widget 3) Total Calpoints Earned --------------------------------------------------------------------------------------------------------
+
+@login_required
+def get_calpoints_balance_view(request, org_id):
+    user = request.user
+    try:
+        profile = Profile.objects.get(user=user, organization_id=org_id)
+    except Profile.DoesNotExist:
+        return JsonResponse({'error': 'Profile not found for this organization.'}, status=404)
+
+    calpoints = CalPoints.objects.filter(user=user, organization_id=org_id)
+    total_points = calpoints.aggregate(total=Sum('points'))['total'] or 0
+
+    return JsonResponse({
+        'total_points': total_points,
+        'username': profile.full_name or user.username,
+        'profile_pic': profile.profile_picture.url if profile.profile_picture else '',
+        'organization_name': profile.organization.name
+    })

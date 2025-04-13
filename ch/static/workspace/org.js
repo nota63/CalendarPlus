@@ -1139,6 +1139,10 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('time traced widget initialized')
         fetchTimeTracing(orgId);
         break;
+      case 'balance-widget':
+          console.log('balance widget initialized')
+          fetchCalPoints(orgId);
+          break;
       case 'high-priority-tasks-widget':
           console.log('high priority tasks widget initialized')
           fetchHighPriorityTasks(orgId);
@@ -1174,6 +1178,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '#channels-widget':'channels-widget',
           '#time-traced-widget':'time-traced-widget',
           '#high-priority-tasks-widget':'high-priority-tasks-widget',
+          '#balance-widget':'balance-widget',
         };
 
         Object.entries(widgetMap).forEach(([selector, widgetType]) => {
