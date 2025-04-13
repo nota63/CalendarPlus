@@ -1158,7 +1158,11 @@ document.addEventListener('DOMContentLoaded', function () {
       case 'youtube-widget':
               console.log('youtube video embed widget initialized')
               fetchYouTubeEmbed();
-              break;              
+              break;
+      case 'figma-widget':
+              console.log('figma prototype embed widget initialized')
+              fetchFigmaEmbed();
+              break;                        
       default:
         console.warn("❓ No init logic defined for widget type:", widgetType);
     }
@@ -1194,6 +1198,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '#google-docs-widget':'google-docs-widget',
           '#google-sheets-widget':'google-sheets-widget',
           '#youtube-widget':'youtube-widget',
+          '#figma-widget':'figma-widget',
         };
 
         Object.entries(widgetMap).forEach(([selector, widgetType]) => {

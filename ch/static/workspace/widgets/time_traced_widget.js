@@ -391,3 +391,42 @@ function fetchYouTubeEmbed() {
     alert("🚨 Could not embed video. Please try again.");
   });
 }
+
+
+// Widget 7 ) Embed figma prototype --------------------------------------------------------------------------------------------------------
+
+function fetchFigmaEmbed() {
+  const figmaUrl = document.getElementById('figma-url').value;
+
+  fetch('/time_traced/embed-figma/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-CSRFToken': csrf_token
+    },
+    body: `figma_url=${encodeURIComponent(figmaUrl)}`
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.error) {
+      alert(data.error);
+    } else {
+      const iframe = `
+        <div class="w-full h-full relative">
+          <iframe 
+            src="${data.embed_url}" 
+            class="absolute top-0 left-0 w-full h-full border-none"
+            allowfullscreen>
+          </iframe>
+        </div>
+      `;
+      document.getElementById('modal-figma-content').innerHTML = iframe;
+      new bootstrap.Modal(document.getElementById('embedFigmaModal')).show();
+      document.getElementById('figma-status').classList.remove('hidden');
+    }
+  })
+  .catch(error => {
+    console.error(error);
+    alert("Error embedding Figma prototype.");
+  });
+}

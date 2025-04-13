@@ -27,6 +27,7 @@ class DashboardWidget(models.Model):
         ('google_docs','Google docs'),
         ('google_sheets','Google sheets'),
         ('youtube','Youtube'),
+        ('figma','Figma'),
         # Add more widgets as you scale, my baby 💖
     ]
 

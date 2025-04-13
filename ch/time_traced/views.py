@@ -227,3 +227,37 @@ def embed_youtube_video(request):
     
     logger.warning("[YouTube Embed View] Invalid request method.")
     return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+    
+
+# // Widget 7 ) Embed figma prototype --------------------------------------------------------------------------------------------------------
+
+def extract_figma_embed_url(url):
+    """
+    Accepts public Figma prototype URL and converts it into embed preview URL.
+    """
+    pattern = r"https:\/\/(?:www\.)?figma\.com\/(?:file|proto)\/([a-zA-Z0-9]+)"
+    match = re.search(pattern, url)
+    if match:
+        file_id = match.group(1)
+        return f"https://www.figma.com/embed?embed_host=calendarplus&url={url}"
+    return None
+
+@csrf_exempt
+def embed_figma_prototype(request):
+    if request.method == 'POST':
+        figma_url = request.POST.get('figma_url', '').strip()
+        if not figma_url:
+            return JsonResponse({'error': 'No URL provided'}, status=400)
+
+        embed_url = extract_figma_embed_url(figma_url)
+        if not embed_url:
+            return JsonResponse({'error': 'Invalid Figma URL'}, status=400)
+
+        return JsonResponse({'embed_url': embed_url})
+    
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+
