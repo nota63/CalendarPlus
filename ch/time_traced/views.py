@@ -127,8 +127,6 @@ def fetch_calpoints_history(request, org_id):
 
 
 # // widget 4) Embed a Google Doc -----------------------------------------------------------------------------------------------
-
-# Function to validate if the URL is a Google Doc URL
 # Function to validate if the URL is a Google Doc URL
 # Set up a logger
 import logging
