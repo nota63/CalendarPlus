@@ -241,32 +241,52 @@ function fetchCalpointsHistory(orgId) {
 }
 
 // widget 4) Embed a Google Doc -----------------------------------------------------------------------------------------------
-
 function fetchGoogleDocEmbed() {
   const docUrl = document.getElementById('doc-url').value;
 
-  // Send the URL to the Django backend
   fetch('/time_traced/embed-google-doc/', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'X-CSRFToken': csrf_token // Make sure CSRF token is passed in AJAX
-      },
-      body: `doc_url=${encodeURIComponent(docUrl)}`
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-CSRFToken': csrf_token
+    },
+    body: `doc_url=${encodeURIComponent(docUrl)}`
   })
-  .then(response => response.json())
-  .then(data => {
+    .then(response => response.json())
+    .then(data => {
       if (data.error) {
-          alert('Error: ' + data.error);
+        alert('Error: ' + data.error);
       } else {
-          // Show the modal with the embedded document
-          const embedUrl = data.embed_url;
-          const modalContent = document.getElementById('modal-embed-content');
-          modalContent.innerHTML = `<iframe src="${embedUrl}" width="100%" height="500px" frameborder="0"></iframe>`;
-          $('#embedDocModal').modal('show');
+        const embedUrl = data.embed_url;
+        const modalContent = document.getElementById('modal-embed-content');
+
+        // Set resizable iframe container
+        modalContent.innerHTML = `
+          <div id="resizable-container" style="
+              resize: both;
+              overflow: hidden;
+              border: 1px solid #ccc;
+              width: 100%;
+              height: 80vh;
+              min-width: 300px;
+              min-height: 300px;
+          ">
+            <iframe 
+              src="${embedUrl}" 
+              width="100%" 
+              height="100%" 
+              frameborder="0" 
+              style="border: none;"
+              allowfullscreen>
+            </iframe>
+          </div>
+        `;
+
+        const modal = new bootstrap.Modal(document.getElementById('embedDocModal'));
+        modal.show();
       }
-  })
-  .catch(error => {
+    })
+    .catch(error => {
       console.error('Error:', error);
-  });
+    });
 }

@@ -2471,3 +2471,10 @@ a {
     outline: none;
     box-shadow: 0 0 0 4px rgba(72, 130, 255, 0.5); /* Focus outline for buttons */
 }
+
+/* Google doc embed modal */
+#resizable-container {
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+    background: white;
+    border-radius: 8px;
+  }

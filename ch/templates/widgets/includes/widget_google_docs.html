@@ -12,15 +12,12 @@
 </div>
 
 <!-- Bootstrap Modal -->
-<div class="modal fade" id="embedDocModal" tabindex="-1" aria-labelledby="embedDocModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="embedDocModalLabel">Google Document</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="modal-embed-content">
-                <!-- The embedded document will appear here -->
+<!-- Bootstrap Modal - Fullscreen, No Header or Footer -->
+<div class="modal fade" id="embedDocModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content border-0 rounded-0">
+            <div class="modal-body p-0" id="modal-embed-content" style="height: 100vh; overflow: hidden;">
+                <!-- The embedded Google Doc will be injected here -->
             </div>
         </div>
     </div>
