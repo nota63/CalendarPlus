@@ -3,6 +3,8 @@ from accounts.models import Organization , Profile
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q,Sum
+from django.db import models 
+from django.shortcuts import get_object_or_404
 
 # 1)Fetch time traced
 def task_time_tracking_summary(request, org_id):
@@ -75,4 +77,40 @@ def get_calpoints_balance_view(request, org_id):
         'username': profile.full_name or user.username,
         'profile_pic': profile.profile_picture.url if profile.profile_picture else '',
         'organization_name': profile.organization.name
+    })
+
+# Fetch calpoints history
+@login_required
+def fetch_calpoints_history(request, org_id):
+    """
+    Fetch the CalPoints history for a user, given an organization ID.
+    Returns the points earned and when they were awarded.
+    """
+    # Fetch user's profile and organization info
+    profile=Profile.objects.filter(user=request.user,organization_id=org_id).first()
+    user_profile = profile.profile_picture.url if profile.profile_picture else None
+    organization = get_object_or_404(Organization,id=org_id)
+
+    # Check if the user belongs to the given organization
+    if organization.id != org_id:
+        return JsonResponse({"error": "Unauthorized access"}, status=403)
+
+    # Fetch the CalPoints data for the user and organization
+    calpoints_history = CalPoints.objects.filter(
+        user=request.user, organization=organization
+    ).values('created_at', 'points')
+
+    # Create a list to return the points history with the formatted date
+    history_data = [
+        {
+            'created_at': point['created_at'].strftime('%Y-%m-%d %H:%M:%S'),
+            'points': point['points']
+        }
+        for point in calpoints_history
+    ]
+
+    # Return the data as a JsonResponse
+    return JsonResponse({
+        "history": history_data,
+        "total_points": calpoints_history.aggregate(total_points=models.Sum('points'))['total_points'] or 0
     })

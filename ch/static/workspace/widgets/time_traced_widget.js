@@ -169,4 +169,42 @@ function fetchCalPoints(orgId) {
     });
 }
 
+// Fetch calpoints history
+function fetchCalpointsHistory(orgId) {
+  fetch(`/time_traced/fetch-calpoints-history/${orgId}/`)
+      .then(response => response.json())
+      .then(data => {
+          if (data.error) {
+              alert(data.error);
+              return;
+          }
+          
+          // Displaying the user's total points in the widget
+          document.getElementById('total-points').textContent = data.total_points;
 
+          // Populating the modal with the CalPoints history
+          const historyContainer = document.getElementById('calpoints-history');
+          historyContainer.innerHTML = ''; // Clear any previous history
+
+          data.history.forEach(item => {
+              const historyItem = document.createElement('div');
+              historyItem.classList.add('flex', 'justify-between', 'text-sm', 'text-gray-700', 'py-2', 'border-b');
+              historyItem.innerHTML = `
+                  <span>${item.created_at}</span>
+                  <span class="font-semibold">${item.points} points</span>
+              `;
+              historyContainer.appendChild(historyItem);
+          });
+
+          // Displaying the total points in the modal
+          document.getElementById('history-total-points').textContent = data.total_points;
+
+          // Show the modal
+          var myModal = new bootstrap.Modal(document.getElementById('calpointsHistoryModal'));
+          myModal.show();
+      })
+      .catch(error => {
+          console.error('Error fetching CalPoints history:', error);
+          alert('Something went wrong. Please try again later.');
+      });
+}

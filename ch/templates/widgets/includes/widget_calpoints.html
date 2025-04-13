@@ -1,15 +1,42 @@
 <div id="balance-widget" class="p-4 bg-white rounded-xl border border-gray-200 shadow-sm space-y-4">
     <div class="flex items-center gap-4">
-      <img id="user-avatar" src="" alt="Profile" class="w-12 h-12 rounded-full border border-gray-300 object-cover" />
-      <div>
-        <div id="user-name" class="text-base font-semibold text-gray-800">Loading...</div>
-        <div id="org-name" class="text-sm text-gray-500">...</div>
-      </div>
+        <img id="user-avatar" src="" alt="Profile" class="w-12 h-12 rounded-full border border-gray-300 object-cover" />
+        <div>
+            <div id="user-name" class="text-base font-semibold text-gray-800">Loading...</div>
+            <div id="org-name" class="text-sm text-gray-500">...</div>
+        </div>
     </div>
-  
+
     <div class="mt-4 text-center">
-      <div class="text-sm text-gray-600">Your Total CalPoints</div>
-      <div id="total-points" class="text-3xl font-bold text-green-600">0</div>
+        <div class="text-sm text-gray-600">Your Total CalPoints</div>
+        <div id="total-points" class="text-3xl font-bold text-green-600">0</div>
+
+        <!-- Icon to fetch CalPoints history -->
+        <button id="fetch-history-btn" class="text-sm text-blue-600 hover:text-blue-800 mt-2 inline-flex items-center gap-2 cursor-pointer" onclick="fetchCalpointsHistory(window.djangoData.orgId)">
+            <i class="bi bi-clock-history"></i> View History
+        </button>
+        
     </div>
-  </div>
+</div>
+
+<!-- Modal to display CalPoints History -->
+<div class="modal fade" id="calpointsHistoryModal" tabindex="-1" aria-labelledby="calpointsHistoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="calpointsHistoryModalLabel">CalPoints History</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="calpoints-history" class="space-y-2">
+                    <!-- History will be injected here -->
+                </div>
+                <div class="text-right">
+                    <div class="font-semibold text-xl">Total Points: <span id="history-total-points" class="text-green-600">0</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
   
