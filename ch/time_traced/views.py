@@ -37,6 +37,11 @@ def task_time_tracking_summary(request, org_id):
 
 @login_required
 def high_priority_tasks_widget(request, org_id):
+
+    # check access 
+    if not Profile.objects.filter(user=request.user,organization_id=org_id).exists():
+        return JsonResponse({'error:':'Unauthorized Access'}, status=400)
+    
     tasks = Task.objects.filter(
         organization_id=org_id,
         assigned_to=request.user,
@@ -90,6 +95,10 @@ def fetch_calpoints_history(request, org_id):
     profile=Profile.objects.filter(user=request.user,organization_id=org_id).first()
     user_profile = profile.profile_picture.url if profile.profile_picture else None
     organization = get_object_or_404(Organization,id=org_id)
+
+    # check the access 
+    if not profile:
+        return JsonResponse({'error:':'You are not authorized!'}, status=400)
 
     # Check if the user belongs to the given organization
     if organization.id != org_id:
