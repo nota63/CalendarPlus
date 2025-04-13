@@ -2478,3 +2478,10 @@ a {
     background: white;
     border-radius: 8px;
   }
+
+/* widgets gap */
+.widget-container {
+    max-width: 250px;  /* Set to your preferred max-width */
+    width: 100%;
+  }
+  
