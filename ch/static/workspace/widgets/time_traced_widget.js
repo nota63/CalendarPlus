@@ -169,6 +169,7 @@ function fetchCalPoints(orgId) {
     });
 }
 
+
 // Fetch calpoints history
 function fetchCalpointsHistory(orgId) {
   fetch(`/time_traced/fetch-calpoints-history/${orgId}/`)
@@ -190,9 +191,39 @@ function fetchCalpointsHistory(orgId) {
               const historyItem = document.createElement('div');
               historyItem.classList.add('flex', 'justify-between', 'text-sm', 'text-gray-700', 'py-2', 'border-b');
               historyItem.innerHTML = `
-                  <span>${item.created_at}</span>
-                  <span class="font-semibold">${item.points} points</span>
-              `;
+              <div class="flex items-start gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors group">
+                <!-- Activity Icon -->
+                <div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center mt-1">
+                  ${item.type === 'earned' ? 
+                    '<i class="fas fa-arrow-up text-indigo-600 text-sm"></i>' :
+                    '<i class="fas fa-arrow-down text-red-600 text-sm"></i>'}
+                </div>
+                
+                <!-- Content -->
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-baseline gap-2">
+                    <span class="text-sm font-medium text-gray-900">${item.description}</span>
+                    <span class="text-xs ${item.type === 'earned' ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'} px-2 py-1 rounded-full">
+                      ${item.type === 'earned' ? '+' : '-'}${item.points} pts
+                    </span>
+                    <span class="text-xs text-gray-400 ml-auto">${new Date(item.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
+                  </div>
+                  
+                  <!-- Metadata -->
+                  <div class="mt-1 flex items-center gap-2">
+                    <span class="text-xs text-gray-500">${new Date(item.created_at).toLocaleDateString()}</span>
+                    <div class="w-1 h-1 bg-gray-300 rounded-full"></div>
+                    <span class="text-xs text-indigo-600 flex items-center gap-1 cursor-pointer hover:text-indigo-700">
+                      <i class="fas fa-link text-[0.6rem]"></i>
+                      Source
+                    </span>
+                  </div>
+                </div>
+                
+                <!-- Status Indicator -->
+                <div class="w-2 h-2 rounded-full ${Date.now() - new Date(item.created_at) < 86400000 ? 'bg-green-400' : 'bg-gray-300'} mt-3 ml-2"></div>
+              </div>
+            `;
               historyContainer.appendChild(historyItem);
           });
 

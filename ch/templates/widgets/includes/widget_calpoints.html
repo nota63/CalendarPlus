@@ -1,24 +1,47 @@
-<div id="balance-widget" class="p-4 bg-white rounded-xl border border-gray-200 shadow-sm space-y-4">
-    <div class="flex items-center gap-4">
-        <img id="user-avatar" src="" alt="Profile" class="w-12 h-12 rounded-full border border-gray-300 object-cover" />
-        <div>
-            <div id="user-name" class="text-base font-semibold text-gray-800">Loading...</div>
-            <div id="org-name" class="text-sm text-gray-500">...</div>
+<div id="balance-widget" class="p-5 bg-white rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-200">
+    <!-- User Profile Section -->
+    <div class="flex items-center gap-3.5 pb-4 border-b border-gray-100">
+        <div class="relative">
+            <img id="user-avatar" src="" alt="Profile" 
+                 class="w-10 h-10 rounded-lg object-cover bg-gray-50 border border-gray-200/60 hover:border-gray-300 transition-colors">
+            <div class="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white"></div>
+        </div>
+        <div class="flex-1 min-w-0">
+            <div id="user-name" class="text-[15px] font-medium text-gray-900 truncate">Loading...</div>
+            <div id="org-name" class="text-[13px] text-gray-400 font-normal truncate">...</div>
         </div>
     </div>
 
-    <div class="mt-4 text-center">
-        <div class="text-sm text-gray-600">Your Total CalPoints</div>
-        <div id="total-points" class="text-3xl font-bold text-green-600">0</div>
+    <!-- Points Display -->
+    <div class="pt-4">
+        <div class="text-[13px] text-gray-400 font-medium uppercase tracking-wide mb-1.5">
+            Available Points
+        </div>
+        <div class="flex items-baseline gap-3">
+            <div id="total-points" class="text-3xl font-semibold text-gray-900">0</div>
+            <span class="text-sm text-green-500 bg-green-50 px-2 py-1 rounded-full">+2.4%</span>
+        </div>
 
-        <!-- Icon to fetch CalPoints history -->
-        <button id="fetch-history-btn" class="text-sm text-blue-600 hover:text-blue-800 mt-2 inline-flex items-center gap-2 cursor-pointer" onclick="fetchCalpointsHistory(window.djangoData.orgId)">
-            <i class="bi bi-clock-history"></i> View History
+        <!-- Progress Bar -->
+        <div class="mt-3.5 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+            <div class="w-3/4 h-full bg-gradient-to-r from-blue-400 to-indigo-400"></div>
+        </div>
+    </div>
+
+    <!-- History Action -->
+    <div class="mt-4 flex justify-end">
+        <button id="fetch-history-btn" 
+                class="flex items-center gap-1.5 text-[13px] text-gray-400 hover:text-gray-600 transition-colors group"
+                onclick="fetchCalpointsHistory(window.djangoData.orgId)">
+            <svg class="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Activity Timeline
         </button>
-        
     </div>
 </div>
 
+<!-- Modal to display CalPoints History -->
 <!-- Modal to display CalPoints History -->
 <div class="modal fade" id="calpointsHistoryModal" tabindex="-1" aria-labelledby="calpointsHistoryModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -38,5 +61,3 @@
         </div>
     </div>
 </div>
-
-  
