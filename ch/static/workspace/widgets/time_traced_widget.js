@@ -290,3 +290,44 @@ function fetchGoogleDocEmbed() {
       console.error('Error:', error);
     });
 }
+
+
+// widget 5) Google Sheets ----------------------------------------------------------------------------------------------------------------------------
+function fetchGoogleSheetEmbed() {
+  const sheetUrl = document.getElementById('sheet-url').value;
+
+  fetch('/time_traced/embed-google-sheet/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-CSRFToken': csrf_token
+    },
+    body: `sheet_url=${encodeURIComponent(sheetUrl)}`
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.error) {
+      alert('Error: ' + data.error);
+    } else {
+      const embedUrl = data.embed_url;
+      const modalContent = document.getElementById('modal-embed-contentt');
+      
+      modalContent.innerHTML = `
+        <div class="w-full h-full relative">
+          <iframe 
+            src="${embedUrl}" 
+            class="absolute top-0 left-0 w-full h-full border-none"
+            allowfullscreen>
+          </iframe>
+        </div>
+      `;
+
+      // Initialize the modal and show it
+      const modal = new bootstrap.Modal(document.getElementById('embedSheetModal'));
+      modal.show();
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}

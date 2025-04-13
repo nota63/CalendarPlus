@@ -155,3 +155,26 @@ def embed_google_doc(request):
             return JsonResponse({'error': 'Failed to extract document ID'}, status=500)
 
     return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+# // widget 5) Google Sheets ----------------------------------------------------------------------------------------------------------------------------
+def is_google_sheet_url(url):
+    pattern = r'https:\/\/docs\.google\.com\/spreadsheets\/d\/[a-zA-Z0-9-_]+'
+    return re.match(pattern, url) is not None
+
+def embed_google_sheet(request):
+    if request.method == 'POST':
+        sheet_url = request.POST.get('sheet_url')
+
+        if not sheet_url:
+            return JsonResponse({'error': 'No URL provided'}, status=400)
+
+        if is_google_sheet_url(sheet_url):
+            sheet_id = sheet_url.split('/d/')[1].split('/')[0]
+            embed_url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/edit?usp=sharing'
+
+            return JsonResponse({'embed_url': embed_url})
+
+        return JsonResponse({'error': 'Invalid Google Sheets URL'}, status=400)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)

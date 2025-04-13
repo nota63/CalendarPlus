@@ -1150,7 +1150,11 @@ document.addEventListener('DOMContentLoaded', function () {
       case 'google-docs-widget':
             console.log('Google docs widget initialized')
             fetchGoogleDocEmbed();
-            break;  
+            break; 
+      case 'google-sheets-widget':
+              console.log('Google sheets widget initialized')
+              fetchGoogleSheetEmbed();
+              break;    
       default:
         console.warn("❓ No init logic defined for widget type:", widgetType);
     }
@@ -1184,6 +1188,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '#high-priority-tasks-widget':'high-priority-tasks-widget',
           '#balance-widget':'balance-widget',
           '#google-docs-widget':'google-docs-widget',
+          '#google-sheets-widget':'google-sheets-widget',
         };
 
         Object.entries(widgetMap).forEach(([selector, widgetType]) => {

@@ -8,4 +8,5 @@ urlpatterns = [
     path('get-calpoints-balance/<int:org_id>/',get_calpoints_balance_view, name='get_calpoints_balance'),
     path('fetch-calpoints-history/<int:org_id>/',fetch_calpoints_history, name='fetch_calpoints_history'),
     path('embed-google-doc/',embed_google_doc, name='embed_google_doc'),
+    path('embed-google-sheet/',embed_google_sheet, name='embed_google_sheet'),
 ]

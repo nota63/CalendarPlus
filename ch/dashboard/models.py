@@ -25,6 +25,7 @@ class DashboardWidget(models.Model):
         ('high_priority_tasks','High priority tasks'),
         ('calpoints','Calpoints'),
         ('google_docs','Google docs'),
+        ('google_sheets','Google sheets'),
         # Add more widgets as you scale, my baby 💖
     ]
 
