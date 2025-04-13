@@ -1146,7 +1146,11 @@ document.addEventListener('DOMContentLoaded', function () {
       case 'high-priority-tasks-widget':
           console.log('high priority tasks widget initialized')
           fetchHighPriorityTasks(orgId);
-          break;  
+          break; 
+      case 'google-docs-widget':
+            console.log('Google docs widget initialized')
+            fetchGoogleDocEmbed();
+            break;  
       default:
         console.warn("❓ No init logic defined for widget type:", widgetType);
     }
@@ -1179,6 +1183,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '#time-traced-widget':'time-traced-widget',
           '#high-priority-tasks-widget':'high-priority-tasks-widget',
           '#balance-widget':'balance-widget',
+          '#google-docs-widget':'google-docs-widget',
         };
 
         Object.entries(widgetMap).forEach(([selector, widgetType]) => {

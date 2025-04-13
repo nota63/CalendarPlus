@@ -24,6 +24,7 @@ class DashboardWidget(models.Model):
         ('time_traced','Time traced'),
         ('high_priority_tasks','High priority tasks'),
         ('calpoints','Calpoints'),
+        ('google_docs','Google docs'),
         # Add more widgets as you scale, my baby 💖
     ]
 

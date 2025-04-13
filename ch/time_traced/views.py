@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q,Sum
 from django.db import models 
 from django.shortcuts import get_object_or_404
+import re 
 
 # 1)Fetch time traced
 def task_time_tracking_summary(request, org_id):
@@ -123,3 +124,34 @@ def fetch_calpoints_history(request, org_id):
         "history": history_data,
         "total_points": calpoints_history.aggregate(total_points=models.Sum('points'))['total_points'] or 0
     })
+
+
+# // widget 4) Embed a Google Doc -----------------------------------------------------------------------------------------------
+
+# Function to validate if the URL is a Google Doc URL
+# Function to validate if the URL is a Google Doc URL
+# Set up a logger
+import logging
+logger = logging.getLogger(__name__)
+def embed_google_doc(request):
+    if request.method == 'POST':
+        doc_url = request.POST.get('doc_url')
+
+        if not doc_url:
+            return JsonResponse({'error': 'No URL provided'}, status=400)
+
+        logger.debug(f"Received Google Doc URL: {doc_url}")
+
+        # Bypass validation and directly extract document ID
+        try:
+            # Extract the document ID from the URL (this assumes the URL follows the correct format)
+            doc_id = doc_url.split('/d/')[1].split('/')[0]
+            # Change the URL to allow editing
+            edit_url = f'https://docs.google.com/document/d/{doc_id}/edit'
+            logger.debug(f"Generated edit URL: {edit_url}")
+            return JsonResponse({'embed_url': edit_url})
+        except Exception as e:
+            logger.error(f"Error extracting doc_id: {str(e)}")
+            return JsonResponse({'error': 'Failed to extract document ID'}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
