@@ -6,6 +6,8 @@ from django.db.models import Q,Sum
 from django.db import models 
 from django.shortcuts import get_object_or_404
 import re 
+from django.views.decorators.csrf import csrf_exempt
+
 
 # 1)Fetch time traced
 def task_time_tracking_summary(request, org_id):
@@ -175,4 +177,53 @@ def embed_google_sheet(request):
 
         return JsonResponse({'error': 'Invalid Google Sheets URL'}, status=400)
 
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+# Widget 6) Embed youtube video --------------------------------------------------------------------------------------------------------------------
+def extract_youtube_video_id(url):
+    logger.info(f"[YouTube Extractor] Raw URL: {url}")
+
+    patterns = [
+        r"(?:youtube\.com/watch\?v=|youtu\.be/|youtube\.com/embed/|youtube\.com/v/|youtube\.com/shorts/)([a-zA-Z0-9_-]{11})",
+        r"v=([a-zA-Z0-9_-]{11})",  # fallback
+    ]
+
+    for idx, pattern in enumerate(patterns):
+        match = re.search(pattern, url)
+        if match:
+            video_id = match.group(1)
+            logger.info(f"[YouTube Extractor] Pattern {idx+1} matched. Extracted ID: {video_id}")
+            return video_id
+        else:
+            logger.warning(f"[YouTube Extractor] Pattern {idx+1} failed: {pattern}")
+    
+    logger.error("[YouTube Extractor] No matching pattern found.")
+    return None
+
+@csrf_exempt
+def embed_youtube_video(request):
+    if request.method == 'POST':
+        video_url = request.POST.get('video_url', '').strip()
+        logger.info(f"[YouTube Embed View] Received URL: {video_url}")
+
+        if not video_url:
+            logger.error("[YouTube Embed View] No URL provided.")
+            return JsonResponse({'error': 'No URL provided'}, status=400)
+
+        video_id = extract_youtube_video_id(video_url)
+        if not video_id:
+            logger.error("[YouTube Embed View] Invalid YouTube URL.")
+            return JsonResponse({
+                'error': 'Invalid YouTube URL',
+                'debug': {
+                    'received_url': video_url
+                }
+            }, status=400)
+
+        embed_url = f'https://www.youtube.com/embed/{video_id}'
+        logger.info(f"[YouTube Embed View] Final embed URL: {embed_url}")
+        return JsonResponse({'embed_url': embed_url})
+    
+    logger.warning("[YouTube Embed View] Invalid request method.")
     return JsonResponse({'error': 'Invalid request method'}, status=405)

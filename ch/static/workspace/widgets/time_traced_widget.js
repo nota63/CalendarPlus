@@ -331,3 +331,63 @@ function fetchGoogleSheetEmbed() {
     console.error('Error:', error);
   });
 }
+
+
+
+// # Widget 6) Embed youtube video --------------------------------------------------------------------------------------------------------------------
+function fetchYouTubeEmbed() {
+  const input = document.getElementById('youtube-url');
+  const videoUrl = input?.value?.trim();
+
+  if (!videoUrl) {
+    alert("🚫 Please enter a YouTube video URL.");
+    return;
+  }
+
+  // Add loading spinner or disable button if needed
+  const status = document.getElementById('youtube-status');
+  status?.classList.remove('hidden');
+  status.textContent = '⏳ Loading video preview...';
+
+  fetch('/time_traced/embed-youtube-video/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-CSRFToken': csrf_token
+    },
+    body: `video_url=${encodeURIComponent(videoUrl)}`
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Server error " + res.status);
+    return res.json();
+  })
+  .then(data => {
+    if (data.error) {
+      status.textContent = '❌ ' + data.error;
+      alert("⚠️ " + data.error);
+    } else {
+      const embedHTML = `
+        <div class="w-full h-0 pt-[56.25%] relative rounded overflow-hidden shadow-md">
+          <iframe 
+            src="${data.embed_url}" 
+            class="absolute top-0 left-0 w-full h-full border-0 rounded"
+            frameborder="0"
+            allowfullscreen
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+          </iframe>
+        </div>
+      `;
+
+      document.getElementById('modal-youtube-content').innerHTML = embedHTML;
+      const modal = new bootstrap.Modal(document.getElementById('embedYouTubeModal'));
+      modal.show();
+
+      status.textContent = '✅ Video loaded successfully!';
+    }
+  })
+  .catch(error => {
+    console.error("❌ Video embed error:", error);
+    status.textContent = '❌ Failed to load video. Please check the URL.';
+    alert("🚨 Could not embed video. Please try again.");
+  });
+}

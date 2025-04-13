@@ -26,6 +26,7 @@ class DashboardWidget(models.Model):
         ('calpoints','Calpoints'),
         ('google_docs','Google docs'),
         ('google_sheets','Google sheets'),
+        ('youtube','Youtube'),
         # Add more widgets as you scale, my baby 💖
     ]
 
