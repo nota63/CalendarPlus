@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from group_tasks.models import Task  
 from accounts.models import Organization, Profile
+from django.db.models import Count
 
 
 # Widget 1) Number of tasks in progress 
@@ -31,3 +32,34 @@ def tasks_in_progress_count(request, org_id):
     
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+# // Widget 2 Completed Tasks Per Group------------------------------------------------------------------------------------------------------------------
+
+@login_required
+def completed_tasks_summary(request, org_id):
+    user = request.user
+
+    # Filter completed tasks assigned to the user in the given organization
+    completed_tasks = Task.objects.filter(
+        organization_id=org_id,
+        assigned_to=user,
+        status='completed'
+    )
+
+    # Total completed tasks
+    total_completed = completed_tasks.count()
+
+    # Group-wise breakdown
+    groupwise = (
+        completed_tasks
+        .values('group__name')
+        .annotate(count=Count('id'))
+        .order_by('-count')
+    )
+
+    return JsonResponse({
+        "total_completed": total_completed,
+        "groupwise": list(groupwise)
+    })
+

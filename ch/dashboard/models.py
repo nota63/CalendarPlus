@@ -29,6 +29,7 @@ class DashboardWidget(models.Model):
         ('youtube','Youtube'),
         ('figma','Figma'),
         ('tasks_in_progress','Tasks in progress'),
+        ('completed_tasks','Completed tasks'),
         # Add more widgets as you scale, my baby 💖
     ]
 

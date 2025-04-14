@@ -1166,7 +1166,11 @@ document.addEventListener('DOMContentLoaded', function () {
       case 'tasks-in-progress-widget':
               console.log('tasks in progress widget initialized')
               fetchTasksProgressCount(orgId);
-              break;                                     
+              break;
+      case 'completed-tasks-widget':
+              FetchCompletedTasksSummary(orgId);
+              break;
+                                                       
       default:
         console.warn("❓ No init logic defined for widget type:", widgetType);
     }
@@ -1204,6 +1208,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '#youtube-widget':'youtube-widget',
           '#figma-widget':'figma-widget',
           '#tasks-in-progress-widget':'tasks-in-progress-widget',
+          '#completed-tasks-widget':'completed-tasks-widget',
         };
 
         Object.entries(widgetMap).forEach(([selector, widgetType]) => {
