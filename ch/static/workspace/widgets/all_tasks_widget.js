@@ -343,3 +343,232 @@ function FetchStatusOverTime(orgId) {
         `;
       });
   }
+
+// Widget 4) Tag usage bar chart-------------------------------------------------------------------------------------------------------------  
+function FetchTagUsageSummary(orgId) {
+    const widget = document.getElementById("tag-usage-widget");
+    
+    // Apply Tailwind styles to the loading state
+    widget.innerHTML = `
+      <div class="flex items-center justify-center w-full h-64 rounded-lg bg-gray-50 dark:bg-gray-800">
+        <div class="flex flex-col items-center">
+          <div class="w-12 h-12 mb-4">
+            <svg class="w-full h-full animate-spin text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </div>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Loading tag data...</p>
+        </div>
+      </div>
+    `;
+    
+    fetch(`/tasks_widgets/tag-usage-summary/${orgId}/`)
+      .then(response => response.json())
+      .then(data => {
+        // Create a styled container for the chart
+        widget.innerHTML = `
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 w-full">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Tag Usage Summary</h3>
+              <div class="flex space-x-2">
+                <button class="text-gray-500 hover:text-indigo-600 focus:outline-none" title="Download CSV">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </button>
+                <button class="text-gray-500 hover:text-indigo-600 focus:outline-none" title="Refresh" onclick="FetchTagUsageSummary('${orgId}')">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </button>
+                  <button onclick="openFullScreenWidget('tag-usage-widget')" title="Fullscreen" class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                    <svg class="w-5 h-5 text-gray-400 hover:text-indigo-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+                    </svg>
+                </button>
+              </div>
+            </div>
+            
+            <div class="relative">
+              <canvas id="tagUsageChart" height="280" class="w-full"></canvas>
+            </div>
+            
+            <div class="mt-4 flex flex-wrap gap-2 justify-center">
+              ${data.labels.map((label, index) => `
+                <div class="flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300">
+                  <span class="w-2 h-2 mr-2 rounded-full" style="background-color: ${getTagColor(index)};"></span>
+                  ${label} <span class="ml-1 text-gray-500 dark:text-gray-400">(${data.data[index]})</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+        
+        const ctx = document.getElementById("tagUsageChart").getContext("2d");
+        
+        // Create a visually appealing color palette for the bars
+        const tagColors = data.labels.map((_, index) => getTagColor(index));
+        const tagBorderColors = tagColors.map(color => adjustColorBrightness(color, -10));
+        
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: data.labels,
+            datasets: [{
+              label: 'Tag Usage',
+              data: data.data,
+              backgroundColor: tagColors,
+              borderColor: tagBorderColors,
+              borderWidth: 1,
+              borderRadius: 8,
+              hoverBackgroundColor: tagColors.map(color => adjustColorBrightness(color, 10)),
+              hoverBorderColor: tagBorderColors.map(color => adjustColorBrightness(color, 5)),
+              hoverBorderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { 
+                display: false 
+              },
+              tooltip: {
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                titleColor: '#333',
+                bodyColor: '#666',
+                bodyFont: {
+                  family: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                  size: 12
+                },
+                titleFont: {
+                  family: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                  size: 14,
+                  weight: 'bold'
+                },
+                borderColor: 'rgba(0, 0, 0, 0.1)',
+                borderWidth: 1,
+                cornerRadius: 8,
+                padding: 12,
+                boxPadding: 6,
+                displayColors: true,
+                usePointStyle: true,
+                callbacks: {
+                  title: function(tooltipItems) {
+                    return tooltipItems[0].label;
+                  },
+                  label: function(context) {
+                    return `Count: ${context.raw} tasks`;
+                  }
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { 
+                  stepSize: 1,
+                  font: {
+                    family: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                    size: 11
+                  },
+                  color: 'rgba(0, 0, 0, 0.6)',
+                  padding: 10
+                },
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.05)',
+                  drawBorder: false
+                }
+              },
+              x: {
+                ticks: {
+                  font: {
+                    family: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                    size: 11
+                  },
+                  color: 'rgba(0, 0, 0, 0.6)'
+                },
+                grid: {
+                  display: false,
+                  drawBorder: false
+                }
+              }
+            },
+            layout: {
+              padding: {
+                top: 5,
+                right: 16,
+                bottom: 16,
+                left: 16
+              }
+            },
+            animation: {
+              duration: 1000,
+              easing: 'easeOutQuart'
+            }
+          }
+        });
+      })
+      .catch(error => {
+        console.error("Failed to load tag usage widget:", error);
+        
+        // Apply Tailwind styles to the error state
+        widget.innerHTML = `
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 w-full">
+            <div class="flex flex-col items-center justify-center text-center">
+              <div class="rounded-full bg-red-100 p-3 mb-4">
+                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Failed to load tag data</h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">There was an error retrieving the tag usage data.</p>
+              <button onclick="FetchTagUsageSummary('${orgId}')" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                Retry
+              </button>
+            </div>
+          </div>
+        `;
+      });
+  }
+  
+  // Helper function to generate consistent colors for tags
+  function getTagColor(index) {
+    const colors = [
+      '#6366F1', // Indigo
+      '#8B5CF6', // Purple
+      '#EC4899', // Pink
+      '#EF4444', // Red
+      '#F97316', // Orange
+      '#F59E0B', // Amber
+      '#10B981', // Emerald
+      '#06B6D4', // Cyan
+      '#3B82F6', // Blue
+      '#14B8A6', // Teal
+      '#8B5CF6', // Purple
+      '#A855F7'  // Purple-brighter
+    ];
+    
+    return colors[index % colors.length];
+  }
+  
+  // Helper function to adjust color brightness
+  function adjustColorBrightness(hex, percent) {
+    // Parse the hex color
+    let r = parseInt(hex.substring(1, 3), 16);
+    let g = parseInt(hex.substring(3, 5), 16);
+    let b = parseInt(hex.substring(5, 7), 16);
+    
+    // Adjust brightness
+    r = Math.min(255, Math.max(0, r + (r * percent / 100)));
+    g = Math.min(255, Math.max(0, g + (g * percent / 100)));
+    b = Math.min(255, Math.max(0, b + (b * percent / 100)));
+    
+    // Convert back to hex
+    return `#${Math.round(r).toString(16).padStart(2, '0')}${Math.round(g).toString(16).padStart(2, '0')}${Math.round(b).toString(16).padStart(2, '0')}`;
+  }

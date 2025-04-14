@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from group_tasks.models import Task  
+from group_tasks.models import Task,TaskTag
 from accounts.models import Organization, Profile
 from django.db.models import Count
 from django.db.models.functions import TruncDate
@@ -118,3 +118,29 @@ def status_over_time_view(request, org_id):
         final_data['datasets'].append(dataset)
 
     return JsonResponse({'data': final_data})
+
+
+
+# // Widget 4) Tag usage bar chart-------------------------------------------------------------------------------------------------------------  
+def tag_usage_summary(request, org_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+
+    tags_data = (
+        TaskTag.objects.filter(organization_id=org_id)
+        .values('name')
+        .annotate(count=Count('id'))
+        .order_by('-count')
+    )
+
+    response_data = {
+        'labels': [entry['name'] for entry in tags_data],
+        'data': [entry['count'] for entry in tags_data],
+    }
+
+    return JsonResponse(response_data)
+
+
+
+
+
