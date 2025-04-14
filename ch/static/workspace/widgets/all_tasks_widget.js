@@ -9,7 +9,7 @@ function fetchTasksProgressCount(orgId) {
           countDisplay.textContent = 'Err';
           console.error('Error fetching task count:', data.error);
         } else {
-          countDisplay.textContent = data.count;
+            countDisplay.textContent = data.count;
         }
       })
       .catch(error => {
