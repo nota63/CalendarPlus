@@ -1170,6 +1170,9 @@ document.addEventListener('DOMContentLoaded', function () {
       case 'completed-tasks-widget':
               FetchCompletedTasksSummary(orgId);
               break;
+      case 'status-over-time-widget':
+              FetchStatusOverTime(orgId);
+              break;      
                                                        
       default:
         console.warn("❓ No init logic defined for widget type:", widgetType);
@@ -1209,6 +1212,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '#figma-widget':'figma-widget',
           '#tasks-in-progress-widget':'tasks-in-progress-widget',
           '#completed-tasks-widget':'completed-tasks-widget',
+          '#status-over-time-widget':'status-over-time-widget',
         };
 
         Object.entries(widgetMap).forEach(([selector, widgetType]) => {

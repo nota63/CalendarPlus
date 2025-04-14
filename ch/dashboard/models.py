@@ -30,6 +30,7 @@ class DashboardWidget(models.Model):
         ('figma','Figma'),
         ('tasks_in_progress','Tasks in progress'),
         ('completed_tasks','Completed tasks'),
+        ('status_over_time','Status over time'),
         # Add more widgets as you scale, my baby 💖
     ]
 

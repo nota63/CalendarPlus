@@ -95,3 +95,69 @@ function FetchCompletedTasksSummary(orgId) {
         `;
       });
   }
+
+// widget 3 tasks status over time -----------------------------------------------------------------------------------------------------------
+function FetchStatusOverTime(orgId) {
+    const widget = document.getElementById("status-over-time-widget");
+    widget.innerHTML = '<p class="text-muted">Loading chart...</p>';
+  
+    fetch(`/tasks_widgets/status-over-time/${orgId}/`)
+      .then(response => response.json())
+      .then(data => {
+        const chartData = data.data;
+        widget.innerHTML = '<canvas id="statusOverTimeChart" height="280"></canvas>';
+  
+        const ctx = document.getElementById("statusOverTimeChart").getContext("2d");
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: chartData.labels,
+            datasets: chartData.datasets.map(ds => ({
+              ...ds,
+              fill: false,
+              borderWidth: 2,
+              tension: 0.4
+            }))
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top',
+                labels: {
+                  boxWidth: 14
+                }
+              },
+              title: {
+                display: true,
+                text: 'Task Status Over Time',
+                font: {
+                  size: 16
+                }
+              }
+            },
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: 'Date'
+                }
+              },
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: 'Count'
+                }
+              }
+            }
+          }
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching status over time:', error);
+        widget.innerHTML = `<p class="text-danger">Failed to load chart.</p>`;
+      });
+  }
+  
