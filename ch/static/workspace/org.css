@@ -2484,4 +2484,10 @@ a {
     max-width: 250px;  /* Set to your preferred max-width */
     width: 100%;
   }
+
+/* business badge  */
+.business-badge {
+    top: 10px;
+    right: 10px;
+  }
   

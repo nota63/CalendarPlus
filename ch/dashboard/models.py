@@ -28,6 +28,7 @@ class DashboardWidget(models.Model):
         ('google_sheets','Google sheets'),
         ('youtube','Youtube'),
         ('figma','Figma'),
+        ('tasks_in_progress','Tasks in progress'),
         # Add more widgets as you scale, my baby 💖
     ]
 
