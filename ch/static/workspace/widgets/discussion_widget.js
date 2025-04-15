@@ -131,12 +131,39 @@ bubble.appendChild(messageContent);
         const bubble = document.createElement('div');
         bubble.className = 'text-end text-primary';
   
-        let content = '';
-        if (text) content += `<small>${text}</small><br>`;
-        if (code) content += `<pre class="bg-light p-2 rounded"><code>${code}</code></pre>`;
-        if (data.file_url) content += `<a href="${data.file_url}" target="_blank">Download File</a><br>`;
-  
-        content += `<small class="text-muted">${data.timestamp}</small>`;
+        let content = '<div class="flex flex-col space-y-2">';
+
+        // Message text with proper styling
+        if (text) {
+          content += `<div class="text-sm text-gray-800 leading-relaxed break-words">${text}</div>`;
+        }
+        
+        // Code snippet with improved styling
+        if (code) {
+          content += `
+            <div class="relative bg-gray-100 rounded-md p-3 border-l-4 border-indigo-500">
+              <div class="absolute top-2 right-2 text-xs px-2 py-1 bg-gray-200 rounded text-gray-600 font-medium">CODE</div>
+              <pre class="text-xs font-mono text-gray-800 whitespace-pre-wrap overflow-x-auto mt-2 max-h-60 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100"><code>${code}</code></pre>
+            </div>
+          `;
+        }
+        
+        // File attachment with icon and better visual
+        if (data.file_url) {
+          content += `
+            <a href="${data.file_url}" target="_blank" class="flex items-center space-x-2 text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 transition duration-200 py-2 px-3 rounded-md w-fit">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+              </svg>
+              <span class="text-sm font-medium">Download File</span>
+            </a>
+          `;
+        }
+        
+        // Timestamp with subtle styling
+        content += `<div class="text-xs text-gray-400 mt-1">${data.timestamp}</div>`;
+        content += '</div>';
+        
         bubble.innerHTML = content;
         chatBox.appendChild(bubble);
   
@@ -151,3 +178,9 @@ bubble.appendChild(messageContent);
     return document.querySelector('[name=csrfmiddlewaretoken]').value;
   }
   
+
+// save code 
+function toggleCodeInput() {
+    const codeInput = document.getElementById("chatCode");
+    codeInput.style.display = codeInput.style.display === "none" ? "block" : "none";
+  }

@@ -7,69 +7,73 @@
 
   
 <!-- chat modal -->
-<!-- Chat Modal - ClickUp Inspired -->
+<!-- Chat Modal - Footer Gap Fixed & Send Button Enlarged -->
 <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable max-w-lg">
-      <div class="modal-content bg-white shadow-xl rounded-lg border-0">
-        <!-- Header with gradient background -->
-        <div class="modal-header border-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-t-lg">
-          <div class="flex items-center">
-            <h5 class="modal-title text-white font-medium text-lg" id="chatModalLabel">Chat</h5>
-            <span class="bg-green-400 w-2 h-2 rounded-full ml-2"></span>
+    <div class="modal-dialog modal-dialog-scrollable max-w-lg h-[90vh]">
+      <div class="modal-content bg-white shadow-xl rounded-lg border-0 h-full flex flex-col">
+  
+        <!-- Header -->
+        <div class="modal-header border-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-t-lg px-4 py-2">
+          <div class="flex items-center justify-between w-full">
+            <div class="flex items-center space-x-2">
+              <h5 class="modal-title text-white font-semibold text-sm" id="chatModalLabel">Chat</h5>
+              <span class="bg-green-400 w-2 h-2 rounded-full"></span>
+            </div>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        
-        <!-- Chat body -->
-        <div class="modal-body p-0">
-          <!-- Messages container with fixed height and scroll -->
-          <div id="chatMessages" class="p-4 h-96 overflow-y-auto bg-gray-50 flex flex-col space-y-3"></div>
-          
-          <!-- Hidden fields -->
+  
+        <!-- Body -->
+        <div class="modal-body p-0 flex-grow flex flex-col">
+  
+          <!-- Messages Section -->
+          <div id="chatMessages" class="p-3 overflow-y-auto bg-gray-50 flex-grow text-sm space-y-2"></div>
+  
+          <!-- Hidden Fields -->
           <input type="hidden" id="chatUserId">
           <input type="hidden" id="chatOrgId">
-          
-          <!-- Message composition area -->
-          <div class="p-4 bg-white border-t border-gray-200">
-            <!-- Text input with modern styling -->
-            <div class="mb-3 relative">
-              <textarea id="chatInput" rows="2" 
-                class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 resize-none placeholder-gray-400 text-sm"
-                placeholder="Type your message..."></textarea>
-            </div>
-            
-            <!-- Controls with visual enhancements -->
+  
+          <!-- Footer Input Area -->
+          <div class="p-3 border-t border-gray-200 bg-white">
             <div class="flex flex-col space-y-2">
-              <!-- Code snippet with icon -->
-              <div class="relative">
-                <div class="absolute left-3 top-2 text-gray-400">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
-                  </svg>
+              
+              <!-- Textarea -->
+              <textarea id="chatInput" rows="2" placeholder="Type your message..."
+                class="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500 text-sm resize-none"></textarea>
+  
+              <!-- Controls -->
+              <div class="flex items-center justify-between space-x-2 text-gray-500 text-xs">
+                
+                <!-- Left Icons -->
+                <div class="flex items-center space-x-3">
+                  <button class="hover:text-indigo-600" title="Emoji">😊</button>
+  
+                  <button onclick="toggleCodeInput()" class="hover:text-indigo-600" title="Code">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path d="M16 18l6-6-6-6M8 6l-6 6 6 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+  
+                  <label for="chatFile" class="cursor-pointer hover:text-indigo-600" title="Attach file">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </label>
+                  <input type="file" id="chatFile" class="hidden" />
                 </div>
-                <textarea id="chatCode" rows="2" 
-                  class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 resize-none placeholder-gray-400 text-sm"
-                  placeholder="Paste code snippet (optional)..."></textarea>
-              </div>
-              
-              <!-- File upload with icon -->
-              <div class="relative">
-                <label for="chatFile" class="w-full flex items-center px-4 py-2 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition duration-200 text-sm">
-                  <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+  
+                <!-- Bigger Send Button -->
+                <button onclick="sendMessage()" class="bg-indigo-600 hover:bg-indigo-700 text-white py-1.5 px-5 rounded-md text-sm font-semibold flex items-center space-x-1 focus:outline-none transition-all duration-200">
+                  <span>Send</span>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M14 5l7 7-7 7M5 12h16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
-                  <span class="text-gray-500">Attach file</span>
-                </label>
-                <input type="file" id="chatFile" class="hidden" />
+                </button>
               </div>
-              
-              <!-- Send button with hover effect -->
-              <button onclick="sendMessage()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                <span>Send Message</span>
-                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                </svg>
-              </button>
+  
+              <!-- Optional Code Snippet -->
+              <textarea id="chatCode" rows="2" placeholder="Paste code..." style="display:none"
+                class="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-1 focus:ring-indigo-500 text-sm resize-none mt-2"></textarea>
             </div>
           </div>
         </div>
