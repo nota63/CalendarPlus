@@ -15,12 +15,21 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div id="chatMessages" class="mb-3" style="max-height: 300px; overflow-y: auto;"></div>
-          <input type="hidden" id="chatUserId">
-          <input type="hidden" id="chatOrgId">
-          <textarea id="chatInput" rows="2" class="form-control mb-2" placeholder="Type your message..."></textarea>
-          <button onclick="sendMessage()" class="btn btn-primary w-100">Send</button>
-        </div>
+            <div id="chatMessages" class="mb-3" style="max-height: 300px; overflow-y: auto;"></div>
+            <input type="hidden" id="chatUserId">
+            <input type="hidden" id="chatOrgId">
+          
+            <textarea id="chatInput" rows="2" class="form-control mb-2" placeholder="Type your message..."></textarea>
+          
+            <!-- Code Snippet -->
+            <textarea id="chatCode" rows="3" class="form-control mb-2" placeholder="Paste code snippet (optional)..."></textarea>
+          
+            <!-- File Upload -->
+            <input type="file" id="chatFile" class="form-control mb-2" />
+          
+            <button onclick="sendMessage()" class="btn btn-primary w-100">Send</button>
+          </div>
+          
       </div>
     </div>
   </div>

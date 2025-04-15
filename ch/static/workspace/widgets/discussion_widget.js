@@ -45,13 +45,17 @@ function HandleAndFetchChat(orgId) {
     const userId = document.getElementById('chatUserId').value;
     const orgId = document.getElementById('chatOrgId').value;
     const text = document.getElementById('chatInput').value;
+    const file = document.getElementById('chatFile').files[0];
+    const code = document.getElementById('chatCode').value;
   
-    if (!text.trim()) return;
+    if (!text.trim() && !file && !code.trim()) return;
   
     const formData = new FormData();
     formData.append('receiver_id', userId);
     formData.append('org_id', orgId);
     formData.append('text', text);
+    formData.append('code_snippet', code);
+    if (file) formData.append('file', file);
   
     fetch('/discussion_widget/handle-chat/', {
       method: 'POST',
@@ -63,11 +67,22 @@ function HandleAndFetchChat(orgId) {
         const chatBox = document.getElementById('chatMessages');
         const bubble = document.createElement('div');
         bubble.className = 'text-end text-primary';
-        bubble.innerHTML = `<small>${text}</small><br><small class="text-muted">${data.timestamp}</small>`;
+  
+        let content = '';
+        if (text) content += `<small>${text}</small><br>`;
+        if (code) content += `<pre class="bg-light p-2 rounded"><code>${code}</code></pre>`;
+        if (data.file_url) content += `<a href="${data.file_url}" target="_blank">Download File</a><br>`;
+  
+        content += `<small class="text-muted">${data.timestamp}</small>`;
+        bubble.innerHTML = content;
         chatBox.appendChild(bubble);
+  
         document.getElementById('chatInput').value = '';
+        document.getElementById('chatCode').value = '';
+        document.getElementById('chatFile').value = '';
       });
   }
+  
   
   function getCSRFToken() {
     return document.querySelector('[name=csrfmiddlewaretoken]').value;
