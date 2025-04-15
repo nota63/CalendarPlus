@@ -10,9 +10,35 @@ function HandleAndFetchChat(orgId) {
           userDiv.className = 'd-flex align-items-center mb-2 chat-user';
           userDiv.setAttribute('data-user-id', user.user_id);
           userDiv.innerHTML = `
-            <img src="${user.profile_picture || '/static/default-avatar.png'}" class="rounded-circle me-2" width="32" height="32">
-            <strong>${user.full_name}</strong>
-          `;
+          <div class="flex items-center p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors duration-150 cursor-pointer">
+            <div class="relative flex-shrink-0">
+              <img 
+                src="${user.profile_picture || '/static/default-avatar.png'}" 
+                class="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-gray-700"
+                alt="${user.full_name}'s avatar"
+              >
+              ${user.status === 'online' ? 
+                '<span class="absolute bottom-0 right-0 block w-2 h-2 bg-green-500 rounded-full ring-1 ring-white dark:ring-gray-800"></span>' : 
+                ''
+              }
+            </div>
+            <div class="ml-3 flex flex-col">
+              <span class="text-sm font-medium text-gray-900 dark:text-gray-100">${user.full_name}</span>
+              ${user.title ? 
+                `<span class="text-xs text-gray-500 dark:text-gray-400">${user.title}</span>` : 
+                ''
+              }
+            </div>
+            ${user.unread_notifications ? 
+              `<div class="ml-auto">
+                <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-medium text-white bg-indigo-600 rounded-full">
+                  ${user.unread_notifications > 9 ? '9+' : user.unread_notifications}
+                </span>
+              </div>` : 
+              ''
+            }
+          </div>
+        `;
           userDiv.addEventListener('click', () => openChatModal(user.user_id, user.full_name, orgId));
           container.appendChild(userDiv);
         });
@@ -34,8 +60,45 @@ function HandleAndFetchChat(orgId) {
         const chatBox = document.getElementById('chatMessages');
         data.messages.forEach(msg => {
           const bubble = document.createElement('div');
-          bubble.className = msg.sender === CURRENT_USER_ID ? 'text-end text-primary' : 'text-start text-secondary';
-          bubble.innerHTML = `<small>${msg.text}</small><br><small class="text-muted">${msg.timestamp}</small>`;
+
+          // Enhanced chat bubble with Tailwind CSS styling for ClickUp-like UI
+bubble.className = msg.sender === CURRENT_USER_ID 
+? 'flex flex-col items-end mb-4 max-w-3/4 ml-auto' 
+: 'flex flex-col items-start mb-4 max-w-3/4';
+
+// Create avatar element with first letter of sender
+const avatar = document.createElement('div');
+const senderInitial = (msg.sender.toString()[0] || '?').toUpperCase();
+avatar.className = msg.sender === CURRENT_USER_ID
+? 'w-8 h-8 rounded-full flex items-center justify-center text-white bg-indigo-600 text-sm font-medium ml-2 order-2'
+: 'w-8 h-8 rounded-full flex items-center justify-center text-white bg-gray-500 text-sm font-medium mr-2 order-1';
+avatar.textContent = senderInitial;
+
+// Create message content container
+const messageContent = document.createElement('div');
+messageContent.className = msg.sender === CURRENT_USER_ID
+? 'order-1 mr-2 py-2 px-4 bg-indigo-100 rounded-2xl rounded-tr-none shadow-sm text-indigo-900'
+: 'order-2 ml-2 py-2 px-4 bg-gray-100 rounded-2xl rounded-tl-none shadow-sm text-gray-900';
+
+// Add message text with proper styling
+const messageText = document.createElement('div');
+messageText.className = 'text-sm font-normal break-words';
+messageText.textContent = msg.text;
+
+// Add timestamp with subtle styling
+const timestamp = document.createElement('div');
+timestamp.className = 'text-xs text-gray-500 mt-1';
+timestamp.textContent = msg.timestamp;
+
+// Append text and timestamp to message content
+messageContent.appendChild(messageText);
+messageContent.appendChild(timestamp);
+
+// Clear and rebuild the bubble with new structure
+bubble.innerHTML = '';
+bubble.className += ' flex items-start';
+bubble.appendChild(avatar);
+bubble.appendChild(messageContent);
           chatBox.appendChild(bubble);
         });
       });
