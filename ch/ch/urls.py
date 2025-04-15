@@ -58,6 +58,7 @@ urlpatterns = [
     path('channels_widget/',include('channels_widget.urls')),
     path('time_traced/',include('time_traced.urls')),
     path('tasks_widgets/',include('all_tasks_widget.urls')),
+    path('discussion_widget/',include('discussion_widget.urls')),
     # ui components
     path('index/', views.styles, name= 'index'),
     path('weather/',views.weather, name='weather'),

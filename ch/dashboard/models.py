@@ -32,6 +32,7 @@ class DashboardWidget(models.Model):
         ('completed_tasks','Completed tasks'),
         ('status_over_time','Status over time'),
         ('tag_usage','Tag usage'),
+        ('discussion','Discussion'),
         # Add more widgets as you scale, my baby 💖
     ]
 

@@ -1175,7 +1175,11 @@ document.addEventListener('DOMContentLoaded', function () {
               break;
       case 'tag-usage-widget':
               FetchTagUsageSummary(orgId);
+              break;
+      case 'discussion-widget':
+              HandleAndFetchChat(orgId);
               break;            
+                                          
                                                        
       default:
         console.warn("❓ No init logic defined for widget type:", widgetType);
@@ -1217,6 +1221,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '#completed-tasks-widget':'completed-tasks-widget',
           '#status-over-time-widget':'status-over-time-widget',
           '#tag-usage-widget':'tag-usage-widget',
+          '#discussion-widget':'discussion-widget',
         };
 
         Object.entries(widgetMap).forEach(([selector, widgetType]) => {

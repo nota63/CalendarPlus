@@ -1,0 +1,27 @@
+<div class="card shadow-sm p-3 mb-4">
+    <h5 class="mb-3">Discussions</h5>
+    <div id="discussion-widget" class="overflow-auto" style="max-height: 250px;">
+      <!-- Users will be dynamically added here -->
+    </div>
+  </div>
+
+  
+<!-- chat modal -->
+<div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content rounded-3">
+        <div class="modal-header">
+          <h5 class="modal-title" id="chatModalLabel">Chat</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="chatMessages" class="mb-3" style="max-height: 300px; overflow-y: auto;"></div>
+          <input type="hidden" id="chatUserId">
+          <input type="hidden" id="chatOrgId">
+          <textarea id="chatInput" rows="2" class="form-control mb-2" placeholder="Type your message..."></textarea>
+          <button onclick="sendMessage()" class="btn btn-primary w-100">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  

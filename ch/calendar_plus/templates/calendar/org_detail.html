@@ -6235,6 +6235,19 @@ body {
               </button>
             </div>
           </div>
+          <!-- real time discussion -->
+          <div class="widget-card border-purple">
+            <div class="widget-header bg-purple">
+              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTBNPHOmB4_69ekfe9PCVJ8k1r7e83LIZFpFA&s" class="w-100 h-100 object-cover" alt="discussion">
+            </div>
+            <div class="widget-body">
+              <h4 class="widget-title">Discussion.</h4>
+              <p class="widget-description">Collaborate and chat with members and guests.</p>
+              <button class="add-widget-btn w-100 text-center" data-widget="discussion">
+                <i class="fas fa-plus"></i> Add widget
+              </button>
+            </div>
+          </div>
  
  
  
@@ -6315,6 +6328,12 @@ body {
         orgId: "{{ organization.id }}",
     };
 </script>
+<!-- set current user id  -->
+<script>
+  const CURRENT_USER_ID = {{ request.user.id }};
+</script>
+
+
 <!-- Link your JS file -->
 <script src="{% static 'workspace/organization_tasks.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -6334,6 +6353,8 @@ body {
 <script src="{% static 'workspace/widgets/time_traced_widget.js'%}"></script>
 <!--number of tasks in progress 2)completed tasks 3)status over time 4)tag usage bar chart-->
 <script src="{% static 'workspace/widgets/all_tasks_widget.js'%}"></script>
+<!-- real time discussion widget -->
+<script src="{% static 'workspace/widgets/discussion_widget.js'%}"></script> 
 <!-- ------------------------------------------------------------------------------------------------------------- -->
  
 

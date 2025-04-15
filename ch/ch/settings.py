@@ -120,6 +120,7 @@ INSTALLED_APPS = [
     'channels_widget',
     'time_traced',
     'all_tasks_widget',
+    'discussion_widget',
 
     #  Unfold admin configurations
     "unfold",  # before django.contrib.admin
