@@ -234,3 +234,21 @@ def task_assignment_summary(request, org_id):
         'user_assigned_tasks': user_assigned_tasks,
     })
 
+
+# // widget 6) Assigned but not completed-----------------------------------------------------------------------------------------------------------
+@login_required
+def assigned_not_completed_tasks_view(request, org_id):
+    try:
+       
+        count = Task.objects.filter(
+            organization_id=org_id,
+            assigned_to=request.user
+        ).exclude(status='completed').count()
+
+        return JsonResponse({
+            'count': count,
+            'message': 'Fetched assigned but not completed tasks'
+        })
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

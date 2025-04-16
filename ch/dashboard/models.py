@@ -36,6 +36,7 @@ class DashboardWidget(models.Model):
         ('total_time_traced','Total time traced'),
         ('tasks_by_assignee','Tasks by assignee'),
         ('un_assigned_tasks','Unassigned tasks'),
+        ('assigned_not_completed','Assigned not completed'),
         # Add more widgets as you scale, my baby 💖
     ]
 

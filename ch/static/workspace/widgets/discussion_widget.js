@@ -816,3 +816,24 @@ function UnassignedTasksSummary(orgId) {
       countBox.classList.remove("hidden");
     });
 }
+
+// widget 6) Assigned but not completed-----------------------------------------------------------------------------------------------------------
+function AssignedNotCompletedTasks(orgId) {
+  const countEl = document.getElementById("assignedNotCompletedCount");
+  countEl.textContent = "Loading...";
+
+  fetch(`/discussion_widget/assigned-not-completed/${orgId}/`)
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.count !== undefined) {
+        countEl.textContent = data.count;
+      } else {
+        countEl.textContent = "Error";
+        console.error("Error fetching:", data);
+      }
+    })
+    .catch((err) => {
+      countEl.textContent = "Error";
+      console.error("Fetch failed:", err);
+    });
+}

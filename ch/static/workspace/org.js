@@ -1188,7 +1188,10 @@ document.addEventListener('DOMContentLoaded', function () {
       case 'un-assigned-tasks-widget':
               UnassignedTasksSummary(orgId);
               break;                                  
-                                          
+      case 'assigned-not-completed-widget':
+              AssignedNotCompletedTasks(orgId);
+              break;
+                                                
                                                        
       default:
         console.warn("❓ No init logic defined for widget type:", widgetType);
@@ -1234,6 +1237,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '#total-time-spent-widget':'total-time-spent-widget',
           '#tasks-by-assignee-widget':'tasks-by-assignee-widget',
           '#un-assigned-tasks-widget':'un-assigned-tasks-widget',
+          '#assigned-not-completed-widget':'assigned-not-completed-widget',
         };
 
         Object.entries(widgetMap).forEach(([selector, widgetType]) => {
