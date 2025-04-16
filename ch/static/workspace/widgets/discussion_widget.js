@@ -957,39 +957,63 @@ function PriorityBreakdownChart(orgId) {
 function UrgentTasksCount(orgId) {
   const container = document.getElementById('urgentTasksGroupContainer');
   const loader = document.getElementById('urgentTasksGroupLoading');
-
+  
   container.innerHTML = '';
-  loader.classList.remove('d-none');
-
+  loader.classList.remove('hidden');
+  
   fetch(`/discussion_widget/urgent-tasks-group/${orgId}/`)
     .then(response => response.json())
     .then(data => {
       if (data.groups.length === 0) {
-        container.innerHTML = '<p class="text-muted">No groups or urgent tasks assigned to you.</p>';
+        container.innerHTML = '<p class="text-sm text-gray-500 font-medium p-4 text-center">No groups or urgent tasks assigned to you.</p>';
         return;
       }
-
+      
       data.groups.forEach(group => {
         const div = document.createElement('div');
-        div.className = 'd-flex justify-content-between align-items-center p-2 border rounded mb-2 shadow-sm bg-white';
-
+        div.className = 'flex justify-between items-center p-3 border border-gray-200 rounded-lg mb-3 shadow-sm bg-white hover:shadow-md transition-shadow duration-200 cursor-pointer';
+        
         div.innerHTML = `
-          <div>
-            <strong>${group.group_name}</strong>
+          <div class="flex items-center space-x-3">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 rounded-md bg-purple-100 flex items-center justify-center">
+                <svg class="w-4 h-4 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="font-medium text-gray-800">${group.group_name}</h3>
+            </div>
           </div>
-          <span class="badge bg-danger">
-            ${group.urgent_task_count} urgent task${group.urgent_task_count !== 1 ? 's' : ''}
-          </span>
+          <div class="flex items-center">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${group.urgent_task_count > 0 ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'}">
+              ${group.urgent_task_count} urgent task${group.urgent_task_count !== 1 ? 's' : ''}
+            </span>
+          </div>
         `;
-
+        
         container.appendChild(div);
       });
     })
     .catch(error => {
       console.error('Error loading urgent task counts:', error);
-      container.innerHTML = '<p class="text-danger">Error loading data.</p>';
+      container.innerHTML = `
+        <div class="p-4 rounded-lg bg-red-50 border border-red-200">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-red-700">Error loading data. Please try again.</p>
+            </div>
+          </div>
+        </div>
+      `;
     })
     .finally(() => {
-      loader.classList.add('d-none');
+      loader.classList.add('hidden');
     });
 }
