@@ -1022,37 +1022,78 @@ function UrgentTasksCount(orgId) {
 function PriorityTasks(orgId) {
   const listContainer = document.getElementById('priorityTasksList');
   const loading = document.getElementById('priorityTasksLoading');
-
+  
   // Clear previous data
   listContainer.innerHTML = '';
-  loading.classList.remove('d-none');
-
+  loading.classList.remove('hidden');
+  
   fetch(`/discussion_widget/priority-tasks/${orgId}/`)
     .then(response => response.json())
     .then(data => {
       if (data.tasks.length === 0) {
-        listContainer.innerHTML = `<div class="text-muted text-sm">No urgent or high priority tasks assigned to you 💖</div>`;
+        listContainer.innerHTML = `
+          <div class="flex items-center justify-center p-4 text-gray-500 text-xs font-medium">
+            <span class="mr-2">No urgent or high priority tasks assigned to you</span>
+            <svg class="w-4 h-4 text-pink-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
+            </svg>
+          </div>`;
       } else {
+        // Create a scrollable container
+        const scrollContainer = document.createElement('div');
+        scrollContainer.className = 'max-h-64 overflow-y-auto scrollbar-hide space-y-2';
+        
+        // Add custom scrollbar styling
+        const style = document.createElement('style');
+        style.textContent = `
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+          .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+        `;
+        document.head.appendChild(style);
+        
         data.tasks.forEach(task => {
-          const badgeColor = task.priority === 'urgent' ? 'danger' : 'warning';
+          const priorityColor = task.priority === 'urgent' ? 'bg-red-500' : 'bg-amber-500';
           const priorityLabel = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
-
-          const taskCard = `
-            <div class="border rounded p-2 mb-2 shadow-sm task-card" data-org-id="${orgId}" data-group-id="${task.group_id}" data-task-id="${task.task_id}">
-              <div class="d-flex justify-content-between align-items-center">
-                <strong>${task.title}</strong>
-                <span class="badge bg-${badgeColor}">${priorityLabel}</span>
+          
+          const taskCard = document.createElement('div');
+          taskCard.className = 'bg-white border border-gray-200 rounded-md shadow-sm hover:shadow transition-shadow duration-200 cursor-pointer task-card overflow-hidden';
+          taskCard.setAttribute('data-org-id', orgId);
+          taskCard.setAttribute('data-group-id', task.group_id);
+          taskCard.setAttribute('data-task-id', task.task_id);
+          
+          taskCard.innerHTML = `
+            <div class="p-3">
+              <div class="flex justify-between items-center mb-1">
+                <h3 class="font-medium text-gray-900 text-xs truncate pr-2">${task.title}</h3>
+                <span class="${priorityColor} text-white text-xxs font-medium px-1.5 py-0.5 rounded">${priorityLabel}</span>
               </div>
-              <div class="text-muted small">
-                <i class="bi bi-people"></i> Group: ${task.group} <br>
-                <i class="bi bi-calendar-event"></i> Deadline: ${task.deadline}
+              <div class="text-xxs text-gray-600 space-y-0.5">
+                <div class="flex items-center">
+                  <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                  </svg>
+                  <span>Group: ${task.group}</span>
+                </div>
+                <div class="flex items-center">
+                  <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                  </svg>
+                  <span>Deadline: ${task.deadline}</span>
+                </div>
               </div>
             </div>
           `;
-
-          listContainer.insertAdjacentHTML('beforeend', taskCard);
+          
+          scrollContainer.appendChild(taskCard);
         });
-
+        
+        listContainer.appendChild(scrollContainer);
+        
         // Add click event listener to each task card
         const taskCards = listContainer.querySelectorAll('.task-card');
         taskCards.forEach(card => {
@@ -1060,7 +1101,7 @@ function PriorityTasks(orgId) {
             const orgId = this.getAttribute('data-org-id');
             const groupId = this.getAttribute('data-group-id');
             const taskId = this.getAttribute('data-task-id');
-
+            
             // Redirect to task detail page
             window.location.href = `/tasks/task_detail/${orgId}/${groupId}/${taskId}/`;
           });
@@ -1069,9 +1110,15 @@ function PriorityTasks(orgId) {
     })
     .catch(error => {
       console.error('Error fetching priority tasks:', error);
-      listContainer.innerHTML = `<div class="text-danger">Failed to load tasks. Try again later 💔</div>`;
+      listContainer.innerHTML = `
+        <div class="flex items-center justify-center p-3 text-red-500 text-xs font-medium">
+          <svg class="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+          </svg>
+          Failed to load tasks. Try again later
+        </div>`;
     })
     .finally(() => {
-      loading.classList.add('d-none');
+      loading.classList.add('hidden');
     });
 }
