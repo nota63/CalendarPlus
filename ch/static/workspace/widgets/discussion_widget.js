@@ -842,62 +842,104 @@ function AssignedNotCompletedTasks(orgId) {
 function PriorityBreakdownChart(orgId) {
   const ctx = document.getElementById('priorityBreakdownChart');
 
-  // Show loader
-  document.getElementById('priorityBreakdownLoading').classList.remove('d-none');
-
+  // Show loader with Tailwind styling
+  document.getElementById('priorityBreakdownLoading').classList.remove('hidden');
+  
   fetch(`/discussion_widget/priority-breakdown/${orgId}/`)
     .then(response => response.json())
     .then(data => {
       new Chart(ctx, {
-        type: 'bar', // changed from 'pie' to 'bar'
+        type: 'bar',
         data: {
           labels: data.labels,
           datasets: [{
             label: 'Number of Tasks',
             data: data.data,
             backgroundColor: [
-              '#34d399', // green
-              '#60a5fa', // blue
-              '#fbbf24', // yellow
-              '#f87171'  // red
+              '#3b82f6',  // Blue-500
+              '#6366f1',  // Indigo-500
+              '#10b981',  // Emerald-500
+              '#f59e0b'   // Amber-500
             ],
-            borderRadius: 6,
-            barThickness: 40
+            borderRadius: 8,
+            barThickness: 40,
+            borderWidth: 0,
+            hoverBackgroundColor: [
+              '#2563eb',  // Blue-600
+              '#4f46e5',  // Indigo-600
+              '#059669',  // Emerald-600
+              '#d97706'   // Amber-600
+            ],
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          layout: {
+            padding: {
+              top: 20,
+              right: 20,
+              bottom: 20,
+              left: 20
+            }
+          },
           scales: {
             y: {
               beginAtZero: true,
+              grid: {
+                color: '#f3f4f6',
+                drawTicks: false
+              },
+              border: { dash: [4, 4] },
               title: {
                 display: true,
-                text: 'Tasks Count'
+                text: 'Tasks Count',
+                font: { size: 14, family: 'Inter, sans-serif' },
+                color: '#6b7280'
               },
               ticks: {
-                precision: 0
+                precision: 0,
+                color: '#9ca3af',
+                font: { size: 12, family: 'Inter, sans-serif' }
               }
             },
             x: {
+              grid: { display: false },
               title: {
                 display: true,
-                text: 'Priority Level'
+                text: 'Priority Level',
+                font: { size: 14, family: 'Inter, sans-serif' },
+                color: '#6b7280'
+              },
+              ticks: {
+                color: '#9ca3af',
+                font: { size: 12, family: 'Inter, sans-serif' }
               }
             }
           },
           plugins: {
-            legend: {
-              display: false // Hides legend since it's just one dataset
-            },
+            legend: { display: false },
             title: {
               display: true,
-              text: 'Task Priority Breakdown (Bar Chart)'
+              text: 'Task Priority Distribution',
+              color: '#111827',
+              font: { size: 18, family: 'Inter, sans-serif', weight: '600' },
+              padding: { bottom: 20 }
             },
             tooltip: {
+              backgroundColor: '#1f2937',
+              titleFont: { size: 14, family: 'Inter, sans-serif', weight: '500' },
+              bodyFont: { size: 14, family: 'Inter, sans-serif' },
+              footerFont: { size: 12, family: 'Inter, sans-serif' },
+              padding: 12,
+              cornerRadius: 8,
+              displayColors: false,
               callbacks: {
-                label: function (context) {
+                label: function(context) {
                   return `${context.dataset.label}: ${context.parsed.y}`;
+                },
+                title: function(context) {
+                  return `Priority: ${context[0].label}`;
                 }
               }
             }
@@ -907,6 +949,6 @@ function PriorityBreakdownChart(orgId) {
     })
     .catch(error => console.error('Error fetching priority data:', error))
     .finally(() => {
-      document.getElementById('priorityBreakdownLoading').classList.add('d-none');
+      document.getElementById('priorityBreakdownLoading').classList.add('hidden');
     });
 }
