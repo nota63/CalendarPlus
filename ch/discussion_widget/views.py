@@ -9,6 +9,8 @@ from django.contrib.auth.decorators import login_required
 from accounts.models import Profile, Organization
 from group_tasks.models import TaskTimeTracking,Task
 from django.views.decorators.http import require_GET
+from groups.models import GroupMember, Group
+
 # Create your views here.
 # fetch users within the workspace
 
@@ -282,3 +284,39 @@ def priority_breakdown_view(request, org_id):
         chart_data['data'].append(item['count'])
 
     return JsonResponse(chart_data)
+
+    
+# // Widget 7) total urgent tasks by Group --------------------------------------------------------------------------------------------------------
+@login_required
+def groups_with_urgent_tasks(request, org_id):
+    """
+    Returns all groups the request.user is a member of (in given org),
+    along with the count of urgent priority tasks assigned to the user in each group.
+    """
+    user = request.user
+
+    group_memberships = GroupMember.objects.filter(
+        organization_id=org_id,
+        user=user
+    ).select_related('group')
+
+    response_data = []
+
+    for membership in group_memberships:
+        group = membership.group
+
+        urgent_task_count = Task.objects.filter(
+            group=group,
+            organization_id=org_id,
+            assigned_to=user,
+            priority='urgent'
+        ).count()
+
+        response_data.append({
+            'group_id': group.id,
+            'group_name': group.name,
+            'urgent_task_count': urgent_task_count
+        })
+
+    return JsonResponse({'groups': response_data})
+

@@ -952,3 +952,44 @@ function PriorityBreakdownChart(orgId) {
       document.getElementById('priorityBreakdownLoading').classList.add('hidden');
     });
 }
+
+// Widget 7) total urgent tasks by Group --------------------------------------------------------------------------------------------------------
+function UrgentTasksCount(orgId) {
+  const container = document.getElementById('urgentTasksGroupContainer');
+  const loader = document.getElementById('urgentTasksGroupLoading');
+
+  container.innerHTML = '';
+  loader.classList.remove('d-none');
+
+  fetch(`/discussion_widget/urgent-tasks-group/${orgId}/`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.groups.length === 0) {
+        container.innerHTML = '<p class="text-muted">No groups or urgent tasks assigned to you.</p>';
+        return;
+      }
+
+      data.groups.forEach(group => {
+        const div = document.createElement('div');
+        div.className = 'd-flex justify-content-between align-items-center p-2 border rounded mb-2 shadow-sm bg-white';
+
+        div.innerHTML = `
+          <div>
+            <strong>${group.group_name}</strong>
+          </div>
+          <span class="badge bg-danger">
+            ${group.urgent_task_count} urgent task${group.urgent_task_count !== 1 ? 's' : ''}
+          </span>
+        `;
+
+        container.appendChild(div);
+      });
+    })
+    .catch(error => {
+      console.error('Error loading urgent task counts:', error);
+      container.innerHTML = '<p class="text-danger">Error loading data.</p>';
+    })
+    .finally(() => {
+      loader.classList.add('d-none');
+    });
+}
