@@ -184,3 +184,5 @@ function toggleCodeInput() {
     const codeInput = document.getElementById("chatCode");
     codeInput.style.display = codeInput.style.display === "none" ? "block" : "none";
   }
+
+  
