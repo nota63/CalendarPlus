@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from conversation.models import Conversation, Message
 from django.contrib.auth.models import User
 from django.utils.timezone import now
-from django.db.models import Q,Sum
+from django.db.models import Q,Sum,Count
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -252,3 +252,33 @@ def assigned_not_completed_tasks_view(request, org_id):
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+# // widget 8) Priority breakdown ------------------------------------------------------------------------------------------------------------------
+@login_required
+def priority_breakdown_view(request, org_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+
+    # Filter by organization + assigned to current user
+    tasks = Task.objects.filter(
+        organization_id=org_id,
+        assigned_to=request.user
+    )
+
+    # Group by priority
+    priority_data = tasks.values('priority').annotate(count=Count('id'))
+
+    # Map priorities to readable labels (optional)
+    priority_map = dict(Task._meta.get_field('priority').choices)
+
+    chart_data = {
+        'labels': [],
+        'data': []
+    }
+
+    for item in priority_data:
+        chart_data['labels'].append(priority_map.get(item['priority'], item['priority']))
+        chart_data['data'].append(item['count'])
+
+    return JsonResponse(chart_data)

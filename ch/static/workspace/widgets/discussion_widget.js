@@ -837,3 +837,76 @@ function AssignedNotCompletedTasks(orgId) {
       console.error("Fetch failed:", err);
     });
 }
+
+// widget 8) Priority breakdown ------------------------------------------------------------------------------------------------------------------
+function PriorityBreakdownChart(orgId) {
+  const ctx = document.getElementById('priorityBreakdownChart');
+
+  // Show loader
+  document.getElementById('priorityBreakdownLoading').classList.remove('d-none');
+
+  fetch(`/discussion_widget/priority-breakdown/${orgId}/`)
+    .then(response => response.json())
+    .then(data => {
+      new Chart(ctx, {
+        type: 'bar', // changed from 'pie' to 'bar'
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: 'Number of Tasks',
+            data: data.data,
+            backgroundColor: [
+              '#34d399', // green
+              '#60a5fa', // blue
+              '#fbbf24', // yellow
+              '#f87171'  // red
+            ],
+            borderRadius: 6,
+            barThickness: 40
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Tasks Count'
+              },
+              ticks: {
+                precision: 0
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Priority Level'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false // Hides legend since it's just one dataset
+            },
+            title: {
+              display: true,
+              text: 'Task Priority Breakdown (Bar Chart)'
+            },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  return `${context.dataset.label}: ${context.parsed.y}`;
+                }
+              }
+            }
+          }
+        }
+      });
+    })
+    .catch(error => console.error('Error fetching priority data:', error))
+    .finally(() => {
+      document.getElementById('priorityBreakdownLoading').classList.add('d-none');
+    });
+}

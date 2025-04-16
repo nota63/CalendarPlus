@@ -37,6 +37,7 @@ class DashboardWidget(models.Model):
         ('tasks_by_assignee','Tasks by assignee'),
         ('un_assigned_tasks','Unassigned tasks'),
         ('assigned_not_completed','Assigned not completed'),
+        ('priority_breakdown','Priority breakdown'),
         # Add more widgets as you scale, my baby 💖
     ]
 

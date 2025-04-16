@@ -1191,6 +1191,9 @@ document.addEventListener('DOMContentLoaded', function () {
       case 'assigned-not-completed-widget':
               AssignedNotCompletedTasks(orgId);
               break;
+      case 'priority-breakdown-widget':
+              PriorityBreakdownChart(orgId);
+              break;     
                                                 
                                                        
       default:
@@ -1238,6 +1241,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '#tasks-by-assignee-widget':'tasks-by-assignee-widget',
           '#un-assigned-tasks-widget':'un-assigned-tasks-widget',
           '#assigned-not-completed-widget':'assigned-not-completed-widget',
+          '#priority-breakdown-widget':'priority-breakdown-widget',
         };
 
         Object.entries(widgetMap).forEach(([selector, widgetType]) => {
