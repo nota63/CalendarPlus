@@ -116,7 +116,7 @@ def time_spent_battery_chart(request, org_id):
         # Sum of time_spent per user (if needed you can just remove `.values('user__username')` to get global)
         time_data = (
             TaskTimeTracking.objects
-            .filter(organization=organization)
+            .filter(organization=organization,user=request.user)
             .values('user__username')
             .annotate(total_time=Sum('time_spent'))
             .order_by('-total_time')
@@ -143,7 +143,7 @@ def time_spent_battery_chart(request, org_id):
 # Time spent by group
 def time_spent_by_group_view(request, org_id):
     time_data = (
-        TaskTimeTracking.objects.filter(organization_id=org_id)
+        TaskTimeTracking.objects.filter(organization_id=org_id,user=request.user)
         .values("group__name")
         .annotate(total_hours=Sum("time_spent"))
         .order_by("-total_hours")
