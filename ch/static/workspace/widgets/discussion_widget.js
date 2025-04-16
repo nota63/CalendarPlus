@@ -273,24 +273,82 @@ let groupTimeChart = null;
 function FetchGroupTimeChart(orgId) {
   const loader = document.getElementById("groupChartLoading");
   const ctx = document.getElementById("groupTimeChart").getContext("2d");
-
+  
   // Reset canvas if it was previously used
   if (groupTimeChart) {
     groupTimeChart.destroy();
     groupTimeChart = null;
   }
-
+  
+  // Style the chart container with Tailwind
+  const chartContainer = document.getElementById("groupTimeChart").parentElement;
+  chartContainer.classList.add("bg-white", "rounded-lg", "shadow-md", "p-6", "mb-8");
+  
+  // Add title with SaaS styling
+  const chartTitle = document.createElement("div");
+  chartTitle.innerHTML = `
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-800">Group Time Analysis</h3>
+        <p class="text-sm text-gray-500">Hours tracked by team group</p>
+      </div>
+      <div class="flex items-center space-x-2">
+        <div class="bg-gray-100 rounded-md p-1">
+          <select id="groupTimeRange" class="bg-transparent text-sm text-gray-600 font-medium px-2 py-1 border-none focus:ring-0 cursor-pointer">
+            <option value="week">This Week</option>
+            <option value="month" selected>This Month</option>
+            <option value="quarter">This Quarter</option>
+          </select>
+        </div>
+        <button class="text-gray-400 hover:text-indigo-600 transition-colors" title="Refresh data">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  `;
+  chartContainer.prepend(chartTitle);
+  
+  // Create loading indicator with Tailwind
+  loader.innerHTML = `
+    <div class="flex justify-center items-center py-12">
+      <svg class="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+    </div>
+  `;
   loader.classList.remove("d-none");
-
+  loader.classList.add("hidden");
+  
+  // Create canvas wrapper with appropriate height
+  const canvasWrapper = document.createElement("div");
+  canvasWrapper.classList.add("h-64", "mt-4");
+  canvasWrapper.appendChild(document.getElementById("groupTimeChart"));
+  chartContainer.appendChild(canvasWrapper);
+  
+  loader.classList.remove("hidden");
+  
   fetch(`/discussion_widget/time-spent-by-group/${orgId}/`)
     .then(res => res.json())
     .then(data => {
-      loader.classList.add("d-none");
-
+      loader.classList.add("hidden");
+      
       if (data.status === "success") {
         const labels = data.data.map(g => g.group);
         const values = data.data.map(g => g.time_hours);
-
+        
+        // Custom font settings for Chart.js
+        Chart.defaults.font.family = "'Inter', 'Segoe UI', sans-serif";
+        Chart.defaults.font.size = 12;
+        
+        // Create custom gradients
+        const ctx = document.getElementById("groupTimeChart").getContext("2d");
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(99, 102, 241, 0.8)');    // indigo-500
+        gradient.addColorStop(1, 'rgba(129, 140, 248, 0.6)');   // indigo-400
+        
         groupTimeChart = new Chart(ctx, {
           type: 'bar',
           data: {
@@ -298,29 +356,72 @@ function FetchGroupTimeChart(orgId) {
             datasets: [{
               label: 'Total Hours',
               data: values,
-              backgroundColor: 'rgba(54, 162, 235, 0.7)',
-              borderColor: 'rgba(54, 162, 235, 1)',
+              backgroundColor: gradient,
+              borderColor: 'rgba(99, 102, 241, 1)',  // indigo-500
               borderWidth: 1,
-              borderRadius: 10,
-              barThickness: 35
+              borderRadius: 6,
+              barThickness: 28,
+              maxBarThickness: 35
             }]
           },
           options: {
             responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+              padding: {
+                top: 15,
+                right: 25,
+                bottom: 15,
+                left: 15
+              }
+            },
             plugins: {
               legend: { display: false },
               tooltip: {
+                backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                padding: 12,
+                titleFont: {
+                  size: 13,
+                  weight: 'bold'
+                },
+                bodyFont: {
+                  size: 12
+                },
+                displayColors: false,
                 callbacks: {
+                  title: function(tooltipItems) {
+                    return tooltipItems[0].label;
+                  },
                   label: function(context) {
-                    return `${context.parsed.y} hours`;
+                    const hours = context.parsed.y;
+                    return `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
                   }
                 }
               }
             },
             scales: {
+              x: {
+                grid: {
+                  display: false,
+                  drawBorder: false
+                },
+                ticks: {
+                  color: '#4B5563', // text-gray-600
+                  font: {
+                    weight: '500'
+                  },
+                  padding: 8
+                }
+              },
               y: {
                 beginAtZero: true,
+                grid: {
+                  color: 'rgba(243, 244, 246, 1)', // gray-100
+                  drawBorder: false
+                },
                 ticks: {
+                  color: '#6B7280', // text-gray-500
+                  padding: 8,
                   callback: function(val) {
                     return val + " hrs";
                   }
@@ -329,12 +430,65 @@ function FetchGroupTimeChart(orgId) {
             }
           }
         });
+        
+        // Add footer stats
+        const chartFooter = document.createElement("div");
+        chartFooter.classList.add("flex", "justify-between", "items-center", "mt-6", "pt-4", "border-t", "border-gray-100", "text-sm");
+        
+        // Calculate stats
+        const totalHours = values.reduce((sum, current) => sum + current, 0);
+        const maxGroupHours = Math.max(...values);
+        const maxGroupName = labels[values.indexOf(maxGroupHours)];
+        
+        chartFooter.innerHTML = `
+          <div class="flex space-x-6">
+            <div>
+              <p class="text-gray-500 mb-1">Total Hours</p>
+              <p class="text-lg font-semibold text-gray-800">${totalHours}</p>
+            </div>
+            <div>
+              <p class="text-gray-500 mb-1">Top Group</p>
+              <p class="text-lg font-semibold text-gray-800">${maxGroupName}</p>
+            </div>
+          </div>
+          <div>
+            <button class="text-sm text-indigo-600 hover:text-indigo-800 font-medium transition-colors flex items-center">
+              <span>Full Report</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        `;
+        chartContainer.appendChild(chartFooter);
+        
       } else {
-        alert("No data found.");
+        const errorMessage = document.createElement("div");
+        errorMessage.classList.add("bg-red-50", "text-red-600", "p-4", "rounded-md", "flex", "items-center", "justify-center", "my-4");
+        errorMessage.innerHTML = `
+          <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>No data available for the selected time period.</span>
+        `;
+        ctx.canvas.parentElement.appendChild(errorMessage);
       }
     })
     .catch(err => {
-      loader.classList.add("d-none");
+      loader.classList.add("hidden");
       console.error("Error fetching group time chart:", err);
+      
+      const errorMessage = document.createElement("div");
+      errorMessage.classList.add("bg-red-50", "text-red-600", "p-4", "rounded-md", "flex", "items-center", "justify-center", "my-4");
+      errorMessage.innerHTML = `
+        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>Something went wrong loading the chart. Please try again.</span>
+        <button class="ml-2 text-indigo-600 hover:text-indigo-800 font-medium text-sm" onclick="FetchGroupTimeChart('${orgId}')">
+          Retry
+        </button>
+      `;
+      ctx.canvas.parentElement.appendChild(errorMessage);
     });
 }
