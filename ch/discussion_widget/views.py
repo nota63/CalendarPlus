@@ -140,3 +140,24 @@ def time_spent_battery_chart(request, org_id):
     except Organization.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': 'Organization not found'}, status=404)
 
+# Time spent by group
+def time_spent_by_group_view(request, org_id):
+    time_data = (
+        TaskTimeTracking.objects.filter(organization_id=org_id)
+        .values("group__name")
+        .annotate(total_hours=Sum("time_spent"))
+        .order_by("-total_hours")
+    )
+
+    result = [
+        {
+            "group": entry["group__name"],
+            "time_hours": float(entry["total_hours"]) if entry["total_hours"] else 0
+        }
+        for entry in time_data
+    ]
+
+    return JsonResponse({
+        "status": "success",
+        "data": result
+    })

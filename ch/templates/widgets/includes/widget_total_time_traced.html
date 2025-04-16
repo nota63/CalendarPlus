@@ -3,6 +3,17 @@
       <h2 class="text-lg font-semibold text-gray-800">Total Time Spent 🔋</h2>
       <button onclick="FetchTotalTimeBatteryChart()" class="text-sm text-indigo-600 hover:underline">Refresh</button>
     </div>
+
+    <button 
+        type="button" 
+        class="btn btn-outline-primary btn-sm" 
+        data-bs-toggle="modal" 
+        data-bs-target="#groupTimeModal"
+        onclick="FetchGroupTimeChart(window.djangoData.orgId)">
+        View Time Spent by Group
+  </button>
+  
+
   
     <div id="timeWidgetLoading" class="text-center text-gray-500 hidden">
       <div class="spinner-border animate-spin inline-block w-4 h-4 border-2 rounded-full mr-2" role="status"></div>
@@ -10,5 +21,26 @@
     </div>
   
     <canvas id="batteryChart" height="300"></canvas>
+  </div>
+  
+<!-- Time spent accross groups  -->
+<div class="modal fade" id="groupTimeModal" tabindex="-1" aria-labelledby="groupTimeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content rounded-4">
+        <div class="modal-header">
+          <h5 class="modal-title" id="groupTimeModalLabel">⏰ Time Spent per Group</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="groupChartLoading" class="text-center my-3">
+            <div class="spinner-border text-primary" role="status"></div>
+          </div>
+          <canvas id="groupTimeChart" class="w-100" height="100"></canvas>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
   </div>
   

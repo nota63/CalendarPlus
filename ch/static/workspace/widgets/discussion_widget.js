@@ -265,3 +265,76 @@ function FetchTotalTimeBatteryChart() {
       ctx.canvas.parentElement.innerHTML = `<p class="text-red-600 text-sm">Something went wrong loading the chart.</p>`;
     });
 }
+
+
+// Fetch time spent by groups
+let groupTimeChart = null;
+
+function FetchGroupTimeChart(orgId) {
+  const loader = document.getElementById("groupChartLoading");
+  const ctx = document.getElementById("groupTimeChart").getContext("2d");
+
+  // Reset canvas if it was previously used
+  if (groupTimeChart) {
+    groupTimeChart.destroy();
+    groupTimeChart = null;
+  }
+
+  loader.classList.remove("d-none");
+
+  fetch(`/discussion_widget/time-spent-by-group/${orgId}/`)
+    .then(res => res.json())
+    .then(data => {
+      loader.classList.add("d-none");
+
+      if (data.status === "success") {
+        const labels = data.data.map(g => g.group);
+        const values = data.data.map(g => g.time_hours);
+
+        groupTimeChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Total Hours',
+              data: values,
+              backgroundColor: 'rgba(54, 162, 235, 0.7)',
+              borderColor: 'rgba(54, 162, 235, 1)',
+              borderWidth: 1,
+              borderRadius: 10,
+              barThickness: 35
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return `${context.parsed.y} hours`;
+                  }
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  callback: function(val) {
+                    return val + " hrs";
+                  }
+                }
+              }
+            }
+          }
+        });
+      } else {
+        alert("No data found.");
+      }
+    })
+    .catch(err => {
+      loader.classList.add("d-none");
+      console.error("Error fetching group time chart:", err);
+    });
+}
