@@ -1,18 +1,14 @@
 <div id="total-time-spent-widget" class="bg-white shadow-md rounded-lg p-4 space-y-4">
     <div class="flex items-center justify-between mb-2">
       <h2 class="text-lg font-semibold text-gray-800">Total Time Spent 🔋</h2>
-      <button onclick="FetchTotalTimeBatteryChart(orgId)" class="text-sm text-indigo-600 hover:underline">Refresh</button>
+      <button onclick="FetchTotalTimeBatteryChart()" class="text-sm text-indigo-600 hover:underline">Refresh</button>
     </div>
-    
-    <!-- Loading Spinner -->
+  
     <div id="timeWidgetLoading" class="text-center text-gray-500 hidden">
       <div class="spinner-border animate-spin inline-block w-4 h-4 border-2 rounded-full mr-2" role="status"></div>
       Loading time tracked...
     </div>
   
-    <!-- Battery Chart Container -->
-    <div id="batteryChartContainer" class="space-y-3">
-      <!-- Dynamic user battery bars will be appended here -->
-    </div>
+    <canvas id="batteryChart" height="300"></canvas>
   </div>
   

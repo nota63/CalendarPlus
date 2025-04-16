@@ -187,13 +187,13 @@ function toggleCodeInput() {
 
  
 // # Widget 2)Total time traced----------------------------------------------------------------------------------------------------------------
+let batteryChart = null;
 
-function FetchTotalTimeBatteryChart(orgId) {
+function FetchTotalTimeBatteryChart() {
   const loading = document.getElementById("timeWidgetLoading");
-  const container = document.getElementById("batteryChartContainer");
+  const ctx = document.getElementById("batteryChart").getContext("2d");
 
-  // Clear existing content + show loader
-  container.innerHTML = "";
+  // Show loading
   loading.classList.remove("hidden");
 
   fetch(`/discussion_widget/time-spent-battery-chart/${window.djangoData.orgId}/`)
@@ -202,37 +202,66 @@ function FetchTotalTimeBatteryChart(orgId) {
       loading.classList.add("hidden");
 
       if (data.status === 'success') {
-        if (data.data.length === 0) {
-          container.innerHTML = "<p class='text-sm text-gray-500'>No data found.</p>";
-        } else {
-          data.data.forEach(item => {
-            const batteryColor = item.battery_level >= 75
-              ? 'bg-green-500'
-              : item.battery_level >= 40
-              ? 'bg-yellow-400'
-              : 'bg-red-500';
+        const labels = data.data.map(item => item.user);
+        const hours = data.data.map(item => item.time_hours);
+        const colors = data.data.map(item => {
+          if (item.battery_level >= 75) return 'rgba(34,197,94,0.8)';        // green-500
+          if (item.battery_level >= 40) return 'rgba(250,204,21,0.8)';       // yellow-400
+          return 'rgba(239,68,68,0.8)';                                      // red-500
+        });
 
-            const userBar = `
-              <div class="space-y-1">
-                <div class="flex justify-between text-sm text-gray-700 font-medium">
-                  <span>${item.user}</span>
-                  <span>${item.time_hours.toFixed(2)} hrs</span>
-                </div>
-                <div class="w-full bg-gray-200 rounded-full h-3">
-                  <div class="${batteryColor} h-3 rounded-full" style="width: ${item.battery_level}%"></div>
-                </div>
-              </div>
-            `;
-            container.insertAdjacentHTML('beforeend', userBar);
-          });
+        // Destroy old chart instance if exists
+        if (batteryChart) {
+          batteryChart.destroy();
         }
+
+        batteryChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Time Spent (hours)',
+              data: hours,
+              backgroundColor: colors,
+              borderRadius: 10,
+              barThickness: 20
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return `${context.parsed.x.toFixed(2)} hrs`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: 'Hours Tracked'
+                },
+                beginAtZero: true
+              },
+              y: {
+                ticks: { font: { weight: 'bold' } }
+              }
+            }
+          }
+        });
+
       } else {
-        container.innerHTML = `<p class="text-red-600 text-sm">${data.message}</p>`;
+        ctx.canvas.parentElement.innerHTML = `<p class="text-red-600 text-sm">${data.message}</p>`;
       }
     })
     .catch(error => {
       loading.classList.add("hidden");
-      console.error("Time battery chart fetch failed:", error);
-      container.innerHTML = `<p class="text-red-600 text-sm">Something went wrong fetching time data.</p>`;
+      console.error("Chart fetch error:", error);
+      ctx.canvas.parentElement.innerHTML = `<p class="text-red-600 text-sm">Something went wrong loading the chart.</p>`;
     });
 }
