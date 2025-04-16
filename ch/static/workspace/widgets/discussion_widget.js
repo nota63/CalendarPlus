@@ -492,3 +492,286 @@ function FetchGroupTimeChart(orgId) {
       ctx.canvas.parentElement.appendChild(errorMessage);
     });
 }
+
+
+// # Widget 4) Total tasks by assignee-------------------------------------------------------------------------------------------------------------------------------------------
+function TasksByAssigneePieChart(orgId) {
+  // Original functionality elements
+  const loading = document.getElementById("taskStatusPieLoading");
+  const canvas = document.getElementById("taskStatusPieChart");
+  const ctx = canvas.getContext("2d");
+  
+  // Clear any previous chart instance
+  if (window.taskStatusPieInstance) {
+    window.taskStatusPieInstance.destroy();
+  }
+  
+  // Wrap canvas in SaaS-style container if not already wrapped
+  let container = document.getElementById("task-chart-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "task-chart-container";
+    canvas.parentNode.insertBefore(container, canvas);
+    container.appendChild(canvas);
+    
+    // Create header section
+    const header = document.createElement("div");
+    header.id = "task-chart-header";
+    container.insertBefore(header, canvas);
+    
+    // Create card-style container for the chart
+    const chartCard = document.createElement("div");
+    chartCard.id = "task-chart-card";
+    chartCard.appendChild(canvas);
+    container.appendChild(chartCard);
+    
+    // Create legend container that will be populated after chart renders
+    const legendContainer = document.createElement("div");
+    legendContainer.id = "task-chart-legend";
+    container.appendChild(legendContainer);
+  }
+  
+  // Apply ClickUp-inspired styling to container and components
+  container.className = "bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden w-full max-w-3xl mx-auto";
+  document.getElementById("task-chart-header").className = "px-6 py-4 border-b border-gray-200 flex justify-between items-center";
+  document.getElementById("task-chart-card").className = "px-6 py-6 relative";
+  document.getElementById("task-chart-legend").className = "px-6 pt-2 pb-6";
+  
+  // Style the canvas itself
+  canvas.className = "h-64 w-full";
+  
+  // Create enhanced loading indicator
+  loading.className = "absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-10";
+  loading.innerHTML = `
+    <div class="flex flex-col items-center">
+      <svg class="animate-spin w-8 h-8 text-purple-600 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="text-sm font-medium text-gray-700">Loading task data...</p>
+    </div>
+  `;
+  
+  // Add ClickUp-inspired header content
+  document.getElementById("task-chart-header").innerHTML = `
+    <div>
+      <h3 class="text-lg font-semibold text-gray-800">Tasks by Status</h3>
+      <p class="text-xs text-gray-500 mt-1">Distribution of tasks across different status categories</p>
+    </div>
+    <div class="flex items-center space-x-2">
+        <button onclick="TasksByAssigneePieChart(window.djangoData.orgId)" title="Refresh"
+        class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500 hover:text-indigo-600 transition" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M4 4v5h.582m15.406 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m-15.406-2a8.001 8.001 0 0015.406 2m0 0H15" />
+        </svg>
+      </button>
+
+      <div class="relative">
+        <select id="chart-type-selector" class="appearance-none bg-gray-100 text-gray-700 text-sm font-medium py-1 pl-3 pr-8 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer">
+          <option value="pie">Pie Chart</option>
+          <option value="doughnut">Doughnut Chart</option>
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Show loading indicator
+  loading.classList.remove("d-none");
+  
+  // Original fetch functionality maintained
+  fetch(`/discussion_widget/tasks-by-assignee/${window.djangoData.orgId}/`)
+    .then(res => res.json())
+    .then(data => {
+      loading.classList.add("d-none");
+      
+      if (data.status === 'success' && data.data.length > 0) {
+        // Data processing logic is unchanged
+        const statusCounts = {};
+        data.data.forEach(task => {
+          const status = task.status;
+          statusCounts[status] = (statusCounts[status] || 0) + 1;
+        });
+        
+        const labels = Object.keys(statusCounts);
+        const values = Object.values(statusCounts);
+        const totalTasks = values.reduce((sum, count) => sum + count, 0);
+        
+        // Update header with task count
+        const headerTitle = document.querySelector("#task-chart-header h3");
+        headerTitle.textContent = `Tasks by Status (${totalTasks})`;
+        
+        // ClickUp-inspired color palette - vibrant, distinct but harmonious
+        const colors = [
+          '#7b68ee', // Medium slate blue (Primary color)
+          '#4cc9f0', // Cyan
+          '#06d6a0', // Green
+          '#ffbe0b', // Yellow
+          '#ff5400', // Orange
+          '#e63946', // Red
+          '#8338ec', // Purple
+          '#3a86ff'  // Blue
+        ];
+        
+        // Create chart with enhanced styling
+        const chartConfig = {
+          type: 'pie',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: values,
+              backgroundColor: colors.slice(0, labels.length),
+              borderColor: '#ffffff',
+              borderWidth: 2,
+              hoverOffset: 10
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+              padding: 20
+            },
+            plugins: {
+              legend: {
+                display: false // We'll create a custom legend below
+              },
+              tooltip: {
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                titleColor: '#111827',
+                titleFont: {
+                  family: "'Inter', 'Segoe UI', sans-serif",
+                  size: 14,
+                  weight: 'bold'
+                },
+                bodyColor: '#4b5563',
+                bodyFont: {
+                  family: "'Inter', 'Segoe UI', sans-serif",
+                  size: 13
+                },
+                padding: 12,
+                boxPadding: 6,
+                borderColor: '#e5e7eb',
+                borderWidth: 1,
+                callbacks: {
+                  // Enhanced tooltip showing percentage
+                  label: function(context) {
+                    const value = context.parsed;
+                    const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
+                    const percentage = Math.round((value / total) * 100);
+                    return `${value} tasks (${percentage}%)`;
+                  }
+                }
+              }
+            },
+            elements: {
+              arc: {
+                borderWidth: 1
+              }
+            },
+            animation: {
+              animateScale: true,
+              animateRotate: true,
+              duration: 800,
+              easing: 'easeOutQuart'
+            }
+          }
+        };
+        
+        window.taskStatusPieInstance = new Chart(ctx, chartConfig);
+        
+        // Create ClickUp-style custom legend
+        const legendContainer = document.getElementById("task-chart-legend");
+        let legendHTML = '<div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">';
+        
+        labels.forEach((label, index) => {
+          const count = values[index];
+          const percentage = Math.round((count / totalTasks) * 100);
+          
+          legendHTML += `
+            <div class="flex items-center group">
+              <div class="w-3 h-3 rounded-sm mr-2" style="background-color: ${colors[index]}"></div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <p class="text-sm font-medium text-gray-700 truncate group-hover:text-gray-900">${label}</p>
+                  <p class="ml-2 text-sm font-medium text-gray-900">${count}</p>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                  <div class="h-1.5 rounded-full" style="width: ${percentage}%; background-color: ${colors[index]}"></div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        
+        legendHTML += '</div>';
+        legendContainer.innerHTML = legendHTML;
+        
+        // Add chart type selector functionality
+        const chartTypeSelector = document.getElementById("chart-type-selector");
+        chartTypeSelector.addEventListener("change", function() {
+          if (window.taskStatusPieInstance) {
+            window.taskStatusPieInstance.destroy();
+          }
+          
+          chartConfig.type = this.value;
+          if (this.value === 'doughnut') {
+            chartConfig.options.cutout = '60%';
+          } else {
+            delete chartConfig.options.cutout;
+          }
+          
+          window.taskStatusPieInstance = new Chart(ctx, chartConfig);
+        });
+        
+      } else {
+        // Empty state with ClickUp styling
+        document.getElementById("task-chart-card").innerHTML = `
+          <div class="flex flex-col items-center justify-center py-12 px-4 text-center">
+            <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+            <h4 class="text-lg font-medium text-gray-700 mb-1">No tasks found</h4>
+            <p class="text-sm text-gray-500 mb-4 max-w-sm">There are currently no assigned tasks to display in this chart</p>
+            <button class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-md shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              Create Task
+            </button>
+          </div>
+        `;
+        document.getElementById("task-chart-legend").innerHTML = '';
+      }
+    })
+    .catch(err => {
+      loading.classList.add("d-none");
+      console.error("Error loading pie chart:", err);
+      
+      // Error state with ClickUp styling
+      document.getElementById("task-chart-card").innerHTML = `
+        <div class="flex flex-col items-center justify-center py-10 px-4 text-center">
+          <div class="rounded-full bg-red-100 p-3 mb-4">
+            <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h4 class="text-lg font-medium text-gray-800 mb-1">Failed to load data</h4>
+          <p class="text-sm text-gray-500 mb-4 max-w-sm">There was a problem fetching task statistics</p>
+          <button onclick="TasksByAssigneePieChart()" class="inline-flex items-center px-4 py-2 border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-md shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            Try Again
+          </button>
+        </div>
+      `;
+      document.getElementById("task-chart-legend").innerHTML = '';
+    });
+}

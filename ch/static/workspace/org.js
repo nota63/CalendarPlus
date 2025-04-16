@@ -1181,7 +1181,10 @@ document.addEventListener('DOMContentLoaded', function () {
               break;
       case 'total-time-spent-widget':
               FetchTotalTimeBatteryChart(orgId);
-              break;            
+              break; 
+      case 'tasks-by-assignee-widget':
+              TasksByAssigneePieChart(orgId);
+              break;                         
                                             
                                           
                                                        
@@ -1227,6 +1230,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '#tag-usage-widget':'tag-usage-widget',
           '#discussion-widget':'discussion-widget',
           '#total-time-spent-widget':'total-time-spent-widget',
+          '#tasks-by-assignee-widget':'tasks-by-assignee-widget',
         };
 
         Object.entries(widgetMap).forEach(([selector, widgetType]) => {

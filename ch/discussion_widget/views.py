@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from accounts.models import Profile, Organization
-from group_tasks.models import TaskTimeTracking
+from group_tasks.models import TaskTimeTracking,Task
 
 # Create your views here.
 # fetch users within the workspace
@@ -160,4 +160,42 @@ def time_spent_by_group_view(request, org_id):
     return JsonResponse({
         "status": "success",
         "data": result
+    })
+
+# Widget 4) Total tasks by assignee-------------------------------------------------------------------------------------------------------------------------------------------
+@login_required
+def fetch_user_pending_tasks_by_org(request, org_id):
+    user = request.user
+    try:
+        organization = Organization.objects.get(id=org_id)
+    except Organization.DoesNotExist:
+        return JsonResponse({"status": "error", "message": "Organization not found."}, status=404)
+
+    # Active task statuses except 'completed'
+    active_statuses = [
+        'pending', 'in_progress', 'overdue', 'pending_approval', 'need_changes'
+    ]
+
+    tasks_qs = Task.objects.filter(
+        assigned_to=user,
+        organization=organization,
+        status__in=active_statuses
+    ).select_related('group')
+
+    task_data = [
+        {
+            'id': task.id,
+            'title': task.title,
+            'status': task.status,
+            'priority': task.priority,
+            'deadline': task.deadline,
+            'group_name': task.group.name if task.group else "No Group"
+        }
+        for task in tasks_qs
+    ]
+
+    return JsonResponse({
+        "status": "success",
+        "total_tasks": tasks_qs.count(),
+        "data": task_data
     })
