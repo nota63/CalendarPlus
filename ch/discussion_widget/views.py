@@ -332,7 +332,7 @@ def high_and_urgent_tasks(request, org_id):
         organization_id=org_id
     ).values_list('group_id', flat=True)
 
-    # Fetch tasks with 'high' or 'urgent' priority assigned to this user in those groups
+    # Fetch high & urgent priority tasks assigned to the user
     tasks = Task.objects.filter(
         group_id__in=user_groups,
         organization_id=org_id,
@@ -343,6 +343,8 @@ def high_and_urgent_tasks(request, org_id):
     task_list = []
     for task in tasks:
         task_list.append({
+            'task_id': task.id,
+            'group_id': task.group.id,
             'title': task.title,
             'priority': task.priority,
             'status': task.status,

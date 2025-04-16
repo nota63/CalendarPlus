@@ -1038,7 +1038,7 @@ function PriorityTasks(orgId) {
           const priorityLabel = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
 
           const taskCard = `
-            <div class="border rounded p-2 mb-2 shadow-sm">
+            <div class="border rounded p-2 mb-2 shadow-sm task-card" data-org-id="${orgId}" data-group-id="${task.group_id}" data-task-id="${task.task_id}">
               <div class="d-flex justify-content-between align-items-center">
                 <strong>${task.title}</strong>
                 <span class="badge bg-${badgeColor}">${priorityLabel}</span>
@@ -1049,7 +1049,21 @@ function PriorityTasks(orgId) {
               </div>
             </div>
           `;
+
           listContainer.insertAdjacentHTML('beforeend', taskCard);
+        });
+
+        // Add click event listener to each task card
+        const taskCards = listContainer.querySelectorAll('.task-card');
+        taskCards.forEach(card => {
+          card.addEventListener('click', function() {
+            const orgId = this.getAttribute('data-org-id');
+            const groupId = this.getAttribute('data-group-id');
+            const taskId = this.getAttribute('data-task-id');
+
+            // Redirect to task detail page
+            window.location.href = `/tasks/task_detail/${orgId}/${groupId}/${taskId}/`;
+          });
         });
       }
     })
