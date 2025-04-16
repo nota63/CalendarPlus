@@ -185,4 +185,54 @@ function toggleCodeInput() {
     codeInput.style.display = codeInput.style.display === "none" ? "block" : "none";
   }
 
-  
+ 
+// # Widget 2)Total time traced----------------------------------------------------------------------------------------------------------------
+
+function FetchTotalTimeBatteryChart(orgId) {
+  const loading = document.getElementById("timeWidgetLoading");
+  const container = document.getElementById("batteryChartContainer");
+
+  // Clear existing content + show loader
+  container.innerHTML = "";
+  loading.classList.remove("hidden");
+
+  fetch(`/discussion_widget/time-spent-battery-chart/${window.djangoData.orgId}/`)
+    .then(response => response.json())
+    .then(data => {
+      loading.classList.add("hidden");
+
+      if (data.status === 'success') {
+        if (data.data.length === 0) {
+          container.innerHTML = "<p class='text-sm text-gray-500'>No data found.</p>";
+        } else {
+          data.data.forEach(item => {
+            const batteryColor = item.battery_level >= 75
+              ? 'bg-green-500'
+              : item.battery_level >= 40
+              ? 'bg-yellow-400'
+              : 'bg-red-500';
+
+            const userBar = `
+              <div class="space-y-1">
+                <div class="flex justify-between text-sm text-gray-700 font-medium">
+                  <span>${item.user}</span>
+                  <span>${item.time_hours.toFixed(2)} hrs</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3">
+                  <div class="${batteryColor} h-3 rounded-full" style="width: ${item.battery_level}%"></div>
+                </div>
+              </div>
+            `;
+            container.insertAdjacentHTML('beforeend', userBar);
+          });
+        }
+      } else {
+        container.innerHTML = `<p class="text-red-600 text-sm">${data.message}</p>`;
+      }
+    })
+    .catch(error => {
+      loading.classList.add("hidden");
+      console.error("Time battery chart fetch failed:", error);
+      container.innerHTML = `<p class="text-red-600 text-sm">Something went wrong fetching time data.</p>`;
+    });
+}

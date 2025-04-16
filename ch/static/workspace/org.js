@@ -1178,7 +1178,11 @@ document.addEventListener('DOMContentLoaded', function () {
               break;
       case 'discussion-widget':
               HandleAndFetchChat(orgId);
+              break;
+      case 'total-time-spent-widget':
+              FetchTotalTimeBatteryChart(orgId);
               break;            
+                                            
                                           
                                                        
       default:
@@ -1222,6 +1226,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '#status-over-time-widget':'status-over-time-widget',
           '#tag-usage-widget':'tag-usage-widget',
           '#discussion-widget':'discussion-widget',
+          '#total-time-spent-widget':'total-time-spent-widget',
         };
 
         Object.entries(widgetMap).forEach(([selector, widgetType]) => {
