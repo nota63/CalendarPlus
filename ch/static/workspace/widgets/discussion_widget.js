@@ -568,6 +568,16 @@ function TasksByAssigneePieChart(orgId) {
         </svg>
       </button>
 
+          <button onclick="openFullScreenWidget('tasks-by-assignee-widget')" title="Fullscreen"
+        class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+        <svg class="w-5 h-5 text-gray-400 hover:text-indigo-600 transition" fill="none" stroke="currentColor"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+        </svg>
+      </button>
+
+
       <div class="relative">
         <select id="chart-type-selector" class="appearance-none bg-gray-100 text-gray-700 text-sm font-medium py-1 pl-3 pr-8 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer">
           <option value="pie">Pie Chart</option>
