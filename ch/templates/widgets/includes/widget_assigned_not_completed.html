@@ -1,5 +1,74 @@
-<div id="assigned-not-completed-widget"
-     class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
-  <div class="text-sm font-medium text-gray-500 mb-1">Assigned but Not Completed Tasks</div>
-  <div id="assignedNotCompletedCount" class="text-2xl font-bold text-indigo-600">0</div>
-</div>
+<div id="assigned-not-completed-widget" class="rounded-xl border border-gray-100 bg-white p-6 shadow-md hover:shadow-lg transition-all duration-300 relative overflow-hidden">
+    <!-- Accent color bar at top -->
+    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-blue-500"></div>
+    
+    <!-- Widget Header -->
+    <div class="flex items-center justify-between mb-5">
+      <div class="flex items-center gap-2.5">
+        <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-50">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+        </div>
+        <h3 class="text-base font-semibold text-gray-800">Assigned Tasks</h3>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="flex gap-1">
+        <!-- Refresh Button -->
+        <button onclick="AssignedNotCompletedTasks(window.djangoData.orgId)" title="Refresh" class="p-1.5 hover:bg-gray-50 rounded-md transition-colors group">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 group-hover:text-indigo-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.406 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m-15.406-2a8.001 8.001 0 0015.406 2m0 0H15"/>
+          </svg>
+        </button>
+        
+        <!-- Fullscreen Button -->
+        <button onclick="openFullScreenWidget('assigned-not-completed-widget')" title="Fullscreen" class="p-1.5 hover:bg-gray-50 rounded-md transition-colors group">
+          <svg class="w-4 h-4 text-gray-400 group-hover:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+          </svg>
+        </button>
+        
+        <!-- Screenshot Button -->
+        <button onclick="takeScreenshot('assigned-not-completed-widget')" title="Download Screenshot" class="p-1.5 hover:bg-gray-50 rounded-md transition-colors group">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 group-hover:text-indigo-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l2-2h4l2-2h2l2 2h4l2 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+            <circle cx="12" cy="13" r="3" />
+          </svg>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Content Area -->
+    <div class="flex flex-col items-center justify-center py-4">
+      <!-- Ring with Count -->
+      <div class="relative mb-4">
+        <div class="w-24 h-24 rounded-full bg-indigo-50 flex items-center justify-center">
+          <div class="assigned-loader hidden">
+            <div class="w-6 h-6 border-t-2 border-indigo-600 border-solid rounded-full animate-spin"></div>
+          </div>
+          <span id="assignedNotCompletedCount" class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">0</span>
+        </div>
+        <div class="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+      </div>
+      
+      <!-- Description -->
+      <p class="text-sm text-gray-500 text-center px-4 leading-5">
+        Tasks assigned to you that are still pending completion
+      </p>
+    </div>
+    
+    <!-- Action Button -->
+    <div class="mt-2">
+      <button onclick="viewAllAssignedTasks()" class="w-full py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white text-sm font-medium transition-all duration-300 flex items-center justify-center gap-2 group">
+        View My Tasks
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+        </svg>
+      </button>
+    </div>
+  </div>
