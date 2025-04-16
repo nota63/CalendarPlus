@@ -785,3 +785,34 @@ function TasksByAssigneePieChart(orgId) {
       document.getElementById("task-chart-legend").innerHTML = '';
     });
 }
+
+// Widget 5) Unassigned tasks ------------------------------------------------------------------------------------------------------------------------------------------------
+
+function UnassignedTasksSummary(orgId) {
+  const container = document.getElementById("un-assigned-tasks-widget");
+  const loader = container.querySelector(".unassigned-loader");
+  const countBox = container.querySelector(".unassigned-count");
+
+  // Show loader
+  loader.classList.remove("hidden");
+  countBox.classList.add("hidden");
+
+  fetch(`/discussion_widget/tasks-assignment-summary/${orgId}/`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Failed to fetch task summary");
+      }
+      return response.json();
+    })
+    .then(data => {
+      countBox.textContent = `${data.unassigned_tasks}`;
+    })
+    .catch(error => {
+      console.error("Error fetching unassigned tasks:", error);
+      countBox.textContent = "Error";
+    })
+    .finally(() => {
+      loader.classList.add("hidden");
+      countBox.classList.remove("hidden");
+    });
+}

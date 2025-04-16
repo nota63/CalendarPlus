@@ -8,7 +8,7 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from accounts.models import Profile, Organization
 from group_tasks.models import TaskTimeTracking,Task
-
+from django.views.decorators.http import require_GET
 # Create your views here.
 # fetch users within the workspace
 
@@ -199,3 +199,38 @@ def fetch_user_pending_tasks_by_org(request, org_id):
         "total_tasks": tasks_qs.count(),
         "data": task_data
     })
+
+
+
+# // Widget 5) Unassigned tasks ------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+@login_required
+@require_GET
+def task_assignment_summary(request, org_id):
+    user = request.user
+
+    # Get total tasks in this organization
+    total_tasks = Task.objects.filter(organization_id=org_id).count()
+
+    # Assigned to any user (not null)
+    assigned_tasks = Task.objects.filter(organization_id=org_id, assigned_to=user).count()
+
+    # Assigned specifically to this user
+    user_assigned_tasks = Task.objects.filter(
+        organization_id=org_id,
+        assigned_to=user
+    ).count()
+
+    # Calculate unassigned tasks
+    unassigned_tasks = total_tasks - assigned_tasks
+    print("Unassigned tasks:",unassigned_tasks)
+
+    return JsonResponse({
+        'organization_id': org_id,
+        'total_tasks': total_tasks,
+        'assigned_tasks': assigned_tasks,
+        'unassigned_tasks': unassigned_tasks,
+        'user_assigned_tasks': user_assigned_tasks,
+    })
+

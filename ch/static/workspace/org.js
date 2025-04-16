@@ -1185,7 +1185,9 @@ document.addEventListener('DOMContentLoaded', function () {
       case 'tasks-by-assignee-widget':
               TasksByAssigneePieChart(orgId);
               break;                         
-                                            
+      case 'un-assigned-tasks-widget':
+              UnassignedTasksSummary(orgId);
+              break;                                  
                                           
                                                        
       default:
@@ -1231,6 +1233,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '#discussion-widget':'discussion-widget',
           '#total-time-spent-widget':'total-time-spent-widget',
           '#tasks-by-assignee-widget':'tasks-by-assignee-widget',
+          '#un-assigned-tasks-widget':'un-assigned-tasks-widget',
         };
 
         Object.entries(widgetMap).forEach(([selector, widgetType]) => {

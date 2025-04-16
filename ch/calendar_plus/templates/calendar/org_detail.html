@@ -6275,6 +6275,20 @@ body {
               </button>
             </div>
           </div>
+          <!-- total un-assigned tasks -->
+          <div class="widget-card border-purple">
+            <div class="widget-header bg-purple">
+              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQS676iFScmoXdqBP23OxjViEdEQqv-rGkUbJbzcgc5EMHtreBHx7evSPHvf8WlucmZ_Wc&usqp=CAU" class="w-100 h-100 object-cover" alt="unassigned tasks">
+            </div>
+            <div class="widget-body">
+              <h4 class="widget-title">Total Unassigned Tasks.</h4>
+              <p class="widget-description">See how many tasks are not Assigned in any location.</p>
+              <button class="add-widget-btn w-100 text-center" data-widget="un_assigned_tasks">
+                <i class="fas fa-plus"></i> Add widget
+              </button>
+            </div>
+          </div>
+
 
 
  
@@ -6384,7 +6398,7 @@ body {
 <script src="{% static 'workspace/widgets/time_traced_widget.js'%}"></script>
 <!--number of tasks in progress 2)completed tasks 3)status over time 4)tag usage bar chart-->
 <script src="{% static 'workspace/widgets/all_tasks_widget.js'%}"></script>
-<!-- real time discussion widget 2)Total time traced 3)total tasks by assignee-->
+<!-- real time discussion widget 2)Total time traced 3)total tasks by assignee 4) total un-assigned tasks-->
 <script src="{% static 'workspace/widgets/discussion_widget.js'%}"></script> 
 <!-- ------------------------------------------------------------------------------------------------------------- -->
  
