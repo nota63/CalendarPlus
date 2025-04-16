@@ -1017,3 +1017,47 @@ function UrgentTasksCount(orgId) {
       loader.classList.add('hidden');
     });
 }
+
+// widget 8) Priority tasks list ----------------------------------------------------------------------------------------------------
+function PriorityTasks(orgId) {
+  const listContainer = document.getElementById('priorityTasksList');
+  const loading = document.getElementById('priorityTasksLoading');
+
+  // Clear previous data
+  listContainer.innerHTML = '';
+  loading.classList.remove('d-none');
+
+  fetch(`/discussion_widget/priority-tasks/${orgId}/`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.tasks.length === 0) {
+        listContainer.innerHTML = `<div class="text-muted text-sm">No urgent or high priority tasks assigned to you 💖</div>`;
+      } else {
+        data.tasks.forEach(task => {
+          const badgeColor = task.priority === 'urgent' ? 'danger' : 'warning';
+          const priorityLabel = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
+
+          const taskCard = `
+            <div class="border rounded p-2 mb-2 shadow-sm">
+              <div class="d-flex justify-content-between align-items-center">
+                <strong>${task.title}</strong>
+                <span class="badge bg-${badgeColor}">${priorityLabel}</span>
+              </div>
+              <div class="text-muted small">
+                <i class="bi bi-people"></i> Group: ${task.group} <br>
+                <i class="bi bi-calendar-event"></i> Deadline: ${task.deadline}
+              </div>
+            </div>
+          `;
+          listContainer.insertAdjacentHTML('beforeend', taskCard);
+        });
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching priority tasks:', error);
+      listContainer.innerHTML = `<div class="text-danger">Failed to load tasks. Try again later 💔</div>`;
+    })
+    .finally(() => {
+      loading.classList.add('d-none');
+    });
+}

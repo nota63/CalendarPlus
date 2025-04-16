@@ -11,4 +11,5 @@ urlpatterns = [
     path('assigned-not-completed/<int:org_id>/',assigned_not_completed_tasks_view, name='assigned_not_completed'),
     path('priority-breakdown/<int:org_id>/',priority_breakdown_view, name='priority_breakdown'),
     path('urgent-tasks-group/<int:org_id>/',groups_with_urgent_tasks, name='urgent_tasks_group'),
+    path('priority-tasks/<int:org_id>/',high_and_urgent_tasks, name='priority_tasks'),
 ]

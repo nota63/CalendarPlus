@@ -320,3 +320,34 @@ def groups_with_urgent_tasks(request, org_id):
 
     return JsonResponse({'groups': response_data})
 
+
+# // widget 8) Priority tasks list ----------------------------------------------------------------------------------------------------
+def high_and_urgent_tasks(request, org_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+
+    # Fetch groups where the user is a member
+    user_groups = GroupMember.objects.filter(
+        user=request.user,
+        organization_id=org_id
+    ).values_list('group_id', flat=True)
+
+    # Fetch tasks with 'high' or 'urgent' priority assigned to this user in those groups
+    tasks = Task.objects.filter(
+        group_id__in=user_groups,
+        organization_id=org_id,
+        assigned_to=request.user,
+        priority__in=['high', 'urgent']
+    ).order_by('-priority', 'deadline')
+
+    task_list = []
+    for task in tasks:
+        task_list.append({
+            'title': task.title,
+            'priority': task.priority,
+            'status': task.status,
+            'deadline': task.deadline.strftime('%Y-%m-%d %H:%M'),
+            'group': task.group.name,
+        })
+
+    return JsonResponse({'tasks': task_list})
