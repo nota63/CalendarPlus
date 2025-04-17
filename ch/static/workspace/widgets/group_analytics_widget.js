@@ -1,46 +1,50 @@
 function fetchAndDisplayGroups(orgId) {
     const container = document.getElementById('group-analytics-widget');
-    container.innerHTML = `<p>Loading groups...</p>`;  // Show loading text initially
+    container.innerHTML = `<p class="text-sm text-gray-500">Loading groups...</p>`;
 
-    // Fetch group leader info from the server
-    fetch(`/admin_widgets/list-groups/${orgId}/`)  // Replace with the correct URL
+    fetch(`/admin_widgets/list-groups/${orgId}/`)
         .then(response => response.json())
         .then(data => {
-            container.innerHTML = '';  // Clear existing content
+            container.innerHTML = '';
 
-            // Check if groups are available
             if (data.groups && data.groups.length > 0) {
-                data.groups.forEach(group => {
-                    const groupCard = document.createElement('div');
-                    groupCard.className = 'group-card p-4 mb-4 rounded-xl border shadow bg-white';
-                    groupCard.dataset.groupId = group.id;  // Store group ID for later use
+                const groupList = document.createElement('div');
+                groupList.className = 'space-y-2';  // Compact stacked style
 
-                    // Create the group leader card content
-                    groupCard.innerHTML = `
-                        <h2 class="text-xl font-bold mb-2">${group.group_name}</h2>
-                        <div class="flex items-center mb-3">
-                            <img src="${group.team_leader.profile_picture || '/static/default-profile-pic.jpg'}" 
-                                 alt="${group.team_leader.username}" 
-                                 class="w-12 h-12 rounded-full mr-3">
+                data.groups.forEach(group => {
+                    const groupRow = document.createElement('div');
+                    groupRow.className = `
+                        flex items-center justify-between p-2 rounded-lg 
+                        hover:bg-gray-50 transition cursor-pointer group-row
+                    `;
+                    groupRow.dataset.groupId = group.id;
+
+                    groupRow.innerHTML = `
+                        <div class="flex items-center">
+                            <img src="${group.team_leader.profile_picture || '/static/default-profile-pic.jpg'}"
+                                 alt="${group.team_leader.username}"
+                                 class="w-8 h-8 rounded-full mr-3">
                             <div>
-                                <p class="font-semibold">${group.team_leader.username}</p>
-                                <p class="text-gray-600 text-sm">Team Leader</p>
+                                <p class="text-sm font-medium text-gray-800">${group.group_name}</p>
+                                <p class="text-xs text-gray-500">${group.team_leader.username} · Team Lead</p>
                             </div>
                         </div>
+                        <div class="text-xs text-indigo-600 font-semibold group-hover:underline">View</div>
                     `;
 
-                    // Add event listener for click to fetch analytics
-                    groupCard.addEventListener('click', () => fetchGroupAnalytics(group.id, orgId));
+                    groupRow.addEventListener('click', () => fetchGroupAnalytics(group.id, orgId));
 
-                    container.appendChild(groupCard);
+                    groupList.appendChild(groupRow);
                 });
+
+                container.appendChild(groupList);
             } else {
-                container.innerHTML = `<p>No groups found for this organization.</p>`;
+                container.innerHTML = `<p class="text-sm text-gray-500">No groups found for this organization.</p>`;
             }
         })
         .catch(error => {
             console.error('Failed to fetch group leader info:', error);
-            container.innerHTML = `<p class="text-red-600">Failed to load groups. Please try again later.</p>`;
+            container.innerHTML = `<p class="text-sm text-red-500">Failed to load groups. Please try again later.</p>`;
         });
 }
 
