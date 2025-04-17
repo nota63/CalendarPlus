@@ -1,53 +1,110 @@
 function fetchAndDisplayGroups(orgId) {
     const container = document.getElementById('group-analytics-widget');
-    container.innerHTML = `<p class="text-sm text-gray-500">Loading groups...</p>`;
-
+    container.innerHTML = `<p class="text-sm text-gray-500 flex items-center justify-center py-4">
+        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Loading groups...
+    </p>`;
+    
     fetch(`/admin_widgets/list-groups/${orgId}/`)
         .then(response => response.json())
         .then(data => {
             container.innerHTML = '';
-
+            
+            // Create a scrollable container with hidden scrollbar
+            const scrollContainer = document.createElement('div');
+            scrollContainer.className = 'max-h-80 overflow-y-auto pr-1 scrollbar-hide';
+            
+            // Add custom scrollbar style
+            const style = document.createElement('style');
+            style.textContent = `
+                .scrollbar-hide::-webkit-scrollbar {
+                    width: 6px;
+                    background: transparent;
+                }
+                .scrollbar-hide::-webkit-scrollbar-thumb {
+                    background: rgba(203, 213, 225, 0.5);
+                    border-radius: 10px;
+                }
+                .scrollbar-hide:hover::-webkit-scrollbar-thumb {
+                    background: rgba(203, 213, 225, 0.8);
+                }
+                .scrollbar-hide {
+                    scrollbar-width: thin;
+                    scrollbar-color: rgba(203, 213, 225, 0.5) transparent;
+                }
+            `;
+            container.appendChild(style);
+            
             if (data.groups && data.groups.length > 0) {
                 const groupList = document.createElement('div');
-                groupList.className = 'space-y-2';  // Compact stacked style
-
+                groupList.className = 'space-y-1';  // Tighter spacing for ClickUp-like density
+                
                 data.groups.forEach(group => {
                     const groupRow = document.createElement('div');
                     groupRow.className = `
-                        flex items-center justify-between p-2 rounded-lg 
-                        hover:bg-gray-50 transition cursor-pointer group-row
+                        flex items-center justify-between p-3 rounded-md
+                        hover:bg-indigo-50 transition-all duration-150 cursor-pointer
+                        border border-transparent hover:border-indigo-100
+                        group-row shadow-sm hover:shadow
                     `;
                     groupRow.dataset.groupId = group.id;
-
+                    
                     groupRow.innerHTML = `
-                        <div class="flex items-center">
-                            <img src="${group.team_leader.profile_picture || '/static/default-profile-pic.jpg'}"
-                                 alt="${group.team_leader.username}"
-                                 class="w-8 h-8 rounded-full mr-3">
-                            <div>
-                                <p class="text-sm font-medium text-gray-800">${group.group_name}</p>
-                                <p class="text-xs text-gray-500">${group.team_leader.username} · Team Lead</p>
+                        <div class="flex items-center flex-1 min-w-0">
+                            <div class="w-8 h-8 rounded-md mr-3 bg-indigo-100 flex-shrink-0 overflow-hidden">
+                                <img src="${group.team_leader.profile_picture || '/static/default-profile-pic.jpg'}"
+                                     alt="${group.team_leader.username}"
+                                     class="w-full h-full object-cover">
+                            </div>
+                            <div class="truncate">
+                                <p class="text-sm font-medium text-gray-800 truncate">${group.group_name}</p>
+                                <p class="text-xs text-gray-500 flex items-center">
+                                    <span class="truncate">${group.team_leader.username}</span>
+                                    <span class="mx-1">•</span>
+                                    <span class="text-gray-400">Team Lead</span>
+                                </p>
                             </div>
                         </div>
-                        <div class="text-xs text-indigo-600 font-semibold group-hover:underline">View</div>
+                        <div class="flex-shrink-0 ml-2 text-indigo-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 opacity-60 group-hover:opacity-100 transition-opacity">
+                                <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
                     `;
-
+                    
                     groupRow.addEventListener('click', () => fetchGroupAnalytics(group.id, orgId));
-
+                    
                     groupList.appendChild(groupRow);
                 });
-
-                container.appendChild(groupList);
+                
+                scrollContainer.appendChild(groupList);
+                container.appendChild(scrollContainer);
             } else {
-                container.innerHTML = `<p class="text-sm text-gray-500">No groups found for this organization.</p>`;
+                container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-8 text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-10 h-10 text-gray-300 mb-3">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18 18v2a2 2 0 01-2 2H8a2 2 0 01-2-2v-2M12 2a5 5 0 00-5 5v3h10V7a5 5 0 00-5-5z" />
+                        </svg>
+                        <p class="text-sm text-gray-500">No groups found for this organization.</p>
+                    </div>
+                `;
             }
         })
         .catch(error => {
             console.error('Failed to fetch group leader info:', error);
-            container.innerHTML = `<p class="text-sm text-red-500">Failed to load groups. Please try again later.</p>`;
+            container.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-8 text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-10 h-10 text-red-400 mb-3">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <p class="text-sm text-red-500">Failed to load groups. Please try again later.</p>
+                </div>
+            `;
         });
 }
-
 function fetchGroupAnalytics(groupId, orgId) {
     // Make the AJAX request to fetch group analytics
     fetch(`/admin_widgets/group-analytics-widget/${orgId}/${groupId}/`)
