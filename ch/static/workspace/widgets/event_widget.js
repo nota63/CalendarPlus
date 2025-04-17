@@ -361,81 +361,155 @@ function TeamAvailabilityHeatmap(orgId) {
       const users = data.heatmap;
       
       let html = `
-        <div class="overflow-x-auto border rounded-lg shadow-sm bg-white">
-          <div class="p-3 border-b bg-gray-50 flex justify-between items-center">
-            <h3 class="text-sm font-medium text-gray-700">Team Availability</h3>
-            <div class="flex space-x-3 text-xs">
-              <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-green-400 mr-1"></span> Available</span>
-              <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-yellow-300 mr-1"></span> Partial</span>
-              <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-red-400 mr-1"></span> Booked</span>
-            </div>
+      <div class="overflow-hidden rounded-lg shadow-md border border-gray-200 bg-white">
+        <!-- Header -->
+        <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-white">
+          <h3 class="text-base font-semibold text-gray-800">Team Availability</h3>
+          <div class="flex space-x-4 text-xs font-medium">
+            <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-emerald-500 mr-2"></span> Available</span>
+            <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-amber-400 mr-2"></span> Partial</span>
+            <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-rose-500 mr-2"></span> Booked</span>
           </div>
-          <table class="min-w-full text-xs">
-            <thead class="bg-gray-50 text-xs uppercase font-medium text-gray-600 sticky top-0 z-10">
-              <tr>
-                <th class="p-2 border-r text-left">User</th>
-                ${days.map(day => `<th class="p-2 text-center">${day}</th>`).join('')}
+        </div>
+        
+        <!-- Table Container with custom styled scrollbars -->
+        <div class="overflow-auto max-h-96 custom-scrollbar">
+          <table class="min-w-full border-collapse text-sm">
+            <thead>
+              <tr class="bg-gray-50 text-xs font-medium text-gray-500 sticky top-0 z-10 shadow-sm">
+                <th class="py-3 px-4 border-r border-gray-200 text-left sticky left-0 bg-gray-50 z-20">User</th>
+                ${days.map(day => `<th class="py-3 px-4 text-center">${day}</th>`).join('')}
               </tr>
             </thead>
             <tbody>
+    `;
+    
+    users.forEach((user, index) => {
+      html += `
+        <tr class="border-t border-gray-200 hover:bg-blue-50/40 transition-colors duration-150">
+          <td class="py-3 px-4 flex items-center gap-3 border-r border-gray-200 sticky left-0 bg-white z-10">
+            <div class="w-8 h-8 rounded-full bg-gray-100 flex-shrink-0 overflow-hidden">
+              <img src="${user.profile_picture || '/static/default-avatar.png'}"
+                   alt="${user.full_name}"
+                   class="w-full h-full object-cover">
+            </div>
+            <span class="font-medium text-gray-800">${user.full_name}</span>
+          </td>
       `;
       
-      users.forEach((user, index) => {
-        html += `
-          <tr class="${index % 2 === 0 ? '' : 'bg-gray-50'} hover:bg-blue-50/30 border-t">
-            <td class="p-2 flex items-center gap-2 border-r">
-              <img src="${user.profile_picture || '/static/default-avatar.png'}" 
-                   alt="${user.full_name}" 
-                   class="w-6 h-6 rounded-full border object-cover">
-              <span class="text-xs font-medium text-gray-700">${user.full_name}</span>
-            </td>
-        `;
+      for (let i = 0; i < 7; i++) {
+        const slots = user.availability[i] || [];
+        let cellColor = "bg-gray-50";
+        let dotColor = "";
+        let textColor = "text-gray-400";
         
-        for (let i = 0; i < 7; i++) {
-          const slots = user.availability[i] || [];
-          let cellColor = "bg-gray-100";
+        if (slots.length > 0) {
+          const allBooked = slots.every(s => s.is_booked);
+          const allAvailable = slots.every(s => !s.is_booked);
           
-          if (slots.length > 0) {
-            const allBooked = slots.every(s => s.is_booked);
-            const allAvailable = slots.every(s => !s.is_booked);
-            
-            cellColor = allAvailable ? "bg-green-100" : 
-                         allBooked ? "bg-red-100" : 
-                         "bg-yellow-100";
+          if (allAvailable) {
+            cellColor = "bg-emerald-50";
+            dotColor = "bg-emerald-500";
+            textColor = "text-emerald-700";
+          } else if (allBooked) {
+            cellColor = "bg-rose-50";
+            dotColor = "bg-rose-500";
+            textColor = "text-rose-700";
+          } else {
+            cellColor = "bg-amber-50";
+            dotColor = "bg-amber-400";
+            textColor = "text-amber-700";
           }
-          
-          html += `
-            <td class="p-2 text-center ${cellColor} cursor-pointer relative group" data-user="${user.user_id}" data-day="${i}">
-              <div class="text-xs">${slots.length > 0 ? slots.length + " slot(s)" : "-"}</div>
-              
-              <!-- Original tooltip functionality preserved -->
-              ${slots.length > 0 ? `
-                <div class="absolute left-1/2 -translate-x-1/2 mt-1 z-50 hidden group-hover:block w-max bg-white border border-gray-200 p-2 rounded shadow-md text-xs text-left">
-                  ${slots.map(slot => `
-                    <div class="mb-1 ${slot !== slots[slots.length-1] ? 'border-b border-gray-100 pb-1' : ''}">
-                      <span class="font-medium">${slot.start_time} - ${slot.end_time}</span><br>
-                      ${slot.is_booked ? 
-                        '<span class="text-red-500">Booked</span>' : 
-                        '<span class="text-green-600">Available</span>'}
-                    </div>
-                  `).join('')}
-                </div>
-              ` : ''}
-            </td>
-          `;
         }
         
-        html += `</tr>`;
-      });
+        html += `
+          <td class="py-3 px-4 text-center ${cellColor} cursor-pointer relative group transition-colors duration-150" data-user="${user.user_id}" data-day="${i}">
+            <div class="flex flex-col items-center justify-center">
+              ${slots.length > 0 ? 
+                `<div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full ${dotColor}"></span>
+                  <span class="text-xs font-medium ${textColor}">${slots.length} slot${slots.length > 1 ? 's' : ''}</span>
+                 </div>` : 
+                `<span class="text-xs text-gray-400">-</span>`
+              }
+            </div>
+            
+            <!-- Enhanced tooltip -->
+            ${slots.length > 0 ? `
+              <div class="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 hidden group-hover:block w-64 bg-white border border-gray-200 p-3 rounded-md shadow-lg text-xs text-left">
+                <div class="font-medium text-gray-700 mb-2 pb-2 border-b border-gray-100">Availability Details</div>
+                ${slots.map(slot => `
+                  <div class="mb-2 ${slot !== slots[slots.length-1] ? 'border-b border-gray-100 pb-2' : ''}">
+                    <div class="flex justify-between items-center mb-1">
+                      <span class="font-medium text-gray-800">${slot.start_time} - ${slot.end_time}</span>
+                      ${slot.is_booked ?
+                        '<span class="px-2 py-1 rounded-full bg-rose-100 text-rose-700 text-xs font-medium">Booked</span>' :
+                        '<span class="px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium">Available</span>'
+                      }
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+          </td>
+        `;
+      }
       
-      html += `
+      html += `</tr>`;
+    });
+    
+    html += `
             </tbody>
           </table>
         </div>
-      `;
-      
-      container.innerHTML = html;
+      </div>
+    
+      <style>
+        /* Modern custom scrollbar styles */
+        .custom-scrollbar {
+          scrollbar-width: thin; /* For Firefox */
+          scrollbar-color: rgba(203, 213, 225, 0.5) transparent; /* For Firefox */
+        }
+        
+        /* Chrome, Edge, and Safari */
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+          border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background-color: rgba(203, 213, 225, 0.5);
+          border-radius: 10px;
+          transition: background-color 0.2s ease;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background-color: rgba(148, 163, 184, 0.7);
+        }
+        
+        /* For IE and Edge legacy support */
+        .custom-scrollbar {
+          -ms-overflow-style: auto;
+        }
+        
+        /* Make sure the User column sticks to the left when scrolling horizontally */
+        .sticky-left {
+          position: sticky;
+          left: 0;
+          z-index: 10;
+        }
+      </style>
+    `;
+    
+    container.innerHTML = html;
     })
+
+
     .catch(err => {
       console.error("Error loading heatmap:", err);
       container.innerHTML = `
