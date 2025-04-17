@@ -25,6 +25,7 @@ def group_leader_info_view(request, org_id):
         
         # Append group data along with team leader's profile picture
         group_leader_data.append({
+            'id':group.id,
             'group_name': group.name,
             'team_leader': {
                 'username': team_leader_profile.user.username,  # Assuming user is the related User instance
