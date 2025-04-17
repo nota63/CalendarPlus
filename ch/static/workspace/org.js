@@ -1199,7 +1199,10 @@ document.addEventListener('DOMContentLoaded', function () {
               break;
       case 'priority-tasks-widget':
               PriorityTasks(orgId);
-              break;                            
+              break;
+      case 'event-calendar-widget':
+              EventCalendar(orgId);
+              break;                                        
                                                 
                                                        
       default:
@@ -1250,6 +1253,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '#priority-breakdown-widget':'priority-breakdown-widget',
           '#urgent-tasks-group-widget':'urgent-tasks-group-widget',
           '#priority-tasks-widget':'priority-tasks-widget',
+          '#event-calendar-widget':'event-calendar-widget',
         };
 
         Object.entries(widgetMap).forEach(([selector, widgetType]) => {
