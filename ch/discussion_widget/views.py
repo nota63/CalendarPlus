@@ -12,11 +12,31 @@ from django.views.decorators.http import require_GET
 from groups.models import GroupMember, Group
 
 # Create your views here.
+
+# helper function to check access 
+def check_access(org_id, user_id):
+    organization = Organization.objects.filter(id=org_id).first()
+    if not organization:
+        return JsonResponse({'error': 'Organization not found'}, status=404)
+    
+    profile = Profile.objects.filter(user_id=user_id, organization=organization).first()
+    if not profile:
+        return JsonResponse({'error': 'Unauthorized Access'}, status=403)
+
+    return True
+
+
+
+
 # fetch users within the workspace
 
 @login_required
 def fetch_chat_users(request, org_id):
     profiles = Profile.objects.filter(organization_id=org_id).exclude(user=request.user)
+    user_id=request.user.id
+    access = check_access(org_id, user_id)
+    if isinstance(access, JsonResponse):
+        return access  # block access if unauthorized
     
     data = []
     for profile in profiles:
@@ -38,6 +58,11 @@ def handle_chat(request):
         org_id = request.POST.get("org_id")
         code_snippet = request.POST.get("code_snippet", "").strip()
         uploaded_file = request.FILES.get("file")
+
+        user_id=request.user.id
+        access = check_access(org_id, user_id)
+        if isinstance(access, JsonResponse):
+            return access  # block access if unauthorized
 
         if not receiver_id or not (text or code_snippet or uploaded_file):
             return JsonResponse({'error': 'Missing message content'}, status=400)
@@ -112,8 +137,15 @@ def handle_chat(request):
 
 @login_required
 def time_spent_battery_chart(request, org_id):
+
     try:
         organization = Organization.objects.get(id=org_id)
+        user_id=request.user.id
+    
+        access = check_access(org_id, user_id)
+        if isinstance(access, JsonResponse):
+            return access  # block access if unauthorized
+
 
         # Sum of time_spent per user (if needed you can just remove `.values('user__username')` to get global)
         time_data = (
@@ -144,6 +176,12 @@ def time_spent_battery_chart(request, org_id):
 
 # Time spent by group
 def time_spent_by_group_view(request, org_id):
+    user_id=request.user.id
+    
+    access = check_access(org_id, user_id)
+    if isinstance(access, JsonResponse):
+        return access  # block access if unauthorized
+
     time_data = (
         TaskTimeTracking.objects.filter(organization_id=org_id,user=request.user)
         .values("group__name")
@@ -168,8 +206,13 @@ def time_spent_by_group_view(request, org_id):
 @login_required
 def fetch_user_pending_tasks_by_org(request, org_id):
     user = request.user
+    user_id=request.user.id
+
     try:
         organization = Organization.objects.get(id=org_id)
+        access = check_access(org_id, user_id)
+        if isinstance(access, JsonResponse):
+            return access  # block access if unauthorized
     except Organization.DoesNotExist:
         return JsonResponse({"status": "error", "message": "Organization not found."}, status=404)
 
@@ -211,6 +254,12 @@ def fetch_user_pending_tasks_by_org(request, org_id):
 @require_GET
 def task_assignment_summary(request, org_id):
     user = request.user
+    user_id=request.user.id
+    
+    access = check_access(org_id, user_id)
+    if isinstance(access, JsonResponse):
+        return access  # block access if unauthorized
+
 
     # Get total tasks in this organization
     total_tasks = Task.objects.filter(organization_id=org_id).count()
@@ -240,6 +289,12 @@ def task_assignment_summary(request, org_id):
 # // widget 6) Assigned but not completed-----------------------------------------------------------------------------------------------------------
 @login_required
 def assigned_not_completed_tasks_view(request, org_id):
+    user_id=request.user.id
+    
+    access = check_access(org_id, user_id)
+    if isinstance(access, JsonResponse):
+        return access  # block access if unauthorized
+
     try:
        
         count = Task.objects.filter(
@@ -261,6 +316,13 @@ def assigned_not_completed_tasks_view(request, org_id):
 def priority_breakdown_view(request, org_id):
     if not request.user.is_authenticated:
         return JsonResponse({'error': 'Unauthorized'}, status=401)
+    
+    user_id=request.user.id
+    
+    access = check_access(org_id, user_id)
+    if isinstance(access, JsonResponse):
+        return access  # block access if unauthorized
+
 
     # Filter by organization + assigned to current user
     tasks = Task.objects.filter(
@@ -294,6 +356,12 @@ def groups_with_urgent_tasks(request, org_id):
     along with the count of urgent priority tasks assigned to the user in each group.
     """
     user = request.user
+    user_id=request.user.id
+    
+    access = check_access(org_id, user_id)
+    if isinstance(access, JsonResponse):
+        return access  
+
 
     group_memberships = GroupMember.objects.filter(
         organization_id=org_id,
@@ -325,6 +393,11 @@ def groups_with_urgent_tasks(request, org_id):
 def high_and_urgent_tasks(request, org_id):
     if not request.user.is_authenticated:
         return JsonResponse({'error': 'Unauthorized'}, status=401)
+    user_id=request.user.id
+    
+    access = check_access(org_id, user_id)
+    if isinstance(access, JsonResponse):
+        return access  # block access if unauthorized
 
     # Fetch groups where the user is a member
     user_groups = GroupMember.objects.filter(

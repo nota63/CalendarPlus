@@ -40,6 +40,7 @@ class DashboardWidget(models.Model):
         ('priority_breakdown','Priority breakdown'),
         ('urgent_tasks_group','Urgent tasks group'),
         ('priority_tasks','Priority tasks'),
+        ('event_calendar','Event calendar'),
         # Add more widgets as you scale, my baby 💖
     ]
 

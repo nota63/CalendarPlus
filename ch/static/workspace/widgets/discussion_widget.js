@@ -1122,3 +1122,4 @@ function PriorityTasks(orgId) {
       loading.classList.add('hidden');
     });
 }
+
