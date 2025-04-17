@@ -1210,7 +1210,7 @@ document.addEventListener('DOMContentLoaded', function () {
               WorkloadDistributionWidget(orgId);
               break;  
       case 'group-analytics-widget':
-              GroupsOverview(orgId);
+              fetchAndDisplayGroups(orgId);
               break;                                                               
                                                 
                                                        
