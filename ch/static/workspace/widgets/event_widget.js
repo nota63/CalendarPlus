@@ -339,3 +339,78 @@ function EventCalendar(orgId) {
       default: return '#6366f1'; // indigo-500
     }
   }
+
+  
+// # Widget 2) Team availability Heatmap------------------------------------------------------------------------------------------------------------
+
+function TeamAvailabilityHeatmap(orgId) {
+  const container = document.getElementById("availability-heatmap-widget");
+  container.innerHTML = `<div class="text-center text-gray-500">Loading team availability...</div>`;
+
+  fetch(`/event_widget/team-availability-heatmap/${orgId}/`)
+    .then(res => res.json())
+    .then(data => {
+      const days = data.days_of_week;
+      const users = data.heatmap;
+
+      let html = `
+        <div class="overflow-x-auto border rounded-xl shadow-sm bg-white">
+          <table class="min-w-full text-sm text-left text-gray-700">
+            <thead class="bg-gray-100 text-xs uppercase font-semibold text-gray-600 sticky top-0 z-10">
+              <tr>
+                <th class="p-3 border-r">User</th>
+                ${days.map(day => `<th class="p-3 text-center">${day}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      users.forEach(user => {
+        html += `<tr class="border-t hover:bg-indigo-50 transition">
+                  <td class="p-3 flex items-center gap-2 border-r">
+                    <img src="${user.profile_picture || '/static/default-avatar.png'}"
+                         alt="${user.full_name}" class="w-8 h-8 rounded-full border object-cover">
+                    <span class="text-sm font-medium">${user.full_name}</span>
+                  </td>`;
+
+        for (let i = 0; i < 7; i++) {
+          const slots = user.availability[i] || [];
+          let cellColor = "bg-gray-100";
+          if (slots.length > 0) {
+            const allBooked = slots.every(s => s.is_booked);
+            const allAvailable = slots.every(s => !s.is_booked);
+            const partial = !allBooked && !allAvailable;
+
+            cellColor = allAvailable ? "bg-green-200" : allBooked ? "bg-red-300" : "bg-yellow-200";
+          }
+
+          html += `<td class="p-3 text-center ${cellColor} cursor-pointer relative group" data-user="${user.user_id}" data-day="${i}">
+                      <div class="text-xs">${slots.length > 0 ? slots.length + " slot(s)" : "-"}</div>
+
+                      <!-- Tooltip on hover -->
+                      ${slots.length > 0 ? `
+                        <div class="absolute left-1/2 -translate-x-1/2 mt-1 z-50 hidden group-hover:block w-max bg-white border border-gray-300 p-2 rounded-lg shadow-md text-xs text-left">
+                          ${slots.map(slot => `
+                            <div class="mb-1">
+                              <span class="font-medium">${slot.start_time} - ${slot.end_time}</span><br>
+                              ${slot.is_booked ? '<span class="text-red-500">Booked</span>' : '<span class="text-green-600">Available</span>'}
+                            </div>
+                          `).join('')}
+                        </div>` : ''}
+                    </td>`;
+        }
+
+        html += `</tr>`;
+      });
+
+      html += `</tbody></table></div>`;
+      container.innerHTML = html;
+    })
+    .catch(err => {
+      console.error("Error loading heatmap:", err);
+      container.innerHTML = `<div class="text-red-500 text-center">Error loading team availability.</div>`;
+    });
+}
+
+
+

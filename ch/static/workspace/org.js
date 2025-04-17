@@ -1202,7 +1202,10 @@ document.addEventListener('DOMContentLoaded', function () {
               break;
       case 'event-calendar-widget':
               EventCalendar(orgId);
-              break;                                        
+              break;
+      case 'availability-heatmap-widget':
+              TeamAvailabilityHeatmap(orgId);
+              break;                                              
                                                 
                                                        
       default:
@@ -1254,6 +1257,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '#urgent-tasks-group-widget':'urgent-tasks-group-widget',
           '#priority-tasks-widget':'priority-tasks-widget',
           '#event-calendar-widget':'event-calendar-widget',
+          '#availability-heatmap-widget':'availability-heatmap-widget',
         };
 
         Object.entries(widgetMap).forEach(([selector, widgetType]) => {
