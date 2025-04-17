@@ -42,6 +42,7 @@ class DashboardWidget(models.Model):
         ('priority_tasks','Priority tasks'),
         ('event_calendar','Event calendar'),
         ('team_availability','Team availability'),
+        ('workload_distribution','Workload distribution'),
         # Add more widgets as you scale, my baby 💖
     ]
 

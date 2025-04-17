@@ -522,3 +522,79 @@ function TeamAvailabilityHeatmap(orgId) {
       `;
     });
 }
+
+// Widget 3) Workload Distributions-------------------------------------------------------------------------------------------------------------------
+function WorkloadDistributionWidget(orgId) {
+  const container = document.getElementById("workload-distribution-widget");
+  container.innerHTML = `<div class="text-center py-6 text-gray-500">Loading workload stats...</div>`;
+
+  fetch(`/event_widget/workload-distribution/${orgId}/`)
+      .then(res => {
+          if (!res.ok) throw new Error("Failed to fetch workload data");
+          return res.json();
+      })
+      .then(data => {
+          if (data.status !== "success") {
+              throw new Error(data.message || "Unknown error");
+          }
+
+          const users = data.data;
+          const suggestion = data.recommended_user;
+
+          let html = `
+              <div class="mb-4 px-4">
+                  <h2 class="text-xl font-semibold text-indigo-700 mb-2">📊 Workload Distribution</h2>
+                  <p class="text-sm text-gray-600">Week: ${data.week_range.start} to ${data.week_range.end}</p>
+              </div>
+              <div class="space-y-4 px-4">
+          `;
+
+          users.forEach(user => {
+              const totalHours = user.task_hours + user.meeting_hours;
+              const usedPercent = totalHours > 0 ? Math.min(Math.round((totalHours / user.available_hours) * 100), 100) : 0;
+
+              html += `
+                  <div class="bg-white p-4 rounded-2xl shadow flex flex-col md:flex-row items-center justify-between">
+                      <div class="flex flex-col">
+                          <span class="font-medium text-gray-800">${user.user_name}</span>
+                          <span class="text-sm text-gray-500">Tasks: ${user.task_hours}h | Meetings: ${user.meeting_hours}h</span>
+                          <span class="text-xs text-gray-400">Available: ${user.available_hours}h</span>
+                      </div>
+                      <div class="w-full md:w-1/2 mt-3 md:mt-0">
+                          <div class="w-full h-2 rounded-full bg-gray-200 overflow-hidden">
+                              <div class="h-full bg-indigo-500 transition-all duration-500 ease-in-out" style="width: ${usedPercent}%"></div>
+                          </div>
+                          <div class="text-right text-xs text-gray-600 mt-1">${user.remaining_capacity}h remaining</div>
+                      </div>
+                  </div>
+              `;
+          });
+
+          html += `</div>`;
+
+          if (suggestion) {
+              html += `
+                  <div class="mt-6 px-4">
+                      <div class="bg-indigo-50 p-4 rounded-xl text-indigo-700 flex items-center justify-between">
+                          <div>
+                              💡 <strong>${suggestion.user_name}</strong> has the most free time this week!
+                          </div>
+                          <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg text-sm">
+                              Assign Task
+                          </button>
+                      </div>
+                  </div>
+              `;
+          }
+
+          container.innerHTML = html;
+      })
+      .catch(err => {
+          console.error(err);
+          container.innerHTML = `
+              <div class="text-red-600 text-center p-4">
+                  ⚠️ Error loading workload stats: ${err.message}
+              </div>
+          `;
+      });
+}
