@@ -22,7 +22,17 @@ def group_leader_info_view(request, org_id):
     for group in groups:
         # Get the team leader from the Profile model (assuming 'team_leader' is a ForeignKey to Profile)
         team_leader_profile =Profile.objects.filter(organization_id=org_id,user=group.team_leader).first()  # assuming 'team_leader' is a ForeignKey to User
-        
+        # check access 
+        try:
+            profile = Profile.objects.get(user=request.user, organization_id=org_id)
+        except Profile.DoesNotExist:
+            return JsonResponse({'error': 'Access denied'}, status=403)
+
+        # Check permission
+        if not profile.is_admin and request.user != group.team_leader:
+            return JsonResponse({'error': 'Access denied'}, status=403)
+
+                
         # Append group data along with team leader's profile picture
         group_leader_data.append({
             'id':group.id,
@@ -51,6 +61,16 @@ def group_task_analytics_view(request, org_id, group_id):
     
     # Fetch the specific group for the given group_id within the organization
     group = get_object_or_404(Group, id=group_id, organization=organization)
+    # check access 
+    try:
+        profile = Profile.objects.get(user=request.user, organization_id=org_id)
+    except Profile.DoesNotExist:
+        return JsonResponse({'error': 'Access denied'}, status=403)
+
+    # Check permission
+    if not profile.is_admin and request.user != group.team_leader:
+        return JsonResponse({'error': 'Access denied'}, status=403)
+
     
     # Fetch all tasks for the specific group
     tasks = group.tasks.all()
