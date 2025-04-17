@@ -60,6 +60,7 @@ urlpatterns = [
     path('tasks_widgets/',include('all_tasks_widget.urls')),
     path('discussion_widget/',include('discussion_widget.urls')),
     path('event_widget/',include('event_widget.urls')),
+    path('admin_widgets/',include('tasks_progress_widget.urls')),
     # ui components
     path('index/', views.styles, name= 'index'),
     path('weather/',views.weather, name='weather'),

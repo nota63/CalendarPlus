@@ -1208,7 +1208,10 @@ document.addEventListener('DOMContentLoaded', function () {
               break;
       case 'workload-distribution-widget':
               WorkloadDistributionWidget(orgId);
-              break;                                                       
+              break;  
+      case 'group-analytics-widget':
+              GroupsOverview(orgId);
+              break;                                                               
                                                 
                                                        
       default:
@@ -1262,6 +1265,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '#event-calendar-widget':'event-calendar-widget',
           '#availability-heatmap-widget':'availability-heatmap-widget',
           '#workload-distribution-widget':'workload-distribution-widget',
+          '#group-analytics-widget':'group-analytics-widget',
         };
 
         Object.entries(widgetMap).forEach(([selector, widgetType]) => {

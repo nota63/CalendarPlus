@@ -43,6 +43,8 @@ class DashboardWidget(models.Model):
         ('event_calendar','Event calendar'),
         ('team_availability','Team availability'),
         ('workload_distribution','Workload distribution'),
+        ('group_analytics','Group analytics'),
+
         # Add more widgets as you scale, my baby 💖
     ]
 

@@ -122,6 +122,7 @@ INSTALLED_APPS = [
     'all_tasks_widget',
     'discussion_widget',
     'event_widget',
+    'tasks_progress_widget',
 
     #  Unfold admin configurations
     "unfold",  # before django.contrib.admin
