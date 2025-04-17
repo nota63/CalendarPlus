@@ -526,75 +526,163 @@ function TeamAvailabilityHeatmap(orgId) {
 // Widget 3) Workload Distributions-------------------------------------------------------------------------------------------------------------------
 function WorkloadDistributionWidget(orgId) {
   const container = document.getElementById("workload-distribution-widget");
-  container.innerHTML = `<div class="text-center py-6 text-gray-500">Loading workload stats...</div>`;
+  container.innerHTML = `
+    <div class="flex justify-center items-center h-24 text-gray-400">
+      <div class="flex items-center">
+        <svg class="animate-spin h-5 w-5 text-indigo-500 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span class="font-medium text-sm">Loading workload stats...</span>
+      </div>
+    </div>
+  `;
 
   fetch(`/event_widget/workload-distribution/${orgId}/`)
-      .then(res => {
-          if (!res.ok) throw new Error("Failed to fetch workload data");
-          return res.json();
-      })
-      .then(data => {
-          if (data.status !== "success") {
-              throw new Error(data.message || "Unknown error");
-          }
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to fetch workload data");
+      return res.json();
+    })
+    .then(data => {
+      if (data.status !== "success") {
+        throw new Error(data.message || "Unknown error");
+      }
 
-          const users = data.data;
-          const suggestion = data.recommended_user;
+      const users = data.data;
+      const suggestion = data.recommended_user;
 
-          let html = `
-              <div class="mb-4 px-4">
-                  <h2 class="text-xl font-semibold text-indigo-700 mb-2">📊 Workload Distribution</h2>
-                  <p class="text-sm text-gray-600">Week: ${data.week_range.start} to ${data.week_range.end}</p>
+      let html = `
+        <div class="bg-white rounded shadow-sm border border-gray-100 overflow-hidden">
+          <div class="bg-white border-b border-gray-100 px-4 py-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-base font-medium text-gray-700 flex items-center">
+                  <svg class="w-4 h-4 mr-1 text-indigo-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM14 11a1 1 0 011 1v1h1a1 1 0 110 2h-1v1a1 1 0 11-2 0v-1h-1a1 1 0 110-2h1v-1a1 1 0 011-1z"></path>
+                  </svg>
+                  Team Workload
+                </h2>
+                <p class="text-xs text-gray-500 mt-1">Week: ${data.week_range.start} to ${data.week_range.end}</p>
               </div>
-              <div class="space-y-4 px-4">
-          `;
+            </div>
+          </div>
 
-          users.forEach(user => {
-              const totalHours = user.task_hours + user.meeting_hours;
-              const usedPercent = totalHours > 0 ? Math.min(Math.round((totalHours / user.available_hours) * 100), 100) : 0;
+          <div class="max-h-64 overflow-y-auto scrollbar-hide">
+      `;
 
-              html += `
-                  <div class="bg-white p-4 rounded-2xl shadow flex flex-col md:flex-row items-center justify-between">
-                      <div class="flex flex-col">
-                          <span class="font-medium text-gray-800">${user.user_name}</span>
-                          <span class="text-sm text-gray-500">Tasks: ${user.task_hours}h | Meetings: ${user.meeting_hours}h</span>
-                          <span class="text-xs text-gray-400">Available: ${user.available_hours}h</span>
-                      </div>
-                      <div class="w-full md:w-1/2 mt-3 md:mt-0">
-                          <div class="w-full h-2 rounded-full bg-gray-200 overflow-hidden">
-                              <div class="h-full bg-indigo-500 transition-all duration-500 ease-in-out" style="width: ${usedPercent}%"></div>
-                          </div>
-                          <div class="text-right text-xs text-gray-600 mt-1">${user.remaining_capacity}h remaining</div>
-                      </div>
+      users.forEach(user => {
+        const totalHours = user.task_hours + user.meeting_hours;
+        const usedPercent = totalHours > 0 ? Math.min(Math.round((totalHours / user.available_hours) * 100), 100) : 0;
+        
+        // Set color based on workload percentage
+        let barColor = "bg-green-500";
+        let textColor = "text-green-600";
+        
+        if (usedPercent > 80) {
+          barColor = "bg-red-500";
+          textColor = "text-red-600";
+        } else if (usedPercent > 60) {
+          barColor = "bg-yellow-500";
+          textColor = "text-yellow-600";
+        } else if (usedPercent > 40) {
+          barColor = "bg-blue-500";
+          textColor = "text-blue-600";
+        }
+
+        html += `
+          <div class="px-4 py-2 border-b border-gray-50 hover:bg-gray-50 transition-colors duration-150">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <div class="w-7 h-7 rounded-md bg-gray-100 text-gray-600 flex items-center justify-center font-medium text-sm mr-2">
+                  ${user.user_name.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <span class="text-sm font-medium text-gray-700">${user.user_name}</span>
+                  <div class="flex items-center text-xs text-gray-500 mt-1">
+                    <span class="mr-2">${user.task_hours}h tasks</span>
+                    <span>${user.meeting_hours}h meetings</span>
                   </div>
-              `;
-          });
-
-          html += `</div>`;
-
-          if (suggestion) {
-              html += `
-                  <div class="mt-6 px-4">
-                      <div class="bg-indigo-50 p-4 rounded-xl text-indigo-700 flex items-center justify-between">
-                          <div>
-                              💡 <strong>${suggestion.user_name}</strong> has the most free time this week!
-                          </div>
-                          <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg text-sm">
-                              Assign Task
-                          </button>
-                      </div>
-                  </div>
-              `;
-          }
-
-          container.innerHTML = html;
-      })
-      .catch(err => {
-          console.error(err);
-          container.innerHTML = `
-              <div class="text-red-600 text-center p-4">
-                  ⚠️ Error loading workload stats: ${err.message}
+                </div>
               </div>
-          `;
+              <div class="w-1/3">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-medium ${textColor}">${usedPercent}%</span>
+                  <span class="text-xs text-gray-500">${user.remaining_capacity}h left</span>
+                </div>
+                <div class="w-full h-1.5 rounded-full bg-gray-100">
+                  <div class="h-full ${barColor} rounded-full transition-all duration-300" style="width: ${usedPercent}%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
       });
+
+      html += `</div>`;
+
+      if (suggestion) {
+        html += `
+          <div class="px-4 py-2 bg-gray-50 border-t border-gray-100">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <div class="w-5 h-5 rounded-full bg-indigo-100 text-indigo-500 flex items-center justify-center mr-2">
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z"></path>
+                  </svg>
+                </div>
+                <span class="text-xs text-indigo-600 font-medium">Suggest <strong>${suggestion.user_name}</strong> for new tasks</span>
+              </div>
+              <button class="text-xs bg-indigo-500 hover:bg-indigo-600 text-white px-2 py-1 rounded transition-colors duration-150 flex items-center">
+                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path>
+                </svg>
+                Assign
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      html += `</div>`;
+
+      // Add custom scrollbar styles
+      html += `
+        <style>
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+          .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+        </style>
+      `;
+
+      container.innerHTML = html;
+    })
+    .catch(err => {
+      console.error(err);
+      container.innerHTML = `
+        <div class="bg-white rounded shadow-sm border border-gray-100 p-4">
+          <div class="flex items-center text-center">
+            <div class="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center text-red-500 mr-3">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <div class="text-left">
+              <p class="text-sm text-gray-600">
+                Error loading workload data: ${err.message || "Unknown error"}
+              </p>
+              <button onclick="WorkloadDistributionWidget('${orgId}')" class="text-xs text-indigo-600 hover:text-indigo-700 mt-1 flex items-center">
+                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path>
+                </svg>
+                Retry
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    });
 }

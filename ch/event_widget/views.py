@@ -149,6 +149,7 @@ def calculate_duration(start_time, end_time):
     dt2 = datetime.combine(now().date(), end_time)
     return max((dt2 - dt1).total_seconds() / 3600, 0)
 
+
 def workload_distribution_view(request, org_id):
     try:
         logger.info(f"[WorkloadWidget] Fetching workload distribution for org_id={org_id}")
