@@ -12,16 +12,16 @@ import secrets
 from accounts.models import Organization, Profile, EmailInvitation
 from django.conf import settings
 
+
 @login_required
 @require_POST
 def create_organization_and_invite(request):
     try:
         data = json.loads(request.body)
 
-        # Step 1: Create the Organization
         org_name = data.get('name')
         org_description = data.get('description', '')
-        icon = request.FILES.get('icon')  # Optional, if sent via FormData
+        icon = request.FILES.get('icon')  # Optional
         status = data.get('status')
 
         if not org_name:
@@ -35,21 +35,19 @@ def create_organization_and_invite(request):
             status=status
         )
 
-        # Step 2: Create Admin Profile for Creator
         Profile.objects.create(
             user=request.user,
             organization=organization,
             is_admin=True
         )
 
-        # Step 3: Handle Invitations (optional)
         invitations = data.get('invitations', [])
         for invite in invitations:
             email = invite.get('email')
             role = invite.get('role')
 
             if role not in ['manager', 'employee'] or not email:
-                continue  # Skip invalid ones
+                continue
 
             invitation = EmailInvitation.objects.create(
                 inviter=request.user,
@@ -80,12 +78,12 @@ def create_organization_and_invite(request):
                 html_message=html_content,
             )
 
-        # return JsonResponse({
-        #     'success': True,
-        #     'message': 'Organization created and invitations sent!',
-        #     'organization_id': organization.id
-        # })
-        return redirect('org_detail',org_id=organization.id)
+        # Return redirect URL as part of JSON
+        return JsonResponse({
+            'success': True,
+            'message': 'Organization created and invitations sent!',
+            'redirect_url': reverse('org_detail', kwargs={'org_id': organization.id})
+        })
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
