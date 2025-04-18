@@ -6,7 +6,7 @@ from .models import EventOrganization, BookingOrganization
 
 
 # register
-
+# re initialized Authentication system ------------------------------------------------------------------------------------------
 def register(request):
     if request.method == 'POST':
         form=UserCreationForm(request.POST)
