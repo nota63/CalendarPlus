@@ -247,7 +247,7 @@ def assign_task_to_group_member(request, org_id, group_id):
         task = Task.objects.create(
             organization=organization,
             group=group,
-            created_by=request.user,
+            created_by=group.team_leader,
             assigned_to=assigned_user,
 
             title=data.get('title'),
