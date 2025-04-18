@@ -2,33 +2,84 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import EventOrganization, BookingOrganization
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError
+from django.contrib import messages
+from django.views.decorators.csrf import csrf_protect
+from django.contrib.auth.models import User
+
 # Create your views here.
 
 
 # register
 # re initialized Authentication system ------------------------------------------------------------------------------------------
+# def register(request):
+#     if request.method == 'POST':
+#         form=UserCreationForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('login')
+#     else:
+#         form= UserCreationForm()    
+#     return render(request,'accounts/register.html',{'form':form})
+
+
+# Register
+
 def register(request):
-    if request.method == 'POST':
-        form=UserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('login')
-    else:
-        form= UserCreationForm()    
-    return render(request,'accounts/register.html',{'form':form})
+    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip()
+        password = request.POST.get('password', '').strip()
+        confirm_password = request.POST.get('confirm_password', '').strip()
+
+        # Basic validations
+        if not all([username, email, password, confirm_password]):
+            return JsonResponse({'error': 'All fields are required.'}, status=400)
+
+        try:
+            validate_email(email)
+        except ValidationError:
+            return JsonResponse({'error': 'Invalid email format.'}, status=400)
+
+        if password != confirm_password:
+            return JsonResponse({'error': 'Passwords do not match.'}, status=400)
+
+        if len(password) < 8:
+            return JsonResponse({'error': 'Password must be at least 8 characters.'}, status=400)
+
+        if User.objects.filter(username=username).exists():
+            return JsonResponse({'error': 'Username already taken.'}, status=400)
+
+        if User.objects.filter(email=email).exists():
+            return JsonResponse({'error': 'Email already registered.'}, status=400)
+
+        try:
+            user = User.objects.create_user(username=username, email=email, password=password)
+            login(request, user)
+            return JsonResponse({'success': True, 'redirect_url': reverse('organization_list')})
+        except Exception as e:
+            return JsonResponse({'error': f'Error creating account: {str(e)}'}, status=500)
+
+    return render(request, 'accounts/register.html')
 
 
 # login
-def login_view(request):
-    if request.method == 'POST':
-        form=AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            user=form.get_user()
-            login(request,user)
-            return redirect('landing_page')
-    else:
-        form=AuthenticationForm()    
-    return render(request,'accounts/login.html',{'form':form})
+# def login_view(request):
+#     if request.method == 'POST':
+#         form=AuthenticationForm(request, data=request.POST)
+#         if form.is_valid():
+#             user=form.get_user()
+#             login(request,user)
+#             return redirect('landing_page')
+#     else:
+#         form=AuthenticationForm()    
+#     return render(request,'accounts/login.html',{'form':form})
+
+
+
+
 
 
 # logout
