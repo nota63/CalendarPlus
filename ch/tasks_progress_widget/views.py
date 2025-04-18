@@ -206,9 +206,18 @@ def get_assignable_groups_ajax(request, org_id):
     except Profile.DoesNotExist:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
 
-    groups = Group.objects.filter(organization_id=org_id).values('id', 'name')
+    # Filter groups where the user is team leader OR is org admin
+    is_admin = Profile.objects.filter(user=request.user, organization_id=org_id, is_admin=True).exists()
 
-    return JsonResponse({'groups': list(groups)}, status=200)
+    if is_admin:
+        # Admin can access all groups
+        groups = Group.objects.filter(organization_id=org_id)
+    else:
+        # Otherwise, only groups where user is team leader
+        groups = Group.objects.filter(organization_id=org_id, team_leader=request.user)
+
+    group_data = groups.values('id', 'name')
+    return JsonResponse({'groups': list(group_data)}, status=200)
 
 
 # Assign the task
