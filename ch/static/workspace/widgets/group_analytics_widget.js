@@ -598,7 +598,7 @@ async function AssignableGroups(orgId) {
     targetEl.innerHTML = `<p class="text-sm text-gray-400">Fetching groups...</p>`;
     const res = await fetch(`/admin_widgets/get-assignable-groups/${orgId}/`);
     if (!res.ok) throw new Error("Failed to fetch groups");
-    
+
     const data = await res.json();
     const groups = data.groups || [];
 
@@ -608,15 +608,101 @@ async function AssignableGroups(orgId) {
     }
 
     const html = groups.map(g => `
-      <div class="px-3 py-2 border border-gray-200 rounded hover:bg-gray-50 cursor-pointer group-item" data-group-id="${g.id}">
+      <div class="px-3 py-2 border border-gray-200 rounded hover:bg-gray-50 cursor-pointer group-item" data-group-id="${g.id}" data-group-name="${g.name}">
         <p class="text-sm font-medium text-gray-700">${g.name}</p>
       </div>
     `).join("");
 
     targetEl.innerHTML = html;
 
+    // Bind click events to open modal
+    document.querySelectorAll(".group-item").forEach(item => {
+      item.addEventListener("click", () => {
+        const groupId = item.dataset.groupId;
+        const groupName = item.dataset.groupName;
+        showAssignTaskModal(orgId, groupId, groupName);
+      });
+    });
+
   } catch (err) {
     console.error("Error loading groups:", err);
     targetEl.innerHTML = `<p class="text-sm text-red-500">Failed to load groups.</p>`;
   }
+}
+
+// assign the task
+function showAssignTaskModal(orgId, groupId, groupName) {
+  const existing = document.getElementById("assignTaskModal");
+  if (existing) existing.remove();
+
+  const modal = document.createElement("div");
+  modal.id = "assignTaskModal";
+  modal.className = "fixed inset-0 z-50 flex items-center justify-center bg-black/50";
+  modal.innerHTML = `
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-xl p-6 relative animate-fadeIn">
+      <button class="absolute top-3 right-3 text-gray-400 hover:text-black" onclick="document.getElementById('assignTaskModal').remove()">✕</button>
+      <h2 class="text-lg font-semibold mb-4">Assign Task to <span class="text-indigo-600">${groupName}</span></h2>
+      
+      <form id="assignTaskForm" class="space-y-3">
+        <input type="text" name="title" required class="w-full border rounded p-2 text-sm" placeholder="Title">
+        <textarea name="description" rows="3" class="w-full border rounded p-2 text-sm" placeholder="Description"></textarea>
+        <textarea name="project_plan" rows="2" class="w-full border rounded p-2 text-sm" placeholder="Project Plan (optional)"></textarea>
+        <select name="priority" class="w-full border rounded p-2 text-sm">
+          <option value="low">Low</option>
+          <option value="medium" selected>Medium</option>
+          <option value="high">High</option>
+          <option value="urgent">Urgent</option>
+        </select>
+        <select name="status" class="w-full border rounded p-2 text-sm">
+          <option value="pending">Pending</option>
+          <option value="in_progress">In Progress</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+          <option value="overdue">Overdue</option>
+          <option value="pending_approval">Pending Approval</option>
+          <option value="need_changes">Need Changes</option>
+        </select>
+        <input type="email" name="assigned_email" required class="w-full border rounded p-2 text-sm" placeholder="Assignee Email">
+        <input type="datetime-local" name="deadline" required class="w-full border rounded p-2 text-sm">
+        <input type="datetime-local" name="start_date" class="w-full border rounded p-2 text-sm">
+        <input type="datetime-local" name="end_date" class="w-full border rounded p-2 text-sm">
+        <button type="submit" class="w-full py-2 rounded bg-indigo-600 text-white font-medium hover:bg-indigo-700">Assign Task</button>
+        <div id="assignTaskLoader" class="hidden text-center text-gray-500 text-sm mt-2">Assigning task...</div>
+      </form>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  document.getElementById("assignTaskForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const form = e.target;
+    const loader = document.getElementById("assignTaskLoader");
+    loader.classList.remove("hidden");
+
+    const formData = new FormData(form);
+    try {
+      const res = await fetch(`/admin_widgets/assign-task-widget/${orgId}/${groupId}/`, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-CSRFToken": getCSRFToken()
+        }
+      });
+
+      const result = await res.json();
+      loader.classList.add("hidden");
+
+      if (result.success) {
+        alert(`✅ ${result.message}`);
+        modal.remove();
+      } else {
+        alert(`❌ ${result.error || "Failed to assign task."}`);
+      }
+    } catch (err) {
+      loader.classList.add("hidden");
+      console.error(err);
+      alert("Something went wrong while assigning task.");
+    }
+  });
 }

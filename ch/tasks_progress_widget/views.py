@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from django.utils.timezone import now
 from django.db.models import Count, Q
-from groups.models import Group
+from groups.models import Group,GroupMember
 from accounts.models import Organization, Profile
 from group_tasks.models import Task
 from django.contrib.auth.models import User
@@ -10,7 +10,9 @@ from django.db.models.functions import TruncDay,TruncDate
 from datetime import timedelta
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
-
+from django.views.decorators.http import require_POST
+from django.utils.dateparse import parse_datetime
+from django.views.decorators.csrf import csrf_exempt
 
 # 1) Fetch groups 
 def group_leader_info_view(request, org_id):
@@ -208,3 +210,62 @@ def get_assignable_groups_ajax(request, org_id):
     groups = Group.objects.filter(organization_id=org_id).values('id', 'name')
 
     return JsonResponse({'groups': list(groups)}, status=200)
+
+
+# Assign the task
+@csrf_exempt
+@require_POST
+def assign_task_to_group_member(request, org_id, group_id):
+    try:
+        data = request.POST
+
+        # Get and validate organization and group
+        try:
+            organization = Organization.objects.get(id=org_id)
+            group = Group.objects.get(id=group_id, organization=organization)
+        except Organization.DoesNotExist:
+            return JsonResponse({'error': 'Organization not found.'}, status=404)
+        except Group.DoesNotExist:
+            return JsonResponse({'error': 'Group not found in this organization.'}, status=404)
+
+        # Resolve user from GroupMember by email and validate org and group membership
+        email = data.get('assigned_email')
+        if not email:
+            return JsonResponse({'error': 'Email is required to assign task.'}, status=400)
+
+        try:
+            group_member = GroupMember.objects.select_related('user').get(
+                group=group,
+                organization=organization,
+                user__email=email
+            )
+            assigned_user = group_member.user
+        except GroupMember.DoesNotExist:
+            return JsonResponse({'error': 'User with this email is not a member of this group in this organization.'}, status=400)
+
+        # Create task
+        task = Task.objects.create(
+            organization=organization,
+            group=group,
+            created_by=request.user,
+            assigned_to=assigned_user,
+
+            title=data.get('title'),
+            description=data.get('description'),
+            project_plan=data.get('project_plan', ''),
+            priority=data.get('priority', 'medium'),
+            status=data.get('status', 'pending'),
+
+            deadline=parse_datetime(data.get('deadline')),
+            start_date=parse_datetime(data.get('start_date')),
+            end_date=parse_datetime(data.get('end_date')),
+        )
+
+        return JsonResponse({
+            'success': True,
+            'message': f'Task \"{task.title}\" assigned to {assigned_user.email}.',
+            'task_id': task.id
+        })
+
+    except Exception as e:
+        return JsonResponse({'error': f'Something went wrong: {str(e)}'}, status=500)
