@@ -44,6 +44,7 @@ class DashboardWidget(models.Model):
         ('team_availability','Team availability'),
         ('workload_distribution','Workload distribution'),
         ('group_analytics','Group analytics'),
+        ('group_tasks_velocity', 'Group tasks velocity'),
 
         # Add more widgets as you scale, my baby 💖
     ]

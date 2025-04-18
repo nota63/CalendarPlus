@@ -6,6 +6,9 @@ from groups.models import Group
 from accounts.models import Organization, Profile
 from group_tasks.models import Task
 from django.contrib.auth.models import User
+from django.db.models.functions import TruncDay
+from datetime import timedelta
+from django.utils import timezone
 
 
 
@@ -139,3 +142,55 @@ def group_task_analytics_view(request, org_id, group_id):
         },
         'group_analytics': group_data
     }, safe=False)
+
+# Widget 2) Group Task completion velocity-----------------------------------------------------------------------------------------------------
+
+def group_task_completion_velocity(request, org_id):
+    try:
+        org = Organization.objects.get(id=org_id)
+    except Organization.DoesNotExist:
+        return JsonResponse({'error': 'Invalid organization.'}, status=404)
+
+    # Optional query params
+    try:
+        days = int(request.GET.get('days', 14))
+        days = min(max(days, 1), 90)  # restrict between 1 and 90 days
+    except ValueError:
+        days = 14
+
+    end_date = timezone.now().date()
+    start_date = end_date - timedelta(days=days)
+
+    groups = Group.objects.filter(organization=org)
+    response_data = []
+
+    for group in groups:
+        task_qs = (
+            Task.objects.filter(
+                organization=org,
+                group=group,
+                status='completed',
+                deadline__date__range=(start_date, end_date),
+                deadline__isnull=False
+            )
+            .annotate(day=TruncDay('deadline'))
+            .values('day')
+            .annotate(total=Count('id'))
+            .order_by('day')
+        )
+
+        group_data = {
+            'group_name': group.name,
+            'data': [
+                {
+                    'x': item['day'].isoformat(),
+                    'y': item['total']
+                }
+                for item in task_qs
+            ]
+        }
+
+        # Even if no tasks, return group with empty data
+        response_data.append(group_data)
+
+    return JsonResponse({'series': response_data}, status=200)

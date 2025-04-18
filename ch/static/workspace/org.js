@@ -1211,7 +1211,10 @@ document.addEventListener('DOMContentLoaded', function () {
               break;  
       case 'group-analytics-widget':
               fetchAndDisplayGroups(orgId);
-              break;                                                               
+              break;
+      case 'group-task-velocity-widget':
+              groupTasksVelocity(orgId);
+              break;                                                                     
                                                 
                                                        
       default:
@@ -1266,6 +1269,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '#availability-heatmap-widget':'availability-heatmap-widget',
           '#workload-distribution-widget':'workload-distribution-widget',
           '#group-analytics-widget':'group-analytics-widget',
+          '#group-task-velocity-widget':'group-task-velocity-widget',
         };
 
         Object.entries(widgetMap).forEach(([selector, widgetType]) => {

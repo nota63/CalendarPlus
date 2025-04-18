@@ -275,3 +275,106 @@ function displayGroupAnalyticsModal(analytics) {
     const modalElement = new bootstrap.Modal(modal);
     modalElement.show();
 }
+
+
+// # Widget 2) Group Task completion velocity-----------------------------------------------------------------------------------------------------
+let groupVelocityChartInstance;
+
+async function groupTasksVelocity(orgId) {
+  const url = `/admin_widgets/group-task-completion-velocity/${orgId}/`;
+  const chartEl = document.getElementById("groupTaskVelocityChart");
+
+  if (!chartEl) {
+    console.warn("Chart canvas not found.");
+    return;
+  }
+
+  try {
+    // Show loading state
+    chartEl.parentElement.classList.add("opacity-50");
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Failed to fetch velocity data.");
+
+    const data = await response.json();
+    const series = data.series || [];
+
+    if (!series.length) {
+      chartEl.parentElement.innerHTML = `<p class="text-sm text-gray-500">No task data available yet.</p>`;
+      return;
+    }
+
+    // Destroy previous chart
+    if (groupVelocityChartInstance) {
+      groupVelocityChartInstance.destroy();
+    }
+
+    // Create datasets for Chart.js
+    const datasets = series.map((group, idx) => {
+      const color = getColor(idx);
+      return {
+        label: group.group_name,
+        data: group.data.map(d => ({ x: d.x, y: d.y })),
+        borderColor: color,
+        backgroundColor: color + "55",
+        tension: 0.3,
+        fill: false,
+        pointRadius: 3
+      };
+    });
+
+    // Draw new chart
+    groupVelocityChartInstance = new Chart(chartEl, {
+      type: 'line',
+      data: {
+        datasets: datasets
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: {
+            type: 'time',
+            time: {
+              unit: 'day',
+              tooltipFormat: 'MMM d'
+            },
+            title: {
+              display: true,
+              text: 'Date'
+            }
+          },
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Tasks Completed'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            position: 'bottom'
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false
+          }
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error("Error loading task velocity:", error);
+    chartEl.parentElement.innerHTML = `<p class="text-sm text-red-500">Error loading chart.</p>`;
+  } finally {
+    chartEl.parentElement.classList.remove("opacity-50");
+  }
+}
+
+function getColor(index) {
+  const palette = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#0ea5e9'];
+  return palette[index % palette.length];
+}
+
+
+

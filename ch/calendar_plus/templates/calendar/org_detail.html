@@ -6394,6 +6394,20 @@ body {
               </button>
             </div>
           </div>
+          <!-- group tasks velocity -->
+          <div class="widget-card border-purple">
+            <div class="widget-header bg-purple">
+              <img src="https://img.freepik.com/free-vector/fast-loading-concept-illustration_114360-747.jpg?ga=GA1.1.1701523175.1737611670&semt=ais_hybrid&w=740" class="w-100 h-100 object-cover" alt="Group tasks velocity">
+            </div>
+            <div class="widget-body">
+              <h4 class="widget-title">Group Task Completion Velocity</h4>
+              <p class="widget-description">Line chart that shows task completion over time (per group).</p>
+              <button class="add-widget-btn w-100 text-center" data-widget="group_tasks_velocity">
+                <i class="fas fa-plus"></i> Add widget
+              </button>
+            </div>
+          </div>
+
 
 
 
@@ -6483,7 +6497,7 @@ body {
 <script src="{% static 'workspace/widgets/discussion_widget.js'%}"></script> 
 <!-- event calendar  2) Team Availability -->
 <script src="{% static 'workspace/widgets/event_widget.js'%}"></script> 
-<!-- group analytics widget -->
+<!-- group analytics widget 2) group task velocity -->
 <script src="{% static 'workspace/widgets/group_analytics_widget.js'%}"></script> 
 <!-- ------------------------------------------------------------------------------------------------------------- -->
  
@@ -6502,6 +6516,8 @@ body {
     };
 </script>
 
+<!-- chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0"></script>
 
 <!-- jQuery (Required for AJAX) -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>

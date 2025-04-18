@@ -1,0 +1,39 @@
+<div id="group-task-velocity-widget" class="group relative rounded-2xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow duration-200">
+    <!-- Action Buttons -->
+    <div class="absolute top-3 right-3 flex gap-1.5 z-10">
+      <button onclick="groupTasksVelocity(window.djangoData.orgId)" title="Refresh"
+        class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500 hover:text-indigo-600 transition" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M4 4v5h.582m15.406 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m-15.406-2a8.001 8.001 0 0015.406 2m0 0H15" />
+        </svg>
+      </button>
+  
+      <button onclick="openFullScreenWidget('group-task-velocity-widget')" title="Fullscreen"
+        class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+        <svg class="w-5 h-5 text-gray-400 hover:text-indigo-600 transition" fill="none" stroke="currentColor"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+        </svg>
+      </button>
+  
+      <button onclick="takeScreenshot('group-task-velocity-widget')" title="Download Screenshot"
+        class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3 8l2-2h4l2-2h2l2 2h4l2 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+          <circle cx="12" cy="13" r="3" />
+        </svg>
+      </button>
+    </div>
+  
+    <!-- Chart Section -->
+    <h2 class="text-lg font-semibold text-gray-800 mb-3">Group Task Completion Velocity</h2>
+    <div>
+      <canvas id="groupTaskVelocityChart" class="w-full h-80"></canvas>
+    </div>
+  </div>
+  
