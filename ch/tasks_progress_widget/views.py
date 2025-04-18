@@ -206,8 +206,6 @@ def get_assignable_groups_ajax(request, org_id):
     except Profile.DoesNotExist:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
 
-    
-
     groups = Group.objects.filter(organization_id=org_id).values('id', 'name')
 
     return JsonResponse({'groups': list(groups)}, status=200)
@@ -224,6 +222,12 @@ def assign_task_to_group_member(request, org_id, group_id):
         try:
             organization = Organization.objects.get(id=org_id)
             group = Group.objects.get(id=group_id, organization=organization)
+            # check acceeess before proceeding
+            is_team_leader = request.user == group.team_leader
+            is_admin = Profile.objects.filter(user=request.user, organization=organization, is_admin=True).exists()
+
+            if not (is_team_leader or is_admin):
+                return JsonResponse({'error': 'You do not have permission to assign this task.'}, status=403)
         except Organization.DoesNotExist:
             return JsonResponse({'error': 'Organization not found.'}, status=404)
         except Group.DoesNotExist:
