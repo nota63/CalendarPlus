@@ -8,22 +8,13 @@ from django.db import IntegrityError
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.models import User
-
+from django.views.decorators.csrf import csrf_exempt
+from django.views import View
 # Create your views here.
 
 
 # register
 # re initialized Authentication system ------------------------------------------------------------------------------------------
-# def register(request):
-#     if request.method == 'POST':
-#         form=UserCreationForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('login')
-#     else:
-#         form= UserCreationForm()    
-#     return render(request,'accounts/register.html',{'form':form})
-
 
 # Register
 
@@ -66,18 +57,22 @@ def register(request):
 
 
 # login
-# def login_view(request):
-#     if request.method == 'POST':
-#         form=AuthenticationForm(request, data=request.POST)
-#         if form.is_valid():
-#             user=form.get_user()
-#             login(request,user)
-#             return redirect('landing_page')
-#     else:
-#         form=AuthenticationForm()    
-#     return render(request,'accounts/login.html',{'form':form})
+class LoginView(View):
+    def get(self, request):
+        return render(request, 'accounts/login.html')
 
+    def post(self, request):
+        data = json.loads(request.body)
+        username = data.get('username')
+        password = data.get('password')
 
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return JsonResponse({'success': True, 'redirect_url': reverse('organization_list')})
+        else:
+            return JsonResponse({'success': False, 'error': 'Invalid credentials.'}, status=400)
 
 
 
