@@ -28,6 +28,7 @@ urlpatterns = [
     # path('',LandingPageView.as_view(), name='landing_page'),
     path('',views.home, name='home'),
     path('meet/', include('meet.urls')),
+    path('workspace_settings/',include('workspace_settings.urls')),
     path('accounts/', include('accounts.urls')),
     path('chat/', include('chat.urls')),
     path('notify/', include('notify.urls')),

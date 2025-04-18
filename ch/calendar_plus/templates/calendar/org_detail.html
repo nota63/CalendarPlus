@@ -1076,6 +1076,13 @@ header {
               <i class="fas fa-plus"></i>
               <span class="ml-1 font-medium text-sm hidden md:inline">Add card</span>
         </button>
+        <!-- create organization -->
+        <button id="createOrgBtn" class="btn btn-primary">
+          Create Organization + Invite Members
+        </button>
+        
+
+
 
         <!-- Notifications -->
         <button id="notificationsBtnTooltip" class="p-2 rounded hover:bg-gray-100 text-gray-600 relative">
@@ -6513,7 +6520,8 @@ body {
 <!-- group analytics widget 2) group task velocity 3)Assign task-->
 <script src="{% static 'workspace/widgets/group_analytics_widget.js'%}"></script> 
 <!-- ------------------------------------------------------------------------------------------------------------- -->
- 
+<!-- external js files  -->
+<script src="{% static 'workspace/workspace_settings/workspace_settings.js'%}"></script> 
 
 
 <!-- ----------------------------------------------------------------------------------------------------------------------------- -->
