@@ -13,6 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST,require_GET
 from django.utils.dateparse import parse_datetime
 from django.views.decorators.csrf import csrf_exempt
+from .utils import send_task_assignment_email
 
 # 1) Fetch groups 
 def group_leader_info_view(request, org_id):
@@ -259,6 +260,13 @@ def assign_task_to_group_member(request, org_id, group_id):
             deadline=parse_datetime(data.get('deadline')),
             start_date=parse_datetime(data.get('start_date')),
             end_date=parse_datetime(data.get('end_date')),
+        )
+        # send the email
+        send_task_assignment_email(
+            user=assigned_user,
+            task=task,
+            group=group,
+            organization=organization
         )
 
         return JsonResponse({

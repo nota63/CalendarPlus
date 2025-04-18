@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>New Task Assigned</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!--[if mso]>
+  <style type="text/css">
+    body, table, td, p, a, li, blockquote {font-family: Arial, Helvetica, sans-serif !important;}
+  </style>
+  <![endif]-->
+</head>
+<body style="margin: 0; padding: 0; background-color: #f7f7fa; font-family: 'Segoe UI', Arial, sans-serif; color: #2c2c37;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f7f7fa; padding: 20px 0;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; background-color: transparent;">
+          <!-- Header with Logo -->
+          <tr>
+            <td style="padding: 0 0 20px 0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #7b68ee; border-radius: 8px; padding: 15px 30px;">
+                <tr>
+                  <td>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td>
+                          <h1 style="color: white; font-size: 24px; margin: 0; font-weight: 600;">CalendarPlus</h1>
+                        </td>
+                        <td align="right">
+                          <span style="color: white; font-size: 14px; font-weight: 500;">Task Management</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          
+          <!-- Main Content Card -->
+          <tr>
+            <td>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); overflow: hidden;">
+                <!-- Card Header -->
+                <tr>
+                  <td style="padding: 25px 30px 5px 30px;">
+                    <h2 style="margin: 0; color: #2c2c37; font-weight: 600; font-size: 20px;">New Task Assigned</h2>
+                    <p style="color: #7b68ee; font-weight: 500; margin: 5px 0 0 0; font-size: 14px;">{{ organization.name }} • {{ group.name }}</p>
+                  </td>
+                </tr>
+                
+                <!-- User Greeting -->
+                <tr>
+                  <td style="padding: 20px 30px 0 30px; font-size: 15px; line-height: 1.5; color: #4d4d58;">
+                    <p style="margin: 0;">Hi {{ user.first_name|default:user.username }},</p>
+                    <p style="margin-top: 10px;">You've been assigned a new task to work on. Here are the details:</p>
+                  </td>
+                </tr>
+                
+                <!-- Task Card -->
+                <tr>
+                  <td style="padding: 15px 30px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8f8fd; border-radius: 8px; border-left: 4px solid #7b68ee;">
+                      <tr>
+                        <td style="padding: 20px;">
+                          <h3 style="margin: 0 0 15px 0; color: #2c2c37; font-size: 18px; font-weight: 600;">{{ task.title }}</h3>
+                          <p style="margin: 0 0 15px 0; color: #4d4d58; font-size: 14px; line-height: 1.5;">{{ task.description }}</p>
+                          
+                          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 15px;">
+                            <tr>
+                              <td width="50%" style="padding-bottom: 12px;">
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                  <tr>
+                                    <td valign="top" style="padding-right: 5px;">
+                                      <img src="/api/placeholder/16/16" alt="Calendar" width="16" height="16" style="display: block;" />
+                                    </td>
+                                    <td>
+                                      <p style="margin: 0; font-size: 13px; color: #6c6c78;">Start Date</p>
+                                      <p style="margin: 2px 0 0 0; font-size: 14px; font-weight: 500; color: #2c2c37;">{{ task.start_date }}</p>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                              <td width="50%" style="padding-bottom: 12px;">
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                  <tr>
+                                    <td valign="top" style="padding-right: 5px;">
+                                      <img src="/api/placeholder/16/16" alt="Clock" width="16" height="16" style="display: block;" />
+                                    </td>
+                                    <td>
+                                      <p style="margin: 0; font-size: 13px; color: #6c6c78;">Due Date</p>
+                                      <p style="margin: 2px 0 0 0; font-size: 14px; font-weight: 500; color: #2c2c37;">{{ task.deadline }}</p>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td width="50%" style="padding-bottom: 12px;">
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                  <tr>
+                                    <td valign="top" style="padding-right: 5px;">
+                                      <img src="/api/placeholder/16/16" alt="Priority" width="16" height="16" style="display: block;" />
+                                    </td>
+                                    <td>
+                                      <p style="margin: 0; font-size: 13px; color: #6c6c78;">Priority</p>
+                                      <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                          <td style="background-color: {% if task.priority == 'high' %}#ff5630{% elif task.priority == 'medium' %}#ffab00{% else %}#36b37e{% endif %}; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px;"></td>
+                                          <td style="padding-left: 5px;">
+                                            <p style="margin: 2px 0 0 0; font-size: 14px; font-weight: 500; color: #2c2c37;">{{ task.priority|title }}</p>
+                                          </td>
+                                        </tr>
+                                      </table>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                              <td width="50%" style="padding-bottom: 12px;">
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                  <tr>
+                                    <td valign="top" style="padding-right: 5px;">
+                                      <img src="/api/placeholder/16/16" alt="Status" width="16" height="16" style="display: block;" />
+                                    </td>
+                                    <td>
+                                      <p style="margin: 0; font-size: 13px; color: #6c6c78;">Status</p>
+                                      <p style="margin: 2px 0 0 0; font-size: 14px; font-weight: 500; color: #2c2c37;">
+                                        <span style="display: inline-block; padding: 2px 8px; border-radius: 4px; background-color: #ebecf5; color: #5d3eff; font-size: 12px; font-weight: 600;">{{ task.status|title }}</span>
+                                      </p>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <!-- Action Button -->
+                <tr>
+                  <td align="center" style="padding: 20px 30px;">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate;">
+                      <tr>
+                        <td align="center" style="border-radius: 6px; background-color: #7b68ee; padding: 12px 24px;">
+                          <a href="#" target="_blank" style="font-size: 16px; font-weight: 600; color: #ffffff; text-decoration: none; display: inline-block;">View Task Details</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <!-- Message -->
+                <tr>
+                  <td style="padding: 10px 30px 20px 30px; font-size: 14px; line-height: 1.5; color: #4d4d58;">
+                    <p style="margin: 0;">If you have any questions about this task, please reach out to your team leader or project coordinator. We appreciate your dedication to the team's success!</p>
+                  </td>
+                </tr>
+                
+                <!-- Team Leader -->
+                <tr>
+                  <td style="padding: 20px 30px; border-top: 1px solid #ebecf5;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td width="40" valign="top">
+                          <div style="width: 40px; height: 40px; border-radius: 50%; background-color: #7b68ee; color: white; text-align: center; line-height: 40px; font-weight: 600; font-size: 16px;">{{ group.team_leader.get_full_name|slice:":1" }}</div>
+                        </td>
+                        <td style="padding-left: 15px;">
+                          <p style="margin: 0; font-weight: 600; font-size: 14px; color: #2c2c37;">{{ group.team_leader.get_full_name }}</p>
+                          <p style="margin: 2px 0 0 0; font-size: 13px; color: #6c6c78;">Team Leader - {{ group.name }}</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding: 20px 0 0 0; font-size: 12px; color: #6c6c78;">
+              <p style="margin: 0;">© 2025 {{ organization.name }} • All rights reserved</p>
+              <p style="margin: 8px 0 0 0;">You're receiving this email because you're a member of {{ organization.name }}</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
