@@ -588,3 +588,35 @@ document.head.insertAdjacentHTML('beforeend', `
     }
   </style>
 `);
+
+// Widget 3) Assign task---------------------------------------------------------------------------
+async function AssignableGroups(orgId) {
+  const targetEl = document.getElementById("assignableGroupsList");
+  if (!targetEl) return;
+
+  try {
+    targetEl.innerHTML = `<p class="text-sm text-gray-400">Fetching groups...</p>`;
+    const res = await fetch(`/admin_widgets/get-assignable-groups/${orgId}/`);
+    if (!res.ok) throw new Error("Failed to fetch groups");
+    
+    const data = await res.json();
+    const groups = data.groups || [];
+
+    if (!groups.length) {
+      targetEl.innerHTML = `<p class="text-sm text-gray-400">No groups available yet.</p>`;
+      return;
+    }
+
+    const html = groups.map(g => `
+      <div class="px-3 py-2 border border-gray-200 rounded hover:bg-gray-50 cursor-pointer group-item" data-group-id="${g.id}">
+        <p class="text-sm font-medium text-gray-700">${g.name}</p>
+      </div>
+    `).join("");
+
+    targetEl.innerHTML = html;
+
+  } catch (err) {
+    console.error("Error loading groups:", err);
+    targetEl.innerHTML = `<p class="text-sm text-red-500">Failed to load groups.</p>`;
+  }
+}

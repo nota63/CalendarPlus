@@ -6,10 +6,10 @@ from groups.models import Group
 from accounts.models import Organization, Profile
 from group_tasks.models import Task
 from django.contrib.auth.models import User
-from django.db.models.functions import TruncDay
+from django.db.models.functions import TruncDay,TruncDate
 from datetime import timedelta
 from django.utils import timezone
-
+from django.contrib.auth.decorators import login_required
 
 
 # 1) Fetch groups 
@@ -194,3 +194,17 @@ def group_task_completion_velocity(request, org_id):
         response_data.append(group_data)
 
     return JsonResponse({'series': response_data}, status=200)
+
+# // Widget 3) Assign Task ---------------------------------------------------------------------------
+@login_required
+def get_assignable_groups_ajax(request, org_id):
+    try:
+        profile = Profile.objects.get(user=request.user, organization_id=org_id)
+    except Profile.DoesNotExist:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+
+    
+
+    groups = Group.objects.filter(organization_id=org_id).values('id', 'name')
+
+    return JsonResponse({'groups': list(groups)}, status=200)

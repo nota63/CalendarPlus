@@ -1214,7 +1214,10 @@ document.addEventListener('DOMContentLoaded', function () {
               break;
       case 'group-task-velocity-widget':
               groupTasksVelocity(orgId);
-              break;                                                                     
+              break;
+      case 'assignable-groups-widget':
+              AssignableGroups(orgId);
+              break;                                                                               
                                                 
                                                        
       default:
@@ -1270,6 +1273,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '#workload-distribution-widget':'workload-distribution-widget',
           '#group-analytics-widget':'group-analytics-widget',
           '#group-task-velocity-widget':'group-task-velocity-widget',
+          '#assignable-groups-widget':'assignable-groups-widget',
         };
 
         Object.entries(widgetMap).forEach(([selector, widgetType]) => {
