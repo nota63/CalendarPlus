@@ -590,6 +590,7 @@ document.head.insertAdjacentHTML('beforeend', `
 `);
 
 // Widget 3) Assign task---------------------------------------------------------------------------
+// Function to fetch assignable groups
 async function AssignableGroups(orgId) {
   const targetEl = document.getElementById("assignableGroupsList");
   if (!targetEl) return;
@@ -630,44 +631,182 @@ async function AssignableGroups(orgId) {
   }
 }
 
-// assign the task
+// Function to show task assignment modal
+// Function to show task assignment modal
 function showAssignTaskModal(orgId, groupId, groupName) {
   const existing = document.getElementById("assignTaskModal");
   if (existing) existing.remove();
 
   const modal = document.createElement("div");
   modal.id = "assignTaskModal";
-  modal.className = "fixed inset-0 z-50 flex items-center justify-center bg-black/50";
+  modal.className = "fixed inset-0 z-50 flex items-center justify-center bg-black/60 overflow-y-auto py-10";
   modal.innerHTML = `
-    <div class="bg-white rounded-xl shadow-lg w-full max-w-xl p-6 relative animate-fadeIn">
-      <button class="absolute top-3 right-3 text-gray-400 hover:text-black" onclick="document.getElementById('assignTaskModal').remove()">✕</button>
-      <h2 class="text-lg font-semibold mb-4">Assign Task to <span class="text-indigo-600">${groupName}</span></h2>
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl p-0 relative animate-fadeIn mx-4">
+      <!-- Header Section -->
+      <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-indigo-600 to-purple-600 rounded-t-xl">
+        <h2 class="text-xl font-bold text-white flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          New Task for <span class="font-bold ml-1">${groupName}</span>
+        </h2>
+        <button class="text-white hover:text-gray-200 transition-colors focus:outline-none" onclick="document.getElementById('assignTaskModal').remove()">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
       
-      <form id="assignTaskForm" class="space-y-3">
-        <input type="text" name="title" required class="w-full border rounded p-2 text-sm" placeholder="Title">
-        <textarea name="description" rows="3" class="w-full border rounded p-2 text-sm" placeholder="Description"></textarea>
-        <textarea name="project_plan" rows="2" class="w-full border rounded p-2 text-sm" placeholder="Project Plan (optional)"></textarea>
-        <select name="priority" class="w-full border rounded p-2 text-sm">
-          <option value="low">Low</option>
-          <option value="medium" selected>Medium</option>
-          <option value="high">High</option>
-          <option value="urgent">Urgent</option>
-        </select>
-        <select name="status" class="w-full border rounded p-2 text-sm">
-          <option value="pending">Pending</option>
-          <option value="in_progress">In Progress</option>
-          <option value="completed">Completed</option>
-          <option value="cancelled">Cancelled</option>
-          <option value="overdue">Overdue</option>
-          <option value="pending_approval">Pending Approval</option>
-          <option value="need_changes">Need Changes</option>
-        </select>
-        <input type="email" name="assigned_email" required class="w-full border rounded p-2 text-sm" placeholder="Assignee Email">
-        <input type="datetime-local" name="deadline" required class="w-full border rounded p-2 text-sm">
-        <input type="datetime-local" name="start_date" class="w-full border rounded p-2 text-sm">
-        <input type="datetime-local" name="end_date" class="w-full border rounded p-2 text-sm">
-        <button type="submit" class="w-full py-2 rounded bg-indigo-600 text-white font-medium hover:bg-indigo-700">Assign Task</button>
-        <div id="assignTaskLoader" class="hidden text-center text-gray-500 text-sm mt-2">Assigning task...</div>
+      <!-- Form Section -->
+      <form id="assignTaskForm" class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Left Column -->
+          <div class="space-y-6">
+            <!-- Title -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Task Title <span class="text-red-500">*</span></label>
+              <input type="text" name="title" required class="w-full border border-gray-300 rounded-lg p-3 text-sm shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="Enter a descriptive title">
+            </div>
+            
+            <!-- Description -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <textarea name="description" rows="4" class="w-full border border-gray-300 rounded-lg p-3 text-sm shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="What needs to be done?"></textarea>
+              <p class="mt-1 text-xs text-gray-500">Include all relevant details for better clarity</p>
+            </div>
+            
+            <!-- Project Plan -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Project Plan</label>
+              <textarea name="project_plan" rows="3" class="w-full border border-gray-300 rounded-lg p-3 text-sm shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="Strategic approach or methodology"></textarea>
+              <p class="mt-1 text-xs text-gray-500">Optional: Add steps or methodology details</p>
+            </div>
+            
+            <!-- Assignee Email -->
+            <div class="relative">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Assignee Email <span class="text-red-500">*</span></label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <input type="email" name="assigned_email" required class="w-full border border-gray-300 rounded-lg p-3 pl-10 text-sm shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" placeholder="user@example.com">
+              </div>
+              <div id="assigneePreview" class="hidden"></div>
+              <p class="mt-1 text-xs text-gray-500">Email of the person responsible for this task</p>
+            </div>
+          </div>
+          
+          <!-- Right Column -->
+          <div class="space-y-6">
+            <!-- Priority -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Priority Level</label>
+              <div class="relative">
+                <select name="priority" class="w-full border border-gray-300 rounded-lg p-3 text-sm shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition appearance-none pr-10">
+                  <option value="low">Low</option>
+                  <option value="medium" selected>Medium</option>
+                  <option value="high">High</option>
+                  <option value="urgent">Urgent</option>
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+              <div class="mt-2 flex space-x-2">
+                <span class="px-2 py-1 text-xs rounded bg-gray-100 text-gray-700">Low</span>
+                <span class="px-2 py-1 text-xs rounded bg-blue-100 text-blue-700">Medium</span>
+                <span class="px-2 py-1 text-xs rounded bg-orange-100 text-orange-700">High</span>
+                <span class="px-2 py-1 text-xs rounded bg-red-100 text-red-700">Urgent</span>
+              </div>
+            </div>
+            
+            <!-- Status -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Task Status</label>
+              <div class="relative">
+                <select name="status" class="w-full border border-gray-300 rounded-lg p-3 text-sm shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition appearance-none pr-10">
+                  <option value="pending">Pending</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                  <option value="overdue">Overdue</option>
+                  <option value="pending_approval">Pending Approval</option>
+                  <option value="need_changes">Need Changes</option>
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Dates section -->
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Deadline <span class="text-red-500">*</span></label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <input type="datetime-local" name="deadline" required class="w-full border border-gray-300 rounded-lg p-3 pl-10 text-sm shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                </div>
+                <p class="mt-1 text-xs text-gray-500">Final date by which task must be completed</p>
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <input type="datetime-local" name="start_date" class="w-full border border-gray-300 rounded-lg p-3 pl-10 text-sm shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                </div>
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <input type="datetime-local" name="end_date" class="w-full border border-gray-300 rounded-lg p-3 pl-10 text-sm shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Footer with button -->
+        <div class="mt-8 border-t border-gray-100 pt-6 flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0">
+          <button type="button" class="px-6 py-3 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition mr-3" onclick="document.getElementById('assignTaskModal').remove()">Cancel</button>
+          <button type="submit" class="px-6 py-3 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium hover:from-indigo-700 hover:to-purple-700 transition flex items-center justify-center shadow-md">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Assign Task
+          </button>
+        </div>
+        
+        <div id="assignTaskLoader" class="hidden text-center text-gray-500 mt-4 p-3 bg-gray-50 rounded-lg">
+          <div class="flex items-center justify-center">
+            <svg class="animate-spin h-5 w-5 mr-3 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>Assigning task...</span>
+          </div>
+        </div>
       </form>
     </div>
   `;
@@ -694,10 +833,49 @@ function showAssignTaskModal(orgId, groupId, groupName) {
       loader.classList.add("hidden");
 
       if (result.success) {
-        alert(`✅ ${result.message}`);
+        // Success notification
+        const notification = document.createElement("div");
+        notification.className = "fixed bottom-4 right-4 bg-green-50 border-l-4 border-green-500 p-4 rounded shadow-lg animate-fadeIn z-50 flex items-center";
+        notification.innerHTML = `
+          <div class="text-green-500 mr-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <div>
+            <p class="font-medium text-green-800">${result.message}</p>
+          </div>
+        `;
+        document.body.appendChild(notification);
+        
+        // Remove notification after 3 seconds
+        setTimeout(() => {
+          notification.classList.add("animate-fadeOut");
+          setTimeout(() => notification.remove(), 500);
+        }, 3000);
+        
         modal.remove();
       } else {
-        alert(`❌ ${result.error || "Failed to assign task."}`);
+        // Error notification
+        const errorMsg = document.createElement("div");
+        errorMsg.className = "mt-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm";
+        errorMsg.innerHTML = `
+          <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>${result.error || "Failed to assign task."}</span>
+          </div>
+        `;
+        
+        // Insert error message before the loader
+        loader.parentNode.insertBefore(errorMsg, loader.nextSibling);
+        
+        // Remove error message after 5 seconds
+        setTimeout(() => {
+          errorMsg.classList.add("animate-fadeOut");
+          setTimeout(() => errorMsg.remove(), 500);
+        }, 5000);
       }
     } catch (err) {
       loader.classList.add("hidden");
@@ -706,3 +884,169 @@ function showAssignTaskModal(orgId, groupId, groupName) {
     }
   });
 }
+
+
+// Function to get user by email dynamically
+let debounceTimer;
+
+// This will be set up once the modal is created
+function setupEmailDebounce() {
+  const emailInput = document.querySelector('input[name="assigned_email"]');
+  if (!emailInput) return;
+
+  emailInput.addEventListener('input', function () {
+    const email = this.value.trim();
+    const orgId = window.djangoData.orgId; // Make sure this is correctly injected
+    const groupId = CURRENT_GROUP_ID; // Make sure the group ID is dynamically available
+
+    if (debounceTimer) clearTimeout(debounceTimer); // Clear previous timeout
+  
+    // Only proceed if there's content to search for
+    if (email.length < 3) {
+      const previewBox = document.getElementById("assigneePreview");
+      if (previewBox) previewBox.classList.add("hidden");
+      return;
+    }
+    
+    debounceTimer = setTimeout(() => {
+      // Show loading indicator
+      const previewBox = document.getElementById("assigneePreview");
+      if (previewBox) {
+        previewBox.classList.remove("hidden");
+        previewBox.innerHTML = `
+          <div class="p-3 bg-white shadow-lg border rounded-lg mt-1 w-full animate-pulse flex items-center space-x-2">
+            <div class="rounded-full bg-gray-200 h-8 w-8"></div>
+            <div class="space-y-2 flex-1">
+              <div class="h-3 bg-gray-200 rounded w-3/4"></div>
+              <div class="h-2 bg-gray-200 rounded w-1/2"></div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Fetch user info by email
+      fetch(`/admin_widgets/get-user-by-email/${orgId}/${groupId}/?email=${encodeURIComponent(email)}`)
+        .then(res => {
+          if (!res.ok) {
+            throw new Error('Failed to fetch user data');
+          }
+          return res.json();
+        })
+        .then(data => {
+          const previewBox = document.getElementById("assigneePreview");
+          
+          if (!previewBox) {
+            const newPreviewBox = document.createElement("div");
+            newPreviewBox.id = "assigneePreview";
+            newPreviewBox.classList.add("absolute", "bg-white", "shadow-lg", "border", "rounded-lg", "w-full", "z-10", "mt-1");
+            document.querySelector('input[name="assigned_email"]').parentElement.appendChild(newPreviewBox);
+          }
+
+          const previewBoxElement = document.getElementById("assigneePreview");
+          previewBoxElement.classList.remove("hidden");
+
+          if (data.success) {
+            const user = data.user;
+
+            previewBoxElement.innerHTML = `
+              <div class="p-3 bg-white shadow-md border rounded-lg flex items-center space-x-3 hover:bg-gray-50 cursor-pointer">
+                <img src="${user.avatar_url || '/static/images/default-avatar.png'}" alt="${user.full_name}" class="w-10 h-10 rounded-full object-cover border-2 border-indigo-100">
+                <div>
+                  <p class="font-medium text-gray-800">${user.full_name}</p>
+                  <p class="text-xs text-gray-500">${user.email}</p>
+                </div>
+              </div>
+            `;
+            
+            // Click to select user
+            previewBoxElement.querySelector('div').addEventListener('click', function() {
+              emailInput.value = user.email;
+              previewBoxElement.classList.add("hidden");
+            });
+            
+          } else {
+            previewBoxElement.innerHTML = `
+              <div class="p-3 bg-white shadow-md border rounded-lg">
+                <div class="flex items-center space-x-2 text-red-600">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <span class="text-sm">${data.error || "User not found in this group"}</span>
+                </div>
+              </div>
+            `;
+          }
+        })
+        .catch(err => {
+          console.error('Error fetching user:', err);
+          const previewBox = document.getElementById("assigneePreview");
+          if (previewBox) {
+            previewBox.classList.remove("hidden");
+            previewBox.innerHTML = `
+              <div class="p-3 bg-white shadow-md border rounded-lg">
+                <div class="flex items-center space-x-2 text-red-600">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span class="text-sm">Error fetching user information</span>
+                </div>
+              </div>
+            `;
+          }
+        });
+    }, 400); // 400ms debounce time
+  });
+
+  // Hide preview when clicking outside
+  document.addEventListener('click', function(e) {
+    const previewBox = document.getElementById("assigneePreview");
+    const emailInput = document.querySelector('input[name="assigned_email"]');
+    
+    if (previewBox && emailInput && !emailInput.contains(e.target) && !previewBox.contains(e.target)) {
+      previewBox.classList.add("hidden");
+    }
+  });
+}
+
+// Add this at the end of showAssignTaskModal function
+document.body.addEventListener('DOMNodeInserted', function(e) {
+  if (e.target.id === 'assignTaskModal') {
+    setupEmailDebounce();
+  }
+});
+
+
+// Function to get CSRF token
+function getCSRFToken() {
+  const cookies = document.cookie.split(';');
+  for (let i = 0; i < cookies.length; i++) {
+    const cookie = cookies[i].trim();
+    if (cookie.startsWith('csrftoken=')) {
+      return cookie.substring('csrftoken='.length);
+    }
+  }
+  return '';
+}
+
+// Add these styles to your CSS or inline in a style tag
+document.head.insertAdjacentHTML('beforeend', `
+<style>
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+  
+  .animate-fadeOut {
+    animation: fadeOut 0.3s ease-out forwards;
+  }
+</style>
+`);

@@ -10,7 +10,7 @@ from django.db.models.functions import TruncDay,TruncDate
 from datetime import timedelta
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST,require_GET
 from django.utils.dateparse import parse_datetime
 from django.views.decorators.csrf import csrf_exempt
 
@@ -269,3 +269,29 @@ def assign_task_to_group_member(request, org_id, group_id):
 
     except Exception as e:
         return JsonResponse({'error': f'Something went wrong: {str(e)}'}, status=500)
+
+
+# Get User by email (live preview)
+@require_GET
+def get_user_by_email(request, org_id, group_id):
+    email = request.GET.get("email")
+    if not email:
+        return JsonResponse({"error": "Email is required."}, status=400)
+
+    try:
+        group = get_object_or_404(Group, id=group_id, organization_id=org_id)
+        group_member = GroupMember.objects.select_related('user').get(
+            group=group,
+            organization_id=org_id,
+            user__email=email
+        )
+        user = group_member.user
+        data = {
+            "full_name": user.get_full_name() or user.username,
+            "email": user.email,
+            "avatar_url": getattr(user.profile, "profile_picture", None) or "/static/default-avatar.png"
+        }
+        return JsonResponse({"success": True, "user": data})
+
+    except GroupMember.DoesNotExist:
+        return JsonResponse({"error": "User not found in this group."}, status=404)
