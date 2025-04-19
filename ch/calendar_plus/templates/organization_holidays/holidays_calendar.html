@@ -1,11 +1,5 @@
 
 
-<!-- re-initialized holidays -------------------------------------------------------------------------------- -->
-{% extends 'custom.html'%}
-
-{% block content %}
-
-
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 
@@ -15,7 +9,7 @@
     <title>{{ organization.name }} Holidays</title>
 
     <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- FullCalendar -->
@@ -26,146 +20,1240 @@
 
     <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 2px 10px rgba(0, 0, 0, 0.06)',
+                        'card-hover': '0 8px 30px rgba(0, 0, 0, 0.12)',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    },
+                }
+            }
+        }
+    </script>
     <style>
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .animate-fade-in {
-            animation: fadeIn 0.3s ease-out;
-        }
-    </style>
+         body {
+      font-family: 'Inter', sans-serif;
+    }
+    .sidebar-section:not(.open) .section-content {
+      display: none;
+    }
+
+/* FullCalendar Custom Styling */
+      /* ClickUp-Inspired Calendar - Modern SaaS UI/UX */
+
+/* Base calendar container */
+#calendar {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  color: #292d34;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Calendar header/toolbar */
+#calendar .fc-toolbar {
+  padding: 16px 20px;
+  margin-bottom: 0;
+  background-color: #ffffff;
+  border-bottom: 1px solid #f0f3f7;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Calendar title */
+#calendar .fc-toolbar h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #222222;
+  margin: 0;
+}
+
+/* Button groups in toolbar */
+#calendar .fc-toolbar .fc-button-group {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* Calendar buttons */
+#calendar .fc-toolbar .fc-button {
+  background: #ffffff;
+  color: #4d5562;
+  text-transform: none;
+  font-weight: 500;
+  font-size: 13px;
+  border: 1px solid #e6eaef;
+  box-shadow: none;
+  padding: 8px 12px;
+  height: auto;
+  border-radius: 0;
+  transition: all 0.2s ease;
+}
+
+/* Button hover state */
+#calendar .fc-toolbar .fc-button:hover {
+  background: #f7fafc;
+  color: #222222;
+}
+
+/* Active button state */
+#calendar .fc-toolbar .fc-button-active {
+  background: #7b68ee; /* ClickUp's signature purple */
+  color: white;
+  border-color: #7b68ee;
+  font-weight: 500;
+}
+
+/* Today button */
+#calendar .fc-toolbar .fc-today-button {
+  background: #ffffff;
+  color: #4d5562;
+  border: 1px solid #e6eaef;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+#calendar .fc-toolbar .fc-today-button:hover {
+  background: #f7fafc;
+  color: #222222;
+}
+
+/* Previous/Next buttons */
+#calendar .fc-toolbar .fc-prev-button,
+#calendar .fc-toolbar .fc-next-button {
+  background: #ffffff;
+  color: #4d5562;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+}
+
+/* Day headers (Mon, Tue, etc.) */
+#calendar .fc-day-header {
+  padding: 12px 0;
+  font-weight: 500;
+  color: #5e6c84;
+  text-transform: none;
+  font-size: 13px;
+  background-color: #fafbfd;
+  border-bottom: 1px solid #f0f3f7;
+}
+
+/* Day cells */
+#calendar .fc-day {
+  border-color: #f0f3f7;
+  transition: background-color 0.15s ease;
+}
+
+/* Today's cell highlight */
+#calendar .fc-today {
+  background-color: rgba(123, 104, 238, 0.05);
+}
+
+/* Day number styling */
+#calendar .fc-day-number {
+  padding: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #4d5562;
+}
+
+/* Weekend days */
+#calendar .fc-day.fc-sat,
+#calendar .fc-day.fc-sun {
+  background-color: #fafbfd;
+}
+
+/* Events */
+#calendar .fc-event {
+  border-radius: 4px;
+  border: none;
+  padding: 6px 10px;
+  margin: 2px 6px;
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Different event categories/colors */
+#calendar .fc-event.task {
+  background-color: rgba(123, 104, 238, 0.12);
+  border-left: 3px solid #7b68ee;
+  color: #453890;
+}
+
+#calendar .fc-event.meeting {
+  background-color: rgba(38, 132, 255, 0.12);
+  border-left: 3px solid #2684ff;
+  color: #1a4f99;
+}
+
+#calendar .fc-event.deadline {
+  background-color: rgba(255, 86, 48, 0.12);
+  border-left: 3px solid #ff5630;
+  color: #ae3a20;
+}
+
+#calendar .fc-event.personal {
+  background-color: rgba(54, 179, 126, 0.12);
+  border-left: 3px solid #36b37e;
+  color: #1e6e4c;
+}
+
+/* Event hover effect */
+#calendar .fc-event:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+}
+
+/* More events indicator */
+#calendar .fc-more {
+  font-size: 12px;
+  color: #5e6c84;
+  font-weight: 500;
+  padding: 2px 6px;
+}
+
+/* Time grid for week/day views */
+#calendar .fc-time-grid .fc-slats td {
+  height: 32px;
+  border-color: #f0f3f7;
+}
+
+#calendar .fc-time-grid .fc-slats .fc-time {
+  font-size: 11px;
+  color: #8993a4;
+  font-weight: 500;
+}
+
+/* View-specific styles */
+/* Month view */
+#calendar .fc-month-view .fc-content-skeleton {
+  padding-bottom: 8px;
+}
+
+/* Week view */
+#calendar .fc-timeGridWeek-view .fc-content-skeleton {
+  padding-top: 8px;
+}
+
+/* Agenda/list view */
+#calendar .fc-list-table {
+  border: none;
+}
+
+#calendar .fc-list-heading {
+  background-color: #fafbfd;
+}
+
+#calendar .fc-list-heading-main,
+#calendar .fc-list-heading-alt {
+  font-size: 13px;
+  font-weight: 500;
+  color: #5e6c84;
+  padding: 12px 16px;
+}
+
+#calendar .fc-list-item {
+  border-color: #f0f3f7;
+}
+
+#calendar .fc-list-item:hover td {
+  background-color: rgba(123, 104, 238, 0.05);
+}
+
+#calendar .fc-list-item-time {
+  font-size: 13px;
+  color: #4d5562;
+  font-weight: 500;
+}
+
+/* Popover for event details */
+.fc-popover {
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16);
+  overflow: hidden;
+}
+
+.fc-popover .fc-header {
+  background-color: #ffffff;
+  padding: 10px 12px;
+  border-bottom: 1px solid #f0f3f7;
+}
+
+.fc-popover .fc-header .fc-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #292d34;
+}
+
+.fc-popover .fc-header .fc-close {
+  color: #8993a4;
+  font-size: 18px;
+  opacity: 0.7;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  #calendar .fc-toolbar {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+  }
+  
+  #calendar .fc-toolbar .fc-left,
+  #calendar .fc-toolbar .fc-right {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  #calendar .fc-toolbar h2 {
+    font-size: 16px;
+  }
+  
+  #calendar .fc-toolbar .fc-button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  
+  #calendar .fc-day-header {
+    font-size: 11px;
+    padding: 8px 0;
+  }
+  
+  #calendar .fc-event {
+    padding: 4px 6px;
+    font-size: 11px;
+    margin: 1px 4px;
+  }
+}
+
+/* Additional UX enhancements */
+/* Quick add button */
+.calendar-quick-add {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background-color: #7b68ee;
+  color: white;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(123, 104, 238, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.calendar-quick-add:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(123, 104, 238, 0.4);
+}
+
+.calendar-quick-add i {
+  font-size: 24px;
+}
+
+/* Filters panel */
+.calendar-filters {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.calendar-filters .filter-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #292d34;
+  margin-bottom: 12px;
+}
+
+.calendar-filters .filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.calendar-filters .filter-chip {
+  background-color: #f5f7fa;
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #4d5562;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.calendar-filters .filter-chip:hover {
+  background-color: #edf1f7;
+}
+
+.calendar-filters .filter-chip.active {
+  background-color: rgba(123, 104, 238, 0.12);
+  color: #7b68ee;
+}
+/* new fullcalendar styles */
+/* Calendar Container Additional Styles */
+
+/* Card hover effects */
+.calendar-dashboard-container .hover\:shadow-md:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Calendar view selector */
+.calendar-view-selector {
+  border: 1px solid #eaecf0;
+}
+
+.calendar-view-btn.active {
+  background-color: #7b68ee;
+  color: white;
+}
+
+.calendar-view-btn {
+  transition: all 0.15s ease;
+}
+
+.calendar-view-btn:hover:not(.active) {
+  background-color: #f3f4f6;
+}
+
+/* Filter chips */
+.filter-chip {
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.filter-chip.active {
+  background-color: rgba(123, 104, 238, 0.12);
+  color: #7b68ee;
+}
+
+/* Quick add button positioning */
+.calendar-dashboard-container {
+  position: relative;
+}
+
+.calendar-quick-add {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  background-color: #7b68ee;
+  color: white;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(123, 104, 238, 0.3);
+  border: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 10;
+}
+
+.calendar-quick-add:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(123, 104, 238, 0.4);
+}
+
+.calendar-quick-add i {
+  font-size: 16px;
+}
+
+/* Remove calendar padding to align with design */
+#calendar.calendar-container {
+  padding: 0;
+}
+
+/* Calendar container responsiveness */
+@media screen and (max-width: 768px) {
+  .calendar-dashboard-container .calendar-filter-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .calendar-dashboard-container .text-xs.font-medium.text-gray-500.mr-3 {
+    margin-right: 0;
+    margin-bottom: 8px;
+  }
+  
+  .calendar-dashboard-container .calendar-view-selector {
+    display: none;
+  }
+}
+/* Header styles */
+/* ClickUp-Inspired Header Additional Styles */
+
+/* Animation for fade-in */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Header icon container */
+header .bg-indigo-100 {
+  transition: all 0.2s ease;
+}
+
+header .bg-indigo-100:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.15);
+}
+
+/* Action buttons */
+header button {
+  transition: all 0.2s ease;
+}
+
+header button.bg-indigo-600:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(79, 70, 229, 0.25);
+}
+
+/* View selector active button */
+header .bg-indigo-50 {
+  position: relative;
+}
+
+header .bg-indigo-50:after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #6366f1;
+  border-radius: 1px;
+}
+
+/* Year filter dropdown */
+header select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1rem;
+}
+
+/* Alert box */
+header .bg-amber-50 {
+  animation: fadeIn 0.8s ease-out forwards;
+  box-shadow: 0 2px 6px rgba(251, 191, 36, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  header .flex-col sm\:flex-row {
+    gap: 10px;
+  }
+  
+  header .sm\:justify-between > div {
+    width: 100%;
+  }
+  
+  header select {
+    width: 100%;
+  }
+}
+</style>
 </head>
 
-<body class="font-['Inter'] bg-slate-50">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Header Section -->
-        <header class="mb-8 text-center animate-fade-in">
-            <div class="inline-block bg-indigo-100 rounded-full p-3 mb-6">
-                <i class="fas fa-calendar-star text-indigo-600 text-3xl"></i>
+<!-- sidebar -->
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+      <!-- Sidebar - Width increased -->
+      <div class="w-72 bg-white shadow-lg flex-shrink-0 h-full overflow-y-auto">
+        <!-- Sidebar Header - Larger padding -->
+        <div class="px-6 py-5 border-b border-gray-200 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="text-indigo-500 rounded-md bg-indigo-50 p-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
             </div>
-            <h1 class="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
-                {{ organization.name }} Holidays
-            </h1>
-            <p class="text-slate-600 mb-6 max-w-2xl mx-auto leading-relaxed">
-                Manage your organization's holidays with ease. These dates will be automatically blocked for all members, 
-                preventing any meeting bookings during these periods.
-            </p>
+            <h1 class="font-semibold text-gray-800 text-xl">Holiday Controls</h1>
+          </div>
+          <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+            </svg>
+          </button>
+        </div>
+  
+        <!-- Add Holiday Button - Larger button -->
+        <div class="px-6 py-5">
+          <button class="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-3 px-4 rounded-lg font-medium transition duration-150 flex items-center justify-center space-x-2 shadow-sm text-base">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            <span>Add New Holiday</span>
+          </button>
+        </div>
+  
+        <!-- Filters Section - Increased spacing -->
+        <div class="sidebar-section open px-6 py-2 border-t border-gray-100">
+          <div class="flex items-center justify-between py-3.5 cursor-pointer" onclick="toggleSection(this.parentElement)">
+            <div class="flex items-center space-x-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              <span class="font-medium text-gray-700 text-base">Filters</span>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 transform rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+          <div class="section-content pb-4 pt-2">
+            <!-- Filter by Month -->
+            <div class="mb-4">
+              <label class="block text-sm text-gray-500 mb-2">Show by month</label>
+              <select class="w-full bg-gray-50 border border-gray-200 rounded-md py-2.5 px-3 text-base focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-300">
+                <option>All Months</option>
+                <option>January</option>
+                <option>February</option>
+                <option>March</option>
+                <option>April</option>
+                <option>May</option>
+                <option>June</option>
+                <option>July</option>
+                <option>August</option>
+                <option>September</option>
+                <option>October</option>
+                <option>November</option>
+                <option>December</option>
+              </select>
+            </div>
             
-            <!-- Alert Banners -->
-            <div class="flex flex-col gap-3 mb-8">
-                <div class="bg-amber-50 border-l-4 border-amber-400 p-4">
-                    <div class="flex items-center">
-                        <i class="fas fa-info-circle text-amber-600 mr-3"></i>
-                        <p class="text-sm text-amber-800">
-                            Currently supporting Indian public holidays. Global holiday support coming soon!
+            <!-- Show Upcoming Only -->
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-gray-700 text-base">Show upcoming only</span>
+              <div class="relative inline-block w-12 align-middle select-none">
+                <input type="checkbox" name="upcoming" id="upcoming" class="sr-only" checked />
+                <label for="upcoming" class="block h-7 w-12 rounded-full bg-indigo-500 cursor-pointer"></label>
+                <span class="absolute inset-y-0 left-0 flex items-center pl-1">
+                  <span class="bg-white border-gray-300 h-5 w-5 rounded-full shadow-sm transform transition-transform duration-200 ease-in-out translate-x-0"></span>
+                </span>
+              </div>
+            </div>
+            
+            <!-- Include Past Holidays -->
+            <div class="flex items-center justify-between">
+              <span class="text-gray-700 text-base">Include past holidays</span>
+              <div class="relative inline-block w-12 align-middle select-none">
+                <input type="checkbox" name="past" id="past" class="sr-only" />
+                <label for="past" class="block h-7 w-12 rounded-full bg-gray-300 cursor-pointer"></label>
+                <span class="absolute inset-y-0 left-0 flex items-center pl-1">
+                  <span class="bg-white border-gray-300 h-5 w-5 rounded-full shadow-sm transform transition-transform duration-200 ease-in-out translate-x-0"></span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Holiday Types Section -->
+        <div class="sidebar-section open px-6 py-2 border-t border-gray-100">
+          <div class="flex items-center justify-between py-3.5 cursor-pointer" onclick="toggleSection(this.parentElement)">
+            <div class="flex items-center space-x-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+              </svg>
+              <span class="font-medium text-gray-700 text-base">Holiday Types</span>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 transform rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+          <div class="section-content pb-4 pt-2">
+            <!-- Holiday Type Checkboxes -->
+            <div class="space-y-3.5">
+              <label class="flex items-center space-x-3 cursor-pointer">
+                <input type="checkbox" class="form-checkbox h-5 w-5 rounded text-indigo-500 focus:ring-indigo-200" checked>
+                <span class="flex items-center space-x-2">
+                  <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                  <span class="text-gray-700 text-base">Public Holidays</span>
+                </span>
+              </label>
+              
+              <label class="flex items-center space-x-3 cursor-pointer">
+                <input type="checkbox" class="form-checkbox h-5 w-5 rounded text-indigo-500 focus:ring-indigo-200" checked>
+                <span class="flex items-center space-x-2">
+                  <span class="w-3 h-3 rounded-full bg-purple-500"></span>
+                  <span class="text-gray-700 text-base">Personal Time Off</span>
+                </span>
+              </label>
+              
+              <label class="flex items-center space-x-3 cursor-pointer">
+                <input type="checkbox" class="form-checkbox h-5 w-5 rounded text-indigo-500 focus:ring-indigo-200" checked>
+                <span class="flex items-center space-x-2">
+                  <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+                  <span class="text-gray-700 text-base">Optional Holidays</span>
+                </span>
+              </label>
+              
+              <label class="flex items-center space-x-3 cursor-pointer">
+                <input type="checkbox" class="form-checkbox h-5 w-5 rounded text-indigo-500 focus:ring-indigo-200">
+                <span class="flex items-center space-x-2">
+                  <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                  <span class="text-gray-700 text-base">Team Events</span>
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Legend Section -->
+        <div class="sidebar-section open px-6 py-2 border-t border-gray-100">
+          <div class="flex items-center justify-between py-3.5 cursor-pointer" onclick="toggleSection(this.parentElement)">
+            <div class="flex items-center space-x-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span class="font-medium text-gray-700 text-base">Legend</span>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 transform rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+          <div class="section-content pb-4 pt-2">
+            <div class="grid grid-cols-1 gap-3">
+              <div class="flex items-center space-x-3">
+                <div class="w-4 h-4 rounded-full bg-green-500"></div>
+                <span class="text-gray-700 text-sm">Public Holidays</span>
+              </div>
+              <div class="flex items-center space-x-3">
+                <div class="w-4 h-4 rounded-full bg-purple-500"></div>
+                <span class="text-gray-700 text-sm">Personal Time Off</span>
+              </div>
+              <div class="flex items-center space-x-3">
+                <div class="w-4 h-4 rounded-full bg-blue-500"></div>
+                <span class="text-gray-700 text-sm">Optional Holidays</span>
+              </div>
+              <div class="flex items-center space-x-3">
+                <div class="w-4 h-4 rounded-full bg-yellow-500"></div>
+                <span class="text-gray-700 text-sm">Team Events</span>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Actions Section -->
+        <div class="sidebar-section px-6 py-2 border-t border-gray-100">
+          <div class="flex items-center justify-between py-3.5 cursor-pointer" onclick="toggleSection(this.parentElement)">
+            <div class="flex items-center space-x-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+              <span class="font-medium text-gray-700 text-base">Actions</span>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+          <div class="section-content hidden pb-4 pt-2">
+            <div class="space-y-2.5">
+              <button class="flex items-center w-full text-left space-x-3 px-3 py-2.5 rounded-md hover:bg-gray-100 transition duration-150 text-base">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                <span>Export Calendar</span>
+              </button>
+              <button class="flex items-center w-full text-left space-x-3 px-3 py-2.5 rounded-md hover:bg-gray-100 transition duration-150 text-base">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                </svg>
+                <span>Import Holidays</span>
+              </button>
+              <button class="flex items-center w-full text-left space-x-3 px-3 py-2.5 rounded-md hover:bg-gray-100 transition duration-150 text-base">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                <span>Copy to Team</span>
+              </button>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Settings Section -->
+        <div class="sidebar-section px-6 py-2 border-t border-gray-100">
+          <div class="flex items-center justify-between py-3.5 cursor-pointer" onclick="toggleSection(this.parentElement)">
+            <div class="flex items-center space-x-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span class="font-medium text-gray-700 text-base">Settings</span>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+          <div class="section-content hidden pb-4 pt-2">
+            <div class="space-y-3.5">
+              <div class="flex items-center justify-between">
+                <span class="text-gray-700 text-base">Notifications</span>
+                <div class="relative inline-block w-12 align-middle select-none">
+                  <input type="checkbox" name="notifications" id="notifications" class="sr-only" checked />
+                  <label for="notifications" class="block h-7 w-12 rounded-full bg-indigo-500 cursor-pointer"></label>
+                  <span class="absolute inset-y-0 left-0 flex items-center pl-1">
+                    <span class="bg-white border-gray-300 h-5 w-5 rounded-full shadow-sm transform transition-transform duration-200 ease-in-out translate-x-0"></span>
+                  </span>
+                </div>
+              </div>
+              
+              <div class="flex items-center justify-between">
+                <span class="text-gray-700 text-base">Calendar Sync</span>
+                <div class="relative inline-block w-12 align-middle select-none">
+                  <input type="checkbox" name="sync" id="sync" class="sr-only" checked />
+                  <label for="sync" class="block h-7 w-12 rounded-full bg-indigo-500 cursor-pointer"></label>
+                  <span class="absolute inset-y-0 left-0 flex items-center pl-1">
+                    <span class="bg-white border-gray-300 h-5 w-5 rounded-full shadow-sm transform transition-transform duration-200 ease-in-out translate-x-0"></span>
+                  </span>
+                </div>
+              </div>
+              
+              <div class="flex items-center justify-between">
+                <span class="text-gray-700 text-base">Dark Mode</span>
+                <div class="relative inline-block w-12 align-middle select-none">
+                  <input type="checkbox" name="darkmode" id="darkmode" class="sr-only" />
+                  <label for="darkmode" class="block h-7 w-12 rounded-full bg-gray-300 cursor-pointer"></label>
+                  <span class="absolute inset-y-0 left-0 flex items-center pl-1">
+                    <span class="bg-white border-gray-300 h-5 w-5 rounded-full shadow-sm transform transition-transform duration-200 ease-in-out translate-x-0"></span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Footer Section -->
+        <div class="mt-auto border-t border-gray-200">
+          <div class="px-6 py-5">
+            <div class="flex items-center justify-between mb-3">
+              <div class="text-sm text-gray-500 font-medium">Holiday Quota</div>
+              <div class="text-sm text-gray-700 font-medium">16/24 days</div>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="bg-indigo-500 h-2 rounded-full" style="width: 66%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+<!-- Main Content Area -->
+    <div class="pt-16 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Header Section -->
+            <header class="mb-8 animate-fade-in">
+                <!-- Main Header Section -->
+                <div class="flex flex-col md:flex-row md:items-start justify-between mb-6">
+                    <!-- Left Side: Title and Description -->
+                    <div class="flex-1">
+                        <div class="flex items-center">
+                            <div class="bg-indigo-100 rounded-lg p-2.5 mr-3 shadow-sm">
+                                <i class="fas fa-calendar-alt text-indigo-600 text-xl"></i>
+                            </div>
+                            <h1 class="text-2xl font-bold text-gray-800 tracking-tight">Manage Holidays</h1>
+                        </div>
+                        <p class="mt-2 text-gray-600 max-w-3xl text-sm leading-relaxed">
+                            Schedule organization-wide holidays to automatically block these dates in your team's calendars and prevent meeting bookings.
                         </p>
+                    </div>
+                    
+                    <!-- Right Side: Actions -->
+                    <div class="mt-4 md:mt-0 flex items-center space-x-3">
+                        <!-- Optional: Search Button -->
+                        <button class="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        
+                        <!-- Optional: Filter Button -->
+                        <button class="inline-flex items-center justify-center px-3.5 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-sm font-medium">
+                            <i class="fas fa-filter mr-2 text-gray-500"></i>
+                            Filter
+                        </button>
+                        
+                        <!-- Add Holiday Button -->
+                        <button id="addHolidayBtn" class="inline-flex items-center px-4 py-2.5 rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all">
+                            <i class="fas fa-plus mr-2"></i>
+                            Add Holiday
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Action Bar / Secondary Navigation -->
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-gray-50 border border-gray-100 rounded-lg p-3 mb-6">
+                    <!-- View Selector -->
+                    <div class="flex items-center space-x-4 mb-3 sm:mb-0">
+                        <span class="text-sm font-medium text-gray-500">View:</span>
+                        <div class="flex border border-gray-200 rounded-md divide-x divide-gray-200 bg-white">
+                            <button class="px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 border-indigo-200">Calendar</button>
+                            <button class="px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50">List</button>
+                            <button class="px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50">Timeline</button>
+                        </div>
+                    </div>
+                    <!-- Year Filter -->
+                    <div class="flex items-center">
+                        <select class="form-select bg-white border border-gray-200 text-gray-700 text-sm rounded-md pl-3 pr-8 py-1.5 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            <option>2025</option>
+                            <option>2024</option>
+                            <option>2023</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Contextual Alert -->
+                <div class="bg-amber-50 border border-amber-100 rounded-lg p-4 flex items-center">
+                    <div class="flex-shrink-0 w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center mr-4">
+                        <i class="fas fa-lightbulb text-amber-600"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-medium text-amber-800 text-sm">Currently supporting Indian holidays</h3>
+                        <p class="text-amber-700 text-sm mt-0.5">
+                            Global holiday support coming soon! You can still manually add custom holidays for any region.
+                        </p>
+                    </div>
+                    <div class="ml-4">
+                        <button class="text-amber-700 hover:text-amber-900">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+            <!-- Main Content Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Calendar Container -->
+                <!-- Calendar Container -->
+<div class="calendar-dashboard-container lg:col-span-2">
+    <!-- Calendar Card -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-md">
+        <!-- Card Header with Controls -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+            <!-- Title Section -->
+            <div class="flex items-center">
+                <div class="w-8 h-8 rounded-md bg-indigo-100 flex items-center justify-center mr-3">
+                    <i class="fas fa-calendar-alt text-indigo-600"></i>
+                </div>
+                <h2 class="text-base font-semibold text-gray-800">Holiday Calendar</h2>
+            </div>
+            
+            <!-- Controls Section -->
+            <div class="flex items-center space-x-2">
+                <!-- Calendar Type Selector -->
+                <div class="calendar-view-selector flex bg-gray-50 rounded-md p-1">
+                    <button class="calendar-view-btn active px-3 py-1 text-xs font-medium rounded">Month</button>
+                    <button class="calendar-view-btn px-3 py-1 text-xs font-medium text-gray-500 hover:text-gray-700">Week</button>
+                    <button class="calendar-view-btn px-3 py-1 text-xs font-medium text-gray-500 hover:text-gray-700">Day</button>
+                </div>
+                
+                <!-- More Options Menu -->
+                <div class="relative">
+                    <button class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-50">
+                        <i class="fas fa-ellipsis-h text-gray-400"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filter Bar (Optional) -->
+        <div class="calendar-filter-bar flex items-center px-6 py-3 bg-gray-50 border-b border-gray-100">
+            <div class="text-xs font-medium text-gray-500 mr-3">Filter:</div>
+            <div class="flex flex-wrap gap-2">
+                <span class="filter-chip active py-1 px-3 text-xs font-medium rounded-full flex items-center">
+                    <span class="w-2 h-2 rounded-full bg-indigo-500 mr-2"></span>
+                    Holidays
+                </span>
+                <span class="filter-chip py-1 px-3 text-xs font-medium rounded-full flex items-center bg-gray-100 text-gray-600 hover:bg-gray-200">
+                    <span class="w-2 h-2 rounded-full bg-teal-500 mr-2"></span>
+                    National
+                </span>
+                <span class="filter-chip py-1 px-3 text-xs font-medium rounded-full flex items-center bg-gray-100 text-gray-600 hover:bg-gray-200">
+                    <span class="w-2 h-2 rounded-full bg-amber-500 mr-2"></span>
+                    Local
+                </span>
+            </div>
+        </div>
+        
+        <!-- Calendar Component -->
+        <div id="calendar" class="calendar-container"></div>
+    </div>
+    
+    <!-- Quick Add Button -->
+    <button class="calendar-quick-add" aria-label="Add new event">
+        <i class="fas fa-plus"></i>
+    </button>
+</div>
+
+                <!-- Upcoming Holidays List -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-xl shadow-card border border-gray-200 overflow-hidden transition-all hover:shadow-card-hover">
+                        <div class="p-5 border-b border-gray-200 flex justify-between items-center">
+                            <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                                <i class="fas fa-list text-primary-500 mr-2"></i>
+                                Upcoming Holidays
+                            </h2>
+                            <button class="text-sm text-primary-600 hover:text-primary-800 font-medium flex items-center transition-colors">
+                                <i class="fas fa-sync-alt mr-1"></i> Refresh
+                            </button>
+                        </div>
+                        <div class="p-4">
+                            <div class="space-y-3 max-h-96 overflow-y-auto px-1">
+                                <!-- Holiday Item 1 -->
+                                <div class="bg-white border border-gray-200 rounded-lg p-4 hover-scale shadow-sm">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-medium text-gray-900">New Year's Day</h3>
+                                        <span class="bg-primary-100 text-primary-800 text-xs font-medium px-2.5 py-0.5 rounded-full">1 day</span>
+                                    </div>
+                                    <div class="text-sm text-gray-500 mb-3 flex items-center">
+                                        <i class="far fa-calendar-alt mr-1"></i>
+                                        Jan 1, 2025
+                                    </div>
+                                    <div class="flex justify-end space-x-2">
+                                        <button class="text-gray-600 hover:text-gray-900 p-1">
+                                            <i class="far fa-edit"></i>
+                                        </button>
+                                        <button class="text-gray-600 hover:text-red-600 p-1">
+                                            <i class="far fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Holiday Item 2 -->
+                                <div class="bg-white border border-gray-200 rounded-lg p-4 hover-scale shadow-sm">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-medium text-gray-900">Republic Day</h3>
+                                        <span class="bg-primary-100 text-primary-800 text-xs font-medium px-2.5 py-0.5 rounded-full">1 day</span>
+                                    </div>
+                                    <div class="text-sm text-gray-500 mb-3 flex items-center">
+                                        <i class="far fa-calendar-alt mr-1"></i>
+                                        Jan 26, 2025
+                                    </div>
+                                    <div class="flex justify-end space-x-2">
+                                        <button class="text-gray-600 hover:text-gray-900 p-1">
+                                            <i class="far fa-edit"></i>
+                                        </button>
+                                        <button class="text-gray-600 hover:text-red-600 p-1">
+                                            <i class="far fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Holiday Item 3 -->
+                                <div class="bg-white border border-gray-200 rounded-lg p-4 hover-scale shadow-sm">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-medium text-gray-900">Holi</h3>
+                                        <span class="bg-primary-100 text-primary-800 text-xs font-medium px-2.5 py-0.5 rounded-full">1 day</span>
+                                    </div>
+                                    <div class="text-sm text-gray-500 mb-3 flex items-center">
+                                        <i class="far fa-calendar-alt mr-1"></i>
+                                        Mar 12, 2025
+                                    </div>
+                                    <div class="flex justify-end space-x-2">
+                                        <button class="text-gray-600 hover:text-gray-900 p-1">
+                                            <i class="far fa-edit"></i>
+                                        </button>
+                                        <button class="text-gray-600 hover:text-red-600 p-1">
+                                            <i class="far fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Add more holiday items as needed -->
+                            </div>
+                            
+                            <!-- Import/Export Section -->
+                            <div class="mt-6 pt-4 border-t border-gray-200">
+                                <h3 class="text-sm font-medium text-gray-700 mb-3">Holiday Management</h3>
+                                <div class="flex space-x-2">
+                                    <button class="flex-1 text-xs flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-700 hover:bg-gray-50 transition-colors">
+                                        <i class="fas fa-file-import mr-1"></i> Import
+                                    </button>
+                                    <button class="flex-1 text-xs flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-700 hover:bg-gray-50 transition-colors">
+                                        <i class="fas fa-file-export mr-1"></i> Export
+                                    </button>
+                                    <button class="flex-1 text-xs flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-700 hover:bg-gray-50 transition-colors">
+                                        <i class="fas fa-sync-alt mr-1"></i> Sync
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </header>
-
-        <!-- Calendar Container -->
-        <main class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden transition-all hover:shadow-md">
-            <div class="p-6 border-b border-slate-200 flex justify-between items-center">
-                <h2 class="text-lg font-semibold text-slate-800">Holiday Calendar</h2>
-                <button id="addHolidayBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center">
-                    <i class="fas fa-plus mr-2"></i> Add Holiday
-                </button>
-            </div>
-            <div id="calendar" class="p-6"></div>
-        </main>
+        </div>
     </div>
 
     <!-- View Holiday Modal -->
-    <div id="viewHolidayModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+    <div id="viewHolidayModal" class="fixed inset-0 bg-gray-900/60 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white rounded-xl max-w-md w-full shadow-2xl transform transition-all animate-fade-in">
-            <div class="p-6 border-b border-slate-200">
-                <h3 id="viewHolidayTitle" class="text-xl font-semibold text-slate-800"></h3>
-                <p id="viewHolidayDate" class="text-slate-500 text-sm mt-1"></p>
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                <h3 id="viewHolidayTitle" class="text-xl font-semibold text-gray-900"></h3>
+                <span id="viewHolidayTag" class="bg-primary-100 text-primary-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Holiday</span>
             </div>
             
             <div class="p-6 space-y-4">
+                <p id="viewHolidayDate" class="text-sm text-gray-500 flex items-center">
+                    <i class="far fa-calendar-alt mr-2 text-primary-500"></i>
+                    <span></span>
+                </p>
+                
                 <div>
-                    <label class="text-sm font-medium text-slate-600 block mb-1">Description</label>
-                    <p id="viewHolidayDescription" class="text-slate-800 bg-slate-50 rounded-lg p-3"></p>
+                    <label class="text-sm font-medium text-gray-700 block mb-1">Description</label>
+                    <p id="viewHolidayDescription" class="text-gray-800 bg-gray-50 rounded-lg p-3 border border-gray-200"></p>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="text-sm font-medium text-slate-600 block mb-1">Start Date</label>
-                        <p id="viewHolidayStart" class="text-slate-800"></p>
+                        <label class="text-sm font-medium text-gray-700 block mb-1">Start Date</label>
+                        <p id="viewHolidayStart" class="text-gray-800 flex items-center">
+                            <i class="far fa-calendar-check mr-2 text-green-500"></i>
+                            <span></span>
+                        </p>
                     </div>
                     <div>
-                        <label class="text-sm font-medium text-slate-600 block mb-1">End Date</label>
-                        <p id="viewHolidayEnd" class="text-slate-800"></p>
+                        <label class="text-sm font-medium text-gray-700 block mb-1">End Date</label>
+                        <p id="viewHolidayEnd" class="text-gray-800 flex items-center">
+                            <i class="far fa-calendar-times mr-2 text-red-500"></i>
+                            <span></span>
+                        </p>
                     </div>
                 </div>
             </div>
 
-            <div class="p-6 border-t border-slate-200 flex justify-end gap-3">
-                <button id="deleteHolidayBtn" class="text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg transition-colors">
-                    Delete
-                </button>
-                <button id="editHolidayBtn" class="text-indigo-600 hover:bg-indigo-50 px-4 py-2 rounded-lg transition-colors">
-                    Edit
-                </button>
-                <button id="messageHolidayBtn" class="text-indigo-600 hover:bg-indigo-50 px-4 py-2 rounded-lg transition-colors">
-                    Message
-                </button>
-                <button id="settingsHolidayBtn" class="text-indigo-600 hover:bg-indigo-50 px-4 py-2 rounded-lg transition-colors">
-                    Settings
-                </button>
-                <button id="closeViewHolidayModal" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
-                    Close
-                </button>
+            <div class="p-6 border-t border-gray-200 flex justify-between">
+                <div class="flex gap-2">
+                    <button id="deleteHolidayBtn" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100 transition-colors">
+                        <i class="far fa-trash-alt mr-1"></i> Delete
+                    </button>
+                    <button id="editHolidayBtn" class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                        <i class="far fa-edit mr-1"></i> Edit
+                    </button>
+                    <!-- settings -->
+                    <button id="settingsHolidayBtn" class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                        <i class="far fa-edit mr-1"></i> Settings
+                    </button>
+                </div>
+                <div>
+                    <button id="closeViewHolidayModal" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 transition-colors">
+                        Close
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Add Holiday Modal -->
-    <div id="addHolidayModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
+    <div id="addHolidayModal" class="fixed inset-0 bg-gray-900/60 z-50 hidden items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white rounded-xl max-w-md w-full shadow-2xl transform transition-all animate-fade-in">
-            <div class="p-6 border-b border-slate-200">
-                <h3 class="text-xl font-semibold text-slate-800">Create New Holiday</h3>
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="text-xl font-semibold text-gray-900">Create New Holiday</h3>
+                <button type="button" id="cancelAddHoliday" class="text-gray-400 hover:text-gray-500">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             
             <form id="addHolidayForm" class="p-6 space-y-5">
                 {% csrf_token %}
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Title</label>
-                    <input type="text" id="addHolidayTitle" required
-                        class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all">
+                    <label for="addHolidayTitle" class="block text-sm font-medium text-gray-700 mb-1">Holiday Name</label>
+                    <div class="relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-tag text-gray-400"></i>
+                        </div>
+                        <input type="text" id="addHolidayTitle" required placeholder="e.g. Christmas Day"
+                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all">
+                    </div>
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Description</label>
-                    <textarea id="addHolidayDescription" rows="3"
-                        class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"></textarea>
+                    <label for="addHolidayDescription" class="block text-sm font-medium text-gray-700 mb-1">Description (Optional)</label>
+                    <textarea id="addHolidayDescription" rows="3" placeholder="Add details about this holiday..."
+                        class="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"></textarea>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Start Date</label>
-                        <input type="date" id="addHolidayStart" required
-                            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all">
+                        <label for="addHolidayStart" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                        <div class="relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="far fa-calendar-alt text-gray-400"></i>
+                            </div>
+                            <input type="date" id="addHolidayStart" required
+                                class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all">
+                        </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">End Date</label>
-                        <input type="date" id="addHolidayEnd" required
-                            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all">
+                        <label for="addHolidayEnd" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                        <div class="relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="far fa-calendar-alt text-gray-400"></i>
+                            </div>
+                            <input type="date" id="addHolidayEnd" required
+                                class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all">
+                        </div>
                     </div>
                 </div>
 
                 <div class="pt-4 flex justify-end gap-3">
-                    <button type="button" id="cancelAddHoliday"
-                        class="px-4 py-2 text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+                    <button type="button" id="cancelAddHoliday2"
+                        class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                         Cancel
                     </button>
                     <button type="submit"
-                        class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
-                        Save Holiday
+                        class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center">
+                        <i class="fas fa-save mr-2"></i> Save Holiday
                     </button>
                 </div>
             </form>
@@ -389,9 +1477,39 @@
     });
   </script>
   
+<!-- sidebar js -->
+<script>
+    function toggleSection(section) {
+      section.classList.toggle('open');
+      const chevron = section.querySelector('svg:last-child');
+      chevron.classList.toggle('rotate-180');
+    }
 
+    // Toggle logic for switches
+    document.addEventListener('DOMContentLoaded', function() {
+      const toggles = document.querySelectorAll('input[type="checkbox"]');
+      toggles.forEach(toggle => {
+        toggle.addEventListener('change', function() {
+          const label = this.nextElementSibling;
+          const circle = label.nextElementSibling.querySelector('span');
+          
+          if (this.checked) {
+            label.classList.remove('bg-gray-300');
+            label.classList.add('bg-indigo-500');
+            circle.classList.add('translate-x-4');
+            circle.classList.remove('translate-x-0');
+          } else {
+            label.classList.add('bg-gray-300');
+            label.classList.remove('bg-indigo-500');
+            circle.classList.remove('translate-x-4');
+            circle.classList.add('translate-x-0');
+          }
+        });
+      });
+    });
+
+</script> 
 </body>
 </html>
 
 
-{% endblock %}
