@@ -932,7 +932,7 @@ header {
 
 <!-- Main Content---------------------------------------------------------------------------------------------------------- -->
 <!-- Header -->
- <!-- Header Component -->
+<!-- Header Component -->
  <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
     <!-- Main Header -->
     <div class="flex items-center justify-between px-4 h-14">
@@ -1148,7 +1148,7 @@ header {
         </button>
       </div>
     </div>
-  </header>
+</header>
 
 
 
@@ -1170,21 +1170,35 @@ header {
 <!--  Containers   -->
 <!-- Reload btn  -->
 <div class="flex items-center gap-2">
-  <button id="refresh-btn" 
-      class="p-1.5 hover:bg-indigo-50/80 active:bg-indigo-100 rounded-lg transition-colors duration-150 ease-out group"
-      aria-label="Refresh data">
-      <svg id="refresh-icon" xmlns="http://www.w3.org/2000/svg" 
-          class="w-5 h-5 text-indigo-600 group-hover:text-indigo-700 transition-colors"
-          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
-          stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 5v-4h-4" class="opacity-50"/>
-          <path d="M4 19v4h4" class="opacity-50"/>
-          <path d="M18.5 12a6.5 6.5 0 1 1-6.5-6.5l3.5 3.5m-8 7l3.5 3.5"/>
-      </svg>
+  <button id="refresh-btn"
+    class="group relative flex items-center gap-2 px-3 py-1.5 border border-indigo-100 bg-white hover:bg-indigo-50 active:bg-indigo-100 rounded-full shadow-sm transition-all duration-150 ease-out">
+    
+    <!-- Icon -->
+    <svg id="refresh-icon" xmlns="http://www.w3.org/2000/svg"
+      class="w-4 h-4 text-indigo-600 group-hover:text-indigo-700 transition-colors"
+      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 5v-4h-4" class="opacity-50"/>
+      <path d="M4 19v4h4" class="opacity-50"/>
+      <path d="M18.5 12a6.5 6.5 0 1 1-6.5-6.5l3.5 3.5m-8 7l3.5 3.5"/>
+    </svg>
+
+    <!-- Label -->
+    <span class="text-xs font-medium text-indigo-700 group-hover:text-indigo-800">
+      Reload
+    </span>
+
+    <!-- Ping animation dot (optional) -->
+    <span class="absolute -top-1 -right-1 inline-flex rounded-full h-2 w-2 bg-indigo-500 opacity-75 animate-ping"></span>
   </button>
 
-  <span id="last-refreshed" class="text-xs font-medium text-gray-500 font-sans">Last refreshed: --</span>
+  <!-- Last refreshed text -->
+  <span id="last-refreshed" class="text-xs font-medium text-gray-500 font-sans">
+    Last refreshed: --
+  </span>
 </div>
+<br>
+
 
 
 
@@ -1275,414 +1289,863 @@ header {
 <!-- WORKING ON IT Main dashboard----------------------------------------------------------------------------------------------------------- -->
 <!-- re-initialized the dashboard -->
 
-<body class="min-h-screen bg-slate-50 font-['Inter'] text-slate-800" id="main-dashboard-tooltip">
-    <div class="max-w-7xl mx-auto p-6">
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-6">
-      
-            <div class="flex items-center gap-4">
-                <button class="p-2 hover:bg-white rounded-full text-slate-600 relative">
-                    <span class="material-icons-round">notifications</span>
-                    <span class="absolute top-1 right-1 w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></span>
-                </button>
-                <div class="w-9 h-9 bg-indigo-600 rounded-full flex items-center justify-center text-white font-medium shadow-sm">
-                    {{ user.username|first }}
-                </div>
+
+<body class="min-h-screen bg-gray-50 font-['Inter'] text-gray-800" id="main-dashboard-tooltip">
+  <!-- Global Navigation Bar -->
+
+  <!-- Top Navigation Bar -->
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+      <!-- Main Navigation Flex Container -->
+      <div class="flex items-center h-14">
+        
+        <!-- Left Side - Logo & Workspace -->
+        <div class="flex items-center pl-3 pr-2">
+          <!-- Logo -->
+          <div class="flex items-center">
+            <div class="h-8 w-8 bg-gradient-to-br from-indigo-600 to-purple-500 rounded flex items-center justify-center text-white font-bold text-xl">
+              C
             </div>
+          </div>
+          
+          <!-- Workspace Dropdown -->
+          <div class="workspace-dropdown ml-3 flex items-center px-3 py-1 rounded-md cursor-pointer hover:bg-gray-100 transition-colors">
+            <span class="font-medium text-gray-800">{{organization.name}}</span>
+            <span class="workspace-icon material-icons-round text-gray-500 ml-1 text-sm">expand_more</span>
+          </div>
+        </div>
+        
+        <!-- Middle - Main Navigation -->
+        <div class="flex-1 flex items-center px-2">
+          <nav class="flex space-x-1">
+            <a href="#" class="nav-item px-3 py-2 rounded-md text-sm font-medium text-indigo-600 bg-indigo-50 flex items-center">
+              <span class="nav-icon material-icons-round text-indigo-600 mr-2 text-lg">dashboard</span>
+              <span>Dashboard</span>
+            </a>
+            
+            <a href="#" class="nav-item px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 flex items-center">
+              <span class="nav-icon material-icons-round text-gray-500 mr-2 text-lg">folder</span>
+              <span>Projects</span>
+            </a>
+            
+            <a href="#" class="nav-item px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 flex items-center">
+              <span class="nav-icon material-icons-round text-gray-500 mr-2 text-lg">event_note</span>
+              <span>Calendar</span>
+            </a>
+            
+            <a href="#" class="nav-item px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 flex items-center">
+              <span class="nav-icon material-icons-round text-gray-500 mr-2 text-lg">assignment</span>
+              <span>Tasks</span>
+            </a>
+            
+            <a href="#" class="nav-item px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 flex items-center">
+              <span class="nav-icon material-icons-round text-gray-500 mr-2 text-lg">insights</span>
+              <span>Reports</span>
+            </a>
+          </nav>
+        </div>
+        
+        <!-- Right Side - Search & Actions -->
+        <div class="flex items-center space-x-3 pr-4">
+          <!-- Search Bar -->
+          <div class="relative">
+            <div class="flex items-center bg-gray-100 rounded-md px-3 py-1.5">
+              <span class="material-icons-round text-gray-400 text-lg">search</span>
+              <input class="bg-transparent border-none text-sm ml-2 w-48 focus:outline-none placeholder-gray-400" placeholder="Search...">
+            </div>
+          </div>
+          
+          <!-- User Area -->
+          <div class="flex items-center gap-2">
+            <button class="p-2 hover:bg-gray-100 rounded-full text-gray-600 relative">
+              <span class="material-icons-round">notifications</span>
+              <span class="absolute top-1 right-1 w-2 h-2 bg-purple-500 rounded-full animate-pulse"></span>
+            </button>
+            <button class="p-2 hover:bg-gray-100 rounded-full text-gray-600">
+              <span class="material-icons-round">help_outline</span>
+            </button>
+          
+          </div>
+        </div>
+      </div>
+    </header>
+  
+    <!-- Main Content Area with Sidebar -->
+    <div class="flex">
+      <!-- Left Sidebar -->
+      <div class="w-56 bg-white border-r border-gray-200 h-screen shrink-0">
+        <div class="py-3 px-3">
+          <!-- Workspaces Section -->
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wider">Workspaces</h3>
+            <button class="text-gray-400 hover:text-gray-600 p-1 rounded">
+              <span class="material-icons-round text-sm">add</span>
+            </button>
+          </div>
+          
+          <div class="space-y-1">
+            <button class="w-full flex items-center text-gray-700 px-2 py-1.5 rounded-md bg-gray-100">
+              <span class="w-4 h-4 rounded-sm bg-purple-500 mr-2 flex-shrink-0"></span>
+              <span class="text-sm font-medium truncate">Main Workspace</span>
+            </button>
+            <button class="w-full flex items-center text-gray-700 px-2 py-1.5 rounded-md hover:bg-gray-100">
+              <span class="w-4 h-4 rounded-sm bg-blue-500 mr-2 flex-shrink-0"></span>
+              <span class="text-sm font-medium truncate">Client Work</span>
+            </button>
+            <button class="w-full flex items-center text-gray-700 px-2 py-1.5 rounded-md hover:bg-gray-100">
+              <span class="w-4 h-4 rounded-sm bg-green-500 mr-2 flex-shrink-0"></span>
+              <span class="text-sm font-medium truncate">Personal Projects</span>
+            </button>
+          </div>
+          
+          <!-- Favorites Section -->
+          <div class="mt-6">
+            <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Favorites</h3>
+            <div class="space-y-1">
+              <button class="sidebar-item w-full flex items-center text-gray-700 px-2 py-1.5 rounded-md hover:bg-gray-100">
+                <span class="sidebar-icon material-icons-round text-yellow-500 text-sm mr-2">star</span>
+                <span class="text-sm truncate">Strategic Planning</span>
+              </button>
+              <button class="sidebar-item w-full flex items-center text-gray-700 px-2 py-1.5 rounded-md hover:bg-gray-100">
+                <span class="sidebar-icon material-icons-round text-yellow-500 text-sm mr-2">star</span>
+                <span class="text-sm truncate">Q2 Roadmap</span>
+              </button>
+              <button class="sidebar-item w-full flex items-center text-gray-700 px-2 py-1.5 rounded-md hover:bg-gray-100">
+                <span class="sidebar-icon material-icons-round text-yellow-500 text-sm mr-2">star</span>
+                <span class="text-sm truncate">Marketing Campaign</span>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Spaces Section -->
+          <div class="mt-6">
+            <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Spaces</h3>
+            <div class="space-y-1">
+              <button class="sidebar-item w-full flex items-center text-gray-700 px-2 py-1.5 rounded-md hover:bg-gray-100">
+                <span class="sidebar-icon material-icons-round text-gray-500 text-sm mr-2">folder</span>
+                <span class="text-sm truncate">Project Management</span>
+              </button>
+              <button class="sidebar-item w-full flex items-center text-gray-700 px-2 py-1.5 rounded-md hover:bg-gray-100">
+                <span class="sidebar-icon material-icons-round text-gray-500 text-sm mr-2">folder</span>
+                <span class="text-sm truncate">Design Assets</span>
+              </button>
+              <button class="sidebar-item w-full flex items-center text-gray-700 px-2 py-1.5 rounded-md hover:bg-gray-100">
+                <span class="sidebar-icon material-icons-round text-gray-500 text-sm mr-2">folder</span>
+                <span class="text-sm truncate">Development</span>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Team Section -->
+          <div class="mt-6">
+            <h3 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2 flex items-center justify-between">
+              <span>Team</span>
+              <button class="text-gray-400 hover:text-gray-600 p-0.5 rounded">
+                <span class="material-icons-round text-sm">person_add</span>
+              </button>
+            </h3>
+            <div class="space-y-1">
+              <div class="flex items-center px-2 py-1.5">
+                <div class="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center text-white text-xs mr-2">AR</div>
+                <span class="text-sm text-gray-700">Alex Roberts</span>
+                <span class="ml-auto w-2 h-2 bg-green-500 rounded-full"></span>
+              </div>
+              <div class="flex items-center px-2 py-1.5">
+                <div class="w-6 h-6 rounded-full bg-pink-500 flex items-center justify-center text-white text-xs mr-2">SM</div>
+                <span class="text-sm text-gray-700">Sarah Miller</span>
+                <span class="ml-auto w-2 h-2 bg-gray-300 rounded-full"></span>
+              </div>
+              <div class="flex items-center px-2 py-1.5">
+                <div class="w-6 h-6 rounded-full bg-amber-500 flex items-center justify-center text-white text-xs mr-2">JL</div>
+                <span class="text-sm text-gray-700">Jason Lee</span>
+                <span class="ml-auto w-2 h-2 bg-green-500 rounded-full"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <!-- Main Dashboard -->
+    <div class="flex-1 overflow-auto p-6">
+      <div class="max-w-6xl mx-auto">
+        <!-- Page Header -->
+        <div class="flex items-center justify-between mb-6">
+          <h1 class="text-xl font-semibold text-gray-800">My Dashboard</h1>
+          <div class="flex items-center space-x-2">
+            <button class="flex items-center px-3 py-1.5 text-sm font-medium text-purple-600 border border-purple-200 rounded-md hover:bg-purple-50 transition-colors">
+              <span class="material-icons-round text-sm mr-1">tune</span>
+              Customize
+            </button>
+            <button class="flex items-center px-3 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-purple-500 rounded-md hover:opacity-90 transition-opacity">
+              <span class="material-icons-round text-sm mr-1">add</span>
+              New
+            </button>
+          </div>
         </div>
 
         <!-- Main Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            <!-- Left Column -->
-            <div class="lg:col-span-2 space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-5">
+          
+          <!-- Left Column (Spans 3 columns) -->
+          <div class="lg:col-span-3 space-y-5">
+              
+            <!-- Active Projects Section -->
+  <!-- Only styling the active projects section -->
+  <div class="bg-white rounded-xl custom-shadow border border-gray-100 overflow-hidden" id="active-projects-tooltip">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+      <h2 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
+        <span class="material-icons-round text-purple-600">folder_open</span>
+        Active Projects
+      </h2>
+      <button class="text-sm bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-md flex items-center gap-1 font-medium transition-colors">
+        <span class="material-icons-round text-sm">add</span>
+        New Project
+      </button>
+    </div>
+    
+    <div class="overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" style="max-height: 320px;">
+      <div class="p-4 hover:bg-gray-50 border-b border-gray-100 transition-colors">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <span class="material-icons-round text-purple-600">description</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+              <h3 class="font-medium text-gray-800 truncate">{{ project.name }}</h3>
+              <span class="material-icons-round text-gray-400 text-sm hover:text-gray-600 cursor-pointer">more_horiz</span>
+            </div>
+            <p class="text-xs text-gray-500 mt-1 flex items-center gap-1">
+              <span class="material-icons-round text-xs">calendar_today</span>
+              {{ project.start_date }} - {{ project.end_date }}
+            </p>
+          
+            <div class="mt-3 flex items-center gap-3">
+              <div class="avatar-stack flex">
+                <div class="avatar w-6 h-6 rounded-full overflow-hidden bg-gray-200">
+                  <img src="https://randomuser.me/api/portraits/men/21.jpg" alt="Team member" class="w-full h-full object-cover">
+                </div>
+                <div class="avatar w-6 h-6 rounded-full overflow-hidden bg-gray-200">
+                  <img src="https://randomuser.me/api/portraits/women/36.jpg" alt="Team member" class="w-full h-full object-cover">
+                </div>
+                <div class="avatar w-6 h-6 rounded-full overflow-hidden bg-gray-200">
+                  <img src="https://randomuser.me/api/portraits/men/47.jpg" alt="Team member" class="w-full h-full object-cover">
+                </div>
+                <div class="avatar w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center text-xs font-medium text-purple-700">
+                  +2
+                </div>
                 
-                <!-- Projects Section -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden transition-all hover:-translate-y-1 hover:shadow-md duration-300" id="active-projects-tooltip">
-                    <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-                        <h2 class="text-base font-semibold text-slate-800 flex items-center gap-2">
-                            <span class="material-icons-round text-indigo-500">folder_open</span>
-                            Active Projects
-                        </h2>
-                        <button class="text-sm text-indigo-600 hover:bg-indigo-50 px-3 py-1.5 rounded-lg flex items-center gap-1 font-medium transition-colors">
-                            <span class="material-icons-round text-sm">add</span>
-                            New
-                        </button>
-                    </div>
-                    
-                    <div class="overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" style="max-height: 380px;">
-                       
-                        <div class="p-3 hover:bg-slate-50/50 border-b border-slate-100 transition-colors">
-                            <div class="flex items-start gap-4">
-                                <div class="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <span class="material-icons-round text-indigo-600">description</span>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-center justify-between">
-                                        <h3 class="font-medium text-slate-800 truncate">{{ project.name }}</h3>
-                                        <span class="material-icons-round text-slate-400 text-sm hover:text-slate-600 cursor-pointer">more_horiz</span>
-                                    </div>
-                                    <p class="text-xs text-slate-500 mt-1">{{ project.start_date }} - {{ project.end_date }}</p>
-                                  
-                                    <div class="mt-3 flex items-center gap-3 text-xs">
-                                        <span class="px-2 py-1 bg-indigo-50 text-indigo-600 rounded-full flex items-center gap-1">
-                                            <span class="material-icons-round text-xs">group</span>
-                                            5 Members
-                                        </span>
-                                        <div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                            <div class="h-full bg-indigo-500 rounded-full" style="width: 66%"></div>
-                                        </div>
-                                        <span class="text-slate-500">66%</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                   
-                    </div>
+              </div>
+              <div class="flex items-center space-x-2 w-full">
+                <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div class="h-full rounded-full bg-gradient-to-r from-green-400 via-yellow-400 to-red-400" style="width: 66%"></div>
                 </div>
-
-                <!-- Meetings & Events -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Upcoming Meetings -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden transition-all hover:-translate-y-1 hover:shadow-md duration-300">
-                        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100" id="my-upcoming-meetings-tooltip">
-                            <h2 class="text-base font-semibold text-slate-800 flex items-center gap-2">
-                                <span class="material-icons-round text-purple-500">event_available</span>
-                                Meetings
-                            </h2>
-                            <button class="text-sm text-purple-600 hover:bg-purple-50 p-1.5 rounded-lg flex items-center gap-1 font-medium transition-colors">
-                                <span class="material-icons-round text-sm">add</span>
-                            </button>
-                        </div>
-                        
-                        <div class="overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" style="max-height: 300px;">
-                            {% for meeting in recent_meetings %}
-                            <div class="p-3 hover:bg-slate-50/50 border-b border-slate-100 transition-colors">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <h3 class="font-medium text-slate-800 text-sm">{{ meeting.meeting_title }}</h3>
-                                        <div class="mt-2 flex items-center gap-2 flex-wrap">
-                                            <span class="px-2 py-1 bg-purple-50 text-purple-600 text-xs rounded-full flex items-center gap-1">
-                                                <span class="material-icons-round text-xs">schedule</span>
-                                                {{ meeting.start_time }}
-                                            </span>
-                                            <span class="px-2 py-1 bg-indigo-50 text-indigo-600 text-xs rounded-full flex items-center gap-1">
-                                                <span class="material-icons-round text-xs">calendar_today</span>
-                                                {{ meeting.meeting_date }}
-                                            </span>
-
-                                              <!-- Options List -->
-       
-                                        </div>
-                                    </div>
-                                    <button id="meeing-menu-tooltip" onclick="document.getElementById('menuModal').classList.remove('hidden')" 
-                                       class="text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-50">
-                                        <span class="material-icons-round">more_vert</span>
-                                    </button>
-
-                                      <!-- Options List -->
-                                           <!-- Meeting Modal (Existing Logic Preserved) -->
-    <div id="menuModal" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50 hidden backdrop-blur-sm">
-        <!-- Modal content remains exactly the same as original -->
-        <div class="bg-white w-96 p-2 rounded-xl shadow-2xl relative transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]">
-            <!-- ... Your existing modal content ... -->
-            <div class="p-2 space-y-2">
-                <a href="{% url 'meeting_detail_view' org_id=organization.id meeting_id=meeting.id  %}" 
-                   class="flex items-center w-full px-4 py-3 text-slate-700 font-medium hover:bg-indigo-50 rounded-lg transition-all group">
-                   <span class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-indigo-200">
-                       <span class="material-icons-round text-indigo-600">calendar_month</span>
-                   </span>
-                   <span class="text-base">Join & Details</span>
-                   <svg class="ml-auto h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                   </svg>
-                </a>
-    
-                <a href="{% url 'collaborate' org_id=organization.id meeting_id=meeting.id %}" 
-                   class="flex items-center w-full px-4 py-3 text-slate-700 font-medium hover:bg-green-50 rounded-lg transition-all group">
-                   <span class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-green-200">
-                       <span class="material-icons-round text-green-600">handshake</span>
-                   </span>
-                   <span class="text-base">Collaborate</span>
-                   <svg class="ml-auto h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                   </svg>
-                </a>
-    
-                <a href="{% url 'remove_myself' org_id=organization.id meeting_id=meeting.id %}" 
-                   class="flex items-center w-full px-4 py-3 text-red-600 font-medium hover:bg-red-50 rounded-lg transition-all group">
-                   <span class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mr-3 group-hover:bg-red-200">
-                       <span class="material-icons-round text-red-600">logout</span>
-                   </span>
-                   <span class="text-base">Exit Meeting</span>
-                   <svg class="ml-auto h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                   </svg>
-                </a>
+                <span class="text-xs text-gray-600 font-medium">66%</span>
+              </div>
+              
             </div>
-    
+          </div>
         </div>
-    </div>
-       
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-
-                    <!-- Upcoming Events -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden transition-all hover:-translate-y-1 hover:shadow-md duration-300">
-                        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-                            <h2 class="text-base font-semibold text-slate-800 flex items-center gap-2">
-                                <span class="material-icons-round text-green-500">celebration</span>
-                                Upcoming Events
-                            </h2>
-                            <button class="text-sm text-green-600 hover:bg-green-50 p-1.5 rounded-lg flex items-center gap-1 font-medium transition-colors">
-                                <span class="material-icons-round text-sm">add</span>
-                            </button>
-                        </div>
-                        
-                        <div class="overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" style="max-height: 300px;">
-                            {% for event in recent_events %}
-                            <div class="p-3 hover:bg-slate-50/50 border-b border-slate-100 transition-colors">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                                        <span class="material-icons-round text-green-600">event</span>
-                                    </div>
-                                    <div class="flex-1 min-w-0">
-                                        <h3 class="font-medium text-slate-800 text-sm">{{ event.title }}</h3>
-                                        <div class="mt-1 flex items-center gap-2">
-                                            <span class="text-xs text-slate-500 flex items-center gap-1">
-                                                <span class="material-icons-round text-xs">bookmark</span>
-                                                {{ event.booking_count }} bookings
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <a href="{% url 'view_bookings' org_id=organization.id event_id=event.id %}" 
-                                           class="text-slate-400 hover:text-green-600 p-1 rounded-full hover:bg-slate-50">
-                                            <span class="material-icons-round text-sm">visibility</span>
-                                        </a>
-                                        <a href="{% url 'delete-event' org_id=organization.id event_id=event.id %}" 
-                                           class="text-slate-400 hover:text-red-600 p-1 rounded-full hover:bg-slate-50">
-                                            <span class="material-icons-round text-sm">delete</span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
+      </div>
+      
+      <!-- More project items would go here -->
+      <div class="p-4 hover:bg-gray-50 border-b border-gray-100 transition-colors">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <span class="material-icons-round text-blue-600">layers</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+              <h3 class="font-medium text-gray-800 truncate">Website Redesign</h3>
+              <span class="material-icons-round text-gray-400 text-sm hover:text-gray-600 cursor-pointer">more_horiz</span>
+            </div>
+            <p class="text-xs text-gray-500 mt-1 flex items-center gap-1">
+              <span class="material-icons-round text-xs">calendar_today</span>
+              Apr 1 - May 15
+            </p>
+          
+            <div class="mt-3 flex items-center gap-3">
+              <div class="avatar-stack flex">
+                <div class="avatar w-6 h-6 rounded-full overflow-hidden bg-gray-200">
+                  <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Team member" class="w-full h-full object-cover">
                 </div>
+                <div class="avatar w-6 h-6 rounded-full overflow-hidden bg-gray-200">
+                  <img src="https://randomuser.me/api/portraits/women/45.jpg" alt="Team member" class="w-full h-full object-cover">
+                </div>
+                <div class="avatar w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs font-medium text-blue-700">
+                  +1
+                </div>
+                
+              </div>
+              <div class="flex items-center space-x-2 w-full">
+                <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div class="h-full rounded-full bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400" style="width: 45%"></div>
+                </div>
+                <span class="text-xs text-gray-600 font-medium">45%</span>
+              </div>
+              
             </div>
-
-            <!-- Right Column -->
-            <div class="space-y-6">
-                <!-- Team Members -->
-                <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden transition-all hover:-translate-y-1 hover:shadow-md duration-300">
-                    <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100" id="team-members-tooltip">
-                        <h2 class="text-base font-semibold text-slate-800 flex items-center gap-2">
-                            <span class="material-icons-round text-amber-500">groups</span>
-                            Team
-                        </h2>
-                        <button class="text-sm text-amber-600 hover:bg-amber-50 p-1.5 rounded-lg flex items-center gap-1 font-medium transition-colors">
-                            <span class="material-icons-round text-sm">add</span>
-                        </button>
-                    </div>
-                    
-                    <div class="overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" style="max-height: 400px;">
-                        {% for member in members %}
-    <div class="p-3 hover:bg-slate-50/50 border-b border-slate-100 transition-colors">
-        <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-full overflow-hidden bg-indigo-50 flex items-center justify-center flex-shrink-0">
-                {% if member.profile_picture %}
-                    <img src="{{ member.profile_picture.url }}" alt="Profile Picture" class="w-full h-full object-cover">
-                {% else %}
-                    <span class="text-indigo-600 font-medium">{{ member.user.username|first|upper }}</span>
-                {% endif %}
-            </div>
-            <div class="flex-1 min-w-0">
-                <h3 class="text-sm font-medium text-slate-800 truncate">{{ member.user.username }}</h3>
-                <p class="text-xs text-slate-500">{{ member.get_role_display }}</p>
-            </div>
-            <div class="flex gap-1">
-                <a href="{% url 'user_calendar' user_id=member.user.id org_id=organization.id %}" id="user-calendar-tooltip" 
-                   class="p-1.5 hover:bg-slate-50 rounded-full text-slate-500 hover:text-indigo-600">
-                    <span class="material-icons-round text-sm">calendar_today</span>
-                </a>
-                <a href="{% url 'dm' user_id=member.user.id org_id=organization.id %}" id="direct-message-tooltip"
-                   class="p-1.5 hover:bg-slate-50 rounded-full text-slate-500 hover:text-green-600">
-                    <span class="material-icons-round text-sm">chat</span>
-                </a>
-                <a href="#" data-bs-toggle="modal" data-bs-target="#ScheduleMeetsModal" id="schedule-recurring-meeting-tooltip"
-                   data-org-id="{{ organization.id }}" data-user-id="{{ member.user.id }}"
-                   class="p-1.5 hover:bg-slate-50 rounded-full text-slate-500 hover:text-purple-600">
-                    <span class="material-icons-round text-sm">schedule</span>
-                </a>
-            </div>
+          </div>
         </div>
+      </div>
+      
     </div>
-{% endfor %}
+  </div>
+            <!-- Meetings & Events Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-                    </div>
-                </div>
-
+              <!-- Upcoming Meetings -->
              
-            </div>
-        </div>
-    </div>
-
-    <!-- Meeting Modal (Existing Logic Preserved) -->
-    <div id="menuModal" class="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 hidden backdrop-blur-sm">
-        <!-- Modal content remains exactly the same as original -->
-        <div class="bg-white w-96 p-2 rounded-xl shadow-2xl relative transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]">
+              <div class="bg-white rounded-xl custom-shadow border border-gray-100 overflow-hidden" id="my-upcoming-meetings-tooltip">
+                <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                  <h2 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2922/2922322.png" alt="Meeting Icon" class="w-5 h-5 rounded-full object-cover">
+                    Next 3 Meetings
+                  </h2>
+                  <button class="text-sm text-blue-600 hover:bg-blue-100 p-1.5 rounded-full flex items-center justify-center add-button transition-all">
+                    <span class="material-icons-round text-sm">add</span>
+                  </button>
+                </div>
+           
+              
             
+    <div class="overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" style="max-height: 280px;">
+      {% for meeting in recent_meetings %}
+      <div class="p-4 hover:bg-gray-50 border-b border-gray-100 transition-colors">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="font-medium text-gray-800 text-sm">{{ meeting.meeting_title }}</h3>
+            <div class="mt-2 flex items-center gap-2 flex-wrap">
+              <span class="tag time-tag">
+                <span class="material-icons-round text-xs">schedule</span>
+                {{ meeting.start_time }}
+              </span>
+              <span class="tag date-tag">
+                <span class="material-icons-round text-xs">calendar_today</span>
+                {{ meeting.meeting_date }}
+              </span>
+            </div>
+          </div>
+          <button id="meeing-menu-tooltip" onclick="document.getElementById('menuModal').classList.remove('hidden')" 
+            class="text-gray-400 hover:text-gray-600 p-1.5 rounded-full hover:bg-gray-100 hover-menu-button">
+            <span class="material-icons-round text-sm menu-icon">more_vert</span>
+          </button>
         </div>
+      </div>
+      <!-- Keep the modal exactly as it was -->
+      <!-- Modal (preserved from original code) -->
+      <div id="menuModal" class="fixed inset-0 bg-black/30 flex items-center justify-center z-50 hidden backdrop-blur-sm">
+        <div class="bg-white w-80 p-2 rounded-xl shadow-2xl relative transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] modal-content">
+          <div class="p-2 space-y-1">
+            <a href="{% url 'meeting_detail_view' org_id=organization.id meeting_id=meeting.id  %}" 
+              class="flex items-center w-full px-3 py-2.5 text-gray-700 font-medium hover:bg-blue-50 rounded-lg transition-all group">
+              <span class="w-8 h-8 bg-blue-100 rounded-md flex items-center justify-center mr-3 group-hover:bg-blue-200">
+                <span class="material-icons-round text-blue-600">calendar_month</span>
+              </span>
+              <span class="text-sm">Join & Details</span>
+              <svg class="ml-auto h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+
+            <a href="{% url 'collaborate' org_id=organization.id meeting_id=meeting.id %}" 
+              class="flex items-center w-full px-3 py-2.5 text-gray-700 font-medium hover:bg-green-50 rounded-lg transition-all group">
+              <span class="w-8 h-8 bg-green-100 rounded-md flex items-center justify-center mr-3 group-hover:bg-green-200">
+                <span class="material-icons-round text-green-600">handshake</span>
+              </span>
+              <span class="text-sm">Collaborate</span>
+              <svg class="ml-auto h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+
+            <a href="{% url 'remove_myself' org_id=organization.id meeting_id=meeting.id %}" 
+              class="flex items-center w-full px-3 py-2.5 text-red-600 font-medium hover:bg-red-50 rounded-lg transition-all group">
+              <span class="w-8 h-8 bg-red-100 rounded-md flex items-center justify-center mr-3 group-hover:bg-red-200">
+                <span class="material-icons-round text-red-600">logout</span>
+              </span>
+              <span class="text-sm">Exit Meeting</span>
+              <svg class="ml-auto h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+  
+                  
+                  <!-- Sample meeting data -->
+                  <div class="p-3 hover:bg-gray-50 border-b border-gray-200 transition-colors">
+                    <div class="flex justify-between items-start">
+                      <div>
+                        <h3 class="font-medium text-gray-800 text-sm">Weekly Sprint Planning</h3>
+                        <div class="mt-1.5 flex items-center gap-2 flex-wrap">
+                          <span class="px-2 py-0.5 bg-blue-50 text-blue-600 text-xs rounded-full flex items-center gap-1">
+                            <span class="material-icons-round text-xs">schedule</span>
+                            10:00 AM
+                          </span>
+                          <span class="px-2 py-0.5 bg-purple-50 text-purple-600 text-xs rounded-full flex items-center gap-1">
+                            <span class="material-icons-round text-xs">calendar_today</span>
+                            Today
+                          </span>
+                        </div>
+                      </div>
+                      <button class="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100">
+                        <span class="material-icons-round text-sm">more_vert</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Upcoming Events -->
+          <!-- Only styling the upcoming events section -->
+  <div class="bg-white rounded-xl custom-shadow border border-gray-100 overflow-hidden">
+   
+      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <h2 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
+          <img src="https://cdn-icons-png.flaticon.com/512/2922/2922322.png" alt="Meeting Icon" class="w-5 h-5 rounded-full object-cover">
+          Next Events
+        </h2>
+        <button class="text-sm text-blue-600 hover:bg-blue-100 p-1.5 rounded-full flex items-center justify-center add-button transition-all">
+          <span class="material-icons-round text-sm">add</span>
+        </button>
+      </div>
+ 
+
+    <div class="overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" style="max-height: 280px;">
+      {% for event in recent_events %}
+      <div class="p-4 hover:bg-gray-50 border-b border-gray-100 transition-colors event-item">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0 event-icon">
+            <span class="material-icons-round text-pink-600">event</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="font-medium text-gray-800 text-sm">{{ event.title }}</h3>
+            <div class="mt-1 flex items-center gap-2">
+              <span class="booking-tag text-xs">
+                <span class="material-icons-round text-xs">bookmark</span>
+                {{ event.booking_count }} bookings
+              </span>
+            </div>
+          </div>
+          <div class="flex gap-1">
+            <a href="{% url 'view_bookings' org_id=organization.id event_id=event.id %}" 
+               class="text-gray-400 hover:text-blue-600 p-1.5 rounded-full hover:bg-gray-100 action-button view-button">
+              <span class="material-icons-round text-sm">visibility</span>
+            </a>
+            <a href="{% url 'delete-event' org_id=organization.id event_id=event.id %}" 
+               class="text-gray-400 hover:text-red-500 p-1.5 rounded-full hover:bg-gray-100 action-button delete-button">
+              <span class="material-icons-round text-sm">delete</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+      
+      <!-- Sample event data (kept exactly as in the original) -->
+      <div class="p-4 hover:bg-gray-50 border-b border-gray-100 transition-colors event-item">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0 event-icon">
+            <span class="material-icons-round text-pink-600">event</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="font-medium text-gray-800 text-sm">Product Launch</h3>
+            <div class="mt-1 flex items-center gap-2">
+              <span class="booking-tag text-xs">
+                <span class="material-icons-round text-xs">bookmark</span>
+                24 bookings
+              </span>
+            </div>
+          </div>
+          <div class="flex gap-1">
+            <a href="#" class="text-gray-400 hover:text-blue-600 p-1.5 rounded-full hover:bg-gray-100 action-button view-button">
+              <span class="material-icons-round text-sm">visibility</span>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-red-500 p-1.5 rounded-full hover:bg-gray-100 action-button delete-button">
+              <span class="material-icons-round text-sm">delete</span>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
+            </div>
+          </div>
+          
+          <!-- Right Column - Widget Area -->
+          <div class="lg:col-span-1 space-y-5">
+            <!-- Activity Feed -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+                <h2 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                  <span class="material-icons-round text-green-500">update</span>
+                  Recent Activity
+                </h2>
+              </div>
+              
+              <div class="p-4 space-y-3">
+                <div class="flex items-start gap-2">
+                  <div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
+                    <div class="w-full h-full bg-gradient-to-br from-blue-500 to-purple-500"></div>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-800">
+                      <span class="font-medium">Alex</span> commented on 
+                      <span class="text-blue-600">Website Redesign</span>
+                    </p>
+                    <p class="text-xs text-gray-500 mt-0.5">10 minutes ago</p>
+                  </div>
+                </div>
+                
+                <div class="flex items-start gap-2">
+                  <div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
+                    <div class="w-full h-full bg-gradient-to-br from-pink-500 to-red-500"></div>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-800">
+                      <span class="font-medium">Sarah</span> completed task 
+                      <span class="text-blue-600">Update homepage copy</span>
+                    </p>
+                    <p class="text-xs text-gray-500 mt-0.5">35 minutes ago</p>
+                  </div>
+                </div>
+                
+                <div class="flex items-start gap-2">
+                  <div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
+                    <div class="w-full h-full bg-gradient-to-br from-green-500 to-teal-500"></div>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-800">
+                      <span class="font-medium">Michael</span> created new project 
+                      <span class="text-blue-600">Q3 Marketing Campaign</span>
+                    </p>
+                    <p class="text-xs text-gray-500 mt-0.5">2 hours ago</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Productivity Stats -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+                <h2 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                  <span class="material-icons-round text-blue-500">insights</span>
+                  Your Productivity
+                </h2>
+              </div>
+              
+              <div class="p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-medium text-gray-700">Tasks Completed</span>
+                  <span class="text-xs font-medium text-gray-700">12/15</span>
+                </div>
+                <div class="h-1.5 w-full bg-gray-100 rounded-full mb-4">
+                  <div class="h-full rounded-full bg-gradient-to-r from-blue-500 to-purple-500" style="width: 80%"></div>
+                </div>
+                
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-medium text-gray-700">Time Tracked</span>
+                  <span class="text-xs font-medium text-gray-700">24h 30m</span>
+                </div>
+                <div class="h-1.5 w-full bg-gray-100 rounded-full mb-4">
+                  <div class="h-full rounded-full bg-gradient-to-r from-green-500 to-teal-500" style="width: 65%"></div>
+                </div>
+                
+                <div class="mt-4 bg-blue-50 rounded-md p-3 flex items-center gap-2">
+                  <span class="material-icons-round text-blue-600">emoji_events</span>
+                  <p class="text-xs text-blue-700">You're 15% more productive than last week!</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+                <h2 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                  <span class="material-icons-round text-purple-500">bolt</span>
+                  Quick Actions
+                </h2>
+              </div>
+              
+              <div class="p-3 grid grid-cols-2 gap-2">
+                <button class="flex flex-col items-center justify-center p-3 rounded-md hover:bg-gray-50 transition-colors">
+                  <span class="material-icons-round text-blue-500 mb-1">add_task</span>
+                  <span class="text-xs font-medium text-gray-700">New Task</span>
+                </button>
+                
+                <button class="flex flex-col items-center justify-center p-3 rounded-md hover:bg-gray-50 transition-colors">
+                  <span class="material-icons-round text-purple-500 mb-1">event</span>
+                  <span class="text-xs font-medium text-gray-700">Schedule</span>
+                </button>
+                
+                <button class="flex flex-col items-center justify-center p-3 rounded-md hover:bg-gray-50 transition-colors">
+                  <span class="material-icons-round text-pink-500 mb-1">chat</span>
+                  <span class="text-xs font-medium text-gray-700">Message</span>
+                </button>
+                
+                <button class="flex flex-col items-center justify-center p-3 rounded-md hover:bg-gray-50 transition-colors">
+                  <span class="material-icons-round text-green-500 mb-1">file_upload</span>
+                  <span class="text-xs font-medium text-gray-700">Upload</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <script>
-        // Preserve existing modal toggle functionality
-        document.querySelectorAll('[data-modal-toggle]').forEach(button => {
-            button.addEventListener('click', () => {
-                const modal = document.getElementById(button.dataset.modalToggle);
-                modal.classList.toggle('hidden');
-            });
-        });
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            if (event.target.id === 'menuModal') {
-                event.target.classList.add('hidden');
-            }
-        }
-    </script>
+ 
 </body>
-
 <!-- ------------------------------------------------------------------------------------------------------------------------------------------ -->
 
 <!-- --------------------------------------------------------------------------------------------------------------- -->
-<!-- Popup Buttons (Initially Hidden) -->
-<div id="popupButtons" class="popup-container shadow-sm rounded-3 p-2" 
-     style="background: white; border: 1px solid #e8e8e8; min-width: 240px;">
-
-    <!-- Short Set-up Button -->
-    <button type="button" class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2" 
-            data-bs-toggle="modal" data-bs-target="#editOrgModal"
-            style="font-family: 'Inter', sans-serif; font-size: 15px; 
-                   color: #1d1c1d; transition: background 0.2s ease; border-radius: 4px;">
-        <span class="material-icons" style="font-size: 18px; color: #007bff;">tune</span> 
-        Short Set-up
+<!-- Popup Buttons (Initially Hidden - Admin) -->
+<div id="popupButtons" class="popup-container" style="display: none;">
+  <!-- Short Set-up Button -->
+  <button type="button" class="popup-btn" data-bs-toggle="modal" data-bs-target="#editOrgModal">
+    <div class="popup-icon icon-primary">
+      <i class="fa-solid fa-sliders"></i>
+    </div>
+    Short Set-up
+  </button>
+  
+  <!-- Monitor Invitations Button -->
+  <button type="button" class="popup-btn" data-bs-toggle="modal" data-bs-target="#invitationsModal">
+    <div class="popup-icon icon-primary">
+      <i class="fa-solid fa-user-plus"></i>
+    </div>
+    Monitor Invitations
+  </button>
+  
+  <!-- Customize Workspace Link -->
+  <a href="{% url 'customize_workspace' org_id=organization.id%}" class="text-decoration-none" style="display: block;">
+    <button type="submit" class="popup-btn">
+      <div class="popup-icon icon-primary">
+        <i class="fa-solid fa-screwdriver-wrench"></i>
+      </div>
+      Customize {{ organization.name }}
     </button>
-
-    <!-- Monitor Invitations Button -->
-    <button type="button" class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2 mb-1"
-            data-bs-toggle="modal" data-bs-target="#invitationsModal"
-            style="font-family: 'Inter', sans-serif; font-size: 15px; 
-                   color: #1d1c1d; transition: background 0.2s ease; border-radius: 4px;">
-        <span class="material-icons" style="font-size: 18px; color: #007bff;">person_add</span> 
-        Monitor Invitations
+  </a>
+  
+  <!-- Workflows & Templates Button -->
+  <a href="{% url 'workflows' org_id=organization.id%}" class="text-decoration-none" style="display: block;">
+    <button type="submit" class="popup-btn">
+      <div class="popup-icon icon-primary">
+        <i class="fa-solid fa-sitemap"></i>
+      </div>
+      Workflows & Templates
     </button>
-
-    <!-- Customize Workspace Link -->
-    <a href="{% url 'customize_workspace' org_id=organization.id%}" class="text-decoration-none">
-        <button type="submit" class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2"
-                style="font-family: 'Inter', sans-serif; font-size: 15px; 
-                       color: #1d1c1d; transition: background 0.2s ease; border-radius: 4px;">
-            <span class="material-icons" style="font-size: 18px; color: #007bff;">build</span> 
-            Customize {{ organization.name }}
-        </button>
-    </a>
-
-    <!-- Workflows & Templates Button -->
-    <a href="{% url 'workflows' org_id=organization.id%}" class="text-decoration-none">
-        <button type="submit" class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2"
-                style="font-family: 'Inter', sans-serif; font-size: 15px; 
-                       color: #1d1c1d; transition: background 0.2s ease; border-radius: 4px;">
-            <span class="material-icons" style="font-size: 18px; color: #007bff;">dashboard_customize</span> 
-            Workflows & Templates
-        </button>
-    </a>
-    <!-- Monitor suspensions -->
-
-    <button type="button" class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2 mb-1"
-    data-bs-toggle="modal" data-bs-target="#suspendUsersModal"
-    style="font-family: 'Inter', sans-serif; font-size: 15px; 
-           color: #1d1c1d; transition: background 0.2s ease; border-radius: 4px;">
-    <span class="material-icons" style="font-size: 18px; color: #dc3545;">person_remove</span> 
+  </a>
+  
+  <div class="popup-divider"></div>
+  
+  <!-- Monitor suspensions -->
+  <button type="button" class="popup-btn" data-bs-toggle="modal" data-bs-target="#suspendUsersModal">
+    <div class="popup-icon icon-danger">
+      <i class="fa-solid fa-user-slash"></i>
+    </div>
     Monitor Suspensions
-</button>
-
+  </button>
 </div>
+
 
 
 <!-- meetings and nlp pop-up btns -->
 
-<div id="meetsButtons" class="popup-container shadow-sm rounded-3 p-2" 
-     style="background: white; border: 1px solid #e8e8e8; min-width: 240px;">
+<div id="meetsButtons" class="popup-container" style="display: none;">
+  <div class="category-label">MEETINGS</div>
+  
+  <!-- Create Meeting via NLP -->
+  <button type="button" class="popup-btn" data-bs-toggle="modal" data-bs-target="#meetingModal">
+    <svg class="btn-svg icon-primary" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Create Meeting via NLP
+  </button>
+  
+  <!-- Overview -->
+  <button class="popup-btn" data-bs-toggle="modal" data-bs-target="#OverviewMeetingModal">
+    <svg class="btn-svg icon-primary" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 18H21M8 12H21M8 6H21M3 18L4 17L5 18L3 18ZM3 12L4 11L5 12L3 12ZM3 6L4 5L5 6L3 6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Overview
+  </button>
+  
+  <!-- Manage Recurring Meetings -->
+  <button class="popup-btn" data-bs-toggle="modal" data-bs-target="#ManageRecurringModal">
+    <svg class="btn-svg icon-primary" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 8V12L15 15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Manage Recurring Meetings
+  </button>
 
-     <button type="button" class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2" data-bs-toggle="modal" data-bs-target="#meetingModal">
-        Create Meeting via NLP
+  <!-- Instant Calendar -->
+  <button class="popup-btn" id="openCalendarBtn">
+    <svg class="btn-svg icon-success" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 2V6M16 2V6M3.5 9.09H20.5M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M15.6947 13.7H15.7037M15.6947 16.7H15.7037M11.9955 13.7H12.0045M11.9955 16.7H12.0045M8.29529 13.7H8.30427M8.29529 16.7H8.30427" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Instant Calendar
+  </button>
+  
+  <!-- Embed Calendar -->
+  <button id="generateEmbedBtn" data-org-id="{{ organization.id }}" class="popup-btn">
+    <svg class="btn-svg icon-success" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 13C10 13 12.1219 13 14 13C15.8781 13 16.1625 14.125 16 15C15.7265 16.3125 14.4219 18 12 18C9.57813 18 7.57813 16.375 7 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M11.9983 3H11.9999C16.4173 3 19.9998 6.58253 19.9998 11V17C19.9998 19.2091 18.209 21 15.9998 21H7.99977C5.7906 21 3.99977 19.2091 3.99977 17V11C3.99977 6.58253 7.58223 3 11.9998 3H11.9983Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M9 8L15 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Embed Your Calendar & Meetings
+  </button>
+  
+  <div class="popup-divider"></div>
+  
+  <!-- Instant Live Meeting -->
+  <a href="{% url 'initiate_meeting' org_id=organization.id%}" style="text-decoration: none; display: block;">
+    <button class="popup-btn" type="submit">
+      <svg class="btn-svg icon-warning" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M15.5 12C15.5 12.2761 15.2761 12.5 15 12.5C14.7239 12.5 14.5 12.2761 14.5 12C14.5 11.7239 14.7239 11.5 15 11.5C15.2761 11.5 15.5 11.7239 15.5 12Z" stroke="currentColor" stroke-width="2"/>
+        <path d="M8.5 12C8.5 12.2761 8.27614 12.5 8 12.5C7.72386 12.5 7.5 12.2761 7.5 12C7.5 11.7239 7.72386 11.5 8 11.5C8.27614 11.5 8.5 11.7239 8.5 12Z" stroke="currentColor" stroke-width="2"/>
+        <path d="M15.5 8C15.5 8.27614 15.2761 8.5 15 8.5C14.7239 8.5 14.5 8.27614 14.5 8C14.5 7.72386 14.7239 7.5 15 7.5C15.2761 7.5 15.5 7.72386 15.5 8Z" stroke="currentColor" stroke-width="2"/>
+        <path d="M8.5 8C8.5 8.27614 8.27614 8.5 8 8.5C7.72386 8.5 7.5 8.27614 7.5 8C7.5 7.72386 7.72386 7.5 8 7.5C8.27614 7.5 8.5 7.72386 8.5 8Z" stroke="currentColor" stroke-width="2"/>
+        <path d="M12 18L12 21M8 21H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M21 9.6V14.4C21 16.3912 21 17.3868 20.4142 18.0251C20.237 18.219 20.0295 18.3823 19.8 18.5069C19.0722 18.9137 18.1251 18.7631 16.3156 18.4799C16.1067 18.4423 15.9278 18.4225 15.75 18.4055C15.2449 18.3597 14.7056 18.3333 14 18.3333C11.2854 18.3333 9.92812 18.3333 8.57187 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M14.75 4.03157C11.8249 3.58358 8.83596 4.24089 6.47919 5.97127C5.13259 6.98489 4.45929 7.49169 4.13988 8.16166C3.71221 9.1202 3.71221 10.2131 4.13988 11.1716C4.45929 11.8416 5.13259 12.3484 6.47918 13.362C9.63086 15.6957 13.8559 15.891 17.1749 13.8979" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Instant Live Meeting
     </button>
-
-    <button class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2 " data-bs-toggle="modal" data-bs-target="#OverviewMeetingModal">
-         Overview
-    </button>
-
-    <button class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2" data-bs-toggle="modal" data-bs-target="#ManageRecurringModal">
-        Manage Recurring Meetings
-    </button>
-    
-     
-    <button class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2" id="openCalendarBtn">Instant Calendar</button>
-
-    <button id="generateEmbedBtn" data-org-id="{{ organization.id }}" class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2">
-        Embed Your Calendar & Meetings
-    </button>
-
-    <!-- Delete Meetings Button -->
-   <button class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2" id="openDeleteMeetsModal" data-org-id="{{ organization.id }}">
-      Shut Down My Meetings
-   </button>
-
-   <a href="{% url 'initiate_meeting' org_id=organization.id%}">
-      <button class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2" type="submit">
-          Instant Live Meeting
-      </button>
-   </a>
-
-   <!-- Task Create Button -->
-    <button id="openTaskModal" class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2">
-       + Add Task
-    </button>
-
-    <!-- Button to Open Modal -->
-    <button id="open-kanban" class="popup-btn w-100 d-flex align-items-center gap-3 px-3 py-2">Open Kanban</button>
+  </a>
+  
+  <!-- Delete Meetings Button -->
+  <button class="popup-btn" id="openDeleteMeetsModal" data-org-id="{{ organization.id }}">
+    <svg class="btn-svg icon-danger" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M16 9V19M8 9V19M12 9V19M20 6H4M18 6L17.2987 4.14986C17.1203 3.61539 16.9858 3.34815 16.7958 3.17574C16.6058 3.00333 16.3712 2.92485 15.9021 2.76788L15.9007 2.76743C15.4245 2.60791 15.1864 2.52816 14.9361 2.51196C14.6858 2.49575 14.4354 2.54347 13.9346 2.63891L12 3M6 6L6.59579 4.5662C6.79772 4.04542 6.89868 3.78502 7.07435 3.59282C7.25002 3.40062 7.4752 3.28324 7.92555 3.04848L8.07445 2.97512C8.55051 2.72398 8.78854 2.59841 9.05121 2.54523C9.31388 2.49206 9.58952 2.51313 10.1408 2.55528L12 3M4 6V20H20V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Shut Down My Meetings
+  </button>
+  
+  <div class="popup-divider"></div>
+  <div class="category-label">TASKS</div>
+  
+  <!-- Add Task Button -->
+  <button id="openTaskModal" class="popup-btn">
+    <svg class="btn-svg icon-primary" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M9 11L12 14L20 6M20 12V18C20 19.1046 19.1046 20 18 20H6C4.89543 20 4 19.1046 4 18V6C4 4.89543 4.89543 4 6 4H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    + Add Task
+  </button>
+  
+  <!-- Open Kanban Button -->
+  <button id="open-kanban" class="popup-btn">
+    <svg class="btn-svg icon-primary" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M9 3H4.5C3.67157 3 3 3.67157 3 4.5V9C3 9.82843 3.67157 10.5 4.5 10.5H9C9.82843 10.5 10.5 9.82843 10.5 9V4.5C10.5 3.67157 9.82843 3 9 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M19.5 3H15C14.1716 3 13.5 3.67157 13.5 4.5V9C13.5 9.82843 14.1716 10.5 15 10.5H19.5C20.3284 10.5 21 9.82843 21 9V4.5C21 3.67157 20.3284 3 19.5 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M9 13.5H4.5C3.67157 13.5 3 14.1716 3 15V19.5C3 20.3284 3.67157 21 4.5 21H9C9.82843 21 10.5 20.3284 10.5 19.5V15C10.5 14.1716 9.82843 13.5 9 13.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M19.5 13.5H15C14.1716 13.5 13.5 14.1716 13.5 15V19.5C13.5 20.3284 14.1716 21 15 21H19.5C20.3284 21 21 20.3284 21 19.5V15C21 14.1716 20.3284 13.5 19.5 13.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Open Kanban
+  </button>
 </div>
 <!-- ------------------------------------------------------------------------------------------------------------------------------------------------- -->
 <!-- Widgets Set-UP ------------------------------------------------------------------------------------- -->
-<div id="dashboard-widgets-container" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-4 px-3 px-md-4">
-  <!-- Widget 1 -->
-  <div class="col d-flex justify-content-center">
-    <div class="widget-container p-4 bg-white shadow rounded-lg">
-      <!-- Your widget content here -->
+<!-- Dashboard Widgets Container -->
+<div id="dashboard-widgets-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mt-6 px-4 md:px-6">
+  <!-- Sample Widget 1 -->
+  <div class="widget-card bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-medium text-gray-800">Task Overview</h3>
+      <span class="text-blue-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+          <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+        </svg>
+      </span>
+    </div>
+    <div class="space-y-3">
+      <div class="flex justify-between items-center">
+        <span class="text-gray-600">Completed</span>
+        <span class="text-green-500 font-medium">24</span>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="text-gray-600">In Progress</span>
+        <span class="text-yellow-500 font-medium">12</span>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="text-gray-600">Pending</span>
+        <span class="text-red-500 font-medium">8</span>
+      </div>
     </div>
   </div>
-
-  <!-- Widget 2 -->
-  <div class="col d-flex justify-content-center">
-    <div class="widget-container p-4 bg-white shadow rounded-lg">
-      <!-- Your widget content here -->
+  
+  <!-- Sample Widget 2 -->
+  <div class="widget-card bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-medium text-gray-800">Project Status</h3>
+      <span class="text-blue-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+      </span>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <div class="flex justify-between mb-1">
+          <span class="text-gray-600 text-sm">Overall Progress</span>
+          <span class="text-blue-600 text-sm font-medium">68%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2.5">
+          <div class="bg-blue-600 h-2.5 rounded-full" style="width: 68%"></div>
+        </div>
+      </div>
+      <div class="text-sm text-gray-600">
+        <p>Next milestone: <span class="font-medium text-gray-800">User Testing</span></p>
+        <p class="mt-1">Due in 5 days</p>
+      </div>
     </div>
   </div>
-
-  <!-- Widget 3 -->
-  <div class="col d-flex justify-content-center">
-    <div class="widget-container p-4 bg-white shadow rounded-lg">
-      <!-- Your widget content here -->
+  
+  <!-- Sample Widget 3 -->
+  <div class="widget-card bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-medium text-gray-800">Recent Activity</h3>
+      <span class="text-blue-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+        </svg>
+      </span>
+    </div>
+    <div class="space-y-3">
+      <div class="flex items-start space-x-3">
+        <div class="flex-shrink-0 mt-1">
+          <div class="h-2 w-2 rounded-full bg-green-500"></div>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-800">Alex updated the design file</p>
+          <p class="text-xs text-gray-500">2 hours ago</p>
+        </div>
+      </div>
+      <div class="flex items-start space-x-3">
+        <div class="flex-shrink-0 mt-1">
+          <div class="h-2 w-2 rounded-full bg-blue-500"></div>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-800">Maria completed backend tasks</p>
+          <p class="text-xs text-gray-500">5 hours ago</p>
+        </div>
+      </div>
+      <div class="flex items-start space-x-3">
+        <div class="flex-shrink-0 mt-1">
+          <div class="h-2 w-2 rounded-full bg-purple-500"></div>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-800">New comment on "Login feature"</p>
+          <p class="text-xs text-gray-500">Yesterday</p>
+        </div>
+      </div>
     </div>
   </div>
-
-  <!-- Add more widgets as needed -->
 </div>
 
 
